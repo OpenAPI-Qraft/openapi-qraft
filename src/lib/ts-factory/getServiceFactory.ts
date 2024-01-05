@@ -1,6 +1,6 @@
 import ts from 'typescript';
 
-import { ServiceOperation } from '../open-api/getServices';
+import { ServiceOperation } from '../open-api/getServices.js';
 import { getServiceImportsFactory } from './getServiceImportsFactory.js';
 
 const SERVICE_OPERATION_QUERY = 'ServiceOperationQuery';

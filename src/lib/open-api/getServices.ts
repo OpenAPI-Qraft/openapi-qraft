@@ -1,7 +1,7 @@
 import { getContentMediaType } from './getContent.js';
 import { getOperationName } from './getOperationName.js';
 import { getServiceName } from './getServiceName.js';
-import type { OpenAPISchemaType } from './OpenAPISchemaType';
+import type { OpenAPISchemaType } from './OpenAPISchemaType.ts';
 
 export type ServiceOperation = {
   method: string;
