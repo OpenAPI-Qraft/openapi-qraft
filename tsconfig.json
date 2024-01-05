@@ -1,7 +1,8 @@
 {
   "compilerOptions": {
+    "rootDir": "src",
     "outDir": "dist",
-    "baseUrl": "src",
+    "baseUrl": ".",
     "target": "ESNext",
     "module": "NodeNext",
     "lib": ["ES2019"],
