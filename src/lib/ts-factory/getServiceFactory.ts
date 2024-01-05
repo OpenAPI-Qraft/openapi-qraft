@@ -339,7 +339,7 @@ const getServiceVariablePropertyFactory = (operation: ServiceOperation) => {
                     factory.createIdentifier('mediaType'),
                     factory.createStringLiteral(operation.mediaType)
                   )
-                : undefined,
+                : null,
               factory.createPropertyAssignment(
                 factory.createIdentifier('errors'),
                 factory.createArrayLiteralExpression(
@@ -348,9 +348,7 @@ const getServiceVariablePropertyFactory = (operation: ServiceOperation) => {
                   )
                 )
               ),
-            ].filter((property): property is NonNullable<typeof property> =>
-              Boolean(property)
-            ),
+            ].filter((node): node is NonNullable<typeof node> => Boolean(node)),
             true
           )
         ),
