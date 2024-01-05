@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 
-import { getOperationName } from './getOperationName';
+import { getOperationName } from './getOperationName.js';
 
 describe('getOperationName', () => {
   it('should produce correct result', () => {
