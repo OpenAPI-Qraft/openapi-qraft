@@ -136,36 +136,51 @@ const getServiceInterfaceOperationFactory = (operation: ServiceOperation) => {
 };
 
 const getOperationSchemaFactory = (operation: ServiceOperation) => {
-  return factory.createTypeLiteralNode([
-    factory.createPropertySignature(
-      undefined,
-      factory.createIdentifier('method'),
-      undefined,
-      factory.createLiteralTypeNode(
-        factory.createStringLiteral(operation.method)
-      )
-    ),
+  return factory.createTypeLiteralNode(
+    [
+      factory.createPropertySignature(
+        undefined,
+        factory.createIdentifier('method'),
+        undefined,
+        factory.createLiteralTypeNode(
+          factory.createStringLiteral(operation.method)
+        )
+      ),
 
-    factory.createPropertySignature(
-      undefined,
-      factory.createIdentifier('url'),
-      undefined,
-      factory.createLiteralTypeNode(factory.createStringLiteral(operation.path))
-    ),
+      factory.createPropertySignature(
+        undefined,
+        factory.createIdentifier('url'),
+        undefined,
+        factory.createLiteralTypeNode(
+          factory.createStringLiteral(operation.path)
+        )
+      ),
 
-    factory.createPropertySignature(
-      undefined,
-      factory.createIdentifier('errors'),
-      undefined,
-      factory.createTupleTypeNode(
-        Object.entries(operation.errors).map(([statusCode]) =>
-          factory.createLiteralTypeNode(
-            factory.createNumericLiteral(statusCode)
+      operation.mediaType
+        ? factory.createPropertySignature(
+            undefined,
+            factory.createIdentifier('mediaType'),
+            undefined,
+            factory.createLiteralTypeNode(
+              factory.createStringLiteral(operation.mediaType)
+            )
+          )
+        : null,
+
+      factory.createPropertySignature(
+        undefined,
+        factory.createIdentifier('errors'),
+        undefined,
+        factory.createTupleTypeNode(
+          Object.entries(operation.errors).map(([statusCode]) =>
+            factory.createLiteralTypeNode(
+              factory.createNumericLiteral(statusCode)
+            )
           )
         )
-      )
-    ),
-  ]);
+      ),
+    ].filter((node): node is NonNullable<typeof node> => Boolean(node))
+  );
 };
 
 const getOperationResponseFactory = (
