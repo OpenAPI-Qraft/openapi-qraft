@@ -17,22 +17,25 @@ export const writeOpenAPISchemaServices = async ({
   servicesOutDir,
   schemaTypesPath,
   operationGenericsPath,
+  fileHeader,
 }: ServiceFactoryOptions & {
   schemaDeclarationPath: string;
   servicesOutDir: string;
+  fileHeader?: string;
 }) => {
   const schema = await readSchemaFromFile(schemaDeclarationPath);
   const services = getServices(schema);
   const servicesCode = generateServices(services, {
     schemaTypesPath,
     operationGenericsPath,
+    fileHeader,
   });
   await writeServices(servicesCode, servicesOutDir);
 };
 
 const generateServices = (
   services: Record<string, ServiceOperation[]>,
-  factoryOptions: ServiceFactoryOptions
+  options: ServiceFactoryOptions & { fileHeader?: string }
 ) => {
   const spinner = ora(`Generating services`).start();
 
@@ -42,18 +45,20 @@ const generateServices = (
     spinner.text = `Generating ${chalk.magenta(serviceName)} service`;
 
     try {
-      generatedServices[serviceName] = astToString(
-        getServiceFactory(
-          {
-            typeName: serviceName,
-            variableName: camelCase(serviceName, {
-              preserveConsecutiveUppercase: false,
-            }),
-          },
-          operations,
-          factoryOptions
-        )
-      );
+      generatedServices[serviceName] =
+        (options.fileHeader && `${options.fileHeader}\n`) +
+        astToString(
+          getServiceFactory(
+            {
+              typeName: serviceName,
+              variableName: camelCase(serviceName, {
+                preserveConsecutiveUppercase: false,
+              }),
+            },
+            operations,
+            options
+          )
+        );
     } catch (error) {
       spinner.fail(
         chalk.redBright(
