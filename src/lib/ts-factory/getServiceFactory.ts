@@ -1,7 +1,6 @@
 import ts from 'typescript';
 
 import { ServiceOperation } from '../open-api/getServices.js';
-import { getServiceImportsFactory } from './getServiceImportsFactory.js';
 
 const SERVICE_OPERATION_QUERY = 'ServiceOperationQuery';
 const SERVICE_OPERATION_MUTATION = 'ServiceOperationMutation';
@@ -17,6 +16,26 @@ export const getServiceFactory = (
     getServiceInterfaceFactory(service, operations),
     getServiceVariableFactory(service, operations),
   ];
+};
+
+export const getServiceImportsFactory = (schemaTypesPath: string) => {
+  const factory = ts.factory;
+
+  return factory.createImportDeclaration(
+    undefined,
+    factory.createImportClause(
+      true,
+      undefined,
+      factory.createNamedImports([
+        factory.createImportSpecifier(
+          false,
+          undefined,
+          factory.createIdentifier('paths')
+        ),
+      ])
+    ),
+    factory.createStringLiteral(schemaTypesPath)
+  );
 };
 
 const getServiceInterfaceFactory = (
