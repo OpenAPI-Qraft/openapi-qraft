@@ -7,78 +7,97 @@ import ora from 'ora';
 import { getServices, ServiceOperation } from './lib/open-api/getServices.js';
 import { readSchemaFromFile } from './lib/open-api/readSchemaFromFile.js';
 import { astToString } from './lib/ts-factory/astToString.js';
-import { getServiceFactory } from './lib/ts-factory/getServiceFactory.js';
+import {
+  getServiceFactory,
+  ServiceFactoryOptions,
+} from './lib/ts-factory/getServiceFactory.js';
 
-export const writeOpenAPISchemaServices = async (
-  openAPIFilePath: string,
-  servicesOutDir: string
-) => {
-  const schema = await readSchemaFromFile(openAPIFilePath);
+export const writeOpenAPISchemaServices = async ({
+  schemaDeclarationPath,
+  servicesOutDir,
+  schemaTypesPath,
+  operationGenericsPath,
+}: ServiceFactoryOptions & {
+  schemaDeclarationPath: string;
+  servicesOutDir: string;
+}) => {
+  const schema = await readSchemaFromFile(schemaDeclarationPath);
   const services = getServices(schema);
-  await writeServices(services, servicesOutDir);
+  const servicesCode = generateServices(services, {
+    schemaTypesPath,
+    operationGenericsPath,
+  });
+  await writeServices(servicesCode, servicesOutDir);
 };
 
-const writeServices = async (
+const generateServices = (
   services: Record<string, ServiceOperation[]>,
-  outputDir: string
+  factoryOptions: ServiceFactoryOptions
 ) => {
-  await fs.promises.mkdir(outputDir, { recursive: true });
-
   const spinner = ora(`Generating services`).start();
 
-  let hasSuccessfulGeneration = false;
-  let hasFailedGeneration = false;
+  const generatedServices: Record<string, string> = {};
 
   for (const [serviceName, operations] of Object.entries(services)) {
     spinner.text = `Generating ${chalk.magenta(serviceName)} service`;
 
     try {
-      const services = generateService(serviceName, operations);
-
-      await fs.promises.writeFile(
-        resolve(outputDir, `${serviceName}.ts`),
-        services
+      generatedServices[serviceName] = astToString(
+        getServiceFactory(
+          {
+            typeName: serviceName,
+            variableName: camelCase(serviceName, {
+              preserveConsecutiveUppercase: false,
+            }),
+          },
+          operations,
+          factoryOptions
+        )
       );
-      hasSuccessfulGeneration = true;
     } catch (error) {
-      spinner.warn(
+      spinner.fail(
         chalk.redBright(
           `Error occurred during ${chalk.magenta(
             serviceName
           )} service generation`
         )
       );
-      console.error(serviceName, error);
-      hasFailedGeneration = true;
+
+      throw error;
     }
   }
 
-  if (!hasSuccessfulGeneration) {
-    spinner.fail(chalk.red('Services has not been generated'));
-    throw new Error('Services has not been generated');
-  }
-
-  if (hasFailedGeneration) {
-    spinner.info(chalk.yellow('Services has been generated with warnings'));
-    throw new Error('Services has been generated with warnings');
-  }
-
   spinner.succeed(chalk.green('Services has been generated'));
+
+  return generatedServices;
 };
 
-const generateService = (
-  serviceName: string,
-  operations: ServiceOperation[]
+const writeServices = async (
+  services: { [serviceName: string]: string },
+  outputDir: string
 ) => {
-  const serviceFactory = getServiceFactory(
-    {
-      typeName: serviceName,
-      variableName: camelCase(serviceName, {
-        preserveConsecutiveUppercase: false,
-      }),
-    },
-    operations
-  );
+  await fs.promises.mkdir(outputDir, { recursive: true });
 
-  return astToString(serviceFactory);
+  const spinner = ora(`Writing services`).start();
+
+  for (const [serviceName, serviceCode] of Object.entries(services)) {
+    spinner.text = `Writing ${chalk.magenta(serviceName)} service`;
+
+    try {
+      await fs.promises.writeFile(
+        resolve(outputDir, `${serviceName}.ts`),
+        serviceCode
+      );
+    } catch (error) {
+      spinner.fail(
+        chalk.redBright(
+          `Error occurred during ${chalk.magenta(serviceName)} service writing`
+        )
+      );
+
+      throw error;
+    }
+  }
+
+  spinner.succeed(chalk.green('Services has been written'));
 };

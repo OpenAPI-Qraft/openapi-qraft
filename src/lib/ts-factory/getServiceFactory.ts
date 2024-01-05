@@ -7,18 +7,28 @@ const SERVICE_OPERATION_MUTATION = 'ServiceOperationMutation';
 
 const factory = ts.factory;
 
+export type ServiceFactoryOptions = {
+  schemaTypesPath: string;
+  operationGenericsPath: string;
+};
+
 export const getServiceFactory = (
   service: { typeName: string; variableName: string },
-  operations: ServiceOperation[]
+  operations: ServiceOperation[],
+  { schemaTypesPath, operationGenericsPath }: ServiceFactoryOptions
 ) => {
   return [
-    getServiceImportsFactory('./schema'),
+    getOpenAPISchemaImportsFactory(schemaTypesPath),
+    getServiceOperationGenericsPathImportsFactory(
+      operationGenericsPath,
+      operations
+    ),
     getServiceInterfaceFactory(service, operations),
     getServiceVariableFactory(service, operations),
   ];
 };
 
-export const getServiceImportsFactory = (schemaTypesPath: string) => {
+export const getOpenAPISchemaImportsFactory = (schemaTypesPath: string) => {
   const factory = ts.factory;
 
   return factory.createImportDeclaration(
@@ -35,6 +45,40 @@ export const getServiceImportsFactory = (schemaTypesPath: string) => {
       ])
     ),
     factory.createStringLiteral(schemaTypesPath)
+  );
+};
+
+export const getServiceOperationGenericsPathImportsFactory = (
+  operationGenericsPath: string,
+  operations: ServiceOperation[]
+) => {
+  const factory = ts.factory;
+
+  return factory.createImportDeclaration(
+    undefined,
+    factory.createImportClause(
+      true,
+      undefined,
+      factory.createNamedImports(
+        [
+          operations.some((operation) => operation.method === 'get')
+            ? factory.createImportSpecifier(
+                false,
+                undefined,
+                factory.createIdentifier('ServiceOperationQuery')
+              )
+            : null,
+          operations.some((operation) => operation.method !== 'get')
+            ? factory.createImportSpecifier(
+                false,
+                undefined,
+                factory.createIdentifier('ServiceOperationMutation')
+              )
+            : null,
+        ].filter((node): node is NonNullable<typeof node> => Boolean(node))
+      )
+    ),
+    factory.createStringLiteral(operationGenericsPath)
   );
 };
 
