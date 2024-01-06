@@ -4,5 +4,5 @@
     "noEmit": false,
     "declaration": true
   },
-  "exclude": ["src/**/*.spec.ts", "src/**/*.test.ts"]
+  "exclude": ["src/**/*.spec.ts", "src/**/*.test.ts", "src/tmp/**"]
 }
