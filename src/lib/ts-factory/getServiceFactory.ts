@@ -7,7 +7,7 @@ const SERVICE_OPERATION_MUTATION = 'ServiceOperationMutation';
 
 const factory = ts.factory;
 
-export type ServiceFactoryOptions = {
+export type ServiceImportsFactoryOptions = {
   schemaTypesPath: string;
   operationGenericsPath: string;
 };
@@ -15,7 +15,7 @@ export type ServiceFactoryOptions = {
 export const getServiceFactory = (
   service: { typeName: string; variableName: string },
   operations: ServiceOperation[],
-  { schemaTypesPath, operationGenericsPath }: ServiceFactoryOptions
+  { schemaTypesPath, operationGenericsPath }: ServiceImportsFactoryOptions
 ) => {
   return [
     getOpenAPISchemaImportsFactory(schemaTypesPath),

@@ -1,70 +1,82 @@
-import camelCase from 'camelcase';
 import chalk from 'chalk';
 import fs from 'node:fs';
 import { resolve } from 'node:path';
 import ora from 'ora';
 
-import { getServices, ServiceOperation } from './lib/open-api/getServices.js';
+import { getServices, Service } from './lib/open-api/getServices.js';
 import { readSchemaFromFile } from './lib/open-api/readSchemaFromFile.js';
 import { astToString } from './lib/ts-factory/astToString.js';
 import {
   getServiceFactory,
-  ServiceFactoryOptions,
+  ServiceImportsFactoryOptions,
 } from './lib/ts-factory/getServiceFactory.js';
 
-export const writeOpenAPISchemaServices = async ({
-  schemaDeclarationPath,
-  servicesOutDir,
-  schemaTypesPath,
-  operationGenericsPath,
-  fileHeader,
-}: ServiceFactoryOptions & {
-  schemaDeclarationPath: string;
-  servicesOutDir: string;
+type OutputOptions = {
   fileHeader?: string;
-}) => {
-  const schema = await readSchemaFromFile(schemaDeclarationPath);
-  const services = getServices(schema);
-  const servicesCode = generateServices(services, {
-    schemaTypesPath,
-    operationGenericsPath,
-    fileHeader,
-  });
-  await writeServices(servicesCode, servicesOutDir);
+  dir: string;
+  clean: boolean;
 };
 
-const generateServices = (
-  services: Record<string, ServiceOperation[]>,
-  options: ServiceFactoryOptions & { fileHeader?: string }
+export const writeOpenAPISchemaServices = async ({
+  sourcePath,
+  serviceImports,
+  output,
+}: {
+  sourcePath: string;
+  serviceImports: ServiceImportsFactoryOptions;
+  output: OutputOptions;
+}) => {
+  const schema = await readSchemaFromFile(sourcePath);
+  const services = getServices(schema);
+  await writeServices(services, serviceImports, output);
+};
+
+const writeServices = async (
+  services: Service[],
+  serviceImports: ServiceImportsFactoryOptions,
+  output: OutputOptions
 ) => {
+  const servicesOutputDir = resolve(output.dir, 'services');
+
+  if (output.clean)
+    await fs.promises.rm(servicesOutputDir, { recursive: true, force: true });
+
+  await fs.promises.mkdir(servicesOutputDir, { recursive: true });
+
   const spinner = ora(`Generating services`).start();
 
-  const generatedServices: Record<string, string> = {};
+  const generatedServices: Record<
+    string,
+    Omit<Service, 'operations'> & { code: string }
+  > = {};
 
-  for (const [serviceName, operations] of Object.entries(services)) {
-    spinner.text = `Generating ${chalk.magenta(serviceName)} service`;
+  for (const service of services) {
+    const { operations, name, typeName, variableName, fileBaseName } = service;
+
+    spinner.text = `Generating ${chalk.magenta(name)} service`;
 
     try {
-      generatedServices[serviceName] =
-        (options.fileHeader && `${options.fileHeader}\n`) +
+      const code =
+        getFileHeader(output) +
         astToString(
           getServiceFactory(
             {
-              typeName: serviceName,
-              variableName: camelCase(serviceName, {
-                preserveConsecutiveUppercase: false,
-              }),
+              typeName,
+              variableName,
             },
             operations,
-            options
+            serviceImports
           )
         );
+
+      await fs.promises.writeFile(
+        resolve(servicesOutputDir, `${fileBaseName}.ts`),
+        code
+      );
     } catch (error) {
       spinner.fail(
         chalk.redBright(
-          `Error occurred during ${chalk.magenta(
-            serviceName
-          )} service generation`
+          `Error occurred during ${chalk.magenta(name)} service generation`
         )
       );
 
@@ -77,32 +89,6 @@ const generateServices = (
   return generatedServices;
 };
 
-const writeServices = async (
-  services: { [serviceName: string]: string },
-  outputDir: string
-) => {
-  await fs.promises.mkdir(outputDir, { recursive: true });
-
-  const spinner = ora(`Writing services`).start();
-
-  for (const [serviceName, serviceCode] of Object.entries(services)) {
-    spinner.text = `Writing ${chalk.magenta(serviceName)} service`;
-
-    try {
-      await fs.promises.writeFile(
-        resolve(outputDir, `${serviceName}.ts`),
-        serviceCode
-      );
-    } catch (error) {
-      spinner.fail(
-        chalk.redBright(
-          `Error occurred during ${chalk.magenta(serviceName)} service writing`
-        )
-      );
-
-      throw error;
-    }
-  }
-
-  spinner.succeed(chalk.green('Services has been written'));
+const getFileHeader = ({ fileHeader }: Pick<OutputOptions, 'fileHeader'>) => {
+  return fileHeader && `${fileHeader}\n`;
 };

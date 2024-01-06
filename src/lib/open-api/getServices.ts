@@ -1,7 +1,17 @@
+import camelCase from 'camelcase';
+
 import { getContentMediaType } from './getContent.js';
 import { getOperationName } from './getOperationName.js';
 import { getServiceName } from './getServiceName.js';
 import type { OpenAPISchemaType } from './OpenAPISchemaType.ts';
+
+export type Service = {
+  name: string;
+  variableName: string;
+  typeName: string;
+  fileBaseName: string;
+  operations: ServiceOperation[];
+};
 
 export type ServiceOperation = {
   method: string;
@@ -14,10 +24,13 @@ export type ServiceOperation = {
   success: Record<string, string | undefined>;
 };
 
-export const getServices = (openApiJson: OpenAPISchemaType) => {
+export const getServices = (
+  openApiJson: OpenAPISchemaType,
+  { postfixServices = 'Service' }: { postfixServices?: string } = {}
+) => {
   const paths = openApiJson.paths;
 
-  const services: Record<string, ServiceOperation[]> = {};
+  const services = new Map<string, Service>();
 
   for (const path in paths) {
     for (const method in paths[path]) {
@@ -25,9 +38,6 @@ export const getServices = (openApiJson: OpenAPISchemaType) => {
 
       const serviceName = getServiceName(path.split('/')[1]);
 
-      if (!services[serviceName]) services[serviceName] = [];
-
-      // todo:: add response multiple statuses success support and media typeName
       const { success, errors } = Object.entries(
         methodOperation.responses
       ).reduce(
@@ -46,7 +56,19 @@ export const getServices = (openApiJson: OpenAPISchemaType) => {
         {} as Record<'errors' | 'success', Record<string, string | undefined>>
       );
 
-      services[serviceName].push({
+      if (!services.has(serviceName)) {
+        services.set(serviceName, {
+          name: serviceName,
+          variableName: `${camelCase(serviceName, {
+            preserveConsecutiveUppercase: false,
+          })}${postfixServices}`,
+          typeName: `${serviceName}${postfixServices}`,
+          fileBaseName: `${serviceName}${postfixServices}`,
+          operations: [],
+        });
+      }
+
+      services.get(serviceName)!.operations.push({
         method,
         path,
         errors,
@@ -61,5 +83,5 @@ export const getServices = (openApiJson: OpenAPISchemaType) => {
     }
   }
 
-  return services;
+  return Array.from(services.values());
 };

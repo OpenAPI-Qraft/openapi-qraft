@@ -25,16 +25,27 @@ program
     './schema'
   )
   .option(
-    '-h --file-header <string>',
+    '-fh, --file-header <string>',
     'Header to be added to the generated file (eg: /* eslint-disable */)'
+  )
+  .option(
+    '-rm, --clean <bool>',
+    'Clean output directory before generating services',
+    (value) => !!JSON.parse(String(value).toLowerCase()),
+    true
   )
   .action(async (args) => {
     await writeOpenAPISchemaServices({
-      schemaDeclarationPath: args.input,
-      servicesOutDir: args.outDir,
-      schemaTypesPath: args.schemaTypesPath,
-      operationGenericsPath: args.operationGenericsPath,
-      fileHeader: args.fileHeader ?? fileHeader,
+      sourcePath: args.input,
+      serviceImports: {
+        operationGenericsPath: args.operationGenericsPath,
+        schemaTypesPath: args.schemaTypesPath,
+      },
+      output: {
+        dir: args.outDir,
+        clean: args.clean,
+        fileHeader: args.fileHeader ?? fileHeader,
+      },
     });
   });
 
