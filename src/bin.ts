@@ -34,6 +34,10 @@ program
     (value) => !!JSON.parse(String(value).toLowerCase()),
     true
   )
+  .option(
+    '-ps, --postfix-services <string>',
+    'Postfix to be added to the generated service name (eg: Service)'
+  )
   .action(async (args) => {
     await writeOpenAPISchemaServices({
       sourcePath: args.input,
@@ -45,6 +49,7 @@ program
         dir: args.outDir,
         clean: args.clean,
         fileHeader: args.fileHeader ?? fileHeader,
+        postfixServices: args.postfixServices,
       },
     });
   });

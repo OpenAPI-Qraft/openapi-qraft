@@ -28,7 +28,7 @@ export const getServiceFactory = (
   ];
 };
 
-export const getOpenAPISchemaImportsFactory = (schemaTypesPath: string) => {
+const getOpenAPISchemaImportsFactory = (schemaTypesPath: string) => {
   const factory = ts.factory;
 
   return factory.createImportDeclaration(
@@ -48,7 +48,7 @@ export const getOpenAPISchemaImportsFactory = (schemaTypesPath: string) => {
   );
 };
 
-export const getServiceOperationGenericsPathImportsFactory = (
+const getServiceOperationGenericsPathImportsFactory = (
   operationGenericsPath: string,
   operations: ServiceOperation[]
 ) => {

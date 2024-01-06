@@ -10,11 +10,13 @@ import {
   getServiceFactory,
   ServiceImportsFactoryOptions,
 } from './lib/ts-factory/getServiceFactory.js';
+import { getServiceIndexFactory } from './lib/ts-factory/getServiceIndexFactory.js';
 
 type OutputOptions = {
   fileHeader?: string;
   dir: string;
   clean: boolean;
+  postfixServices?: string;
 };
 
 export const writeOpenAPISchemaServices = async ({
@@ -27,28 +29,29 @@ export const writeOpenAPISchemaServices = async ({
   output: OutputOptions;
 }) => {
   const schema = await readSchemaFromFile(sourcePath);
-  const services = getServices(schema);
-  await writeServices(services, serviceImports, output);
+  const services = getServices(schema, output);
+
+  await writeServices(services, output, servicesDirName, serviceImports);
+  await writeServiceIndex(services, output, servicesDirName);
 };
 
 const writeServices = async (
   services: Service[],
-  serviceImports: ServiceImportsFactoryOptions,
-  output: OutputOptions
+  output: OutputOptions,
+  servicesDirName: string,
+  serviceImports: ServiceImportsFactoryOptions
 ) => {
-  const servicesOutputDir = resolve(output.dir, 'services');
+  const servicesDir = resolve(output.dir, servicesDirName);
 
   if (output.clean)
-    await fs.promises.rm(servicesOutputDir, { recursive: true, force: true });
+    await fs.promises.rm(servicesDir, {
+      recursive: true,
+      force: true,
+    });
 
-  await fs.promises.mkdir(servicesOutputDir, { recursive: true });
+  await fs.promises.mkdir(servicesDir, { recursive: true });
 
   const spinner = ora(`Generating services`).start();
-
-  const generatedServices: Record<
-    string,
-    Omit<Service, 'operations'> & { code: string }
-  > = {};
 
   for (const service of services) {
     const { operations, name, typeName, variableName, fileBaseName } = service;
@@ -70,7 +73,7 @@ const writeServices = async (
         );
 
       await fs.promises.writeFile(
-        resolve(servicesOutputDir, `${fileBaseName}.ts`),
+        resolve(servicesDir, `${fileBaseName}.ts`),
         code
       );
     } catch (error) {
@@ -85,10 +88,34 @@ const writeServices = async (
   }
 
   spinner.succeed(chalk.green('Services has been generated'));
+};
 
-  return generatedServices;
+const writeServiceIndex = async (
+  services: Service[],
+  output: OutputOptions,
+  servicesDirName: string
+) => {
+  const spinner = ora('Generating services index').start();
+
+  try {
+    const code =
+      getFileHeader(output) +
+      astToString(getServiceIndexFactory(services, { servicesDirName }));
+
+    await fs.promises.writeFile(resolve(output.dir, 'index.ts'), code);
+  } catch (error) {
+    spinner.fail(
+      chalk.redBright('Error occurred during services index generation')
+    );
+
+    throw error;
+  }
+
+  spinner.succeed(chalk.green('Services index has been generated'));
 };
 
 const getFileHeader = ({ fileHeader }: Pick<OutputOptions, 'fileHeader'>) => {
   return fileHeader && `${fileHeader}\n`;
 };
+
+const servicesDirName = 'services';
