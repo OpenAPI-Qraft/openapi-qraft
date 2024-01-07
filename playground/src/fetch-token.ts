@@ -13,14 +13,14 @@ export const fetchToken = async (
       }
   ),
   {
-    apiURL,
+    baseURL,
     version,
   }: {
     version: string;
-    apiURL: string;
+    baseURL: string;
   }
 ): Promise<AccessToken> => {
-  const response = await fetch(`${apiURL}/auth/token`, {
+  const response = await fetch(`${baseURL}/auth/token`, {
     method: 'POST',
     headers: {
       'X-Monite-Version': version,

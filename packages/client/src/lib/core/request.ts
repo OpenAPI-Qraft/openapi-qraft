@@ -1,47 +1,7 @@
 import { ApiError } from './ApiError.js';
-import type { ApiRequestOptions } from './ApiRequestOptions.js';
+import { ApiRequestOptions, HeadersOptions } from './ApiRequestOptions.js';
 import type { ApiResult } from './ApiResult.js';
 import type { OpenAPIConfig } from './OpenAPI.js';
-
-export const isDefined = <T>(
-  value: T | null | undefined
-): value is Exclude<T, null | undefined> => {
-  return value !== undefined && value !== null;
-};
-
-export const isString = (value: any): value is string => {
-  return typeof value === 'string';
-};
-
-export const isStringWithValue = (value: any): value is string => {
-  return isString(value) && value !== '';
-};
-
-export const isBlob = (value: any): value is Blob => {
-  return (
-    typeof value === 'object' &&
-    typeof value.type === 'string' &&
-    typeof value.stream === 'function' &&
-    typeof value.arrayBuffer === 'function' &&
-    typeof value.constructor === 'function' &&
-    typeof value.constructor.name === 'string' &&
-    /^(Blob|File)$/.test(value.constructor.name) &&
-    /^(Blob|File)$/.test(value[Symbol.toStringTag])
-  );
-};
-
-export const isFormData = (value: any): value is FormData => {
-  return value instanceof FormData;
-};
-
-export const base64 = (str: string): string => {
-  try {
-    return btoa(str);
-  } catch (err) {
-    // @ts-ignore
-    return Buffer.from(str).toString('base64');
-  }
-};
 
 export const getQueryString = (params: Record<string, any>): string => {
   const qs: string[] = [];
@@ -51,18 +11,18 @@ export const getQueryString = (params: Record<string, any>): string => {
   };
 
   const process = (key: string, value: any) => {
-    if (isDefined(value)) {
-      if (Array.isArray(value)) {
-        value.forEach((v) => {
-          process(key, v);
-        });
-      } else if (typeof value === 'object') {
-        Object.entries(value).forEach(([k, v]) => {
-          process(`${key}[${k}]`, v);
-        });
-      } else {
-        append(key, value);
-      }
+    if (typeof value === 'undefined' || value === null) return;
+
+    if (Array.isArray(value)) {
+      value.forEach((v) => {
+        process(key, v);
+      });
+    } else if (typeof value === 'object') {
+      Object.entries(value).forEach(([k, v]) => {
+        process(`${key}[${k}]`, v);
+      });
+    } else {
+      append(key, value);
     }
   };
 
@@ -78,24 +38,26 @@ export const getQueryString = (params: Record<string, any>): string => {
 };
 
 const getUrl = (
-  config: OpenAPIConfig,
-  { url, parameters }: ApiRequestOptions
+  config: Pick<OpenAPIConfig, 'version' | 'baseUrl'>,
+  { url, parameters }: Pick<ApiRequestOptions, 'url' | 'parameters'>
 ): string => {
-  const encoder = config.ENCODE_PATH || encodeURI;
+  let path = url;
 
-  const path = url
-    .replace('{api-version}', config.VERSION)
-    .replace(/{(.*?)}/g, (substring: string, group: string) => {
-      if (parameters?.path?.hasOwnProperty(group)) {
-        return encoder(String(parameters?.path[group]));
-      }
-      return substring;
-    });
+  if (typeof config.version !== 'undefined') {
+    path = path.replace('{api-version}', config.version);
+  }
+
+  path = path.replace(/{(.*?)}/g, (substring: string, group: string) => {
+    if (parameters?.path?.hasOwnProperty(group)) {
+      return encodeURI(String(parameters?.path[group]));
+    }
+    return substring;
+  });
 
   if (parameters?.query) {
-    return `${config.BASE}${path}${getQueryString(parameters.query)}`;
+    return `${config.baseUrl}${path}${getQueryString(parameters.query)}`;
   }
-  return `${config.BASE}${path}`;
+  return `${config.baseUrl}${path}`;
 };
 
 type Resolver<T> = (options: ApiRequestOptions) => Promise<T>;
@@ -110,56 +72,68 @@ export const resolve = async <T>(
   return resolver;
 };
 
-export const getHeaders = async (
-  config: OpenAPIConfig,
-  options: ApiRequestOptions
-): Promise<Headers> => {
-  const [token, username, password, additionalHeaders] = await Promise.all([
-    resolve(options, config.TOKEN),
-    resolve(options, config.USERNAME),
-    resolve(options, config.PASSWORD),
-    resolve(options, config.HEADERS),
-  ]);
-
-  const headers = Object.entries({
-    Accept: 'application/json',
-    ...additionalHeaders,
-    ...options.parameters?.header,
-  })
-    .filter(([_, value]) => isDefined(value))
-    .reduce(
-      (headers, [key, value]) => ({
-        ...headers,
-        [key]: String(value),
-      }),
-      {} as Record<string, string>
-    );
-
-  if (isStringWithValue(token)) {
-    headers['Authorization'] = `Bearer ${token}`;
-  }
-
-  if (isStringWithValue(username) && isStringWithValue(password)) {
-    const credentials = base64(`${username}:${password}`);
-    headers['Authorization'] = `Basic ${credentials}`;
-  }
-
-  if (options.body) {
-    if (options.mediaType) {
-      headers['Content-Type'] = options.mediaType;
-    } else if (isBlob(options.body)) {
-      headers['Content-Type'] = options.body.type || 'application/octet-stream';
-    } else if (isString(options.body)) {
-      headers['Content-Type'] = 'text/plain';
-    } else if (!isFormData(options.body)) {
-      headers['Content-Type'] = 'application/json';
-    }
-  }
+export const getHeaders = (
+  options: Pick<
+    ApiRequestOptions,
+    'headers' | 'parameters' | 'body' | 'mediaType'
+  >
+): Headers => {
+  const headers = mergeHeaders(
+    {
+      Accept: 'application/json',
+      'Content-Type': getPayloadContentType(options),
+    },
+    options.headers,
+    options.parameters?.header
+  );
 
   return new Headers(headers);
 };
 
-export const getRequestBody = (options: ApiRequestOptions) => {
+const getPayloadContentType = (
+  options: Pick<ApiRequestOptions, 'body' | 'mediaType'>
+) => {
+  if (options.body) {
+    if (options.mediaType) {
+      return options.mediaType;
+    } else if (options.body instanceof Blob) {
+      return options.body.type || 'application/octet-stream';
+    } else if (typeof options.body === 'string') {
+      return 'text/plain';
+    } else if (!(options.body instanceof FormData)) {
+      return 'application/json';
+    }
+  }
+};
+
+export function mergeHeaders(...allHeaders: (HeadersOptions | undefined)[]) {
+  const headers = new Headers();
+
+  for (const headerSet of allHeaders) {
+    if (!headerSet || typeof headerSet !== 'object') {
+      continue;
+    }
+
+    const headersIterator =
+      headerSet instanceof Headers
+        ? headerSet.entries()
+        : Object.entries(headerSet);
+
+    for (const [headerKey, headerValue] of headersIterator) {
+      if (headerValue === null) {
+        headers.delete(headerKey);
+      } else if (headerValue !== undefined) {
+        headers.set(headerKey, headerValue);
+      }
+    }
+  }
+
+  return headers;
+}
+
+export const getRequestBody = (
+  options: Pick<ApiRequestOptions, 'method' | 'mediaType' | 'body'>
+) => {
   if (
     options.method === 'get' ||
     options.method === 'head' ||
@@ -175,10 +149,25 @@ export const getRequestBody = (options: ApiRequestOptions) => {
 const getFormData = ({
   body,
 }: Pick<ApiRequestOptions, 'body'>): FormData | undefined => {
+  if (body instanceof FormData) return body;
+  if (body === null) return;
+
+  if (body instanceof Blob) throw new Error('Blob not supported in form-data');
+  if (body instanceof ArrayBuffer)
+    throw new Error('ArrayBuffer not supported in form-data');
+  if (body instanceof URLSearchParams)
+    throw new Error('URLSearchParams not supported in form-data');
+  if (body instanceof ReadableStream)
+    throw new Error('ReadableStream not supported in form-data');
+  if (typeof body === 'string')
+    throw new Error('String not supported in form-data');
+  if (typeof body !== 'object')
+    throw new Error(`Unsupported body type ${typeof body} in form-data.`);
+
   const formData = new FormData();
 
   const process = (key: string, value: any) => {
-    if (isString(value) || isBlob(value)) {
+    if (typeof value === 'string' || value instanceof Blob) {
       formData.append(key, value);
     } else {
       formData.append(key, JSON.stringify(value));
@@ -186,7 +175,7 @@ const getFormData = ({
   };
 
   Object.entries(body)
-    .filter(([_, value]) => isDefined(value))
+    .filter(([_, value]) => typeof value !== 'undefined' && value !== null)
     .forEach(([key, value]) => {
       if (Array.isArray(value)) {
         value.forEach((v) => process(key, v));
@@ -205,7 +194,9 @@ const getBody = (
 
   if (
     !options.mediaType?.includes('/json') &&
-    (isString(options.body) || isBlob(options.body) || isFormData(options.body))
+    (typeof options.body === 'string' ||
+      options.body instanceof Blob ||
+      options.body instanceof FormData)
   ) {
     return options.body;
   }
@@ -214,7 +205,6 @@ const getBody = (
 };
 
 export const sendRequest = async (
-  config: OpenAPIConfig,
   options: ApiRequestOptions,
   url: string,
   body: BodyInit | undefined,
@@ -226,10 +216,6 @@ export const sendRequest = async (
     method: options.method.toUpperCase(),
     signal: options.signal,
   };
-
-  if (config.WITH_CREDENTIALS) {
-    request.credentials = config.CREDENTIALS;
-  }
 
   return await fetch(url, request);
 };
@@ -309,11 +295,27 @@ export async function request<T>(
   config: OpenAPIConfig,
   options: ApiRequestOptions
 ): Promise<T> {
-  const url = getUrl(config, options);
-  const body = getRequestBody(options);
-  const headers = await getHeaders(config, options);
+  const {
+    method,
+    url,
+    parameters,
+    mediaType,
+    errors,
+    headers,
+    body,
+    ...requestInit
+  } = options;
 
-  const response = await sendRequest(config, options, url, body, headers);
+  const response = await fetch(getUrl(config, { url, parameters }), {
+    body: getRequestBody({
+      method,
+      mediaType,
+      body,
+    }),
+    headers: getHeaders({ headers, parameters }),
+    method: method.toUpperCase(),
+    ...requestInit,
+  });
 
   const responseBody = await getResponseBody(response);
 

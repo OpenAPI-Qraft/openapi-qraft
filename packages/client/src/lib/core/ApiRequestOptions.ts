@@ -14,8 +14,12 @@ export type ApiRequestOptions = {
     readonly header?: Record<string, any>;
     readonly query?: Record<string, any>;
   };
-  readonly body?: any;
+  readonly body?: BodyInit | Record<string, unknown> | null;
   readonly mediaType?: string;
   readonly errors?: number[];
-  readonly signal?: AbortSignal;
-};
+  readonly headers?: HeadersOptions;
+} & Omit<RequestInit, 'headers' | 'method' | 'body'>;
+
+export type HeadersOptions =
+  | HeadersInit
+  | Record<string, string | number | boolean | null | undefined>;

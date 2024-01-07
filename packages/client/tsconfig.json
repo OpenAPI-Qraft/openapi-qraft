@@ -4,7 +4,7 @@
     "rootDir": "src",
     "outDir": "dist",
     "baseUrl": ".",
-    "lib": ["ES2019", "DOM"]
+    "lib": ["ES2019", "DOM", "DOM.Iterable"],
   },
   "include": ["src/**/*"]
 }
