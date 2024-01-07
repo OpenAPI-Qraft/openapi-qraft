@@ -1,15 +1,15 @@
-import { useMutation, useQuery } from '@tanstack/react-query';
-
 import { useContext } from 'react';
+
+import { useMutation, useQuery } from '@tanstack/react-query';
 
 import { createCallbackProxyDecoration } from './lib/createCallbackProxyDecoration.js';
 import { QueryCraftContext } from './QueryCraftContext.js';
 import {
   RequestSchema,
-  ServiceOperationQuery,
   ServiceOperationMutation,
-  ServiceOperationQueryKey,
   ServiceOperationMutationKey,
+  ServiceOperationQuery,
+  ServiceOperationQueryKey,
 } from './ServiceOperation.js';
 
 export const createQueryCraft = <
@@ -107,7 +107,7 @@ export const createQueryCraft = <
         const [parameters, options, ...restArgs] = args as Parameters<
           ServiceOperationMutation<
             RequestSchema,
-            unknown,
+            object | undefined,
             unknown,
             unknown
           >['useMutation']
@@ -154,15 +154,19 @@ export const createQueryCraft = <
             mutationKey,
             mutationFn:
               options?.mutationFn ??
-              function (mutationPayload: {
-                parameters: unknown;
-                body: unknown;
-              }) {
-                return client(serviceOperation.schema, {
-                  parameters: mutationPayload.parameters as never,
-                  body: mutationPayload.body as never,
-                });
-              },
+              (parameters
+                ? function (bodyPayload) {
+                    return client(serviceOperation.schema, {
+                      parameters,
+                      body: bodyPayload as never,
+                    });
+                  }
+                : function (parametersAndBodyPayload) {
+                    return client(
+                      serviceOperation.schema,
+                      parametersAndBodyPayload as never
+                    );
+                  }),
           },
           ...restArgs
         );
