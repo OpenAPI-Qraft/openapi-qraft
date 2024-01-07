@@ -111,10 +111,12 @@ const getServiceInterfaceOperationFactory = (operation: ServiceOperation) => {
 
         getOperationParametersFactory(operation),
 
+        operation.method !== 'get' ? getOperationBodyFactory(operation) : null,
+
         getOperationResponseFactory(operation, 'success'),
 
         getOperationResponseFactory(operation, 'errors'),
-      ]
+      ].filter((node): node is NonNullable<typeof node> => Boolean(node))
     )
   );
 
@@ -231,6 +233,39 @@ const getOperationResponseFactory = (
         factory.createLiteralTypeNode(factory.createStringLiteral(mediaType))
       );
     })
+  );
+};
+
+const getOperationBodyFactory = (operation: ServiceOperation) => {
+  if (!operation.mediaType)
+    return factory.createKeywordTypeNode(ts.SyntaxKind.UnknownKeyword);
+
+  return factory.createIndexedAccessTypeNode(
+    factory.createIndexedAccessTypeNode(
+      factory.createIndexedAccessTypeNode(
+        factory.createIndexedAccessTypeNode(
+          factory.createIndexedAccessTypeNode(
+            factory.createTypeReferenceNode(
+              factory.createIdentifier('paths'),
+              undefined
+            ),
+            factory.createLiteralTypeNode(
+              factory.createStringLiteral(operation.path)
+            )
+          ),
+          factory.createLiteralTypeNode(
+            factory.createStringLiteral(operation.method)
+          )
+        ),
+        factory.createLiteralTypeNode(
+          factory.createStringLiteral('requestBody')
+        )
+      ),
+      factory.createLiteralTypeNode(factory.createStringLiteral('content'))
+    ),
+    factory.createLiteralTypeNode(
+      factory.createStringLiteral(operation.mediaType)
+    )
   );
 };
 
