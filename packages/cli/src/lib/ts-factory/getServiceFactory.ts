@@ -393,7 +393,11 @@ const getServiceVariablePropertyFactory = (operation: ServiceOperation) => {
   );
 };
 
-const createMultilineComment = (output: string[]) => {
+const createMultilineComment = (comment: string[]) => {
+  const output = comment.flatMap((line) =>
+    line.includes('\n') ? line.split('\n') : line
+  );
+
   if (output.length) {
     const text =
       output.length === 1
