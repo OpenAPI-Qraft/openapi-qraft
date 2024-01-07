@@ -6,6 +6,7 @@ type RequestClientParams = {
   header?: Record<string, never>;
   path?: Record<string, never>;
   query?: Record<string, never>;
+  cookie?: Record<string, never>;
 };
 
 export type RequestClient = <T>(
