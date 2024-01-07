@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 import { program } from 'commander';
+import * as console from 'console';
 
 import { fileHeader } from './lib/fileHeader.js';
 import { writeOpenAPISchemaServices } from './write-open-api-schema-services.js';
@@ -20,7 +21,7 @@ program
     '@radist2s/qraft/ServiceOperation'
   )
   .option(
-    '-t, --schema-types-path <path>',
+    '-t, --schema-types-path <path>', // todo::specify better param name to avoid confusion with real path
     'Path to schema types file (.d.ts)',
     './schema'
   )
@@ -28,12 +29,7 @@ program
     '-fh, --file-header <string>',
     'Header to be added to the generated file (eg: /* eslint-disable */)'
   )
-  .option(
-    '-rm, --clean <bool>',
-    'Clean output directory before generating services',
-    (value) => !!JSON.parse(String(value).toLowerCase()),
-    true
-  )
+  .option('-rm, --clean', 'Clean output directory before generating services')
   .option(
     '-ps, --postfix-services <string>',
     'Postfix to be added to the generated service name (eg: Service)'
