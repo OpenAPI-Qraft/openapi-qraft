@@ -182,6 +182,6 @@ export interface MutationFn<
 export type RequestSchema = {
   url: string;
   method: 'get' | 'put' | 'post' | 'delete' | 'options' | 'head' | 'patch';
-  errors?: Record<number, string>;
+  errors?: number[];
   mediaType?: string;
 };
