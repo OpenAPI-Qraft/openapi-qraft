@@ -234,19 +234,6 @@ export const sendRequest = async (
   return await fetch(url, request);
 };
 
-export const getResponseHeader = (
-  response: Response,
-  responseHeader?: string
-): string | undefined => {
-  if (responseHeader) {
-    const content = response.headers.get(responseHeader);
-    if (isString(content)) {
-      return content;
-    }
-  }
-  return undefined;
-};
-
 export const getResponseBody = async (response: Response): Promise<any> => {
   if (response.status !== 204) {
     try {
@@ -329,14 +316,13 @@ export async function request<T>(
   const response = await sendRequest(config, options, url, body, headers);
 
   const responseBody = await getResponseBody(response);
-  const responseHeader = getResponseHeader(response, options.responseHeader);
 
   const result: ApiResult = {
     url,
     ok: response.ok,
     status: response.status,
     statusText: response.statusText,
-    body: responseHeader ?? responseBody,
+    body: responseBody,
   };
 
   catchErrorCodes(options, result); // todo::refactor to return result

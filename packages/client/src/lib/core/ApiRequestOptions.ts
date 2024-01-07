@@ -16,7 +16,6 @@ export type ApiRequestOptions = {
   };
   readonly body?: any;
   readonly mediaType?: string;
-  readonly responseHeader?: string;
   readonly errors?: number[];
   readonly signal?: AbortSignal;
 };
