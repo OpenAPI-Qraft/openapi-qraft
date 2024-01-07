@@ -58,7 +58,7 @@ export const getServices = (
 
       if (!services.has(serviceName)) {
         services.set(serviceName, {
-          name: serviceName,
+          name: camelCase(serviceName),
           variableName: `${camelCase(serviceName, {
             preserveConsecutiveUppercase: false,
           })}${postfixServices}`,
