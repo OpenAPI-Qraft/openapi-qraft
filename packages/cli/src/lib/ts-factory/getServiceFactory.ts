@@ -228,6 +228,7 @@ const getOperationResponseFactory = (
               factory.createStringLiteral(statusCode)
             )
           ),
+          // todo::Add NonNullable, see `POST /entities/{entity_id}/documents`
           factory.createLiteralTypeNode(factory.createStringLiteral('content'))
         ),
         factory.createLiteralTypeNode(factory.createStringLiteral(mediaType))
