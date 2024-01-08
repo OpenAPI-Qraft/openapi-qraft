@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+import chalk from 'chalk';
 import { program } from 'commander';
 import * as console from 'console';
 
@@ -6,11 +7,10 @@ import { fileHeader } from './lib/fileHeader.js';
 import { writeOpenAPISchemaServices } from './write-open-api-schema-services.js';
 
 program
-  .description('Generate counterparts, taxId, payables and line items')
-  .requiredOption(
-    '-i, --input <path>',
-    'Input OpenAPI Schema file path (json, yml)'
+  .description(
+    'Generate services declarations and Typed React Query Interfaces from OpenAPI Schema'
   )
+  .option('-i, --input <path>', 'Input OpenAPI Schema file path (json, yml)')
   .requiredOption(
     '-o, --out-dir <path>',
     'Output directory for generated services'
@@ -47,6 +47,11 @@ program
         fileHeader: args.fileHeader ?? fileHeader,
         postfixServices: args.postfixServices,
       },
+    }).catch((error) => {
+      if (error instanceof Error)
+        console.error(chalk.red(error.message, error.stack));
+      console.error(error);
+      process.exit(1);
     });
   });
 
