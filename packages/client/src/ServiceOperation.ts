@@ -1,5 +1,5 @@
-import { DefaultError, QueryClient } from '@tanstack/query-core';
-import {
+import type { DefaultError, QueryClient } from '@tanstack/query-core';
+import type {
   DefinedInitialDataOptions,
   DefinedUseQueryResult,
   UndefinedInitialDataOptions,
