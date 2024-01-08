@@ -5,6 +5,7 @@
     "build": "tsc --project tsconfig.build.json",
     "dev": "yarn build --watch",
     "test": "vitest run",
+    "typecheck": "tsc --noEmit",
     "generate": "qraft --clean true -i ../../schema.json -o src/mocks/fixtures/api --schema-types-path '../../../../../../../schema.d.ts'"
   },
   "type": "module",
