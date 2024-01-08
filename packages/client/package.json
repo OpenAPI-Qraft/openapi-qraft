@@ -22,6 +22,7 @@
     "@types/react": "^18.2.47",
     "@vitejs/plugin-react": "latest",
     "jsdom": "latest",
+    "msw": "^2.0.12",
     "react": "^18.2.0",
     "vitest": "^1.1.3"
   },
