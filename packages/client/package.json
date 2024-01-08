@@ -4,7 +4,8 @@
   "scripts": {
     "build": "tsc --project tsconfig.build.json",
     "dev": "yarn build --watch",
-    "test": "vitest run"
+    "test": "vitest run",
+    "generate": "qraft --clean true -i ../../schema.json -o src/mocks/fixtures/api --schema-types-path '../../../../../../../schema.d.ts'"
   },
   "type": "module",
   "dependencies": {
@@ -15,6 +16,7 @@
     "yaml": "^2.3.4"
   },
   "devDependencies": {
+    "@radist2s/qraft-cli": "workspace:~",
     "@tanstack/react-query": "^5.17.3",
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^13.4.0",
