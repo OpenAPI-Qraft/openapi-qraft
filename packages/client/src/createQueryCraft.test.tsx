@@ -32,6 +32,32 @@ describe('Qraft uses Queries', () => {
       expect(result.current.data?.id).toEqual('1');
     });
   });
+
+  it('supports useQuery with query parameters', async () => {
+    const id__in = ['1', '2'];
+    const { result } = renderHook(
+      () =>
+        qraft.files.getFiles.useQuery({
+          header: {
+            'x-monite-version': '1.0.0',
+          },
+          query: {
+            id__in,
+          },
+        }),
+      {
+        wrapper: Providers,
+      }
+    );
+
+    await waitFor(() => {
+      expect(
+        result.current.data?.data
+          .filter(({ id }) => id__in.includes(id))
+          .map(({ id }) => id)
+      ).toEqual(id__in);
+    });
+  });
 });
 
 describe('Qraft uses Mutations', () => {

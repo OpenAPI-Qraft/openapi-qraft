@@ -1,4 +1,5 @@
 import { http, HttpResponse } from 'msw';
+import queryString from 'query-string';
 
 import { Services, services } from './fixtures/api/index.js';
 
@@ -29,6 +30,43 @@ export const handlers = [
           is_vendor: true,
           is_customer: false,
         },
+      });
+    }
+  ),
+
+  http.get<
+    ServicePathParameters<Services['files']['getFiles']>,
+    undefined,
+    ServiceResponseParameters<Services['files']['getFiles']>
+  >(
+    openApiToMswPath(services.files.getFiles.schema.url),
+    ({ params, request }) => {
+      if (request.headers.get('x-monite-version') !== '1.0.0') {
+        return HttpResponse.json(
+          { error: { message: 'Wrong version number' } },
+          { status: 500 }
+        ) as never;
+      }
+
+      const { id__in } = queryString.parse(request.url.split('?')[1]) as {
+        id__in: string[];
+      };
+
+      return HttpResponse.json({
+        data: id__in.map((id) => ({
+          id,
+          url: 'data:text/html,<b>bold</b>',
+          updated_at: '2021-08-05T13:00:00.000Z',
+          created_at: '2021-08-05T13:00:00.000Z',
+          name: 'test.pdf',
+          size: 100,
+          md5: 'md5',
+          file_type: 'application/pdf',
+          mimetype: 'application/pdf',
+          region: 'us-east-1',
+          s3_bucket: 's3_bucket',
+          s3_file_path: 's3_file_path',
+        })),
       });
     }
   ),
