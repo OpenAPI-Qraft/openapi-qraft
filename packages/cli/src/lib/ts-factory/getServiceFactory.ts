@@ -177,11 +177,13 @@ const getOperationSchemaFactory = (operation: ServiceOperation) => {
         factory.createIdentifier('errors'),
         undefined,
         factory.createTupleTypeNode(
-          Object.entries(operation.errors).map(([statusCode]) =>
-            factory.createLiteralTypeNode(
-              factory.createNumericLiteral(statusCode)
+          Object.keys(operation.errors)
+            .filter((statusCode) => statusCode !== 'default')
+            .map((statusCode) =>
+              factory.createLiteralTypeNode(
+                factory.createNumericLiteral(statusCode)
+              )
             )
-          )
         )
       ),
     ].filter((node): node is NonNullable<typeof node> => Boolean(node))
@@ -384,9 +386,11 @@ const getServiceVariablePropertyFactory = (operation: ServiceOperation) => {
               factory.createPropertyAssignment(
                 factory.createIdentifier('errors'),
                 factory.createArrayLiteralExpression(
-                  Object.entries(operation.errors).map(([statusCode]) =>
-                    factory.createNumericLiteral(statusCode)
-                  )
+                  Object.keys(operation.errors)
+                    .filter((statusCode) => statusCode !== 'default')
+                    .map((statusCode) =>
+                      factory.createNumericLiteral(statusCode)
+                    )
                 )
               ),
             ].filter((node): node is NonNullable<typeof node> => Boolean(node)),

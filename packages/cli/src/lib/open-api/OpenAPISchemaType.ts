@@ -14,7 +14,7 @@ export type OpenAPISchemaType = {
           };
         };
         responses: {
-          [statusCode: string]: {
+          [statusCode in number | 'default']: {
             description: string;
             content: {
               [contentType: string]: {

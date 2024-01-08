@@ -44,7 +44,11 @@ export const getServices = (
         (acc, [statusCode, response]) => {
           if (!response.content || typeof response.content !== 'object')
             return acc;
-          const statusType = Number(statusCode) < 400 ? 'success' : 'errors';
+          const statusType =
+            statusCode !== 'default' && // See "default" response https://swagger.io/docs/specification/describing-responses/#default
+            Number(statusCode) < 400
+              ? 'success'
+              : 'errors';
           return {
             ...acc,
             [statusType]: {
