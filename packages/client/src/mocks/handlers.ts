@@ -9,7 +9,14 @@ export const handlers = [
     ServiceResponseParameters<Services['counterparts']['getCounterpartsId']>
   >(
     openApiToMswPath(services.counterparts.getCounterpartsId.schema.url),
-    ({ params }) => {
+    ({ params, request }) => {
+      if (request.headers.get('x-monite-version') !== '1.0.0') {
+        return HttpResponse.json(
+          { error: { message: 'Wrong version number' } },
+          { status: 500 }
+        ) as never;
+      }
+
       const { counterpart_id } = params;
 
       return HttpResponse.json({
@@ -41,6 +48,13 @@ export const handlers = [
       services.counterparts.postCounterpartsIdAddresses.schema.url
     ),
     async ({ params, request }) => {
+      if (request.headers.get('x-monite-version') !== '1.0.0') {
+        return HttpResponse.json(
+          { error: { message: 'Wrong version number' } },
+          { status: 500 }
+        ) as never;
+      }
+
       const { counterpart_id } = params;
       const body = await request.json();
 
