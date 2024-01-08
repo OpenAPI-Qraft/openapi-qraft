@@ -1,0 +1,386 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Monite Partner API",
+    "version": "2023-06-04",
+    "description": "The Monite REST API, for Monite partners to integrate with our solution.",
+    "termsOfService": "https://monite.com/terms",
+    "contact": {
+      "name": "Monite team",
+      "url": "https://monite.com/about/",
+      "email": "developers@monite.com"
+    }
+  },
+  "paths": {
+    "/entities/{entity_id}/documents": {
+      "post": {
+        "tags": ["Onboarding documents"],
+        "summary": "Update entity onboarding documents",
+        "description": "Update the onboarding documents of an entity.",
+        "operationId": "post_entities_id_documents",
+        "parameters": [
+          {
+            "required": true,
+            "schema": { "type": "string", "format": "date" },
+            "example": "2023-06-04",
+            "name": "x-monite-version",
+            "in": "header"
+          },
+          {
+            "required": true,
+            "schema": { "type": "string", "format": "uuid" },
+            "name": "entity_id",
+            "in": "path"
+          },
+          {
+            "description": "Document referer",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "description": "Referer of the document"
+            },
+            "name": "referer",
+            "in": "query"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EntityOnboardingDocuments"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "schema": {
+              "type": "object",
+              "required": ["message", "referer"],
+              "properties": {
+                "message": {
+                  "type": "string"
+                },
+                "referer": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorSchemaResponse" }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorSchemaResponse" }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          },
+          "default": {
+            "description": "Unexpected error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorSchemaResponse" }
+              }
+            }
+          }
+        },
+        "security": [{ "HTTPBearer": [] }]
+      }
+    },
+    "/approval_policies/{approval_policy_id}": {
+      "get": {
+        "tags": ["Approval policies"],
+        "summary": "Get an approval policy by ID",
+        "description": "Retrieve a specific approval policy.",
+        "operationId": "get_approval_policies_id",
+        "parameters": [
+          {
+            "required": true,
+            "schema": { "type": "string", "format": "date" },
+            "example": "2023-06-04",
+            "name": "x-monite-version",
+            "in": "header"
+          },
+          {
+            "required": true,
+            "schema": { "type": "string", "format": "uuid" },
+            "name": "approval_policy_id",
+            "in": "path"
+          },
+          {
+            "description": "Order by",
+            "required": false,
+            "schema": {
+              "allOf": [{ "$ref": "#/components/schemas/OrderEnum" }],
+              "description": "Order by",
+              "default": "asc"
+            },
+            "name": "order",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApprovalPolicyResource"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorSchemaResponse" }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          },
+          "default": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorSchemaResponse" }
+              }
+            }
+          }
+        },
+        "security": [{ "HTTPBearer": [] }]
+      },
+      "delete": {
+        "tags": ["Approval policies"],
+        "summary": "Delete an approval policy",
+        "description": "Delete an existing approval policy.",
+        "operationId": "delete_approval_policies_id",
+        "parameters": [
+          {
+            "required": true,
+            "schema": { "type": "string", "format": "date" },
+            "example": "2023-06-04",
+            "name": "x-monite-version",
+            "in": "header"
+          },
+          {
+            "required": true,
+            "schema": { "type": "string", "format": "uuid" },
+            "name": "approval_policy_id",
+            "in": "path"
+          },
+          {
+            "description": "Limit of records to delete",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "description": "Limit"
+            },
+            "name": "limit",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "schema": {
+                "type": "object",
+                "required": ["message"],
+                "properties": {
+                  "message": {
+                    "type": "string"
+                  },
+                  "limit": {
+                    "type": "number"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorSchemaResponse" }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          },
+          "default": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorSchemaResponse" }
+              }
+            }
+          }
+        },
+        "security": [{ "HTTPBearer": [] }]
+      },
+      "patch": {
+        "tags": ["Approval policies"],
+        "summary": "Update an approval policy",
+        "description": "Update an existing approval policy.",
+        "operationId": "patch_approval_policies_id",
+        "parameters": [
+          {
+            "required": true,
+            "schema": { "type": "string", "format": "date" },
+            "example": "2023-06-04",
+            "name": "x-monite-version",
+            "in": "header"
+          },
+          {
+            "required": true,
+            "schema": { "type": "string", "format": "uuid" },
+            "name": "approval_policy_id",
+            "in": "path"
+          },
+          {
+            "description": "Limit of records to patch",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "description": "Limit"
+            },
+            "name": "limit",
+            "in": "query"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/ApprovalPolicyUpdate" }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApprovalPolicyResource"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorSchemaResponse" }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          },
+          "default": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorSchemaResponse" }
+              }
+            }
+          }
+        },
+        "security": [{ "HTTPBearer": [] }]
+      }
+    }
+  },
+  "components": {
+    "EntityOnboardingDocuments": {
+      "properties": {
+        "verification_document_front": {
+          "type": "string",
+          "format": "binary"
+        },
+        "verification_document_back": {
+          "type": "string",
+          "format": "binary"
+        }
+      },
+      "type": "object"
+    },
+    "ErrorSchema": {
+      "properties": { "message": { "type": "string" } },
+      "type": "object",
+      "required": ["message"]
+    },
+    "ErrorSchemaResponse": {
+      "properties": {
+        "error": { "$ref": "#/components/schemas/ErrorSchema" }
+      },
+      "type": "object",
+      "required": ["error"]
+    },
+    "HTTPValidationError": {
+      "properties": {
+        "detail": {
+          "items": { "$ref": "#/components/schemas/ValidationError" },
+          "type": "array"
+        }
+      },
+      "type": "object"
+    },
+    "ApprovalPolicyResource": {
+      "required": ["name", "description", "id"],
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "The name of the approval policy."
+        },
+        "description": {
+          "type": "string",
+          "description": "A brief description of the approval policy."
+        },
+        "id": { "type": "string", "format": "uuid" }
+      }
+    },
+    "OrderEnum": {
+      "type": "string",
+      "enum": ["asc", "desc"],
+      "description": "An enumeration."
+    }
+  }
+}

@@ -21,3 +21,6 @@ coverage
 !.yarn/versions
 
 .swc/
+
+# genetated
+openaapi.d.ts
