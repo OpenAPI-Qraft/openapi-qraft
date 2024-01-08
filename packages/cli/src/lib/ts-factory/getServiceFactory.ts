@@ -120,19 +120,22 @@ const getServiceInterfaceOperationFactory = (operation: ServiceOperation) => {
     )
   );
 
-  ts.addSyntheticLeadingComment(
-    node,
-    ts.SyntaxKind.MultiLineCommentTrivia,
-    createMultilineComment(
-      [
-        operation.deprecated ? '@deprecated' : null,
-        operation.description ? `@description ${operation.description}` : null,
-      ].filter((comment): comment is NonNullable<typeof comment> =>
-        Boolean(comment)
-      )
-    ),
-    true
+  const comment = createMultilineComment(
+    [
+      operation.deprecated ? '@deprecated' : null,
+      operation.description ? `@description ${operation.description}` : null,
+    ].filter((comment): comment is NonNullable<typeof comment> =>
+      Boolean(comment)
+    )
   );
+
+  if (comment)
+    ts.addSyntheticLeadingComment(
+      node,
+      ts.SyntaxKind.MultiLineCommentTrivia,
+      comment,
+      true
+    );
 
   return node;
 };
