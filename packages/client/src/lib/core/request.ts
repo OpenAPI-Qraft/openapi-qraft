@@ -81,17 +81,12 @@ export const getHeaders = (
 const getPayloadContentType = (
   options: Pick<ApiRequestOptions, 'body' | 'mediaType'>
 ) => {
-  if (options.body) {
-    if (options.mediaType) {
-      return options.mediaType;
-    } else if (options.body instanceof Blob) {
-      return options.body.type || 'application/octet-stream';
-    } else if (typeof options.body === 'string') {
-      return 'text/plain';
-    } else if (!(options.body instanceof FormData)) {
-      return 'application/json';
-    }
-  }
+  if (!options.body) return;
+  if (options.mediaType) return options.mediaType;
+  if (options.body instanceof Blob)
+    return options.body.type || 'application/octet-stream';
+  if (typeof options.body === 'string') return 'text/plain';
+  if (!(options.body instanceof FormData)) return 'application/json';
 };
 
 export function mergeHeaders(...allHeaders: (HeadersOptions | undefined)[]) {
