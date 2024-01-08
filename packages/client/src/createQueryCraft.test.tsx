@@ -67,6 +67,22 @@ describe('Qraft uses Mutations', () => {
   });
 });
 
+describe('Qraft uses utils', () => {
+  it('returns _def', () => {
+    // @ts-ignore
+    expect(qraft.counterparts.postCounterpartsIdAddresses._def()).toEqual({
+      path: ['counterparts', 'postCounterpartsIdAddresses'],
+    });
+  });
+
+  it('throws an error when calling an unsupported method ', () => {
+    expect(() =>
+      // @ts-ignore
+      qraft.counterparts.postCounterpartsIdAddresses.unsupportedMethod()
+    ).toThrowError(/Function unsupportedMethod is not supported/i);
+  });
+});
+
 function Providers({ children }: { children: ReactNode }) {
   const [queryClient] = React.useState(() => new QueryClient());
 
