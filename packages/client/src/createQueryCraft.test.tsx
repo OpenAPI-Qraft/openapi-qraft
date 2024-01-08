@@ -1,7 +1,7 @@
 import React, { ReactNode } from 'react';
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { renderHook, waitFor } from '@testing-library/react';
+import { act, renderHook, waitFor } from '@testing-library/react';
 
 import { createQueryCraft } from './createQueryCraft.js';
 import { request } from './lib/core/request.js';
@@ -30,6 +30,39 @@ describe('Qraft uses Queries', () => {
 
     await waitFor(() => {
       expect(result.current.data?.id).toEqual('1');
+    });
+  });
+});
+
+describe('Qraft uses Mutations', () => {
+  it('supports useMutation', async () => {
+    const { result } = renderHook(
+      () =>
+        qraft.counterparts.postCounterpartsIdAddresses.useMutation({
+          header: {
+            'x-monite-entity-id': '1',
+            'x-monite-version': '1.0.0',
+          },
+          path: {
+            counterpart_id: '1',
+          },
+        }),
+      {
+        wrapper: Providers,
+      }
+    );
+
+    act(() => {
+      result.current.mutate({
+        city: 'Paris',
+        country: 'FR',
+        line1: '1 rue de la Paix',
+        postal_code: '75000',
+      });
+    });
+
+    await waitFor(() => {
+      expect(result.current.data?.city).toEqual('Paris');
     });
   });
 });
