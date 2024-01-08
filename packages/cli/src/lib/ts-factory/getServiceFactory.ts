@@ -231,7 +231,6 @@ const getOperationResponseFactory = (
               factory.createStringLiteral(statusCode)
             )
           ),
-          // todo::Add NonNullable, see `POST /entities/{entity_id}/documents`
           factory.createLiteralTypeNode(factory.createStringLiteral('content'))
         ),
         factory.createLiteralTypeNode(factory.createStringLiteral(mediaType))
@@ -246,25 +245,28 @@ const getOperationBodyFactory = (operation: ServiceOperation) => {
 
   return factory.createIndexedAccessTypeNode(
     factory.createIndexedAccessTypeNode(
-      factory.createIndexedAccessTypeNode(
+      factory.createTypeReferenceNode(factory.createIdentifier('NonNullable'), [
         factory.createIndexedAccessTypeNode(
           factory.createIndexedAccessTypeNode(
-            factory.createTypeReferenceNode(
-              factory.createIdentifier('paths'),
-              undefined
+            factory.createIndexedAccessTypeNode(
+              factory.createTypeReferenceNode(
+                factory.createIdentifier('paths'),
+                undefined
+              ),
+              factory.createLiteralTypeNode(
+                factory.createStringLiteral(operation.path)
+              )
             ),
             factory.createLiteralTypeNode(
-              factory.createStringLiteral(operation.path)
+              factory.createStringLiteral(operation.method)
             )
           ),
           factory.createLiteralTypeNode(
-            factory.createStringLiteral(operation.method)
+            factory.createStringLiteral('requestBody')
           )
         ),
-        factory.createLiteralTypeNode(
-          factory.createStringLiteral('requestBody')
-        )
-      ),
+      ]),
+      // todo::Add optional NonNullable inference, see `POST /entities/{entity_id}/documents`
       factory.createLiteralTypeNode(factory.createStringLiteral('content'))
     ),
     factory.createLiteralTypeNode(
