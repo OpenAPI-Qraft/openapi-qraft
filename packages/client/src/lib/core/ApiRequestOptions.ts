@@ -20,6 +20,7 @@ export type ApiRequestOptions = {
   readonly headers?: HeadersOptions;
 } & Omit<RequestInit, 'headers' | 'method' | 'body'>;
 
+// To have definitely typed headers without a conversion to stings
 export type HeadersOptions =
   | HeadersInit
   | Record<string, string | number | boolean | null | undefined>;
