@@ -4,7 +4,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { act, renderHook, waitFor } from '@testing-library/react';
 
 import { createQueryCraft } from './createQueryCraft.js';
-import { request } from './lib/core/request.js';
+import { getRequestBody, getRequestUrl, request } from './lib/core/request.js';
 import { services, Services } from './mocks/fixtures/api/index.js';
 import { QueryCraftContext } from './QueryCraftContext.js';
 
@@ -170,7 +170,8 @@ function Providers({ children }: { children: ReactNode }) {
               {
                 ...schema,
                 ...options,
-              }
+              },
+              { getRequestUrl, getRequestBody }
             );
           },
         }}

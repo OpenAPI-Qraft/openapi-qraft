@@ -37,10 +37,10 @@ export const getQueryString = (params: Record<string, any>): string => {
   return '';
 };
 
-const getUrl = (
+function getRequestUrlBase(
   config: Pick<OpenAPIConfig, 'version' | 'baseUrl'>,
   { url, parameters }: Pick<ApiRequestInit, 'url' | 'parameters'>
-): string => {
+): string {
   let path = url;
 
   if (typeof config.version !== 'undefined') {
@@ -58,7 +58,9 @@ const getUrl = (
     return `${config.baseUrl}${path}${getQueryString(parameters.query)}`;
   }
   return `${config.baseUrl}${path}`;
-};
+}
+
+export { getRequestUrlBase as getRequestUrl };
 
 const getBodyContentType = (body: ApiRequestInit['body']) => {
   if (!body) return;
@@ -92,9 +94,11 @@ export function mergeHeaders(...allHeaders: (HeadersOptions | undefined)[]) {
   return headers;
 }
 
-export const getRequestBody = (
-  options: Pick<ApiRequestInit, 'method' | 'mediaType' | 'body'>
-) => {
+function getRequestBodyBase(options: {
+  method: ApiRequestInit['method'];
+  mediaType: ApiRequestInit['mediaType'];
+  body: ApiRequestInit['body'];
+}) {
   if (
     options.method === 'get' ||
     options.method === 'head' ||
@@ -105,7 +109,9 @@ export const getRequestBody = (
   if (options.mediaType?.includes('/form-data')) return getFormData(options);
 
   return getBody(options);
-};
+}
+
+export { getRequestBodyBase as getRequestBody };
 
 const getFormData = ({
   body,
@@ -148,7 +154,10 @@ const getFormData = ({
   return formData;
 };
 
-const getBody = (options: Pick<ApiRequestInit, 'body' | 'mediaType'>): any => {
+const getBody = (options: {
+  mediaType: ApiRequestInit['mediaType'];
+  body: ApiRequestInit['body'];
+}): any => {
   if (options.body === undefined) return;
 
   if (
@@ -247,12 +256,21 @@ export const catchErrorCodes = (
  * Request method
  * @param config The OpenAPI configuration object
  * @param requestInit The request options from the service
+ * @param getRequestUrl The function to get the request URL
+ * @param getRequestBody The function to get the request body
  * @returns Promise<T>
  * @throws ApiError
  */
 export async function request<T>(
   config: OpenAPIConfig,
-  requestInit: ApiRequestInit
+  requestInit: ApiRequestInit,
+  {
+    getRequestUrl,
+    getRequestBody,
+  }: {
+    getRequestUrl: typeof getRequestUrlBase;
+    getRequestBody: typeof getRequestBodyBase;
+  }
 ): Promise<T> {
   const {
     method,
@@ -265,7 +283,7 @@ export async function request<T>(
     ...requestInitRest
   } = requestInit;
 
-  const response = await fetch(getUrl(config, { url, parameters }), {
+  const response = await fetch(getRequestUrl(config, { url, parameters }), {
     body: getRequestBody({
       method,
       mediaType,
