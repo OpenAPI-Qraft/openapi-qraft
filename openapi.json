@@ -536,6 +536,65 @@
         },
         "type": "object"
       },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": { "anyOf": [{ "type": "string" }, { "type": "integer" }] },
+            "type": "array"
+          },
+          "msg": { "type": "string" },
+          "type": { "type": "string" }
+        },
+        "type": "object",
+        "required": ["loc", "msg", "type"]
+      },
+      "ApprovalPolicyUpdate": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "The name of the approval policy."
+          },
+          "description": {
+            "type": "string",
+            "description": "A brief description of the approval policy."
+          },
+          "script": {
+            "type": "array",
+            "items": {
+              "anyOf": [
+                { "type": "boolean" },
+                { "minimum": 1.0, "type": "number" },
+                { "type": "string" },
+                { "type": "array", "items": {} },
+                { "type": "object" }
+              ]
+            },
+            "description": "A list of JSON objects that represents the approval policy script. The script contains the logic that determines whether an action should be sent to approval. This field is required, and it should contain at least one script object."
+          },
+          "trigger": {
+            "anyOf": [
+              { "type": "boolean" },
+              { "type": "number" },
+              { "type": "string" },
+              { "type": "array", "items": {} },
+              { "type": "object" }
+            ],
+            "description": "A JSON object that represents the trigger for the approval policy. The trigger specifies the event that will trigger the policy to be evaluated.",
+            "example": "{amount >= 1000}"
+          },
+          "status": {
+            "allOf": [{ "$ref": "#/components/schemas/ApprovalPolicyStatus" }],
+            "description": "A string that represents the current status of the approval policy."
+          }
+        },
+        "additionalProperties": false
+      },
+      "ApprovalPolicyStatus": {
+        "enum": ["active", "deleted", "pending"],
+        "type": "string",
+        "description": "An enumeration."
+      },
       "ApprovalPolicyResource": {
         "required": ["name", "description", "id"],
         "type": "object",
