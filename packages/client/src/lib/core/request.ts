@@ -1,5 +1,5 @@
 import { ApiError } from './ApiError.js';
-import { ApiRequestOptions, HeadersOptions } from './ApiRequestOptions.js';
+import { ApiRequestInit, HeadersOptions } from './ApiRequestInit.js';
 import type { ApiResult } from './ApiResult.js';
 import type { OpenAPIConfig } from './OpenAPI.js';
 
@@ -39,7 +39,7 @@ export const getQueryString = (params: Record<string, any>): string => {
 
 const getUrl = (
   config: Pick<OpenAPIConfig, 'version' | 'baseUrl'>,
-  { url, parameters }: Pick<ApiRequestOptions, 'url' | 'parameters'>
+  { url, parameters }: Pick<ApiRequestInit, 'url' | 'parameters'>
 ): string => {
   let path = url;
 
@@ -60,7 +60,7 @@ const getUrl = (
   return `${config.baseUrl}${path}`;
 };
 
-const getBodyContentType = (body: ApiRequestOptions['body']) => {
+const getBodyContentType = (body: ApiRequestInit['body']) => {
   if (!body) return;
   if (body instanceof Blob) return body.type || 'application/octet-stream';
   if (typeof body === 'string') return 'text/plain';
@@ -93,7 +93,7 @@ export function mergeHeaders(...allHeaders: (HeadersOptions | undefined)[]) {
 }
 
 export const getRequestBody = (
-  options: Pick<ApiRequestOptions, 'method' | 'mediaType' | 'body'>
+  options: Pick<ApiRequestInit, 'method' | 'mediaType' | 'body'>
 ) => {
   if (
     options.method === 'get' ||
@@ -109,7 +109,7 @@ export const getRequestBody = (
 
 const getFormData = ({
   body,
-}: Pick<ApiRequestOptions, 'body'>): FormData | undefined => {
+}: Pick<ApiRequestInit, 'body'>): FormData | undefined => {
   if (body instanceof FormData) return body;
   if (body === null) return;
 
@@ -148,9 +148,7 @@ const getFormData = ({
   return formData;
 };
 
-const getBody = (
-  options: Pick<ApiRequestOptions, 'body' | 'mediaType'>
-): any => {
+const getBody = (options: Pick<ApiRequestInit, 'body' | 'mediaType'>): any => {
   if (options.body === undefined) return;
 
   if (
@@ -166,7 +164,7 @@ const getBody = (
 };
 
 export const sendRequest = async (
-  options: ApiRequestOptions,
+  options: ApiRequestInit,
   url: string,
   body: BodyInit | undefined,
   headers: Headers
@@ -204,7 +202,7 @@ export const getResponseBody = async (response: Response): Promise<any> => {
 };
 
 export const catchErrorCodes = (
-  options: ApiRequestOptions,
+  options: ApiRequestInit,
   result: ApiResult
 ): void => {
   const errors: Record<number, string> = {
@@ -248,13 +246,13 @@ export const catchErrorCodes = (
 /**
  * Request method
  * @param config The OpenAPI configuration object
- * @param options The request options from the service
+ * @param requestInit The request options from the service
  * @returns Promise<T>
  * @throws ApiError
  */
 export async function request<T>(
   config: OpenAPIConfig,
-  options: ApiRequestOptions
+  requestInit: ApiRequestInit
 ): Promise<T> {
   const {
     method,
@@ -264,8 +262,8 @@ export async function request<T>(
     errors,
     headers,
     body,
-    ...requestInit
-  } = options;
+    ...requestInitRest
+  } = requestInit;
 
   const response = await fetch(getUrl(config, { url, parameters }), {
     body: getRequestBody({
@@ -284,7 +282,7 @@ export async function request<T>(
       )
     ),
     method: method.toUpperCase(),
-    ...requestInit,
+    ...requestInitRest,
   });
 
   const responseBody = await getResponseBody(response);
@@ -297,7 +295,7 @@ export async function request<T>(
     body: responseBody,
   };
 
-  catchErrorCodes(options, result); // todo::refactor to return result
+  catchErrorCodes(requestInit, result); // todo::refactor to return result
 
   return result.body;
 }

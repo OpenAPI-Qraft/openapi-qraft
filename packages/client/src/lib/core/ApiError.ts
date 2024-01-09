@@ -1,4 +1,4 @@
-import type { ApiRequestOptions } from './ApiRequestOptions.js';
+import type { ApiRequestInit } from './ApiRequestInit.js';
 import type { ApiResult } from './ApiResult.js';
 
 export class ApiError extends Error {
@@ -6,13 +6,9 @@ export class ApiError extends Error {
   public readonly status: number;
   public readonly statusText: string;
   public readonly body: any;
-  public readonly request: ApiRequestOptions;
+  public readonly request: ApiRequestInit;
 
-  constructor(
-    request: ApiRequestOptions,
-    response: ApiResult,
-    message: string
-  ) {
+  constructor(request: ApiRequestInit, response: ApiResult, message: string) {
     super(message);
 
     this.name = 'ApiError';

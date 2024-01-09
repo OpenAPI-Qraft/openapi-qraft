@@ -1,4 +1,4 @@
-export type ApiRequestOptions = {
+export type ApiRequestInit = {
   readonly method:
     | 'get'
     | 'put'
