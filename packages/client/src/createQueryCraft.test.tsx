@@ -14,35 +14,15 @@ describe('Qraft uses Queries', () => {
   it('supports useQuery', async () => {
     const { result } = renderHook(
       () =>
-        qraft.counterparts.getCounterpartsId.useQuery({
+        qraft.approvalPolicies.getApprovalPoliciesId.useQuery({
           header: {
-            'x-monite-entity-id': '1',
             'x-monite-version': '1.0.0',
           },
           path: {
-            counterpart_id: '1',
-          },
-        }),
-      {
-        wrapper: Providers,
-      }
-    );
-
-    await waitFor(() => {
-      expect(result.current.data?.id).toEqual('1');
-    });
-  });
-
-  it('supports useQuery with query parameters', async () => {
-    const id__in = ['1', '2'];
-    const { result } = renderHook(
-      () =>
-        qraft.files.getFiles.useQuery({
-          header: {
-            'x-monite-version': '1.0.0',
+            approval_policy_id: '1',
           },
           query: {
-            id__in,
+            items_order: ['asc', 'desc'],
           },
         }),
       {
@@ -51,11 +31,17 @@ describe('Qraft uses Queries', () => {
     );
 
     await waitFor(() => {
-      expect(
-        result.current.data?.data
-          .filter(({ id }) => id__in.includes(id))
-          .map(({ id }) => id)
-      ).toEqual(id__in);
+      expect(result.current.data).toEqual({
+        header: {
+          'x-monite-version': '1.0.0',
+        },
+        path: {
+          approval_policy_id: '1',
+        },
+        query: {
+          items_order: ['asc', 'desc'],
+        },
+      });
     });
   });
 });
@@ -63,16 +49,7 @@ describe('Qraft uses Queries', () => {
 describe('Qraft uses Mutations', () => {
   it('supports useMutation', async () => {
     const { result } = renderHook(
-      () =>
-        qraft.counterparts.postCounterpartsIdAddresses.useMutation({
-          header: {
-            'x-monite-entity-id': '1',
-            'x-monite-version': '1.0.0',
-          },
-          path: {
-            counterpart_id: '1',
-          },
-        }),
+      () => qraft.entities.postEntitiesIdDocuments.useMutation(),
       {
         wrapper: Providers,
       }
@@ -80,15 +57,41 @@ describe('Qraft uses Mutations', () => {
 
     act(() => {
       result.current.mutate({
-        city: 'Paris',
-        country: 'FR',
-        line1: '1 rue de la Paix',
-        postal_code: '75000',
+        // todo::seems, parameters is redundant property, may be flattened?
+        parameters: {
+          header: {
+            'x-monite-version': '1.0.0',
+          },
+          path: {
+            entity_id: '1',
+          },
+          query: {
+            referer: 'https://example.com',
+          },
+        },
+        body: {
+          verification_document_back: 'back',
+          verification_document_front: 'front',
+        },
       });
     });
 
     await waitFor(() => {
-      expect(result.current.data?.city).toEqual('Paris');
+      expect(result.current.data).toEqual({
+        header: {
+          'x-monite-version': '1.0.0',
+        },
+        path: {
+          entity_id: '1',
+        },
+        query: {
+          referer: 'https://example.com',
+        },
+        body: {
+          verification_document_back: 'back',
+          verification_document_front: 'front',
+        },
+      });
     });
   });
 });

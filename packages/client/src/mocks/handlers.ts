@@ -5,102 +5,58 @@ import { Services, services } from './fixtures/api/index.js';
 
 export const handlers = [
   http.get<
-    ServicePathParameters<Services['counterparts']['getCounterpartsId']>,
+    ServicePathParameters<
+      Services['approvalPolicies']['getApprovalPoliciesId']
+    >,
     undefined,
-    ServiceResponseParameters<Services['counterparts']['getCounterpartsId']>
+    ServiceResponseParameters<
+      Services['approvalPolicies']['getApprovalPoliciesId']
+    >
   >(
-    openApiToMswPath(services.counterparts.getCounterpartsId.schema.url),
-    ({ params, request }) => {
-      if (request.headers.get('x-monite-version') !== '1.0.0') {
-        return HttpResponse.json(
-          { error: { message: 'Wrong version number' } },
-          { status: 500 }
-        ) as never;
-      }
+    openApiToMswPath(
+      services.approvalPolicies.getApprovalPoliciesId.schema.url
+    ),
+    ({ params: { '0': _, ...path }, request }) => {
+      const query = getQueryParameters<
+        Services['approvalPolicies']['getApprovalPoliciesId']
+      >(request.url);
 
-      const { counterpart_id } = params;
+      const header = getHeaders<
+        Services['approvalPolicies']['getApprovalPoliciesId']
+      >(request.headers, 'x-');
 
       return HttpResponse.json({
-        id: counterpart_id,
-        type: 'organization',
-        created_at: '2021-08-05T13:00:00.000Z',
-        updated_at: '2021-08-05T13:00:00.000Z',
-        organization: {
-          legal_name: 'Test Company',
-          is_vendor: true,
-          is_customer: false,
-        },
-      });
-    }
-  ),
-
-  http.get<
-    ServicePathParameters<Services['files']['getFiles']>,
-    undefined,
-    ServiceResponseParameters<Services['files']['getFiles']>
-  >(
-    openApiToMswPath(services.files.getFiles.schema.url),
-    ({ params, request }) => {
-      if (request.headers.get('x-monite-version') !== '1.0.0') {
-        return HttpResponse.json(
-          { error: { message: 'Wrong version number' } },
-          { status: 500 }
-        ) as never;
-      }
-
-      const { id__in } = queryString.parse(request.url.split('?')[1]) as {
-        id__in: string[];
-      };
-
-      return HttpResponse.json({
-        data: id__in.map((id) => ({
-          id,
-          url: 'data:text/html,<b>bold</b>',
-          updated_at: '2021-08-05T13:00:00.000Z',
-          created_at: '2021-08-05T13:00:00.000Z',
-          name: 'test.pdf',
-          size: 100,
-          md5: 'md5',
-          file_type: 'application/pdf',
-          mimetype: 'application/pdf',
-          region: 'us-east-1',
-          s3_bucket: 's3_bucket',
-          s3_file_path: 's3_file_path',
-        })),
+        path,
+        query,
+        header,
       });
     }
   ),
 
   http.post<
-    ServicePathParameters<
-      Services['counterparts']['postCounterpartsIdAddresses']
-    >,
+    ServicePathParameters<Services['entities']['postEntitiesIdDocuments']>,
     ServiceRequestBodyParameters<
-      Services['counterparts']['postCounterpartsIdAddresses']
+      Services['entities']['postEntitiesIdDocuments']
     >,
-    ServiceResponseParameters<
-      Services['counterparts']['postCounterpartsIdAddresses']
-    >
+    ServiceResponseParameters<Services['entities']['postEntitiesIdDocuments']>
   >(
-    openApiToMswPath(
-      services.counterparts.postCounterpartsIdAddresses.schema.url
-    ),
-    async ({ params, request }) => {
-      if (request.headers.get('x-monite-version') !== '1.0.0') {
-        return HttpResponse.json(
-          { error: { message: 'Wrong version number' } },
-          { status: 500 }
-        ) as never;
-      }
+    openApiToMswPath(services.entities.postEntitiesIdDocuments.schema.url),
+    async ({ params: { '0': _, ...path }, request }) => {
+      const query = getQueryParameters<
+        Services['entities']['postEntitiesIdDocuments']
+      >(request.url);
 
-      const { counterpart_id } = params;
+      const header = getHeaders<
+        Services['entities']['postEntitiesIdDocuments']
+      >(request.headers, 'x-');
+
       const body = await request.json();
 
       return HttpResponse.json({
-        counterpart_id,
-        id: 'address_id',
-        is_default: false,
-        ...body,
+        path,
+        query,
+        header,
+        body,
       });
     }
   ),
@@ -113,6 +69,62 @@ function openApiToMswPath(url: string) {
   )}`;
 }
 
+function getQueryParameters<
+  T extends
+    | {
+        getQueryKey: (arg: never) => unknown;
+      }
+    | {
+        getMutationKey: (arg: never) => unknown;
+      },
+>(url: string): ServiceQueryParameters<T> {
+  return queryString.parse(url.split('?')[1]) as ServiceQueryParameters<T>;
+}
+
+function getHeaders<
+  T extends
+    | {
+        getQueryKey: (arg: never) => unknown;
+      }
+    | {
+        getMutationKey: (arg: never) => unknown;
+      },
+>(headers: Headers, prefix: string): ServiceHeaderParameters<T> {
+  return Array.from(headers.entries()).reduce(
+    (acc, [headerKey, headerValue]) => {
+      if (!headerKey.toLowerCase().startsWith(prefix.toLowerCase())) return acc;
+      if (typeof headerValue !== 'string') return acc;
+      return {
+        ...acc,
+        [headerKey]: headerValue,
+      };
+    },
+    {} as Record<string, string>
+  ) as ServiceHeaderParameters<T>;
+}
+
+type ServiceHeaderParameters<
+  T extends
+    | {
+        getQueryKey: (arg: never) => unknown;
+      }
+    | {
+        getMutationKey: (arg: never) => unknown;
+      },
+> = T extends {
+  getQueryKey: (arg: infer QueryKey) => unknown;
+}
+  ? QueryKey extends { header?: infer Parameters }
+    ? Parameters
+    : unknown
+  : T extends {
+        getMutationKey: (arg: infer MutationKey) => unknown;
+      }
+    ? MutationKey extends { header?: infer Parameters }
+      ? Parameters
+      : unknown
+    : never;
+
 type ServicePathParameters<
   T extends
     | {
@@ -124,16 +136,38 @@ type ServicePathParameters<
 > = T extends {
   getQueryKey: (arg: infer QueryKey) => unknown;
 }
-  ? QueryKey extends { path: infer Parameters }
+  ? QueryKey extends { path?: infer Parameters }
+    ? Parameters & { 0: string }
+    : unknown
+  : T extends {
+        getMutationKey: (arg: infer MutationKey) => unknown;
+      }
+    ? MutationKey extends { path?: infer Parameters }
+      ? Parameters & { 0: string }
+      : unknown
+    : never;
+
+type ServiceQueryParameters<
+  T extends
+    | {
+        getQueryKey: (arg: never) => unknown;
+      }
+    | {
+        getMutationKey: (arg: never) => unknown;
+      },
+> = T extends {
+  getQueryKey: (arg: infer QueryKey) => unknown;
+}
+  ? QueryKey extends { query?: infer Parameters }
     ? Parameters
-    : T extends {
-          getQueryKey: (arg: infer MutationKey) => unknown;
-        }
-      ? MutationKey extends { path: infer Parameters }
-        ? Parameters
-        : never
-      : never
-  : never;
+    : unknown
+  : T extends {
+        getMutationKey: (arg: infer MutationKey) => unknown;
+      }
+    ? MutationKey extends { query?: infer Parameters }
+      ? Parameters
+      : unknown
+    : never;
 
 type ServiceRequestBodyParameters<
   T extends {

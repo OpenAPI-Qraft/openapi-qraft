@@ -55,15 +55,50 @@
         "responses": {
           "201": {
             "description": "Successful Response",
-            "schema": {
-              "type": "object",
-              "required": ["message", "referer"],
-              "properties": {
-                "message": {
-                  "type": "string"
-                },
-                "referer": {
-                  "type": "string"
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "header": {
+                      "type": "object",
+                      "properties": {
+                        "x-monite-version": {
+                          "type": "string",
+                          "format": "date"
+                        }
+                      }
+                    },
+                    "path": {
+                      "type": "object",
+                      "properties": {
+                        "entity_id": {
+                          "type": "string",
+                          "format": "uuid"
+                        }
+                      }
+                    },
+                    "query": {
+                      "type": "object",
+                      "properties": {
+                        "referer": {
+                          "type": "string",
+                          "description": "Referer of the document"
+                        }
+                      }
+                    },
+                    "body": {
+                      "type": "object",
+                      "properties": {
+                        "verification_document_front": {
+                          "type": "string"
+                        },
+                        "verification_document_back": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
                 }
               }
             }
@@ -128,11 +163,12 @@
             "description": "Order by",
             "required": false,
             "schema": {
-              "allOf": [{ "$ref": "#/components/schemas/OrderEnum" }],
+              "type": "array",
+              "items": { "$ref": "#/components/schemas/OrderEnum" },
               "description": "Order by",
               "default": "asc"
             },
-            "name": "order",
+            "name": "items_order",
             "in": "query"
           }
         ],
@@ -142,7 +178,38 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ApprovalPolicyResource"
+                  "type": "object",
+                  "properties": {
+                    "header": {
+                      "type": "object",
+                      "properties": {
+                        "x-monite-version": {
+                          "type": "string",
+                          "format": "date"
+                        }
+                      }
+                    },
+                    "path": {
+                      "type": "object",
+                      "properties": {
+                        "approval_policy_id": {
+                          "type": "string",
+                          "format": "uuid"
+                        }
+                      }
+                    },
+                    "query": {
+                      "type": "object",
+                      "properties": {
+                        "items_order": {
+                          "type": "array",
+                          "items": { "$ref": "#/components/schemas/OrderEnum" },
+                          "description": "Order by",
+                          "default": "asc"
+                        }
+                      }
+                    }
+                  }
                 }
               }
             }
@@ -325,62 +392,192 @@
         },
         "security": [{ "HTTPBearer": [] }]
       }
+    },
+    "/files": {
+      "get": {
+        "tags": ["Files"],
+        "summary": "Get a files by ID",
+        "operationId": "get_files",
+        "parameters": [
+          {
+            "required": true,
+            "schema": { "type": "string", "format": "date" },
+            "example": "2023-06-04",
+            "name": "x-monite-version",
+            "in": "header"
+          },
+          {
+            "required": true,
+            "schema": {
+              "items": { "type": "string", "format": "uuid" },
+              "type": "array",
+              "maxItems": 100
+            },
+            "name": "id__in",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/FilesResponse" }
+              }
+            }
+          },
+          "405": {
+            "description": "Method Not Allowed",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorSchemaResponse" }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          },
+          "default": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorSchemaResponse" }
+              }
+            }
+          }
+        },
+        "security": [{ "HTTPBearer": [] }]
+      }
+    },
+    "/files/list": {
+      "get": {
+        "tags": ["Files"],
+        "summary": "Get a file list",
+        "operationId": "get_file_list",
+        "parameters": [
+          {
+            "required": false,
+            "schema": { "type": "string", "format": "date" },
+            "example": "2023-06-04",
+            "name": "x-monite-version",
+            "in": "header"
+          },
+          {
+            "required": false,
+            "schema": {
+              "items": { "type": "string", "format": "uuid" },
+              "type": "array",
+              "maxItems": 100
+            },
+            "name": "id__in",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/FilesResponse" }
+              }
+            }
+          },
+          "default": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorSchemaResponse" }
+              }
+            }
+          }
+        },
+        "security": [{ "HTTPBearer": [] }]
+      }
     }
   },
   "components": {
-    "EntityOnboardingDocuments": {
-      "properties": {
-        "verification_document_front": {
-          "type": "string",
-          "format": "binary"
+    "schemas": {
+      "EntityOnboardingDocuments": {
+        "properties": {
+          "verification_document_front": {
+            "type": "string",
+            "format": "binary"
+          },
+          "verification_document_back": {
+            "type": "string",
+            "format": "binary"
+          }
         },
-        "verification_document_back": {
-          "type": "string",
-          "format": "binary"
+        "type": "object"
+      },
+      "ErrorSchema": {
+        "properties": { "message": { "type": "string" } },
+        "type": "object",
+        "required": ["message"]
+      },
+      "ErrorSchemaResponse": {
+        "properties": {
+          "error": { "$ref": "#/components/schemas/ErrorSchema" }
+        },
+        "type": "object",
+        "required": ["error"]
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": { "$ref": "#/components/schemas/ValidationError" },
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
+      "ApprovalPolicyResource": {
+        "required": ["name", "description", "id"],
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "The name of the approval policy."
+          },
+          "description": {
+            "type": "string",
+            "description": "A brief description of the approval policy."
+          },
+          "id": { "type": "string", "format": "uuid" }
         }
       },
-      "type": "object"
-    },
-    "ErrorSchema": {
-      "properties": { "message": { "type": "string" } },
-      "type": "object",
-      "required": ["message"]
-    },
-    "ErrorSchemaResponse": {
-      "properties": {
-        "error": { "$ref": "#/components/schemas/ErrorSchema" }
+      "OrderEnum": {
+        "type": "string",
+        "enum": ["asc", "desc"],
+        "description": "An enumeration."
       },
-      "type": "object",
-      "required": ["error"]
-    },
-    "HTTPValidationError": {
-      "properties": {
-        "detail": {
-          "items": { "$ref": "#/components/schemas/ValidationError" },
-          "type": "array"
-        }
+      "FilesResponse": {
+        "properties": {
+          "data": {
+            "items": { "$ref": "#/components/schemas/FileResponse" },
+            "type": "array"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": ["data"]
       },
-      "type": "object"
-    },
-    "ApprovalPolicyResource": {
-      "required": ["name", "description", "id"],
-      "type": "object",
-      "properties": {
-        "name": {
-          "type": "string",
-          "description": "The name of the approval policy."
+      "FileResponse": {
+        "properties": {
+          "id": { "type": "string", "format": "uuid" },
+          "file_type": { "type": "string" },
+          "name": { "type": "string" },
+          "url": { "type": "string" }
         },
-        "description": {
-          "type": "string",
-          "description": "A brief description of the approval policy."
-        },
-        "id": { "type": "string", "format": "uuid" }
+        "additionalProperties": false,
+        "type": "object",
+        "required": ["id", "file_type", "name", "url"]
       }
-    },
-    "OrderEnum": {
-      "type": "string",
-      "enum": ["asc", "desc"],
-      "description": "An enumeration."
     }
   }
 }
