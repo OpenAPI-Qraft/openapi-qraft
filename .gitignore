@@ -23,4 +23,4 @@ coverage
 .swc/
 
 # genetated
-openaapi.d.ts
+openapi.d.ts

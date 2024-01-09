@@ -7,7 +7,7 @@
     "dev": "yarn workspaces foreach --verbose --recursive --no-private --from '@radist2s/*' run dev",
     "test": "yarn workspaces foreach --verbose --recursive --no-private --from '@radist2s/*' run test",
     "lint": "yarn workspaces foreach --verbose --recursive run lint",
-    "generate": "openapi-typescript ./openapi.json -o ./openaapi.d.ts"
+    "generate": "openapi-typescript ./openapi.json -o openapi.d.ts"
   },
   "devDependencies": {
     "@trivago/prettier-plugin-sort-imports": "^4.3.0",
