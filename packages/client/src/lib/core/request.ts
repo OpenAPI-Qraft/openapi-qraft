@@ -60,33 +60,11 @@ const getUrl = (
   return `${config.baseUrl}${path}`;
 };
 
-export const getHeaders = (
-  options: Pick<
-    ApiRequestOptions,
-    'headers' | 'parameters' | 'body' | 'mediaType'
-  >
-): Headers => {
-  const headers = mergeHeaders(
-    {
-      Accept: 'application/json',
-      'Content-Type': getPayloadContentType(options),
-    },
-    options.headers,
-    options.parameters?.header
-  );
-
-  return new Headers(headers);
-};
-
-const getPayloadContentType = (
-  options: Pick<ApiRequestOptions, 'body' | 'mediaType'>
-) => {
-  if (!options.body) return;
-  if (options.mediaType) return options.mediaType;
-  if (options.body instanceof Blob)
-    return options.body.type || 'application/octet-stream';
-  if (typeof options.body === 'string') return 'text/plain';
-  if (!(options.body instanceof FormData)) return 'application/json';
+const getBodyContentType = (body: ApiRequestOptions['body']) => {
+  if (!body) return;
+  if (body instanceof Blob) return body.type || 'application/octet-stream';
+  if (typeof body === 'string') return 'text/plain';
+  if (!(body instanceof FormData)) return 'application/json';
 };
 
 export function mergeHeaders(...allHeaders: (HeadersOptions | undefined)[]) {
@@ -295,7 +273,16 @@ export async function request<T>(
       mediaType,
       body,
     }),
-    headers: getHeaders({ headers, parameters }),
+    headers: new Headers(
+      mergeHeaders(
+        {
+          Accept: 'application/json',
+          'Content-Type': mediaType ?? getBodyContentType(body),
+        },
+        headers,
+        parameters?.header
+      )
+    ),
     method: method.toUpperCase(),
     ...requestInit,
   });
