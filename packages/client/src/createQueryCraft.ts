@@ -162,10 +162,13 @@ export const createQueryCraft = <
                     });
                   }
                 : function (parametersAndBodyPayload) {
-                    return client(
-                      serviceOperation.schema,
-                      parametersAndBodyPayload as never
-                    );
+                    const { body, ...parameters } =
+                      parametersAndBodyPayload as { body: unknown };
+
+                    return client(serviceOperation.schema, {
+                      body,
+                      parameters,
+                    } as never);
                   }),
           },
           ...restArgs

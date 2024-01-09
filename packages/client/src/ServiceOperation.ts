@@ -19,6 +19,14 @@ export type ServiceOperationMutationKey<
   T,
 > = [Pick<S, 'url' | 'method'>, T];
 
+type AreKeysOptional<T> = T extends object
+  ? {
+      [P in keyof T]-?: T[P] extends NonNullable<T[P]> ? true : false;
+    }[keyof T] extends false
+    ? true
+    : false
+  : never;
+
 export interface ServiceOperationQuery<
   TSchema extends { url: string; method: string },
   TParams,
@@ -33,7 +41,82 @@ export interface ServiceOperationQuery<
 
   queryFn: QueryFn<TSchema, TParams, TData>;
 
-  useQuery(
+  // !! experimental, need to test
+  useQuery: AreKeysOptional<TParams> extends true
+    ? ServiceOperationQueryOptionalParameters<TSchema, TParams, TData, TError>
+    : ServiceOperationQueryRequiredParameters<TSchema, TParams, TData, TError>;
+
+  // useQuery(
+  //   params: TParams,
+  //   options?: Omit<
+  //     UndefinedInitialDataOptions<
+  //       TData,
+  //       TError,
+  //       TData,
+  //       ServiceOperationQueryKey<TSchema, TParams>
+  //     >,
+  //     'queryKey'
+  //   >,
+  //   queryClient?: QueryClient
+  // ): UseQueryResult<TData, TError>;
+  //
+  // useQuery(
+  //   params: TParams,
+  //   options?: Omit<
+  //     DefinedInitialDataOptions<
+  //       TData,
+  //       TError,
+  //       TData,
+  //       ServiceOperationQueryKey<TSchema, TParams>
+  //     >,
+  //     'queryKey'
+  //   >,
+  //   queryClient?: QueryClient
+  // ): DefinedUseQueryResult<TData, TError>;
+}
+
+interface ServiceOperationQueryOptionalParameters<
+  TSchema extends { url: string; method: string },
+  TParams,
+  TData,
+  TError = DefaultError,
+> {
+  (
+    params?: TParams,
+    options?: Omit<
+      UndefinedInitialDataOptions<
+        TData,
+        TError,
+        TData,
+        ServiceOperationQueryKey<TSchema, TParams>
+      >,
+      'queryKey'
+    >,
+    queryClient?: QueryClient
+  ): UseQueryResult<TData, TError>;
+
+  (
+    params?: TParams,
+    options?: Omit<
+      DefinedInitialDataOptions<
+        TData,
+        TError,
+        TData,
+        ServiceOperationQueryKey<TSchema, TParams>
+      >,
+      'queryKey'
+    >,
+    queryClient?: QueryClient
+  ): DefinedUseQueryResult<TData, TError>;
+}
+
+interface ServiceOperationQueryRequiredParameters<
+  TSchema extends { url: string; method: string },
+  TParams,
+  TData,
+  TError = DefaultError,
+> {
+  (
     params: TParams,
     options?: Omit<
       UndefinedInitialDataOptions<
@@ -47,7 +130,7 @@ export interface ServiceOperationQuery<
     queryClient?: QueryClient
   ): UseQueryResult<TData, TError>;
 
-  useQuery(
+  (
     params: TParams,
     options?: Omit<
       DefinedInitialDataOptions<
@@ -77,10 +160,7 @@ export interface ServiceOperationMutation<
 
   mutationFn: MutationFn<TSchema, TParams, TBody, TData>;
 
-  useMutation<
-    TVariables extends { parameters: TParams; body: TBody },
-    TContext = unknown,
-  >(
+  useMutation<TVariables extends { body: TBody } & TParams, TContext = unknown>(
     params?: undefined,
     options?: Omit<
       UseMutationOptions<TData, TError, TVariables, TContext>,

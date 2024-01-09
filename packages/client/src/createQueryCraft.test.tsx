@@ -47,7 +47,7 @@ describe('Qraft uses Queries', () => {
 });
 
 describe('Qraft uses Mutations', () => {
-  it('supports useMutation', async () => {
+  it('supports useMutation without predefined parameters', async () => {
     const { result } = renderHook(
       () => qraft.entities.postEntitiesIdDocuments.useMutation(),
       {
@@ -57,8 +57,45 @@ describe('Qraft uses Mutations', () => {
 
     act(() => {
       result.current.mutate({
-        // todo::seems, parameters is redundant property, may be flattened?
-        parameters: {
+        header: {
+          'x-monite-version': '1.0.0',
+        },
+        path: {
+          entity_id: '1',
+        },
+        query: {
+          referer: 'https://example.com',
+        },
+        body: {
+          verification_document_back: 'back',
+          verification_document_front: 'front',
+        },
+      });
+    });
+
+    await waitFor(() => {
+      expect(result.current.data).toEqual({
+        header: {
+          'x-monite-version': '1.0.0',
+        },
+        path: {
+          entity_id: '1',
+        },
+        query: {
+          referer: 'https://example.com',
+        },
+        body: {
+          verification_document_back: 'back',
+          verification_document_front: 'front',
+        },
+      });
+    });
+  });
+
+  it('supports useMutation with predefined parameters', async () => {
+    const { result } = renderHook(
+      () =>
+        qraft.entities.postEntitiesIdDocuments.useMutation({
           header: {
             'x-monite-version': '1.0.0',
           },
@@ -68,11 +105,16 @@ describe('Qraft uses Mutations', () => {
           query: {
             referer: 'https://example.com',
           },
-        },
-        body: {
-          verification_document_back: 'back',
-          verification_document_front: 'front',
-        },
+        }),
+      {
+        wrapper: Providers,
+      }
+    );
+
+    act(() => {
+      result.current.mutate({
+        verification_document_back: 'back',
+        verification_document_front: 'front',
       });
     });
 
