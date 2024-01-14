@@ -4,6 +4,7 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 
 import { getMutationKey } from './lib/callbacks/getMutationKey.js';
 import { getQueryKey } from './lib/callbacks/getQueryKey.js';
+import { mutationFn } from './lib/callbacks/mutationFn.js';
 import { queryFn } from './lib/callbacks/queryFn.js';
 import { createCallbackProxyDecoration } from './lib/createCallbackProxyDecoration.js';
 import { QueryCraftContext, RequestSchema } from './QueryCraftContext.js';
@@ -158,18 +159,7 @@ export const createQueryCraft = <
       }
 
       if (functionName === 'mutationFn') {
-        const [client, options] = args as Parameters<
-          ServiceOperationMutation<
-            RequestSchema,
-            unknown,
-            unknown,
-            never
-          >['mutationFn']
-        >;
-        return client(serviceOperation.schema, {
-          parameters: options.parameters,
-          body: options.body,
-        });
+        return mutationFn(serviceOperation.schema, args);
       }
 
       throw new Error(`Not supported API method: ${String(functionName)}`);
