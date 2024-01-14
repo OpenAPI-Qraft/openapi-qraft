@@ -49,7 +49,7 @@ interface ServiceOperationQueryOptionalParameters<
   TParams,
   TData,
   TError = DefaultError,
-> {
+> extends ServiceOperationQueryDefinedResult<TSchema, TParams, TData, TError> {
   (
     params?: TParams,
     options?: Omit<
@@ -63,20 +63,6 @@ interface ServiceOperationQueryOptionalParameters<
     >,
     queryClient?: QueryClient
   ): UseQueryResult<TData, TError>;
-
-  (
-    params?: TParams,
-    options?: Omit<
-      DefinedInitialDataOptions<
-        TData,
-        TError,
-        TData,
-        ServiceOperationQueryKey<TSchema, TParams>
-      >,
-      'queryKey'
-    >,
-    queryClient?: QueryClient
-  ): DefinedUseQueryResult<TData, TError>;
 }
 
 interface ServiceOperationQueryRequiredParameters<
@@ -84,7 +70,7 @@ interface ServiceOperationQueryRequiredParameters<
   TParams,
   TData,
   TError = DefaultError,
-> {
+> extends ServiceOperationQueryDefinedResult<TSchema, TParams, TData, TError> {
   (
     params: TParams,
     options?: Omit<
@@ -98,10 +84,17 @@ interface ServiceOperationQueryRequiredParameters<
     >,
     queryClient?: QueryClient
   ): UseQueryResult<TData, TError>;
+}
 
+interface ServiceOperationQueryDefinedResult<
+  TSchema extends { url: string; method: string },
+  TParams,
+  TData,
+  TError = DefaultError,
+> {
   (
     params: TParams,
-    options?: Omit<
+    options: Omit<
       DefinedInitialDataOptions<
         TData,
         TError,
