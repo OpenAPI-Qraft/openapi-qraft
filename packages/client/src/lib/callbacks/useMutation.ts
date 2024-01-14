@@ -1,0 +1,82 @@
+import { useContext } from 'react';
+
+import { useMutation as useMutationBase } from '@tanstack/react-query';
+
+import { QueryCraftContext, RequestSchema } from '../../QueryCraftContext.js';
+import {
+  ServiceOperationMutation,
+  ServiceOperationMutationKey,
+} from '../../ServiceOperation.js';
+
+export const useMutation = (schema: RequestSchema, args: unknown) => {
+  const [parameters, options, ...restArgs] = args as Parameters<
+    ServiceOperationMutation<
+      RequestSchema,
+      object | undefined,
+      unknown,
+      unknown
+    >['useMutation']
+  >;
+
+  if (
+    parameters &&
+    typeof parameters === 'object' &&
+    options &&
+    'mutationKey' in options
+  )
+    throw new Error(
+      `'useMutation': parameters and 'options.mutationKey' cannot be used together`
+    );
+
+  const client = useContext(QueryCraftContext)?.client;
+
+  if (!client) throw new Error(`QueryCraftContext.client not found`);
+
+  const mutationKey =
+    parameters && typeof parameters === 'object'
+      ? ([
+          {
+            url: schema.url,
+            method: schema.method,
+          },
+          parameters,
+        ] as const)
+      : options && 'mutationKey' in options
+        ? (options.mutationKey as ServiceOperationMutationKey<
+            typeof schema,
+            unknown
+          >)
+        : ([
+            {
+              url: schema.url,
+              method: schema.method,
+            },
+          ] as const);
+
+  return useMutationBase(
+    {
+      ...options,
+      mutationKey,
+      mutationFn:
+        options?.mutationFn ??
+        (parameters
+          ? function (bodyPayload) {
+              return client(schema, {
+                parameters,
+                body: bodyPayload as never,
+              });
+            }
+          : function (parametersAndBodyPayload) {
+              const { body, ...parameters } = parametersAndBodyPayload as {
+                body: unknown;
+              };
+
+              return client(schema, {
+                body,
+                parameters,
+              } as never);
+            }),
+    },
+    ...restArgs
+  );
+};

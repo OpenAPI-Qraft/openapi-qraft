@@ -1,19 +1,15 @@
 import { useContext } from 'react';
 
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 
 import { getMutationKey } from './lib/callbacks/getMutationKey.js';
 import { getQueryKey } from './lib/callbacks/getQueryKey.js';
 import { mutationFn } from './lib/callbacks/mutationFn.js';
 import { queryFn } from './lib/callbacks/queryFn.js';
+import { useMutation } from './lib/callbacks/useMutation.js';
 import { createCallbackProxyDecoration } from './lib/createCallbackProxyDecoration.js';
 import { QueryCraftContext, RequestSchema } from './QueryCraftContext.js';
-import {
-  ServiceOperationMutation,
-  ServiceOperationMutationKey,
-  ServiceOperationQuery,
-  ServiceOperationQueryKey,
-} from './ServiceOperation.js';
+import { ServiceOperationQuery } from './ServiceOperation.js';
 
 export const createQueryCraft = <
   Services extends {
@@ -83,75 +79,7 @@ export const createQueryCraft = <
       }
 
       if (functionName === 'useMutation') {
-        const [parameters, options, ...restArgs] = args as Parameters<
-          ServiceOperationMutation<
-            RequestSchema,
-            object | undefined,
-            unknown,
-            unknown
-          >['useMutation']
-        >;
-
-        if (
-          parameters &&
-          typeof parameters === 'object' &&
-          options &&
-          'mutationKey' in options
-        )
-          throw new Error(
-            `'useMutation': parameters and 'options.mutationKey' cannot be used together`
-          );
-
-        const client = useContext(QueryCraftContext)?.client;
-
-        if (!client) throw new Error(`QueryCraftContext.client not found`);
-
-        const mutationKey =
-          parameters && typeof parameters === 'object'
-            ? ([
-                {
-                  url: serviceOperation.schema.url,
-                  method: serviceOperation.schema.method,
-                },
-                parameters,
-              ] as const)
-            : options && 'mutationKey' in options
-              ? (options.mutationKey as ServiceOperationMutationKey<
-                  typeof serviceOperation.schema,
-                  unknown
-                >)
-              : ([
-                  {
-                    url: serviceOperation.schema.url,
-                    method: serviceOperation.schema.method,
-                  },
-                ] as const);
-
-        return useMutation(
-          {
-            ...options,
-            mutationKey,
-            mutationFn:
-              options?.mutationFn ??
-              (parameters
-                ? function (bodyPayload) {
-                    return client(serviceOperation.schema, {
-                      parameters,
-                      body: bodyPayload as never,
-                    });
-                  }
-                : function (parametersAndBodyPayload) {
-                    const { body, ...parameters } =
-                      parametersAndBodyPayload as { body: unknown };
-
-                    return client(serviceOperation.schema, {
-                      body,
-                      parameters,
-                    } as never);
-                  }),
-          },
-          ...restArgs
-        );
+        return useMutation(serviceOperation.schema, args);
       }
 
       if (functionName === 'queryFn') {
