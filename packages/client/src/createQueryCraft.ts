@@ -4,6 +4,7 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 
 import { getMutationKey } from './lib/callbacks/getMutationKey.js';
 import { getQueryKey } from './lib/callbacks/getQueryKey.js';
+import { queryFn } from './lib/callbacks/queryFn.js';
 import { createCallbackProxyDecoration } from './lib/createCallbackProxyDecoration.js';
 import { QueryCraftContext, RequestSchema } from './QueryCraftContext.js';
 import {
@@ -153,16 +154,7 @@ export const createQueryCraft = <
       }
 
       if (functionName === 'queryFn') {
-        const [client, options] = args as Parameters<
-          ServiceOperationQuery<RequestSchema, unknown, never>['queryFn']
-        >;
-        const parameters =
-          'queryKey' in options ? options.queryKey[1] : options.parameters;
-        return client(serviceOperation.schema, {
-          parameters,
-          meta: options.meta,
-          signal: options.signal,
-        });
+        return queryFn(serviceOperation.schema, args);
       }
 
       if (functionName === 'mutationFn') {
