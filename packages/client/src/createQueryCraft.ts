@@ -3,6 +3,7 @@ import { useContext } from 'react';
 import { useMutation, useQuery } from '@tanstack/react-query';
 
 import { getMutationKey } from './lib/callbacks/getMutationKey.js';
+import { getQueryKey } from './lib/callbacks/getQueryKey.js';
 import { createCallbackProxyDecoration } from './lib/createCallbackProxyDecoration.js';
 import { QueryCraftContext, RequestSchema } from './QueryCraftContext.js';
 import {
@@ -42,14 +43,7 @@ export const createQueryCraft = <
         throw new Error(`Service operation not found: ${path.join('.')}`);
 
       if (functionName === 'getQueryKey') {
-        const [params] = args as Parameters<
-          ServiceOperationQuery<RequestSchema, unknown, unknown>['getQueryKey']
-        >;
-        const key: ServiceOperationQueryKey<RequestSchema, unknown> = [
-          { url: serviceOperation.schema.url },
-          params,
-        ];
-        return key;
+        return getQueryKey(serviceOperation.schema, args);
       }
 
       if (functionName === 'getMutationKey') {
