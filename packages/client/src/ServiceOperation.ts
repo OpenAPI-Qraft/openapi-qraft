@@ -1,8 +1,16 @@
-import type { DefaultError, QueryClient } from '@tanstack/query-core';
 import type {
+  DefaultError,
+  InfiniteData,
+  QueryClient,
+} from '@tanstack/query-core';
+import type {
+  DefinedInitialDataInfiniteOptions,
   DefinedInitialDataOptions,
+  DefinedUseInfiniteQueryResult,
   DefinedUseQueryResult,
+  UndefinedInitialDataInfiniteOptions,
   UndefinedInitialDataOptions,
+  UseInfiniteQueryResult,
   UseMutationOptions,
   UseMutationResult,
   UseQueryResult,
@@ -30,6 +38,7 @@ export interface ServiceOperationQuery<
   TParams,
   TData,
   TError = DefaultError,
+  TPageParam = unknown,
 > {
   schema: TSchema;
 
@@ -42,6 +51,14 @@ export interface ServiceOperationQuery<
   useQuery: AreKeysOptional<TParams> extends true
     ? ServiceOperationQueryOptionalParameters<TSchema, TParams, TData, TError>
     : ServiceOperationQueryRequiredParameters<TSchema, TParams, TData, TError>;
+
+  useInfiniteQuery: ServiceOperationInfiniteQuery<
+    TSchema,
+    TParams,
+    TData,
+    TError,
+    TPageParam
+  >;
 }
 
 interface ServiceOperationQueryOptionalParameters<
@@ -105,6 +122,43 @@ interface ServiceOperationQueryDefinedResult<
     >,
     queryClient?: QueryClient
   ): DefinedUseQueryResult<TData, TError>;
+}
+
+interface ServiceOperationInfiniteQuery<
+  TSchema extends { url: string; method: string },
+  TParams,
+  TData,
+  TError = DefaultError,
+  TPageParam = unknown,
+> {
+  (
+    params: TParams,
+    options: Omit<
+      UndefinedInitialDataInfiniteOptions<
+        TData,
+        TError,
+        InfiniteData<TData>,
+        ServiceOperationQueryKey<TSchema, TParams>,
+        TPageParam
+      >,
+      'queryKey'
+    >,
+    queryClient?: QueryClient
+  ): UseInfiniteQueryResult<TData, TError>;
+  (
+    params: TParams,
+    options: Omit<
+      DefinedInitialDataInfiniteOptions<
+        TData,
+        TError,
+        InfiniteData<TData>,
+        ServiceOperationQueryKey<TSchema, TParams>,
+        TPageParam
+      >,
+      'queryKey'
+    >,
+    queryClient?: QueryClient
+  ): DefinedUseInfiniteQueryResult<TData, TError>;
 }
 
 export interface ServiceOperationMutation<
