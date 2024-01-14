@@ -1,15 +1,11 @@
-import { useContext } from 'react';
-
-import { useQuery } from '@tanstack/react-query';
-
 import { getMutationKey } from './lib/callbacks/getMutationKey.js';
 import { getQueryKey } from './lib/callbacks/getQueryKey.js';
 import { mutationFn } from './lib/callbacks/mutationFn.js';
 import { queryFn } from './lib/callbacks/queryFn.js';
 import { useMutation } from './lib/callbacks/useMutation.js';
+import { useQuery } from './lib/callbacks/useQuery.js';
 import { createCallbackProxyDecoration } from './lib/createCallbackProxyDecoration.js';
-import { QueryCraftContext, RequestSchema } from './QueryCraftContext.js';
-import { ServiceOperationQuery } from './ServiceOperation.js';
+import { RequestSchema } from './QueryCraftContext.js';
 
 export const createQueryCraft = <
   Services extends {
@@ -49,33 +45,7 @@ export const createQueryCraft = <
       }
 
       if (functionName === 'useQuery') {
-        const [params, options, ...restArgs] = args as Parameters<
-          ServiceOperationQuery<RequestSchema, unknown, unknown>['useQuery']
-        >;
-
-        const client = useContext(QueryCraftContext)?.client;
-
-        if (!client) throw new Error(`QueryCraftContext.client not found`);
-
-        return useQuery(
-          {
-            ...options,
-            queryKey: [
-              { url: serviceOperation.schema.url },
-              params as never,
-            ] as const,
-            queryFn:
-              options?.queryFn ??
-              function ({ queryKey: [, queryParams], signal, meta }) {
-                return client(serviceOperation.schema, {
-                  parameters: queryParams as never,
-                  signal,
-                  meta,
-                });
-              },
-          },
-          ...restArgs
-        );
+        return useQuery(serviceOperation.schema, args as never);
       }
 
       if (functionName === 'useMutation') {
