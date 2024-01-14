@@ -1,12 +1,17 @@
 import { createContext } from 'react';
 
-import { RequestSchema } from './ServiceOperation.js';
-
 type RequestClientParams = {
   header?: Record<string, never>;
   path?: Record<string, never>;
   query?: Record<string, never>;
   cookie?: Record<string, never>;
+};
+
+export type RequestSchema = {
+  url: string;
+  method: 'get' | 'put' | 'post' | 'delete' | 'options' | 'head' | 'patch';
+  errors?: number[];
+  mediaType?: string;
 };
 
 export type RequestClient = <T>(

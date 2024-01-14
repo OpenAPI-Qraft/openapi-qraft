@@ -3,14 +3,12 @@ import type {
   DefinedInitialDataOptions,
   DefinedUseQueryResult,
   UndefinedInitialDataOptions,
-  UseQueryResult,
-} from '@tanstack/react-query';
-import type {
   UseMutationOptions,
   UseMutationResult,
+  UseQueryResult,
 } from '@tanstack/react-query';
 
-export type ServiceOperationQueryKey<S extends Record<'url', string>, T> = [
+export type ServiceOperationQueryKey<S extends { url: string }, T> = [
   Pick<S, 'url'>,
   T,
 ];
@@ -41,38 +39,9 @@ export interface ServiceOperationQuery<
 
   queryFn: QueryFn<TSchema, TParams, TData>;
 
-  // !! experimental, need to test
   useQuery: AreKeysOptional<TParams> extends true
     ? ServiceOperationQueryOptionalParameters<TSchema, TParams, TData, TError>
     : ServiceOperationQueryRequiredParameters<TSchema, TParams, TData, TError>;
-
-  // useQuery(
-  //   params: TParams,
-  //   options?: Omit<
-  //     UndefinedInitialDataOptions<
-  //       TData,
-  //       TError,
-  //       TData,
-  //       ServiceOperationQueryKey<TSchema, TParams>
-  //     >,
-  //     'queryKey'
-  //   >,
-  //   queryClient?: QueryClient
-  // ): UseQueryResult<TData, TError>;
-  //
-  // useQuery(
-  //   params: TParams,
-  //   options?: Omit<
-  //     DefinedInitialDataOptions<
-  //       TData,
-  //       TError,
-  //       TData,
-  //       ServiceOperationQueryKey<TSchema, TParams>
-  //     >,
-  //     'queryKey'
-  //   >,
-  //   queryClient?: QueryClient
-  // ): DefinedUseQueryResult<TData, TError>;
 }
 
 interface ServiceOperationQueryOptionalParameters<
@@ -171,7 +140,6 @@ export interface ServiceOperationMutation<
     queryClient?: QueryClient
   ): UseMutationResult<TData, TError, TVariables, TContext>;
 
-  // ????experimental, need to test
   useMutation<TVariables extends TBody, TContext = unknown>(
     params: TParams,
     options?: Omit<
@@ -258,10 +226,3 @@ export interface MutationFn<
     }
   ): Promise<TData>;
 }
-
-export type RequestSchema = {
-  url: string;
-  method: 'get' | 'put' | 'post' | 'delete' | 'options' | 'head' | 'patch';
-  errors?: number[];
-  mediaType?: string;
-};

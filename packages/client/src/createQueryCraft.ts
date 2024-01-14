@@ -3,9 +3,8 @@ import { useContext } from 'react';
 import { useMutation, useQuery } from '@tanstack/react-query';
 
 import { createCallbackProxyDecoration } from './lib/createCallbackProxyDecoration.js';
-import { QueryCraftContext } from './QueryCraftContext.js';
+import { QueryCraftContext, RequestSchema } from './QueryCraftContext.js';
 import {
-  RequestSchema,
   ServiceOperationMutation,
   ServiceOperationMutationKey,
   ServiceOperationQuery,
