@@ -2,6 +2,7 @@ import { useContext } from 'react';
 
 import { useMutation, useQuery } from '@tanstack/react-query';
 
+import { getMutationKey } from './lib/callbacks/getMutationKey.js';
 import { createCallbackProxyDecoration } from './lib/createCallbackProxyDecoration.js';
 import { QueryCraftContext, RequestSchema } from './QueryCraftContext.js';
 import {
@@ -52,24 +53,7 @@ export const createQueryCraft = <
       }
 
       if (functionName === 'getMutationKey') {
-        const [parameters] = args as Parameters<
-          ServiceOperationMutation<
-            RequestSchema,
-            unknown,
-            unknown,
-            unknown
-          >['getMutationKey']
-        >;
-
-        const key: ServiceOperationMutationKey<RequestSchema, unknown> = [
-          {
-            url: serviceOperation.schema.url,
-            method: serviceOperation.schema.method,
-          },
-          omitMutationPayload(parameters),
-        ];
-
-        return key;
+        return getMutationKey(serviceOperation.schema, args);
       }
 
       if (functionName === 'useQuery') {
@@ -206,22 +190,6 @@ export const createQueryCraft = <
     }
   ) as Services;
 };
-
-function omitMutationPayload<T>(params: T) {
-  if (!params || typeof params !== 'object')
-    throw new Error('`params` must be object');
-
-  if ('body' in params || 'requestBody' in params) {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { body, requestBody, ...paramsRest } = params as Record<
-      'body' | 'requestBody',
-      unknown
-    >;
-    return paramsRest;
-  }
-
-  return params as Omit<T, 'body' | 'requestBody'>;
-}
 
 function isServiceOperation(
   input: unknown
