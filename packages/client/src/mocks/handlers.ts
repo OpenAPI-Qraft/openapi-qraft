@@ -60,6 +60,26 @@ export const handlers = [
       });
     }
   ),
+
+  http.get<
+    ServicePathParameters<Services['files']['getFiles']>,
+    undefined,
+    ServiceResponseParameters<Services['files']['getFiles']>
+  >(openApiToMswPath(services.files.getFiles.schema.url), ({ request }) => {
+    const query = getQueryParameters<Services['files']['getFiles']>(
+      request.url
+    );
+
+    const header = getHeaders<Services['files']['getFiles']>(
+      request.headers,
+      'x-'
+    );
+
+    return HttpResponse.json({
+      query,
+      header,
+    });
+  }),
 ];
 
 function openApiToMswPath(url: string) {
@@ -138,13 +158,13 @@ type ServicePathParameters<
 }
   ? QueryKey extends { path?: infer Parameters }
     ? Parameters & { 0: string }
-    : unknown
+    : {}
   : T extends {
         getMutationKey: (arg: infer MutationKey) => unknown;
       }
     ? MutationKey extends { path?: infer Parameters }
       ? Parameters & { 0: string }
-      : unknown
+      : {}
     : never;
 
 type ServiceQueryParameters<

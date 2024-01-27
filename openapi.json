@@ -415,6 +415,16 @@
             },
             "name": "id__in",
             "in": "query"
+          },
+          {
+            "description": "Page number",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "description": "Page number"
+            },
+            "name": "page",
+            "in": "query"
           }
         ],
         "responses": {
@@ -422,7 +432,36 @@
             "description": "Successful Response",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/FilesResponse" }
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "header": {
+                      "type": "object",
+                      "properties": {
+                        "x-monite-version": {
+                          "type": "string",
+                          "format": "date"
+                        }
+                      }
+                    },
+                    "query": {
+                      "type": "object",
+                      "properties": {
+                        "id__in": {
+                          "type": "array",
+                          "items": {
+                            "type": "string",
+                            "format": "uuid"
+                          }
+                        },
+                        "page": {
+                          "type": "string",
+                          "description": "Page number"
+                        }
+                      }
+                    }
+                  }
+                }
               }
             }
           },
