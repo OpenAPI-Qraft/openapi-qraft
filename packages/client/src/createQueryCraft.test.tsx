@@ -1,6 +1,10 @@
 import React, { ReactNode } from 'react';
 
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import {
+  QueryClient,
+  QueryClientProvider,
+  useQueryClient,
+} from '@tanstack/react-query';
 import { act, renderHook, waitFor } from '@testing-library/react';
 
 import { createQueryCraft } from './createQueryCraft.js';
@@ -41,6 +45,168 @@ describe('Qraft uses Queries', () => {
         query: {
           items_order: ['asc', 'desc'],
         },
+      });
+    });
+  });
+});
+
+describe('Qraft uses Infinite Queries', () => {
+  it('supports useInfiniteQuery', async () => {
+    const { result } = renderHook(
+      () =>
+        qraft.files.getFiles.useInfiniteQuery(
+          {
+            header: {
+              'x-monite-version': '1.0.0',
+            },
+            query: {
+              id__in: ['1', '2'],
+            },
+          },
+          {
+            getNextPageParam: (lastPage, allPages, params) => {
+              return {
+                query: {
+                  page: params.query?.page
+                    ? String(Number(params.query.page) + 1)
+                    : undefined,
+                },
+              };
+            },
+            initialPageParam: {
+              query: {
+                page: '1',
+              },
+            },
+          }
+        ),
+      {
+        wrapper: Providers,
+      }
+    );
+
+    await waitFor(() => {
+      expect(result.current.data).toEqual({
+        pageParams: [
+          {
+            query: {
+              page: '1',
+            },
+          },
+        ],
+        pages: [
+          {
+            header: {
+              'x-monite-version': '1.0.0',
+            },
+            query: {
+              id__in: ['1', '2'],
+              page: '1',
+            },
+          },
+        ],
+      });
+    });
+  });
+
+  it('supports useInfiniteQuery with next page', async () => {
+    const queryClient = new QueryClient();
+
+    const { result } = renderHook(
+      () =>
+        qraft.files.getFiles.useInfiniteQuery(
+          {
+            header: {
+              'x-monite-version': '1.0.0',
+            },
+            query: {
+              id__in: ['1', '2'],
+            },
+          },
+          {
+            getNextPageParam: (lastPage, allPages, params) => {
+              return {
+                query: {
+                  page: params.query?.page
+                    ? String(Number(params.query.page) + 1)
+                    : undefined,
+                },
+              };
+            },
+            initialPageParam: {
+              query: {
+                page: '1',
+              },
+            },
+          }
+        ),
+      {
+        wrapper: (props) => <Providers {...props} queryClient={queryClient} />,
+      }
+    );
+
+    await waitFor(() => {
+      expect(result.current.isSuccess).toBeTruthy();
+    });
+
+    await act(async () => {
+      await result.current.fetchNextPage();
+    });
+
+    const { result: result2 } = renderHook(
+      () => {
+        const queryClient = useQueryClient();
+
+        return queryClient.getQueryData(
+          qraft.files.getFiles.getQueryKey({
+            header: {
+              'x-monite-version': '1.0.0',
+            },
+            query: {
+              id__in: ['1', '2'],
+            },
+          })
+        );
+      },
+      {
+        wrapper: (props) => <Providers {...props} queryClient={queryClient} />,
+      }
+    );
+
+    await waitFor(() => {
+      expect(result2.current).toEqual({
+        pageParams: [
+          {
+            query: {
+              page: '1',
+            },
+          },
+          {
+            query: {
+              page: '2',
+            },
+          },
+        ],
+        pages: [
+          {
+            header: {
+              'x-monite-version': '1.0.0',
+            },
+            query: {
+              id__in: ['1', '2'],
+              page: '1',
+            },
+          },
+          {
+            header: {
+              'x-monite-version': '1.0.0',
+            },
+            query: {
+              id__in: ['1', '2'],
+              page: '2',
+            },
+          },
+        ],
       });
     });
   });
@@ -154,8 +320,14 @@ describe('Qraft uses utils', () => {
   });
 });
 
-function Providers({ children }: { children: ReactNode }) {
-  const [queryClient] = React.useState(() => new QueryClient());
+function Providers({
+  children,
+  queryClient,
+}: {
+  children: ReactNode;
+  queryClient?: QueryClient;
+}) {
+  queryClient = React.useState(() => queryClient ?? new QueryClient())[0];
 
   return (
     <QueryClientProvider client={queryClient}>

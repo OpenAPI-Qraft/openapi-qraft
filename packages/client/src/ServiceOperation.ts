@@ -52,12 +52,12 @@ export interface ServiceOperationQuery<
     ? ServiceOperationQueryOptionalParameters<TSchema, TParams, TData, TError>
     : ServiceOperationQueryRequiredParameters<TSchema, TParams, TData, TError>;
 
-  /*useInfiniteQuery: ServiceOperationInfiniteQuery<
+  useInfiniteQuery: ServiceOperationInfiniteQuery<
     TSchema,
     TParams,
     TData,
     TError
-  >;*/
+  >;
 }
 
 interface ServiceOperationQueryOptionalParameters<

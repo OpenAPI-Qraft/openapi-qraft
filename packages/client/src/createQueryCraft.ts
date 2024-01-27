@@ -2,6 +2,7 @@ import { getMutationKey } from './lib/callbacks/getMutationKey.js';
 import { getQueryKey } from './lib/callbacks/getQueryKey.js';
 import { mutationFn } from './lib/callbacks/mutationFn.js';
 import { queryFn } from './lib/callbacks/queryFn.js';
+import { useInfiniteQuery } from './lib/callbacks/useInfiniteQuery.js';
 import { useMutation } from './lib/callbacks/useMutation.js';
 import { useQuery } from './lib/callbacks/useQuery.js';
 import { createCallbackProxyDecoration } from './lib/createCallbackProxyDecoration.js';
@@ -23,6 +24,7 @@ export const createQueryCraft = <
   const catchFunctionList = [
     'queryFn',
     'useQuery',
+    'useInfiniteQuery',
     'getQueryKey',
     'mutationFn',
     'useMutation',
@@ -46,6 +48,10 @@ export const createQueryCraft = <
 
       if (functionName === 'useQuery') {
         return useQuery(serviceOperation.schema, args as never);
+      }
+
+      if (functionName === 'useInfiniteQuery') {
+        return useInfiniteQuery(serviceOperation.schema, args as never);
       }
 
       if (functionName === 'useMutation') {
