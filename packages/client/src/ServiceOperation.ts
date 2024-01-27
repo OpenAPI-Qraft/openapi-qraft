@@ -2,6 +2,7 @@ import type {
   DefaultError,
   InfiniteData,
   QueryClient,
+  InfiniteQueryPageParamsOptions,
 } from '@tanstack/query-core';
 import type {
   DefinedInitialDataInfiniteOptions,
@@ -38,7 +39,6 @@ export interface ServiceOperationQuery<
   TParams,
   TData,
   TError = DefaultError,
-  TPageParam = unknown,
 > {
   schema: TSchema;
 
@@ -56,8 +56,7 @@ export interface ServiceOperationQuery<
     TSchema,
     TParams,
     TData,
-    TError,
-    TPageParam
+    TError
   >;*/
 }
 
@@ -124,14 +123,17 @@ interface ServiceOperationQueryDefinedResult<
   ): DefinedUseQueryResult<TData, TError>;
 }
 
+type PartialParams<T> = T extends object
+  ? { [K in keyof T]?: T[K] extends object ? Partial<T[K]> : T[K] }
+  : T;
+
 interface ServiceOperationInfiniteQuery<
   TSchema extends { url: string; method: string },
   TParams,
   TData,
   TError = DefaultError,
-  TPageParam = unknown,
 > {
-  (
+  <TPageParam extends TParams>(
     params: TParams,
     options: Omit<
       UndefinedInitialDataInfiniteOptions<
@@ -139,13 +141,17 @@ interface ServiceOperationInfiniteQuery<
         TError,
         InfiniteData<TData>,
         ServiceOperationQueryKey<TSchema, TParams>,
-        TPageParam
+        PartialParams<TPageParam>
       >,
-      'queryKey'
-    >,
+      | 'queryKey'
+      | 'getPreviousPageParam'
+      | 'getNextPageParam'
+      | 'initialPageParam'
+    > &
+      InfiniteQueryPageParamsOptions<TData, PartialParams<TPageParam>>,
     queryClient?: QueryClient
-  ): UseInfiniteQueryResult<TData, TError>;
-  (
+  ): UseInfiniteQueryResult<InfiniteData<TData>, TError>;
+  <TPageParam extends TParams>(
     params: TParams,
     options: Omit<
       DefinedInitialDataInfiniteOptions<
@@ -153,12 +159,16 @@ interface ServiceOperationInfiniteQuery<
         TError,
         InfiniteData<TData>,
         ServiceOperationQueryKey<TSchema, TParams>,
-        TPageParam
+        PartialParams<TPageParam>
       >,
-      'queryKey'
-    >,
+      | 'queryKey'
+      | 'getPreviousPageParam'
+      | 'getNextPageParam'
+      | 'initialPageParam'
+    > &
+      InfiniteQueryPageParamsOptions<TData, PartialParams<TPageParam>>,
     queryClient?: QueryClient
-  ): DefinedUseInfiniteQueryResult<TData, TError>;
+  ): DefinedUseInfiniteQueryResult<InfiniteData<TData>, TError>;
 }
 
 export interface ServiceOperationMutation<
