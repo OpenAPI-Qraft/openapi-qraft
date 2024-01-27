@@ -49,7 +49,7 @@ export const createQueryCraft = <
       }
 
       if (functionName === 'useMutation') {
-        return useMutation(serviceOperation.schema, args);
+        return useMutation(serviceOperation.schema, args as never);
       }
 
       if (functionName === 'queryFn') {

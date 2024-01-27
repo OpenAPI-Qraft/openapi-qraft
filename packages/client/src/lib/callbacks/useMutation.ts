@@ -1,5 +1,7 @@
 import { useContext } from 'react';
 
+import type { DefaultError } from '@tanstack/query-core';
+import type { UseMutationResult } from '@tanstack/react-query';
 import { useMutation as useMutationBase } from '@tanstack/react-query';
 
 import { QueryCraftContext, RequestSchema } from '../../QueryCraftContext.js';
@@ -8,15 +10,26 @@ import {
   ServiceOperationMutationKey,
 } from '../../ServiceOperation.js';
 
-export const useMutation = (schema: RequestSchema, args: unknown) => {
-  const [parameters, options, ...restArgs] = args as Parameters<
+export const useMutation: <
+  TData = unknown,
+  TError = DefaultError,
+  TVariables = void,
+  TContext = unknown,
+>(
+  schema: RequestSchema,
+  args: Parameters<
     ServiceOperationMutation<
       RequestSchema,
       object | undefined,
-      unknown,
-      unknown
+      TVariables,
+      TData
     >['useMutation']
-  >;
+  >
+) => UseMutationResult<TData, TError, TVariables, TContext> = (
+  schema,
+  args
+) => {
+  const [parameters, options, ...restArgs] = args;
 
   if (
     parameters &&
@@ -78,5 +91,5 @@ export const useMutation = (schema: RequestSchema, args: unknown) => {
             }),
     },
     ...restArgs
-  );
+  ) as never;
 };
