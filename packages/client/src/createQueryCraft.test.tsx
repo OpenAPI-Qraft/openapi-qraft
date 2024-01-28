@@ -8,11 +8,28 @@ import {
 import { act, renderHook, waitFor } from '@testing-library/react';
 
 import { createQueryCraft } from './createQueryCraft.js';
+import { getMutationKey } from './lib/callbacks/getMutationKey.js';
+import { getQueryKey } from './lib/callbacks/getQueryKey.js';
+import { mutationFn } from './lib/callbacks/mutationFn.js';
+import { queryFn } from './lib/callbacks/queryFn.js';
+import { useInfiniteQuery } from './lib/callbacks/useInfiniteQuery.js';
+import { useMutation } from './lib/callbacks/useMutation.js';
+import { useQuery } from './lib/callbacks/useQuery.js';
 import { getRequestBody, getRequestUrl, request } from './lib/core/request.js';
 import { services, Services } from './mocks/fixtures/api/index.js';
 import { QueryCraftContext } from './QueryCraftContext.js';
 
-const qraft = createQueryCraft<Services>(services);
+const callbacks = {
+  queryFn,
+  useQuery,
+  useInfiniteQuery,
+  getQueryKey,
+  mutationFn,
+  useMutation,
+  getMutationKey,
+} as const;
+
+const qraft = createQueryCraft<Services, typeof callbacks>(services, callbacks);
 
 describe('Qraft uses Queries', () => {
   it('supports useQuery', async () => {
