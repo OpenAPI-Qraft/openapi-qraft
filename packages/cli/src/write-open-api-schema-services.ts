@@ -1,10 +1,12 @@
 import chalk from 'chalk';
 import fs from 'node:fs';
 import { resolve } from 'node:path';
+import { Readable } from 'node:stream';
+import { OpenAPI3 } from 'openapi-typescript';
 import ora from 'ora';
 
 import { getServices, Service } from './lib/open-api/getServices.js';
-import { readSchemaFromFile } from './lib/open-api/readSchemaFromFile.js';
+import { readSchema } from './lib/open-api/readSchema.js';
 import { astToString } from './lib/ts-factory/astToString.js';
 import {
   getServiceFactory,
@@ -20,15 +22,15 @@ type OutputOptions = {
 };
 
 export const writeOpenAPISchemaServices = async ({
-  sourcePath,
+  source,
   serviceImports,
   output,
 }: {
-  sourcePath: string;
+  source: string | URL | OpenAPI3 | Readable | Buffer;
   serviceImports: ServiceImportsFactoryOptions;
   output: OutputOptions;
 }) => {
-  const schema = await readSchemaFromFile(sourcePath);
+  const schema = await readSchema(source);
   const services = getServices(schema, output);
 
   await writeServices(services, output, servicesDirName, serviceImports);

@@ -1,7 +1,6 @@
 #!/usr/bin/env node
 import chalk from 'chalk';
 import { program } from 'commander';
-import * as console from 'console';
 
 import { fileHeader } from './lib/fileHeader.js';
 import { writeOpenAPISchemaServices } from './write-open-api-schema-services.js';
@@ -10,7 +9,7 @@ program
   .description(
     'Generate services declarations and Typed React Query Interfaces from OpenAPI Schema'
   )
-  .option('-i, --input <path>', 'Input OpenAPI Schema file path (json, yml)')
+  .argument('[input]', 'Input OpenAPI Schema file path, URL (json, yml)', null)
   .requiredOption(
     '-o, --out-dir <path>',
     'Output directory for generated services'
@@ -34,9 +33,23 @@ program
     '-ps, --postfix-services <string>',
     'Postfix to be added to the generated service name (eg: Service)'
   )
-  .action(async (args) => {
+  .action(async (input, args) => {
+    const source = input
+      ? new URL(input, new URL(`file://${process.cwd()}/`))
+      : process.stdin;
+
+    if (source === process.stdin && source.isTTY) {
+      console.error(
+        chalk.red(
+          'Input file not found or stdin is empty. Please specify `--input` option or pipe OpenAPI Schema to stdin.'
+        )
+      );
+
+      process.exit(1);
+    }
+
     await writeOpenAPISchemaServices({
-      sourcePath: args.input,
+      source,
       serviceImports: {
         operationGenericsPath: args.operationGenericsPath,
         schemaTypesPath: args.schemaTypesPath,
