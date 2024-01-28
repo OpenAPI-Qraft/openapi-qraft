@@ -2,7 +2,7 @@
   "name": "@radist2s/qraft",
   "version": "1.0.0",
   "scripts": {
-    "build": "tsc --project tsconfig.build.json",
+    "build": "rimraf dist/ && tsc --project tsconfig.build.json",
     "dev": "yarn build --watch",
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
@@ -22,6 +22,7 @@
     "msw": "^2.0.12",
     "query-string": "^8.1.0",
     "react": "^18.2.0",
+    "rimraf": "^5.0.5",
     "vitest": "^1.1.3"
   },
   "peerDependencies": {
