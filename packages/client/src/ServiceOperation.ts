@@ -49,37 +49,37 @@ interface ServiceOperationUseQuery<
   TParams = {},
   TError = DefaultError,
 > {
-  useQuery<TQueryParam extends TParams>(
-    params?: TQueryParam,
+  useQuery(
+    params?: TParams,
     options?: Omit<
       UndefinedInitialDataOptions<
         TData,
         TError,
         TData,
-        | ServiceOperationQueryKey<TSchema, TQueryParam>
-        | readonly [...ServiceOperationQueryKey<TSchema, TQueryParam>]
+        | ServiceOperationQueryKey<TSchema, TParams>
+        | readonly [...ServiceOperationQueryKey<TSchema, TParams>]
       >,
       'queryKey'
     >,
     queryClient?: QueryClient
   ): UseQueryResult<TData, TError> & {
-    queryKey: ServiceOperationQueryKey<TSchema, TQueryParam>;
+    queryKey: ServiceOperationQueryKey<TSchema, TParams>;
   };
-  useQuery<TQueryParam extends TParams>(
-    params: TQueryParam,
+  useQuery(
+    params: TParams,
     options: Omit<
       DefinedInitialDataOptions<
         TData,
         TError,
         TData,
-        | ServiceOperationQueryKey<TSchema, TQueryParam>
-        | readonly [...ServiceOperationQueryKey<TSchema, TQueryParam>]
+        | ServiceOperationQueryKey<TSchema, TParams>
+        | readonly [...ServiceOperationQueryKey<TSchema, TParams>]
       >,
       'queryKey'
     >,
     queryClient?: QueryClient
   ): DefinedUseQueryResult<TData, TError> & {
-    queryKey: ServiceOperationQueryKey<TSchema, TQueryParam>;
+    queryKey: ServiceOperationQueryKey<TSchema, TParams>;
   };
 }
 
