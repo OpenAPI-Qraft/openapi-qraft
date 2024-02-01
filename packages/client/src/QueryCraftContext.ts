@@ -1,10 +1,10 @@
 import { createContext } from 'react';
 
 type RequestClientParams = {
-  header?: Record<string, never>;
-  path?: Record<string, never>;
-  query?: Record<string, never>;
-  cookie?: Record<string, never>;
+  header?: Record<string, any>;
+  path?: Record<string, any>;
+  query?: Record<string, any>;
+  cookie?: Record<string, any>;
 };
 
 export type RequestSchema = {
