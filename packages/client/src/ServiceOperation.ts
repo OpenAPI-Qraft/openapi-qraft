@@ -36,9 +36,9 @@ export interface ServiceOperationQuery<
     ServiceOperationUseInfiniteQuery<TSchema, TData, TParams, TError> {
   schema: TSchema;
 
-  getQueryKey: <T extends TParams>(
-    params: T
-  ) => ServiceOperationQueryKey<TSchema, T>;
+  getQueryKey<QueryKeyParams extends TParams>(
+    params: QueryKeyParams
+  ): ServiceOperationQueryKey<TSchema, QueryKeyParams>;
 
   queryFn: QueryFn<TSchema, TParams, TData>;
 }
