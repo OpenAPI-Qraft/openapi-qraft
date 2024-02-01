@@ -138,14 +138,12 @@ export interface ServiceOperationMutation<
   TBody,
   TData,
   TError = DefaultError,
-> {
+> extends MutationFn<TSchema, TParams, TBody, TData> {
   schema: TSchema;
 
   getMutationKey: <T extends TParams>(
     params: T
   ) => ServiceOperationMutationKey<TSchema, T>;
-
-  mutationFn: MutationFn<TSchema, TParams, TBody, TData>;
 
   useMutation<TVariables extends { body: TBody } & TParams, TContext = unknown>(
     params?: undefined,
@@ -216,27 +214,28 @@ export interface MutationFn<
   TBody,
   TData,
 > {
-  <T extends TData>(
+  mutationFn(
     client: (
       schema: TSchema,
       options: {
         parameters: TParams;
         body: TBody;
       }
-    ) => T,
+    ) => TData,
     options: {
       parameters: TParams;
       body: TBody;
     }
   ): TData;
-  <T extends TData>(
+
+  mutationFn(
     client: (
       schema: TSchema,
       options: {
         parameters: TParams;
         body: TBody;
       }
-    ) => Promise<T>,
+    ) => Promise<TData>,
     options: {
       parameters: TParams;
       body: TBody;
