@@ -141,9 +141,9 @@ export interface ServiceOperationMutation<
 > extends MutationFn<TSchema, TParams, TBody, TData> {
   schema: TSchema;
 
-  getMutationKey: <T extends TParams>(
+  getMutationKey<T extends TParams>(
     params: T
-  ) => ServiceOperationMutationKey<TSchema, T>;
+  ): ServiceOperationMutationKey<TSchema, T>;
 
   useMutation<TVariables extends { body: TBody } & TParams, TContext = unknown>(
     params?: undefined,
