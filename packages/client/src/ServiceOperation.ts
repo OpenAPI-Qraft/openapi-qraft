@@ -32,7 +32,7 @@ export interface ServiceOperationQuery<
   TParams,
   TData,
   TError = DefaultError,
-> {
+> extends ServiceOperationUseQuery<TSchema, TData, TParams, TError> {
   schema: TSchema;
 
   getQueryKey: <T extends TParams>(
@@ -40,8 +40,6 @@ export interface ServiceOperationQuery<
   ) => ServiceOperationQueryKey<TSchema, T>;
 
   queryFn: QueryFn<TSchema, TParams, TData>;
-
-  useQuery: ServiceOperationUseQuery<TSchema, TData, TParams, TError>;
 
   useInfiniteQuery: ServiceOperationUseInfiniteQuery<
     TSchema,
@@ -57,37 +55,37 @@ interface ServiceOperationUseQuery<
   TParams = {},
   TError = DefaultError,
 > {
-  (
-    params?: TParams,
+  useQuery<TQueryParam extends TParams>(
+    params?: TQueryParam,
     options?: Omit<
       UndefinedInitialDataOptions<
         TData,
         TError,
         TData,
-        | ServiceOperationQueryKey<TSchema, TParams>
-        | readonly [...ServiceOperationQueryKey<TSchema, TParams>]
+        | ServiceOperationQueryKey<TSchema, TQueryParam>
+        | readonly [...ServiceOperationQueryKey<TSchema, TQueryParam>]
       >,
       'queryKey'
     >,
     queryClient?: QueryClient
   ): UseQueryResult<TData, TError> & {
-    queryKey: ServiceOperationQueryKey<TSchema, TParams>;
+    queryKey: ServiceOperationQueryKey<TSchema, TQueryParam>;
   };
-  (
-    params: TParams,
+  useQuery<TQueryParam extends TParams>(
+    params: TQueryParam,
     options: Omit<
       DefinedInitialDataOptions<
         TData,
         TError,
         TData,
-        | ServiceOperationQueryKey<TSchema, TParams>
-        | readonly [...ServiceOperationQueryKey<TSchema, TParams>]
+        | ServiceOperationQueryKey<TSchema, TQueryParam>
+        | readonly [...ServiceOperationQueryKey<TSchema, TQueryParam>]
       >,
       'queryKey'
     >,
     queryClient?: QueryClient
   ): DefinedUseQueryResult<TData, TError> & {
-    queryKey: ServiceOperationQueryKey<TSchema, TParams>;
+    queryKey: ServiceOperationQueryKey<TSchema, TQueryParam>;
   };
 }
 
