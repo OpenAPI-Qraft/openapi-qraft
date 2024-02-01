@@ -17,7 +17,7 @@ import { useMutation } from './lib/callbacks/useMutation.js';
 import { useQuery } from './lib/callbacks/useQuery.js';
 import { getRequestBody, getRequestUrl, request } from './lib/core/request.js';
 import { services, Services } from './mocks/fixtures/api/index.js';
-import { QueryCraftContext } from './QueryCraftContext.js';
+import { QueryCraftContext, RequestClient } from './QueryCraftContext.js';
 
 const callbacks = {
   queryFn,
@@ -30,6 +30,20 @@ const callbacks = {
 } as const;
 
 const qraft = createQueryCraft<Services, typeof callbacks>(services, callbacks);
+
+const client: RequestClient = async (schema, options) => {
+  return request(
+    {
+      baseUrl: 'https://api.sandbox.monite.com/v1',
+      version: '2023-06-04',
+    },
+    {
+      ...schema,
+      ...options,
+    },
+    { getRequestUrl, getRequestBody }
+  );
+};
 
 describe('Qraft uses Queries', () => {
   it('supports useQuery', async () => {
@@ -321,6 +335,39 @@ describe('Qraft uses Mutations', () => {
   });
 });
 
+describe('Qraft uses Query Function', () => {
+  it('uses queryFn', async () => {
+    const result = await qraft.approvalPolicies.getApprovalPoliciesId.queryFn(
+      client,
+      {
+        parameters: {
+          header: {
+            'x-monite-version': '1.0.0',
+          },
+          path: {
+            approval_policy_id: '1',
+          },
+          query: {
+            items_order: ['asc', 'desc'],
+          },
+        },
+      }
+    );
+
+    expect(result).toEqual({
+      header: {
+        'x-monite-version': '1.0.0',
+      },
+      path: {
+        approval_policy_id: '1',
+      },
+      query: {
+        items_order: ['asc', 'desc'],
+      },
+    });
+  });
+});
+
 describe('Qraft uses utils', () => {
   it('returns _def', () => {
     // @ts-ignore
@@ -348,23 +395,7 @@ function Providers({
 
   return (
     <QueryClientProvider client={queryClient}>
-      <QueryCraftContext.Provider
-        value={{
-          client: async (schema, options) => {
-            return request(
-              {
-                baseUrl: 'https://api.sandbox.monite.com/v1',
-                version: '2023-06-04',
-              },
-              {
-                ...schema,
-                ...options,
-              },
-              { getRequestUrl, getRequestBody }
-            );
-          },
-        }}
-      >
+      <QueryCraftContext.Provider value={{ client }}>
         {children}
       </QueryCraftContext.Provider>
     </QueryClientProvider>
