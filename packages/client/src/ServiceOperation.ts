@@ -27,14 +27,6 @@ export type ServiceOperationMutationKey<
   T,
 > = [Pick<S, 'url' | 'method'>, T];
 
-type AreKeysOptional<T> = T extends object
-  ? {
-      [P in keyof T]-?: T[P] extends NonNullable<T[P]> ? true : false;
-    }[keyof T] extends false
-    ? true
-    : false
-  : never;
-
 export interface ServiceOperationQuery<
   TSchema extends { url: string; method: string },
   TParams,
@@ -49,9 +41,7 @@ export interface ServiceOperationQuery<
 
   queryFn: QueryFn<TSchema, TParams, TData>;
 
-  useQuery: AreKeysOptional<TParams> extends true
-    ? ServiceOperationQueryOptionalParameters<TSchema, TParams, TData, TError>
-    : ServiceOperationQueryRequiredParameters<TSchema, TParams, TData, TError>;
+  useQuery: ServiceOperationUseQuery<TSchema, TData, TParams, TError>;
 
   useInfiniteQuery: ServiceOperationInfiniteQuery<
     TSchema,
@@ -61,12 +51,12 @@ export interface ServiceOperationQuery<
   >;
 }
 
-interface ServiceOperationQueryOptionalParameters<
+interface ServiceOperationUseQuery<
   TSchema extends { url: string; method: string },
-  TParams,
   TData,
+  TParams = {},
   TError = DefaultError,
-> extends ServiceOperationQueryDefinedResult<TSchema, TParams, TData, TError> {
+> {
   (
     params?: TParams,
     options?: Omit<
@@ -83,38 +73,6 @@ interface ServiceOperationQueryOptionalParameters<
   ): UseQueryResult<TData, TError> & {
     queryKey: ServiceOperationQueryKey<TSchema, TParams>;
   };
-}
-
-interface ServiceOperationQueryRequiredParameters<
-  TSchema extends { url: string; method: string },
-  TParams,
-  TData,
-  TError = DefaultError,
-> extends ServiceOperationQueryDefinedResult<TSchema, TParams, TData, TError> {
-  (
-    params: TParams,
-    options?: Omit<
-      UndefinedInitialDataOptions<
-        TData,
-        TError,
-        TData,
-        | ServiceOperationQueryKey<TSchema, TParams>
-        | readonly [...ServiceOperationQueryKey<TSchema, TParams>]
-      >,
-      'queryKey'
-    >,
-    queryClient?: QueryClient
-  ): UseQueryResult<TData, TError> & {
-    queryKey: ServiceOperationQueryKey<TSchema, TParams>;
-  };
-}
-
-interface ServiceOperationQueryDefinedResult<
-  TSchema extends { url: string; method: string },
-  TParams,
-  TData,
-  TError = DefaultError,
-> {
   (
     params: TParams,
     options: Omit<
