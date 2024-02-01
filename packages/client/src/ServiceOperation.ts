@@ -33,14 +33,13 @@ export interface ServiceOperationQuery<
   TData,
   TError = DefaultError,
 > extends ServiceOperationUseQuery<TSchema, TData, TParams, TError>,
-    ServiceOperationUseInfiniteQuery<TSchema, TData, TParams, TError> {
+    ServiceOperationUseInfiniteQuery<TSchema, TData, TParams, TError>,
+    ServiceOperationQueryFn<TSchema, TData, TParams> {
   schema: TSchema;
 
   getQueryKey<QueryKeyParams extends TParams>(
     params: QueryKeyParams
   ): ServiceOperationQueryKey<TSchema, QueryKeyParams>;
-
-  queryFn: QueryFn<TSchema, TParams, TData>;
 }
 
 interface ServiceOperationUseQuery<
@@ -169,15 +168,14 @@ export interface ServiceOperationMutation<
   ): UseMutationResult<TData, TError, TVariables, TContext>;
 }
 
-export interface QueryFn<
+interface ServiceOperationQueryFn<
   TSchema extends { url: string; method: string },
-  TParams,
   TData,
+  TParams,
 > {
-  <
-    T extends TData,
-    TMeta extends Record<string, unknown>,
-    TSignal extends AbortSignal,
+  queryFn<
+    TMeta extends Record<string, any>,
+    TSignal extends AbortSignal = AbortSignal,
   >(
     client: (
       schema: TSchema,
@@ -186,16 +184,16 @@ export interface QueryFn<
         signal?: TSignal;
         meta?: TMeta;
       }
-    ) => T,
+    ) => TData,
     options: { signal?: TSignal; meta?: TMeta } & (
       | { queryKey: [unknown, TParams] }
       | { parameters: TParams }
     )
   ): TData;
-  <
-    T extends TData,
-    TMeta extends Record<string, unknown>,
-    TSignal extends AbortSignal,
+
+  queryFn<
+    TMeta extends Record<string, any>,
+    TSignal extends AbortSignal = AbortSignal,
   >(
     client: (
       schema: TSchema,
@@ -204,7 +202,7 @@ export interface QueryFn<
         signal?: TSignal;
         meta?: TMeta;
       }
-    ) => Promise<T>,
+    ) => Promise<TData>,
     options: { signal?: TSignal; meta?: TMeta } & (
       | { queryKey: [unknown, TParams] }
       | { parameters: TParams }
