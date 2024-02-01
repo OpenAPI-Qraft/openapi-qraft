@@ -4513,8 +4513,8 @@ __metadata:
   linkType: hard
 
 "openapi-typescript@npm:^6.7.3":
-  version: 6.7.3
-  resolution: "openapi-typescript@npm:6.7.3"
+  version: 6.7.4
+  resolution: "openapi-typescript@npm:6.7.4"
   dependencies:
     ansi-colors: "npm:^4.1.3"
     fast-glob: "npm:^3.3.2"
@@ -4524,7 +4524,7 @@ __metadata:
     yargs-parser: "npm:^21.1.1"
   bin:
     openapi-typescript: bin/cli.js
-  checksum: 7fcb6fa31fa868e82d62317aa66c10bb96b400a06917978f4282ddc4b89b0812fbe4dabae880c592d6f5fa1abbff87917929dd7ad0761e157812f680ea24183b
+  checksum: d87ac3b2ce5f615bbada8da7489d480441241fdcb2abcc3068847e5935bdaf038aba6caeedd8cf10745c533e94ad0debe3b88536c439534a58172e532ec004e1
   languageName: node
   linkType: hard
 
