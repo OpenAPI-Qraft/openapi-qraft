@@ -138,13 +138,22 @@ export interface ServiceOperationMutation<
   TBody,
   TData,
   TError = DefaultError,
-> extends MutationFn<TSchema, TParams, TBody, TData> {
+> extends ServiceOperationUseMutation<TSchema, TBody, TData, TParams, TError>,
+    MutationFn<TSchema, TParams, TBody, TData> {
   schema: TSchema;
 
   getMutationKey<T extends TParams>(
     params: T
   ): ServiceOperationMutationKey<TSchema, T>;
+}
 
+interface ServiceOperationUseMutation<
+  TSchema extends { url: string; method: string },
+  TBody,
+  TData,
+  TParams = {},
+  TError = DefaultError,
+> {
   useMutation<TVariables extends { body: TBody } & TParams, TContext = unknown>(
     params?: undefined,
     options?: Omit<
