@@ -21,6 +21,7 @@ export type ServiceOperationQueryKey<S extends { url: string }, T> = [
   Pick<S, 'url'>,
   T,
 ];
+
 export type ServiceOperationMutationKey<
   S extends Record<'url' | 'method', string>,
   T,
@@ -73,12 +74,15 @@ interface ServiceOperationQueryOptionalParameters<
         TData,
         TError,
         TData,
-        ServiceOperationQueryKey<TSchema, TParams>
+        | ServiceOperationQueryKey<TSchema, TParams>
+        | readonly [...ServiceOperationQueryKey<TSchema, TParams>]
       >,
       'queryKey'
     >,
     queryClient?: QueryClient
-  ): UseQueryResult<TData, TError>;
+  ): UseQueryResult<TData, TError> & {
+    queryKey: ServiceOperationQueryKey<TSchema, TParams>;
+  };
 }
 
 interface ServiceOperationQueryRequiredParameters<
@@ -94,12 +98,15 @@ interface ServiceOperationQueryRequiredParameters<
         TData,
         TError,
         TData,
-        ServiceOperationQueryKey<TSchema, TParams>
+        | ServiceOperationQueryKey<TSchema, TParams>
+        | readonly [...ServiceOperationQueryKey<TSchema, TParams>]
       >,
       'queryKey'
     >,
     queryClient?: QueryClient
-  ): UseQueryResult<TData, TError>;
+  ): UseQueryResult<TData, TError> & {
+    queryKey: ServiceOperationQueryKey<TSchema, TParams>;
+  };
 }
 
 interface ServiceOperationQueryDefinedResult<
@@ -115,12 +122,15 @@ interface ServiceOperationQueryDefinedResult<
         TData,
         TError,
         TData,
-        ServiceOperationQueryKey<TSchema, TParams>
+        | ServiceOperationQueryKey<TSchema, TParams>
+        | readonly [...ServiceOperationQueryKey<TSchema, TParams>]
       >,
       'queryKey'
     >,
     queryClient?: QueryClient
-  ): DefinedUseQueryResult<TData, TError>;
+  ): DefinedUseQueryResult<TData, TError> & {
+    queryKey: ServiceOperationQueryKey<TSchema, TParams>;
+  };
 }
 
 type PartialParams<T> = T extends object
@@ -140,7 +150,8 @@ interface ServiceOperationInfiniteQuery<
         TData,
         TError,
         InfiniteData<TData>,
-        ServiceOperationQueryKey<TSchema, TParams>,
+        | ServiceOperationQueryKey<TSchema, TParams>
+        | readonly [...ServiceOperationQueryKey<TSchema, TParams>],
         PartialParams<TPageParam>
       >,
       | 'queryKey'
@@ -158,7 +169,8 @@ interface ServiceOperationInfiniteQuery<
         TData,
         TError,
         InfiniteData<TData>,
-        ServiceOperationQueryKey<TSchema, TParams>,
+        | ServiceOperationQueryKey<TSchema, TParams>
+        | readonly [...ServiceOperationQueryKey<TSchema, TParams>],
         PartialParams<TPageParam>
       >,
       | 'queryKey'

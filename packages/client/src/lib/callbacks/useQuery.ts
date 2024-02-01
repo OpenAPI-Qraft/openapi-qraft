@@ -5,7 +5,10 @@ import type { UseQueryResult } from '@tanstack/react-query';
 import { useQuery as useQueryBase } from '@tanstack/react-query';
 
 import { QueryCraftContext, RequestSchema } from '../../QueryCraftContext.js';
-import { ServiceOperationQuery } from '../../ServiceOperation.js';
+import {
+  ServiceOperationQuery,
+  ServiceOperationQueryKey,
+} from '../../ServiceOperation.js';
 
 export const useQuery: <
   TQueryFnData = unknown,
@@ -16,27 +19,34 @@ export const useQuery: <
   args: Parameters<
     ServiceOperationQuery<RequestSchema, unknown, unknown>['useQuery']
   >
-) => UseQueryResult<TData, TError> = (schema, args) => {
+) => UseQueryResult<TData, TError> & {
+  queryKey: ServiceOperationQueryKey<RequestSchema, unknown>;
+} = (schema, args) => {
   const [params, options, ...restArgs] = args;
 
   const client = useContext(QueryCraftContext)?.client;
 
   if (!client) throw new Error(`QueryCraftContext.client not found`);
 
-  return useQueryBase(
-    {
-      ...options,
-      queryKey: [{ url: schema.url }, params as never] as const,
-      queryFn:
-        options?.queryFn ??
-        function ({ queryKey: [, queryParams], signal, meta }) {
-          return client(schema, {
-            parameters: queryParams as never,
-            signal,
-            meta,
-          });
-        },
-    },
-    ...restArgs
-  ) as never;
+  const queryKey = [{ url: schema.url }, params] as const;
+
+  return {
+    queryKey,
+    ...useQueryBase(
+      {
+        ...options,
+        queryKey,
+        queryFn:
+          options?.queryFn ??
+          function ({ queryKey: [, queryParams], signal, meta }) {
+            return client(schema, {
+              parameters: queryParams as never,
+              signal,
+              meta,
+            });
+          },
+      },
+      ...restArgs
+    ),
+  } as never;
 };
