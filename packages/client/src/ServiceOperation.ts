@@ -32,7 +32,8 @@ export interface ServiceOperationQuery<
   TParams,
   TData,
   TError = DefaultError,
-> extends ServiceOperationUseQuery<TSchema, TData, TParams, TError> {
+> extends ServiceOperationUseQuery<TSchema, TData, TParams, TError>,
+    ServiceOperationUseInfiniteQuery<TSchema, TData, TParams, TError> {
   schema: TSchema;
 
   getQueryKey: <T extends TParams>(
@@ -40,13 +41,6 @@ export interface ServiceOperationQuery<
   ) => ServiceOperationQueryKey<TSchema, T>;
 
   queryFn: QueryFn<TSchema, TParams, TData>;
-
-  useInfiniteQuery: ServiceOperationUseInfiniteQuery<
-    TSchema,
-    TData,
-    TParams,
-    TError
-  >;
 }
 
 interface ServiceOperationUseQuery<
@@ -99,7 +93,7 @@ interface ServiceOperationUseInfiniteQuery<
   TParams = {},
   TError = DefaultError,
 > {
-  <TPageParam extends TParams>(
+  useInfiniteQuery<TPageParam extends TParams>(
     params: TParams,
     options: Omit<
       UndefinedInitialDataInfiniteOptions<
@@ -118,7 +112,7 @@ interface ServiceOperationUseInfiniteQuery<
       InfiniteQueryPageParamsOptions<TData, PartialParams<TPageParam>>,
     queryClient?: QueryClient
   ): UseInfiniteQueryResult<InfiniteData<TData>, TError>;
-  <TPageParam extends TParams>(
+  useInfiniteQuery<TPageParam extends TParams>(
     params: TParams,
     options: Omit<
       DefinedInitialDataInfiniteOptions<
