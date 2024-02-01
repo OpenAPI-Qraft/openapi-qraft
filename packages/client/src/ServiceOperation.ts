@@ -43,10 +43,10 @@ export interface ServiceOperationQuery<
 
   useQuery: ServiceOperationUseQuery<TSchema, TData, TParams, TError>;
 
-  useInfiniteQuery: ServiceOperationInfiniteQuery<
+  useInfiniteQuery: ServiceOperationUseInfiniteQuery<
     TSchema,
-    TParams,
     TData,
+    TParams,
     TError
   >;
 }
@@ -95,10 +95,10 @@ type PartialParams<T> = T extends object
   ? { [K in keyof T]?: T[K] extends object ? Partial<T[K]> : T[K] }
   : T;
 
-interface ServiceOperationInfiniteQuery<
+interface ServiceOperationUseInfiniteQuery<
   TSchema extends { url: string; method: string },
-  TParams,
   TData,
+  TParams = {},
   TError = DefaultError,
 > {
   <TPageParam extends TParams>(
