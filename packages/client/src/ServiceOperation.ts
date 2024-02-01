@@ -139,7 +139,7 @@ export interface ServiceOperationMutation<
   TData,
   TError = DefaultError,
 > extends ServiceOperationUseMutation<TSchema, TBody, TData, TParams, TError>,
-    MutationFn<TSchema, TParams, TBody, TData> {
+    ServiceOperationMutationFn<TSchema, TParams, TBody, TData> {
   schema: TSchema;
 
   getMutationKey<T extends TParams>(
@@ -218,6 +218,7 @@ interface ServiceOperationQueryFn<
 }
 
 export interface MutationFn<
+export interface ServiceOperationMutationFn<
   TSchema extends { url: string; method: string },
   TParams,
   TBody,
