@@ -1,8 +1,11 @@
-import type {
+import {
   DefaultError,
   InfiniteData,
   QueryClient,
   InfiniteQueryPageParamsOptions,
+  NoInfer,
+  SetDataOptions,
+  Updater,
 } from '@tanstack/query-core';
 import type {
   DefinedInitialDataInfiniteOptions,
@@ -34,7 +37,8 @@ export interface ServiceOperationQuery<
   TError = DefaultError,
 > extends ServiceOperationUseQuery<TSchema, TData, TParams, TError>,
     ServiceOperationUseInfiniteQuery<TSchema, TData, TParams, TError>,
-    ServiceOperationQueryFn<TSchema, TData, TParams> {
+    ServiceOperationQueryFn<TSchema, TData, TParams>,
+    ServiceOperationSetQueryData<TData, TParams> {
   schema: TSchema;
 
   getQueryKey<QueryKeyParams extends TParams>(
@@ -139,7 +143,8 @@ export interface ServiceOperationMutation<
   TData,
   TError = DefaultError,
 > extends ServiceOperationUseMutation<TSchema, TBody, TData, TParams, TError>,
-    ServiceOperationMutationFn<TSchema, TParams, TBody, TData> {
+    ServiceOperationMutationFn<TSchema, TParams, TBody, TData>,
+    ServiceOperationSetQueryData<TData, TParams> {
   schema: TSchema;
 
   getMutationKey<T extends TParams>(
@@ -217,7 +222,15 @@ interface ServiceOperationQueryFn<
   ): Promise<TData>;
 }
 
-export interface MutationFn<
+interface ServiceOperationSetQueryData<TData, TParams = {}> {
+  setQueryData(
+    queryKey: TParams,
+    updater: Updater<NoInfer<TData> | undefined, NoInfer<TData> | undefined>,
+    queryClient: QueryClient,
+    options?: SetDataOptions
+  ): TData | undefined;
+}
+
 export interface ServiceOperationMutationFn<
   TSchema extends { url: string; method: string },
   TParams,

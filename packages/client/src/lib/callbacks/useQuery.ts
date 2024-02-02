@@ -28,7 +28,10 @@ export const useQuery: <
 
   if (!client) throw new Error(`QueryCraftContext.client not found`);
 
-  const queryKey = [{ url: schema.url }, params] as const;
+  const queryKey: ServiceOperationQueryKey<RequestSchema, unknown> = [
+    { url: schema.url },
+    params,
+  ];
 
   return {
     queryKey,

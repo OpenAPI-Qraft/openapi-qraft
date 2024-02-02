@@ -12,6 +12,7 @@ import { getMutationKey } from './lib/callbacks/getMutationKey.js';
 import { getQueryKey } from './lib/callbacks/getQueryKey.js';
 import { mutationFn } from './lib/callbacks/mutationFn.js';
 import { queryFn } from './lib/callbacks/queryFn.js';
+import { setQueryData } from './lib/callbacks/setQueryData.js';
 import { useInfiniteQuery } from './lib/callbacks/useInfiniteQuery.js';
 import { useMutation } from './lib/callbacks/useMutation.js';
 import { useQuery } from './lib/callbacks/useQuery.js';
@@ -27,6 +28,7 @@ const callbacks = {
   mutationFn,
   useMutation,
   getMutationKey,
+  setQueryData,
 } as const;
 
 const qraft = createQueryCraft<Services, typeof callbacks>(services, callbacks);
@@ -430,6 +432,52 @@ describe('Qraft uses utils', () => {
       // @ts-ignore
       qraft.counterparts.postCounterpartsIdAddresses.unsupportedMethod()
     ).toThrowError(/Function unsupportedMethod is not supported/i);
+  });
+});
+
+describe('Qraft uses setQueryData', () => {
+  it('uses setQueryData', async () => {
+    const queryClient = new QueryClient();
+
+    qraft.files.getFiles.setQueryData(
+      {
+        header: {
+          'x-monite-version': '1.0.0',
+        },
+        query: {
+          id__in: ['1', '2'],
+        },
+      },
+      {
+        header: {
+          'x-monite-version': '1.0.0',
+        },
+        query: {
+          id__in: ['1', '2'],
+        },
+      },
+      queryClient
+    );
+
+    expect(
+      queryClient.getQueryData(
+        qraft.files.getFiles.getQueryKey({
+          header: {
+            'x-monite-version': '1.0.0',
+          },
+          query: {
+            id__in: ['1', '2'],
+          },
+        })
+      )
+    ).toEqual({
+      header: {
+        'x-monite-version': '1.0.0',
+      },
+      query: {
+        id__in: ['1', '2'],
+      },
+    });
   });
 });
 
