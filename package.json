@@ -7,11 +7,11 @@
     "dev": "yarn workspaces foreach --verbose --recursive --no-private --from '@radist2s/*' run dev",
     "test": "yarn workspaces foreach --verbose --recursive --no-private --from '@radist2s/*' run test",
     "lint": "yarn workspaces foreach --verbose --recursive run lint",
-    "generate": "openapi-typescript ./openapi.json -o openapi.d.ts"
+    "generate": "qraft-openapi-typescript ./openapi.json -o openapi.d.ts"
   },
   "devDependencies": {
+    "@radist2s/qraft-openapi-typescript": "workspace:^",
     "@trivago/prettier-plugin-sort-imports": "^4.3.0",
-    "openapi-typescript": "^6.7.3",
     "prettier": "^3.1.1",
     "typescript": "^5.3.3"
   },

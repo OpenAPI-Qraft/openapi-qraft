@@ -1,0 +1,40 @@
+{
+  "name": "@radist2s/qraft-openapi-typescript",
+  "packageManager": "yarn@4.0.2",
+  "type": "module",
+  "bin": "./dist/bin.js",
+  "scripts": {
+    "build": "tsc --project tsconfig.build.json",
+    "dev": "yarn build --watch"
+  },
+  "dependencies": {
+    "commander": "^11.1.0",
+    "openapi-typescript": "7.0.0-next.7"
+  },
+  "devDependencies": {
+    "@types/node": "^18.19.4",
+    "typescript": "^5.3.3"
+  },
+  "peerDependencies": {
+    "typescript": "^5.x"
+  },
+  "peerDependenciesMeta": {
+    "typescript": {
+      "optional": false
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "exports": {
+    "./package.json": "./package.json",
+    "./*": "./dist/*.js"
+  },
+  "typesVersions": {
+    "*": {
+      "*": [
+        "dist/*"
+      ]
+    }
+  }
+}
