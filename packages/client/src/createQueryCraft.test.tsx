@@ -397,7 +397,6 @@ describe('Qraft uses Mutations', () => {
 describe('Qraft uses Query Function', () => {
   it('uses queryFn', async () => {
     const result = await qraft.approvalPolicies.getApprovalPoliciesId.queryFn(
-      client,
       {
         parameters: {
           header: {
@@ -410,7 +409,8 @@ describe('Qraft uses Query Function', () => {
             items_order: ['asc', 'desc'],
           },
         },
-      }
+      },
+      client
     );
 
     expect(result).toEqual({

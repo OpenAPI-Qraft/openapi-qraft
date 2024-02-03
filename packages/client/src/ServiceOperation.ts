@@ -201,6 +201,10 @@ interface ServiceOperationQueryFn<
     TMeta extends Record<string, any>,
     TSignal extends AbortSignal = AbortSignal,
   >(
+    options: { signal?: TSignal; meta?: TMeta } & (
+      | { queryKey: [unknown, TParams] }
+      | { parameters: TParams }
+    ),
     client: (
       schema: TSchema,
       options: {
@@ -208,17 +212,17 @@ interface ServiceOperationQueryFn<
         signal?: TSignal;
         meta?: TMeta;
       }
-    ) => TData,
-    options: { signal?: TSignal; meta?: TMeta } & (
-      | { queryKey: [unknown, TParams] }
-      | { parameters: TParams }
-    )
+    ) => TData
   ): TData;
 
   queryFn<
     TMeta extends Record<string, any>,
     TSignal extends AbortSignal = AbortSignal,
   >(
+    options: { signal?: TSignal; meta?: TMeta } & (
+      | { queryKey: [unknown, TParams] }
+      | { parameters: TParams }
+    ),
     client: (
       schema: TSchema,
       options: {
@@ -226,11 +230,7 @@ interface ServiceOperationQueryFn<
         signal?: TSignal;
         meta?: TMeta;
       }
-    ) => Promise<TData>,
-    options: { signal?: TSignal; meta?: TMeta } & (
-      | { queryKey: [unknown, TParams] }
-      | { parameters: TParams }
-    )
+    ) => Promise<TData>
   ): Promise<TData>;
 }
 
