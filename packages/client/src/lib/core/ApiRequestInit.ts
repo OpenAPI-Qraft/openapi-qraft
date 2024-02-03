@@ -16,7 +16,6 @@ export type ApiRequestInit = {
   };
   readonly body?: BodyInit | Record<string, unknown> | null;
   readonly mediaType?: string;
-  readonly errors?: number[];
   readonly headers?: HeadersOptions;
 } & Omit<RequestInit, 'headers' | 'method' | 'body'>;
 

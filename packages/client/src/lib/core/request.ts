@@ -1,8 +1,6 @@
-import { ApiError } from './ApiError.js';
 import { ApiRequestInit, HeadersOptions } from './ApiRequestInit.js';
-import type { ApiResult } from './ApiResult.js';
 
-export const getQueryString = (params: Record<string, any>): string => {
+export function getQueryString(params: Record<string, any>): string {
   const qs: string[] = [];
 
   const append = (key: string, value: any) => {
@@ -34,7 +32,7 @@ export const getQueryString = (params: Record<string, any>): string => {
   }
 
   return '';
-};
+}
 
 export function getRequestUrl(
   config: { baseUrl: string },
@@ -55,12 +53,12 @@ export function getRequestUrl(
   return `${config.baseUrl}${path}`;
 }
 
-const getBodyContentType = (body: ApiRequestInit['body']) => {
+function getBodyContentType(body: ApiRequestInit['body']) {
   if (!body) return;
   if (body instanceof Blob) return body.type || 'application/octet-stream';
   if (typeof body === 'string') return 'text/plain';
   if (!(body instanceof FormData)) return 'application/json';
-};
+}
 
 export function mergeHeaders(...allHeaders: (HeadersOptions | undefined)[]) {
   const headers = new Headers();
@@ -92,6 +90,8 @@ export function getRequestBody(options: {
   mediaType: ApiRequestInit['mediaType'];
   body: ApiRequestInit['body'];
 }) {
+  if (options.body === undefined) return;
+
   if (
     options.method === 'get' ||
     options.method === 'head' ||
@@ -99,14 +99,24 @@ export function getRequestBody(options: {
   )
     return;
 
-  if (options.mediaType?.includes('/form-data')) return getFormData(options);
+  if (options.mediaType?.includes('/form-data'))
+    return getRequestBodyFormData(options);
 
-  return getBody(options);
+  if (
+    !options.mediaType?.includes('/json') &&
+    (typeof options.body === 'string' ||
+      options.body instanceof Blob ||
+      options.body instanceof FormData)
+  ) {
+    return options.body;
+  }
+
+  return JSON.stringify(options.body);
 }
 
-const getFormData = ({
+function getRequestBodyFormData({
   body,
-}: Pick<ApiRequestInit, 'body'>): FormData | undefined => {
+}: Pick<ApiRequestInit, 'body'>): FormData | undefined {
   if (body instanceof FormData) return body;
   if (body === null) return;
 
@@ -143,109 +153,26 @@ const getFormData = ({
     });
 
   return formData;
-};
+}
 
-const getBody = (options: {
-  mediaType: ApiRequestInit['mediaType'];
-  body: ApiRequestInit['body'];
-}): any => {
-  if (options.body === undefined) return;
+export async function getResponseBody<T>(
+  response: Response
+): Promise<T | undefined> {
+  if (response.status === 204 || response.headers.get('Content-Length') === '0')
+    return undefined;
 
-  if (
-    !options.mediaType?.includes('/json') &&
-    (typeof options.body === 'string' ||
-      options.body instanceof Blob ||
-      options.body instanceof FormData)
-  ) {
-    return options.body;
-  }
+  const contentType = response.headers.get('Content-Type')?.toLowerCase();
+  const isJSON =
+    contentType?.includes('/json') || contentType?.includes('+json');
 
-  return JSON.stringify(options.body);
-};
+  // parse response (falling back to .text() when necessary)
+  if (isJSON) return response.json();
 
-export const sendRequest = async (
-  options: ApiRequestInit,
-  url: string,
-  body: BodyInit | undefined,
-  headers: Headers
-): Promise<Response> => {
-  const request: RequestInit = {
-    headers,
-    body: body,
-    method: options.method.toUpperCase(),
-    signal: options.signal,
-  };
-
-  return await fetch(url, request);
-};
-
-export const getResponseBody = async (response: Response): Promise<any> => {
-  if (response.status !== 204) {
-    try {
-      const contentType = response.headers.get('Content-Type');
-      if (contentType) {
-        const jsonTypes = ['application/json', 'application/problem+json'];
-        const isJSON = jsonTypes.some((type) =>
-          contentType.toLowerCase().startsWith(type)
-        );
-        if (isJSON) {
-          return await response.json();
-        } else {
-          return await response.text();
-        }
-      }
-    } catch (error) {
-      console.error(error);
-    }
-  }
-  return undefined;
-};
-
-export const catchErrorCodes = (
-  options: ApiRequestInit,
-  result: ApiResult
-): void => {
-  const errors: Record<number, string> = {
-    ...Object.fromEntries(
-      options.errors?.map((code) => [code, 'API Error']) ?? []
-    ),
-    400: 'Bad Request',
-    401: 'Unauthorized',
-    403: 'Forbidden',
-    404: 'Not Found',
-    500: 'Internal Server Error',
-    502: 'Bad Gateway',
-    503: 'Service Unavailable',
-  };
-
-  const error = errors[result.status];
-
-  if (error) {
-    throw new ApiError(options, result, error);
-  }
-
-  if (!result.ok) {
-    const errorStatus = result.status ?? 'unknown';
-    const errorStatusText = result.statusText ?? 'unknown';
-    const errorBody = (() => {
-      try {
-        return JSON.stringify(result.body, null, 2);
-      } catch (e) {
-        return undefined;
-      }
-    })();
-
-    throw new ApiError(
-      options,
-      result,
-      `Generic Error: status: ${errorStatus}; status text: ${errorStatusText}; body: ${errorBody}`
-    );
-  }
-};
+  return response.text() as Promise<T>;
+}
 
 /**
- * Request method
- * @throws ApiError
+ * @throws {error: object|string, response: Response} if the request fails
  */
 export async function request<T>(
   config: { baseUrl: string },
@@ -263,41 +190,41 @@ export async function request<T>(
     url,
     parameters,
     mediaType,
-    errors,
     headers,
     body,
     ...requestInitRest
   } = requestInit;
 
+  const requestBody = getRequestBodyFunc({
+    method,
+    mediaType,
+    body,
+  });
+
   const response = await fetch(getRequestUrlFunc(config, { url, parameters }), {
-    body: getRequestBodyFunc({
-      method,
-      mediaType,
-      body,
-    }),
+    method: method.toUpperCase(),
+    body: requestBody,
     headers: mergeHeaders(
       {
         Accept: 'application/json',
         'Content-Type': mediaType ?? getBodyContentType(body),
       },
       headers,
-      parameters?.header
+      parameters?.header,
+      requestBody instanceof FormData
+        ? // remove `Content-Type` if serialized body is FormData; browser will correctly set Content-Type & boundary expression
+          { 'Content-Type': null }
+        : undefined
     ),
-    method: method.toUpperCase(),
     ...requestInitRest,
   });
 
-  const responseBody = await getResponseBody(response);
+  // clone response to allow multiple reads
+  const clonedResponse = response.clone();
 
-  const result: ApiResult = {
-    url,
-    ok: response.ok,
-    status: response.status,
-    statusText: response.statusText,
-    body: responseBody,
-  };
+  if (!response.ok) {
+    throw await getResponseBody(clonedResponse);
+  }
 
-  catchErrorCodes(requestInit, result); // todo::refactor to return result
-
-  return result.body;
+  return (await getResponseBody(clonedResponse)) as T;
 }
