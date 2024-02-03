@@ -4,13 +4,14 @@ import {
   ServiceOperationQueryKey,
 } from '../../ServiceOperation.js';
 
-export const getQueryKey = (schema: RequestSchema, args: unknown) => {
-  const [params] = args as Parameters<
+export const getQueryKey = (
+  schema: RequestSchema,
+  args: Parameters<
     ServiceOperationQuery<RequestSchema, unknown, unknown>['getQueryKey']
+  >
+) => {
+  return [{ url: schema.url }, args[0]] satisfies ServiceOperationQueryKey<
+    RequestSchema,
+    unknown
   >;
-  const key: ServiceOperationQueryKey<RequestSchema, unknown> = [
-    { url: schema.url },
-    params,
-  ];
-  return key;
 };

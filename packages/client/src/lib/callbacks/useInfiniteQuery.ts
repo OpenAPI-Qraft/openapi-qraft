@@ -28,7 +28,7 @@ export const useInfiniteQuery: <
   return useInfiniteQueryBase(
     {
       ...options,
-      queryKey: [{ url: schema.url }, params as never] as const,
+      queryKey: [{ url: schema.url, infinite: true }, params as never] as const,
       queryFn:
         options?.queryFn ??
         function ({ queryKey: [, queryParams], signal, meta, pageParam }) {
