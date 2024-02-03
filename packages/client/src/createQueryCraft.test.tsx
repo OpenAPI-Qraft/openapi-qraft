@@ -45,7 +45,6 @@ const client: RequestClient = async (schema, options) => {
   return request(
     {
       baseUrl: 'https://api.sandbox.monite.com/v1',
-      version: '2023-06-04',
     },
     {
       ...schema,

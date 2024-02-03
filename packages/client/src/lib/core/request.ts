@@ -1,7 +1,6 @@
 import { ApiError } from './ApiError.js';
 import { ApiRequestInit, HeadersOptions } from './ApiRequestInit.js';
 import type { ApiResult } from './ApiResult.js';
-import type { OpenAPIConfig } from './OpenAPI.js';
 
 export const getQueryString = (params: Record<string, any>): string => {
   const qs: string[] = [];
@@ -38,14 +37,10 @@ export const getQueryString = (params: Record<string, any>): string => {
 };
 
 function getRequestUrlBase(
-  config: Pick<OpenAPIConfig, 'version' | 'baseUrl'>,
+  config: { baseUrl: string },
   { url, parameters }: Pick<ApiRequestInit, 'url' | 'parameters'>
 ): string {
   let path = url;
-
-  if (typeof config.version !== 'undefined') {
-    path = path.replace('{api-version}', config.version);
-  }
 
   path = path.replace(/{(.*?)}/g, (substring: string, group: string) => {
     if (parameters?.path?.hasOwnProperty(group)) {
@@ -262,7 +257,7 @@ export const catchErrorCodes = (
  * @throws ApiError
  */
 export async function request<T>(
-  config: OpenAPIConfig,
+  config: { baseUrl: string },
   requestInit: ApiRequestInit,
   {
     getRequestUrl,
