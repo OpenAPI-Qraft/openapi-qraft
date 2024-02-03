@@ -275,15 +275,13 @@ export async function request<T>(
       mediaType,
       body,
     }),
-    headers: new Headers(
-      mergeHeaders(
-        {
-          Accept: 'application/json',
-          'Content-Type': mediaType ?? getBodyContentType(body),
-        },
-        headers,
-        parameters?.header
-      )
+    headers: mergeHeaders(
+      {
+        Accept: 'application/json',
+        'Content-Type': mediaType ?? getBodyContentType(body),
+      },
+      headers,
+      parameters?.header
     ),
     method: method.toUpperCase(),
     ...requestInitRest,
