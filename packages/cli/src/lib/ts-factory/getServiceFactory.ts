@@ -171,21 +171,6 @@ const getOperationSchemaFactory = (operation: ServiceOperation) => {
             )
           )
         : null,
-
-      factory.createPropertySignature(
-        undefined,
-        factory.createIdentifier('errors'),
-        undefined,
-        factory.createTupleTypeNode(
-          Object.keys(operation.errors)
-            .filter((statusCode) => statusCode !== 'default')
-            .map((statusCode) =>
-              factory.createLiteralTypeNode(
-                factory.createNumericLiteral(statusCode)
-              )
-            )
-        )
-      ),
     ].filter((node): node is NonNullable<typeof node> => Boolean(node))
   );
 };
@@ -383,16 +368,6 @@ const getServiceVariablePropertyFactory = (operation: ServiceOperation) => {
                     factory.createStringLiteral(operation.mediaType)
                   )
                 : null,
-              factory.createPropertyAssignment(
-                factory.createIdentifier('errors'),
-                factory.createArrayLiteralExpression(
-                  Object.keys(operation.errors)
-                    .filter((statusCode) => statusCode !== 'default')
-                    .map((statusCode) =>
-                      factory.createNumericLiteral(statusCode)
-                    )
-                )
-              ),
             ].filter((node): node is NonNullable<typeof node> => Boolean(node)),
             true
           )
