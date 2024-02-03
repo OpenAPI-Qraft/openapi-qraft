@@ -46,10 +46,6 @@ export interface ServiceOperationQuery<
     ServiceOperationSetQueryData<TData, TParams>,
     ServiceOperationSetInfiniteQueryData<TData, TParams> {
   schema: TSchema;
-
-  getQueryKey<QueryKeyParams extends TParams>(
-    params: QueryKeyParams
-  ): ServiceOperationQueryKey<TSchema, QueryKeyParams>;
 }
 
 interface ServiceOperationUseQuery<
@@ -58,6 +54,10 @@ interface ServiceOperationUseQuery<
   TParams = {},
   TError = DefaultError,
 > {
+  getQueryKey<QueryKeyParams extends TParams>(
+    params: QueryKeyParams
+  ): ServiceOperationQueryKey<TSchema, QueryKeyParams>;
+
   useQuery(
     params?: TParams,
     options?: Omit<
@@ -156,10 +156,6 @@ export interface ServiceOperationMutation<
     ServiceOperationMutationFn<TSchema, TParams, TBody, TData>,
     ServiceOperationSetQueryData<TData, TParams> {
   schema: TSchema;
-
-  getMutationKey<T extends TParams>(
-    params: T
-  ): ServiceOperationMutationKey<TSchema, T>;
 }
 
 interface ServiceOperationUseMutation<
@@ -169,6 +165,10 @@ interface ServiceOperationUseMutation<
   TParams = {},
   TError = DefaultError,
 > {
+  getMutationKey<T extends TParams>(
+    params: T
+  ): ServiceOperationMutationKey<TSchema, T>;
+
   useMutation<TVariables extends { body: TBody } & TParams, TContext = unknown>(
     params?: undefined,
     options?: Omit<
