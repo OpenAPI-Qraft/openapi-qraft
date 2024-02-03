@@ -22,6 +22,7 @@ export type ServiceOperation = {
   mediaType: string | undefined;
   errors: Record<string, string | undefined>;
   success: Record<string, string | undefined>;
+  parameters: Record<string, never> | undefined;
 };
 
 export const getServices = (
@@ -79,6 +80,7 @@ export const getServices = (
         name: getOperationName(path, method, methodOperation.operationId),
         description: methodOperation.description,
         deprecated: methodOperation.deprecated,
+        parameters: methodOperation.parameters,
         mediaType: methodOperation.requestBody?.content
           ? getContentMediaType(methodOperation.requestBody.content)
           : undefined,

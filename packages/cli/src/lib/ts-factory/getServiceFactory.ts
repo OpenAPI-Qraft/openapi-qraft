@@ -263,6 +263,9 @@ const getOperationBodyFactory = (operation: ServiceOperation) => {
 };
 
 const getOperationParametersFactory = (operation: ServiceOperation) => {
+  if (!operation.parameters)
+    return factory.createKeywordTypeNode(ts.SyntaxKind.UndefinedKeyword);
+
   return factory.createIndexedAccessTypeNode(
     factory.createIndexedAccessTypeNode(
       factory.createIndexedAccessTypeNode(
