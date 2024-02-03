@@ -1,5 +1,82 @@
 import { ApiRequestInit, HeadersOptions } from './ApiRequestInit.js';
 
+/**
+ * @throws {error: object|string, response: Response} if the request fails
+ */
+export async function request<T>(
+  config: { baseUrl: string },
+  requestInit: ApiRequestInit,
+  {
+    getRequestUrl: getRequestUrlFunc,
+    getRequestBody: getRequestBodyFunc,
+  }: {
+    getRequestUrl: typeof getRequestUrl;
+    getRequestBody: typeof getRequestBody;
+  }
+): Promise<T> {
+  const {
+    method,
+    url,
+    parameters,
+    mediaType,
+    headers,
+    body,
+    ...requestInitRest
+  } = requestInit;
+
+  const requestBody = getRequestBodyFunc({
+    method,
+    mediaType,
+    body,
+  });
+
+  const response = await fetch(getRequestUrlFunc(config, { url, parameters }), {
+    method: method.toUpperCase(),
+    body: requestBody,
+    headers: mergeHeaders(
+      {
+        Accept: 'application/json',
+        'Content-Type': mediaType ?? getBodyContentType(body),
+      },
+      headers,
+      parameters?.header,
+      requestBody instanceof FormData
+        ? // remove `Content-Type` if serialized body is FormData; browser will correctly set Content-Type & boundary expression
+          { 'Content-Type': null }
+        : undefined
+    ),
+    ...requestInitRest,
+  });
+
+  // clone response to allow multiple reads
+  const clonedResponse = response.clone();
+
+  if (!response.ok) {
+    throw await getResponseBody(clonedResponse);
+  }
+
+  return (await getResponseBody(clonedResponse)) as T;
+}
+
+export function getRequestUrl(
+  config: { baseUrl: string },
+  { url, parameters }: Pick<ApiRequestInit, 'url' | 'parameters'>
+): string {
+  let path = url;
+
+  path = path.replace(/{(.*?)}/g, (substring: string, group: string) => {
+    if (parameters?.path?.hasOwnProperty(group)) {
+      return encodeURI(String(parameters?.path[group]));
+    }
+    return substring;
+  });
+
+  if (parameters?.query) {
+    return `${config.baseUrl}${path}${getQueryString(parameters.query)}`;
+  }
+  return `${config.baseUrl}${path}`;
+}
+
 export function getQueryString(params: Record<string, any>): string {
   const qs: string[] = [];
 
@@ -32,32 +109,6 @@ export function getQueryString(params: Record<string, any>): string {
   }
 
   return '';
-}
-
-export function getRequestUrl(
-  config: { baseUrl: string },
-  { url, parameters }: Pick<ApiRequestInit, 'url' | 'parameters'>
-): string {
-  let path = url;
-
-  path = path.replace(/{(.*?)}/g, (substring: string, group: string) => {
-    if (parameters?.path?.hasOwnProperty(group)) {
-      return encodeURI(String(parameters?.path[group]));
-    }
-    return substring;
-  });
-
-  if (parameters?.query) {
-    return `${config.baseUrl}${path}${getQueryString(parameters.query)}`;
-  }
-  return `${config.baseUrl}${path}`;
-}
-
-function getBodyContentType(body: ApiRequestInit['body']) {
-  if (!body) return;
-  if (body instanceof Blob) return body.type || 'application/octet-stream';
-  if (typeof body === 'string') return 'text/plain';
-  if (!(body instanceof FormData)) return 'application/json';
 }
 
 export function mergeHeaders(...allHeaders: (HeadersOptions | undefined)[]) {
@@ -155,6 +206,13 @@ function getRequestBodyFormData({
   return formData;
 }
 
+function getBodyContentType(body: ApiRequestInit['body']) {
+  if (!body) return;
+  if (body instanceof Blob) return body.type || 'application/octet-stream';
+  if (typeof body === 'string') return 'text/plain';
+  if (!(body instanceof FormData)) return 'application/json';
+}
+
 export async function getResponseBody<T>(
   response: Response
 ): Promise<T | undefined> {
@@ -169,62 +227,4 @@ export async function getResponseBody<T>(
   if (isJSON) return response.json();
 
   return response.text() as Promise<T>;
-}
-
-/**
- * @throws {error: object|string, response: Response} if the request fails
- */
-export async function request<T>(
-  config: { baseUrl: string },
-  requestInit: ApiRequestInit,
-  {
-    getRequestUrl: getRequestUrlFunc,
-    getRequestBody: getRequestBodyFunc,
-  }: {
-    getRequestUrl: typeof getRequestUrl;
-    getRequestBody: typeof getRequestBody;
-  }
-): Promise<T> {
-  const {
-    method,
-    url,
-    parameters,
-    mediaType,
-    headers,
-    body,
-    ...requestInitRest
-  } = requestInit;
-
-  const requestBody = getRequestBodyFunc({
-    method,
-    mediaType,
-    body,
-  });
-
-  const response = await fetch(getRequestUrlFunc(config, { url, parameters }), {
-    method: method.toUpperCase(),
-    body: requestBody,
-    headers: mergeHeaders(
-      {
-        Accept: 'application/json',
-        'Content-Type': mediaType ?? getBodyContentType(body),
-      },
-      headers,
-      parameters?.header,
-      requestBody instanceof FormData
-        ? // remove `Content-Type` if serialized body is FormData; browser will correctly set Content-Type & boundary expression
-          { 'Content-Type': null }
-        : undefined
-    ),
-    ...requestInitRest,
-  });
-
-  // clone response to allow multiple reads
-  const clonedResponse = response.clone();
-
-  if (!response.ok) {
-    throw await getResponseBody(clonedResponse);
-  }
-
-  return (await getResponseBody(clonedResponse)) as T;
 }
