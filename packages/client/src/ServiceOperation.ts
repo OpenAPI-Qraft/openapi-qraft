@@ -73,7 +73,7 @@ interface ServiceOperationUseQuery<
       'queryKey'
     >,
     queryClient?: QueryClient
-  ): UseQueryResult<TData, TError> & {
+  ): UseQueryResult<TData, TError | Error> & {
     queryKey: ServiceOperationQueryKey<TSchema, TParams>;
   };
   useQuery(
@@ -89,7 +89,7 @@ interface ServiceOperationUseQuery<
       'queryKey'
     >,
     queryClient?: QueryClient
-  ): DefinedUseQueryResult<TData, TError> & {
+  ): DefinedUseQueryResult<TData, TError | Error> & {
     queryKey: ServiceOperationQueryKey<TSchema, TParams>;
   };
 }
@@ -126,7 +126,7 @@ interface ServiceOperationUseInfiniteQuery<
     > &
       InfiniteQueryPageParamsOptions<TData, PartialParams<TPageParam>>,
     queryClient?: QueryClient
-  ): UseInfiniteQueryResult<InfiniteData<TData>, TError>;
+  ): UseInfiniteQueryResult<InfiniteData<TData>, TError | Error>;
   useInfiniteQuery<TPageParam extends TParams>(
     params: TParams,
     options: Omit<
@@ -145,7 +145,7 @@ interface ServiceOperationUseInfiniteQuery<
     > &
       InfiniteQueryPageParamsOptions<TData, PartialParams<TPageParam>>,
     queryClient?: QueryClient
-  ): DefinedUseInfiniteQueryResult<InfiniteData<TData>, TError>;
+  ): DefinedUseInfiniteQueryResult<InfiniteData<TData>, TError | Error>;
 }
 
 export interface ServiceOperationMutation<
@@ -180,7 +180,7 @@ interface ServiceOperationUseMutation<
       mutationKey?: ServiceOperationMutationKey<TSchema, TParams>;
     },
     queryClient?: QueryClient
-  ): UseMutationResult<TData, TError, TVariables, TContext>;
+  ): UseMutationResult<TData, TError | Error, TVariables, TContext>;
 
   useMutation<TVariables extends TBody, TContext = unknown>(
     params: TParams,
@@ -189,7 +189,7 @@ interface ServiceOperationUseMutation<
       'mutationKey'
     >,
     queryClient?: QueryClient
-  ): UseMutationResult<TData, TError, TVariables, TContext>;
+  ): UseMutationResult<TData, TError | Error, TVariables, TContext>;
 }
 
 interface ServiceOperationQueryFn<
