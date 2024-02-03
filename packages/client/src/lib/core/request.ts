@@ -36,7 +36,7 @@ export const getQueryString = (params: Record<string, any>): string => {
   return '';
 };
 
-function getRequestUrlBase(
+export function getRequestUrl(
   config: { baseUrl: string },
   { url, parameters }: Pick<ApiRequestInit, 'url' | 'parameters'>
 ): string {
@@ -54,8 +54,6 @@ function getRequestUrlBase(
   }
   return `${config.baseUrl}${path}`;
 }
-
-export { getRequestUrlBase as getRequestUrl };
 
 const getBodyContentType = (body: ApiRequestInit['body']) => {
   if (!body) return;
@@ -89,7 +87,7 @@ export function mergeHeaders(...allHeaders: (HeadersOptions | undefined)[]) {
   return headers;
 }
 
-function getRequestBodyBase(options: {
+export function getRequestBody(options: {
   method: ApiRequestInit['method'];
   mediaType: ApiRequestInit['mediaType'];
   body: ApiRequestInit['body'];
@@ -105,8 +103,6 @@ function getRequestBodyBase(options: {
 
   return getBody(options);
 }
-
-export { getRequestBodyBase as getRequestBody };
 
 const getFormData = ({
   body,
@@ -249,22 +245,17 @@ export const catchErrorCodes = (
 
 /**
  * Request method
- * @param config The OpenAPI configuration object
- * @param requestInit The request options from the service
- * @param getRequestUrl The function to get the request URL
- * @param getRequestBody The function to get the request body
- * @returns Promise<T>
  * @throws ApiError
  */
 export async function request<T>(
   config: { baseUrl: string },
   requestInit: ApiRequestInit,
   {
-    getRequestUrl,
-    getRequestBody,
+    getRequestUrl: getRequestUrlFunc,
+    getRequestBody: getRequestBodyFunc,
   }: {
-    getRequestUrl: typeof getRequestUrlBase;
-    getRequestBody: typeof getRequestBodyBase;
+    getRequestUrl: typeof getRequestUrl;
+    getRequestBody: typeof getRequestBody;
   }
 ): Promise<T> {
   const {
@@ -278,8 +269,8 @@ export async function request<T>(
     ...requestInitRest
   } = requestInit;
 
-  const response = await fetch(getRequestUrl(config, { url, parameters }), {
-    body: getRequestBody({
+  const response = await fetch(getRequestUrlFunc(config, { url, parameters }), {
+    body: getRequestBodyFunc({
       method,
       mediaType,
       body,
