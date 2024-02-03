@@ -1,4 +1,4 @@
-import chalk from 'chalk';
+import c from 'ansi-colors';
 import fs from 'node:fs';
 import { resolve } from 'node:path';
 import { Readable } from 'node:stream';
@@ -58,7 +58,7 @@ const writeServices = async (
   for (const service of services) {
     const { operations, name, typeName, variableName, fileBaseName } = service;
 
-    spinner.text = `Generating ${chalk.magenta(name)} service`;
+    spinner.text = `Generating ${c.magenta(name)} service`;
 
     try {
       const code =
@@ -80,8 +80,8 @@ const writeServices = async (
       );
     } catch (error) {
       spinner.fail(
-        chalk.redBright(
-          `Error occurred during ${chalk.magenta(name)} service generation`
+        c.redBright(
+          `Error occurred during ${c.magenta(name)} service generation`
         )
       );
 
@@ -89,7 +89,7 @@ const writeServices = async (
     }
   }
 
-  spinner.succeed(chalk.green('Services has been generated'));
+  spinner.succeed(c.green('Services has been generated'));
 };
 
 const writeServiceIndex = async (
@@ -107,13 +107,13 @@ const writeServiceIndex = async (
     await fs.promises.writeFile(resolve(output.dir, 'index.ts'), code);
   } catch (error) {
     spinner.fail(
-      chalk.redBright('Error occurred during services index generation')
+      c.redBright('Error occurred during services index generation')
     );
 
     throw error;
   }
 
-  spinner.succeed(chalk.green('Services index has been generated'));
+  spinner.succeed(c.green('Services index has been generated'));
 };
 
 const getFileHeader = ({ fileHeader }: Pick<OutputOptions, 'fileHeader'>) => {

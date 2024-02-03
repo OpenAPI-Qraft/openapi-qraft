@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import chalk from 'chalk';
+import c from 'ansi-colors';
 import { program } from 'commander';
 
 import { fileHeader } from './lib/fileHeader.js';
@@ -40,7 +40,7 @@ program
 
     if (source === process.stdin && source.isTTY) {
       console.error(
-        chalk.red(
+        c.red(
           'Input file not found or stdin is empty. Please specify `--input` option or pipe OpenAPI Schema to stdin.'
         )
       );
@@ -62,7 +62,7 @@ program
       },
     }).catch((error) => {
       if (error instanceof Error)
-        console.error(chalk.red(error.message, error.stack));
+        console.error(c.red(error.message), c.red(error.stack ?? ''));
       console.error(error);
       process.exit(1);
     });
