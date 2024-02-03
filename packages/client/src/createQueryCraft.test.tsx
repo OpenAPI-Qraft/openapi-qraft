@@ -8,8 +8,10 @@ import {
 import { act, renderHook, waitFor } from '@testing-library/react';
 
 import { createQueryCraft } from './createQueryCraft.js';
+import { getInfiniteQueryData } from './lib/callbacks/getInfiniteQueryData.js';
 import { getInfiniteQueryKey } from './lib/callbacks/getInfiniteQueryKey.js';
 import { getMutationKey } from './lib/callbacks/getMutationKey.js';
+import { getQueryData } from './lib/callbacks/getQueryData.js';
 import { getQueryKey } from './lib/callbacks/getQueryKey.js';
 import { mutationFn } from './lib/callbacks/mutationFn.js';
 import { queryFn } from './lib/callbacks/queryFn.js';
@@ -30,6 +32,8 @@ const callbacks = {
   mutationFn,
   useMutation,
   getMutationKey,
+  getQueryData,
+  getInfiniteQueryData,
   setQueryData,
   setInfiniteQueryData,
   getInfiniteQueryKey,
@@ -244,7 +248,7 @@ describe('Qraft uses Infinite Queries', () => {
         const queryClient = useQueryClient();
 
         return queryClient.getQueryData(
-          qraft.files.getFiles.getQueryKey({
+          qraft.files.getFiles.getInfiniteQueryKey({
             header: {
               'x-monite-version': '1.0.0',
             },
@@ -440,7 +444,7 @@ describe('Qraft uses utils', () => {
 });
 
 describe('Qraft uses setQueryData', () => {
-  it('uses setQueryData', async () => {
+  it('uses setQueryData & getQueryData', async () => {
     const queryClient = new QueryClient();
 
     qraft.files.getFiles.setQueryData(
@@ -464,15 +468,16 @@ describe('Qraft uses setQueryData', () => {
     );
 
     expect(
-      queryClient.getQueryData(
-        qraft.files.getFiles.getQueryKey({
+      qraft.files.getFiles.getQueryData(
+        {
           header: {
             'x-monite-version': '1.0.0',
           },
           query: {
             id__in: ['1', '2'],
           },
-        })
+        },
+        queryClient
       )
     ).toEqual({
       header: {
@@ -486,7 +491,7 @@ describe('Qraft uses setQueryData', () => {
 });
 
 describe('Qraft uses setInfiniteQueryData', () => {
-  it('uses setInfiniteQueryData', async () => {
+  it('uses setInfiniteQueryData & getInfiniteQueryData', async () => {
     const queryClient = new QueryClient();
 
     qraft.files.getFiles.setInfiniteQueryData(
@@ -521,15 +526,16 @@ describe('Qraft uses setInfiniteQueryData', () => {
     );
 
     expect(
-      queryClient.getQueryData(
-        qraft.files.getFiles.getInfiniteQueryKey({
+      qraft.files.getFiles.getInfiniteQueryData(
+        {
           header: {
             'x-monite-version': '1.0.0',
           },
           query: {
             id__in: ['1', '2'],
           },
-        })
+        },
+        queryClient
       )
     ).toEqual({
       pages: [

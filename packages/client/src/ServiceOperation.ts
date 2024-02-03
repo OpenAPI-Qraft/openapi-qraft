@@ -43,6 +43,8 @@ export interface ServiceOperationQuery<
 > extends ServiceOperationUseQuery<TSchema, TData, TParams, TError>,
     ServiceOperationUseInfiniteQuery<TSchema, TData, TParams, TError>,
     ServiceOperationQueryFn<TSchema, TData, TParams>,
+    ServiceOperationGetQueryData<TData, TParams>,
+    ServiceOperationGetInfiniteQueryData<TData, TParams>,
     ServiceOperationSetQueryData<TData, TParams>,
     ServiceOperationSetInfiniteQueryData<TData, TParams> {
   schema: TSchema;
@@ -250,6 +252,17 @@ interface ServiceOperationSetInfiniteQueryData<TData, TParams = {}> {
     >,
     queryClient: QueryClient,
     options?: SetDataOptions
+  ): InfiniteData<TData> | undefined;
+}
+
+interface ServiceOperationGetQueryData<TData, TParams = {}> {
+  getQueryData(queryKey: TParams, queryClient: QueryClient): TData | undefined;
+}
+
+interface ServiceOperationGetInfiniteQueryData<TData, TParams = {}> {
+  getInfiniteQueryData(
+    queryKey: TParams,
+    queryClient: QueryClient
   ): InfiniteData<TData> | undefined;
 }
 
