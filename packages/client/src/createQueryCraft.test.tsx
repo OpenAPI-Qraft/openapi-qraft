@@ -8,10 +8,12 @@ import {
 import { act, renderHook, waitFor } from '@testing-library/react';
 
 import { createQueryCraft } from './createQueryCraft.js';
+import { getInfiniteQueryKey } from './lib/callbacks/getInfiniteQueryKey.js';
 import { getMutationKey } from './lib/callbacks/getMutationKey.js';
 import { getQueryKey } from './lib/callbacks/getQueryKey.js';
 import { mutationFn } from './lib/callbacks/mutationFn.js';
 import { queryFn } from './lib/callbacks/queryFn.js';
+import { setInfiniteQueryData } from './lib/callbacks/setInfiniteQueryData.js';
 import { setQueryData } from './lib/callbacks/setQueryData.js';
 import { useInfiniteQuery } from './lib/callbacks/useInfiniteQuery.js';
 import { useMutation } from './lib/callbacks/useMutation.js';
@@ -29,6 +31,8 @@ const callbacks = {
   useMutation,
   getMutationKey,
   setQueryData,
+  setInfiniteQueryData,
+  getInfiniteQueryKey,
 } as const;
 
 const qraft = createQueryCraft<Services, typeof callbacks>(services, callbacks);
@@ -477,6 +481,74 @@ describe('Qraft uses setQueryData', () => {
       query: {
         id__in: ['1', '2'],
       },
+    });
+  });
+});
+
+describe('Qraft uses setInfiniteQueryData', () => {
+  it('uses setInfiniteQueryData', async () => {
+    const queryClient = new QueryClient();
+
+    qraft.files.getFiles.setInfiniteQueryData(
+      {
+        header: {
+          'x-monite-version': '1.0.0',
+        },
+        query: {
+          id__in: ['1', '2'],
+        },
+      },
+      {
+        pages: [
+          {
+            header: {
+              'x-monite-version': '1.0.0',
+            },
+            query: {
+              id__in: ['1', '2'],
+            },
+          },
+        ],
+        pageParams: [
+          {
+            query: {
+              page: '1',
+            },
+          },
+        ],
+      },
+      queryClient
+    );
+
+    expect(
+      queryClient.getQueryData(
+        qraft.files.getFiles.getInfiniteQueryKey({
+          header: {
+            'x-monite-version': '1.0.0',
+          },
+          query: {
+            id__in: ['1', '2'],
+          },
+        })
+      )
+    ).toEqual({
+      pages: [
+        {
+          header: {
+            'x-monite-version': '1.0.0',
+          },
+          query: {
+            id__in: ['1', '2'],
+          },
+        },
+      ],
+      pageParams: [
+        {
+          query: {
+            page: '1',
+          },
+        },
+      ],
     });
   });
 });

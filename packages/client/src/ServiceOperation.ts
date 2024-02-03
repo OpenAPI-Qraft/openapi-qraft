@@ -25,6 +25,11 @@ export type ServiceOperationQueryKey<S extends { url: string }, T> = [
   T,
 ];
 
+export type ServiceOperationInfiniteQueryKey<S extends { url: string }, T> = [
+  Pick<S, 'url'> & { infinite: true },
+  T,
+];
+
 export type ServiceOperationMutationKey<
   S extends Record<'url' | 'method', string>,
   T,
@@ -38,7 +43,8 @@ export interface ServiceOperationQuery<
 > extends ServiceOperationUseQuery<TSchema, TData, TParams, TError>,
     ServiceOperationUseInfiniteQuery<TSchema, TData, TParams, TError>,
     ServiceOperationQueryFn<TSchema, TData, TParams>,
-    ServiceOperationSetQueryData<TData, TParams> {
+    ServiceOperationSetQueryData<TData, TParams>,
+    ServiceOperationSetInfiniteQueryData<TData, TParams> {
   schema: TSchema;
 
   getQueryKey<QueryKeyParams extends TParams>(
@@ -96,6 +102,10 @@ interface ServiceOperationUseInfiniteQuery<
   TParams = {},
   TError = DefaultError,
 > {
+  getInfiniteQueryKey<QueryKeyParams extends TParams>(
+    params: QueryKeyParams
+  ): ServiceOperationInfiniteQueryKey<TSchema, QueryKeyParams>;
+
   useInfiniteQuery<TPageParam extends TParams>(
     params: TParams,
     options: Omit<
@@ -103,8 +113,8 @@ interface ServiceOperationUseInfiniteQuery<
         TData,
         TError,
         InfiniteData<TData>,
-        | ServiceOperationQueryKey<TSchema, TParams>
-        | readonly [...ServiceOperationQueryKey<TSchema, TParams>],
+        | ServiceOperationInfiniteQueryKey<TSchema, TParams>
+        | readonly [...ServiceOperationInfiniteQueryKey<TSchema, TParams>],
         PartialParams<TPageParam>
       >,
       | 'queryKey'
@@ -122,8 +132,8 @@ interface ServiceOperationUseInfiniteQuery<
         TData,
         TError,
         InfiniteData<TData>,
-        | ServiceOperationQueryKey<TSchema, TParams>
-        | readonly [...ServiceOperationQueryKey<TSchema, TParams>],
+        | ServiceOperationInfiniteQueryKey<TSchema, TParams>
+        | readonly [...ServiceOperationInfiniteQueryKey<TSchema, TParams>],
         PartialParams<TPageParam>
       >,
       | 'queryKey'
@@ -229,6 +239,18 @@ interface ServiceOperationSetQueryData<TData, TParams = {}> {
     queryClient: QueryClient,
     options?: SetDataOptions
   ): TData | undefined;
+}
+
+interface ServiceOperationSetInfiniteQueryData<TData, TParams = {}> {
+  setInfiniteQueryData(
+    queryKey: TParams,
+    updater: Updater<
+      NoInfer<InfiniteData<TData>> | undefined,
+      NoInfer<InfiniteData<TData>> | undefined
+    >,
+    queryClient: QueryClient,
+    options?: SetDataOptions
+  ): InfiniteData<TData> | undefined;
 }
 
 export interface ServiceOperationMutationFn<
