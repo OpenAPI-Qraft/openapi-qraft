@@ -61,6 +61,36 @@ export const handlers = [
     }
   ),
 
+  http.post<
+    ServicePathParameters<Services['files']['postFiles']>,
+    ServiceRequestBodyParameters<Services['files']['postFiles']>,
+    ServiceResponseParameters<Services['files']['postFiles']>
+  >(
+    openApiToMswPath(services.files.postFiles.schema.url),
+    async ({ request }) => {
+      const formData = Object.fromEntries(await request.formData()) as Awaited<
+        ReturnType<typeof request.json>
+      >;
+
+      const body: Record<string, any> = {};
+
+      for (const [key, value] of Object.entries(formData)) {
+        // some workaround to make it work, since value instanceof (File | Blob) is not working by some reason
+        if (
+          !value ||
+          typeof value === 'string' ||
+          value.type !== 'application/octet-stream'
+        ) {
+          body[key] = value;
+          continue;
+        }
+        body[key] = (value as File).name;
+      }
+
+      return HttpResponse.json({ body });
+    }
+  ),
+
   http.get<
     ServicePathParameters<Services['files']['getFiles']>,
     undefined,

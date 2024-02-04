@@ -391,6 +391,30 @@ describe('Qraft uses Mutations', () => {
       });
     });
   });
+
+  it('supports useMutation with form data', async () => {
+    const { result } = renderHook(() => qraft.files.postFiles.useMutation(), {
+      wrapper: Providers,
+    });
+
+    act(() => {
+      result.current.mutate({
+        body: {
+          file: new File([''], 'file.png'),
+          file_description: 'my file',
+        },
+      });
+    });
+
+    await waitFor(() => {
+      expect(result.current.data).toEqual({
+        body: {
+          file: 'file.png',
+          file_description: 'my file',
+        },
+      });
+    });
+  });
 });
 
 describe('Qraft uses Query Function', () => {
