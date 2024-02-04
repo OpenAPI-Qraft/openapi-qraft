@@ -603,12 +603,10 @@
         "required": ["verification_document_front"],
         "properties": {
           "verification_document_front": {
-            "type": "string",
-            "format": "binary"
+            "type": "string"
           },
           "verification_document_back": {
-            "type": "string",
-            "format": "binary"
+            "type": "string"
           }
         },
         "type": "object"
