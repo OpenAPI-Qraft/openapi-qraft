@@ -164,20 +164,28 @@ interface ServiceOperationUseMutation<
   TSchema extends { url: string; method: string },
   TBody,
   TData,
-  TParams = {},
+  TParams,
   TError = DefaultError,
 > {
   getMutationKey<T extends TParams>(
     params: T
   ): ServiceOperationMutationKey<TSchema, T>;
 
-  useMutation<TVariables extends { body: TBody } & TParams, TContext = unknown>(
+  useMutation<
+    TVariables extends { body: TBody } & (NonNullable<TParams> extends never
+      ? {}
+      : TParams),
+    TContext = unknown,
+  >(
     params?: undefined,
     options?: Omit<
       UseMutationOptions<TData, TError, TVariables, TContext>,
       'mutationKey'
     > & {
-      mutationKey?: ServiceOperationMutationKey<TSchema, TParams>;
+      mutationKey?: ServiceOperationMutationKey<
+        TSchema,
+        NonNullable<TParams> extends never ? {} : TParams
+      >;
     },
     queryClient?: QueryClient
   ): UseMutationResult<TData, TError | Error, TVariables, TContext>;
