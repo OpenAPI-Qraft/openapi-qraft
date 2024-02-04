@@ -37,8 +37,8 @@ export type ServiceOperationMutationKey<
 
 export interface ServiceOperationQuery<
   TSchema extends { url: string; method: string },
-  TParams,
   TData,
+  TParams,
   TError = DefaultError,
 > extends ServiceOperationUseQuery<TSchema, TData, TParams, TError>,
     ServiceOperationUseInfiniteQuery<TSchema, TData, TParams, TError>,
@@ -150,12 +150,12 @@ interface ServiceOperationUseInfiniteQuery<
 
 export interface ServiceOperationMutation<
   TSchema extends { url: string; method: string },
-  TParams,
   TBody,
   TData,
+  TParams,
   TError = DefaultError,
 > extends ServiceOperationUseMutation<TSchema, TBody, TData, TParams, TError>,
-    ServiceOperationMutationFn<TSchema, TParams, TBody, TData>,
+    ServiceOperationMutationFn<TSchema, TBody, TData, TParams>,
     ServiceOperationSetQueryData<TData, TParams> {
   schema: TSchema;
 }
@@ -268,9 +268,9 @@ interface ServiceOperationGetInfiniteQueryData<TData, TParams = {}> {
 
 export interface ServiceOperationMutationFn<
   TSchema extends { url: string; method: string },
-  TParams,
   TBody,
   TData,
+  TParams,
 > {
   mutationFn(
     client: (

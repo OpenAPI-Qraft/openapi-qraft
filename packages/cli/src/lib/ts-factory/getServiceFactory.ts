@@ -109,11 +109,11 @@ const getServiceInterfaceOperationFactory = (operation: ServiceOperation) => {
       [
         getOperationSchemaFactory(operation),
 
-        getOperationParametersFactory(operation),
-
         operation.method !== 'get' ? getOperationBodyFactory(operation) : null,
 
         getOperationResponseFactory(operation, 'success'),
+
+        getOperationParametersFactory(operation),
 
         getOperationResponseFactory(operation, 'errors'),
       ].filter((node): node is NonNullable<typeof node> => Boolean(node))
