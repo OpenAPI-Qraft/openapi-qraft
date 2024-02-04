@@ -204,8 +204,7 @@
                         "items_order": {
                           "type": "array",
                           "items": { "$ref": "#/components/schemas/OrderEnum" },
-                          "description": "Order by",
-                          "default": "asc"
+                          "description": "Order by"
                         }
                       }
                     }
@@ -275,15 +274,17 @@
           "200": {
             "description": "Successful Response",
             "content": {
-              "schema": {
-                "type": "object",
-                "required": ["message"],
-                "properties": {
-                  "message": {
-                    "type": "string"
-                  },
-                  "limit": {
-                    "type": "number"
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": ["message"],
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    },
+                    "limit": {
+                      "type": "number"
+                    }
                   }
                 }
               }
