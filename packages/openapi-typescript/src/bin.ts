@@ -49,6 +49,25 @@ program
     ) {
       const result = `${COMMENT_HEADER}${astToString(
         await openapiTS(schema, {
+          transform(schemaObject) {
+            if (schemaObject.format === 'binary') {
+              return {
+                schema: schemaObject.nullable
+                  ? ts.factory.createUnionTypeNode([
+                      ts.factory.createTypeReferenceNode(
+                        ts.factory.createIdentifier('Blob'),
+                        undefined
+                      ),
+                      ts.factory.createLiteralTypeNode(ts.factory.createNull()),
+                    ])
+                  : ts.factory.createTypeReferenceNode(
+                      ts.factory.createIdentifier('Blob'),
+                      undefined
+                    ),
+                questionToken: true, // todo::make PR to openapi-typescript to add `schemaObject` to `transform` third argument, to get `required` properties
+              };
+            }
+          },
           additionalProperties: args.additionalProperties,
           alphabetize: args.alphabetize,
           arrayLength: args.arrayLength,

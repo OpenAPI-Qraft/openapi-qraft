@@ -491,6 +491,62 @@
           }
         },
         "security": [{ "HTTPBearer": [] }]
+      },
+      "post": {
+        "tags": ["Files"],
+        "summary": "Upload a files by ID",
+        "operationId": "post_files",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary"
+                  },
+                  "file_description": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "body": {
+                      "type": "object",
+                      "properties": {
+                        "file": {
+                          "type": "string"
+                        },
+                        "file_description": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorSchemaResponse" }
+              }
+            }
+          }
+        }
       }
     },
     "/files/list": {
@@ -543,6 +599,7 @@
   "components": {
     "schemas": {
       "EntityOnboardingDocuments": {
+        "required": ["verification_document_front"],
         "properties": {
           "verification_document_front": {
             "type": "string",
