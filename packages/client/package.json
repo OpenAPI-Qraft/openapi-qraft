@@ -6,7 +6,7 @@
     "dev": "yarn build --watch",
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
-    "generate": "qraft ../../openapi.json --clean -o src/mocks/fixtures/api --schema-types-path '../../../../../../../openapi.d.ts'"
+    "generate": "qraft-openapi-services ../../openapi.json --clean -o src/mocks/fixtures/api --schema-types-path '../../../../../../../openapi.d.ts'"
   },
   "type": "module",
   "devDependencies": {

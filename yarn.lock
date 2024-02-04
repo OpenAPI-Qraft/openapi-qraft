@@ -837,7 +837,7 @@ __metadata:
     typescript:
       optional: false
   bin:
-    qraft: ./dist/bin.js
+    qraft-openapi-services: ./dist/bin.js
   languageName: unknown
   linkType: soft
 
