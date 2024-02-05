@@ -17,5 +17,5 @@ export function setQueryData<TData>(
     params,
   ];
 
-  return queryClient.setQueryData(queryKey, updater, options);
+  return queryClient.setQueryData(queryKey, updater as never, options);
 }
