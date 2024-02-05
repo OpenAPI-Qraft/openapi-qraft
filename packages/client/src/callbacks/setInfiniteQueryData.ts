@@ -1,10 +1,10 @@
 import { InfiniteData } from '@tanstack/query-core';
 
-import { RequestSchema } from '../../QueryCraftContext.js';
+import { RequestSchema } from '../QueryCraftContext.js';
 import type {
   ServiceOperationQuery,
   ServiceOperationInfiniteQueryKey,
-} from '../../ServiceOperation.js';
+} from '../ServiceOperation.js';
 
 export function setInfiniteQueryData<TData>(
   schema: RequestSchema,

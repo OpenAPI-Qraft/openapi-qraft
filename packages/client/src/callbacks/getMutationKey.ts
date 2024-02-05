@@ -1,8 +1,8 @@
-import { RequestSchema } from '../../QueryCraftContext.js';
+import { RequestSchema } from '../QueryCraftContext.js';
 import {
   ServiceOperationMutation,
   ServiceOperationMutationKey,
-} from '../../ServiceOperation.js';
+} from '../ServiceOperation.js';
 
 export const getMutationKey = (schema: RequestSchema, args: unknown) => {
   const [parameters] = args as Parameters<

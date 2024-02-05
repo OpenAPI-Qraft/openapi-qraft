@@ -1,8 +1,8 @@
-import { RequestSchema } from '../../QueryCraftContext.js';
+import { RequestSchema } from '../QueryCraftContext.js';
 import {
   ServiceOperationInfiniteQueryKey,
   ServiceOperationQuery,
-} from '../../ServiceOperation.js';
+} from '../ServiceOperation.js';
 
 export const getInfiniteQueryKey = (
   schema: RequestSchema,

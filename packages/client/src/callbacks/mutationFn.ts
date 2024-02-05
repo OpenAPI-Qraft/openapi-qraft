@@ -1,5 +1,5 @@
-import { RequestSchema } from '../../QueryCraftContext.js';
-import { ServiceOperationMutation } from '../../ServiceOperation.js';
+import { RequestSchema } from '../QueryCraftContext.js';
+import { ServiceOperationMutation } from '../ServiceOperation.js';
 
 export const mutationFn = (schema: RequestSchema, args: unknown) => {
   const [client, options] = args as Parameters<

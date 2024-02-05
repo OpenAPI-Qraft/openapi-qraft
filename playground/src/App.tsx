@@ -1,26 +1,36 @@
-import { createQueryCraft } from '@radist2s/qraft/createQueryCraft';
-import { getMutationKey } from '@radist2s/qraft/lib/callbacks/getMutationKey';
-import { getQueryKey } from '@radist2s/qraft/lib/callbacks/getQueryKey';
-import { mutationFn } from '@radist2s/qraft/lib/callbacks/mutationFn';
-import { queryFn } from '@radist2s/qraft/lib/callbacks/queryFn';
-import { useInfiniteQuery } from '@radist2s/qraft/lib/callbacks/useInfiniteQuery';
-import { useMutation } from '@radist2s/qraft/lib/callbacks/useMutation';
-import { useQuery } from '@radist2s/qraft/lib/callbacks/useQuery';
+import { craftAPIClient } from '@radist2s/qraft';
+import { getInfiniteQueryData } from '@radist2s/qraft/callbacks/getInfiniteQueryData';
+import { getInfiniteQueryKey } from '@radist2s/qraft/callbacks/getInfiniteQueryKey';
+import { getMutationKey } from '@radist2s/qraft/callbacks/getMutationKey';
+import { getQueryData } from '@radist2s/qraft/callbacks/getQueryData';
+import { getQueryKey } from '@radist2s/qraft/callbacks/getQueryKey';
+import { mutationFn } from '@radist2s/qraft/callbacks/mutationFn';
+import { queryFn } from '@radist2s/qraft/callbacks/queryFn';
+import { setInfiniteQueryData } from '@radist2s/qraft/callbacks/setInfiniteQueryData';
+import { setQueryData } from '@radist2s/qraft/callbacks/setQueryData';
+import { useInfiniteQuery } from '@radist2s/qraft/callbacks/useInfiniteQuery';
+import { useMutation } from '@radist2s/qraft/callbacks/useMutation';
+import { useQuery } from '@radist2s/qraft/callbacks/useQuery';
 
 import { Services, services } from './api';
 import { MONITE_VERSION } from './constants.ts';
 
 const callbacks = {
-  queryFn,
-  useQuery,
-  useInfiniteQuery,
+  getInfiniteQueryData,
+  getInfiniteQueryKey,
+  getMutationKey,
+  getQueryData,
   getQueryKey,
   mutationFn,
+  queryFn,
+  setInfiniteQueryData,
+  setQueryData,
+  useInfiniteQuery,
   useMutation,
-  getMutationKey,
+  useQuery,
 } as const;
 
-const qraft = createQueryCraft<Services, typeof callbacks>(services, callbacks);
+const qraft = craftAPIClient<Services, typeof callbacks>(services, callbacks);
 
 function App() {
   const { data } = qraft.entityUsers.getEntityUsersMe.useQuery({

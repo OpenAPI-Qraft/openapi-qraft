@@ -1,8 +1,8 @@
-import { RequestSchema } from '../../QueryCraftContext.js';
+import { RequestSchema } from '../QueryCraftContext.js';
 import {
   ServiceOperationQuery,
   ServiceOperationQueryKey,
-} from '../../ServiceOperation.js';
+} from '../ServiceOperation.js';
 
 export function setQueryData<TData>(
   schema: RequestSchema,

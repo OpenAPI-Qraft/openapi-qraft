@@ -7,36 +7,36 @@ import {
 } from '@tanstack/react-query';
 import { act, renderHook, waitFor } from '@testing-library/react';
 
+import { getInfiniteQueryData } from './callbacks/getInfiniteQueryData.js';
+import { getInfiniteQueryKey } from './callbacks/getInfiniteQueryKey.js';
+import { getMutationKey } from './callbacks/getMutationKey.js';
+import { getQueryData } from './callbacks/getQueryData.js';
+import { getQueryKey } from './callbacks/getQueryKey.js';
+import { mutationFn } from './callbacks/mutationFn.js';
+import { queryFn } from './callbacks/queryFn.js';
+import { setInfiniteQueryData } from './callbacks/setInfiniteQueryData.js';
+import { setQueryData } from './callbacks/setQueryData.js';
+import { useInfiniteQuery } from './callbacks/useInfiniteQuery.js';
+import { useMutation } from './callbacks/useMutation.js';
+import { useQuery } from './callbacks/useQuery.js';
 import { craftAPIClient } from './createQueryCraftClient.js';
-import { getInfiniteQueryData } from './lib/callbacks/getInfiniteQueryData.js';
-import { getInfiniteQueryKey } from './lib/callbacks/getInfiniteQueryKey.js';
-import { getMutationKey } from './lib/callbacks/getMutationKey.js';
-import { getQueryData } from './lib/callbacks/getQueryData.js';
-import { getQueryKey } from './lib/callbacks/getQueryKey.js';
-import { mutationFn } from './lib/callbacks/mutationFn.js';
-import { queryFn } from './lib/callbacks/queryFn.js';
-import { setInfiniteQueryData } from './lib/callbacks/setInfiniteQueryData.js';
-import { setQueryData } from './lib/callbacks/setQueryData.js';
-import { useInfiniteQuery } from './lib/callbacks/useInfiniteQuery.js';
-import { useMutation } from './lib/callbacks/useMutation.js';
-import { useQuery } from './lib/callbacks/useQuery.js';
 import { bodySerializer, urlSerializer, request } from './lib/core/request.js';
 import { services, Services } from './mocks/fixtures/api/index.js';
 import { QueryCraftContext, RequestClient } from './QueryCraftContext.js';
 
 const callbacks = {
-  queryFn,
-  useQuery,
-  useInfiniteQuery,
-  getQueryKey,
-  mutationFn,
-  useMutation,
+  getInfiniteQueryData,
+  getInfiniteQueryKey,
   getMutationKey,
   getQueryData,
-  getInfiniteQueryData,
-  setQueryData,
+  getQueryKey,
+  mutationFn,
+  queryFn,
   setInfiniteQueryData,
-  getInfiniteQueryKey,
+  setQueryData,
+  useInfiniteQuery,
+  useMutation,
+  useQuery,
 } as const;
 
 const qraft = craftAPIClient<Services, typeof callbacks>(services, callbacks);

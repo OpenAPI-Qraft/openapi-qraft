@@ -4,11 +4,11 @@ import type { DefaultError } from '@tanstack/query-core';
 import type { UseMutationResult } from '@tanstack/react-query';
 import { useMutation as useMutationBase } from '@tanstack/react-query';
 
-import { QueryCraftContext, RequestSchema } from '../../QueryCraftContext.js';
+import { QueryCraftContext, RequestSchema } from '../QueryCraftContext.js';
 import {
   ServiceOperationMutation,
   ServiceOperationMutationKey,
-} from '../../ServiceOperation.js';
+} from '../ServiceOperation.js';
 
 export const useMutation: <
   TData = unknown,

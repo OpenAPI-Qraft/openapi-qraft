@@ -4,11 +4,11 @@ import type { DefaultError } from '@tanstack/query-core';
 import type { UseQueryResult } from '@tanstack/react-query';
 import { useQuery as useQueryBase } from '@tanstack/react-query';
 
-import { QueryCraftContext, RequestSchema } from '../../QueryCraftContext.js';
+import { QueryCraftContext, RequestSchema } from '../QueryCraftContext.js';
 import {
   ServiceOperationQuery,
   ServiceOperationQueryKey,
-} from '../../ServiceOperation.js';
+} from '../ServiceOperation.js';
 
 export const useQuery: <
   TQueryFnData = unknown,

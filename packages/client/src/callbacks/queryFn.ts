@@ -1,5 +1,5 @@
-import { RequestSchema } from '../../QueryCraftContext.js';
-import { ServiceOperationQuery } from '../../ServiceOperation.js';
+import { RequestSchema } from '../QueryCraftContext.js';
+import { ServiceOperationQuery } from '../ServiceOperation.js';
 
 export const queryFn = (
   schema: RequestSchema,

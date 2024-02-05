@@ -6,8 +6,8 @@ import {
   UseInfiniteQueryResult,
 } from '@tanstack/react-query';
 
-import { QueryCraftContext, RequestSchema } from '../../QueryCraftContext.js';
-import { ServiceOperationQuery } from '../../ServiceOperation.js';
+import { QueryCraftContext, RequestSchema } from '../QueryCraftContext.js';
+import { ServiceOperationQuery } from '../ServiceOperation.js';
 
 export const useInfiniteQuery: <
   TQueryFnData,
