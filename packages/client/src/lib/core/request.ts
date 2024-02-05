@@ -1,5 +1,3 @@
-import { ApiRequestInit, HeadersOptions } from './ApiRequestInit.js';
-
 /**
  * @throws {error: object|string, response: Response} if the request fails
  */
@@ -228,3 +226,29 @@ export async function getResponseBody<T>(
 
   return response.text() as Promise<T>;
 }
+
+// To have definitely typed headers without a conversion to stings
+export type HeadersOptions =
+  | HeadersInit
+  | Record<string, string | number | boolean | null | undefined>;
+
+export type APIRequestInit = {
+  readonly method:
+    | 'get'
+    | 'put'
+    | 'post'
+    | 'delete'
+    | 'options'
+    | 'head'
+    | 'patch';
+  readonly url: string;
+  readonly parameters?: {
+    readonly path?: Record<string, any>;
+    readonly cookie?: Record<string, any>;
+    readonly header?: Record<string, any>;
+    readonly query?: Record<string, any>;
+  };
+  readonly body?: BodyInit | Record<string, unknown> | null;
+  readonly mediaType?: string;
+  readonly headers?: HeadersOptions;
+} & Omit<RequestInit, 'headers' | 'method' | 'body'>;
