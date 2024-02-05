@@ -9,6 +9,7 @@
     "generate": "qraft-openapi-services ../../openapi.json --clean -o src/mocks/fixtures/api --schema-types-path '../../../../../../../openapi.d.ts'"
   },
   "type": "module",
+  "sideEffects": false,
   "devDependencies": {
     "@radist2s/qraft-cli": "workspace:~",
     "@tanstack/react-query": "^5.17.3",
