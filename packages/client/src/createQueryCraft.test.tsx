@@ -20,7 +20,7 @@ import { setQueryData } from './lib/callbacks/setQueryData.js';
 import { useInfiniteQuery } from './lib/callbacks/useInfiniteQuery.js';
 import { useMutation } from './lib/callbacks/useMutation.js';
 import { useQuery } from './lib/callbacks/useQuery.js';
-import { getRequestBody, getRequestUrl, request } from './lib/core/request.js';
+import { bodySerializer, urlSerializer, request } from './lib/core/request.js';
 import { services, Services } from './mocks/fixtures/api/index.js';
 import { QueryCraftContext, RequestClient } from './QueryCraftContext.js';
 
@@ -46,11 +46,8 @@ const client: RequestClient = async (schema, options) => {
     {
       baseUrl: 'https://api.sandbox.monite.com/v1',
     },
-    {
-      ...schema,
-      ...options,
-    },
-    { getRequestUrl, getRequestBody }
+    { ...schema, ...options },
+    { urlSerializer, bodySerializer }
   );
 };
 

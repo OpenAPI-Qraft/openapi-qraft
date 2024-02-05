@@ -3,13 +3,13 @@
  */
 export async function request<T>(
   config: { baseUrl: string },
-  requestInit: ApiRequestInit,
+  requestInit: APIRequestInit,
   {
-    getRequestUrl: getRequestUrlFunc,
-    getRequestBody: getRequestBodyFunc,
+    urlSerializer: urlSerializerFunc,
+    bodySerializer: bodySerializerFunc,
   }: {
-    getRequestUrl: typeof getRequestUrl;
-    getRequestBody: typeof getRequestBody;
+    urlSerializer: typeof urlSerializer;
+    bodySerializer: typeof bodySerializer;
   }
 ): Promise<T> {
   const {
@@ -22,13 +22,13 @@ export async function request<T>(
     ...requestInitRest
   } = requestInit;
 
-  const requestBody = getRequestBodyFunc({
+  const requestBody = bodySerializerFunc({
     method,
     mediaType,
     body,
   });
 
-  const response = await fetch(getRequestUrlFunc(config, { url, parameters }), {
+  const response = await fetch(urlSerializerFunc(config, { url, parameters }), {
     method: method.toUpperCase(),
     body: requestBody,
     headers: mergeHeaders(
@@ -56,13 +56,11 @@ export async function request<T>(
   return (await getResponseBody(clonedResponse)) as T;
 }
 
-export function getRequestUrl(
+export function urlSerializer(
   config: { baseUrl: string },
-  { url, parameters }: Pick<ApiRequestInit, 'url' | 'parameters'>
+  { url, parameters }: Pick<APIRequestInit, 'url' | 'parameters'>
 ): string {
-  let path = url;
-
-  path = path.replace(/{(.*?)}/g, (substring: string, group: string) => {
+  const path = url.replace(/{(.*?)}/g, (substring: string, group: string) => {
     if (parameters?.path?.hasOwnProperty(group)) {
       return encodeURI(String(parameters?.path[group]));
     }
@@ -72,6 +70,7 @@ export function getRequestUrl(
   if (parameters?.query) {
     return `${config.baseUrl}${path}${getQueryString(parameters.query)}`;
   }
+
   return `${config.baseUrl}${path}`;
 }
 
@@ -134,10 +133,10 @@ export function mergeHeaders(...allHeaders: (HeadersOptions | undefined)[]) {
   return headers;
 }
 
-export function getRequestBody(options: {
-  method: ApiRequestInit['method'];
-  mediaType: ApiRequestInit['mediaType'];
-  body: ApiRequestInit['body'];
+export function bodySerializer(options: {
+  method: APIRequestInit['method'];
+  mediaType: APIRequestInit['mediaType'];
+  body: APIRequestInit['body'];
 }) {
   if (options.body === undefined) return;
 
@@ -165,7 +164,7 @@ export function getRequestBody(options: {
 
 function getRequestBodyFormData({
   body,
-}: Pick<ApiRequestInit, 'body'>): FormData | undefined {
+}: Pick<APIRequestInit, 'body'>): FormData | undefined {
   if (body instanceof FormData) return body;
   if (body === null) return;
 
@@ -204,7 +203,7 @@ function getRequestBodyFormData({
   return formData;
 }
 
-function getBodyContentType(body: ApiRequestInit['body']) {
+function getBodyContentType(body: APIRequestInit['body']) {
   if (!body) return;
   if (body instanceof Blob) return body.type || 'application/octet-stream';
   if (typeof body === 'string') return 'text/plain';
