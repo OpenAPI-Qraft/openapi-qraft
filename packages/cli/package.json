@@ -2,7 +2,7 @@
   "name": "@radist2s/qraft-cli",
   "version": "1.0.0-beta.0",
   "scripts": {
-    "build": "tsc --project tsconfig.build.json",
+    "build": "rimraf dist/ && tsc --project tsconfig.build.json",
     "dev": "yarn build --watch",
     "test": "vitest run"
   },
@@ -20,6 +20,7 @@
   },
   "devDependencies": {
     "@types/node": "^18.19.4",
+    "rimraf": "^5.0.5",
     "typescript": "^5.3.3",
     "vitest": "^1.1.3"
   },
