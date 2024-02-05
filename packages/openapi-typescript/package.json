@@ -1,5 +1,6 @@
 {
   "name": "@radist2s/qraft-openapi-typescript",
+  "version": "1.0.0-beta.0",
   "packageManager": "yarn@4.0.2",
   "type": "module",
   "bin": "./dist/bin.js",
