@@ -19,7 +19,7 @@ import { setQueryData } from './callbacks/setQueryData.js';
 import { useInfiniteQuery } from './callbacks/useInfiniteQuery.js';
 import { useMutation } from './callbacks/useMutation.js';
 import { useQuery } from './callbacks/useQuery.js';
-import { craftAPIClient } from './createQueryCraftClient.js';
+import { qraftAPIClient } from './createQueryCraftClient.js';
 import { bodySerializer, urlSerializer, request } from './lib/core/request.js';
 import { services, Services } from './mocks/fixtures/api/index.js';
 import { QueryCraftContext, RequestClient } from './QueryCraftContext.js';
@@ -39,7 +39,7 @@ const callbacks = {
   useQuery,
 } as const;
 
-const qraft = craftAPIClient<Services, typeof callbacks>(services, callbacks);
+const qraft = qraftAPIClient<Services, typeof callbacks>(services, callbacks);
 
 const client: RequestClient = async (schema, options) => {
   return request(

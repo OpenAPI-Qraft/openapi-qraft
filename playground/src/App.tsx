@@ -1,4 +1,4 @@
-import { craftAPIClient } from '@radist2s/qraft';
+import { qraftAPIClient } from '@radist2s/qraft';
 import { getInfiniteQueryData } from '@radist2s/qraft/callbacks/getInfiniteQueryData';
 import { getInfiniteQueryKey } from '@radist2s/qraft/callbacks/getInfiniteQueryKey';
 import { getMutationKey } from '@radist2s/qraft/callbacks/getMutationKey';
@@ -30,7 +30,7 @@ const callbacks = {
   useQuery,
 } as const;
 
-const qraft = craftAPIClient<Services, typeof callbacks>(services, callbacks);
+const qraft = qraftAPIClient<Services, typeof callbacks>(services, callbacks);
 
 function App() {
   const { data } = qraft.entityUsers.getEntityUsersMe.useQuery({
