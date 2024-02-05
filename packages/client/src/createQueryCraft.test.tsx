@@ -7,7 +7,7 @@ import {
 } from '@tanstack/react-query';
 import { act, renderHook, waitFor } from '@testing-library/react';
 
-import { createQueryCraft } from './createQueryCraft.js';
+import { craftAPIClient } from './createQueryCraftClient.js';
 import { getInfiniteQueryData } from './lib/callbacks/getInfiniteQueryData.js';
 import { getInfiniteQueryKey } from './lib/callbacks/getInfiniteQueryKey.js';
 import { getMutationKey } from './lib/callbacks/getMutationKey.js';
@@ -39,7 +39,7 @@ const callbacks = {
   getInfiniteQueryKey,
 } as const;
 
-const qraft = createQueryCraft<Services, typeof callbacks>(services, callbacks);
+const qraft = craftAPIClient<Services, typeof callbacks>(services, callbacks);
 
 const client: RequestClient = async (schema, options) => {
   return request(

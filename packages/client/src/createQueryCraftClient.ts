@@ -1,7 +1,7 @@
 import { createCallbackProxyDecoration } from './lib/createCallbackProxyDecoration.js';
 import { RequestSchema } from './QueryCraftContext.js';
 
-export const createQueryCraft = <
+export const craftAPIClient = <
   Services extends {
     [service in keyof Services]: {
       [method in keyof Services[service]]: { schema: RequestSchema };
