@@ -74,7 +74,7 @@ export function urlSerializer(
   return `${config.baseUrl}${path}`;
 }
 
-export function getQueryString(params: Record<string, any>): string {
+function getQueryString(params: Record<string, any>): string {
   const qs: string[] = [];
 
   const append = (key: string, value: any) => {
@@ -108,7 +108,7 @@ export function getQueryString(params: Record<string, any>): string {
   return '';
 }
 
-export function mergeHeaders(...allHeaders: (HeadersOptions | undefined)[]) {
+function mergeHeaders(...allHeaders: (HeadersOptions | undefined)[]) {
   const headers = new Headers();
 
   for (const headerSet of allHeaders) {
@@ -210,9 +210,7 @@ function getBodyContentType(body: APIRequestInit['body']) {
   if (!(body instanceof FormData)) return 'application/json';
 }
 
-export async function getResponseBody<T>(
-  response: Response
-): Promise<T | undefined> {
+async function getResponseBody<T>(response: Response): Promise<T | undefined> {
   if (response.status === 204 || response.headers.get('Content-Length') === '0')
     return undefined;
 
