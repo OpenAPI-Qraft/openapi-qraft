@@ -20,7 +20,7 @@ import { useInfiniteQuery } from './callbacks/useInfiniteQuery.js';
 import { useMutation } from './callbacks/useMutation.js';
 import { useQuery } from './callbacks/useQuery.js';
 import { qraftAPIClient } from './createQueryCraftClient.js';
-import { bodySerializer, urlSerializer, request } from './lib/core/request.js';
+import { bodySerializer, urlSerializer, request } from './lib/request.js';
 import { services, Services } from './mocks/fixtures/api/index.js';
 import { QueryCraftContext, RequestClient } from './QueryCraftContext.js';
 
