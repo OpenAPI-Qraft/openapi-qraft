@@ -19,10 +19,10 @@ import { setQueryData } from './callbacks/setQueryData.js';
 import { useInfiniteQuery } from './callbacks/useInfiniteQuery.js';
 import { useMutation } from './callbacks/useMutation.js';
 import { useQuery } from './callbacks/useQuery.js';
-import { qraftAPIClient } from './createQueryCraftClient.js';
+import { qraftAPIClient } from './createQraftClient.js';
 import { bodySerializer, urlSerializer, request } from './lib/request.js';
 import { services, Services } from './mocks/fixtures/api/index.js';
-import { QueryCraftContext, RequestClient } from './QueryCraftContext.js';
+import { QraftContext, RequestClient } from './QraftContext.js';
 
 const callbacks = {
   getInfiniteQueryData,
@@ -590,9 +590,9 @@ function Providers({
 
   return (
     <QueryClientProvider client={queryClient}>
-      <QueryCraftContext.Provider value={{ requestClient }}>
+      <QraftContext.Provider value={{ requestClient }}>
         {children}
-      </QueryCraftContext.Provider>
+      </QraftContext.Provider>
     </QueryClientProvider>
   );
 }

@@ -4,7 +4,7 @@ import type { DefaultError } from '@tanstack/query-core';
 import type { UseQueryResult } from '@tanstack/react-query';
 import { useQuery as useQueryBase } from '@tanstack/react-query';
 
-import { QueryCraftContext, RequestSchema } from '../QueryCraftContext.js';
+import { QraftContext, RequestSchema } from '../QraftContext.js';
 import {
   ServiceOperationQuery,
   ServiceOperationQueryKey,
@@ -24,9 +24,9 @@ export const useQuery: <
 } = (schema, args) => {
   const [params, options, ...restArgs] = args;
 
-  const client = useContext(QueryCraftContext)?.requestClient;
+  const client = useContext(QraftContext)?.requestClient;
 
-  if (!client) throw new Error(`QueryCraftContext.client not found`);
+  if (!client) throw new Error(`QraftContext.client not found`);
 
   const queryKey: ServiceOperationQueryKey<RequestSchema, unknown> = [
     { url: schema.url },

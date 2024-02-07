@@ -6,7 +6,7 @@ import {
   UseInfiniteQueryResult,
 } from '@tanstack/react-query';
 
-import { QueryCraftContext, RequestSchema } from '../QueryCraftContext.js';
+import { QraftContext, RequestSchema } from '../QraftContext.js';
 import { ServiceOperationQuery } from '../ServiceOperation.js';
 
 export const useInfiniteQuery: <
@@ -21,9 +21,9 @@ export const useInfiniteQuery: <
 ) => UseInfiniteQueryResult<TData, TError> = (schema, args) => {
   const [params, options, ...restArgs] = args;
 
-  const client = useContext(QueryCraftContext)?.requestClient;
+  const client = useContext(QraftContext)?.requestClient;
 
-  if (!client) throw new Error(`QueryCraftContext.client not found`);
+  if (!client) throw new Error(`QraftContext.client not found`);
 
   return useInfiniteQueryBase(
     {

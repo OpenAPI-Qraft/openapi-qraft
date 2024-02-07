@@ -1,5 +1,5 @@
 import { createCallbackProxyDecoration } from './lib/createCallbackProxyDecoration.js';
-import { RequestSchema } from './QueryCraftContext.js';
+import { RequestSchema } from './QraftContext.js';
 
 export const qraftAPIClient = <
   Services extends {

@@ -1,4 +1,4 @@
-import { RequestSchema } from '../QueryCraftContext.js';
+import { RequestSchema } from '../QraftContext.js';
 import { ServiceOperationMutation } from '../ServiceOperation.js';
 
 export const mutationFn = (schema: RequestSchema, args: unknown) => {

@@ -24,7 +24,7 @@ export type RequestClient = <T>(
   }
 ) => Promise<T>;
 
-export const QueryCraftContext = createContext<
+export const QraftContext = createContext<
   | {
       /** The request client to use for making requests. Will be invoked with every request. */
       requestClient: RequestClient;
