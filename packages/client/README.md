@@ -52,7 +52,8 @@ npx @radist2s/qraft-cli https://api.dev.monite.com/openapi.json?version=2023-09-
 ```
 
 By completing these steps, you will generate `openapi.d.ts`, which serves as a TypeScript representation of the
-specified OpenAPI, _along with a set of services_ in `src/api/services`. These elements are key to enhancing your development workflow with type
+specified OpenAPI, _along with a set of services_ in `src/api/services`. These elements are key to enhancing your
+development workflow with type
 safety and auto-completion features.
 
 ### 2. Set Up Callbacks
@@ -91,7 +92,7 @@ export const callbacks = {
 } as const;
 ```
 
-### 3. Qraft API Client
+### 3. API Client stitching
 
 Now, create the Qraft client by providing it with your services and callbacks. This step dynamically generates typed
 hooks for your API endpoints.
@@ -114,6 +115,55 @@ Hooks and utilities.
 This setup provides you with a powerful, type-safe way to interact with your backend APIs using React Query.
 The `qraftAPIClient` function generates a client (`qraft`) that allows you to make API calls with type-checked
 parameters, ensuring that your application remains robust and error-free.
+
+### 4. Provide Request Client
+
+Finally, provide the request client to the `QraftContext` to enable the generated hooks to make API requests.
+
+Every request will be handled by `requestClient`, which can be customized to fit your project's needs.
+
+```tsx
+import { useMemo } from 'react';
+
+import { request, bodySerializer, urlSerializer } from '@radist2s/qraft';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+
+function Providers({ children }: { children: React.ReactNode }) {
+  const queryClient = useMemo(() => new QueryClient(), []);
+
+  return (
+    <QueryClientProvider client={queryClient}>
+      <QraftContext.Provider
+        value={{
+          /**
+           * Request client will be invoked for every request
+           */
+          requestClient(schema, options) {
+            return request(
+              {
+                baseUrl: 'https://api.sandbox.monite.com/v1',
+              },
+              {
+                ...schema,
+                ...options,
+                headers: {
+                  Authorization: 'Bearer token', // Specify your authorization token here
+                },
+              },
+              { urlSerializer, bodySerializer } // Serializers for request body and URL
+            );
+          },
+        }}
+      >
+        {children}
+      </QraftContext.Provider>
+    </QueryClientProvider>
+  );
+}
+```
+
+> The Qraft is designed to be as modular as possible, enabling you to integrate your own request client and serializers.
+> To ensure optimal tree-shaking, we do not include default serializers in the functions.
 
 ## Usage
 
@@ -147,8 +197,8 @@ const { data, error, isLoading } =
 
 #### Without predefined parameters
 
-It happens that at the time of calling the Hook, you don't yet know what query parameters to be passed. In this case,
-you will need to pass the request parameters and the body of the request when you call `mutate()` function:
+It happens that at the time of calling the Mutation Hook, you don't yet know what query parameters to be passed. In this case,
+you will need to pass the _parameters and the body_ of the request when you call `mutate()` function:
 
 ```ts
 /**
@@ -195,6 +245,8 @@ mutation.mutate({
 ```
 
 ### useInfiniteQuery
+
+`todo::Add Description`
 
 ```ts
 /**
