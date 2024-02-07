@@ -41,7 +41,7 @@ const callbacks = {
 
 const qraft = qraftAPIClient<Services, typeof callbacks>(services, callbacks);
 
-const client: RequestClient = async (schema, options) => {
+const requestClient: RequestClient = async (schema, options) => {
   return request(
     {
       baseUrl: 'https://api.sandbox.monite.com/v1',
@@ -430,7 +430,7 @@ describe('Qraft uses Query Function', () => {
           },
         },
       },
-      client
+      requestClient
     );
 
     expect(result).toEqual({
@@ -590,7 +590,7 @@ function Providers({
 
   return (
     <QueryClientProvider client={queryClient}>
-      <QueryCraftContext.Provider value={{ client }}>
+      <QueryCraftContext.Provider value={{ requestClient }}>
         {children}
       </QueryCraftContext.Provider>
     </QueryClientProvider>

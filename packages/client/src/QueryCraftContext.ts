@@ -26,7 +26,8 @@ export type RequestClient = <T>(
 
 export const QueryCraftContext = createContext<
   | {
-      client: RequestClient;
+      /** The request client to use for making requests. Will be invoked with every request. */
+      requestClient: RequestClient;
     }
   | undefined
 >(undefined);

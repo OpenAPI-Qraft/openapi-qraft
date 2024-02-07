@@ -41,7 +41,7 @@ export const useMutation: <
       `'useMutation': parameters and 'options.mutationKey' cannot be used together`
     );
 
-  const client = useContext(QueryCraftContext)?.client;
+  const client = useContext(QueryCraftContext)?.requestClient;
 
   if (!client) throw new Error(`QueryCraftContext.client not found`);
 

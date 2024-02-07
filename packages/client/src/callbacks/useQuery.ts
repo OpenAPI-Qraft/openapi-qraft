@@ -24,7 +24,7 @@ export const useQuery: <
 } = (schema, args) => {
   const [params, options, ...restArgs] = args;
 
-  const client = useContext(QueryCraftContext)?.client;
+  const client = useContext(QueryCraftContext)?.requestClient;
 
   if (!client) throw new Error(`QueryCraftContext.client not found`);
 
