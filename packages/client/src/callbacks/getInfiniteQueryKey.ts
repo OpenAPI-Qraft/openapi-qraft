@@ -1,3 +1,4 @@
+import type { QraftClientOptions } from '../createQraftClient.js';
 import { RequestSchema } from '../QraftContext.js';
 import {
   ServiceOperationInfiniteQueryKey,
@@ -5,6 +6,7 @@ import {
 } from '../ServiceOperation.js';
 
 export const getInfiniteQueryKey = (
+  qraftOptions: QraftClientOptions | undefined,
   schema: RequestSchema,
   args: Parameters<
     ServiceOperationQuery<

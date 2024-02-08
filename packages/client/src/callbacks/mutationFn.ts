@@ -1,7 +1,12 @@
+import type { QraftClientOptions } from '../createQraftClient.js';
 import { RequestSchema } from '../QraftContext.js';
 import { ServiceOperationMutation } from '../ServiceOperation.js';
 
-export const mutationFn = (schema: RequestSchema, args: unknown) => {
+export const mutationFn = (
+  qraftOptions: QraftClientOptions | undefined,
+  schema: RequestSchema,
+  args: unknown
+) => {
   const [client, options] = args as Parameters<
     ServiceOperationMutation<
       RequestSchema,

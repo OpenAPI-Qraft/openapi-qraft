@@ -1,7 +1,9 @@
+import type { QraftClientOptions } from '../createQraftClient.js';
 import { RequestSchema } from '../QraftContext.js';
 import { ServiceOperationQuery } from '../ServiceOperation.js';
 
 export const queryFn = (
+  qraftOptions: QraftClientOptions | undefined,
   schema: RequestSchema,
   args: Parameters<
     ServiceOperationQuery<RequestSchema, unknown, never>['queryFn']

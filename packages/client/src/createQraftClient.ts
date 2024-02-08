@@ -1,5 +1,11 @@
+import { Context } from 'react';
+
 import { createCallbackProxyDecoration } from './lib/createCallbackProxyDecoration.js';
-import { RequestSchema } from './QraftContext.js';
+import { QraftContextValue, RequestSchema } from './QraftContext.js';
+
+export type QraftClientOptions = {
+  context?: Context<QraftContextValue>;
+};
 
 export const qraftAPIClient = <
   Services extends {
@@ -16,7 +22,8 @@ export const qraftAPIClient = <
       };
     };
   },
-  callbacks: Callbacks
+  callbacks: Callbacks,
+  options?: QraftClientOptions
 ): ServicesCallbacksFilter<Services, keyof Callbacks> => {
   return createCallbackProxyDecoration(
     Object.keys(callbacks),
@@ -27,6 +34,7 @@ export const qraftAPIClient = <
 
       if (functionName in callbacks) {
         return callbacks[functionName as keyof Callbacks](
+          options,
           serviceOperation.schema,
           args
         );

@@ -4,6 +4,7 @@ import type { DefaultError } from '@tanstack/query-core';
 import type { UseMutationResult } from '@tanstack/react-query';
 import { useMutation as useMutationBase } from '@tanstack/react-query';
 
+import type { QraftClientOptions } from '../createQraftClient.js';
 import { QraftContext, RequestSchema } from '../QraftContext.js';
 import {
   ServiceOperationMutation,
@@ -16,6 +17,7 @@ export const useMutation: <
   TVariables = void,
   TContext = unknown,
 >(
+  qraftOptions: QraftClientOptions | undefined,
   schema: RequestSchema,
   args: Parameters<
     ServiceOperationMutation<
@@ -26,6 +28,7 @@ export const useMutation: <
     >['useMutation']
   >
 ) => UseMutationResult<TData, TError, TVariables, TContext> = (
+  qraftOptions,
   schema,
   args
 ) => {
@@ -41,7 +44,8 @@ export const useMutation: <
       `'useMutation': parameters and 'options.mutationKey' cannot be used together`
     );
 
-  const client = useContext(QraftContext)?.requestClient;
+  const client = useContext(qraftOptions?.context ?? QraftContext)
+    ?.requestClient;
 
   if (!client) throw new Error(`QraftContext.client not found`);
 

@@ -24,10 +24,11 @@ export type RequestClient = <T>(
   }
 ) => Promise<T>;
 
-export const QraftContext = createContext<
+export type QraftContextValue =
   | {
       /** The request client to use for making requests. Will be invoked with every request. */
       requestClient: RequestClient;
     }
-  | undefined
->(undefined);
+  | undefined;
+
+export const QraftContext = createContext<QraftContextValue>(undefined);

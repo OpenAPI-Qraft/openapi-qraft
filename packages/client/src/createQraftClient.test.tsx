@@ -1,4 +1,4 @@
-import React, { ReactNode } from 'react';
+import React, { createContext, ReactNode } from 'react';
 
 import {
   QueryClient,
@@ -22,7 +22,11 @@ import { useQuery } from './callbacks/useQuery.js';
 import { qraftAPIClient } from './createQraftClient.js';
 import { bodySerializer, urlSerializer, request } from './lib/request.js';
 import { services, Services } from './mocks/fixtures/api/index.js';
-import { QraftContext, RequestClient } from './QraftContext.js';
+import {
+  QraftContext,
+  QraftContextValue,
+  RequestClient,
+} from './QraftContext.js';
 
 const callbacks = {
   getInfiniteQueryData,
@@ -75,6 +79,69 @@ describe('Qraft uses Queries', () => {
       expect(result.current.data).toEqual({
         header: {
           'x-monite-version': '1.0.0',
+        },
+        path: {
+          approval_policy_id: '1',
+        },
+        query: {
+          items_order: ['asc', 'desc'],
+        },
+      });
+    });
+  });
+
+  it('supports custom context', async () => {
+    const QraftCustomContext = createContext<QraftContextValue>(undefined);
+
+    const customQraft = qraftAPIClient<Services, typeof callbacks>(
+      services,
+      callbacks,
+      { context: QraftCustomContext }
+    );
+
+    const { result } = renderHook(
+      () =>
+        customQraft.approvalPolicies.getApprovalPoliciesId.useQuery({
+          header: {
+            'x-monite-version': '1.0.0',
+          },
+          path: {
+            approval_policy_id: '1',
+          },
+          query: {
+            items_order: ['asc', 'desc'],
+          },
+        }),
+      {
+        wrapper: (props) => (
+          <QraftCustomContext.Provider
+            value={{
+              requestClient(schema, options) {
+                return request(
+                  {
+                    baseUrl: 'https://api.sandbox.monite.com/v1',
+                  },
+                  {
+                    headers: { 'x-custom-provider': 'true' },
+                    ...schema,
+                    ...options,
+                  },
+                  { urlSerializer, bodySerializer }
+                );
+              },
+            }}
+          >
+            <Providers {...props} />
+          </QraftCustomContext.Provider>
+        ),
+      }
+    );
+
+    await waitFor(() => {
+      expect(result.current.data).toEqual({
+        header: {
+          'x-monite-version': '1.0.0',
+          'x-custom-provider': 'true',
         },
         path: {
           approval_policy_id: '1',
