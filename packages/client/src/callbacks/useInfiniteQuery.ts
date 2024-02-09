@@ -6,7 +6,7 @@ import {
   UseInfiniteQueryResult,
 } from '@tanstack/react-query';
 
-import type { QraftClientOptions } from '../createQraftClient.js';
+import type { QraftClientOptions } from '../qraftAPIClient.js';
 import { QraftContext, RequestSchema } from '../QraftContext.js';
 import { ServiceOperationQuery } from '../ServiceOperation.js';
 

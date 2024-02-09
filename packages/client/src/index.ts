@@ -1,3 +1,3 @@
-export { qraftAPIClient } from './createQraftClient.js';
+export { qraftAPIClient } from './qraftAPIClient.js';
 export { request, urlSerializer, bodySerializer } from './lib/request.js';
 export type { APIRequestInit, HeadersOptions } from './lib/request.js';

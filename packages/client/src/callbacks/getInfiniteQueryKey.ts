@@ -1,4 +1,4 @@
-import type { QraftClientOptions } from '../createQraftClient.js';
+import type { QraftClientOptions } from '../qraftAPIClient.js';
 import { RequestSchema } from '../QraftContext.js';
 import {
   ServiceOperationInfiniteQueryKey,

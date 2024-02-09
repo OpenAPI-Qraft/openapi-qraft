@@ -1,6 +1,6 @@
 import { InfiniteData } from '@tanstack/query-core';
 
-import type { QraftClientOptions } from '../createQraftClient.js';
+import type { QraftClientOptions } from '../qraftAPIClient.js';
 import { RequestSchema } from '../QraftContext.js';
 import type {
   ServiceOperationInfiniteQueryKey,

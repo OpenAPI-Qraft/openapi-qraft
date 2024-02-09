@@ -19,9 +19,9 @@ import { setQueryData } from './callbacks/setQueryData.js';
 import { useInfiniteQuery } from './callbacks/useInfiniteQuery.js';
 import { useMutation } from './callbacks/useMutation.js';
 import { useQuery } from './callbacks/useQuery.js';
-import { qraftAPIClient } from './createQraftClient.js';
 import { bodySerializer, urlSerializer, request } from './lib/request.js';
 import { services, Services } from './mocks/fixtures/api/index.js';
+import { qraftAPIClient } from './qraftAPIClient.js';
 import {
   QraftContext,
   QraftContextValue,

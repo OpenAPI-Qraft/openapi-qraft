@@ -4,7 +4,7 @@ import type { DefaultError } from '@tanstack/query-core';
 import type { UseQueryResult } from '@tanstack/react-query';
 import { useQuery as useQueryBase } from '@tanstack/react-query';
 
-import type { QraftClientOptions } from '../createQraftClient.js';
+import type { QraftClientOptions } from '../qraftAPIClient.js';
 import { QraftContext, RequestSchema } from '../QraftContext.js';
 import {
   ServiceOperationQuery,
