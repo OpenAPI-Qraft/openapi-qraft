@@ -18,7 +18,6 @@ export type RequestSchema = {
     | 'options'
     | 'head'
     | 'trace';
-  errors?: number[];
   mediaType?: string;
 };
 
