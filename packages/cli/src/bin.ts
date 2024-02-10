@@ -17,7 +17,7 @@ program
   .option(
     '--operation-generics-path <path>',
     'Path to operation generics file',
-    '@radist2s/qraft/ServiceOperation'
+    '@openapi-qraft/react'
   )
   .option(
     '--schema-types-path <path>', // todo::specify better param name to avoid confusion with real path

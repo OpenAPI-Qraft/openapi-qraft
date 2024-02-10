@@ -1,6 +1,6 @@
-# @radist2s/qraft
+# @openapi-qraft/react
 
-`@radist2s/qraft` is a modular TypeScript client designed to facilitate type-safe API requests in React applications,
+`@openapi-qraft/react` is a modular TypeScript client designed to facilitate type-safe API requests in React applications,
 leveraging the power of Tanstack Query. It utilizes a Proxy-based architecture to dynamically generate Tanstack Query
 hooks with typed parameters, ensuring that your API requests are both type-safe and efficient.
 
@@ -18,17 +18,17 @@ hooks with typed parameters, ensuring that your API requests are both type-safe 
 ## Installation
 
 ```bash
-npm install @radist2s/qraft
+npm install @openapi-qraft/react
 ```
 
 ## Getting Started
 
-To get started with `@radist2s/qraft`, you'll need to set up your client by passing in your API services and a set of
+To get started with `@openapi-qraft/react`, you'll need to set up your client by passing in your API services and a set of
 callbacks to handle various React Query functionalities.
 
 ## 1. Define Your API Services
 
-Before utilizing `@radist2s/qraft` to make typed requests, you need to define your API services by generating types and
+Before utilizing `@openapi-qraft/react` to make typed requests, you need to define your API services by generating types and
 schemas from your OpenAPI Specification. This ensures that your requests are type-safe and that your development
 experience benefits from TypeScript's power. Follow the steps below to generate your API services:
 
@@ -43,12 +43,12 @@ npx openapi-typescript https://api.dev.monite.com/openapi.json?version=2023-09-0
 
 ### Generating Qraft Services
 
-Next, use `@radist2s/qraft-cli` to generate the services and typed React Query hooks. Ensure to specify the path to the
+Next, use `@openapi-qraft/cli` to generate the services and typed React Query hooks. Ensure to specify the path to the
 TypeScript definitions generated in the previous step. This creates a seamless integration between your OpenAPI schema
 and React Query, providing you with type-safe hooks for data fetching and mutation operations.
 
 ```bash
-npx @radist2s/qraft-cli https://api.dev.monite.com/openapi.json?version=2023-09-01 --output-dir src/api --schema-types-path ../openapi.d.ts
+npx @openapi-qraft/cli https://api.dev.monite.com/openapi.json?version=2023-09-01 --output-dir src/api --schema-types-path ../openapi.d.ts
 ```
 
 By completing these steps, you will generate `openapi.d.ts`, which serves as a TypeScript representation of the
@@ -63,18 +63,18 @@ and utilities.
 
 ```ts
 // callbacks.ts
-import { getInfiniteQueryData } from '@radist2s/qraft/callbacks/getInfiniteQueryData';
-import { getInfiniteQueryKey } from '@radist2s/qraft/callbacks/getInfiniteQueryKey';
-import { getMutationKey } from '@radist2s/qraft/callbacks/getMutationKey';
-import { getQueryData } from '@radist2s/qraft/callbacks/getQueryData';
-import { getQueryKey } from '@radist2s/qraft/callbacks/getQueryKey';
-import { mutationFn } from '@radist2s/qraft/callbacks/mutationFn';
-import { queryFn } from '@radist2s/qraft/callbacks/queryFn';
-import { setInfiniteQueryData } from '@radist2s/qraft/callbacks/setInfiniteQueryData';
-import { setQueryData } from '@radist2s/qraft/callbacks/setQueryData';
-import { useInfiniteQuery } from '@radist2s/qraft/callbacks/useInfiniteQuery';
-import { useMutation } from '@radist2s/qraft/callbacks/useMutation';
-import { useQuery } from '@radist2s/qraft/callbacks/useQuery';
+import { getInfiniteQueryData } from '@openapi-qraft/react/callbacks/getInfiniteQueryData';
+import { getInfiniteQueryKey } from '@openapi-qraft/react/callbacks/getInfiniteQueryKey';
+import { getMutationKey } from '@openapi-qraft/react/callbacks/getMutationKey';
+import { getQueryData } from '@openapi-qraft/react/callbacks/getQueryData';
+import { getQueryKey } from '@openapi-qraft/react/callbacks/getQueryKey';
+import { mutationFn } from '@openapi-qraft/react/callbacks/mutationFn';
+import { queryFn } from '@openapi-qraft/react/callbacks/queryFn';
+import { setInfiniteQueryData } from '@openapi-qraft/react/callbacks/setInfiniteQueryData';
+import { setQueryData } from '@openapi-qraft/react/callbacks/setQueryData';
+import { useInfiniteQuery } from '@openapi-qraft/react/callbacks/useInfiniteQuery';
+import { useMutation } from '@openapi-qraft/react/callbacks/useMutation';
+import { useQuery } from '@openapi-qraft/react/callbacks/useQuery';
 
 export const callbacks = {
   getInfiniteQueryData,
@@ -98,13 +98,13 @@ Now, create the Qraft client by providing it with your services and callbacks. T
 hooks for your API endpoints.
 
 ```ts
-import { qraftAPIClient } from '@radist2s/qraft';
+import { qraftAPIClient } from '@openapi-qraft/react';
 
+/** '--output-dir' path to your generated services **/
 import { services, Services } from './api';
-// '--output-dir' path to your generated services
-import { callbacks } from './callbacks';
 
-// just created 'callbacks.ts'
+/** just created 'callbacks.ts' **/
+import { callbacks } from './callbacks';
 
 const qraft = qraftAPIClient<Services, typeof callbacks>(services, callbacks);
 ```
@@ -125,7 +125,7 @@ Every request will be handled by `requestClient`, which can be customized to fit
 ```tsx
 import { useMemo } from 'react';
 
-import { request, bodySerializer, urlSerializer } from '@radist2s/qraft';
+import { request, bodySerializer, urlSerializer } from '@openapi-qraft/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 function Providers({ children }: { children: React.ReactNode }) {
@@ -287,9 +287,9 @@ infiniteQuery.fetchNextPage(); // will execute GET /files?search=Agreements&limi
 
 ## Contributing
 
-Contributions are welcome! If you have suggestions or want to improve `@radist2s/qraft`, please feel free to submit a
+Contributions are welcome! If you have suggestions or want to improve `@openapi-qraft/react`, please feel free to submit a
 pull request or open an issue.
 
 ## License
 
-`@radist2s/qraft` is licensed under the MIT License. See the LICENSE file for more details.
+`@openapi-qraft/react` is licensed under the MIT License. See the LICENSE file for more details.

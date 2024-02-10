@@ -8,15 +8,18 @@
     "build": "tsc && vite build",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
-    "generate": "qraft --clean true -i ../schema.json -o src/api --schema-types-path '../../../../schema.d.ts'"
+    "typecheck": "tsc --noEmit",
+    "generate-openapi": "openapi-qraft-typescript ./schema.json -o ./schema.d.ts",
+    "generate": "qraft-openapi-services ./schema.json --clean -o src/api --schema-types-path '../../../schema.d.ts'"
   },
   "dependencies": {
-    "@radist2s/qraft": "workspace:~",
+    "@openapi-qraft/react": "workspace:~",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },
   "devDependencies": {
-    "@radist2s/qraft-cli": "workspace:~",
+    "@openapi-qraft/cli": "workspace:~",
+    "@openapi-qraft/openapi-typescript": "workspace:~",
     "@types/react": "^18.2.43",
     "@types/react-dom": "^18.2.17",
     "@typescript-eslint/eslint-plugin": "^6.14.0",
