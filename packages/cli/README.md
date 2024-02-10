@@ -16,7 +16,7 @@ npm install -g @openapi-qraft/cli
 ## Usage
 
 ```
-Usage: qraft-openapi-services [options] [input]
+Usage: openapi-qraft [options] [input]
 
 Arguments:
   input   Input OpenAPI Schema file path, URL (json, yml)
@@ -36,7 +36,7 @@ Options:
 To generate services from an OpenAPI schema file:
 
 ```bash
-qraft-openapi-services https://example.com/openapi.json --output-dir src/api --schema-types-path ../openapi.d.ts
+openapi-qraft https://example.com/openapi.json --output-dir src/api --schema-types-path ../openapi.d.ts
 ```
 
 This command generates service declarations and React Query hooks types in the `src/api` directory based on the `schema.json` file.

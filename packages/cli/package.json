@@ -8,7 +8,7 @@
   },
   "type": "module",
   "bin": {
-    "qraft-openapi-services": "./dist/bin.js"
+    "openapi-qraft": "./dist/bin.js"
   },
   "dependencies": {
     "ansi-colors": "^4.1.3",
