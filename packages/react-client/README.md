@@ -147,7 +147,8 @@ function Providers({ children }: { children: React.ReactNode }) {
                 ...schema,
                 ...options,
                 headers: {
-                  Authorization: 'Bearer token', // Specify your authorization token here
+                  /** Specify your predefined header here **/
+                  // Authorization: 'Bearer token',
                 },
               },
               { urlSerializer, bodySerializer } // Serializers for request body and URL
@@ -170,10 +171,12 @@ function Providers({ children }: { children: React.ReactNode }) {
 With the client set up, you can now use the generated hooks in your React components to fetch data, execute mutations,
 and more.
 
-### useQuery
+### [useQuery 🔗](https://tanstack.com/query/latest/docs/framework/react/reference/useQuery)
 
 ```ts
 /**
+ * `qraft.approvalPolicies.getApprovalPoliciesId.useQuery(...)` will execute:
+ * 
  * GET /approval_policies/1?items_order=asc
  * x-monite-version: '2023-09-01'
  *
@@ -193,7 +196,34 @@ const { data, error, isLoading } =
   });
 ```
 
-### useMutation
+### [useMutation 🔗](https://tanstack.com/query/latest/docs/framework/react/reference/useMutation)
+
+#### With predefined parameters
+
+In case you know the query parameters that are needed for mutation, you can preset them. In this case, you must pass
+only `body` when calling `mutate()` function:
+
+```ts
+const mutation = qraft.entities.postEntitiesIdDocuments.useMutation({
+  path: {
+    entity_id: '1',
+  },
+});
+
+/**
+ * `mutation.mutate(...)` will execute:
+ * 
+ * POST /entities/1/documents
+ * Content-Type: application/json
+ * {"document_title": "Agreement of Intent"}
+ *
+ * Used Open API: POST /entities/{entity_id}/documents
+ **/
+mutation.mutate({
+  document_title: 'Agreement of Intent',
+});
+
+```
 
 #### Without predefined parameters
 
@@ -201,14 +231,17 @@ It happens that at the time of calling the Mutation Hook, you don't yet know wha
 you will need to pass the _parameters and the body_ of the request when you call `mutate()` function:
 
 ```ts
+const mutation = qraft.entities.postEntitiesIdDocuments.useMutation();
+
 /**
+ * `mutation.mutate(...)` will execute:
+ * 
  * POST /entities/1/documents
  * Content-Type: application/json
  * {"document_title": "Agreement of Intent"}
  *
  * Used Open API: POST /entities/{entity_id}/documents
  **/
-const mutation = qraft.entities.postEntitiesIdDocuments.useMutation();
 
 mutation.mutate({
   path: {
@@ -220,39 +253,16 @@ mutation.mutate({
 });
 ```
 
-#### With predefined parameters
-
-In case you know the query parameters that are needed for mutation, you can preset them. In this case, you must pass
-only `body` when calling `mutate()` function:
-
-```ts
-/**
- * POST /entities/1/documents
- * Content-Type: application/json
- * {"document_title": "Agreement of Intent"}
- *
- * Used Open API: POST /entities/{entity_id}/documents
- **/
-const mutation = qraft.entities.postEntitiesIdDocuments.useMutation({
-  path: {
-    entity_id: '1',
-  },
-});
-
-mutation.mutate({
-  document_title: 'Agreement of Intent',
-});
-```
-
-### useInfiniteQuery
+### [useInfiniteQuery 🔗](https://tanstack.com/query/latest/docs/framework/react/reference/useInfiniteQuery)
 
 `todo::Add Description`
 
 ```ts
 /**
+ * `qraft.files.getFiles.useInfiniteQuery(...)` will execute:
+ * 
  * GET /files?search=Agreements&limit=10&page=1
  * Content-Type: application/json
- * {"document_title": "Agreement of Intent"}
  *
  * Used Open API: GET /files
  **/
