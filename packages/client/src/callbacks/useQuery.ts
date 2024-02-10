@@ -36,23 +36,20 @@ export const useQuery: <
     params,
   ];
 
-  return {
-    queryKey,
-    ...useQueryBase(
-      {
-        ...options,
-        queryKey,
-        queryFn:
-          options?.queryFn ??
-          function ({ queryKey: [, queryParams], signal, meta }) {
-            return client(schema, {
-              parameters: queryParams as never,
-              signal,
-              meta,
-            });
-          },
-      },
-      ...restArgs
-    ),
-  } as never;
+  return useQueryBase(
+    {
+      ...options,
+      queryKey,
+      queryFn:
+        options?.queryFn ??
+        function ({ queryKey: [, queryParams], signal, meta }) {
+          return client(schema, {
+            parameters: queryParams as never,
+            signal,
+            meta,
+          });
+        },
+    },
+    ...restArgs
+  ) as never;
 };

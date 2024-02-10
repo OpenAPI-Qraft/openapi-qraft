@@ -162,45 +162,6 @@ describe('Qraft uses Queries', () => {
       expect(result.current.data).toEqual(undefined);
     });
   });
-
-  it('returns queryKey', async () => {
-    const { result } = renderHook(
-      () =>
-        qraft.approvalPolicies.getApprovalPoliciesId.useQuery({
-          header: {
-            'x-monite-version': '1.0.0',
-          },
-          path: {
-            approval_policy_id: '1',
-          },
-          query: {
-            items_order: ['asc', 'desc'],
-          },
-        }),
-      {
-        wrapper: Providers,
-      }
-    );
-
-    await waitFor(() => {
-      expect(result.current.queryKey).toEqual([
-        {
-          url: '/approval_policies/{approval_policy_id}',
-        },
-        {
-          header: {
-            'x-monite-version': '1.0.0',
-          },
-          path: {
-            approval_policy_id: '1',
-          },
-          query: {
-            items_order: ['asc', 'desc'],
-          },
-        },
-      ]);
-    });
-  });
 });
 
 describe('Qraft uses Infinite Queries', () => {

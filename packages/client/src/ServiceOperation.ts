@@ -73,9 +73,7 @@ interface ServiceOperationUseQuery<
       'queryKey'
     >,
     queryClient?: QueryClient
-  ): UseQueryResult<TData, TError | Error> & {
-    queryKey: ServiceOperationQueryKey<TSchema, TParams>;
-  };
+  ): UseQueryResult<TData, TError | Error>;
   useQuery(
     params: TParams,
     options: Omit<
@@ -89,9 +87,7 @@ interface ServiceOperationUseQuery<
       'queryKey'
     >,
     queryClient?: QueryClient
-  ): DefinedUseQueryResult<TData, TError | Error> & {
-    queryKey: ServiceOperationQueryKey<TSchema, TParams>;
-  };
+  ): DefinedUseQueryResult<TData, TError | Error>;
 }
 
 type PartialParams<T> = T extends object
