@@ -1,5 +1,5 @@
 import type { QraftClientOptions } from '../qraftAPIClient.js';
-import { RequestSchema } from '../QraftContext.js';
+import type { RequestClientSchema } from '../RequestClient.js';
 import {
   ServiceOperationQuery,
   ServiceOperationQueryKey,
@@ -7,14 +7,14 @@ import {
 
 export function getQueryData<TData>(
   qraftOptions: QraftClientOptions | undefined,
-  schema: RequestSchema,
+  schema: RequestClientSchema,
   args: Parameters<
-    ServiceOperationQuery<RequestSchema, unknown, TData>['getQueryData']
+    ServiceOperationQuery<RequestClientSchema, unknown, TData>['getQueryData']
   >
 ): TData | undefined {
   const [params, queryClient] = args;
   return queryClient.getQueryData([
     { url: schema.url },
     params,
-  ] satisfies ServiceOperationQueryKey<RequestSchema, unknown>);
+  ] satisfies ServiceOperationQueryKey<RequestClientSchema, unknown>);
 }

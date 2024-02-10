@@ -1,7 +1,8 @@
 import { Context } from 'react';
 
 import { createCallbackProxyDecoration } from './lib/createCallbackProxyDecoration.js';
-import { QraftContextValue, RequestSchema } from './QraftContext.js';
+import { QraftContextValue } from './QraftContext.js';
+import type { RequestClientSchema } from './RequestClient.js';
 
 export type QraftClientOptions = {
   context?: Context<QraftContextValue>;
@@ -10,7 +11,7 @@ export type QraftClientOptions = {
 export const qraftAPIClient = <
   Services extends {
     [service in keyof Services]: {
-      [method in keyof Services[service]]: { schema: RequestSchema };
+      [method in keyof Services[service]]: { schema: RequestClientSchema };
     };
   },
   Callbacks extends Record<string, (...rest: any[]) => any>,
@@ -47,7 +48,7 @@ export const qraftAPIClient = <
 
 function isServiceOperation(
   input: unknown
-): input is { schema: RequestSchema } {
+): input is { schema: RequestClientSchema } {
   return input !== null && typeof input === 'object' && 'schema' in input;
 }
 
@@ -60,7 +61,7 @@ function getByPath(obj: Record<string, unknown>, path: string[]) {
 
 type ServicesCallbacksFilter<Services, Callbacks> = Services extends {
   [serviceName in keyof Services]: {
-    [method in keyof Services[serviceName]]: { schema: RequestSchema };
+    [method in keyof Services[serviceName]]: { schema: RequestClientSchema };
   };
 }
   ? {

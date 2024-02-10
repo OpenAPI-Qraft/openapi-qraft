@@ -1,5 +1,5 @@
 import type { QraftClientOptions } from '../qraftAPIClient.js';
-import { RequestSchema } from '../QraftContext.js';
+import type { RequestClientSchema } from '../RequestClient.js';
 import {
   ServiceOperationMutation,
   ServiceOperationMutationKey,
@@ -7,19 +7,19 @@ import {
 
 export const getMutationKey = (
   qraftOptions: QraftClientOptions | undefined,
-  schema: RequestSchema,
+  schema: RequestClientSchema,
   args: unknown
 ) => {
   const [parameters] = args as Parameters<
     ServiceOperationMutation<
-      RequestSchema,
+      RequestClientSchema,
       unknown,
       unknown,
       unknown
     >['getMutationKey']
   >;
 
-  const key: ServiceOperationMutationKey<RequestSchema, unknown> = [
+  const key: ServiceOperationMutationKey<RequestClientSchema, unknown> = [
     {
       url: schema.url,
       method: schema.method,

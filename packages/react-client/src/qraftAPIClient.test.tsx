@@ -22,11 +22,8 @@ import { useQuery } from './callbacks/useQuery.js';
 import { bodySerializer, urlSerializer, request } from './lib/request.js';
 import { services, Services } from './mocks/fixtures/api/index.js';
 import { qraftAPIClient } from './qraftAPIClient.js';
-import {
-  QraftContext,
-  QraftContextValue,
-  RequestClient,
-} from './QraftContext.js';
+import { QraftContext, QraftContextValue } from './QraftContext.js';
+import type { RequestClient } from './RequestClient.js';
 
 const callbacks = {
   getInfiniteQueryData,
