@@ -1,4 +1,4 @@
-export const fileHeader = `/* generated using openapi-typescript-codegen -- do no edit */
+export const fileHeader = `/* generated using @radist2s/qraft-cli -- do no edit */
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */`;
