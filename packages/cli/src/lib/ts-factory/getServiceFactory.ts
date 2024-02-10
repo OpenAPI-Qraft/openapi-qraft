@@ -228,7 +228,7 @@ const getOperationResponseFactory = (
 
 const getOperationBodyFactory = (operation: ServiceOperation) => {
   if (!operation.mediaType)
-    return factory.createKeywordTypeNode(ts.SyntaxKind.UnknownKeyword);
+    return factory.createKeywordTypeNode(ts.SyntaxKind.UndefinedKeyword);
 
   return factory.createIndexedAccessTypeNode(
     factory.createIndexedAccessTypeNode(
