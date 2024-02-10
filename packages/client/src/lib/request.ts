@@ -234,10 +234,11 @@ export type APIRequestInit = {
     | 'get'
     | 'put'
     | 'post'
+    | 'patch'
     | 'delete'
     | 'options'
     | 'head'
-    | 'patch';
+    | 'trace';
   readonly url: string;
   readonly parameters?: {
     readonly path?: Record<string, any>;

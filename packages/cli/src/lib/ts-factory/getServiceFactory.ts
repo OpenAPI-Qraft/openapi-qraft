@@ -54,6 +54,8 @@ const getServiceOperationGenericsPathImportsFactory = (
 ) => {
   const factory = ts.factory;
 
+  const queryMethods = ['get', 'head', 'options'] as const;
+
   return factory.createImportDeclaration(
     undefined,
     factory.createImportClause(
@@ -61,14 +63,19 @@ const getServiceOperationGenericsPathImportsFactory = (
       undefined,
       factory.createNamedImports(
         [
-          operations.some((operation) => operation.method === 'get')
+          operations.some((operation) =>
+            queryMethods.some((method) => method === operation.method)
+          )
             ? factory.createImportSpecifier(
                 false,
                 undefined,
                 factory.createIdentifier('ServiceOperationQuery')
               )
             : null,
-          operations.some((operation) => operation.method !== 'get')
+          operations.some(
+            (operation) =>
+              !queryMethods.some((method) => method === operation.method)
+          )
             ? factory.createImportSpecifier(
                 false,
                 undefined,

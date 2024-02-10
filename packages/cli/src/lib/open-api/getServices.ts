@@ -1,4 +1,5 @@
 import camelCase from 'camelcase';
+import * as console from 'console';
 
 import { getContentMediaType } from './getContent.js';
 import { getOperationName } from './getOperationName.js';
@@ -14,7 +15,15 @@ export type Service = {
 };
 
 export type ServiceOperation = {
-  method: string;
+  method:
+    | 'get'
+    | 'put'
+    | 'post'
+    | 'patch'
+    | 'delete'
+    | 'options'
+    | 'head'
+    | 'trace';
   path: string;
   name: string;
   description: string | undefined;
@@ -34,7 +43,17 @@ export const getServices = (
   const services = new Map<string, Service>();
 
   for (const path in paths) {
+    if (!paths.hasOwnProperty(path)) continue;
+
     for (const method in paths[path]) {
+      if (!paths[path].hasOwnProperty(method)) continue;
+      if (!supportedMethod(method)) {
+        console.warn(
+          `The path "${path}" HTTP method "${method}" is not supported`
+        );
+        continue;
+      }
+
       const methodOperation = paths[path][method];
 
       const serviceName = getServiceName(path.split('/')[1]);
@@ -91,3 +110,21 @@ export const getServices = (
 
   return Array.from(services.values());
 };
+
+export const supportedMethod = (
+  method: unknown
+): method is (typeof supportedHTTPMethods)[number] =>
+  supportedHTTPMethods.includes(
+    method as (typeof supportedHTTPMethods)[number]
+  );
+
+const supportedHTTPMethods = Object.values({
+  get: 'get',
+  put: 'put',
+  post: 'post',
+  patch: 'patch',
+  delete: 'delete',
+  options: 'options',
+  head: 'head',
+  trace: 'trace',
+} satisfies { [key in ServiceOperation['method']]: key });

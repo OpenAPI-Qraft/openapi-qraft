@@ -9,7 +9,15 @@ type RequestClientParams = {
 
 export type RequestSchema = {
   url: string;
-  method: 'get' | 'put' | 'post' | 'delete' | 'options' | 'head' | 'patch';
+  method:
+    | 'get'
+    | 'put'
+    | 'post'
+    | 'patch'
+    | 'delete'
+    | 'options'
+    | 'head'
+    | 'trace';
   errors?: number[];
   mediaType?: string;
 };
