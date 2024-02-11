@@ -1,6 +1,7 @@
 # @openapi-qraft/react
 
-`@openapi-qraft/react` is a modular TypeScript client designed to facilitate type-safe API requests in React applications,
+`@openapi-qraft/react` is a modular TypeScript client designed to facilitate type-safe API requests in React
+applications,
 leveraging the power of Tanstack Query. It utilizes a Proxy-based architecture to dynamically generate Tanstack Query
 hooks with typed parameters, ensuring that your API requests are both type-safe and efficient.
 
@@ -23,29 +24,31 @@ npm install @openapi-qraft/react
 
 ## Getting Started
 
-To get started with `@openapi-qraft/react`, you'll need to set up your client by passing in your API services and a set of
+To get started with `@openapi-qraft/react`, you'll need to set up your client by passing in your API services and a set
+of
 callbacks to handle various React Query functionalities.
 
-## 1. Define Your API Services
+### 1. Generate API Types
 
-Before utilizing `@openapi-qraft/react` to make typed requests, you need to define your API services by generating types and
-schemas from your OpenAPI Specification. This ensures that your requests are type-safe and that your development
+Before utilizing `@openapi-qraft/react` to make typed requests, you need to define your API services by generating types
+and
+schemas from your OpenAPI specification. This ensures that your requests are type-safe and that your development
 experience benefits from TypeScript's power. Follow the steps below to generate your API services:
 
-### Generating TypeScript Definitions
+#### Generating TypeScript Definitions
 
-First, generate TypeScript definitions from your OpenAPI schema using `openapi-typescript`. This will provide you with
+First, generate TypeScript definitions from your OpenAPI schema
+using [`openapi-typescript`](https://www.npmjs.com/package/openapi-typescript). This will provide you with
 the necessary types for your API requests and responses.
 
 ```bash
 npx openapi-typescript https://api.dev.monite.com/openapi.json?version=2023-09-01 --output src/api/openapi.d.ts
 ```
 
-### Generating Qraft Services
+#### Generating Qraft Services
 
-Next, use `@openapi-qraft/cli` to generate the services and typed React Query hooks. Ensure to specify the path to the
-TypeScript definitions generated in the previous step. This creates a seamless integration between your OpenAPI schema
-and React Query, providing you with type-safe hooks for data fetching and mutation operations.
+Next, use `@openapi-qraft/cli` to generate the services and typed Tanstack Query React Hooks. Ensure to specify the path to the
+TypeScript definitions generated in the previous step.
 
 ```bash
 npx @openapi-qraft/cli https://api.dev.monite.com/openapi.json?version=2023-09-01 --output-dir src/api --schema-types-path ../openapi.d.ts
@@ -56,67 +59,22 @@ specified OpenAPI, _along with a set of services_ in `src/api/services`. These e
 development workflow with type
 safety and auto-completion features.
 
-### 2. Set Up Callbacks
+### 2. Create API Client
 
-Define callbacks to handle queries, mutations, and more. These callbacks integrate directly with Tanstack Query's hooks
-and utilities.
-
-```ts
-// callbacks.ts
-import { getInfiniteQueryData } from '@openapi-qraft/react/callbacks/getInfiniteQueryData';
-import { getInfiniteQueryKey } from '@openapi-qraft/react/callbacks/getInfiniteQueryKey';
-import { getMutationKey } from '@openapi-qraft/react/callbacks/getMutationKey';
-import { getQueryData } from '@openapi-qraft/react/callbacks/getQueryData';
-import { getQueryKey } from '@openapi-qraft/react/callbacks/getQueryKey';
-import { mutationFn } from '@openapi-qraft/react/callbacks/mutationFn';
-import { queryFn } from '@openapi-qraft/react/callbacks/queryFn';
-import { setInfiniteQueryData } from '@openapi-qraft/react/callbacks/setInfiniteQueryData';
-import { setQueryData } from '@openapi-qraft/react/callbacks/setQueryData';
-import { useInfiniteQuery } from '@openapi-qraft/react/callbacks/useInfiniteQuery';
-import { useMutation } from '@openapi-qraft/react/callbacks/useMutation';
-import { useQuery } from '@openapi-qraft/react/callbacks/useQuery';
-
-export const callbacks = {
-  getInfiniteQueryData,
-  getInfiniteQueryKey,
-  getMutationKey,
-  getQueryData,
-  getQueryKey,
-  mutationFn,
-  queryFn,
-  setInfiniteQueryData,
-  setQueryData,
-  useInfiniteQuery,
-  useMutation,
-  useQuery,
-} as const;
-```
-
-### 3. API Client stitching
-
-Now, create the Qraft client by providing it with your services and callbacks. This step dynamically generates typed
-hooks for your API endpoints.
+Now, create the API Client to utilize typed React Hooks for your API endpoints.
 
 ```ts
-import { qraftAPIClient } from '@openapi-qraft/react';
-
 /** '--output-dir' path to your generated services **/
-import { services, Services } from './api';
+import { createAPIClient } from './api';
 
-/** just created 'callbacks.ts' **/
-import { callbacks } from './callbacks';
-
-const qraft = qraftAPIClient<Services, typeof callbacks>(services, callbacks);
+const qraft = createAPIClient();
 ```
-
-Define callbacks to handle queries, mutations, and more. These callbacks integrate directly with Tanstack Query's React
-Hooks and utilities.
 
 This setup provides you with a powerful, type-safe way to interact with your backend APIs using React Query.
-The `qraftAPIClient` function generates a client (`qraft`) that allows you to make API calls with type-checked
+The `createAPIClient` function generates a client (`qraft`) that allows you to make API calls with type-checked
 parameters, ensuring that your application remains robust and error-free.
 
-### 4. Provide Request Client
+### 3. Provide Request Client
 
 Finally, provide the request client to the `QraftContext` to enable the generated hooks to make API requests.
 
@@ -161,6 +119,29 @@ function Providers({ children }: { children: React.ReactNode }) {
     </QueryClientProvider>
   );
 }
+
+function Example() {
+  const { isPending, error, data } =
+    qract.approvalPolicies.getApprovalPoliciesId.useQuery({
+      path: {
+        approval_policy_id: '1',
+      },
+    });
+
+  if (isPending) return 'Loading...';
+
+  if (error) return 'An error has occurred: ' + error.message;
+
+  return <div>Name: {data?.name}</div>;
+}
+
+function App() {
+  return (
+    <Providers>
+      <Example />
+    </Providers>
+  );
+}
 ```
 
 > The Qraft is designed to be as modular as possible, enabling you to integrate your own request client and serializers.
@@ -168,7 +149,7 @@ function Providers({ children }: { children: React.ReactNode }) {
 
 ## Usage
 
-With the client set up, you can now use the generated hooks in your React components to fetch data, execute mutations,
+With the client set up, you can now use the generated Hooks in your React Components to fetch data, execute mutations,
 and more.
 
 ### [useQuery 🔗](https://tanstack.com/query/latest/docs/framework/react/reference/useQuery)
@@ -176,13 +157,13 @@ and more.
 ```ts
 /**
  * `qraft.approvalPolicies.getApprovalPoliciesId.useQuery(...)` will execute:
- * 
+ *
  * GET /approval_policies/1?items_order=asc
  * x-monite-version: '2023-09-01'
  *
  * Used Open API: GET /approval_policies/{approval_policy_id}
  **/
-const { data, error, isLoading } =
+const { data, error, isPending } =
   qraft.approvalPolicies.getApprovalPoliciesId.useQuery({
     header: {
       'x-monite-version': '2023-09-01',
@@ -212,7 +193,7 @@ const mutation = qraft.entities.postEntitiesIdDocuments.useMutation({
 
 /**
  * `mutation.mutate(...)` will execute:
- * 
+ *
  * POST /entities/1/documents
  * Content-Type: application/json
  * {"document_title": "Agreement of Intent"}
@@ -222,12 +203,12 @@ const mutation = qraft.entities.postEntitiesIdDocuments.useMutation({
 mutation.mutate({
   document_title: 'Agreement of Intent',
 });
-
 ```
 
 #### Without predefined parameters
 
-It happens that at the time of calling the Mutation Hook, you don't yet know what query parameters to be passed. In this case,
+It happens that at the time of calling the Mutation Hook, you don't yet know what query parameters to be passed. In this
+case,
 you will need to pass the _parameters and the body_ of the request when you call `mutate()` function:
 
 ```ts
@@ -235,7 +216,7 @@ const mutation = qraft.entities.postEntitiesIdDocuments.useMutation();
 
 /**
  * `mutation.mutate(...)` will execute:
- * 
+ *
  * POST /entities/1/documents
  * Content-Type: application/json
  * {"document_title": "Agreement of Intent"}
@@ -260,7 +241,7 @@ mutation.mutate({
 ```ts
 /**
  * `qraft.files.getFiles.useInfiniteQuery(...)` will execute:
- * 
+ *
  * GET /files?search=Agreements&limit=10&page=1
  * Content-Type: application/json
  *
@@ -297,7 +278,8 @@ infiniteQuery.fetchNextPage(); // will execute GET /files?search=Agreements&limi
 
 ## Contributing
 
-Contributions are welcome! If you have suggestions or want to improve `@openapi-qraft/react`, please feel free to submit a
+Contributions are welcome! If you have suggestions or want to improve `@openapi-qraft/react`, please feel free to submit
+a
 pull request or open an issue.
 
 ## License
