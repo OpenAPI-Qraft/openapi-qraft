@@ -3,7 +3,7 @@
   "version": "1.0.0-beta.0",
   "scripts": {
     "build": "rimraf dist/ && tsc --project tsconfig.build.json",
-    "dev": "yarn build --watch",
+    "dev": "rimraf dist/ && tsc --project tsconfig.dev.json --watch",
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
     "generate-qraft": "openapi-qraft ./src/fixtures/openapi.json --clean -o src/fixtures/api --schema-types-path '../../openapi.ts'",
@@ -45,7 +45,8 @@
     }
   },
   "files": [
-    "dist"
+    "dist",
+    "src"
   ],
   "exports": {
     "./package.json": "./package.json",
