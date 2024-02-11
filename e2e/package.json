@@ -1,0 +1,21 @@
+{
+  "name": "@opeanapi-qraft/e2e",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "verdaccio": "VERDACCIO_STORAGE_PATH=./verdaccio-storage verdaccio --config ./verdaccio-config.yaml",
+    "remove-verdaccio-storage": "rimraf ./verdaccio-storage",
+    "e2e:publish-to-private-registry": "NPM_PUBLISH_SCOPES='openapi-qraft' yarn exec bin/publish-to-private-registry.sh",
+    "e2e:unpublish-from-private-registry": "NPM_PUBLISH_SCOPES='openapi-qraft' yarn exec bin/unpublish-from-private-registry.sh",
+    "e2e:update-projects-from-private-registry": "NPM_PUBLISH_SCOPES='openapi-qraft' yarn exec bin/update-projects-from-private-registry.sh",
+    "e2e:build-projects": "yarn exec bin/build-projects.sh",
+    "e2e:test": "yarn e2e:publish-to-private-registry && yarn e2e:update-projects-from-private-registry && yarn e2e:build-projects && yarn e2e:unpublish-from-private-registry"
+  },
+  "packageManager": "yarn@3.5.0",
+  "dependencies": {
+    "verdaccio": "~5.29.0"
+  },
+  "devDependencies": {
+    "rimraf": "~5.0.0"
+  }
+}

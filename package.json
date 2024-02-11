@@ -15,7 +15,8 @@
   },
   "workspaces": [
     "packages/*",
-    "playground"
+    "playground",
+    "e2e"
   ],
   "packageManager": "yarn@4.0.2"
 }
