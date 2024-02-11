@@ -61,7 +61,7 @@ interface ServiceOperationUseQuery<
   ): ServiceOperationQueryKey<TSchema, QueryKeyParams>;
 
   useQuery(
-    params?: TParams,
+    params: TParams,
     options?: Omit<
       UndefinedInitialDataOptions<
         TData,

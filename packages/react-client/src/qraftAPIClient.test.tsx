@@ -120,7 +120,7 @@ describe('Qraft uses Queries', () => {
   });
 
   it('supports useQuery with optional params', async () => {
-    const { result } = renderHook(() => qraft.files.getFileList.useQuery(), {
+    const { result } = renderHook(() => qraft.files.getFileList.useQuery({}), {
       wrapper: Providers,
     });
 
