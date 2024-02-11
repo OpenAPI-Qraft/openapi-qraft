@@ -6,12 +6,9 @@
     "build": "yarn workspaces foreach --verbose --recursive --no-private --from '@openapi-qraft/*' run build",
     "dev": "yarn workspaces foreach --verbose --recursive --no-private --from '@openapi-qraft/*' run dev",
     "test": "yarn workspaces foreach --verbose --recursive --no-private --from '@openapi-qraft/*' run test",
-    "lint": "yarn workspaces foreach --verbose --recursive run lint",
-    "generate": "qraft-openapi-typescript ./openapi.json -o openapi.d.ts",
-    "generate-orgn": "openapi-typescript ./openapi.json -o openapi.d.ts"
+    "lint": "yarn workspaces foreach --verbose --recursive run lint"
   },
   "devDependencies": {
-    "@openapi-qraft/openapi-typescript": "workspace:^",
     "@trivago/prettier-plugin-sort-imports": "^4.3.0",
     "prettier": "^3.1.1",
     "typescript": "^5.3.3"

@@ -813,7 +813,7 @@ __metadata:
     typescript:
       optional: false
   bin:
-    qraft-openapi-services: ./dist/bin.js
+    openapi-qraft: ./dist/bin.js
   languageName: unknown
   linkType: soft
 
@@ -841,6 +841,7 @@ __metadata:
   resolution: "@openapi-qraft/react@workspace:packages/react-client"
   dependencies:
     "@openapi-qraft/cli": "workspace:~"
+    "@openapi-qraft/openapi-typescript": "workspace:^"
     "@tanstack/react-query": "npm:^5.17.3"
     "@testing-library/jest-dom": "npm:^5.17.0"
     "@testing-library/react": "npm:^13.4.0"
@@ -4847,7 +4848,6 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "qraft@workspace:."
   dependencies:
-    "@openapi-qraft/openapi-typescript": "workspace:^"
     "@trivago/prettier-plugin-sort-imports": "npm:^4.3.0"
     prettier: "npm:^3.1.1"
     typescript: "npm:^5.3.3"

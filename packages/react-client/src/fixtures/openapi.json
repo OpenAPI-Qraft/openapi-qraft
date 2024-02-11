@@ -1,14 +1,12 @@
 {
   "openapi": "3.1.0",
   "info": {
-    "title": "Monite Partner API",
+    "title": "Fixture API",
     "version": "2023-06-04",
-    "description": "The Monite REST API, for Monite partners to integrate with our solution.",
-    "termsOfService": "https://monite.com/terms",
+    "description": "The fixture API",
     "contact": {
-      "name": "Monite team",
-      "url": "https://monite.com/about/",
-      "email": "developers@monite.com"
+      "name": "Alex Batalov",
+      "email": "radist2s@gmail.com"
     }
   },
   "paths": {

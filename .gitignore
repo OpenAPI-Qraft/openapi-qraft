@@ -21,6 +21,3 @@ coverage
 !.yarn/versions
 
 .swc/
-
-# genetated
-openapi.d.ts
