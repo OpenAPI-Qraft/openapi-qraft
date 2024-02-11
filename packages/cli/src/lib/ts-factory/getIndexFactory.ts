@@ -1,7 +1,14 @@
 import ts from 'typescript';
 
-export const getIndexFactory = (servicesDirName: string) => {
+export const getIndexFactory = ({
+  servicesDirName,
+  explicitImportExtensions,
+}: {
+  servicesDirName: string;
+  explicitImportExtensions: boolean;
+}) => {
   const factory = ts.factory;
+  const importExtension = explicitImportExtensions ? '.js' : '';
 
   return [
     factory.createExportDeclaration(
@@ -14,7 +21,9 @@ export const getIndexFactory = (servicesDirName: string) => {
           factory.createIdentifier('services')
         ),
       ]),
-      factory.createStringLiteral(`./${servicesDirName}/index.js`),
+      factory.createStringLiteral(
+        `./${servicesDirName}/index${importExtension}`
+      ),
       undefined
     ),
     factory.createExportDeclaration(
@@ -27,7 +36,9 @@ export const getIndexFactory = (servicesDirName: string) => {
           factory.createIdentifier('Services')
         ),
       ]),
-      factory.createStringLiteral(`./${servicesDirName}/index.js`),
+      factory.createStringLiteral(
+        `./${servicesDirName}/index${importExtension}`
+      ),
       undefined
     ),
     factory.createExportDeclaration(
@@ -40,7 +51,7 @@ export const getIndexFactory = (servicesDirName: string) => {
           factory.createIdentifier('createAPIClient')
         ),
       ]),
-      factory.createStringLiteral('./create-api-client.js'),
+      factory.createStringLiteral(`./create-api-client${importExtension}`),
       undefined
     ),
   ];

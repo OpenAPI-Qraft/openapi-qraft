@@ -21,6 +21,8 @@ type OutputOptions = {
   dir: string;
   clean: boolean;
   postfixServices?: string;
+  explicitImportExtensions?: boolean;
+  servicesDirName: string;
 };
 
 export const writeOpenAPIServices = async ({
@@ -35,19 +37,18 @@ export const writeOpenAPIServices = async ({
   const schema = await readSchema(source);
   const services = getServices(schema, output);
 
-  await writeServices(services, output, servicesDirName, serviceImports);
-  await writeServiceIndex(services, output, servicesDirName);
-  await writeClient(services, output, servicesDirName);
-  await writeIndex(output, servicesDirName);
+  await writeServices(services, serviceImports, output);
+  await writeServiceIndex(services, output);
+  await writeClient(output);
+  await writeIndex(output);
 };
 
 const writeServices = async (
   services: Service[],
-  output: OutputOptions,
-  servicesDirName: string,
-  serviceImports: ServiceImportsFactoryOptions
+  serviceImports: ServiceImportsFactoryOptions,
+  output: OutputOptions
 ) => {
-  const servicesDir = resolve(output.dir, servicesDirName);
+  const servicesDir = resolve(output.dir, output.servicesDirName);
 
   if (output.clean)
     await fs.promises.rm(servicesDir, {
@@ -98,17 +99,21 @@ const writeServices = async (
 
 const writeServiceIndex = async (
   services: Service[],
-  output: OutputOptions,
-  servicesDirName: string
+  output: OutputOptions
 ) => {
   const spinner = ora('Generating services index').start();
 
   try {
     const code =
-      getFileHeader(output) + astToString(getServiceIndexFactory(services));
+      getFileHeader(output) +
+      astToString(
+        getServiceIndexFactory(services, {
+          explicitImportExtensions: Boolean(output.explicitImportExtensions),
+        })
+      );
 
     await fs.promises.writeFile(
-      resolve(output.dir, servicesDirName, 'index.ts'),
+      resolve(output.dir, output.servicesDirName, 'index.ts'),
       code
     );
   } catch (error) {
@@ -122,17 +127,18 @@ const writeServiceIndex = async (
   spinner.succeed(c.green('Services index has been generated'));
 };
 
-const writeClient = async (
-  services: Service[],
-  output: OutputOptions,
-  servicesDirName: string
-) => {
+const writeClient = async (output: OutputOptions) => {
   const spinner = ora('Generating client').start();
 
   try {
     const code =
       getFileHeader(output) +
-      astToString(getClientFactory(services, servicesDirName));
+      astToString(
+        getClientFactory({
+          servicesDirName: output.servicesDirName,
+          explicitImportExtensions: Boolean(output.explicitImportExtensions),
+        })
+      );
 
     await fs.promises.writeFile(
       resolve(output.dir, 'create-api-client.ts'),
@@ -147,12 +153,18 @@ const writeClient = async (
   spinner.succeed(c.green('Client has been generated'));
 };
 
-const writeIndex = async (output: OutputOptions, servicesDirName: string) => {
+const writeIndex = async (output: OutputOptions) => {
   const spinner = ora('Generating index').start();
 
   try {
     const code =
-      getFileHeader(output) + astToString(getIndexFactory(servicesDirName));
+      getFileHeader(output) +
+      astToString(
+        getIndexFactory({
+          servicesDirName: output.servicesDirName,
+          explicitImportExtensions: Boolean(output.explicitImportExtensions),
+        })
+      );
 
     await fs.promises.writeFile(resolve(output.dir, 'index.ts'), code);
   } catch (error) {
@@ -167,5 +179,3 @@ const writeIndex = async (output: OutputOptions, servicesDirName: string) => {
 const getFileHeader = ({ fileHeader }: Pick<OutputOptions, 'fileHeader'>) => {
   return fileHeader && `${fileHeader}\n`;
 };
-
-const servicesDirName = 'services';

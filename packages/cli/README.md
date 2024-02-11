@@ -31,6 +31,7 @@ Options:
   --file-header <string>                   Header to be added to the generated file (eg: /* eslint-disable */)
   -rm, --clean                             Clean output directory before generating services
   --postfix-services <string>              Postfix to be added to the generated service name (eg: Service)
+  --explicit-import-extensions             All import statements will include explicit `.js` extensions. Ideal for projects using ECMAScript modules.
   -h, --help                               display help for command
 ```
 
@@ -58,6 +59,8 @@ the `schema.json` file.
 - **`-rm, --clean`:** Clean the specified output directory services before generating to remove stale files _(
   optional)_.
 - **`--postfix-services`:** Customize the generated service names with a specific postfix _(optional)_.
+- **`--explicit-import-extensions`:** Include explicit `.js` extensions in all import statements. Ideal for projects
+  using ECMAScript modules when TypeScript's _--moduleResolution_ is `node16` or `nodenext` _(optional)_.
 
 ## Contributing
 

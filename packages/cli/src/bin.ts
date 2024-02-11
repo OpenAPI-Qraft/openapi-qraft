@@ -32,6 +32,10 @@ program
     '--postfix-services <string>',
     'Postfix to be added to the generated service name (eg: Service)'
   )
+  .option(
+    '--explicit-import-extensions',
+    'All import statements will include explicit `.js` extensions. Ideal for projects using ECMAScript modules.'
+  )
   .action(async (input, args) => {
     const source = input
       ? new URL(input, new URL(`file://${process.cwd()}/`))
@@ -58,6 +62,8 @@ program
         clean: args.clean,
         fileHeader: args.fileHeader ?? fileHeader,
         postfixServices: args.postfixServices,
+        explicitImportExtensions: args.explicitImportExtensions,
+        servicesDirName: 'services',
       },
     }).catch((error) => {
       if (error instanceof Error)

@@ -2,9 +2,14 @@ import ts from 'typescript';
 
 import { Service } from '../open-api/getServices.js';
 
-export const getServiceIndexFactory = (services: Service[]) => {
+type Options = { explicitImportExtensions: boolean };
+
+export const getServiceIndexFactory = (
+  services: Service[],
+  options: Options
+) => {
   return [
-    ...getServicesImportsFactory(services),
+    ...getServicesImportsFactory(services, options),
     getServiceIndexInterfaceFactory(services),
     getServiceIndexVariableFactory(services),
   ];
@@ -66,7 +71,10 @@ const getServiceIndexVariableFactory = (services: Service[]) => {
   );
 };
 
-const getServicesImportsFactory = (services: Service[]) => {
+const getServicesImportsFactory = (
+  services: Service[],
+  { explicitImportExtensions }: Options
+) => {
   const factory = ts.factory;
 
   return services.map(({ variableName, typeName, fileBaseName }) =>
@@ -88,7 +96,9 @@ const getServicesImportsFactory = (services: Service[]) => {
           ),
         ])
       ),
-      factory.createStringLiteral(`./${fileBaseName}.js`)
+      factory.createStringLiteral(
+        `./${fileBaseName}${explicitImportExtensions ? '.js' : ''}`
+      )
     )
   );
 };

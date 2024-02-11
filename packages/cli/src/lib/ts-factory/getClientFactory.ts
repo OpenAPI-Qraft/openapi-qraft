@@ -1,22 +1,22 @@
 import ts from 'typescript';
 
-import { Service } from '../open-api/getServices.js';
+type Options = {
+  servicesDirName: string;
+  explicitImportExtensions: boolean;
+};
 
-export const getClientFactory = (
-  services: Service[],
-  servicesDirName: string
-) => {
+export const getClientFactory = (options: Options) => {
   return [
-    ...getClientImportsFactory(services, servicesDirName),
+    ...getClientImportsFactory(options),
     getCallbacksVariableFactory(),
     getCreateClientFunctionFactory(),
   ];
 };
 
-const getClientImportsFactory = (
-  services: Service[],
-  servicesDirName: string
-) => {
+const getClientImportsFactory = ({
+  servicesDirName,
+  explicitImportExtensions,
+}: Options) => {
   const factory = ts.factory;
 
   return [
@@ -79,7 +79,9 @@ const getClientImportsFactory = (
           ),
         ])
       ),
-      factory.createStringLiteral(`./${servicesDirName}/index.js`),
+      factory.createStringLiteral(
+        `./${servicesDirName}/index${explicitImportExtensions ? '.js' : ''}`
+      ),
       undefined
     ),
   ];
