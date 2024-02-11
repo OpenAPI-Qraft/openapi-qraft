@@ -10,7 +10,7 @@
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",
     "generate-openapi": "openapi-qraft-typescript ./schema.json -o ./schema.d.ts",
-    "generate": "qraft-openapi-services ./schema.json --clean -o src/api --schema-types-path '../../../schema.d.ts'"
+    "generate": "openapi-qraft ./schema.json --clean -o src/api --openapi-types-import-path '../../../schema.d.ts'"
   },
   "dependencies": {
     "@openapi-qraft/react": "workspace:~",

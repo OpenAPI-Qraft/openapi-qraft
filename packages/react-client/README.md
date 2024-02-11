@@ -51,7 +51,7 @@ Next, use `@openapi-qraft/cli` to generate the services and typed Tanstack Query
 TypeScript definitions generated in the previous step.
 
 ```bash
-npx @openapi-qraft/cli https://api.dev.monite.com/openapi.json?version=2023-09-01 --output-dir src/api --schema-types-path ../openapi.d.ts
+npx @openapi-qraft/cli https://api.dev.monite.com/openapi.json?version=2023-09-01 --output-dir src/api --openapi-types-import-path '../openapi.d.ts'
 ```
 
 By completing these steps, you will generate `openapi.d.ts`, which serves as a TypeScript representation of the
@@ -71,7 +71,7 @@ const qraft = createAPIClient();
 ```
 
 This setup provides you with a powerful, type-safe way to interact with your backend APIs using React Query.
-The `createAPIClient` function generates a client (`qraft`) that allows you to make API calls with type-checked
+The `createAPIClient` function generates a client that allows you to make API calls with type-checked
 parameters, ensuring that your application remains robust and error-free.
 
 ### 3. Provide Request Client

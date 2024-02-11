@@ -15,12 +15,12 @@ program
     'Output directory for generated services'
   )
   .option(
-    '--operation-generics-path <path>',
+    '--operation-generics-import-path <path>',
     'Path to operation generics file',
     '@openapi-qraft/react'
   )
   .option(
-    '--schema-types-path <path>', // todo::specify better param name to avoid confusion with real path
+    '--openapi-types-import-path <path>', // todo::specify better param name to avoid confusion with real path
     'Path to schema types file (.d.ts)',
     './schema'
   )
@@ -51,8 +51,8 @@ program
     await writeOpenAPISchemaServices({
       source,
       serviceImports: {
-        operationGenericsPath: args.operationGenericsPath,
-        schemaTypesPath: args.schemaTypesPath,
+        operationGenericsImportPath: args.operationGenericsImportPath,
+        openapiTypesImportPath: args.openapiTypesImportPath,
       },
       output: {
         dir: args.outputDir,
