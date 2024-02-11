@@ -1,5 +1,6 @@
 import React, { createContext, ReactNode } from 'react';
 
+import { QraftContext as QraftContextDist } from '@openapi-qraft/react';
 import {
   QueryClient,
   QueryClientProvider,
@@ -583,9 +584,12 @@ function Providers({
 
   return (
     <QueryClientProvider client={queryClient}>
-      <QraftContext.Provider value={{ requestClient }}>
+      {/* We should use precompiled `QraftContextDist`,
+       * because callbacks are imported from `@openapi-qraft` package `/dist` folder
+       */}
+      <QraftContextDist.Provider value={{ requestClient }}>
         {children}
-      </QraftContext.Provider>
+      </QraftContextDist.Provider>
     </QueryClientProvider>
   );
 }
