@@ -8,6 +8,8 @@ import ora from 'ora';
 import { getServices, Service } from './lib/open-api/getServices.js';
 import { readSchema } from './lib/open-api/readSchema.js';
 import { astToString } from './lib/ts-factory/astToString.js';
+import { getClientFactory } from './lib/ts-factory/getClientFactory.js';
+import { getIndexFactory } from './lib/ts-factory/getIndexFactory.js';
 import {
   getServiceFactory,
   ServiceImportsFactoryOptions,
@@ -35,6 +37,8 @@ export const writeOpenAPISchemaServices = async ({
 
   await writeServices(services, output, servicesDirName, serviceImports);
   await writeServiceIndex(services, output, servicesDirName);
+  await writeClient(services, output, servicesDirName);
+  await writeIndex(output, servicesDirName);
 };
 
 const writeServices = async (
@@ -101,10 +105,12 @@ const writeServiceIndex = async (
 
   try {
     const code =
-      getFileHeader(output) +
-      astToString(getServiceIndexFactory(services, { servicesDirName }));
+      getFileHeader(output) + astToString(getServiceIndexFactory(services));
 
-    await fs.promises.writeFile(resolve(output.dir, 'index.ts'), code);
+    await fs.promises.writeFile(
+      resolve(output.dir, servicesDirName, 'index.ts'),
+      code
+    );
   } catch (error) {
     spinner.fail(
       c.redBright('Error occurred during services index generation')
@@ -114,6 +120,48 @@ const writeServiceIndex = async (
   }
 
   spinner.succeed(c.green('Services index has been generated'));
+};
+
+const writeClient = async (
+  services: Service[],
+  output: OutputOptions,
+  servicesDirName: string
+) => {
+  const spinner = ora('Generating client').start();
+
+  try {
+    const code =
+      getFileHeader(output) +
+      astToString(getClientFactory(services, servicesDirName));
+
+    await fs.promises.writeFile(
+      resolve(output.dir, 'create-api-client.ts'),
+      code
+    );
+  } catch (error) {
+    spinner.fail(c.redBright('Error occurred during client generation'));
+
+    throw error;
+  }
+
+  spinner.succeed(c.green('Client has been generated'));
+};
+
+const writeIndex = async (output: OutputOptions, servicesDirName: string) => {
+  const spinner = ora('Generating index').start();
+
+  try {
+    const code =
+      getFileHeader(output) + astToString(getIndexFactory(servicesDirName));
+
+    await fs.promises.writeFile(resolve(output.dir, 'index.ts'), code);
+  } catch (error) {
+    spinner.fail(c.redBright('Error occurred during index generation'));
+
+    throw error;
+  }
+
+  spinner.succeed(c.green('Index has been generated'));
 };
 
 const getFileHeader = ({ fileHeader }: Pick<OutputOptions, 'fileHeader'>) => {

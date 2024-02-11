@@ -7,40 +7,12 @@ import {
 } from '@tanstack/react-query';
 import { act, renderHook, waitFor } from '@testing-library/react';
 
-import { getInfiniteQueryData } from './callbacks/getInfiniteQueryData.js';
-import { getInfiniteQueryKey } from './callbacks/getInfiniteQueryKey.js';
-import { getMutationKey } from './callbacks/getMutationKey.js';
-import { getQueryData } from './callbacks/getQueryData.js';
-import { getQueryKey } from './callbacks/getQueryKey.js';
-import { mutationFn } from './callbacks/mutationFn.js';
-import { queryFn } from './callbacks/queryFn.js';
-import { setInfiniteQueryData } from './callbacks/setInfiniteQueryData.js';
-import { setQueryData } from './callbacks/setQueryData.js';
-import { useInfiniteQuery } from './callbacks/useInfiniteQuery.js';
-import { useMutation } from './callbacks/useMutation.js';
-import { useQuery } from './callbacks/useQuery.js';
+import { createAPIClient } from './fixtures/api/index.js';
 import { bodySerializer, urlSerializer, request } from './lib/request.js';
-import { services, Services } from './mocks/fixtures/api/index.js';
-import { qraftAPIClient } from './qraftAPIClient.js';
 import { QraftContext, QraftContextValue } from './QraftContext.js';
 import type { RequestClient } from './RequestClient.js';
 
-const callbacks = {
-  getInfiniteQueryData,
-  getInfiniteQueryKey,
-  getMutationKey,
-  getQueryData,
-  getQueryKey,
-  mutationFn,
-  queryFn,
-  setInfiniteQueryData,
-  setQueryData,
-  useInfiniteQuery,
-  useMutation,
-  useQuery,
-} as const;
-
-const qraft = qraftAPIClient<Services, typeof callbacks>(services, callbacks);
+const qraft = createAPIClient();
 
 const requestClient: RequestClient = async (schema, options) => {
   return request(
@@ -90,11 +62,7 @@ describe('Qraft uses Queries', () => {
   it('supports custom context', async () => {
     const QraftCustomContext = createContext<QraftContextValue>(undefined);
 
-    const customQraft = qraftAPIClient<Services, typeof callbacks>(
-      services,
-      callbacks,
-      { context: QraftCustomContext }
-    );
+    const customQraft = createAPIClient({ context: QraftCustomContext });
 
     const { result } = renderHook(
       () =>

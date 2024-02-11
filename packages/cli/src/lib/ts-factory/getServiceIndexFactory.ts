@@ -2,16 +2,9 @@ import ts from 'typescript';
 
 import { Service } from '../open-api/getServices.js';
 
-type OutputOptions = {
-  servicesDirName: string;
-};
-
-export const getServiceIndexFactory = (
-  services: Service[],
-  output: OutputOptions
-) => {
+export const getServiceIndexFactory = (services: Service[]) => {
   return [
-    ...getServicesImportsFactory(services, output),
+    ...getServicesImportsFactory(services),
     getServiceIndexInterfaceFactory(services),
     getServiceIndexVariableFactory(services),
   ];
@@ -51,14 +44,20 @@ const getServiceIndexVariableFactory = (services: Service[]) => {
           factory.createIdentifier('services'),
           undefined,
           undefined,
-          factory.createObjectLiteralExpression(
-            services.map(({ name, variableName }) =>
-              factory.createPropertyAssignment(
-                factory.createIdentifier(name),
-                factory.createIdentifier(variableName)
-              )
+          factory.createAsExpression(
+            factory.createObjectLiteralExpression(
+              services.map(({ name, variableName }) =>
+                factory.createPropertyAssignment(
+                  factory.createIdentifier(name),
+                  factory.createIdentifier(variableName)
+                )
+              ),
+              true
             ),
-            true
+            factory.createTypeReferenceNode(
+              factory.createIdentifier('const'),
+              undefined
+            )
           )
         ),
       ],
@@ -67,10 +66,7 @@ const getServiceIndexVariableFactory = (services: Service[]) => {
   );
 };
 
-const getServicesImportsFactory = (
-  services: Service[],
-  output: OutputOptions
-) => {
+const getServicesImportsFactory = (services: Service[]) => {
   const factory = ts.factory;
 
   return services.map(({ variableName, typeName, fileBaseName }) =>
@@ -92,9 +88,7 @@ const getServicesImportsFactory = (
           ),
         ])
       ),
-      factory.createStringLiteral(
-        `./${output.servicesDirName}/${fileBaseName}.js`
-      )
+      factory.createStringLiteral(`./${fileBaseName}.js`)
     )
   );
 };
