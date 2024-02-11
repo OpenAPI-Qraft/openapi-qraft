@@ -39,6 +39,14 @@
       ]
     }
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/OpenAPI-Qraft/openapi-qraft.git",
+    "directory": "packages/cli"
+  },
+  "bugs": {
+    "url": "https://github.com/OpenAPI-Qraft/openapi-qraft/issues"
+  },
   "keywords": [
     "openapi",
     "swagger",
