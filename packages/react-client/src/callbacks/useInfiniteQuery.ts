@@ -28,10 +28,10 @@ export const useInfiniteQuery: <
 ) => UseInfiniteQueryResult<TData, TError> = (qraftOptions, schema, args) => {
   const [params, options, ...restArgs] = args;
 
-  const client = useContext(qraftOptions?.context ?? QraftContext)
+  const requestClient = useContext(qraftOptions?.context ?? QraftContext)
     ?.requestClient;
 
-  if (!client) throw new Error(`QraftContext.client not found`);
+  if (!requestClient) throw new Error(`QraftContext.requestClient not found`);
 
   return useInfiniteQueryBase(
     {
@@ -40,7 +40,7 @@ export const useInfiniteQuery: <
       queryFn:
         options?.queryFn ??
         function ({ queryKey: [, queryParams], signal, meta, pageParam }) {
-          return client(schema, {
+          return requestClient(schema, {
             parameters: shelfMerge(2, queryParams, pageParam) as never,
             signal,
             meta,

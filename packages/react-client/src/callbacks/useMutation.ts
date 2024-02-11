@@ -45,10 +45,10 @@ export const useMutation: <
       `'useMutation': parameters and 'options.mutationKey' cannot be used together`
     );
 
-  const client = useContext(qraftOptions?.context ?? QraftContext)
+  const requestClient = useContext(qraftOptions?.context ?? QraftContext)
     ?.requestClient;
 
-  if (!client) throw new Error(`QraftContext.client not found`);
+  if (!requestClient) throw new Error(`QraftContext.requestClient not found`);
 
   const mutationKey =
     parameters && typeof parameters === 'object'
@@ -79,7 +79,7 @@ export const useMutation: <
         options?.mutationFn ??
         (parameters
           ? function (bodyPayload) {
-              return client(schema, {
+              return requestClient(schema, {
                 parameters,
                 body: bodyPayload as never,
               });
@@ -89,7 +89,7 @@ export const useMutation: <
                 body: unknown;
               };
 
-              return client(schema, {
+              return requestClient(schema, {
                 body,
                 parameters,
               } as never);

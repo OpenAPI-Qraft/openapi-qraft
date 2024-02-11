@@ -27,10 +27,10 @@ export const useQuery: <
 } = (qraftOptions, schema, args) => {
   const [params, options, ...restArgs] = args;
 
-  const client = useContext(qraftOptions?.context ?? QraftContext)
+  const requestClient = useContext(qraftOptions?.context ?? QraftContext)
     ?.requestClient;
 
-  if (!client) throw new Error(`QraftContext.client not found`);
+  if (!requestClient) throw new Error(`QraftContext.requestClient not found`);
 
   const queryKey: ServiceOperationQueryKey<RequestClientSchema, unknown> = [
     { url: schema.url },
@@ -44,7 +44,7 @@ export const useQuery: <
       queryFn:
         options?.queryFn ??
         function ({ queryKey: [, queryParams], signal, meta }) {
-          return client(schema, {
+          return requestClient(schema, {
             parameters: queryParams as never,
             signal,
             meta,
