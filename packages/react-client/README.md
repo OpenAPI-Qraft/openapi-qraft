@@ -19,7 +19,7 @@ hooks with typed parameters, ensuring that your API requests are both type-safe 
 ## Installation
 
 ```bash
-npm install @openapi-qraft/react
+npm install @openapi-qraft/react@beta
 ```
 
 ## Getting Started

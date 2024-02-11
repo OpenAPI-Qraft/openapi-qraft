@@ -10,7 +10,7 @@
 ## Installation
 
 ```bash
-npm install -g @openapi-qraft/cli
+npm install -g @openapi-qraft/cli@beta
 ```
 
 ## Usage
