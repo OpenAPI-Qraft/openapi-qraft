@@ -1,4 +1,12 @@
 {
   "mode": "pre",
-  "tag": "beta"
+  "tag": "beta",
+  "initialVersions": {
+    "@openapi-qraft/e2e": "0.1.0",
+    "@openapi-qraft/cli": "0.1.0",
+    "@openapi-qraft/openapi-typescript": "0.1.0",
+    "@openapi-qraft/react": "0.1.0",
+    "playground": "0.0.0"
+  },
+  "changesets": []
 }
