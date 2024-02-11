@@ -3,7 +3,7 @@ import c from 'ansi-colors';
 import { program } from 'commander';
 
 import { fileHeader } from './lib/fileHeader.js';
-import { writeOpenAPISchemaServices } from './write-open-api-schema-services.js';
+import { writeOpenAPIServices } from './writeOpenAPIServices.js';
 
 program
   .description(
@@ -48,7 +48,7 @@ program
       process.exit(1);
     }
 
-    await writeOpenAPISchemaServices({
+    await writeOpenAPIServices({
       source,
       serviceImports: {
         operationGenericsImportPath: args.operationGenericsImportPath,

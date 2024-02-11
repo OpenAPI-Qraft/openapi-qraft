@@ -23,7 +23,7 @@ type OutputOptions = {
   postfixServices?: string;
 };
 
-export const writeOpenAPISchemaServices = async ({
+export const writeOpenAPIServices = async ({
   source,
   serviceImports,
   output,
