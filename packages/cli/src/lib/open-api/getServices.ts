@@ -27,6 +27,7 @@ export type ServiceOperation = {
   path: string;
   name: string;
   description: string | undefined;
+  summary: string | undefined;
   deprecated: boolean | undefined;
   mediaType: string | undefined;
   errors: Record<string, string | undefined>;
@@ -98,6 +99,7 @@ export const getServices = (
         errors,
         name: getOperationName(path, method, methodOperation.operationId),
         description: methodOperation.description,
+        summary: methodOperation.summary,
         deprecated: methodOperation.deprecated,
         parameters: methodOperation.parameters,
         mediaType: methodOperation.requestBody?.content

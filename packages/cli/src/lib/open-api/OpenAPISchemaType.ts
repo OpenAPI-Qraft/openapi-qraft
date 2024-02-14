@@ -3,6 +3,7 @@ export type OpenAPISchemaType = {
     [path: string]: {
       [method: string]: {
         description?: string;
+        summary?: string;
         operationId?: string;
         parameters?: Record<string, never>;
         deprecated?: boolean;
