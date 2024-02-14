@@ -37,7 +37,8 @@
   "files": [
     "dist",
     "src",
-    "!dist/fixtures/**"
+    "!dist/fixtures/**",
+    "!src/fixtures/**"
   ],
   "exports": {
     "./package.json": "./package.json",
