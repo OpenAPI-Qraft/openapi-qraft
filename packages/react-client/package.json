@@ -72,5 +72,8 @@
     "react",
     "hooks",
     "react-query"
-  ]
+  ],
+  "publishConfig": {
+    "access": "public"
+  }
 }

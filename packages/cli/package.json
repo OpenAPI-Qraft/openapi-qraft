@@ -64,5 +64,8 @@
     "react",
     "hooks",
     "TanStack Query"
-  ]
+  ],
+  "publishConfig": {
+    "access": "public"
+  }
 }
