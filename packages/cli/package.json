@@ -9,7 +9,7 @@
   },
   "type": "module",
   "bin": {
-    "openapi-qraft": "./dist/bin.js"
+    "openapi-qraft": "./bin.mjs"
   },
   "dependencies": {
     "ansi-colors": "^4.1.3",
@@ -26,7 +26,8 @@
     "vitest": "^1.1.3"
   },
   "files": [
-    "dist"
+    "dist",
+    "bin.mjs"
   ],
   "exports": {
     "./package.json": "./package.json",
