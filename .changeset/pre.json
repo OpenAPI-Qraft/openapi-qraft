@@ -8,5 +8,8 @@
     "@openapi-qraft/react": "0.1.0",
     "playground": "0.0.0"
   },
-  "changesets": []
+  "changesets": [
+    "shy-crabs-agree",
+    "six-flowers-share"
+  ]
 }
