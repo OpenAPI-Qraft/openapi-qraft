@@ -2,7 +2,7 @@
 
 `@openapi-qraft/react` is a modular TypeScript client designed to facilitate type-safe API requests in React
 applications,
-leveraging the power of Tanstack Query. It utilizes a Proxy-based architecture to dynamically generate Tanstack Query
+leveraging the power of **Tanstack Query v5**. It utilizes a Proxy-based architecture to dynamically generate
 hooks with typed parameters, ensuring that your API requests are both type-safe and efficient.
 
 ## Features
@@ -11,15 +11,24 @@ hooks with typed parameters, ensuring that your API requests are both type-safe 
   developer experience.
 - **Modular Design:** Customize the utility with a set of callbacks to handle API calls according to your project's
   needs.
-- **Integration with [Tanstack Query](https://tanstack.com/query/v5):** Seamlessly integrate with _Tanstack Query_ for
-  handling server state, caching, and data synchronization.
+- **Integration with [Tanstack Query v5](https://tanstack.com/query/v5):** Seamlessly integrate with _Tanstack Query_
+  for handling server state, caching, and data synchronization.
 - **Dynamic Proxy-Based Hooks:** Automatically generate React Query hooks for your API endpoints without manual
   boilerplate.
 
 ## Installation
 
+First, install the core package for your project:
+
 ```bash
 npm install @openapi-qraft/react@beta
+```
+
+If your project doesn't already include `@tanstack/react-query`, you'll also need to install it. This package is
+essential for handling server state in React applications:
+
+```bash
+npm install @tanstack/react-query
 ```
 
 ## Getting Started
@@ -47,8 +56,8 @@ npx openapi-typescript https://api.dev.monite.com/openapi.json?version=2023-09-0
 
 #### Generating Qraft Services
 
-Next, use `@openapi-qraft/cli` to generate the services and typed Tanstack Query React Hooks. Ensure to specify the path to the
-TypeScript definitions generated in the previous step.
+Next, use `@openapi-qraft/cli` to generate the services and typed Tanstack Query React Hooks. Ensure to specify the path
+to the TypeScript definitions generated in the previous step.
 
 ```bash
 npx @openapi-qraft/cli@beta https://api.dev.monite.com/openapi.json?version=2023-09-01 --output-dir src/api --openapi-types-import-path '../openapi.d.ts'
@@ -122,7 +131,11 @@ function Providers({ children }: { children: React.ReactNode }) {
 
 function Example() {
   const { isPending, error, data } =
-    qract.approvalPolicies.getApprovalPoliciesId.useQuery({
+    qraft.approvalPolicies.getApprovalPoliciesId.useQuery({
+      header: {
+        'x-monite-version': '2023-09-01',
+        'x-monite-entity-id': '3e3e-3e3e-3e3e',
+      },
       path: {
         approval_policy_id: '1',
       },
@@ -156,25 +169,19 @@ and more.
 
 ```ts
 /**
- * `qraft.approvalPolicies.getApprovalPoliciesId.useQuery(...)` will execute:
+ * Will execute the request:
  *
- * GET /approval_policies/1?items_order=asc
- * x-monite-version: '2023-09-01'
- *
- * Used Open API: GET /approval_policies/{approval_policy_id}
+ * GET /entities?sort=asc
+ * x-monite-version: 2023-09-01
  **/
-const { data, error, isPending } =
-  qraft.approvalPolicies.getApprovalPoliciesId.useQuery({
-    header: {
-      'x-monite-version': '2023-09-01',
-    },
-    path: {
-      approval_policy_id: '1',
-    },
-    query: {
-      items_order: 'asc',
-    },
-  });
+const { data, error, isPending } = qraft.entities.getEntities.useQuery({
+  header: {
+    'x-monite-version': '2023-09-01',
+  },
+  query: {
+    sort: 'updated_at',
+  },
+});
 ```
 
 ### [useMutation 🔗](https://tanstack.com/query/latest/docs/framework/react/reference/useMutation)
@@ -187,21 +194,23 @@ only `body` when calling `mutate()` function:
 ```ts
 const mutation = qraft.entities.postEntitiesIdDocuments.useMutation({
   path: {
-    entity_id: '1',
+    entity_id: '3e3e-3e3e-3e3e',
+  },
+  header: {
+    'x-monite-version': '2023-09-01',
   },
 });
 
 /**
- * `mutation.mutate(...)` will execute:
+ * Will execute the request when call `mutation.mutate(...)`:
  *
- * POST /entities/1/documents
+ * POST /entities/3e3e-3e3e-3e3e/documents
  * Content-Type: application/json
- * {"document_title": "Agreement of Intent"}
- *
- * Used Open API: POST /entities/{entity_id}/documents
+ * x-monite-version: 2023-09-01
+ * {"company_tax_id_verification": ["verification-id"]}
  **/
 mutation.mutate({
-  document_title: 'Agreement of Intent',
+  company_tax_id_verification: ['verification-id'],
 });
 ```
 
@@ -215,65 +224,98 @@ you will need to pass the _parameters and the body_ of the request when you call
 const mutation = qraft.entities.postEntitiesIdDocuments.useMutation();
 
 /**
- * `mutation.mutate(...)` will execute:
+ * Will execute the request when call `mutation.mutate(...)`:
  *
- * POST /entities/1/documents
+ * POST /entities/3e3e-3e3e-3e3e/documents
  * Content-Type: application/json
- * {"document_title": "Agreement of Intent"}
- *
- * Used Open API: POST /entities/{entity_id}/documents
+ * {"company_tax_id_verification": ["verification-id"]}
  **/
-
 mutation.mutate({
   path: {
-    entity_id: '1',
+    entity_id: '3e3e-3e3e-3e3e',
+  },
+  header: {
+    'x-monite-version': '2023-09-01',
   },
   body: {
-    document_title: 'Agreement of Intent',
+    company_tax_id_verification: ['verification-id'],
   },
 });
 ```
 
 ### [useInfiniteQuery 🔗](https://tanstack.com/query/latest/docs/framework/react/reference/useInfiniteQuery)
 
-`todo::Add Description`
+#### _Offset-based_
 
 ```ts
 /**
- * `qraft.files.getFiles.useInfiniteQuery(...)` will execute:
+ * Will execute the initial request:
  *
- * GET /files?search=Agreements&limit=10&page=1
+ * GET /posts?search=limit=10&page=1
  * Content-Type: application/json
- *
- * Used Open API: GET /files
  **/
-const infiniteQuery = qraft.files.getFiles.useInfiniteQuery(
-  {
-    query: {
-      search: 'Agreements',
-      limit: 10,
-    },
-  },
+const infiniteQuery = qraft.posts.getPosts.useInfiniteQuery(
+  { query: { limit: 10 } },
   {
     getNextPageParam: (lastPage, allPages, lastPageParams) => {
-      if (lastPage.length < 10) return;
+      if (lastPage.length < 10) return; // if less than 10 items, there are no more pages
       return {
         query: {
-          page: lastPageParams.query?.page
-            ? lastPageParams.query.page + 1
-            : undefined,
+          page: Number(lastPageParams.query?.page) + 1,
         },
       };
     },
     initialPageParam: {
       query: {
-        page: 1,
+        page: 1, // will be used in initial request
       },
     },
   }
 );
 
-infiniteQuery.fetchNextPage(); // will execute GET /files?search=Agreements&limit=10&page=2
+// ⬇︎ will execute GET /posts?limit=10&page=2
+infiniteQuery.fetchNextPage();
+```
+
+#### _Pagination token_ based
+
+If your API uses pagination tokens, the Infinite Queries implementation becomes quite laconically:
+
+```ts
+/**
+ * Will execute the initial request:
+ *
+ * GET /data_exports
+ * Content-Type: application/json
+ **/
+const infiniteQuery = qraft.dataExports.getDataExports.useInfiniteQuery(
+  {
+    header: {
+      'x-monite-version': '2023-09-01',
+      'x-monite-entity-id': '3e3e-3e3e-3e3e',
+    },
+  },
+  {
+    // * required by Tanstack Query
+    initialPageParam: {
+      query: { pagination_token: undefined }, // will be used in initial request
+    },
+    // * required by Tanstack Query
+    getNextPageParam: (lastPage, allPages, lastPageParam) => ({
+      query: { pagination_token: lastPage.next_pagination_token },
+    }),
+    // * optional
+    getPreviousPageParam: (firstPage, allPages, firstPageParam) => ({
+      query: { pagination_token: firstPage.prev_pagination_token },
+    }),
+  }
+);
+
+// ⬇︎ will execute GET /data_exports?pagination_token=...NEXT_PAGE_TOKEN....
+infiniteQuery.fetchNextPage();
+
+// ⬇︎ will execute GET /data_exports?pagination_token=...PREV_PAGE_TOKEN....
+infiniteQuery.fetchPreviousPage();
 ```
 
 ## Contributing
