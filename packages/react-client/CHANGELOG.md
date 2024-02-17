@@ -1,5 +1,11 @@
 # @openapi-qraft/react
 
+## 1.0.0-beta.4
+
+### Patch Changes
+
+- c940886: Add 'use client' header for Next.js /app compatibility
+
 ## 1.0.0-beta.3
 
 ### Patch Changes
