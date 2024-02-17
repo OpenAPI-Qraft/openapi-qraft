@@ -1,3 +1,5 @@
+'use client';
+
 import { useContext } from 'react';
 
 import type { DefaultError, InfiniteData } from '@tanstack/query-core';
