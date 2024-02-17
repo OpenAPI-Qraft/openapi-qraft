@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import c from 'ansi-colors';
 import { program } from 'commander';
+import fs from 'node:fs';
 
 import { fileHeader } from './lib/fileHeader.js';
 import { writeOpenAPIServices } from './writeOpenAPIServices.js';
@@ -37,6 +38,17 @@ program
     'All import statements will include explicit `.js` extensions. Ideal for projects using ECMAScript modules.'
   )
   .action(async (input, args) => {
+    const { version: packageVersion, name: packageName } = JSON.parse(
+      fs.readFileSync(new URL('../package.json', import.meta.url), 'utf8')
+    );
+
+    if (args.version) {
+      console.info(`v${packageVersion}`);
+      process.exit(0);
+    }
+
+    console.info(`✨ ${c.bold(`${packageName} ${packageVersion}`)}`);
+
     const source = input
       ? new URL(input, new URL(`file://${process.cwd()}/`))
       : process.stdin;
