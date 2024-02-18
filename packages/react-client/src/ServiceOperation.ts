@@ -2,6 +2,9 @@ import {
   DefaultError,
   InfiniteData,
   InfiniteQueryPageParamsOptions,
+  Mutation,
+  MutationState,
+  MutationStatus,
   NoInfer,
   QueryClient,
   SetDataOptions,
@@ -209,6 +212,7 @@ export interface ServiceOperationMutation<
   TParams,
   TError = DefaultError,
 > extends ServiceOperationUseMutation<TSchema, TBody, TData, TParams, TError>,
+    ServiceOperationUseMutationState<TSchema, TBody, TData, TParams, TError>,
     ServiceOperationMutationFn<TSchema, TBody, TData, TParams>,
     ServiceOperationSetQueryData<TData, TParams> {
   schema: TSchema;
@@ -226,9 +230,7 @@ interface ServiceOperationUseMutation<
   ): ServiceOperationMutationKey<TSchema, T>;
 
   useMutation<
-    TVariables extends { body: TBody } & (NonNullable<TParams> extends never
-      ? {}
-      : TParams),
+    TVariables extends MutationVariables<TBody, TParams>,
     TContext = unknown,
   >(
     params?: undefined,
@@ -252,6 +254,94 @@ interface ServiceOperationUseMutation<
     >,
     queryClient?: QueryClient
   ): UseMutationResult<TData, TError | Error, TVariables, TContext>;
+}
+
+type MutationFilters<
+  TSchema extends { url: string; method: string },
+  TBody,
+  TData,
+  TParams,
+  TError = DefaultError,
+  TContext = unknown,
+> = {
+  /**
+   * Match mutation key exactly
+   */
+  exact?: boolean;
+  /**
+   * Include mutations matching this predicate function
+   */
+  predicate?: (
+    mutation: Mutation<
+      TData,
+      TError,
+      MutationVariables<TBody, TParams>,
+      TContext
+    >
+  ) => boolean;
+
+  /**
+   * Filter by mutation status
+   */
+  status?: MutationStatus;
+} & (
+  | {
+      /**
+       * Include mutations matching this mutation key
+       */
+      mutationKey?: ServiceOperationMutationKey<
+        TSchema,
+        PartialParams<TParams>
+      >;
+    }
+  | {
+      /**
+       * Include mutations matching these parameters
+       */
+      parameters?: PartialParams<TParams>;
+    }
+);
+
+type MutationVariables<TBody, TParams> = {
+  body: TBody;
+} & (NonNullable<TParams> extends never ? {} : TParams);
+
+interface ServiceOperationUseMutationState<
+  TSchema extends { url: string; method: string },
+  TBody,
+  TData,
+  TParams,
+  TError = DefaultError,
+> {
+  useMutationState<
+    TContext = unknown,
+    TResult = MutationState<
+      TData,
+      TError,
+      MutationVariables<TBody, TParams>,
+      TContext
+    >,
+  >(
+    options?: {
+      filters?: MutationFilters<
+        TSchema,
+        TBody,
+        TData,
+        TParams,
+        TError,
+        TContext
+      >;
+      select?: (
+        mutation: Mutation<
+          TData,
+          TError,
+          MutationVariables<TBody, TParams>,
+          TContext
+        >
+      ) => TResult;
+    },
+    queryClient?: QueryClient
+  ): Array<TResult>;
 }
 
 interface ServiceOperationQueryFn<

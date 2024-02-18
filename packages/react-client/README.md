@@ -243,6 +243,34 @@ mutation.mutate({
 });
 ```
 
+### [useMutationState 🔗](https://tanstack.com/query/latest/docs/framework/react/reference/useMutationState)
+
+Mutation state is a helper hook that provides the current state of a mutation globally.
+It could be used to track the status of a mutation in any component, which is useful for showing loading spinners or
+disabling buttons.
+
+```ts
+const { mutate } = qraft.entities.postEntitiesIdDocuments.useMutation({
+  path: {
+    entity_id: '3e3e-3e3e-3e3e',
+  },
+  header: {
+    'x-monite-version': '2023-09-01',
+  },
+});
+
+const mutationState = qraft.entities.postEntitiesIdDocuments
+  // You can pass Partial parameters, or even `undefined` to specify filters
+  .useMutationState({ path: { entity_id: '3e3e-3e3e-3e3e' } })
+  ?.at(0);
+
+useEffect(() => {
+  if (mutationState?.status === 'iddle') {
+    mutate({ company_tax_id_verification: ['verification-id'] });
+  }
+}, [mutate, mutationState?.status]);
+```
+
 ### [useInfiniteQuery 🔗](https://tanstack.com/query/latest/docs/framework/react/reference/useInfiniteQuery)
 
 #### _Offset-based_
