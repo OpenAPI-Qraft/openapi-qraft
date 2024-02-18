@@ -18,6 +18,8 @@ import {
   UseMutationOptions,
   UseMutationResult,
   UseQueryResult,
+  UseSuspenseInfiniteQueryOptions,
+  UseSuspenseInfiniteQueryResult,
   UseSuspenseQueryOptions,
   UseSuspenseQueryResult,
 } from '@tanstack/react-query';
@@ -45,6 +47,7 @@ export interface ServiceOperationQuery<
 > extends ServiceOperationUseQuery<TSchema, TData, TParams, TError>,
     ServiceOperationUseInfiniteQuery<TSchema, TData, TParams, TError>,
     ServiceOperationUseSuspenseQueryQuery<TSchema, TData, TParams, TError>,
+    ServiceOperationUseSuspenseInfiniteQuery<TSchema, TData, TParams, TError>,
     ServiceOperationQueryFn<TSchema, TData, TParams>,
     ServiceOperationGetQueryData<TData, TParams>,
     ServiceOperationGetInfiniteQueryData<TData, TParams>,
@@ -145,6 +148,34 @@ interface ServiceOperationUseInfiniteQuery<
       InfiniteQueryPageParamsOptions<TData, PartialParams<TPageParam>>,
     queryClient?: QueryClient
   ): DefinedUseInfiniteQueryResult<InfiniteData<TData>, TError | Error>;
+}
+
+interface ServiceOperationUseSuspenseInfiniteQuery<
+  TSchema extends { url: string; method: string },
+  TData,
+  TParams = {},
+  TError = DefaultError,
+> {
+  useSuspenseInfiniteQuery<TPageParam extends TParams>(
+    params: TParams,
+    options: Omit<
+      UseSuspenseInfiniteQueryOptions<
+        TData,
+        TError,
+        InfiniteData<TData>,
+        TData,
+        | ServiceOperationInfiniteQueryKey<TSchema, TParams>
+        | readonly [...ServiceOperationInfiniteQueryKey<TSchema, TParams>],
+        PartialParams<TPageParam>
+      >,
+      | 'queryKey'
+      | 'getPreviousPageParam'
+      | 'getNextPageParam'
+      | 'initialPageParam'
+    > &
+      InfiniteQueryPageParamsOptions<TData, PartialParams<TPageParam>>,
+    queryClient?: QueryClient
+  ): UseSuspenseInfiniteQueryResult<InfiniteData<TData>, TError | Error>;
 }
 
 interface ServiceOperationUseSuspenseQueryQuery<

@@ -318,9 +318,12 @@ infiniteQuery.fetchNextPage();
 infiniteQuery.fetchPreviousPage();
 ```
 
-### [useSuspenseQuery 🔗](https://tanstack.com/query/latest/docs/framework/react/reference/useSuspenseQuery)
+### Suspense Queries
 
-The same syntax as `useQuery` but with the ability to use Suspense.
+Supported Suspense Queries are:
+
+- [useSuspenseQuery 🔗](https://tanstack.com/query/latest/docs/framework/react/reference/useSuspenseQuery)
+- [useSuspenseInfiniteQuery 🔗](https://tanstack.com/query/latest/docs/framework/react/reference/useSuspenseInfiniteQuery)
 
 ## Contributing
 

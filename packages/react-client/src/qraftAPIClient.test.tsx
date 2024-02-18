@@ -344,6 +344,86 @@ describe('Qraft uses Infinite Queries', () => {
   });
 });
 
+describe('Qraft uses Suspense Infinite Queries', () => {
+  it('supports useSuspenseInfiniteQuery', async () => {
+    const hook = () => {
+      try {
+        return qraft.files.getFiles.useSuspenseInfiniteQuery(
+          {
+            header: {
+              'x-monite-version': '1.0.0',
+            },
+            query: {
+              id__in: ['1', '2'],
+            },
+          },
+          {
+            getNextPageParam: (lastPage, allPages, params) => {
+              return {
+                query: {
+                  page: params.query?.page
+                    ? String(Number(params.query.page) + 1)
+                    : undefined,
+                },
+              };
+            },
+            initialPageParam: {
+              query: {
+                page: '1',
+              },
+            },
+          }
+        );
+      } catch (error) {
+        return error as Promise<unknown>;
+      }
+    };
+
+    const queryClient = new QueryClient();
+
+    const { result } = renderHook(hook, {
+      wrapper: (props) => <Providers {...props} queryClient={queryClient} />,
+    });
+
+    const { result: resultWithErrorPromise } = renderHook(hook, {
+      wrapper: (props) => <Providers {...props} queryClient={queryClient} />,
+    });
+
+    expect(resultWithErrorPromise.current).toBeInstanceOf(Promise); // Suspense throws a promise
+
+    await resultWithErrorPromise.current;
+
+    const { result: resultWithData } = renderHook(hook, {
+      wrapper: (props) => <Providers {...props} queryClient={queryClient} />,
+    });
+
+    if (resultWithData.current instanceof Promise) {
+      throw new Error('Promise should be resolved');
+    }
+
+    expect(resultWithData.current.data).toEqual({
+      pageParams: [
+        {
+          query: {
+            page: '1',
+          },
+        },
+      ],
+      pages: [
+        {
+          header: {
+            'x-monite-version': '1.0.0',
+          },
+          query: {
+            id__in: ['1', '2'],
+            page: '1',
+          },
+        },
+      ],
+    });
+  });
+});
+
 describe('Qraft uses Mutations', () => {
   it('supports useMutation without predefined parameters', async () => {
     const { result } = renderHook(
