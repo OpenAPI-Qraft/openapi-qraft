@@ -1,9 +1,7 @@
+import { composeMutationKey } from '../lib/composeMutationKey.js';
 import type { QraftClientOptions } from '../qraftAPIClient.js';
 import type { RequestClientSchema } from '../RequestClient.js';
-import {
-  ServiceOperationMutation,
-  ServiceOperationMutationKey,
-} from '../ServiceOperation.js';
+import { ServiceOperationMutation } from '../ServiceOperation.js';
 
 export const getMutationKey = (
   qraftOptions: QraftClientOptions | undefined,
@@ -17,35 +15,5 @@ export const getMutationKey = (
     >['getMutationKey']
   >
 ) => {
-  const [parameters] = args;
-
-  const mutationKey:
-    | ServiceOperationMutationKey<RequestClientSchema, unknown>
-    | ServiceOperationMutationKey<RequestClientSchema, undefined> =
-    parameters === undefined
-      ? [{ url: schema.url, method: schema.method }]
-      : [
-          {
-            url: schema.url,
-            method: schema.method,
-          },
-          omitMutationPayload(parameters),
-        ];
-
-  return mutationKey;
+  return composeMutationKey(schema, args[0]);
 };
-
-function omitMutationPayload<T>(params: T) {
-  if (!params || typeof params !== 'object')
-    throw new Error('`params` must be object');
-
-  if ('body' in params || 'requestBody' in params) {
-    const { body, requestBody, ...paramsRest } = params as Record<
-      'body' | 'requestBody',
-      unknown
-    >;
-    return paramsRest;
-  }
-
-  return params as Omit<T, 'body' | 'requestBody'>;
-}
