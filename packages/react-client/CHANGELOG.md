@@ -1,5 +1,12 @@
 # @openapi-qraft/react
 
+## 1.0.0-beta.6
+
+### Patch Changes
+
+- 75dbf6f: feature: add support of `useMutationState(..)` hook
+- 1ae85df: refactor: `getMutationKey` type and composed key if parameters are `undefined`
+
 ## 1.0.0-beta.5
 
 ### Patch Changes

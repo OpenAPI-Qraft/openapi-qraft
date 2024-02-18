@@ -1,5 +1,11 @@
 # @openapi-qraft/cli
 
+## 1.0.0-beta.4
+
+### Patch Changes
+
+- 75dbf6f: feature: add support of `useMutationState(..)` hook
+
 ## 1.0.0-beta.3
 
 ### Patch Changes
