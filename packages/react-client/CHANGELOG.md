@@ -1,5 +1,12 @@
 # @openapi-qraft/react
 
+## 1.0.0-beta.5
+
+### Patch Changes
+
+- cd66c2e: feature: add support of `useSuspenseQuery(..)` hook
+- 1b93dc7: feature: add support of `useSuspenseInfiniteQuery(..)` hook
+
 ## 1.0.0-beta.4
 
 ### Patch Changes
