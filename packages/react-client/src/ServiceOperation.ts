@@ -36,8 +36,10 @@ export type ServiceOperationInfiniteQueryKey<S extends { url: string }, T> = [
 
 export type ServiceOperationMutationKey<
   S extends Record<'url' | 'method', string>,
-  T,
-> = [Pick<S, 'url' | 'method'>, T];
+  T extends unknown,
+> = NonNullable<T> extends never
+  ? [Pick<S, 'url' | 'method'>]
+  : [Pick<S, 'url' | 'method'>, T];
 
 export interface ServiceOperationQuery<
   TSchema extends { url: string; method: string },
@@ -220,7 +222,7 @@ interface ServiceOperationUseMutation<
   TError = DefaultError,
 > {
   getMutationKey<T extends TParams>(
-    params: T
+    params: T | undefined
   ): ServiceOperationMutationKey<TSchema, T>;
 
   useMutation<

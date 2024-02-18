@@ -8,26 +8,31 @@ import {
 export const getMutationKey = (
   qraftOptions: QraftClientOptions | undefined,
   schema: RequestClientSchema,
-  args: unknown
-) => {
-  const [parameters] = args as Parameters<
+  args: Parameters<
     ServiceOperationMutation<
       RequestClientSchema,
       unknown,
       unknown,
       unknown
     >['getMutationKey']
-  >;
+  >
+) => {
+  const [parameters] = args;
 
-  const key: ServiceOperationMutationKey<RequestClientSchema, unknown> = [
-    {
-      url: schema.url,
-      method: schema.method,
-    },
-    omitMutationPayload(parameters),
-  ];
+  const mutationKey:
+    | ServiceOperationMutationKey<RequestClientSchema, unknown>
+    | ServiceOperationMutationKey<RequestClientSchema, undefined> =
+    parameters === undefined
+      ? [{ url: schema.url, method: schema.method }]
+      : [
+          {
+            url: schema.url,
+            method: schema.method,
+          },
+          omitMutationPayload(parameters),
+        ];
 
-  return key;
+  return mutationKey;
 };
 
 function omitMutationPayload<T>(params: T) {
@@ -35,7 +40,6 @@ function omitMutationPayload<T>(params: T) {
     throw new Error('`params` must be object');
 
   if ('body' in params || 'requestBody' in params) {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { body, requestBody, ...paramsRest } = params as Record<
       'body' | 'requestBody',
       unknown
