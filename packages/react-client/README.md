@@ -318,6 +318,10 @@ infiniteQuery.fetchNextPage();
 infiniteQuery.fetchPreviousPage();
 ```
 
+### [useSuspenseQuery 🔗](https://tanstack.com/query/latest/docs/framework/react/reference/useSuspenseQuery)
+
+The same syntax as `useQuery` but with the ability to use Suspense.
+
 ## Contributing
 
 Contributions are welcome! If you have suggestions or want to improve `@openapi-qraft/react`, please feel free to submit

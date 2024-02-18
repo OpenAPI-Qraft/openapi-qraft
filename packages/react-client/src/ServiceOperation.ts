@@ -1,13 +1,13 @@
 import {
   DefaultError,
   InfiniteData,
-  QueryClient,
   InfiniteQueryPageParamsOptions,
   NoInfer,
+  QueryClient,
   SetDataOptions,
   Updater,
 } from '@tanstack/query-core';
-import type {
+import {
   DefinedInitialDataInfiniteOptions,
   DefinedInitialDataOptions,
   DefinedUseInfiniteQueryResult,
@@ -18,6 +18,8 @@ import type {
   UseMutationOptions,
   UseMutationResult,
   UseQueryResult,
+  UseSuspenseQueryOptions,
+  UseSuspenseQueryResult,
 } from '@tanstack/react-query';
 
 export type ServiceOperationQueryKey<S extends { url: string }, T> = [
@@ -42,6 +44,7 @@ export interface ServiceOperationQuery<
   TError = DefaultError,
 > extends ServiceOperationUseQuery<TSchema, TData, TParams, TError>,
     ServiceOperationUseInfiniteQuery<TSchema, TData, TParams, TError>,
+    ServiceOperationUseSuspenseQueryQuery<TSchema, TData, TParams, TError>,
     ServiceOperationQueryFn<TSchema, TData, TParams>,
     ServiceOperationGetQueryData<TData, TParams>,
     ServiceOperationGetInfiniteQueryData<TData, TParams>,
@@ -142,6 +145,28 @@ interface ServiceOperationUseInfiniteQuery<
       InfiniteQueryPageParamsOptions<TData, PartialParams<TPageParam>>,
     queryClient?: QueryClient
   ): DefinedUseInfiniteQueryResult<InfiniteData<TData>, TError | Error>;
+}
+
+interface ServiceOperationUseSuspenseQueryQuery<
+  TSchema extends { url: string; method: string },
+  TData,
+  TParams = {},
+  TError = DefaultError,
+> {
+  useSuspenseQuery(
+    params: TParams,
+    options?: Omit<
+      UseSuspenseQueryOptions<
+        TData,
+        TError,
+        TData,
+        | ServiceOperationQueryKey<TSchema, TParams>
+        | readonly [...ServiceOperationQueryKey<TSchema, TParams>]
+      >,
+      'queryKey'
+    >,
+    queryClient?: QueryClient
+  ): UseSuspenseQueryResult<TData, TError | Error>;
 }
 
 export interface ServiceOperationMutation<

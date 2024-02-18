@@ -9,8 +9,8 @@ import {
 import { act, renderHook, waitFor } from '@testing-library/react';
 
 import { createAPIClient } from './fixtures/api/index.js';
-import { bodySerializer, urlSerializer, request } from './lib/request.js';
-import { QraftContext, QraftContextValue } from './QraftContext.js';
+import { bodySerializer, request, urlSerializer } from './lib/request.js';
+import { QraftContextValue } from './QraftContext.js';
 import type { RequestClient } from './RequestClient.js';
 
 const qraft = createAPIClient();
@@ -126,6 +126,58 @@ describe('Qraft uses Queries', () => {
 
     await waitFor(() => {
       expect(result.current.data).toEqual(undefined);
+    });
+  });
+});
+
+describe('Qraft uses Suspense Queries', () => {
+  it('supports useSuspenseQuery', async () => {
+    const hook = () => {
+      try {
+        return qraft.approvalPolicies.getApprovalPoliciesId.useSuspenseQuery({
+          header: {
+            'x-monite-version': '1.0.0',
+          },
+          path: {
+            approval_policy_id: '1',
+          },
+          query: {
+            items_order: ['asc', 'desc'],
+          },
+        });
+      } catch (error) {
+        return error as Promise<unknown>;
+      }
+    };
+
+    const queryClient = new QueryClient();
+
+    const { result: resultWithErrorPromise } = renderHook(hook, {
+      wrapper: (props) => <Providers {...props} queryClient={queryClient} />,
+    });
+
+    expect(resultWithErrorPromise.current).toBeInstanceOf(Promise); // Suspense throws a promise
+
+    await resultWithErrorPromise.current;
+
+    const { result: resultWithData } = renderHook(hook, {
+      wrapper: (props) => <Providers {...props} queryClient={queryClient} />,
+    });
+
+    if (resultWithData.current instanceof Promise) {
+      throw new Error('Promise should be resolved');
+    }
+
+    expect(resultWithData.current.data).toEqual({
+      header: {
+        'x-monite-version': '1.0.0',
+      },
+      path: {
+        approval_policy_id: '1',
+      },
+      query: {
+        items_order: ['asc', 'desc'],
+      },
     });
   });
 });
