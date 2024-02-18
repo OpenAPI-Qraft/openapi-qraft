@@ -265,7 +265,7 @@ const mutationState = qraft.entities.postEntitiesIdDocuments
   ?.at(0);
 
 useEffect(() => {
-  if (mutationState?.status === 'iddle') {
+  if (!mutationState || mutationState.status === 'iddle') {
     mutate({ company_tax_id_verification: ['verification-id'] });
   }
 }, [mutate, mutationState?.status]);
@@ -285,6 +285,7 @@ useEffect(() => {
 const infiniteQuery = qraft.posts.getPosts.useInfiniteQuery(
   { query: { limit: 10 } },
   {
+    // * required by Tanstack Query
     getNextPageParam: (lastPage, allPages, lastPageParams) => {
       if (lastPage.length < 10) return; // if less than 10 items, there are no more pages
       return {
@@ -293,6 +294,7 @@ const infiniteQuery = qraft.posts.getPosts.useInfiniteQuery(
         },
       };
     },
+    // * required by Tanstack Query
     initialPageParam: {
       query: {
         page: 1, // will be used in initial request
