@@ -1,4 +1,4 @@
-import { shelfMerge } from './useInfiniteQuery.js';
+import { shelfMerge } from './shelfMerge.js';
 
 describe('shelfMerge', () => {
   it('merges simple objects', async () => {
