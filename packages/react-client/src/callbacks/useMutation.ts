@@ -6,6 +6,7 @@ import type { DefaultError } from '@tanstack/query-core';
 import type { UseMutationResult } from '@tanstack/react-query';
 import { useMutation as useMutationBase } from '@tanstack/react-query';
 
+import { composeMutationKey } from '../lib/composeMutationKey.js';
 import type { QraftClientOptions } from '../qraftAPIClient.js';
 import { QraftContext } from '../QraftContext.js';
 import type { RequestClientSchema } from '../RequestClient.js';
@@ -53,25 +54,12 @@ export const useMutation: <
   if (!requestClient) throw new Error(`QraftContext.requestClient not found`);
 
   const mutationKey =
-    parameters && typeof parameters === 'object'
-      ? ([
-          {
-            url: schema.url,
-            method: schema.method,
-          },
-          parameters,
-        ] as const)
-      : options && 'mutationKey' in options
-        ? (options.mutationKey as ServiceOperationMutationKey<
-            typeof schema,
-            unknown
-          >)
-        : ([
-            {
-              url: schema.url,
-              method: schema.method,
-            },
-          ] as const);
+    options && 'mutationKey' in options
+      ? (options.mutationKey as ServiceOperationMutationKey<
+          typeof schema,
+          unknown
+        >)
+      : composeMutationKey(schema, parameters);
 
   return useMutationBase(
     {
