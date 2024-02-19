@@ -1,5 +1,19 @@
 # @openapi-qraft/cli
 
+## 1.0.0
+
+### Major Changes
+
+- c545cb2: chore: First release of the `@openapi-qraft/*` packages.
+
+### Patch Changes
+
+- 06d644a: feature: Print the Qraft version
+- 269e464: feature: Add support for `useSuspenseQuery(..)` hook
+- 0640daf: feature: Add support for `useMutationState(..)` hook
+- 0534411: feature: Add @summary output for OpenAPI operations
+- cc93fc3: feature: Add support for `useSuspenseInfiniteQuery(..)` hook
+
 ## 1.0.0-beta.4
 
 ### Patch Changes

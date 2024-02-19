@@ -1,6 +1,6 @@
 {
   "name": "@openapi-qraft/e2e",
-  "version": "1.0.0-beta.1",
+  "version": "1.0.0",
   "private": true,
   "scripts": {
     "verdaccio": "VERDACCIO_STORAGE_PATH=./verdaccio-storage verdaccio --config ./verdaccio-config.yaml",

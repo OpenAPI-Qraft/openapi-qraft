@@ -1,5 +1,21 @@
 # @openapi-qraft/react
 
+## 1.0.0
+
+### Major Changes
+
+- c545cb2: chore: First release of the `@openapi-qraft/*` packages.
+
+### Patch Changes
+
+- 269e464: feature: Add support for `useSuspenseQuery(..)` hook
+- 8f0359d: Add a 'use client' header for compatibility with Next.js /app
+- 0640daf: feature: Add support for `useMutationState(..)` hook
+- ddb4d87: docs: Update README
+- cc93fc3: feature: Add support for `useSuspenseInfiniteQuery(..)` hook
+- 2509822: refactor: `getMutationKey` type, and change key composition logic if parameters are `undefined`
+- fb6b450: chore: Bump
+
 ## 1.0.0-beta.6
 
 ### Patch Changes
