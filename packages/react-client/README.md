@@ -170,8 +170,8 @@ and more.
 ```ts
 /**
  * Will execute the request:
- *
- * GET /entities?sort=asc
+ * ###
+ * GET /entities?sort=updated_at
  * x-monite-version: 2023-09-01
  **/
 const { data, error, isPending } = qraft.entities.getEntities.useQuery({
@@ -203,10 +203,10 @@ const mutation = qraft.entities.postEntitiesIdDocuments.useMutation({
 
 /**
  * Will execute the request when call `mutation.mutate(...)`:
- *
+ * ###
  * POST /entities/3e3e-3e3e-3e3e/documents
- * Content-Type: application/json
  * x-monite-version: 2023-09-01
+ *
  * {"company_tax_id_verification": ["verification-id"]}
  **/
 mutation.mutate({
@@ -225,9 +225,10 @@ const mutation = qraft.entities.postEntitiesIdDocuments.useMutation();
 
 /**
  * Will execute the request when call `mutation.mutate(...)`:
- *
+ * ###
  * POST /entities/3e3e-3e3e-3e3e/documents
- * Content-Type: application/json
+ * x-monite-version: 2023-09-01
+ *
  * {"company_tax_id_verification": ["verification-id"]}
  **/
 mutation.mutate({
@@ -278,9 +279,8 @@ useEffect(() => {
 ```ts
 /**
  * Will execute the initial request:
- *
- * GET /posts?search=limit=10&page=1
- * Content-Type: application/json
+ * ###
+ * GET /posts?limit=10&page=1
  **/
 const infiniteQuery = qraft.posts.getPosts.useInfiniteQuery(
   { query: { limit: 10 } },
@@ -314,9 +314,10 @@ If your API uses pagination tokens, the Infinite Queries implementation becomes 
 ```ts
 /**
  * Will execute the initial request:
- *
+ * ###
  * GET /data_exports
- * Content-Type: application/json
+ * x-monite-version: 2023-09-01
+ * x-monite-entity-id: 3e3e-3e3e-3e3e
  **/
 const infiniteQuery = qraft.dataExports.getDataExports.useInfiniteQuery(
   {
