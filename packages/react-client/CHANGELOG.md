@@ -1,6 +1,6 @@
 # @openapi-qraft/react
 
-## 1.0.0
+## 1.0.1
 
 ### Major Changes
 
