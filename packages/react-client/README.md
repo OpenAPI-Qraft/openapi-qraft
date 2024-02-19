@@ -21,7 +21,7 @@ hooks with typed parameters, ensuring that your API requests are both type-safe 
 First, install the core package for your project:
 
 ```bash
-npm install @openapi-qraft/react@beta
+npm install @openapi-qraft/react
 ```
 
 If your project doesn't already include `@tanstack/react-query`, you'll also need to install it. This package is
@@ -60,7 +60,7 @@ Next, use `@openapi-qraft/cli` to generate the services and typed Tanstack Query
 to the TypeScript definitions generated in the previous step.
 
 ```bash
-npx @openapi-qraft/cli@beta https://api.dev.monite.com/openapi.json?version=2023-09-01 --output-dir src/api --openapi-types-import-path '../openapi.d.ts'
+npx @openapi-qraft/cli https://api.dev.monite.com/openapi.json?version=2023-09-01 --output-dir src/api --openapi-types-import-path '../openapi.d.ts'
 ```
 
 By completing these steps, you will generate `openapi.d.ts`, which serves as a TypeScript representation of the

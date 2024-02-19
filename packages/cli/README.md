@@ -13,7 +13,7 @@ within React applications.
 ## Installation
 
 ```bash
-npm install -g @openapi-qraft/cli@beta
+npm install -g @openapi-qraft/cli
 ```
 
 ## Usage
