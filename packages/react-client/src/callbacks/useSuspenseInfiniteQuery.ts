@@ -31,9 +31,11 @@ export const useSuspenseInfiniteQuery: <
       unknown
     >['useSuspenseInfiniteQuery']
   >
-) => UseSuspenseInfiniteQueryResult<TData, TError> & {
-  queryKey: ServiceOperationQueryKey<RequestClientSchema, unknown>;
-} = (qraftOptions, schema, args) => {
+) => UseSuspenseInfiniteQueryResult<TData, TError> = (
+  qraftOptions,
+  schema,
+  args
+) => {
   const [params, options, ...restArgs] = args;
 
   const requestClient = useContext(qraftOptions?.context ?? QraftContext)

@@ -30,9 +30,7 @@ export const useSuspenseQuery: <
       unknown
     >['useSuspenseQuery']
   >
-) => UseQueryResult<TData, TError> & {
-  queryKey: ServiceOperationQueryKey<RequestClientSchema, unknown>;
-} = (qraftOptions, schema, args) => {
+) => UseQueryResult<TData, TError> = (qraftOptions, schema, args) => {
   const [params, options, ...restArgs] = args;
 
   const requestClient = useContext(qraftOptions?.context ?? QraftContext)
