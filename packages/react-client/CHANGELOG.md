@@ -1,5 +1,11 @@
 # @openapi-qraft/react
 
+## 1.0.3
+
+### Patch Changes
+
+- 179fdaf: docs: Update README with `useQueries` hook
+
 ## 1.0.2
 
 ### Patch Changes
