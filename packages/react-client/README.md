@@ -349,6 +349,45 @@ infiniteQuery.fetchNextPage();
 infiniteQuery.fetchPreviousPage();
 ```
 
+### [useQueries 🔗](https://tanstack.com/query/latest/docs/framework/react/reference/useQueries)
+
+```ts
+/**
+ * Will execute the request two queries:
+ * ###
+ * GET /entities/3e3e-3e3e-3e3e
+ * x-monite-version: 2023-09-01
+ * ###
+ * GET /entities/5c5c-5c5c-5c5c
+ * x-monite-version: 2023-09-01
+ **/
+qraft.entities.getEntities.useQueries({
+  queries: [
+    {
+      parameters: {
+        header: {
+          'x-monite-version': '2023-09-01',
+        },
+        path: {
+          entity_id: '3e3e-3e3e-3e3e',
+        },
+      },
+    },
+    {
+      parameters: {
+        header: {
+          'x-monite-version': '2023-09-01',
+        },
+        path: {
+          entity_id: '5c5c-5c5c-5c5c',
+        },
+      },
+    },
+  ],
+  combine: (results) => results.map((result) => result.data),
+});
+```
+
 ### Suspense Queries
 
 Supported Suspense Queries are:
