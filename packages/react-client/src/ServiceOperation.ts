@@ -6,6 +6,7 @@ import {
   MutationState,
   MutationStatus,
   NoInfer,
+  QueriesPlaceholderDataFunction,
   QueryClient,
   SetDataOptions,
   Updater,
@@ -20,6 +21,7 @@ import {
   UseInfiniteQueryResult,
   UseMutationOptions,
   UseMutationResult,
+  UseQueryOptions,
   UseQueryResult,
   UseSuspenseInfiniteQueryOptions,
   UseSuspenseInfiniteQueryResult,
@@ -50,6 +52,7 @@ export interface ServiceOperationQuery<
   TParams,
   TError = DefaultError,
 > extends ServiceOperationUseQuery<TSchema, TData, TParams, TError>,
+    ServiceOperationUseQueries<TSchema, TData, TParams, TError>,
     ServiceOperationUseInfiniteQuery<TSchema, TData, TParams, TError>,
     ServiceOperationUseSuspenseQueryQuery<TSchema, TData, TParams, TError>,
     ServiceOperationUseSuspenseInfiniteQuery<TSchema, TData, TParams, TError>,
@@ -99,6 +102,40 @@ interface ServiceOperationUseQuery<
     >,
     queryClient?: QueryClient
   ): DefinedUseQueryResult<TData, TError | Error>;
+}
+
+interface ServiceOperationUseQueries<
+  TSchema extends { url: string; method: string },
+  TData,
+  TParams = {},
+  TError = DefaultError,
+> {
+  useQueries<TCombinedResult = Array<UseQueryResult<TData, TError>>>(
+    {
+      queries,
+      ...options
+    }: {
+      queries: ReadonlyArray<
+        Omit<
+          UseQueryOptions<
+            TData,
+            TError,
+            TData,
+            | ServiceOperationQueryKey<TSchema, TParams>
+            | readonly [...ServiceOperationQueryKey<TSchema, TParams>]
+          >,
+          'placeholderData' | 'suspense' | 'queryKey'
+        > & {
+          parameters: TParams;
+          placeholderData?: TData | QueriesPlaceholderDataFunction<TData>;
+        }
+      >;
+      combine?: (
+        results: Array<UseQueryResult<TData, TError>>
+      ) => TCombinedResult;
+    },
+    queryClient?: QueryClient
+  ): TCombinedResult;
 }
 
 type PartialParams<T> = T extends object

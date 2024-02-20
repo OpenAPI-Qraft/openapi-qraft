@@ -25,7 +25,7 @@ const requestClient: RequestClient = async (schema, options) => {
   );
 };
 
-describe('Qraft uses Queries', () => {
+describe('Qraft uses singular Query', () => {
   it('supports useQuery', async () => {
     const { result } = renderHook(
       () =>
@@ -178,6 +178,51 @@ describe('Qraft uses Suspense Queries', () => {
       query: {
         items_order: ['asc', 'desc'],
       },
+    });
+  });
+});
+
+describe('Qraft uses Queries', () => {
+  it('supports useQueries', async () => {
+    const { result } = renderHook(
+      () =>
+        qraft.approvalPolicies.getApprovalPoliciesId.useQueries({
+          queries: [
+            {
+              parameters: {
+                header: {
+                  'x-monite-version': '1.0.0',
+                },
+                path: {
+                  approval_policy_id: '1',
+                },
+                query: {
+                  items_order: ['asc', 'desc'],
+                },
+              },
+            },
+          ],
+          combine: (results) => results.map((result) => result.data),
+        }),
+      {
+        wrapper: Providers,
+      }
+    );
+
+    await waitFor(() => {
+      expect(result.current).toEqual([
+        {
+          header: {
+            'x-monite-version': '1.0.0',
+          },
+          path: {
+            approval_policy_id: '1',
+          },
+          query: {
+            items_order: ['asc', 'desc'],
+          },
+        },
+      ]);
     });
   });
 });
