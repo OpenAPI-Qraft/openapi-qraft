@@ -1,5 +1,12 @@
 # @openapi-qraft/react
 
+## 1.0.2
+
+### Patch Changes
+
+- 16cf4df: Update README
+- dbf1bdc: feature: Add support for `useQueries(..)` hook
+
 ## 1.0.1
 
 ### Major Changes

@@ -1,5 +1,11 @@
 # @openapi-qraft/cli
 
+## 1.0.2
+
+### Patch Changes
+
+- dbf1bdc: feature: Add support for `useQueries(..)` hook
+
 ## 1.0.1
 
 ### Major Changes
