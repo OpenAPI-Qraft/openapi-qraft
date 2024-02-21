@@ -987,15 +987,17 @@ describe('Qraft uses setInfiniteQueryData', () => {
   it('uses setInfiniteQueryData & getInfiniteQueryData', async () => {
     const queryClient = new QueryClient();
 
-    qraft.files.getFiles.setInfiniteQueryData(
-      {
-        header: {
-          'x-monite-version': '1.0.0',
-        },
-        query: {
-          id__in: ['1', '2'],
-        },
+    const parameters: typeof qraft.files.getFiles.types.parameters = {
+      header: {
+        'x-monite-version': '1.0.0',
       },
+      query: {
+        id__in: ['1', '2'],
+      },
+    };
+
+    qraft.files.getFiles.setInfiniteQueryData(
+      parameters,
       {
         pages: [
           {
@@ -1019,28 +1021,9 @@ describe('Qraft uses setInfiniteQueryData', () => {
     );
 
     expect(
-      qraft.files.getFiles.getInfiniteQueryData(
-        {
-          header: {
-            'x-monite-version': '1.0.0',
-          },
-          query: {
-            id__in: ['1', '2'],
-          },
-        },
-        queryClient
-      )
+      qraft.files.getFiles.getInfiniteQueryData(parameters, queryClient)
     ).toEqual({
-      pages: [
-        {
-          header: {
-            'x-monite-version': '1.0.0',
-          },
-          query: {
-            id__in: ['1', '2'],
-          },
-        },
-      ],
+      pages: [parameters],
       pageParams: [
         {
           query: {
@@ -1054,7 +1037,7 @@ describe('Qraft uses setInfiniteQueryData', () => {
   it('does not return getInfiniteQueryData() from non Infinite query', async () => {
     const queryClient = new QueryClient();
 
-    const parameters = {
+    const parameters: typeof qraft.files.getFiles.types.parameters = {
       header: {
         'x-monite-version': '1.0.0',
       },

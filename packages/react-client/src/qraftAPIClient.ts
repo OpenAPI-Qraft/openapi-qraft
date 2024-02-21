@@ -68,7 +68,10 @@ type ServicesCallbacksFilter<Services, Callbacks> = Services extends {
       [serviceName in keyof Services]: {
         [method in keyof Services[serviceName]]: Pick<
           Services[serviceName][method],
-          FilterKeys<keyof Services[serviceName][method], Callbacks | 'schema'>
+          FilterKeys<
+            keyof Services[serviceName][method],
+            Callbacks | 'schema' | 'types'
+          >
         >;
       };
     }

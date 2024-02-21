@@ -62,6 +62,11 @@ export interface ServiceOperationQuery<
     ServiceOperationSetQueryData<TData, TParams>,
     ServiceOperationSetInfiniteQueryData<TData, TParams> {
   schema: TSchema;
+  types: {
+    parameters: TParams;
+    data: TData;
+    error: TError;
+  };
 }
 
 interface ServiceOperationUseQuery<
@@ -253,6 +258,12 @@ export interface ServiceOperationMutation<
     ServiceOperationMutationFn<TSchema, TBody, TData, TParams>,
     ServiceOperationSetQueryData<TData, TParams> {
   schema: TSchema;
+  types: {
+    parameters: TParams;
+    data: TData;
+    error: TError;
+    body: TBody;
+  };
 }
 
 interface ServiceOperationUseMutation<
