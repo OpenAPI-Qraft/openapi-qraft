@@ -391,7 +391,7 @@ interface ServiceOperationQueryFn<
     TSignal extends AbortSignal = AbortSignal,
   >(
     options: { signal?: TSignal; meta?: TMeta } & (
-      | { queryKey: [unknown, TParams] }
+      | { queryKey: ServiceOperationQueryKey<TSchema, TParams> }
       | { parameters: TParams }
     ),
     client: (
@@ -409,7 +409,7 @@ interface ServiceOperationQueryFn<
     TSignal extends AbortSignal = AbortSignal,
   >(
     options: { signal?: TSignal; meta?: TMeta } & (
-      | { queryKey: [unknown, TParams] }
+      | { queryKey: ServiceOperationQueryKey<TSchema, TParams> }
       | { parameters: TParams }
     ),
     client: (

@@ -810,7 +810,7 @@ describe('Qraft uses Mutation State', () => {
 });
 
 describe('Qraft uses Query Function', () => {
-  it('uses queryFn', async () => {
+  it('uses queryFn with `parameters`', async () => {
     const result = await qraft.approvalPolicies.getApprovalPoliciesId.queryFn(
       {
         parameters: {
@@ -824,6 +824,43 @@ describe('Qraft uses Query Function', () => {
             items_order: ['asc', 'desc'],
           },
         },
+      },
+      requestClient
+    );
+
+    expect(result).toEqual({
+      header: {
+        'x-monite-version': '1.0.0',
+      },
+      path: {
+        approval_policy_id: '1',
+      },
+      query: {
+        items_order: ['asc', 'desc'],
+      },
+    });
+  });
+
+  it('uses queryFn with `queryKey`', async () => {
+    const result = await qraft.approvalPolicies.getApprovalPoliciesId.queryFn(
+      {
+        queryKey: [
+          {
+            url: '/approval_policies/{approval_policy_id}',
+            method: 'get',
+          },
+          {
+            header: {
+              'x-monite-version': '1.0.0',
+            },
+            path: {
+              approval_policy_id: '1',
+            },
+            query: {
+              items_order: ['asc', 'desc'],
+            },
+          },
+        ],
       },
       requestClient
     );

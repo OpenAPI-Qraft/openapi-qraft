@@ -10,11 +10,10 @@ export const queryFn = (
   >
 ) => {
   const [options, client] = args;
-  const parameters =
-    'queryKey' in options ? options.queryKey[1] : options.parameters;
 
-  return client(schema, {
-    parameters,
+  return client('queryKey' in options ? options.queryKey[0] : schema, {
+    parameters:
+      'queryKey' in options ? options.queryKey[1] : options.parameters,
     meta: options.meta,
     signal: options.signal,
   });
