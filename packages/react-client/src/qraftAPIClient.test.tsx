@@ -940,6 +940,47 @@ describe('Qraft uses setQueryData', () => {
       },
     });
   });
+
+  it('does not return getQueryData() from Infinite query', async () => {
+    const queryClient = new QueryClient();
+
+    const parameters = {
+      header: {
+        'x-monite-version': '1.0.0',
+      },
+      query: {
+        id__in: ['1', '2'],
+      },
+    };
+
+    qraft.files.getFiles.setInfiniteQueryData(
+      parameters,
+      {
+        pages: [
+          {
+            header: {
+              'x-monite-version': '1.0.0',
+            },
+            query: {
+              id__in: ['1', '2'],
+            },
+          },
+        ],
+        pageParams: [
+          {
+            query: {
+              page: '1',
+            },
+          },
+        ],
+      },
+      queryClient
+    );
+
+    expect(
+      qraft.files.getFiles.getQueryData(parameters, queryClient)
+    ).not.toBeDefined();
+  });
 });
 
 describe('Qraft uses setInfiniteQueryData', () => {
@@ -1008,6 +1049,36 @@ describe('Qraft uses setInfiniteQueryData', () => {
         },
       ],
     });
+  });
+
+  it('does not return getInfiniteQueryData() from non Infinite query', async () => {
+    const queryClient = new QueryClient();
+
+    const parameters = {
+      header: {
+        'x-monite-version': '1.0.0',
+      },
+      query: {
+        id__in: ['1', '2'],
+      },
+    };
+
+    qraft.files.getFiles.setQueryData(
+      parameters,
+      {
+        header: {
+          'x-monite-version': '1.0.0',
+        },
+        query: {
+          id__in: ['1', '2'],
+        },
+      },
+      queryClient
+    );
+
+    expect(
+      qraft.files.getFiles.getInfiniteQueryData(parameters, queryClient)
+    ).not.toBeDefined();
   });
 });
 
