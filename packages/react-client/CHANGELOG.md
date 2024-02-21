@@ -1,5 +1,13 @@
 # @openapi-qraft/react
 
+## 1.0.4
+
+### Patch Changes
+
+- c02aade: feature: Improve `queryFn({queryKey})` usage and handling
+- d3420eb: feature: Add `method` to `queryKey`
+- ab3ac31: feature: Add services output types: `types={parameters, data, error, body}`
+
 ## 1.0.3
 
 ### Patch Changes
