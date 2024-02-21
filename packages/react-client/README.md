@@ -395,6 +395,17 @@ Supported Suspense Queries are:
 - [useSuspenseQuery 🔗](https://tanstack.com/query/latest/docs/framework/react/reference/useSuspenseQuery)
 - [useSuspenseInfiniteQuery 🔗](https://tanstack.com/query/latest/docs/framework/react/reference/useSuspenseInfiniteQuery)
 
+### Documentation in Progress 🚧
+
+- `getQueryKey(parameters)`
+- `getQueryData(parameters)`
+- `setQueryData(parameters, updater)`
+- `getInfiniteQueryKey(parameters)`
+- `getInfinityQueryData(parameters)`
+- `setInfinityQueryData(parameters, updater)`
+- `schema` - object with schema: `{method, url, mediaType}`
+- `types` - object with types: `{parameters, data, error, body}`
+
 ## Contributing
 
 Contributions are welcome! If you have suggestions or want to improve `@openapi-qraft/react`, please feel free to submit
