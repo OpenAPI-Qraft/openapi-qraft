@@ -12,11 +12,11 @@ export function setQueryData<TData>(
     ServiceOperationQuery<RequestClientSchema, unknown, TData>['setQueryData']
   >
 ): TData | undefined {
-  const [params, updater, queryClient, options] = args;
+  const [parameters, updater, queryClient, options] = args;
 
   const queryKey: ServiceOperationQueryKey<RequestClientSchema, unknown> = [
-    { url: schema.url },
-    params,
+    { url: schema.url, method: schema.method },
+    parameters,
   ];
 
   return queryClient.setQueryData(queryKey, updater as never, options);

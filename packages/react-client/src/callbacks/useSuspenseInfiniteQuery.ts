@@ -36,7 +36,7 @@ export const useSuspenseInfiniteQuery: <
   schema,
   args
 ) => {
-  const [params, options, ...restArgs] = args;
+  const [parameters, options, ...restArgs] = args;
 
   const requestClient = useContext(qraftOptions?.context ?? QraftContext)
     ?.requestClient;
@@ -46,7 +46,10 @@ export const useSuspenseInfiniteQuery: <
   return useSuspenseInfiniteQueryTanstack(
     {
       ...options,
-      queryKey: [{ url: schema.url, infinite: true }, params as never] as const,
+      queryKey: [
+        { url: schema.url, method: schema.method, infinite: true },
+        parameters as never,
+      ] as const,
       queryFn:
         options?.queryFn ??
         function ({ queryKey: [, queryParams], signal, meta, pageParam }) {

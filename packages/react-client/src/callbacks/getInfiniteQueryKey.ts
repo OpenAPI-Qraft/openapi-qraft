@@ -17,7 +17,7 @@ export const getInfiniteQueryKey = (
   >
 ) => {
   return [
-    { url: schema.url, infinite: true },
+    { url: schema.url, method: schema.method, infinite: true },
     args[0],
   ] satisfies ServiceOperationInfiniteQueryKey<RequestClientSchema, unknown>;
 };

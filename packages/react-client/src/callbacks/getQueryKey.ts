@@ -12,8 +12,8 @@ export const getQueryKey = (
     ServiceOperationQuery<RequestClientSchema, unknown, unknown>['getQueryKey']
   >
 ) => {
-  return [{ url: schema.url }, args[0]] satisfies ServiceOperationQueryKey<
-    RequestClientSchema,
-    unknown
-  >;
+  return [
+    { url: schema.url, method: schema.method },
+    args[0],
+  ] satisfies ServiceOperationQueryKey<RequestClientSchema, unknown>;
 };

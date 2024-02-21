@@ -12,9 +12,9 @@ export function getQueryData<TData>(
     ServiceOperationQuery<RequestClientSchema, unknown, TData>['getQueryData']
   >
 ): TData | undefined {
-  const [params, queryClient] = args;
+  const [parameters, queryClient] = args;
   return queryClient.getQueryData([
-    { url: schema.url },
-    params,
+    { url: schema.url, method: schema.method },
+    parameters,
   ] satisfies ServiceOperationQueryKey<RequestClientSchema, unknown>);
 }

@@ -31,7 +31,7 @@ export const useSuspenseQuery: <
     >['useSuspenseQuery']
   >
 ) => UseQueryResult<TData, TError> = (qraftOptions, schema, args) => {
-  const [params, options, ...restArgs] = args;
+  const [parameters, options, ...restArgs] = args;
 
   const requestClient = useContext(qraftOptions?.context ?? QraftContext)
     ?.requestClient;
@@ -39,8 +39,8 @@ export const useSuspenseQuery: <
   if (!requestClient) throw new Error(`QraftContext.requestClient not found`);
 
   const queryKey: ServiceOperationQueryKey<RequestClientSchema, unknown> = [
-    { url: schema.url },
-    params,
+    { url: schema.url, method: schema.method },
+    parameters,
   ];
 
   return useSuspenseQueryTanstack(

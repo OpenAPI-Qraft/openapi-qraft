@@ -35,7 +35,7 @@ export const useQueries: (
       queries: options.queries.map(({ parameters, ...queryOptions }) => ({
         ...queryOptions,
         queryKey: [
-          { url: schema.url },
+          { url: schema.url, method: schema.method },
           parameters,
         ] satisfies ServiceOperationQueryKey<RequestClientSchema, unknown>,
         queryFn:

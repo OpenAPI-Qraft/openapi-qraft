@@ -29,15 +29,15 @@ import {
   UseSuspenseQueryResult,
 } from '@tanstack/react-query';
 
-export type ServiceOperationQueryKey<S extends { url: string }, T> = [
-  Pick<S, 'url'>,
+export type ServiceOperationQueryKey<
+  S extends { url: string; method: string },
   T,
-];
+> = [Pick<S, 'url' | 'method'>, T];
 
-export type ServiceOperationInfiniteQueryKey<S extends { url: string }, T> = [
-  Pick<S, 'url'> & { infinite: true },
+export type ServiceOperationInfiniteQueryKey<
+  S extends { url: string; method: string },
   T,
-];
+> = [Pick<S, 'url' | 'method'> & { infinite: true }, T];
 
 export type ServiceOperationMutationKey<
   S extends Record<'url' | 'method', string>,

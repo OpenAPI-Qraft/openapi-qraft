@@ -18,9 +18,9 @@ export function getInfiniteQueryData<TData>(
     >['getInfiniteQueryData']
   >
 ): InfiniteData<TData> | undefined {
-  const [params, queryClient] = args;
+  const [parameters, queryClient] = args;
   return queryClient.getQueryData([
-    { url: schema.url, infinite: true },
-    params,
+    { url: schema.url, method: schema.method, infinite: true },
+    parameters,
   ] satisfies ServiceOperationInfiniteQueryKey<RequestClientSchema, unknown>);
 }

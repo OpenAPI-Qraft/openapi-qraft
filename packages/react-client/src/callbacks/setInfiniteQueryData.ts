@@ -18,12 +18,12 @@ export function setInfiniteQueryData<TData>(
     >['setInfiniteQueryData']
   >
 ): InfiniteData<TData> | undefined {
-  const [params, updater, queryClient, options] = args;
+  const [parameters, updater, queryClient, options] = args;
 
   const queryKey: ServiceOperationInfiniteQueryKey<
     RequestClientSchema,
     unknown
-  > = [{ url: schema.url, infinite: true }, params];
+  > = [{ url: schema.url, method: schema.method, infinite: true }, parameters];
 
   return queryClient.setQueryData(queryKey, updater as never, options);
 }
