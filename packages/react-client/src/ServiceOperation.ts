@@ -114,10 +114,7 @@ interface ServiceOperationUseQueries<
   TError = DefaultError,
 > {
   useQueries<TCombinedResult = Array<UseQueryResult<TData, TError>>>(
-    {
-      queries,
-      ...options
-    }: {
+    options: {
       queries: ReadonlyArray<
         Omit<
           UseQueryOptions<
