@@ -286,10 +286,7 @@ interface ServiceOperationUseMutation<
       UseMutationOptions<TData, TError, TVariables, TContext>,
       'mutationKey'
     > & {
-      mutationKey?: ServiceOperationMutationKey<
-        TSchema,
-        NonNullable<TParams> extends never ? {} : TParams
-      >;
+      mutationKey?: ServiceOperationMutationKey<TSchema, TParams>;
     },
     queryClient?: QueryClient
   ): UseMutationResult<TData, TError | Error, TVariables, TContext>;
@@ -304,14 +301,13 @@ interface ServiceOperationUseMutation<
   ): UseMutationResult<TData, TError | Error, TVariables, TContext>;
 }
 
-type MutationFilters<
-  TSchema extends { url: string; method: string },
+interface UseMutationStateFiltersBase<
   TBody,
   TData,
   TParams,
   TError = DefaultError,
   TContext = unknown,
-> = {
+> {
   /**
    * Match mutation key exactly
    */
@@ -332,23 +328,34 @@ type MutationFilters<
    * Filter by mutation status
    */
   status?: MutationStatus;
-} & (
-  | {
-      /**
-       * Include mutations matching this mutation key
-       */
-      mutationKey?: ServiceOperationMutationKey<
-        TSchema,
-        PartialParams<TParams>
-      >;
-    }
-  | {
-      /**
-       * Include mutations matching these parameters
-       */
-      parameters?: PartialParams<TParams>;
-    }
-);
+}
+
+interface UseMutationStateFiltersByParameters<
+  TBody,
+  TData,
+  TParams,
+  TError = DefaultError,
+  TContext = unknown,
+> extends UseMutationStateFiltersBase<TBody, TData, TParams, TError, TContext> {
+  /**
+   * Include mutations matching these parameters
+   */
+  parameters?: PartialParams<TParams>;
+}
+
+interface UseMutationStateFiltersByMutationKey<
+  TSchema extends { url: string; method: string },
+  TBody,
+  TData,
+  TParams,
+  TError = DefaultError,
+  TContext = unknown,
+> extends UseMutationStateFiltersBase<TBody, TData, TParams, TError, TContext> {
+  /**
+   * Include mutations matching this mutation key
+   */
+  mutationKey?: ServiceOperationMutationKey<TSchema, PartialParams<TParams>>;
+}
 
 type MutationVariables<TBody, TParams> = {
   body: TBody;
@@ -371,14 +378,22 @@ interface ServiceOperationUseMutationState<
     >,
   >(
     options?: {
-      filters?: MutationFilters<
-        TSchema,
-        TBody,
-        TData,
-        TParams,
-        TError,
-        TContext
-      >;
+      filters?:
+        | UseMutationStateFiltersByParameters<
+            TBody,
+            TData,
+            TParams,
+            TError,
+            TContext
+          >
+        | UseMutationStateFiltersByMutationKey<
+            TSchema,
+            TBody,
+            TData,
+            TParams,
+            TError,
+            TContext
+          >;
       select?: (
         mutation: Mutation<
           TData,
@@ -392,6 +407,31 @@ interface ServiceOperationUseMutationState<
   ): Array<TResult>;
 }
 
+interface QueryFnOptionsBase<
+  TMeta extends Record<string, any>,
+  TSignal extends AbortSignal = AbortSignal,
+> {
+  signal?: TSignal;
+  meta?: TMeta;
+}
+
+interface QueryFnOptionsByParameters<
+  TParams,
+  TMeta extends Record<string, any>,
+  TSignal extends AbortSignal = AbortSignal,
+> extends QueryFnOptionsBase<TMeta, TSignal> {
+  parameters: TParams;
+}
+
+interface QueryFnOptionsByQueryKey<
+  TSchema extends { url: string; method: string },
+  TParams,
+  TMeta extends Record<string, any>,
+  TSignal extends AbortSignal = AbortSignal,
+> extends QueryFnOptionsBase<TMeta, TSignal> {
+  queryKey: ServiceOperationQueryKey<TSchema, TParams>;
+}
+
 interface ServiceOperationQueryFn<
   TSchema extends { url: string; method: string },
   TData,
@@ -401,10 +441,9 @@ interface ServiceOperationQueryFn<
     TMeta extends Record<string, any>,
     TSignal extends AbortSignal = AbortSignal,
   >(
-    options: { signal?: TSignal; meta?: TMeta } & (
-      | { queryKey: ServiceOperationQueryKey<TSchema, TParams> }
-      | { parameters: TParams }
-    ),
+    options:
+      | QueryFnOptionsByParameters<TParams, TMeta, TSignal>
+      | QueryFnOptionsByQueryKey<TSchema, TParams, TMeta, TSignal>,
     client: (
       schema: TSchema,
       options: {
@@ -419,10 +458,9 @@ interface ServiceOperationQueryFn<
     TMeta extends Record<string, any>,
     TSignal extends AbortSignal = AbortSignal,
   >(
-    options: { signal?: TSignal; meta?: TMeta } & (
-      | { queryKey: ServiceOperationQueryKey<TSchema, TParams> }
-      | { parameters: TParams }
-    ),
+    options:
+      | QueryFnOptionsByParameters<TParams, TMeta, TSignal>
+      | QueryFnOptionsByQueryKey<TSchema, TParams, TMeta, TSignal>,
     client: (
       schema: TSchema,
       options: {
