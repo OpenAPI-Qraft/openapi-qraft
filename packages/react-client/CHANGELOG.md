@@ -1,5 +1,11 @@
 # @openapi-qraft/react
 
+## 1.0.8
+
+### Patch Changes
+
+- 9018be7: feature: Add support for `useQueries(..)` hook
+
 ## 1.0.7
 
 ### Patch Changes

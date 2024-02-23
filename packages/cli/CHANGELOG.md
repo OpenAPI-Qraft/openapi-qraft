@@ -1,5 +1,11 @@
 # @openapi-qraft/cli
 
+## 1.0.4
+
+### Patch Changes
+
+- 9018be7: feature: Add support for `useQueries(..)` hook
+
 ## 1.0.3
 
 ### Patch Changes
