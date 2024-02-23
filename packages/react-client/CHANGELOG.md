@@ -1,5 +1,11 @@
 # @openapi-qraft/react
 
+## 1.0.6
+
+### Patch Changes
+
+- 128465a: refactor: Change npm "files"
+
 ## 1.0.5
 
 ### Patch Changes

@@ -1,5 +1,11 @@
 # @openapi-qraft/cli
 
+## 1.0.3
+
+### Patch Changes
+
+- 128465a: refactor: Change npm "files"
+
 ## 1.0.2
 
 ### Patch Changes
