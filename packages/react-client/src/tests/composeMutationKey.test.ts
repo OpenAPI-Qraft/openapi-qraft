@@ -1,4 +1,4 @@
-import { composeMutationKey } from './composeMutationKey.js';
+import { composeMutationKey } from '../lib/composeMutationKey.js';
 
 describe('composeMutationKey', () => {
   it('should return mutation key with parameters', () => {

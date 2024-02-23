@@ -41,6 +41,7 @@ export const handlers = [
     ServiceResponseParameters<Services['entities']['postEntitiesIdDocuments']>
   >(
     openApiToMswPath(services.entities.postEntitiesIdDocuments.schema.url),
+    // @ts-expect-error
     async ({ params: { '0': _, ...path }, request }) => {
       const query = getQueryParameters<
         Services['entities']['postEntitiesIdDocuments']

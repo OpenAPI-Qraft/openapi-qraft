@@ -7,11 +7,8 @@
   },
   "include": ["src/**/*"],
   "exclude": [
-    "src/setupTests.ts",
-    "src/**/*.test.ts",
-    "src/**/*.test.tsx",
-    "src/mocks/**/*",
-    "src/fixtures/**/*",
-    "vitest.config.ts"
+    "**/node_modules",
+    "**/.*/",
+    "src/tests/**/*"
   ]
 }

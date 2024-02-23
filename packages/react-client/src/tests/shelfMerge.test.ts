@@ -1,4 +1,4 @@
-import { shelfMerge } from './shelfMerge.js';
+import { shelfMerge } from '../lib/shelfMerge.js';
 
 describe('shelfMerge', () => {
   it('merges simple objects', async () => {

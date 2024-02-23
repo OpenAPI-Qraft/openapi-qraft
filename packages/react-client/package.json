@@ -4,11 +4,11 @@
   "description": "API client for React, providing type-safe requests and dynamic Tanstack Query React Hooks via a modular, Proxy-based architecture.",
   "scripts": {
     "build": "rimraf dist/ && tsc --project tsconfig.build.json",
-    "dev": "rimraf dist/ && tsc --project tsconfig.dev.json --watch",
+    "dev": "rimraf dist/ && tsc --project tsconfig.build.json --watch",
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
-    "generate-qraft": "openapi-qraft ./src/fixtures/openapi.json --clean -o src/fixtures/api --openapi-types-import-path '../../openapi.js' --explicit-import-extensions",
-    "generate-types": "openapi-qraft-typescript ./src/fixtures/openapi.json -o src/fixtures/openapi.ts"
+    "generate-qraft": "openapi-qraft src/tests/fixtures/openapi.json --clean -o src/tests/fixtures/api --openapi-types-import-path '../../openapi.js' --explicit-import-extensions",
+    "generate-types": "openapi-qraft-typescript src/tests/fixtures/openapi.json -o src/tests/fixtures/openapi.ts"
   },
   "type": "module",
   "sideEffects": false,

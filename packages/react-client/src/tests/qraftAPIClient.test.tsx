@@ -8,10 +8,14 @@ import {
 } from '@tanstack/react-query';
 import { act, renderHook, waitFor } from '@testing-library/react';
 
+import type { RequestClient } from '../index.js';
+import {
+  bodySerializer,
+  QraftContextValue,
+  request,
+  urlSerializer,
+} from '../index.js';
 import { createAPIClient } from './fixtures/api/index.js';
-import { bodySerializer, request, urlSerializer } from './lib/request.js';
-import { QraftContextValue } from './QraftContext.js';
-import type { RequestClient } from './RequestClient.js';
 
 const qraft = createAPIClient();
 
