@@ -134,7 +134,7 @@ describe('Qraft uses singular Query', () => {
   });
 });
 
-describe('Qraft uses Suspense Queries', () => {
+describe('Qraft uses Suspense Query', () => {
   it('supports useSuspenseQuery', async () => {
     const hook = () => {
       try {
