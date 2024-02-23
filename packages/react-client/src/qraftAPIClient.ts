@@ -9,20 +9,10 @@ export type QraftClientOptions = {
 };
 
 export const qraftAPIClient = <
-  Services extends {
-    [service in keyof Services]: {
-      [method in keyof Services[service]]: { schema: RequestClientSchema };
-    };
-  },
-  Callbacks extends Record<string, (...rest: any[]) => any>,
+  Services extends ServicesOutput<Services>,
+  Callbacks extends ServicesCallbacks,
 >(
-  services: {
-    [service in keyof Services]: {
-      [method in keyof Services[service]]: {
-        schema: Services[service][method]['schema'];
-      };
-    };
-  },
+  services: ServicesDeclaration<Services>,
   callbacks: Callbacks,
   options?: QraftClientOptions
 ): ServicesCallbacksFilter<Services, keyof Callbacks> => {
@@ -59,7 +49,26 @@ function getByPath(obj: Record<string, unknown>, path: string[]) {
   }, obj);
 }
 
-type ServicesCallbacksFilter<Services, Callbacks> = Services extends {
+type ServicesOutput<Services> = {
+  [service in keyof Services]: {
+    [method in keyof Services[service]]: { schema: RequestClientSchema };
+  };
+};
+
+type ServicesDeclaration<Services extends ServicesOutput<Services>> = {
+  [service in keyof Services]: {
+    [method in keyof Services[service]]: {
+      schema: Services[service][method]['schema'];
+    };
+  };
+};
+
+type ServicesCallbacks = Record<string, (...rest: any[]) => any>;
+
+type ServicesCallbacksFilter<
+  Services extends ServicesOutput<Services>,
+  Callbacks,
+> = Services extends {
   [serviceName in keyof Services]: {
     [method in keyof Services[serviceName]]: { schema: RequestClientSchema };
   };
