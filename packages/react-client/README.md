@@ -403,6 +403,7 @@ Supported Suspense Queries are:
 
 - [useSuspenseQuery 🔗](https://tanstack.com/query/latest/docs/framework/react/reference/useSuspenseQuery)
 - [useSuspenseInfiniteQuery 🔗](https://tanstack.com/query/latest/docs/framework/react/reference/useSuspenseInfiniteQuery)
+- [useSuspenseQueries 🔗](https://tanstack.com/query/latest/docs/framework/react/reference/useSuspenseQueries)
 
 ### Documentation in Progress 🚧
 

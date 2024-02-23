@@ -51,6 +51,7 @@ export interface ServiceOperationQuery<
   TError = DefaultError,
 > extends ServiceOperationUseQuery<TSchema, TData, TParams, TError>,
     ServiceOperationUseQueries<TSchema, TData, TParams, TError>,
+    ServiceOperationUseSuspenseQueries<TSchema, TData, TParams, TError>,
     ServiceOperationUseInfiniteQuery<TSchema, TData, TParams, TError>,
     ServiceOperationUseSuspenseQueryQuery<TSchema, TData, TParams, TError>,
     ServiceOperationUseSuspenseInfiniteQuery<TSchema, TData, TParams, TError>,
@@ -132,6 +133,36 @@ interface ServiceOperationUseQueries<
       >;
       combine?: (
         results: Array<UseQueryResult<TData, TError>>
+      ) => TCombinedResult;
+    },
+    queryClient?: QueryClient
+  ): TCombinedResult;
+}
+
+interface ServiceOperationUseSuspenseQueries<
+  TSchema extends { url: string; method: string },
+  TData,
+  TParams = {},
+  TError = DefaultError,
+> {
+  useSuspenseQueries<
+    TCombinedResult = Array<UseSuspenseQueryResult<TData, TError>>,
+  >(
+    options: {
+      queries: ReadonlyArray<
+        Omit<
+          UseSuspenseQueryOptions<
+            TData,
+            TError,
+            TData,
+            | ServiceOperationQueryKey<TSchema, TParams>
+            | readonly [...ServiceOperationQueryKey<TSchema, TParams>]
+          >,
+          'queryKey'
+        > & { parameters: TParams }
+      >;
+      combine?: (
+        results: Array<UseSuspenseQueryResult<TData, TError>>
       ) => TCombinedResult;
     },
     queryClient?: QueryClient

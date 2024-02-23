@@ -231,6 +231,69 @@ describe('Qraft uses Queries', () => {
   });
 });
 
+describe('Qraft uses Suspense Queries', () => {
+  it('supports useSuspenseQueries', async () => {
+    const hook = () => {
+      try {
+        return qraft.approvalPolicies.getApprovalPoliciesId.useSuspenseQueries({
+          queries: [
+            {
+              parameters: {
+                header: {
+                  'x-monite-version': '1.0.0',
+                },
+                path: {
+                  approval_policy_id: '1',
+                },
+                query: {
+                  items_order: ['asc', 'desc'],
+                },
+              },
+            },
+          ],
+          combine: (results) => results.map((result) => result.data),
+        });
+      } catch (error) {
+        return error as Promise<unknown>;
+      }
+    };
+
+    const queryClient = new QueryClient();
+
+    const { result: resultWithErrorPromise } = renderHook(hook, {
+      wrapper: (props) => <Providers {...props} queryClient={queryClient} />,
+    });
+
+    expect(resultWithErrorPromise.current).toBeInstanceOf(Promise); // Suspense throws a promise
+
+    await resultWithErrorPromise.current;
+
+    const { result: resultWithData } = renderHook(hook, {
+      wrapper: (props) => <Providers {...props} queryClient={queryClient} />,
+    });
+
+    if (resultWithData.current instanceof Promise) {
+      throw new Error('Promise should be resolved');
+    }
+
+    await waitFor(() => {
+      expect(resultWithData.current).toEqual([
+        {
+          header: {
+            'x-monite-version': '1.0.0',
+          },
+          path: {
+            approval_policy_id: '1',
+          },
+          query: {
+            items_order: ['asc', 'desc'],
+          },
+        },
+      ]);
+    });
+  });
+});
+
 describe('Qraft uses Infinite Queries', () => {
   it('supports useInfiniteQuery', async () => {
     const { result } = renderHook(
@@ -430,9 +493,9 @@ describe('Qraft uses Suspense Infinite Queries', () => {
 
     const queryClient = new QueryClient();
 
-    const { result } = renderHook(hook, {
+    /*const { result } = renderHook(hook, {
       wrapper: (props) => <Providers {...props} queryClient={queryClient} />,
-    });
+    });*/
 
     const { result: resultWithErrorPromise } = renderHook(hook, {
       wrapper: (props) => <Providers {...props} queryClient={queryClient} />,
