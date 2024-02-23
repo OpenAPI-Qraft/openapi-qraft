@@ -11,6 +11,7 @@ import { setQueryData } from '@openapi-qraft/react/callbacks/setQueryData';
 import { useInfiniteQuery } from '@openapi-qraft/react/callbacks/useInfiniteQuery';
 import { useMutation } from '@openapi-qraft/react/callbacks/useMutation';
 import { useQuery } from '@openapi-qraft/react/callbacks/useQuery';
+import { useQueryClient } from '@tanstack/react-query';
 
 import { Services, services } from './api';
 import { MONITE_VERSION } from './constants.ts';
@@ -33,6 +34,17 @@ const callbacks = {
 const qraft = qraftAPIClient<Services, typeof callbacks>(services, callbacks);
 
 function App() {
+  const queryClient = useQueryClient();
+
+  qraft.entityUsers.getEntityUsersMe.getQueryData(
+    {
+      header: {
+        'x-monite-version': MONITE_VERSION,
+      },
+    } as const,
+    queryClient
+  );
+
   const { data } = qraft.entityUsers.getEntityUsersMe.useQuery({
     header: {
       'x-monite-version': MONITE_VERSION,
