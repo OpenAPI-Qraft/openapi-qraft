@@ -1,5 +1,12 @@
 # @openapi-qraft/react
 
+## 1.0.7
+
+### Patch Changes
+
+- bf0c4c7: chore: Add 'use client' to `QraftContext.ts`
+- 26980c7: docs: Update README.md
+
 ## 1.0.6
 
 ### Patch Changes

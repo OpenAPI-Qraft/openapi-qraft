@@ -1,5 +1,13 @@
 # playground
 
+## 0.0.7
+
+### Patch Changes
+
+- Updated dependencies [bf0c4c7]
+- Updated dependencies [26980c7]
+  - @openapi-qraft/react@1.0.7
+
 ## 0.0.6
 
 ### Patch Changes
