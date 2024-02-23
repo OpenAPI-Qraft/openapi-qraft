@@ -73,7 +73,7 @@ safety and auto-completion features.
 Now, create the API Client to utilize typed React Hooks for your API endpoints.
 
 ```ts
-/** '--output-dir' path to your generated services **/
+// where `./api` is the '--output-dir' path to the services you generated
 import { createAPIClient } from './api';
 
 const qraft = createAPIClient();
@@ -92,8 +92,19 @@ Every request will be handled by `requestClient`, which can be customized to fit
 ```tsx
 import { useMemo } from 'react';
 
-import { request, bodySerializer, urlSerializer } from '@openapi-qraft/react';
+import {
+  request,
+  bodySerializer,
+  urlSerializer,
+  QraftContext,
+} from '@openapi-qraft/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+
+// where `./api` is the '--output-dir' path to the services you generated
+import { createAPIClient } from './api';
+
+// create a client anywhere
+const qraft = createAPIClient();
 
 function Providers({ children }: { children: React.ReactNode }) {
   const queryClient = useMemo(() => new QueryClient(), []);
@@ -105,11 +116,9 @@ function Providers({ children }: { children: React.ReactNode }) {
           /**
            * Request client will be invoked for every request
            */
-          requestClient(schema, options) {
+          async requestClient(schema, options) {
             return request(
-              {
-                baseUrl: 'https://api.sandbox.monite.com/v1',
-              },
+              { baseUrl: 'https://api.sandbox.monite.com/v1' },
               {
                 ...schema,
                 ...options,
