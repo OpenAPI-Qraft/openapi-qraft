@@ -32,19 +32,17 @@ import {
 export type ServiceOperationQueryKey<
   S extends { url: string; method: string },
   T,
-> = [Pick<S, 'url' | 'method'>, T];
+> = [S, T];
 
 export type ServiceOperationInfiniteQueryKey<
   S extends { url: string; method: string },
   T,
-> = [Pick<S, 'url' | 'method'> & { infinite: true }, T];
+> = [S & { infinite: true }, T];
 
 export type ServiceOperationMutationKey<
   S extends Record<'url' | 'method', string>,
   T extends unknown,
-> = NonNullable<T> extends never
-  ? [Pick<S, 'url' | 'method'>]
-  : [Pick<S, 'url' | 'method'>, T];
+> = NonNullable<T> extends never ? [S] : [S, T];
 
 export interface ServiceOperationQuery<
   TSchema extends { url: string; method: string },
