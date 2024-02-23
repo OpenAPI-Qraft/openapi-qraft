@@ -1,8 +1,12 @@
 import React, { ReactNode, useCallback, useRef } from 'react';
 import ReactDOM from 'react-dom/client';
 
-import { request } from '@radist2s/qraft/lib/core/request';
-import { QueryCraftContext } from '@radist2s/qraft/QueryCraftContext';
+import {
+  bodySerializer,
+  QraftContext,
+  request,
+  urlSerializer,
+} from '@openapi-qraft/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 import App from './App.tsx';
@@ -15,31 +19,29 @@ const Providers = ({ children }: { children: ReactNode }) => {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <QueryCraftContext.Provider
+      <QraftContext.Provider
         value={{
-          client: async (schema, { signal, body, parameters }) => {
+          async requestClient(schema, options) {
             const { access_token } = await fetchAppToken();
 
             return request(
               {
                 baseUrl: 'https://api.sandbox.monite.com/v1',
-                version: MONITE_VERSION,
               },
               {
                 ...schema,
-                parameters,
-                body,
-                signal,
+                ...options,
                 headers: {
                   Authorization: `Bearer ${access_token}`,
                 },
-              }
+              },
+              { urlSerializer, bodySerializer }
             );
           },
         }}
       >
         {children}
-      </QueryCraftContext.Provider>
+      </QraftContext.Provider>
     </QueryClientProvider>
   );
 };
