@@ -1,5 +1,11 @@
 # @openapi-qraft/react
 
+## 1.0.5
+
+### Patch Changes
+
+- 3694231: refactor: Optimize types
+
 ## 1.0.4
 
 ### Patch Changes
