@@ -7,7 +7,7 @@
     "dev": "rimraf dist/ && tsc --project tsconfig.build.json --watch",
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
-    "generate-qraft": "openapi-qraft src/tests/fixtures/openapi.json --clean -o src/tests/fixtures/api --openapi-types-import-path '../../openapi.js' --explicit-import-extensions",
+    "generate-qraft": "openapi-qraft src/tests/fixtures/openapi.json --clean -o src/tests/fixtures/api --openapi-types-import-path '../../openapi.js' --explicit-import-extensions && prettier --write src/tests/fixtures/api/**/*.ts",
     "generate-types": "openapi-qraft-typescript src/tests/fixtures/openapi.json -o src/tests/fixtures/openapi.ts"
   },
   "type": "module",
