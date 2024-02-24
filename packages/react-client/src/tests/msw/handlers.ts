@@ -41,7 +41,6 @@ export const handlers = [
     ServiceResponseParameters<Services['entities']['postEntitiesIdDocuments']>
   >(
     openApiToMswPath(services.entities.postEntitiesIdDocuments.schema.url),
-    // @ts-expect-error
     async ({ params: { '0': _, ...path }, request }) => {
       const query = getQueryParameters<
         Services['entities']['postEntitiesIdDocuments']
@@ -171,7 +170,7 @@ type ServiceHeaderParameters<
   : T extends {
         getMutationKey: (arg: infer MutationKey) => unknown;
       }
-    ? MutationKey extends { header?: infer Parameters }
+    ? NonNullable<MutationKey> extends { header?: infer Parameters }
       ? Parameters
       : unknown
     : never;
@@ -193,7 +192,7 @@ type ServicePathParameters<
   : T extends {
         getMutationKey: (arg: infer MutationKey) => unknown;
       }
-    ? MutationKey extends { path?: infer Parameters }
+    ? NonNullable<MutationKey> extends { path?: infer Parameters }
       ? Parameters & { 0: string }
       : {}
     : never;
@@ -215,7 +214,7 @@ type ServiceQueryParameters<
   : T extends {
         getMutationKey: (arg: infer MutationKey) => unknown;
       }
-    ? MutationKey extends { query?: infer Parameters }
+    ? NonNullable<MutationKey> extends { query?: infer Parameters }
       ? Parameters
       : unknown
     : never;
