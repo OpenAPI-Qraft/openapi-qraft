@@ -9,11 +9,12 @@
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",
-    "generate-openapi": "openapi-qraft-typescript ./schema.json -o ./schema.d.ts",
-    "generate": "openapi-qraft ./schema.json --clean -o src/api --openapi-types-import-path '../../../schema.d.ts'"
+    "generate-openapi": "openapi-qraft-typescript https://petstore3.swagger.io/api/v3/openapi.json -o ./schema.d.ts",
+    "generate": "openapi-qraft https://petstore3.swagger.io/api/v3/openapi.json --clean -o src/api --openapi-types-import-path '../../../schema.d.ts'"
   },
   "dependencies": {
     "@openapi-qraft/react": "workspace:~",
+    "constate": "^3.3.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },

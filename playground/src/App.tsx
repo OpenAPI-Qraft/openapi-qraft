@@ -1,57 +1,218 @@
-import { qraftAPIClient } from '@openapi-qraft/react';
-import { getInfiniteQueryData } from '@openapi-qraft/react/callbacks/getInfiniteQueryData';
-import { getInfiniteQueryKey } from '@openapi-qraft/react/callbacks/getInfiniteQueryKey';
-import { getMutationKey } from '@openapi-qraft/react/callbacks/getMutationKey';
-import { getQueryData } from '@openapi-qraft/react/callbacks/getQueryData';
-import { getQueryKey } from '@openapi-qraft/react/callbacks/getQueryKey';
-import { mutationFn } from '@openapi-qraft/react/callbacks/mutationFn';
-import { queryFn } from '@openapi-qraft/react/callbacks/queryFn';
-import { setInfiniteQueryData } from '@openapi-qraft/react/callbacks/setInfiniteQueryData';
-import { setQueryData } from '@openapi-qraft/react/callbacks/setQueryData';
-import { useInfiniteQuery } from '@openapi-qraft/react/callbacks/useInfiniteQuery';
-import { useMutation } from '@openapi-qraft/react/callbacks/useMutation';
-import { useQuery } from '@openapi-qraft/react/callbacks/useQuery';
+import { useState } from 'react';
+
 import { useQueryClient } from '@tanstack/react-query';
 
-import { Services, services } from './api';
-import { MONITE_VERSION } from './constants.ts';
+import constate from 'constate';
 
-const callbacks = {
-  getInfiniteQueryData,
-  getInfiniteQueryKey,
-  getMutationKey,
-  getQueryData,
-  getQueryKey,
-  mutationFn,
-  queryFn,
-  setInfiniteQueryData,
-  setQueryData,
-  useInfiniteQuery,
-  useMutation,
-  useQuery,
-} as const;
+import { components } from '../schema';
+import { createAPIClient } from './api';
 
-const qraft = qraftAPIClient<Services, typeof callbacks>(services, callbacks);
+const qraft = createAPIClient();
 
 function App() {
-  const queryClient = useQueryClient();
+  return (
+    <div style={{ display: 'flex', flexFlow: 'column', gap: 20 }}>
+      <PetListFilter />
+      <PetList />
+    </div>
+  );
+}
 
-  qraft.entityUsers.getEntityUsersMe.getQueryData(
-    {
-      header: {
-        'x-monite-version': MONITE_VERSION,
-      },
-    } as const,
-    queryClient
+function PetListFilter() {
+  const { status, setStatus } = useFilterStatus();
+  return (
+    <div>
+      <label htmlFor="status">Select Status:</label>
+      <select
+        name="status"
+        value={status}
+        onChange={(event) => {
+          setStatus(event.target.value as typeof status);
+        }}
+      >
+        <option value="available">Available</option>
+        <option value="pending">Pending</option>
+        <option value="sold">Sold</option>
+      </select>
+    </div>
+  );
+}
+
+function PetList() {
+  const { status } = useFilterStatus();
+  const { petId } = usePetForm();
+  const { data, isPending } = qraft.pet.findPetsByStatus.useQuery({
+    query: { status },
+  });
+  const {
+    data: petById,
+    isPending: isPetByIdPending,
+    error: petByIdError,
+  } = qraft.pet.getPetById.useQuery(
+    { path: { petId: petId ?? 0 } },
+    { enabled: !!petId }
   );
 
-  const { data } = qraft.entityUsers.getEntityUsersMe.useQuery({
-    header: {
-      'x-monite-version': MONITE_VERSION,
+  if (isPending) return <div>Loading...</div>;
+
+  if (petId) {
+    if (isPetByIdPending)
+      return (
+        <div>
+          Loading <strong>{petId}</strong>...
+        </div>
+      );
+
+    if (petById) return <PetForm pet={petById} />;
+
+    if (petByIdError)
+      return (
+        <div>
+          Error:{' '}
+          {petByIdError instanceof Error
+            ? petByIdError.message
+            : JSON.stringify(petByIdError)}
+        </div>
+      );
+  }
+
+  return (
+    <div
+      style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
+        gridAutoRows: 'auto',
+        gap: 20,
+      }}
+    >
+      {data?.map((pet) => <PetCard key={pet.id} pet={pet} />)}
+    </div>
+  );
+}
+
+function PetCard({ pet }: { pet: components['schemas']['Pet'] }) {
+  const { setPetId } = usePetForm();
+
+  return (
+    <div
+      key={pet.id}
+      style={{
+        border: '1px solid',
+        padding: 10,
+        position: 'relative',
+      }}
+    >
+      <dl>
+        <dt>Name:</dt>
+        <dd>{pet.name}</dd>
+        <dt>ID:</dt>
+        <dd>{pet.id}</dd>
+        <dt>Category:</dt>
+        <dd>{pet.category?.name}</dd>
+        <dt>Status:</dt>
+        <dd>{pet.status}</dd>
+      </dl>
+
+      <button
+        style={{ right: 10, top: 10, position: 'absolute' }}
+        onClick={(event) => {
+          event.preventDefault();
+          if (!pet.id) throw new Error('pet.id not found');
+          setPetId(pet.id);
+        }}
+      >
+        Edit
+      </button>
+    </div>
+  );
+}
+
+function PetForm({ pet }: { pet: components['schemas']['Pet'] }) {
+  const { setPetId } = usePetForm();
+
+  const queryClient = useQueryClient();
+  const { isPending, mutate } = qraft.pet.updatePet.useMutation(undefined, {
+    async onSuccess() {
+      await queryClient.invalidateQueries({
+        queryKey: qraft.pet.findPetsByStatus.getQueryKey({}),
+      });
+      setPetId(null);
     },
   });
 
-  return <>{data?.first_name}</>;
+  return (
+    <form
+      id="updatePetForm"
+      style={{ display: 'flex', flexFlow: 'column', gap: 10, maxWidth: 300 }}
+      onSubmit={(event) => {
+        event.preventDefault();
+        const formData = new FormData(event.currentTarget);
+        mutate({
+          body: {
+            id: pet.id,
+            photoUrls: pet.photoUrls, // required by schema
+            status: formData.get('status') as typeof pet.status,
+            name: formData.get('name') as typeof pet.name,
+          },
+        });
+      }}
+    >
+      <label>
+        Pet ID: <strong>{pet.id}</strong>
+      </label>
+
+      <label htmlFor="name">Name:</label>
+      <input
+        readOnly={isPending}
+        aria-busy={isPending}
+        type="text"
+        id="name"
+        name="name"
+        defaultValue={pet.name}
+        required
+      />
+
+      <label htmlFor="status">Status:</label>
+      <select
+        id="status"
+        name="status"
+        defaultValue={pet.status}
+        aria-busy={isPending}
+        disabled={isPending}
+        required
+      >
+        <option value="available">Available</option>
+        <option value="pending">Pending</option>
+        <option value="sold">Sold</option>
+      </select>
+
+      <button type="submit" disabled={isPending}>
+        Update Pet
+      </button>
+    </form>
+  );
 }
 
-export default App;
+const [UseFilterStatusProvider, useFilterStatus] = constate(() => {
+  const [status, setStatus] = useState<'available' | 'pending' | 'sold'>(
+    'available'
+  );
+
+  return { status, setStatus };
+});
+
+const [UsePetFormProvider, usePetForm] = constate(() => {
+  const [petId, setPetId] = useState<number | null>(null);
+
+  return { petId, setPetId };
+});
+
+export default function () {
+  return (
+    <UseFilterStatusProvider>
+      <UsePetFormProvider>
+        <App />
+      </UsePetFormProvider>
+    </UseFilterStatusProvider>
+  );
+}
