@@ -10,10 +10,11 @@ import { createAPIClient } from './api';
 const qraft = createAPIClient();
 
 function App() {
+  const { petId } = usePetForm();
   return (
     <div style={{ display: 'flex', flexFlow: 'column', gap: 20 }}>
       <PetListFilter />
-      <PetList />
+      {petId ? <PetForm petId={petId} /> : <PetList />}
     </div>
   );
 }
@@ -40,41 +41,11 @@ function PetListFilter() {
 
 function PetList() {
   const { status } = useFilterStatus();
-  const { petId } = usePetForm();
   const { data, isPending } = qraft.pet.findPetsByStatus.useQuery({
     query: { status },
   });
-  const {
-    data: petById,
-    isPending: isPetByIdPending,
-    error: petByIdError,
-  } = qraft.pet.getPetById.useQuery(
-    { path: { petId: petId ?? 0 } },
-    { enabled: !!petId }
-  );
 
   if (isPending) return <div>Loading...</div>;
-
-  if (petId) {
-    if (isPetByIdPending)
-      return (
-        <div>
-          Loading <strong>{petId}</strong>...
-        </div>
-      );
-
-    if (petById) return <PetForm pet={petById} />;
-
-    if (petByIdError)
-      return (
-        <div>
-          Error:{' '}
-          {petByIdError instanceof Error
-            ? petByIdError.message
-            : JSON.stringify(petByIdError)}
-        </div>
-      );
-  }
 
   return (
     <div
@@ -127,14 +98,37 @@ function PetCard({ pet }: { pet: components['schemas']['Pet'] }) {
   );
 }
 
-function PetForm({ pet }: { pet: components['schemas']['Pet'] }) {
+function PetForm({ petId }: { petId: number }) {
   const { setPetId } = usePetForm();
 
+  const petQueryKey = qraft.pet.getPetById.getQueryKey({
+    path: { petId },
+  });
+
+  const {
+    data: pet,
+    isPending: isPetQueryPending,
+    error: petQueryError,
+  } = qraft.pet.getPetById.useQuery(petQueryKey, { enabled: !!petId });
+
   const queryClient = useQueryClient();
+
   const { isPending, mutate } = qraft.pet.updatePet.useMutation(undefined, {
-    async onSuccess() {
+    onMutate(variables) {
+      qraft.pet.getPetById.setQueryData(
+        petQueryKey,
+        (oldData) => ({
+          ...oldData,
+          ...variables.body,
+        }),
+        queryClient
+      );
+    },
+    async onSuccess(updatedPet) {
+      qraft.pet.getPetById.setQueryData(petQueryKey, updatedPet, queryClient);
       await queryClient.invalidateQueries({
-        queryKey: qraft.pet.findPetsByStatus.getQueryKey({}),
+        // todo::add helper to invalidate by service operation
+        queryKey: qraft.pet.findPetsByStatus.getQueryKey(),
       });
       setPetId(null);
     },
@@ -147,6 +141,7 @@ function PetForm({ pet }: { pet: components['schemas']['Pet'] }) {
       onSubmit={(event) => {
         event.preventDefault();
         const formData = new FormData(event.currentTarget);
+        if (!pet) throw new Error('pet not found');
         mutate({
           body: {
             id: pet.id,
@@ -156,39 +151,65 @@ function PetForm({ pet }: { pet: components['schemas']['Pet'] }) {
           },
         });
       }}
+      onReset={(event) => {
+        event.preventDefault();
+        setPetId(null);
+      }}
     >
-      <label>
-        Pet ID: <strong>{pet.id}</strong>
-      </label>
+      {isPetQueryPending && <div>Loading...</div>}
+      {!!petQueryError && (
+        <div>
+          {getErrorMessage(petQueryError)} <button type="reset">Reset</button>
+        </div>
+      )}
 
-      <label htmlFor="name">Name:</label>
-      <input
-        readOnly={isPending}
-        aria-busy={isPending}
-        type="text"
-        id="name"
-        name="name"
-        defaultValue={pet.name}
-        required
-      />
+      {!pet && (
+        <div>
+          Pet <strong>{petId}</strong> not found{' '}
+          <button type="reset">Close</button>
+        </div>
+      )}
 
-      <label htmlFor="status">Status:</label>
-      <select
-        id="status"
-        name="status"
-        defaultValue={pet.status}
-        aria-busy={isPending}
-        disabled={isPending}
-        required
-      >
-        <option value="available">Available</option>
-        <option value="pending">Pending</option>
-        <option value="sold">Sold</option>
-      </select>
+      {pet && (
+        <>
+          <label>
+            Pet ID: <strong>{pet.id}</strong>
+          </label>
 
-      <button type="submit" disabled={isPending}>
-        Update Pet
-      </button>
+          <label htmlFor="name">Name:</label>
+          <input
+            readOnly={isPending}
+            aria-busy={isPending}
+            type="text"
+            id="name"
+            name="name"
+            defaultValue={pet.name}
+            required
+          />
+
+          <label htmlFor="status">Status:</label>
+          <select
+            id="status"
+            name="status"
+            defaultValue={pet.status}
+            aria-busy={isPending}
+            disabled={isPending}
+            required
+          >
+            <option value="available">Available</option>
+            <option value="pending">Pending</option>
+            <option value="sold">Sold</option>
+          </select>
+
+          <button type="submit" disabled={isPending}>
+            Update Pet
+          </button>
+
+          <button type="reset" disabled={isPending}>
+            Cancel
+          </button>
+        </>
+      )}
     </form>
   );
 }
@@ -206,6 +227,12 @@ const [UsePetFormProvider, usePetForm] = constate(() => {
 
   return { petId, setPetId };
 });
+
+function getErrorMessage(error: unknown) {
+  return `Error: ${
+    error instanceof Error ? error.message : JSON.stringify(error)
+  }`;
+}
 
 export default function () {
   return (
