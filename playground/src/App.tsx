@@ -10,19 +10,36 @@ import { createAPIClient } from './api';
 const qraft = createAPIClient();
 
 function App() {
-  const { petId } = usePetForm();
+  const { petIdToEdit } = usePetToEdit();
+  const { petStatusToCreate } = usePetStatusToCreate();
+
   return (
     <div style={{ display: 'flex', flexFlow: 'column', gap: 20 }}>
-      <PetListFilter />
-      {petId ? <PetForm petId={petId} /> : <PetList />}
+      {!petIdToEdit && !petStatusToCreate && <PetListFilter />}
+
+      {petIdToEdit && <PetUpdateForm petId={petIdToEdit} />}
+      {!petIdToEdit && petStatusToCreate && (
+        <PetCreateForm status={petStatusToCreate} />
+      )}
+      {!petIdToEdit && !petStatusToCreate && <PetList />}
     </div>
   );
 }
 
 function PetListFilter() {
+  const { petStatusToCreate, setPetStatusToCreate } = usePetStatusToCreate();
+
   const { status, setStatus } = useFilterStatus();
   return (
-    <div>
+    <form
+      onSubmit={(event) => {
+        event.preventDefault();
+        const formData = new FormData(event.currentTarget);
+        setPetStatusToCreate(
+          formData.get('status') as typeof petStatusToCreate
+        );
+      }}
+    >
       <label htmlFor="status">Select Status:</label>{' '}
       <StatusesSelect
         name="status"
@@ -31,7 +48,10 @@ function PetListFilter() {
           setStatus((event.target.value as typeof status) || undefined);
         }}
       />
-    </div>
+      <button type="submit" style={{ marginLeft: 10 }}>
+        Add new Pet
+      </button>
+    </form>
   );
 }
 
@@ -41,7 +61,8 @@ function PetList() {
     query: { status },
   });
 
-  if (error) return <div>{getErrorMessage(error)}</div>;
+  if (error)
+    return <div style={{ color: 'red' }}>{getErrorMessage(error)}</div>;
   if (isPending) return <div>Loading...</div>;
 
   return (
@@ -59,7 +80,7 @@ function PetList() {
 }
 
 function PetCard({ pet }: { pet: components['schemas']['Pet'] }) {
-  const { setPetId } = usePetForm();
+  const { setPetIdToEditToEdit } = usePetToEdit();
 
   return (
     <div
@@ -68,6 +89,7 @@ function PetCard({ pet }: { pet: components['schemas']['Pet'] }) {
         border: '1px solid',
         padding: 10,
         position: 'relative',
+        wordBreak: 'break-word',
       }}
     >
       <dl>
@@ -76,7 +98,7 @@ function PetCard({ pet }: { pet: components['schemas']['Pet'] }) {
         <dt>ID:</dt>
         <dd>{pet.id}</dd>
         <dt>Category:</dt>
-        <dd>{pet.category?.name}</dd>
+        <dd>{pet.category?.name || <code>not specified</code>}</dd>
         <dt>Status:</dt>
         <dd>{pet.status}</dd>
       </dl>
@@ -86,7 +108,7 @@ function PetCard({ pet }: { pet: components['schemas']['Pet'] }) {
         onClick={(event) => {
           event.preventDefault();
           if (!pet.id) throw new Error('pet.id not found');
-          setPetId(pet.id);
+          setPetIdToEditToEdit(pet.id);
         }}
       >
         Edit
@@ -95,8 +117,8 @@ function PetCard({ pet }: { pet: components['schemas']['Pet'] }) {
   );
 }
 
-function PetForm({ petId }: { petId: number }) {
-  const { setPetId } = usePetForm();
+function PetUpdateForm({ petId }: { petId: number }) {
+  const { setPetIdToEditToEdit } = usePetToEdit();
 
   const petQueryKey = qraft.pet.getPetById.getQueryKey({
     path: { petId },
@@ -127,37 +149,22 @@ function PetForm({ petId }: { petId: number }) {
         // todo::add helper to invalidate by service operation
         queryKey: qraft.pet.findPetsByStatus.getQueryKey(),
       });
-      setPetId(undefined);
+      setPetIdToEditToEdit(undefined);
     },
   });
 
   return (
-    <form
-      id="updatePetForm"
-      style={{ display: 'flex', flexFlow: 'column', gap: 10, maxWidth: 300 }}
-      onSubmit={(event) => {
-        event.preventDefault();
-        const formData = new FormData(event.currentTarget);
-        if (!pet) throw new Error('pet not found');
-        mutate({
-          body: {
-            id: pet.id,
-            photoUrls: pet.photoUrls, // required by schema
-            status: formData.get('status') as typeof pet.status,
-            name: formData.get('name') as typeof pet.name,
-          },
-        });
-      }}
-      onReset={(event) => {
-        event.preventDefault();
-        setPetId(undefined);
-      }}
-    >
+    <>
       {isPetQueryPending && <div>Loading...</div>}
 
       {!!petQueryError && (
         <div>
-          {getErrorMessage(petQueryError)} <button type="reset">Reset</button>
+          <span style={{ color: 'error' }}>
+            {getErrorMessage(petQueryError)}
+          </span>
+          <button type="reset" style={{ marginLeft: 10 }}>
+            Reset
+          </button>
         </div>
       )}
 
@@ -169,41 +176,150 @@ function PetForm({ petId }: { petId: number }) {
       )}
 
       {pet && (
-        <>
-          <label>
-            Pet ID: <strong>{pet.id}</strong>
-          </label>
-
-          <label htmlFor="name">Name:</label>
-          <input
-            readOnly={isPending}
-            aria-busy={isPending}
-            type="text"
-            id="name"
-            name="name"
-            defaultValue={pet.name}
-            required
-          />
-
-          <label htmlFor="status">Status:</label>
-          <StatusesSelect
-            id="status"
-            name="status"
-            defaultValue={pet.status}
-            aria-busy={isPending}
-            disabled={isPending}
-            required
-          />
-
-          <button type="submit" disabled={isPending}>
-            Update Pet
-          </button>
-
-          <button type="reset" disabled={isPending}>
-            Cancel
-          </button>
-        </>
+        <PetForm
+          pet={pet}
+          disabled={isPending}
+          formMode="update"
+          onSubmit={(event) => {
+            event.preventDefault();
+            const formData = new FormData(event.currentTarget);
+            if (!pet) throw new Error('pet not found');
+            mutate({
+              body: {
+                id: pet.id,
+                photoUrls: pet.photoUrls, // required by schema
+                status: formData.get('status') as typeof pet.status,
+                name: formData.get('name') as typeof pet.name,
+              },
+            });
+          }}
+          onReset={(event) => {
+            event.preventDefault();
+            setPetIdToEditToEdit(undefined);
+          }}
+          id="updatePetForm"
+          style={{
+            display: 'flex',
+            flexFlow: 'column',
+            gap: 10,
+            maxWidth: 300,
+          }}
+        />
       )}
+    </>
+  );
+}
+
+function PetCreateForm({
+  status,
+}: {
+  status: typeof qraft.pet.addPet.types.body.status;
+}) {
+  const { setPetIdToEditToEdit } = usePetToEdit();
+  const { setPetStatusToCreate } = usePetStatusToCreate();
+
+  const queryClient = useQueryClient();
+
+  const { isPending, mutate, error } = qraft.pet.addPet.useMutation(undefined, {
+    async onSuccess(createdPet) {
+      await queryClient.invalidateQueries({
+        // todo::add helper to invalidate by service operation
+        queryKey: qraft.pet.findPetsByStatus.getQueryKey(),
+      });
+      if (!createdPet)
+        throw new Error('createdPet not found in addPet.onSuccess');
+      setPetIdToEditToEdit(createdPet.id);
+    },
+  });
+
+  return (
+    <PetForm
+      pet={{ status }}
+      disabled={isPending}
+      formMode="create"
+      onSubmit={(event) => {
+        event.preventDefault();
+        const formData = new FormData(event.currentTarget);
+        mutate({
+          body: {
+            status: formData.get(
+              'status'
+            ) as typeof qraft.pet.addPet.types.body.status,
+            name: formData.get(
+              'name'
+            ) as typeof qraft.pet.addPet.types.body.name,
+            photoUrls: [],
+          },
+        });
+      }}
+      onReset={(event) => {
+        event.preventDefault();
+        setPetStatusToCreate(undefined);
+      }}
+      id="updatePetForm"
+      style={{
+        display: 'flex',
+        flexFlow: 'column',
+        gap: 10,
+        maxWidth: 300,
+      }}
+    >
+      {!!error && <div style={{ color: 'red' }}>{getErrorMessage(error)}</div>}
+    </PetForm>
+  );
+}
+
+function PetForm({
+  formMode,
+  pet,
+  disabled,
+  children,
+  ...restProps
+}: {
+  formMode: 'create' | 'update';
+  pet: Partial<components['schemas']['Pet']> | undefined;
+  disabled: boolean;
+} & ComponentProps<'form'>) {
+  return (
+    <form {...restProps}>
+      {children}
+
+      {formMode === 'update' ? (
+        <label>
+          Pet ID: <strong>{pet?.id}</strong>
+        </label>
+      ) : (
+        <label>Creating new pet</label>
+      )}
+
+      <label htmlFor="name">Name:</label>
+      <input
+        readOnly={disabled}
+        aria-busy={disabled}
+        type="text"
+        id="name"
+        name="name"
+        defaultValue={pet?.name}
+        required
+      />
+
+      <label htmlFor="status">Status:</label>
+      <StatusesSelect
+        id="status"
+        name="status"
+        defaultValue={pet?.status}
+        aria-busy={disabled}
+        disabled={disabled}
+        required
+      />
+
+      <button type="submit" disabled={disabled}>
+        {formMode === 'update' ? 'Update Pet' : 'Create Pet'}
+      </button>
+
+      <button type="reset" disabled={disabled}>
+        Cancel
+      </button>
     </form>
   );
 }
@@ -226,10 +342,18 @@ const [UseFilterStatusProvider, useFilterStatus] = constate(() => {
   return { status, setStatus };
 });
 
-const [UsePetFormProvider, usePetForm] = constate(() => {
-  const [petId, setPetId] = useState<number>();
+const [UsePetToEditProvider, usePetToEdit] = constate(() => {
+  const [petIdToEdit, setPetIdToEditToEdit] = useState<number>();
 
-  return { petId, setPetId };
+  return { petIdToEdit, setPetIdToEditToEdit };
+});
+
+const [UsePetStatusToCreateProvider, usePetStatusToCreate] = constate(() => {
+  const [petStatusToCreate, setPetStatusToCreate] = useState<
+    'available' | 'pending' | 'sold'
+  >();
+
+  return { petStatusToCreate, setPetStatusToCreate };
 });
 
 function getErrorMessage(error: unknown) {
@@ -241,9 +365,11 @@ function getErrorMessage(error: unknown) {
 export default function () {
   return (
     <UseFilterStatusProvider>
-      <UsePetFormProvider>
-        <App />
-      </UsePetFormProvider>
+      <UsePetToEditProvider>
+        <UsePetStatusToCreateProvider>
+          <App />
+        </UsePetStatusToCreateProvider>
+      </UsePetToEditProvider>
     </UseFilterStatusProvider>
   );
 }
