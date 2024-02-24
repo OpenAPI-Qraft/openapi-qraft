@@ -23,7 +23,9 @@ export function setInfiniteQueryData<TData>(
   const queryKey: ServiceOperationInfiniteQueryKey<
     RequestClientSchema,
     unknown
-  > = [{ url: schema.url, method: schema.method, infinite: true }, parameters];
+  > = Array.isArray(parameters)
+    ? parameters
+    : [{ url: schema.url, method: schema.method, infinite: true }, parameters];
 
   return queryClient.setQueryData(queryKey, updater as never, options);
 }

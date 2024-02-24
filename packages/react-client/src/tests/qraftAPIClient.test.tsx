@@ -64,6 +64,35 @@ describe('Qraft uses singular Query', () => {
     });
   });
 
+  it('supports useQuery with QueryKey', async () => {
+    const getApprovalPoliciesIdQueryKey =
+      qraft.approvalPolicies.getApprovalPoliciesId.getQueryKey({
+        header: {
+          'x-monite-version': '1.0.0',
+        },
+        path: {
+          approval_policy_id: '1',
+        },
+        query: {
+          items_order: ['asc', 'desc'],
+        },
+      });
+
+    const { result } = renderHook(
+      () =>
+        qraft.approvalPolicies.getApprovalPoliciesId.useQuery(
+          getApprovalPoliciesIdQueryKey
+        ),
+      {
+        wrapper: Providers,
+      }
+    );
+
+    await waitFor(() => {
+      expect(result.current.data).toEqual(getApprovalPoliciesIdQueryKey[1]);
+    });
+  });
+
   it('supports custom context', async () => {
     const QraftCustomContext = createContext<QraftContextValue>(undefined);
 
@@ -1006,6 +1035,42 @@ describe('Qraft uses setQueryData', () => {
         id__in: ['1', '2'],
       },
     });
+  });
+
+  it('uses setQueryData & getQueryData with QueryKey', async () => {
+    const queryClient = new QueryClient();
+
+    const getFilesQueryKey = qraft.files.getFiles.getQueryKey({
+      header: {
+        'x-monite-version': '1.0.0',
+      },
+      query: {
+        id__in: ['1', '2'],
+      },
+    });
+
+    const getFilesSetQueryData: typeof qraft.files.getFiles.types.data = {
+      header: {
+        'x-monite-version': '1.0.0',
+      },
+      query: {
+        id__in: ['1', '2'],
+      },
+    };
+
+    qraft.files.getFiles.setQueryData(
+      getFilesQueryKey,
+      getFilesSetQueryData,
+      queryClient
+    );
+
+    expect(
+      qraft.files.getFiles.getQueryData(getFilesQueryKey, queryClient)
+    ).toEqual(getFilesSetQueryData);
+
+    expect(
+      qraft.files.getFiles.getQueryData(getFilesQueryKey[1], queryClient)
+    ).toEqual(getFilesSetQueryData);
   });
 
   it('does not return getQueryData() from Infinite query', async () => {

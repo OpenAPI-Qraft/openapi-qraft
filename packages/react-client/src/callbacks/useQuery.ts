@@ -17,11 +17,7 @@ import {
   ServiceOperationQueryKey,
 } from '../ServiceOperation.js';
 
-export const useQuery: <
-  TQueryFnData = unknown,
-  TError = DefaultError,
-  TData = TQueryFnData,
->(
+export const useQuery: <TData = unknown, TError = DefaultError>(
   qraftOptions: QraftClientOptions | undefined,
   schema: RequestClientSchema,
   args: Parameters<
@@ -35,10 +31,10 @@ export const useQuery: <
 
   if (!requestClient) throw new Error(`QraftContext.requestClient not found`);
 
-  const queryKey: ServiceOperationQueryKey<RequestClientSchema, unknown> = [
-    { url: schema.url, method: schema.method },
-    parameters,
-  ];
+  const queryKey: ServiceOperationQueryKey<RequestClientSchema, unknown> =
+    Array.isArray(parameters)
+      ? (parameters as ServiceOperationQueryKey<RequestClientSchema, unknown>)
+      : [{ url: schema.url, method: schema.method }, parameters];
 
   return useQueryTanstack(
     {

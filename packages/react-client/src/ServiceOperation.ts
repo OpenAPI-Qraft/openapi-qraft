@@ -56,10 +56,10 @@ export interface ServiceOperationQuery<
     ServiceOperationUseSuspenseQueryQuery<TSchema, TData, TParams, TError>,
     ServiceOperationUseSuspenseInfiniteQuery<TSchema, TData, TParams, TError>,
     ServiceOperationQueryFn<TSchema, TData, TParams>,
-    ServiceOperationGetQueryData<TData, TParams>,
-    ServiceOperationGetInfiniteQueryData<TData, TParams>,
-    ServiceOperationSetQueryData<TData, TParams>,
-    ServiceOperationSetInfiniteQueryData<TData, TParams> {
+    ServiceOperationGetQueryData<TSchema, TData, TParams>,
+    ServiceOperationGetInfiniteQueryData<TSchema, TData, TParams>,
+    ServiceOperationSetQueryData<TSchema, TData, TParams>,
+    ServiceOperationSetInfiniteQueryData<TSchema, TData, TParams> {
   schema: TSchema;
   types: {
     parameters: TParams;
@@ -79,7 +79,7 @@ interface ServiceOperationUseQuery<
   ): ServiceOperationQueryKey<TSchema, QueryKeyParams>;
 
   useQuery(
-    parameters: TParams,
+    parameters: TParams | ServiceOperationQueryKey<TSchema, TParams>,
     options?: Omit<
       UndefinedInitialDataOptions<
         TData,
@@ -92,7 +92,7 @@ interface ServiceOperationUseQuery<
     queryClient?: QueryClient
   ): UseQueryResult<TData, TError | Error>;
   useQuery(
-    parameters: TParams,
+    parameters: TParams | ServiceOperationQueryKey<TSchema, TParams>,
     options: Omit<
       DefinedInitialDataOptions<
         TData,
@@ -269,8 +269,7 @@ export interface ServiceOperationMutation<
   TError = DefaultError,
 > extends ServiceOperationUseMutation<TSchema, TBody, TData, TParams, TError>,
     ServiceOperationUseMutationState<TSchema, TBody, TData, TParams, TError>,
-    ServiceOperationMutationFn<TSchema, TBody, TData, TParams>,
-    ServiceOperationSetQueryData<TData, TParams> {
+    ServiceOperationMutationFn<TSchema, TBody, TData, TParams> {
   schema: TSchema;
   types: {
     parameters: TParams;
@@ -489,18 +488,26 @@ interface ServiceOperationQueryFn<
   ): Promise<TData>;
 }
 
-interface ServiceOperationSetQueryData<TData, TParams = {}> {
+interface ServiceOperationSetQueryData<
+  TSchema extends { url: string; method: string },
+  TData,
+  TParams = {}, // todo::try to replace `TParams = {}` with `TParams = undefined`
+> {
   setQueryData(
-    parameters: TParams,
+    parameters: TParams | ServiceOperationQueryKey<TSchema, TParams>,
     updater: Updater<NoInfer<TData> | undefined, NoInfer<TData> | undefined>,
     queryClient: QueryClient,
     options?: SetDataOptions
   ): TData | undefined;
 }
 
-interface ServiceOperationSetInfiniteQueryData<TData, TParams = {}> {
+interface ServiceOperationSetInfiniteQueryData<
+  TSchema extends { url: string; method: string },
+  TData,
+  TParams = {},
+> {
   setInfiniteQueryData(
-    parameters: TParams,
+    parameters: TParams | ServiceOperationInfiniteQueryKey<TSchema, TParams>,
     updater: Updater<
       NoInfer<InfiniteData<TData>> | undefined,
       NoInfer<InfiniteData<TData>> | undefined
@@ -510,16 +517,24 @@ interface ServiceOperationSetInfiniteQueryData<TData, TParams = {}> {
   ): InfiniteData<TData> | undefined;
 }
 
-interface ServiceOperationGetQueryData<TData, TParams = {}> {
+interface ServiceOperationGetQueryData<
+  TSchema extends { url: string; method: string },
+  TData,
+  TParams = {},
+> {
   getQueryData(
-    parameters: TParams,
+    parameters: TParams | ServiceOperationQueryKey<TSchema, TParams>,
     queryClient: QueryClient
   ): TData | undefined;
 }
 
-interface ServiceOperationGetInfiniteQueryData<TData, TParams = {}> {
+interface ServiceOperationGetInfiniteQueryData<
+  TSchema extends { url: string; method: string },
+  TData,
+  TParams = {},
+> {
   getInfiniteQueryData(
-    parameters: TParams,
+    parameters: TParams | ServiceOperationInfiniteQueryKey<TSchema, TParams>,
     queryClient: QueryClient
   ): InfiniteData<TData> | undefined;
 }
