@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { ComponentProps, useState } from 'react';
 
 import { useQueryClient } from '@tanstack/react-query';
 
@@ -23,28 +23,25 @@ function PetListFilter() {
   const { status, setStatus } = useFilterStatus();
   return (
     <div>
-      <label htmlFor="status">Select Status:</label>
-      <select
+      <label htmlFor="status">Select Status:</label>{' '}
+      <StatusesSelect
         name="status"
         value={status}
         onChange={(event) => {
-          setStatus(event.target.value as typeof status);
+          setStatus((event.target.value as typeof status) || undefined);
         }}
-      >
-        <option value="available">Available</option>
-        <option value="pending">Pending</option>
-        <option value="sold">Sold</option>
-      </select>
+      />
     </div>
   );
 }
 
 function PetList() {
   const { status } = useFilterStatus();
-  const { data, isPending } = qraft.pet.findPetsByStatus.useQuery({
+  const { data, error, isPending } = qraft.pet.findPetsByStatus.useQuery({
     query: { status },
   });
 
+  if (error) return <div>{getErrorMessage(error)}</div>;
   if (isPending) return <div>Loading...</div>;
 
   return (
@@ -130,7 +127,7 @@ function PetForm({ petId }: { petId: number }) {
         // todo::add helper to invalidate by service operation
         queryKey: qraft.pet.findPetsByStatus.getQueryKey(),
       });
-      setPetId(null);
+      setPetId(undefined);
     },
   });
 
@@ -153,17 +150,18 @@ function PetForm({ petId }: { petId: number }) {
       }}
       onReset={(event) => {
         event.preventDefault();
-        setPetId(null);
+        setPetId(undefined);
       }}
     >
       {isPetQueryPending && <div>Loading...</div>}
+
       {!!petQueryError && (
         <div>
           {getErrorMessage(petQueryError)} <button type="reset">Reset</button>
         </div>
       )}
 
-      {!pet && (
+      {!isPetQueryPending && !pet && (
         <div>
           Pet <strong>{petId}</strong> not found{' '}
           <button type="reset">Close</button>
@@ -188,18 +186,14 @@ function PetForm({ petId }: { petId: number }) {
           />
 
           <label htmlFor="status">Status:</label>
-          <select
+          <StatusesSelect
             id="status"
             name="status"
             defaultValue={pet.status}
             aria-busy={isPending}
             disabled={isPending}
             required
-          >
-            <option value="available">Available</option>
-            <option value="pending">Pending</option>
-            <option value="sold">Sold</option>
-          </select>
+          />
 
           <button type="submit" disabled={isPending}>
             Update Pet
@@ -214,6 +208,16 @@ function PetForm({ petId }: { petId: number }) {
   );
 }
 
+const StatusesSelect = (props: Omit<ComponentProps<'select'>, 'children'>) => {
+  return (
+    <select {...props}>
+      <option value="available">Available</option>
+      <option value="pending">Pending</option>
+      <option value="sold">Sold</option>
+    </select>
+  );
+};
+
 const [UseFilterStatusProvider, useFilterStatus] = constate(() => {
   const [status, setStatus] = useState<'available' | 'pending' | 'sold'>(
     'available'
@@ -223,7 +227,7 @@ const [UseFilterStatusProvider, useFilterStatus] = constate(() => {
 });
 
 const [UsePetFormProvider, usePetForm] = constate(() => {
-  const [petId, setPetId] = useState<number | null>(null);
+  const [petId, setPetId] = useState<number>();
 
   return { petId, setPetId };
 });
