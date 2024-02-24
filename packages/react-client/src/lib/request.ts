@@ -218,8 +218,26 @@ async function getResponseBody<T>(response: Response): Promise<T | undefined> {
   const isJSON =
     contentType?.includes('/json') || contentType?.includes('+json');
 
-  // parse response (falling back to .text() when necessary)
-  if (isJSON) return response.json();
+  if (isJSON) {
+    // attempt to parse JSON for successful responses, otherwise fail
+    if (response.ok) return response.json();
+
+    const errorFallbackResponse = response.clone(); // clone to allow multiple reads
+
+    return response.json().catch(() => {
+      if (
+        typeof process !== 'undefined' &&
+        typeof process.env !== 'undefined' &&
+        process.env.NODE_ENV === 'development'
+      ) {
+        console.warn(
+          'Failed to parse response body as JSON. Falling back to .text()'
+        );
+      }
+      // falling back to .text() when necessary for error messages
+      return errorFallbackResponse.text();
+    });
+  }
 
   return response.text() as Promise<T>;
 }
