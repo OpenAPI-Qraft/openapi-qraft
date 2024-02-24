@@ -1,5 +1,11 @@
 # @openapi-qraft/react
 
+## 1.0.9
+
+### Patch Changes
+
+- e482dbe: chore: Remove `DeepReadonly<TParams>`
+
 ## 1.0.8
 
 ### Patch Changes
