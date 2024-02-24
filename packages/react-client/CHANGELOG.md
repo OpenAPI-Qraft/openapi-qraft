@@ -1,5 +1,11 @@
 # @openapi-qraft/react
 
+## 1.0.10
+
+### Patch Changes
+
+- 52eaba7: feature: Add the use of `QueryClient` to `QraftContext.value`
+
 ## 1.0.9
 
 ### Patch Changes
