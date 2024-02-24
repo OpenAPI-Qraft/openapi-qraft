@@ -75,11 +75,11 @@ interface ServiceOperationUseQuery<
   TError = DefaultError,
 > {
   getQueryKey<QueryKeyParams extends TParams>(
-    parameters: QueryKeyParams | DeepReadonly<QueryKeyParams>
+    parameters: QueryKeyParams
   ): ServiceOperationQueryKey<TSchema, QueryKeyParams>;
 
   useQuery(
-    parameters: TParams | DeepReadonly<TParams>,
+    parameters: TParams,
     options?: Omit<
       UndefinedInitialDataOptions<
         TData,
@@ -92,7 +92,7 @@ interface ServiceOperationUseQuery<
     queryClient?: QueryClient
   ): UseQueryResult<TData, TError | Error>;
   useQuery(
-    parameters: TParams | DeepReadonly<TParams>,
+    parameters: TParams,
     options: Omit<
       DefinedInitialDataOptions<
         TData,
@@ -124,7 +124,7 @@ interface ServiceOperationUseQueries<
           >,
           'placeholderData' | 'suspense' | 'queryKey'
         > & {
-          parameters: TParams | DeepReadonly<TParams>;
+          parameters: TParams;
           placeholderData?: TData | QueriesPlaceholderDataFunction<TData>;
         }
       >;
@@ -155,7 +155,7 @@ interface ServiceOperationUseSuspenseQueries<
             ServiceOperationQueryKey<TSchema, TParams>
           >,
           'queryKey'
-        > & { parameters: TParams | DeepReadonly<TParams> }
+        > & { parameters: TParams }
       >;
       combine?: (
         results: Array<UseSuspenseQueryResult<TData, TError>>
@@ -172,11 +172,11 @@ interface ServiceOperationUseInfiniteQuery<
   TError = DefaultError,
 > {
   getInfiniteQueryKey<TQueryKeyParams extends TParams>(
-    parameters: TQueryKeyParams | DeepReadonly<TQueryKeyParams>
+    parameters: TQueryKeyParams
   ): ServiceOperationInfiniteQueryKey<TSchema, TQueryKeyParams>;
 
   useInfiniteQuery<TPageParam extends TParams>(
-    parameters: TParams | DeepReadonly<TParams>,
+    parameters: TParams,
     options: Omit<
       UndefinedInitialDataInfiniteOptions<
         TData,
@@ -194,7 +194,7 @@ interface ServiceOperationUseInfiniteQuery<
     queryClient?: QueryClient
   ): UseInfiniteQueryResult<InfiniteData<TData>, TError | Error>;
   useInfiniteQuery<TPageParam extends TParams>(
-    parameters: TParams | DeepReadonly<TParams>,
+    parameters: TParams,
     options: Omit<
       DefinedInitialDataInfiniteOptions<
         TData,
@@ -220,7 +220,7 @@ interface ServiceOperationUseSuspenseInfiniteQuery<
   TError = DefaultError,
 > {
   useSuspenseInfiniteQuery<TPageParam extends TParams>(
-    parameters: TParams | DeepReadonly<TParams>,
+    parameters: TParams,
     options: Omit<
       UseSuspenseInfiniteQueryOptions<
         TData,
@@ -247,7 +247,7 @@ interface ServiceOperationUseSuspenseQueryQuery<
   TError = DefaultError,
 > {
   useSuspenseQuery(
-    parameters: TParams | DeepReadonly<TParams>,
+    parameters: TParams,
     options?: Omit<
       UseSuspenseQueryOptions<
         TData,
@@ -288,10 +288,7 @@ interface ServiceOperationUseMutation<
   TError = DefaultError,
 > {
   getMutationKey<TMutationKeyParams extends TParams>(
-    parameters:
-      | TMutationKeyParams
-      | DeepReadonly<TMutationKeyParams>
-      | undefined
+    parameters: TMutationKeyParams | undefined
   ): ServiceOperationMutationKey<TSchema, TMutationKeyParams>;
 
   useMutation<
@@ -309,7 +306,7 @@ interface ServiceOperationUseMutation<
   ): UseMutationResult<TData, TError | Error, TVariables, TContext>;
 
   useMutation<TVariables extends TBody, TContext = unknown>(
-    parameters: TParams | DeepReadonly<TParams>,
+    parameters: TParams,
     options?: Omit<
       UseMutationOptions<TData, TError, TVariables, TContext>,
       'mutationKey'
@@ -357,9 +354,7 @@ interface UseMutationStateFiltersByParameters<
   /**
    * Include mutations matching these parameters
    */
-  parameters?:
-    | PartialParameters<TParams>
-    | DeepReadonly<PartialParameters<TParams>>;
+  parameters?: PartialParameters<TParams>;
 }
 
 interface UseMutationStateFiltersByMutationKey<
@@ -373,11 +368,10 @@ interface UseMutationStateFiltersByMutationKey<
   /**
    * Include mutations matching this mutation key
    */
-  mutationKey?:
-    | ServiceOperationMutationKey<TSchema, PartialParameters<TParams>>
-    | DeepReadonly<
-        ServiceOperationMutationKey<TSchema, PartialParameters<TParams>>
-      >;
+  mutationKey?: ServiceOperationMutationKey<
+    TSchema,
+    PartialParameters<TParams>
+  >;
 }
 
 type MutationVariables<TBody, TParams> = {
@@ -497,7 +491,7 @@ interface ServiceOperationQueryFn<
 
 interface ServiceOperationSetQueryData<TData, TParams = {}> {
   setQueryData(
-    parameters: TParams | DeepReadonly<TParams>,
+    parameters: TParams,
     updater: Updater<NoInfer<TData> | undefined, NoInfer<TData> | undefined>,
     queryClient: QueryClient,
     options?: SetDataOptions
@@ -506,7 +500,7 @@ interface ServiceOperationSetQueryData<TData, TParams = {}> {
 
 interface ServiceOperationSetInfiniteQueryData<TData, TParams = {}> {
   setInfiniteQueryData(
-    parameters: TParams | DeepReadonly<TParams>,
+    parameters: TParams,
     updater: Updater<
       NoInfer<InfiniteData<TData>> | undefined,
       NoInfer<InfiniteData<TData>> | undefined
@@ -518,14 +512,14 @@ interface ServiceOperationSetInfiniteQueryData<TData, TParams = {}> {
 
 interface ServiceOperationGetQueryData<TData, TParams = {}> {
   getQueryData(
-    parameters: TParams | DeepReadonly<TParams>,
+    parameters: TParams,
     queryClient: QueryClient
   ): TData | undefined;
 }
 
 interface ServiceOperationGetInfiniteQueryData<TData, TParams = {}> {
   getInfiniteQueryData(
-    parameters: TParams | DeepReadonly<TParams>,
+    parameters: TParams,
     queryClient: QueryClient
   ): InfiniteData<TData> | undefined;
 }
@@ -545,7 +539,7 @@ export interface ServiceOperationMutationFn<
       }
     ) => TData,
     options: {
-      parameters: TParams | DeepReadonly<TParams>;
+      parameters: TParams;
       body: TBody;
     }
   ): TData;
@@ -559,16 +553,11 @@ export interface ServiceOperationMutationFn<
       }
     ) => Promise<TData>,
     options: {
-      parameters: TParams | DeepReadonly<TParams>;
+      parameters: TParams;
       body: TBody;
     }
   ): Promise<TData>;
 }
-
-// see also: https://dev.to/bwca/deep-readonly-generic-in-typescript-4b04
-type DeepReadonly<T> = {
-  readonly [K in keyof T]: T[K] extends object ? DeepReadonly<T[K]> : T[K];
-};
 
 /**
  * Shallow partial 'parameters'.
