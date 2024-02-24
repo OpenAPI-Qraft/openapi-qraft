@@ -74,8 +74,8 @@ interface ServiceOperationUseQuery<
   TParams = {},
   TError = DefaultError,
 > {
-  getQueryKey<QueryKeyParams extends TParams>(
-    parameters: QueryKeyParams
+  getQueryKey<QueryKeyParams extends TParams | undefined = undefined>(
+    parameters?: QueryKeyParams
   ): ServiceOperationQueryKey<TSchema, QueryKeyParams>;
 
   useQuery(
