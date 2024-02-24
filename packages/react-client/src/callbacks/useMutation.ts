@@ -3,8 +3,11 @@
 import { useContext } from 'react';
 
 import type { DefaultError } from '@tanstack/query-core';
-import type { UseMutationResult } from '@tanstack/react-query';
-import { useMutation as useMutationBase } from '@tanstack/react-query';
+import {
+  useMutation as useMutationBase,
+  UseMutationResult,
+  useQueryClient,
+} from '@tanstack/react-query';
 
 import { composeMutationKey } from '../lib/composeMutationKey.js';
 import type { QraftClientOptions } from '../qraftAPIClient.js';
@@ -36,7 +39,7 @@ export const useMutation: <
   schema,
   args
 ) => {
-  const [parameters, options, ...restArgs] = args;
+  const [parameters, options, queryClientByArg] = args;
 
   if (
     parameters &&
@@ -48,8 +51,8 @@ export const useMutation: <
       `'useMutation': parameters and 'options.mutationKey' cannot be used together`
     );
 
-  const requestClient = useContext(qraftOptions?.context ?? QraftContext)
-    ?.requestClient;
+  const { requestClient, queryClient: queryClientByContext } =
+    useContext(qraftOptions?.context ?? QraftContext) ?? {};
 
   if (!requestClient) throw new Error(`QraftContext.requestClient not found`);
 
@@ -85,6 +88,6 @@ export const useMutation: <
               } as never);
             }),
     },
-    ...restArgs
+    useQueryClient(queryClientByArg ?? queryClientByContext)
   ) as never;
 };

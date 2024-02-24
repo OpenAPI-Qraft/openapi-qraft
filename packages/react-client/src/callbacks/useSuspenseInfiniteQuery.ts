@@ -4,6 +4,7 @@ import { useContext } from 'react';
 
 import type { DefaultError, InfiniteData } from '@tanstack/query-core';
 import {
+  useQueryClient,
   useSuspenseInfiniteQuery as useSuspenseInfiniteQueryTanstack,
   UseSuspenseInfiniteQueryResult,
 } from '@tanstack/react-query';
@@ -12,10 +13,7 @@ import { shelfMerge } from '../lib/shelfMerge.js';
 import type { QraftClientOptions } from '../qraftAPIClient.js';
 import { QraftContext } from '../QraftContext.js';
 import type { RequestClientSchema } from '../RequestClient.js';
-import {
-  ServiceOperationQuery,
-  ServiceOperationQueryKey,
-} from '../ServiceOperation.js';
+import { ServiceOperationQuery } from '../ServiceOperation.js';
 
 export const useSuspenseInfiniteQuery: <
   TQueryFnData,
@@ -36,10 +34,10 @@ export const useSuspenseInfiniteQuery: <
   schema,
   args
 ) => {
-  const [parameters, options, ...restArgs] = args;
+  const [parameters, options, queryClientByArg] = args;
 
-  const requestClient = useContext(qraftOptions?.context ?? QraftContext)
-    ?.requestClient;
+  const { requestClient, queryClient: queryClientByContext } =
+    useContext(qraftOptions?.context ?? QraftContext) ?? {};
 
   if (!requestClient) throw new Error(`QraftContext.requestClient not found`);
 
@@ -60,6 +58,6 @@ export const useSuspenseInfiniteQuery: <
           });
         },
     },
-    ...restArgs
+    useQueryClient(queryClientByArg ?? queryClientByContext)
   ) as never;
 };

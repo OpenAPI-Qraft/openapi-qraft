@@ -6,6 +6,7 @@ import type { DefaultError, InfiniteData } from '@tanstack/query-core';
 import {
   useInfiniteQuery as useInfiniteQueryBase,
   UseInfiniteQueryResult,
+  useQueryClient,
 } from '@tanstack/react-query';
 
 import { shelfMerge } from '../lib/shelfMerge.js';
@@ -29,10 +30,10 @@ export const useInfiniteQuery: <
     >['useInfiniteQuery']
   >
 ) => UseInfiniteQueryResult<TData, TError> = (qraftOptions, schema, args) => {
-  const [parameters, options, ...restArgs] = args;
+  const [parameters, options, queryClientByArg] = args;
 
-  const requestClient = useContext(qraftOptions?.context ?? QraftContext)
-    ?.requestClient;
+  const { requestClient, queryClient: queryClientByContext } =
+    useContext(qraftOptions?.context ?? QraftContext) ?? {};
 
   if (!requestClient) throw new Error(`QraftContext.requestClient not found`);
 
@@ -53,6 +54,6 @@ export const useInfiniteQuery: <
           });
         },
     },
-    ...restArgs
+    useQueryClient(queryClientByArg ?? queryClientByContext)
   ) as never;
 };

@@ -3,8 +3,11 @@
 import { useContext } from 'react';
 
 import type { DefaultError } from '@tanstack/query-core';
-import type { UseQueryResult } from '@tanstack/react-query';
-import { useQuery as useQueryBase } from '@tanstack/react-query';
+import {
+  useQuery as useQueryTanstack,
+  useQueryClient,
+  UseQueryResult,
+} from '@tanstack/react-query';
 
 import type { QraftClientOptions } from '../qraftAPIClient.js';
 import { QraftContext } from '../QraftContext.js';
@@ -25,10 +28,10 @@ export const useQuery: <
     ServiceOperationQuery<RequestClientSchema, unknown, unknown>['useQuery']
   >
 ) => UseQueryResult<TData, TError> = (qraftOptions, schema, args) => {
-  const [parameters, options, ...restArgs] = args;
+  const [parameters, options, queryClientByArg] = args;
 
-  const requestClient = useContext(qraftOptions?.context ?? QraftContext)
-    ?.requestClient;
+  const { requestClient, queryClient: queryClientByContext } =
+    useContext(qraftOptions?.context ?? QraftContext) ?? {};
 
   if (!requestClient) throw new Error(`QraftContext.requestClient not found`);
 
@@ -37,7 +40,7 @@ export const useQuery: <
     parameters,
   ];
 
-  return useQueryBase(
+  return useQueryTanstack(
     {
       ...options,
       queryKey,
@@ -51,6 +54,6 @@ export const useQuery: <
           });
         },
     },
-    ...restArgs
+    useQueryClient(queryClientByArg ?? queryClientByContext)
   ) as never;
 };

@@ -4,6 +4,7 @@ import { useContext } from 'react';
 
 import type { DefaultError } from '@tanstack/query-core';
 import {
+  useQueryClient,
   UseQueryResult,
   useSuspenseQuery as useSuspenseQueryTanstack,
 } from '@tanstack/react-query';
@@ -31,10 +32,10 @@ export const useSuspenseQuery: <
     >['useSuspenseQuery']
   >
 ) => UseQueryResult<TData, TError> = (qraftOptions, schema, args) => {
-  const [parameters, options, ...restArgs] = args;
+  const [parameters, options, queryClientByArg] = args;
 
-  const requestClient = useContext(qraftOptions?.context ?? QraftContext)
-    ?.requestClient;
+  const { requestClient, queryClient: queryClientByContext } =
+    useContext(qraftOptions?.context ?? QraftContext) ?? {};
 
   if (!requestClient) throw new Error(`QraftContext.requestClient not found`);
 
@@ -57,6 +58,6 @@ export const useSuspenseQuery: <
           });
         },
     },
-    ...restArgs
+    useQueryClient(queryClientByArg ?? queryClientByContext)
   ) as never;
 };
