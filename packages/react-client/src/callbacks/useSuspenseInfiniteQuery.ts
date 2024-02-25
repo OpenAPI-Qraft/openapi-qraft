@@ -9,6 +9,7 @@ import {
   UseSuspenseInfiniteQueryResult,
 } from '@tanstack/react-query';
 
+import { composeInfiniteQueryKey } from '../lib/composeInfiniteQueryKey.js';
 import { shelfMerge } from '../lib/shelfMerge.js';
 import type { QraftClientOptions } from '../qraftAPIClient.js';
 import { QraftContext } from '../QraftContext.js';
@@ -17,7 +18,6 @@ import {
   ServiceOperationInfiniteQueryKey,
   ServiceOperationQuery,
 } from '../ServiceOperation.js';
-import { composeInfiniteQueryKey } from './getInfiniteQueryKey.js';
 
 export const useSuspenseInfiniteQuery: <
   TQueryFnData,

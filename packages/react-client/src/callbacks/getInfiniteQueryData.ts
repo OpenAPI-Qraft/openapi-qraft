@@ -1,12 +1,12 @@
 import { InfiniteData } from '@tanstack/query-core';
 
+import { composeInfiniteQueryKey } from '../lib/composeInfiniteQueryKey.js';
 import type { QraftClientOptions } from '../qraftAPIClient.js';
 import type { RequestClientSchema } from '../RequestClient.js';
 import {
   ServiceOperationInfiniteQueryKey,
   ServiceOperationQuery,
 } from '../ServiceOperation.js';
-import { composeInfiniteQueryKey } from './getInfiniteQueryKey.js';
 
 export function getInfiniteQueryData<TData>(
   qraftOptions: QraftClientOptions | undefined,
