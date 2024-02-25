@@ -39,7 +39,7 @@ function AppComponent() {
 function PetListFilter() {
   const { petStatusToCreate, setPetStatusToCreate } = usePetStatusToCreate();
 
-  const { status, setStatus } = useFilterStatus();
+  const { petsFilter, setPetsFilter } = usePetsFilter();
   return (
     <form
       onSubmit={(event) => {
@@ -53,9 +53,12 @@ function PetListFilter() {
       <label htmlFor="status">Select Status:</label>{' '}
       <StatusesSelect
         name="status"
-        value={status}
+        value={petsFilter.status}
         onChange={(event) => {
-          setStatus((event.target.value as typeof status) || undefined);
+          setPetsFilter((prev) => ({
+            ...prev,
+            status: event.target.value as typeof prev.status,
+          }));
         }}
       />
       <button type="submit" style={{ marginLeft: 10 }}>
@@ -66,9 +69,9 @@ function PetListFilter() {
 }
 
 function PetList() {
-  const { status } = useFilterStatus();
+  const { petsFilter } = usePetsFilter();
   const { data, error, isPending } = qraft.pet.findPetsByStatus.useQuery({
-    query: { status },
+    query: { status: petsFilter.status },
   });
 
   if (error)
@@ -338,12 +341,14 @@ const StatusesSelect = (props: Omit<ComponentProps<'select'>, 'children'>) => {
   );
 };
 
-const [UseFilterStatusProvider, useFilterStatus] = constate(() => {
-  const [status, setStatus] = useState<'available' | 'pending' | 'sold'>(
-    'available'
-  );
+const [UsePetsFilterProvider, usePetsFilter] = constate(() => {
+  const [petsFilter, setPetsFilter] = useState<{
+    status: 'available' | 'pending' | 'sold';
+    limit: number;
+    page: 1;
+  }>({ status: 'available', limit: 4, page: 1 });
 
-  return { status, setStatus };
+  return { petsFilter, setPetsFilter };
 });
 
 const [UsePetToEditProvider, usePetToEdit] = constate(() => {
@@ -396,13 +401,13 @@ export const QraftProviders = ({ children }: { children: ReactNode }) => {
 export default function App() {
   return (
     <QraftProviders>
-      <UseFilterStatusProvider>
+      <UsePetsFilterProvider>
         <UsePetToEditProvider>
           <UsePetStatusToCreateProvider>
             <AppComponent />
           </UsePetStatusToCreateProvider>
         </UsePetToEditProvider>
-      </UseFilterStatusProvider>
+      </UsePetsFilterProvider>
     </QraftProviders>
   );
 }
