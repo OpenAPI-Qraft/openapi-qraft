@@ -6,6 +6,7 @@ import type {
   ServiceOperationInfiniteQueryKey,
   ServiceOperationQuery,
 } from '../ServiceOperation.js';
+import { composeInfiniteQueryKey } from './getInfiniteQueryKey.js';
 
 export function setInfiniteQueryData<TData>(
   qraftOptions: QraftClientOptions | undefined,
@@ -25,7 +26,7 @@ export function setInfiniteQueryData<TData>(
     unknown
   > = Array.isArray(parameters)
     ? parameters
-    : [{ url: schema.url, method: schema.method, infinite: true }, parameters];
+    : composeInfiniteQueryKey(schema, parameters);
 
   return queryClient.setQueryData(queryKey, updater as never, options);
 }

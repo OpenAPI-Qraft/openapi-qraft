@@ -14,6 +14,7 @@ import type { QraftClientOptions } from '../qraftAPIClient.js';
 import { QraftContext } from '../QraftContext.js';
 import type { RequestClientSchema } from '../RequestClient.js';
 import { ServiceOperationQuery } from '../ServiceOperation.js';
+import { composeInfiniteQueryKey } from './getInfiniteQueryKey.js';
 
 export const useInfiniteQuery: <
   TQueryFnData,
@@ -40,10 +41,7 @@ export const useInfiniteQuery: <
   return useInfiniteQueryBase(
     {
       ...options,
-      queryKey: [
-        { url: schema.url, method: schema.method, infinite: true },
-        parameters as never,
-      ] as const,
+      queryKey: composeInfiniteQueryKey(schema, parameters),
       queryFn:
         options?.queryFn ??
         function ({ queryKey: [, queryParams], signal, meta, pageParam }) {

@@ -16,8 +16,15 @@ export const getInfiniteQueryKey = (
     >['getInfiniteQueryKey']
   >
 ) => {
-  return [
-    { url: schema.url, method: schema.method, infinite: true },
-    args[0],
-  ] satisfies ServiceOperationInfiniteQueryKey<RequestClientSchema, unknown>;
+  return composeInfiniteQueryKey(schema, args[0]);
 };
+
+export function composeInfiniteQueryKey<
+  TSchema extends RequestClientSchema,
+  TParams,
+>(
+  schema: TSchema,
+  parameters: TParams | undefined
+): ServiceOperationInfiniteQueryKey<TSchema, TParams> {
+  return [{ ...schema, infinite: true }, parameters ?? ({} as TParams)];
+}
