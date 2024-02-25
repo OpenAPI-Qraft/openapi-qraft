@@ -145,10 +145,7 @@ function PetUpdateForm({ petId }: { petId: number }) {
     },
     async onSuccess(updatedPet) {
       qraft.pet.getPetById.setQueryData(petQueryKey, updatedPet, queryClient);
-      await queryClient.invalidateQueries({
-        // todo::add helper to invalidate by service operation
-        queryKey: qraft.pet.findPetsByStatus.getQueryKey(),
-      });
+      await qraft.pet.findPetsByStatus.invalidateQueries(queryClient);
       setPetIdToEditToEdit(undefined);
     },
   });
@@ -222,10 +219,7 @@ function PetCreateForm({
 
   const { isPending, mutate, error } = qraft.pet.addPet.useMutation(undefined, {
     async onSuccess(createdPet) {
-      await queryClient.invalidateQueries({
-        // todo::add helper to invalidate by service operation
-        queryKey: qraft.pet.findPetsByStatus.getQueryKey(),
-      });
+      await qraft.pet.findPetsByStatus.invalidateQueries(queryClient);
       if (!createdPet)
         throw new Error('createdPet not found in addPet.onSuccess');
       setPetIdToEditToEdit(createdPet.id);
