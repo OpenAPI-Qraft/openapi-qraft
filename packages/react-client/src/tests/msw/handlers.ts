@@ -110,6 +110,44 @@ export const handlers = [
       header,
     });
   }),
+
+  http.get<
+    ServicePathParameters<Services['files']['getFileList']>,
+    undefined,
+    ServiceResponseParameters<Services['files']['getFileList']>
+  >(openApiToMswPath(services.files.getFileList.schema.url), ({ request }) => {
+    const query = getQueryParameters<Services['files']['getFileList']>(
+      request.url
+    );
+
+    const header = getHeaders<Services['files']['getFileList']>(
+      request.headers,
+      'x-'
+    );
+
+    return HttpResponse.json({
+      data: [
+        {
+          id: '1',
+          url: 'http://localhost:3000/1',
+          name: 'file1',
+          file_type: 'pdf',
+        },
+        {
+          id: '2',
+          url: 'http://localhost:3000/2',
+          name: 'file2',
+          file_type: 'pdf',
+        },
+        {
+          id: '3',
+          url: 'http://localhost:3000/3',
+          name: 'file3',
+          file_type: 'pdf',
+        },
+      ],
+    });
+  }),
 ];
 
 function openApiToMswPath(url: string) {
