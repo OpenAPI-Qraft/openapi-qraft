@@ -218,23 +218,32 @@ describe('Qraft uses Suspense Query', () => {
 });
 
 describe('Qraft uses Queries', () => {
-  it('supports useQueries', async () => {
+  it('supports useQueries with parameters and queryKey', async () => {
+    const parameters: typeof qraft.approvalPolicies.getApprovalPoliciesId.types.parameters =
+      {
+        header: {
+          'x-monite-version': '1.0.0',
+        },
+        path: {
+          approval_policy_id: '1',
+        },
+        query: {
+          items_order: ['asc', 'desc'],
+        },
+      };
+
     const { result } = renderHook(
       () =>
         qraft.approvalPolicies.getApprovalPoliciesId.useQueries({
           queries: [
             {
-              parameters: {
-                header: {
-                  'x-monite-version': '1.0.0',
-                },
-                path: {
-                  approval_policy_id: '1',
-                },
-                query: {
-                  items_order: ['asc', 'desc'],
-                },
-              },
+              parameters,
+            },
+            {
+              queryKey:
+                qraft.approvalPolicies.getApprovalPoliciesId.getQueryKey(
+                  parameters
+                ),
             },
           ],
           combine: (results) => results.map((result) => result.data),
@@ -245,19 +254,7 @@ describe('Qraft uses Queries', () => {
     );
 
     await waitFor(() => {
-      expect(result.current).toEqual([
-        {
-          header: {
-            'x-monite-version': '1.0.0',
-          },
-          path: {
-            approval_policy_id: '1',
-          },
-          query: {
-            items_order: ['asc', 'desc'],
-          },
-        },
-      ]);
+      expect(result.current).toEqual([parameters, parameters]);
     });
   });
 });

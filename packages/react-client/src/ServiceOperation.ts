@@ -128,9 +128,11 @@ interface ServiceOperationUseQueries<
           >,
           'placeholderData' | 'suspense' | 'queryKey'
         > & {
-          parameters: TParams;
           placeholderData?: TData | QueriesPlaceholderDataFunction<TData>;
-        }
+        } & (
+            | { parameters: TParams }
+            | { queryKey: ServiceOperationQueryKey<TSchema, TParams> }
+          )
       >;
       combine?: (
         results: Array<UseQueryResult<TData, TError>>

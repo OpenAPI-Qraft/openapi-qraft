@@ -31,19 +31,37 @@ export const useQueries: (
   return useQueriesTanstack(
     {
       ...options,
-      queries: options.queries.map(({ parameters, ...queryOptions }) => ({
-        ...queryOptions,
-        queryKey: composeQueryKey(schema, parameters),
-        queryFn:
-          queryOptions.queryFn ??
-          function ({ queryKey: [, queryParams], signal, meta }) {
-            return requestClient(schema, {
-              parameters: queryParams as never,
-              signal,
-              meta,
-            });
-          },
-      })),
+      queries: options.queries.map((queryOptions) => {
+        const queryKey =
+          'queryKey' in queryOptions
+            ? queryOptions.queryKey
+            : composeQueryKey(schema, queryOptions.parameters);
+
+        const optionsWithQueryKey =
+          'parameters' in queryOptions
+            ? (() => {
+                const queryOptionsCopy = Object.assign(
+                  { queryKey },
+                  queryOptions
+                );
+                delete queryOptionsCopy.parameters;
+                return queryOptionsCopy;
+              })()
+            : queryOptions;
+
+        return {
+          ...optionsWithQueryKey,
+          queryFn:
+            optionsWithQueryKey.queryFn ??
+            function ({ queryKey: [, queryParams], signal, meta }) {
+              return requestClient(schema, {
+                parameters: queryParams as never,
+                signal,
+                meta,
+              });
+            },
+        };
+      }),
     },
     useQueryClient(queryClientByArg ?? queryClientByContext)
   ) as never;
