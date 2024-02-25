@@ -974,6 +974,49 @@ describe('Qraft uses Query Function', () => {
   });
 });
 
+describe('Qraft uses mutationFn', () => {
+  it('supports mutationFn', async () => {
+    const result = await qraft.entities.postEntitiesIdDocuments.mutationFn(
+      requestClient,
+      {
+        parameters: {
+          header: {
+            'x-monite-version': '1.0.0',
+          },
+          path: {
+            entity_id: '1',
+          },
+          query: {
+            referer: 'https://example.com',
+          },
+        },
+        body: {
+          verification_document_back: 'back',
+          verification_document_front: 'front',
+        },
+      }
+    );
+
+    await waitFor(() => {
+      expect(result).toEqual({
+        header: {
+          'x-monite-version': '1.0.0',
+        },
+        path: {
+          entity_id: '1',
+        },
+        query: {
+          referer: 'https://example.com',
+        },
+        body: {
+          verification_document_back: 'back',
+          verification_document_front: 'front',
+        },
+      });
+    });
+  });
+});
+
 describe('Qraft uses utils', () => {
   it('returns _def', () => {
     // @ts-ignore
