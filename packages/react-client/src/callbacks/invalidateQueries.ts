@@ -1,10 +1,10 @@
 import { InvalidateOptions } from '@tanstack/query-core';
 import { QueryClient } from '@tanstack/react-query';
 
+import { composeQueryKey } from '../lib/composeQueryKey.js';
 import type { QraftClientOptions } from '../qraftAPIClient.js';
 import type { RequestClientSchema } from '../RequestClient.js';
 import { ServiceOperationInvalidateQueriesCallback } from '../ServiceOperation.js';
-import { composeQueryKey } from './getQueryKey.js';
 
 export function invalidateQueries<TData>(
   qraftOptions: QraftClientOptions | undefined,

@@ -1,10 +1,10 @@
+import { composeQueryKey } from '../lib/composeQueryKey.js';
 import type { QraftClientOptions } from '../qraftAPIClient.js';
 import type { RequestClientSchema } from '../RequestClient.js';
 import {
   ServiceOperationQuery,
   ServiceOperationQueryKey,
 } from '../ServiceOperation.js';
-import { composeQueryKey } from './getQueryKey.js';
 
 export function setQueryData<TData>(
   qraftOptions: QraftClientOptions | undefined,

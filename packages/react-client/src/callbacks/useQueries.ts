@@ -8,11 +8,11 @@ import {
   useQueryClient,
 } from '@tanstack/react-query';
 
+import { composeQueryKey } from '../lib/composeQueryKey.js';
 import type { QraftClientOptions } from '../qraftAPIClient.js';
 import { QraftContext } from '../QraftContext.js';
 import type { RequestClientSchema } from '../RequestClient.js';
 import { ServiceOperationQuery } from '../ServiceOperation.js';
-import { composeQueryKey } from './getQueryKey.js';
 
 export const useQueries: (
   qraftOptions: QraftClientOptions | undefined,
