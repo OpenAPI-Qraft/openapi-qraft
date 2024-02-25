@@ -263,7 +263,11 @@ interface ServiceOperationUseSuspenseQueries<
             ServiceOperationQueryKey<TSchema, TParams>
           >,
           'queryKey'
-        > & { parameters: TParams }
+        > &
+          (
+            | { parameters: TParams }
+            | { queryKey: ServiceOperationQueryKey<TSchema, TParams> }
+          )
       >;
       combine?: (
         results: Array<UseSuspenseQueryResult<TData, TError>>
@@ -284,7 +288,7 @@ interface ServiceOperationUseInfiniteQuery<
   ): ServiceOperationInfiniteQueryKey<TSchema, TQueryKeyParams>;
 
   useInfiniteQuery<TPageParam extends TParams>(
-    parameters: TParams,
+    parameters: TParams | ServiceOperationInfiniteQueryKey<TSchema, TParams>,
     options: Omit<
       UndefinedInitialDataInfiniteOptions<
         TData,
@@ -302,7 +306,7 @@ interface ServiceOperationUseInfiniteQuery<
     queryClient?: QueryClient
   ): UseInfiniteQueryResult<InfiniteData<TData>, TError | Error>;
   useInfiniteQuery<TPageParam extends TParams>(
-    parameters: TParams,
+    parameters: TParams | ServiceOperationInfiniteQueryKey<TSchema, TParams>,
     options: Omit<
       DefinedInitialDataInfiniteOptions<
         TData,
@@ -328,7 +332,7 @@ interface ServiceOperationUseSuspenseInfiniteQuery<
   TError = DefaultError,
 > {
   useSuspenseInfiniteQuery<TPageParam extends TParams>(
-    parameters: TParams,
+    parameters: TParams | ServiceOperationInfiniteQueryKey<TSchema, TParams>,
     options: Omit<
       UseSuspenseInfiniteQueryOptions<
         TData,
@@ -355,7 +359,7 @@ interface ServiceOperationUseSuspenseQueryQuery<
   TError = DefaultError,
 > {
   useSuspenseQuery(
-    parameters: TParams,
+    parameters: TParams | ServiceOperationQueryKey<TSchema, TParams>,
     options?: Omit<
       UseSuspenseQueryOptions<
         TData,

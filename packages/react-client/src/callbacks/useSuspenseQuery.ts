@@ -41,7 +41,9 @@ export const useSuspenseQuery: <
   if (!requestClient) throw new Error(`QraftContext.requestClient not found`);
 
   const queryKey: ServiceOperationQueryKey<RequestClientSchema, unknown> =
-    composeQueryKey(schema, parameters);
+    Array.isArray(parameters)
+      ? (parameters as never)
+      : composeQueryKey(schema, parameters);
 
   return useSuspenseQueryTanstack(
     {

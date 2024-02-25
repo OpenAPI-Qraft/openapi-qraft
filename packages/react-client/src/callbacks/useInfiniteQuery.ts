@@ -13,7 +13,10 @@ import { shelfMerge } from '../lib/shelfMerge.js';
 import type { QraftClientOptions } from '../qraftAPIClient.js';
 import { QraftContext } from '../QraftContext.js';
 import type { RequestClientSchema } from '../RequestClient.js';
-import { ServiceOperationQuery } from '../ServiceOperation.js';
+import {
+  ServiceOperationInfiniteQueryKey,
+  ServiceOperationQuery,
+} from '../ServiceOperation.js';
 import { composeInfiniteQueryKey } from './getInfiniteQueryKey.js';
 
 export const useInfiniteQuery: <
@@ -38,10 +41,17 @@ export const useInfiniteQuery: <
 
   if (!requestClient) throw new Error(`QraftContext.requestClient not found`);
 
+  const queryKey: ServiceOperationInfiniteQueryKey<
+    RequestClientSchema,
+    unknown
+  > = Array.isArray(parameters)
+    ? (parameters as never)
+    : composeInfiniteQueryKey(schema, parameters);
+
   return useInfiniteQueryBase(
     {
       ...options,
-      queryKey: composeInfiniteQueryKey(schema, parameters),
+      queryKey,
       queryFn:
         options?.queryFn ??
         function ({ queryKey: [, queryParams], signal, meta, pageParam }) {
