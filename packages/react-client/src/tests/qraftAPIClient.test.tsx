@@ -1074,6 +1074,13 @@ describe('Qraft uses utils', () => {
       qraft.counterparts.postCounterpartsIdAddresses.unsupportedMethod()
     ).toThrowError(/Function unsupportedMethod is not supported/i);
   });
+
+  it('resolves original proxy in promises ', async () => {
+    const getFilesProxy = qraft.files.getFiles;
+    expect(getFilesProxy === (await Promise.resolve(getFilesProxy))).toEqual(
+      true
+    );
+  });
 });
 
 describe('Qraft uses setQueryData', () => {
