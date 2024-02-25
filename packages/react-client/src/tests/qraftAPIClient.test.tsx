@@ -568,10 +568,6 @@ describe('Qraft uses Suspense Infinite Queries', () => {
 
     const queryClient = new QueryClient();
 
-    /*const { result } = renderHook(hook, {
-      wrapper: (props) => <Providers {...props} queryClient={queryClient} />,
-    });*/
-
     const { result: resultWithErrorPromise } = renderHook(hook, {
       wrapper: (props) => <Providers {...props} queryClient={queryClient} />,
     });
