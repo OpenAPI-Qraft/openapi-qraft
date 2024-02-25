@@ -1,5 +1,6 @@
 import react from '@vitejs/plugin-react';
 
+import { fileURLToPath } from 'node:url';
 import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
@@ -9,5 +10,25 @@ export default defineConfig({
     environment: 'jsdom',
     setupFiles: './src/tests/setupTests.ts',
     css: false,
+    alias: [
+      {
+        find: '@openapi-qraft/react/callbacks',
+        replacement: fileURLToPath(new URL('./src/callbacks', import.meta.url)),
+      },
+      {
+        find: '@openapi-qraft/react',
+        replacement: fileURLToPath(new URL('./src', import.meta.url)),
+      },
+    ],
+    coverage: {
+      exclude: [
+        'src/ServiceOperation.ts', // only types
+        'src/RequestClient.ts', // only types
+        'src/tests/**',
+        'src/**/*.d.ts',
+        'src/**/*.test.*',
+        'src/**/*.spec.*',
+      ],
+    },
   },
 });
