@@ -16,6 +16,7 @@ import {
   ServiceOperationQuery,
   ServiceOperationQueryKey,
 } from '../ServiceOperation.js';
+import { composeQueryKey } from './getQueryKey.js';
 
 export const useSuspenseQuery: <
   TQueryFnData = unknown,
@@ -39,10 +40,8 @@ export const useSuspenseQuery: <
 
   if (!requestClient) throw new Error(`QraftContext.requestClient not found`);
 
-  const queryKey: ServiceOperationQueryKey<RequestClientSchema, unknown> = [
-    { url: schema.url, method: schema.method },
-    parameters,
-  ];
+  const queryKey: ServiceOperationQueryKey<RequestClientSchema, unknown> =
+    composeQueryKey(schema, parameters);
 
   return useSuspenseQueryTanstack(
     {

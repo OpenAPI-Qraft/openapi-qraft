@@ -4,6 +4,7 @@ import {
   ServiceOperationQuery,
   ServiceOperationQueryKey,
 } from '../ServiceOperation.js';
+import { composeQueryKey } from './getQueryKey.js';
 
 export function setQueryData<TData>(
   qraftOptions: QraftClientOptions | undefined,
@@ -17,7 +18,7 @@ export function setQueryData<TData>(
   const queryKey: ServiceOperationQueryKey<RequestClientSchema, unknown> =
     Array.isArray(parameters)
       ? parameters
-      : [{ url: schema.url, method: schema.method }, parameters];
+      : composeQueryKey(schema, parameters);
 
   return queryClient.setQueryData(queryKey, updater as never, options);
 }

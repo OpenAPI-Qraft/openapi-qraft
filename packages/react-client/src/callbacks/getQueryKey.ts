@@ -12,8 +12,12 @@ export const getQueryKey = (
     ServiceOperationQuery<RequestClientSchema, unknown, unknown>['getQueryKey']
   >
 ) => {
-  return [
-    { url: schema.url, method: schema.method },
-    args[0],
-  ] satisfies ServiceOperationQueryKey<RequestClientSchema, unknown>;
+  return composeQueryKey(schema, args[0]);
 };
+
+export function composeQueryKey<TSchema extends RequestClientSchema, TParams>(
+  schema: TSchema,
+  parameters: TParams | undefined
+): ServiceOperationQueryKey<TSchema, TParams> {
+  return [schema, parameters ?? ({} as TParams)];
+}

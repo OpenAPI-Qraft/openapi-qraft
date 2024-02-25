@@ -1391,14 +1391,68 @@ describe('Qraft uses Queries Invalidation', () => {
       )
     ).toBeInstanceOf(Promise);
 
-    const { result: result_02 } = renderHook(hook, {
+    expect(counterFn.mock.calls).toEqual(
+      new Array(counterFn.mock.calls.length).fill([parameters])
+    );
+  });
+
+  it('supports invalidateQueries with predicate and no queryKey', async () => {
+    const queryClient = new QueryClient({
+      defaultOptions: {
+        queries: {
+          refetchOnMount: false,
+        },
+      },
+    });
+
+    const filesQueryKey = qraft.files.getFiles.getQueryKey({
+      header: {
+        'x-monite-version': '1.0.0',
+      },
+      query: {
+        id__in: ['1', '2'],
+      },
+    });
+
+    // Mix with another query to make sure it's not in predicate
+    await queryClient.fetchQuery({
+      queryKey: filesQueryKey,
+      queryFn: () =>
+        qraft.files.getFiles.queryFn(
+          { queryKey: filesQueryKey },
+          requestClient
+        ),
+    });
+
+    const { result: result_01 } = renderHook(hook, {
       wrapper: wrapper.bind(null, queryClient),
     });
+
+    await waitFor(() => {
+      expect(result_01.current.isSuccess).toBeTruthy();
+      expect(result_01.current.isFetching).toBeFalsy();
+    });
+
+    const counterFn =
+      vi.fn<
+        [typeof qraft.approvalPolicies.getApprovalPoliciesId.types.parameters]
+      >();
+
+    expect(
+      qraft.approvalPolicies.getApprovalPoliciesId.invalidateQueries(
+        {
+          predicate: (query) => {
+            counterFn(query.queryKey[1]);
+            return true;
+          },
+        },
+        queryClient
+      )
+    ).toBeInstanceOf(Promise);
 
     expect(counterFn.mock.calls).toEqual(
       new Array(counterFn.mock.calls.length).fill([parameters])
     );
-    expect(result_02.current.isFetching).toBeTruthy();
   });
 });
 

@@ -1,9 +1,7 @@
 import type { QraftClientOptions } from '../qraftAPIClient.js';
 import type { RequestClientSchema } from '../RequestClient.js';
-import {
-  ServiceOperationQuery,
-  ServiceOperationQueryKey,
-} from '../ServiceOperation.js';
+import { ServiceOperationQuery } from '../ServiceOperation.js';
+import { composeQueryKey } from './getQueryKey.js';
 
 export function getQueryData<TData>(
   qraftOptions: QraftClientOptions | undefined,
@@ -14,11 +12,6 @@ export function getQueryData<TData>(
 ): TData | undefined {
   const [parameters, queryClient] = args;
   return queryClient.getQueryData(
-    Array.isArray(parameters)
-      ? parameters
-      : ([
-          { url: schema.url, method: schema.method },
-          parameters,
-        ] satisfies ServiceOperationQueryKey<RequestClientSchema, unknown>)
+    Array.isArray(parameters) ? parameters : composeQueryKey(schema, parameters)
   );
 }

@@ -16,6 +16,7 @@ import {
   ServiceOperationQuery,
   ServiceOperationQueryKey,
 } from '../ServiceOperation.js';
+import { composeQueryKey } from './getQueryKey.js';
 
 export const useQuery: <TData = unknown, TError = DefaultError>(
   qraftOptions: QraftClientOptions | undefined,
@@ -34,7 +35,7 @@ export const useQuery: <TData = unknown, TError = DefaultError>(
   const queryKey: ServiceOperationQueryKey<RequestClientSchema, unknown> =
     Array.isArray(parameters)
       ? (parameters as ServiceOperationQueryKey<RequestClientSchema, unknown>)
-      : [{ url: schema.url, method: schema.method }, parameters];
+      : composeQueryKey(schema, parameters);
 
   return useQueryTanstack(
     {

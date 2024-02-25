@@ -11,10 +11,8 @@ import {
 import type { QraftClientOptions } from '../qraftAPIClient.js';
 import { QraftContext } from '../QraftContext.js';
 import type { RequestClientSchema } from '../RequestClient.js';
-import {
-  ServiceOperationQuery,
-  ServiceOperationQueryKey,
-} from '../ServiceOperation.js';
+import { ServiceOperationQuery } from '../ServiceOperation.js';
+import { composeQueryKey } from './getQueryKey.js';
 
 export const useQueries: (
   qraftOptions: QraftClientOptions | undefined,
@@ -35,10 +33,7 @@ export const useQueries: (
       ...options,
       queries: options.queries.map(({ parameters, ...queryOptions }) => ({
         ...queryOptions,
-        queryKey: [
-          { url: schema.url, method: schema.method },
-          parameters,
-        ] satisfies ServiceOperationQueryKey<RequestClientSchema, unknown>,
+        queryKey: composeQueryKey(schema, parameters),
         queryFn:
           queryOptions.queryFn ??
           function ({ queryKey: [, queryParams], signal, meta }) {

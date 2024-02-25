@@ -3,10 +3,8 @@ import { QueryClient } from '@tanstack/react-query';
 
 import type { QraftClientOptions } from '../qraftAPIClient.js';
 import type { RequestClientSchema } from '../RequestClient.js';
-import {
-  ServiceOperationInvalidateQueriesCallback,
-  ServiceOperationQueryKey,
-} from '../ServiceOperation.js';
+import { ServiceOperationInvalidateQueriesCallback } from '../ServiceOperation.js';
+import { composeQueryKey } from './getQueryKey.js';
 
 export function invalidateQueries<TData>(
   qraftOptions: QraftClientOptions | undefined,
@@ -40,10 +38,7 @@ export function invalidateQueries<TData>(
   if (!filters) {
     return queryClient.invalidateQueries(
       {
-        queryKey: [
-          { url: schema.url, method: schema.method },
-          undefined,
-        ] satisfies ServiceOperationQueryKey<RequestClientSchema, unknown>,
+        queryKey: composeQueryKey(schema, undefined),
       },
       options
     );
@@ -59,10 +54,7 @@ export function invalidateQueries<TData>(
     return queryClient.invalidateQueries(
       {
         ...filtersRest,
-        queryKey: [
-          { url: schema.url, method: schema.method },
-          parameters,
-        ] satisfies ServiceOperationQueryKey<RequestClientSchema, unknown>,
+        queryKey: composeQueryKey(schema, parameters),
       } as never,
       options
     );
@@ -71,10 +63,7 @@ export function invalidateQueries<TData>(
   return queryClient.invalidateQueries(
     {
       ...filters,
-      queryKey: [
-        { url: schema.url, method: schema.method },
-        undefined,
-      ] satisfies ServiceOperationQueryKey<RequestClientSchema, unknown>,
+      queryKey: composeQueryKey(schema, undefined),
     } as never,
     options
   );
