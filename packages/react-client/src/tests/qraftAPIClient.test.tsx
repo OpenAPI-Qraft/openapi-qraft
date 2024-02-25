@@ -320,18 +320,68 @@ describe('Qraft uses Suspense Queries', () => {
 });
 
 describe('Qraft uses Infinite Queries', () => {
-  it('supports useInfiniteQuery', async () => {
+  const parameters: typeof qraft.files.getFiles.types.parameters = {
+    header: {
+      'x-monite-version': '1.0.0',
+    },
+    query: {
+      id__in: ['1', '2'],
+    },
+  };
+
+  it('supports useInfiniteQuery with parameters', async () => {
     const { result } = renderHook(
       () =>
-        qraft.files.getFiles.useInfiniteQuery(
+        qraft.files.getFiles.useInfiniteQuery(parameters, {
+          getNextPageParam: (lastPage, allPages, params) => {
+            return {
+              query: {
+                page: params.query?.page
+                  ? String(Number(params.query.page) + 1)
+                  : undefined,
+              },
+            };
+          },
+          initialPageParam: {
+            query: {
+              page: '1',
+            },
+          },
+        }),
+      {
+        wrapper: Providers,
+      }
+    );
+
+    await waitFor(() => {
+      expect(result.current.data).toEqual({
+        pageParams: [
+          {
+            query: {
+              page: '1',
+            },
+          },
+        ],
+        pages: [
           {
             header: {
               'x-monite-version': '1.0.0',
             },
             query: {
               id__in: ['1', '2'],
+              page: '1',
             },
           },
+        ],
+      });
+    });
+  });
+
+  it('supports useInfiniteQuery with queryKey', async () => {
+    const { result } = renderHook(
+      () =>
+        qraft.files.getFiles.useInfiniteQuery(
+          qraft.files.getFiles.getInfiniteQueryKey(parameters),
           {
             getNextPageParam: (lastPage, allPages, params) => {
               return {
