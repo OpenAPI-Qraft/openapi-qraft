@@ -1205,7 +1205,7 @@ describe('Qraft uses setQueryData', () => {
 });
 
 describe('Qraft uses setInfiniteQueryData', () => {
-  it('uses setInfiniteQueryData & getInfiniteQueryData', async () => {
+  it('uses setInfiniteQueryData & getInfiniteQueryData with parameters', async () => {
     const queryClient = new QueryClient();
 
     const parameters: typeof qraft.files.getFiles.types.parameters = {
@@ -1241,9 +1241,7 @@ describe('Qraft uses setInfiniteQueryData', () => {
       queryClient
     );
 
-    expect(
-      qraft.files.getFiles.getInfiniteQueryData(parameters, queryClient)
-    ).toEqual({
+    const expectedResult = {
       pages: [parameters],
       pageParams: [
         {
@@ -1252,7 +1250,77 @@ describe('Qraft uses setInfiniteQueryData', () => {
           },
         },
       ],
-    });
+    };
+
+    expect(
+      qraft.files.getFiles.getInfiniteQueryData(parameters, queryClient)
+    ).toEqual(expectedResult);
+
+    expect(
+      qraft.files.getFiles.getInfiniteQueryData(
+        qraft.files.getFiles.getInfiniteQueryKey(parameters),
+        queryClient
+      )
+    ).toEqual(expectedResult);
+  });
+
+  it('uses setInfiniteQueryData & getInfiniteQueryData with queryKey', async () => {
+    const queryClient = new QueryClient();
+
+    const parameters: typeof qraft.files.getFiles.types.parameters = {
+      header: {
+        'x-monite-version': '1.0.0',
+      },
+      query: {
+        id__in: ['1', '2'],
+      },
+    };
+
+    qraft.files.getFiles.setInfiniteQueryData(
+      qraft.files.getFiles.getInfiniteQueryKey(parameters),
+      {
+        pages: [
+          {
+            header: {
+              'x-monite-version': '1.0.0',
+            },
+            query: {
+              id__in: ['1', '2'],
+            },
+          },
+        ],
+        pageParams: [
+          {
+            query: {
+              page: '1',
+            },
+          },
+        ],
+      },
+      queryClient
+    );
+
+    const expectedResult = {
+      pages: [parameters],
+      pageParams: [
+        {
+          query: {
+            page: '1',
+          },
+        },
+      ],
+    };
+
+    expect(
+      qraft.files.getFiles.getInfiniteQueryData(parameters, queryClient)
+    ).toEqual(expectedResult);
+
+    expect(
+      qraft.files.getFiles.getInfiniteQueryData(
+        qraft.files.getFiles.getInfiniteQueryKey(parameters),
+        queryClient
+      )
+    ).toEqual(expectedResult);
   });
 
   it('does not return getInfiniteQueryData() from non Infinite query', async () => {
