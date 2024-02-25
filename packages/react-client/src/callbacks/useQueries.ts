@@ -32,16 +32,13 @@ export const useQueries: (
     {
       ...options,
       queries: options.queries.map((queryOptions) => {
-        const queryKey =
-          'queryKey' in queryOptions
-            ? queryOptions.queryKey
-            : composeQueryKey(schema, queryOptions.parameters);
-
         const optionsWithQueryKey =
           'parameters' in queryOptions
             ? (() => {
                 const queryOptionsCopy = Object.assign(
-                  { queryKey },
+                  {
+                    queryKey: composeQueryKey(schema, queryOptions.parameters),
+                  },
                   queryOptions
                 );
                 delete queryOptionsCopy.parameters;
