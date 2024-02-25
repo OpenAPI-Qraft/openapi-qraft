@@ -1330,6 +1330,167 @@ describe('Qraft uses Queries Invalidation', () => {
     expect(result_02.current.isFetching).toBeTruthy();
   });
 
+  it('supports invalidateQueries with options', async () => {
+    const queryClient = new QueryClient({
+      defaultOptions: {
+        queries: {
+          refetchOnMount: false,
+        },
+      },
+    });
+
+    let counter = 0;
+
+    const useMockHook = () => {
+      return qraft.approvalPolicies.getApprovalPoliciesId.useQuery(parameters, {
+        retry: false,
+        queryFn: () => {
+          if (++counter > 1) throw new Error('Invalidation Error');
+          return Promise.resolve(parameters);
+        },
+      });
+    };
+
+    const { result: result_01 } = renderHook(useMockHook, {
+      wrapper: wrapper.bind(null, queryClient),
+    });
+
+    await waitFor(() => {
+      expect(result_01.current.isSuccess).toBeTruthy();
+      expect(result_01.current.isFetching).toBeFalsy();
+    });
+
+    await expect(
+      qraft.approvalPolicies.getApprovalPoliciesId.invalidateQueries(
+        { parameters },
+        { throwOnError: true },
+        queryClient
+      )
+    ).rejects.toThrowError('Invalidation Error');
+  });
+
+  it('requires invalidateQueries queryClient instance', async () => {
+    expect(() =>
+      // @ts-expect-error
+      qraft.approvalPolicies.getApprovalPoliciesId.invalidateQueries()
+    ).toThrowError();
+  });
+
+  it('check invalidateQueries queryClient instance', async () => {
+    expect(() =>
+      qraft.approvalPolicies.getApprovalPoliciesId.invalidateQueries(
+        {} as never
+      )
+    ).toThrowError();
+  });
+
+  it('supports invalidateQueries without filters and not effect other queries', async () => {
+    const queryClient = new QueryClient({
+      defaultOptions: {
+        queries: {
+          refetchOnMount: false,
+        },
+      },
+    });
+
+    const { result: result_01 } = renderHook(hook, {
+      wrapper: wrapper.bind(null, queryClient),
+    });
+
+    const { result: getFilesResult_01 } = renderHook(
+      () => qraft.files.getFileList.useQuery({}),
+      {
+        wrapper: wrapper.bind(null, queryClient),
+      }
+    );
+
+    await waitFor(() => {
+      expect(result_01.current.isSuccess).toBeTruthy();
+      expect(result_01.current.isFetching).toBeFalsy();
+      expect(getFilesResult_01.current.isSuccess).toBeTruthy();
+    });
+
+    expect(
+      qraft.approvalPolicies.getApprovalPoliciesId.invalidateQueries(
+        queryClient
+      )
+    ).toBeInstanceOf(Promise);
+
+    const { result: result_02 } = renderHook(hook, {
+      wrapper: wrapper.bind(null, queryClient),
+    });
+
+    const { result: getFilesResult_02 } = renderHook(
+      () => qraft.files.getFileList.useQuery({}),
+      {
+        wrapper: wrapper.bind(null, queryClient),
+      }
+    );
+
+    expect(result_02.current.isFetching).toBeTruthy();
+    expect(getFilesResult_02.current.isFetching).toBeFalsy();
+  });
+
+  it('supports invalidateQueries for Infinite Query', async () => {
+    const queryClient = new QueryClient({
+      defaultOptions: {
+        queries: {
+          refetchOnMount: false,
+        },
+      },
+    });
+
+    const useInfiniteHook = () =>
+      qraft.approvalPolicies.getApprovalPoliciesId.useInfiniteQuery(
+        parameters,
+        {
+          initialPageParam: {},
+          getNextPageParam: () => {
+            return {};
+          },
+        }
+      );
+
+    const { result: result_01 } = renderHook(useInfiniteHook, {
+      wrapper: wrapper.bind(null, queryClient),
+    });
+
+    await waitFor(() => {
+      expect(result_01.current.isSuccess).toBeTruthy();
+      expect(result_01.current.isFetching).toBeFalsy();
+    });
+
+    const counterFn = vi.fn<[{ infinite: boolean | undefined }]>();
+
+    expect(
+      qraft.approvalPolicies.getApprovalPoliciesId.invalidateQueries(
+        {
+          parameters,
+          predicate: (query) => {
+            counterFn({
+              infinite:
+                'infinite' in query.queryKey[0]
+                  ? query.queryKey[0].infinite
+                  : false,
+            });
+            return true;
+          },
+        },
+        queryClient
+      )
+    ).toBeInstanceOf(Promise);
+
+    const { result: result_02 } = renderHook(useInfiniteHook, {
+      wrapper: wrapper.bind(null, queryClient),
+    });
+
+    expect(result_02.current.isFetching).toBeTruthy();
+
+    expect(counterFn.mock.calls).toEqual(
+      new Array(counterFn.mock.calls.length).fill([{ infinite: true }])
+    );
+  });
+
   it('does not invalidateQueries by not matching queryKey', async () => {
     const queryClient = new QueryClient({
       defaultOptions: {
