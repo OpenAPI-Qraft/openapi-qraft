@@ -1,6 +1,16 @@
-import { ComponentProps, useState } from 'react';
+import { ComponentProps, ReactNode, useState } from 'react';
 
-import { useQueryClient } from '@tanstack/react-query';
+import {
+  bodySerializer,
+  QraftContext,
+  request,
+  urlSerializer,
+} from '@openapi-qraft/react';
+import {
+  QueryClient,
+  QueryClientProvider,
+  useQueryClient,
+} from '@tanstack/react-query';
 
 import constate from 'constate';
 
@@ -9,7 +19,7 @@ import { createAPIClient } from './api';
 
 const qraft = createAPIClient();
 
-function App() {
+function AppComponent() {
   const { petIdToEdit } = usePetToEdit();
   const { petStatusToCreate } = usePetStatusToCreate();
 
@@ -356,14 +366,43 @@ function getErrorMessage(error: unknown) {
   }`;
 }
 
-export default function () {
+export const QraftProviders = ({ children }: { children: ReactNode }) => {
+  const [queryClient] = useState(() => new QueryClient());
+
   return (
-    <UseFilterStatusProvider>
-      <UsePetToEditProvider>
-        <UsePetStatusToCreateProvider>
-          <App />
-        </UsePetStatusToCreateProvider>
-      </UsePetToEditProvider>
-    </UseFilterStatusProvider>
+    <QueryClientProvider client={queryClient}>
+      <QraftContext.Provider
+        value={{
+          async requestClient(schema, options) {
+            return request(
+              {
+                baseUrl: 'https://petstore3.swagger.io/api/v3',
+              },
+              {
+                ...schema,
+                ...options,
+              },
+              { urlSerializer, bodySerializer }
+            );
+          },
+        }}
+      >
+        {children}
+      </QraftContext.Provider>
+    </QueryClientProvider>
+  );
+};
+
+export default function App() {
+  return (
+    <QraftProviders>
+      <UseFilterStatusProvider>
+        <UsePetToEditProvider>
+          <UsePetStatusToCreateProvider>
+            <AppComponent />
+          </UsePetStatusToCreateProvider>
+        </UsePetToEditProvider>
+      </UseFilterStatusProvider>
+    </QraftProviders>
   );
 }
