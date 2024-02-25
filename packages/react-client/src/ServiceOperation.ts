@@ -1,12 +1,15 @@
 import {
   DefaultError,
+  FetchStatus,
   InfiniteData,
   InfiniteQueryPageParamsOptions,
+  InvalidateOptions,
   Mutation,
   MutationState,
   MutationStatus,
   NoInfer,
   QueriesPlaceholderDataFunction,
+  Query,
   QueryClient,
   SetDataOptions,
   Updater,
@@ -59,7 +62,8 @@ export interface ServiceOperationQuery<
     ServiceOperationGetQueryData<TSchema, TData, TParams>,
     ServiceOperationGetInfiniteQueryData<TSchema, TData, TParams>,
     ServiceOperationSetQueryData<TSchema, TData, TParams>,
-    ServiceOperationSetInfiniteQueryData<TSchema, TData, TParams> {
+    ServiceOperationSetInfiniteQueryData<TSchema, TData, TParams>,
+    ServiceOperationInvalidateQueries<TSchema, TData, TParams, TError> {
   schema: TSchema;
   types: {
     parameters: TParams;
@@ -134,6 +138,108 @@ interface ServiceOperationUseQueries<
     },
     queryClient?: QueryClient
   ): TCombinedResult;
+}
+
+type QueryTypeFilter = 'all' | 'active' | 'inactive';
+
+interface InvalidateQueryFiltersBase<
+  TSchema extends { url: string; method: string },
+  TData,
+  TParams = {},
+  TError = DefaultError,
+> {
+  /**
+   * Filter to active queries, inactive queries or all queries
+   */
+  type?: QueryTypeFilter;
+  /**
+   * Match query key exactly
+   */
+  exact?: boolean;
+  /**
+   * Include queries matching this predicate function
+   */
+  predicate?: (
+    query: Query<
+      TData,
+      TError,
+      TData,
+      | ServiceOperationQueryKey<TSchema, TParams>
+      | ServiceOperationInfiniteQueryKey<TSchema, TParams>
+    >
+  ) => boolean;
+  /**
+   * Include or exclude stale queries
+   */
+  stale?: boolean;
+  /**
+   * Include queries matching their fetchStatus
+   */
+  fetchStatus?: FetchStatus;
+
+  refetchType?: QueryTypeFilter | 'none';
+}
+
+interface InvalidateQueryFiltersByQueryKey<
+  TSchema extends { url: string; method: string },
+  TData,
+  TParams = {},
+  TError = DefaultError,
+> extends InvalidateQueryFiltersBase<TSchema, TData, TParams, TError> {
+  /**
+   * Include queries matching this query key
+   */
+  queryKey?: ServiceOperationQueryKey<TSchema, TParams>;
+}
+
+interface InvalidateQueryFiltersByParameters<
+  TSchema extends { url: string; method: string },
+  TData,
+  TParams = {},
+  TError = DefaultError,
+> extends InvalidateQueryFiltersBase<TSchema, TData, TParams, TError> {
+  /**
+   * Include queries matching parameters
+   */
+  parameters?: TParams;
+}
+
+interface ServiceOperationInvalidateQueries<
+  TSchema extends { url: string; method: string },
+  TData,
+  TParams = {},
+  TError = DefaultError,
+> {
+  invalidateQueries(
+    filters:
+      | InvalidateQueryFiltersByParameters<TSchema, TData, TParams, TError>
+      | InvalidateQueryFiltersByQueryKey<TSchema, TData, TParams, TError>,
+    options: InvalidateOptions,
+    queryClient: QueryClient
+  ): Promise<void>;
+  invalidateQueries(
+    filters:
+      | InvalidateQueryFiltersByParameters<TSchema, TData, TParams, TError>
+      | InvalidateQueryFiltersByQueryKey<TSchema, TData, TParams, TError>,
+    queryClient: QueryClient
+  ): Promise<void>;
+  invalidateQueries(queryClient: QueryClient): Promise<void>;
+}
+
+export interface ServiceOperationInvalidateQueriesCallback<
+  TSchema extends { url: string; method: string },
+  TData,
+  TParams = {},
+  TError = DefaultError,
+> extends ServiceOperationInvalidateQueries<TSchema, TData, TParams, TError> {
+  invalidateQueries(
+    filters:
+      | InvalidateQueryFiltersByParameters<TSchema, TData, TParams, TError>
+      | InvalidateQueryFiltersByQueryKey<TSchema, TData, TParams, TError>
+      | QueryClient,
+    options?: InvalidateOptions | QueryClient,
+    queryClient?: QueryClient
+  ): Promise<void>;
 }
 
 interface ServiceOperationUseSuspenseQueries<

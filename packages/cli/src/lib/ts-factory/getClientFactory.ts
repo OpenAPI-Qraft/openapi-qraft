@@ -185,4 +185,5 @@ const serviceCallbacks = [
   'useMutationState',
   'useQueries',
   'useSuspenseQueries',
+  'invalidateQueries',
 ] as const;

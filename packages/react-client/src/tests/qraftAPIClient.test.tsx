@@ -8,6 +8,8 @@ import {
 } from '@tanstack/react-query';
 import { act, renderHook, waitFor } from '@testing-library/react';
 
+import { vi } from 'vitest';
+
 import type { RequestClient } from '../index.js';
 import {
   bodySerializer,
@@ -1194,6 +1196,209 @@ describe('Qraft uses setInfiniteQueryData', () => {
     expect(
       qraft.files.getFiles.getInfiniteQueryData(parameters, queryClient)
     ).not.toBeDefined();
+  });
+});
+
+describe('Qraft uses Queries Invalidation', () => {
+  const parameters: typeof qraft.approvalPolicies.getApprovalPoliciesId.types.parameters =
+    {
+      header: {
+        'x-monite-version': '1.0.0',
+      },
+      path: {
+        approval_policy_id: '1',
+      },
+      query: {
+        items_order: ['asc', 'desc'],
+      },
+    };
+
+  const hook = () =>
+    qraft.approvalPolicies.getApprovalPoliciesId.useQuery(parameters);
+
+  const wrapper = (
+    queryClient: QueryClient,
+    props: { children: ReactNode }
+  ) => <Providers {...props} queryClient={queryClient} />;
+
+  it('supports invalidateQueries by parameters', async () => {
+    const queryClient = new QueryClient({
+      defaultOptions: {
+        queries: {
+          refetchOnMount: false,
+        },
+      },
+    });
+
+    const { result: result_01 } = renderHook(hook, {
+      wrapper: wrapper.bind(null, queryClient),
+    });
+
+    await waitFor(() => {
+      expect(result_01.current.isSuccess).toBeTruthy();
+      expect(result_01.current.isFetching).toBeFalsy();
+    });
+
+    expect(
+      qraft.approvalPolicies.getApprovalPoliciesId.invalidateQueries(
+        { parameters },
+        queryClient
+      )
+    ).toBeInstanceOf(Promise);
+
+    const { result: result_02 } = renderHook(hook, {
+      wrapper: wrapper.bind(null, queryClient),
+    });
+
+    expect(result_02.current.isFetching).toBeTruthy();
+  });
+
+  it('supports invalidateQueries by queryKey', async () => {
+    const queryClient = new QueryClient({
+      defaultOptions: {
+        queries: {
+          refetchOnMount: false,
+        },
+      },
+    });
+
+    const { result: result_01 } = renderHook(hook, {
+      wrapper: wrapper.bind(null, queryClient),
+    });
+
+    await waitFor(() => {
+      expect(result_01.current.isSuccess).toBeTruthy();
+      expect(result_01.current.isFetching).toBeFalsy();
+    });
+
+    expect(
+      qraft.approvalPolicies.getApprovalPoliciesId.invalidateQueries(
+        {
+          queryKey:
+            qraft.approvalPolicies.getApprovalPoliciesId.getQueryKey(
+              parameters
+            ),
+        },
+        queryClient
+      )
+    ).toBeInstanceOf(Promise);
+
+    const { result: result_02 } = renderHook(hook, {
+      wrapper: wrapper.bind(null, queryClient),
+    });
+
+    expect(result_02.current.isFetching).toBeTruthy();
+  });
+
+  it('does not invalidateQueries by not matching queryKey', async () => {
+    const queryClient = new QueryClient({
+      defaultOptions: {
+        queries: {
+          refetchOnMount: false,
+        },
+      },
+    });
+
+    const { result: result_01 } = renderHook(hook, {
+      wrapper: wrapper.bind(null, queryClient),
+    });
+
+    await waitFor(() => {
+      expect(result_01.current.isSuccess).toBeTruthy();
+      expect(result_01.current.isFetching).toBeFalsy();
+    });
+
+    expect(
+      qraft.approvalPolicies.getApprovalPoliciesId.invalidateQueries(
+        {
+          queryKey: qraft.approvalPolicies.getApprovalPoliciesId.getQueryKey({
+            ...parameters,
+            path: {
+              approval_policy_id: `NOT-MATCHING-${parameters.path.approval_policy_id}`,
+            },
+          }),
+        },
+        queryClient
+      )
+    ).toBeInstanceOf(Promise);
+
+    const { result: result_02 } = renderHook(hook, {
+      wrapper: wrapper.bind(null, queryClient),
+    });
+
+    expect(result_02.current.isFetching).toBeFalsy();
+  });
+
+  it('supports invalidateQueries with predicate', async () => {
+    const queryClient = new QueryClient({
+      defaultOptions: {
+        queries: {
+          refetchOnMount: false,
+        },
+      },
+    });
+
+    const filesQueryKey = qraft.files.getFiles.getQueryKey({
+      header: {
+        'x-monite-version': '1.0.0',
+      },
+      query: {
+        id__in: ['1', '2'],
+      },
+    });
+
+    // Mix with another query to make sure it's not in predicate
+    await queryClient.fetchQuery({
+      queryKey: filesQueryKey,
+      queryFn: () =>
+        qraft.files.getFiles.queryFn(
+          { queryKey: filesQueryKey },
+          requestClient
+        ),
+    });
+
+    const { result: result_01 } = renderHook(hook, {
+      wrapper: wrapper.bind(null, queryClient),
+    });
+
+    await waitFor(() => {
+      expect(result_01.current.isSuccess).toBeTruthy();
+      expect(result_01.current.isFetching).toBeFalsy();
+    });
+
+    const counterFn =
+      vi.fn<
+        [typeof qraft.approvalPolicies.getApprovalPoliciesId.types.parameters]
+      >();
+
+    expect(
+      qraft.approvalPolicies.getApprovalPoliciesId.invalidateQueries(
+        {
+          queryKey: qraft.approvalPolicies.getApprovalPoliciesId.getQueryKey({
+            header: parameters.header,
+            path: parameters.path,
+          }),
+          predicate: (query) => {
+            counterFn(query.queryKey[1]);
+
+            return (
+              query.queryKey[1].path.approval_policy_id ===
+              parameters.path.approval_policy_id
+            );
+          },
+        },
+        queryClient
+      )
+    ).toBeInstanceOf(Promise);
+
+    const { result: result_02 } = renderHook(hook, {
+      wrapper: wrapper.bind(null, queryClient),
+    });
+
+    expect(counterFn.mock.calls).toEqual(
+      new Array(counterFn.mock.calls.length).fill([parameters])
+    );
+    expect(result_02.current.isFetching).toBeTruthy();
   });
 });
 
