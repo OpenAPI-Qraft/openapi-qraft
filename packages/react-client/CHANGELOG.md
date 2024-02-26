@@ -1,5 +1,13 @@
 # @openapi-qraft/react
 
+## 1.1.0
+
+### Minor Changes
+
+- 2cacc3b: feature: Add the use of `queryKey` as an alternative to `parameters`.
+- 546b9c8: feature: Add support for `invalidateQueries(..)` method
+- f120ba7: feature: Improve error handling with the fallback to text error
+
 ## 1.0.10
 
 ### Patch Changes
