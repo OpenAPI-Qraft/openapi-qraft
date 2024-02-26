@@ -1,5 +1,12 @@
 # @openapi-qraft/react
 
+## 1.1.1
+
+### Patch Changes
+
+- cd51935: docs: Update docs
+- 1674847: refactor: optimize Tanstack type imports
+
 ## 1.1.0
 
 ### Minor Changes
