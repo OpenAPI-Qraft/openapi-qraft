@@ -1060,18 +1060,46 @@ describe('Qraft uses mutationFn', () => {
   });
 });
 
-describe('Qraft uses utils', () => {
-  it('returns _def', () => {
-    // @ts-ignore
-    expect(qraft.counterparts.postCounterpartsIdAddresses._def()).toEqual({
-      path: ['counterparts', 'postCounterpartsIdAddresses'],
+describe('Proxy call manipulations', () => {
+  it('reads the schema', () => {
+    expect(qraft.files.getFiles.schema).toEqual({
+      url: '/files',
+      method: 'get',
     });
+  });
+
+  const parameters: typeof qraft.files.getFiles.types.parameters = {
+    header: { 'x-monite-version': '1.0.0' },
+    query: { id__in: ['1', '2'] },
+  };
+
+  it('uses "apply" on proxy', async () => {
+    expect(qraft.files.getFiles.getQueryKey.apply(null, [parameters])).toEqual([
+      qraft.files.getFiles.schema,
+      parameters,
+    ]);
+  });
+
+  it('uses "call" on proxy', async () => {
+    expect(qraft.files.getFiles.getQueryKey.call(null, parameters)).toEqual([
+      qraft.files.getFiles.schema,
+      parameters,
+    ]);
+  });
+});
+
+describe('Qraft uses utils', () => {
+  it('throws an error when calling an unsupported service ', () => {
+    expect(() =>
+      // @ts-ignore
+      qraft.counterparts.postCounterpartsIdAddresses.useQuery()
+    ).toThrowError(/Service operation not found/i);
   });
 
   it('throws an error when calling an unsupported method ', () => {
     expect(() =>
       // @ts-ignore
-      qraft.counterparts.postCounterpartsIdAddresses.unsupportedMethod()
+      qraft.files.getFileList.unsupportedMethod()
     ).toThrowError(/Function unsupportedMethod is not supported/i);
   });
 

@@ -1,6 +1,6 @@
 import { Context } from 'react';
 
-import { createCallbackProxyDecoration } from './lib/createCallbackProxyDecoration.js';
+import { createRecursiveProxy } from './lib/createRecursiveProxy.js';
 import { QraftContextValue } from './QraftContext.js';
 import type { RequestClientSchema } from './RequestClient.js';
 
@@ -16,23 +16,35 @@ export const qraftAPIClient = <
   callbacks: Callbacks,
   options?: QraftClientOptions
 ): ServicesCallbacksFilter<Services, keyof Callbacks> => {
-  return createCallbackProxyDecoration(
-    Object.keys(callbacks),
-    (path, functionName, args) => {
+  return createRecursiveProxy(
+    (getPath, key) => {
+      if (getPath.length !== 2 || key !== 'schema') return;
+
+      const serviceOperation = getByPath(services, getPath);
+      if (!isServiceOperation(serviceOperation))
+        throw new Error(`Service operation not found: ${getPath.join('.')}`);
+      return serviceOperation.schema;
+    },
+    (applyPath, args) => {
+      const path = applyPath.slice(0, -1);
       const serviceOperation = getByPath(services, path);
+
       if (!isServiceOperation(serviceOperation))
         throw new Error(`Service operation not found: ${path.join('.')}`);
 
-      if (functionName in callbacks) {
-        return callbacks[functionName as keyof Callbacks](
-          options,
-          serviceOperation.schema,
-          args
-        );
-      }
+      // The last arg is for instance `.useMutation` or `.useQuery()`
+      const functionName = applyPath[applyPath.length - 1];
 
-      throw new Error(`Not supported API method: ${String(functionName)}`);
-    }
+      if (!(functionName in callbacks))
+        throw new Error(`Function ${functionName} is not supported`);
+
+      return callbacks[functionName as keyof Callbacks](
+        options,
+        serviceOperation.schema,
+        args
+      );
+    },
+    []
   ) as never;
 };
 
