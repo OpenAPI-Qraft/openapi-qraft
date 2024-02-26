@@ -5,7 +5,7 @@
   "packageManager": "yarn@4.0.2",
   "type": "module",
   "bin": {
-    "openapi-qraft-typescript": "./dist/bin.js"
+    "openapi-qraft-typescript": "./bin.mjs"
   },
   "scripts": {
     "build": "rimraf dist/ && tsc --project tsconfig.build.json",
@@ -29,7 +29,8 @@
     }
   },
   "files": [
-    "dist"
+    "dist",
+    "bin.mjs"
   ],
   "exports": {
     "./package.json": "./package.json",

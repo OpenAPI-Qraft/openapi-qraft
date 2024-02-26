@@ -1132,7 +1132,7 @@ __metadata:
     typescript:
       optional: false
   bin:
-    openapi-qraft-typescript: ./dist/bin.js
+    openapi-qraft-typescript: ./bin.mjs
   languageName: unknown
   linkType: soft
 
