@@ -57,3 +57,9 @@ else
   echo "Publishing as @latest"
   sh -c "yarn workspaces foreach --verbose --recursive --no-private $from_flags npm publish --tolerate-republish"
 fi
+
+for arg in "$@"; do
+  if [ "$arg" = "--create-git-tags" ]; then
+    yarn changeset tag
+  fi
+done
