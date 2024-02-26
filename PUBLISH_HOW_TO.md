@@ -23,7 +23,7 @@ To switch between release modes, you could use the following commands:
 Ensure you have a NPM account and this account is added to the `@openapi-qraft` organization.
 
 1. Login to NPM: `yarn npm login --scope openapi-qraft`
-2. Create new branch `packages-version-update(-<version>)` from the `master` branch.
+2. Create new branch `packages-version-update(-<version>)` from the `main` branch.
 3. Run `yarn install --immutable`
 4. Run `yarn build` to validate that packages are building correctly.
 5. Run Changesets versioning:
@@ -31,9 +31,9 @@ Ensure you have a NPM account and this account is added to the `@openapi-qraft` 
    .changeset/version.sh
    ```
 6. Push your `packages-version-update(-<version>)` branch that were created on step 2 to the `origin`,
-   and create a new Merge Request into `master`.
+   and create a new Merge Request into `main`.
    Review it and merge.
-7. Checkout `master` branch
+7. Checkout `main` branch
 8. Run `yarn build` to rebuild packages with the updated versions.
 9. Run command below and answer <kbd>Y</kbd>:
    ```bash

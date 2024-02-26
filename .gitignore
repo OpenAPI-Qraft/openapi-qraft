@@ -21,3 +21,6 @@ coverage
 !.yarn/versions
 
 .swc/
+
+# Used as dummy placeholder during CI/CD
+/.npmrc
