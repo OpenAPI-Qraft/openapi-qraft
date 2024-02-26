@@ -3,10 +3,10 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "yarn workspaces foreach --verbose --recursive --no-private --from '@openapi-qraft/*' run build",
-    "dev": "yarn workspaces foreach --verbose --recursive --no-private --from '@openapi-qraft/*' run dev",
-    "test": "yarn workspaces foreach --verbose --recursive --no-private --from '@openapi-qraft/*' run test",
-    "lint": "yarn workspaces foreach --verbose --recursive run lint"
+    "build": "yarn workspaces foreach --verbose --recursive --topological --from '@openapi-qraft/*' run build",
+    "dev": "yarn workspaces foreach --verbose --recursive --parallel --no-private --from '@openapi-qraft/*' run dev",
+    "test": "yarn workspaces foreach --verbose --recursive --topological --no-private --from '@openapi-qraft/*' run test",
+    "lint": "yarn workspaces foreach --verbose --recursive --topological run lint"
   },
   "devDependencies": {
     "@changesets/cli": "^2.27.1",
