@@ -397,6 +397,110 @@ qraft.entities.getEntities.useQueries({
 });
 ```
 
+### [invalidateQueries 🔗](https://tanstack.com/query/latest/docs/reference/QueryClient#queryclientinvalidatequeries)
+
+[Queries Invalidation 🔗](https://tanstack.com/query/latest/docs/framework/react/guides/query-invalidation) is possible
+using `<operation>.invalidateQueries(..)` method.
+This method is a wrapper around the `queryClient.invalidateQueries(..)`.
+
+##### Invalidation with _parameters_:
+
+To invalidate queries, with the specified parameters, you can use the `invalidateQueries` method:
+
+```ts
+/**
+ * Will invalidate the queries with the specified parameters:
+ * ###
+ * GET /entities/3e3e-3e3e-3e3e
+ * x-monite-version: 2023-09-01
+ **/
+qraft.entities.getEntities.invalidateQueries(
+  {
+    parameters: {
+      header: {
+        'x-monite-version': '2023-09-01',
+      },
+      path: {
+        entity_id: '3e3e-3e3e-3e3e',
+      },
+    },
+  },
+  queryClient
+);
+```
+
+##### Invalidation without _parameters_:
+
+To invalidate all queries for a specific endpoint, you can call `invalidateQueries` without any parameters:
+
+```ts
+/**
+ * Will invalidate the queries matching the specified endpoint:
+ * ###
+ * GET /entities/3e3e-3e3e-3e3e
+ * x-monite-version: 2023-09-01
+ * ###
+ * GET /entities/4c4c-4c4c-4c4c
+ * x-monite-version: 2023-09-01
+ **/
+qraft.entities.getEntities.invalidateQueries(queryClient);
+```
+
+##### Invalidation with _queryKey_:
+
+It could be useful to invalidate queries using `queryKey` directly:
+
+```ts
+/**
+ * Will invalidate the queries matching the specified endpoint:
+ * ###
+ * GET /entities/3e3e-3e3e-3e3e
+ * x-monite-version: 2023-09-01
+ **/
+qraft.entities.getEntities.invalidateQueries(
+  {
+    // `queryKey` is fully typed to `qraft.entities.getEntities`
+    queryKey: qraft.entities.getEntities.getQueryKey({
+      header: {
+        'x-monite-version': '2023-09-01',
+      },
+      path: {
+        entity_id: '3e3e-3e3e-3e3e',
+      },
+    }),
+  },
+  queryClient
+);
+```
+
+##### [Invalidation with _predicate_: 🔗](https://tanstack.com/query/latest/docs/framework/react/guides/filters#query-filters)
+
+The `predicate(..)` function will be used as a final filter on all matching queries.
+
+```ts
+/**
+ * Will invalidate the queries matching the specified endpoint and predicate:
+ * ###
+ * GET /entities/3e3e-3e3e-3e3e
+ * x-monite-version: 2023-09-01
+ **/
+qraft.entities.getEntities.invalidateQueries(
+  {
+    parameters, // * optional, or specific parameters, alternatively, you can use `queryKey`
+    predicate: (query) => {
+      // `infinite`⬇︎ property will preset for Infinite Queries
+      if ('infinite' in query.queryKey[0]) return false;
+
+      // `queryKey`⬇︎ is fully typed to `qraft.entities.getEntities` operation parameters
+      if (query.queryKey[1].path.entity_id === '4c4c-4c4c-4c4c') return false;
+
+      return true;
+    },
+  },
+  queryClient
+);
+```
+
 ### Suspense Queries
 
 Supported Suspense Queries are:
