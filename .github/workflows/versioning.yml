@@ -1,7 +1,9 @@
-name: Release
+name: Versioning
 
 on:
-  workflow_dispatch:
+  push:
+    branches:
+      - main
 
 concurrency: ${{ github.workflow }}-${{ github.ref }}
 
@@ -26,21 +28,10 @@ jobs:
       - name: Install Dependencies
         run: yarn install --immutable
 
-      - name: Create dummy npmrc # Prevent creation of '.npmrc' by 'changesets-gitlab' with the 'NPM_TOKEN'
-        run: touch ".npmrc"
-
-      - name: Set token in .yarnrc.yml
-        run: |
-          yarn config set 'npmScopes["openapi-qraft"]' --home --json '{"npmAlwaysAuth":true,"npmAuthToken":"${NPM_TOKEN}"}'
-        env:
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-
-      - name: Create Version Packages Pull Request or Publish to npm
+      - name: Create Version Packages Pull Request
         id: changesets
         uses: changesets/action@v1
         with:
-          publish: yarn exec .changeset/publish.sh --create-git-tags
           version: yarn exec .changeset/version.sh
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
