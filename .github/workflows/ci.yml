@@ -12,7 +12,7 @@ jobs:
   validate:
     timeout-minutes: 10
     runs-on: ubuntu-latest
-    name: validate
+    name: Validate Build
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v4
