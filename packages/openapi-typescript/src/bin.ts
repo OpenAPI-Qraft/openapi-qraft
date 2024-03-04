@@ -64,7 +64,8 @@ program
                       ts.factory.createIdentifier('Blob'),
                       undefined
                     ),
-                questionToken: true, // todo::make PR to openapi-typescript to add `schemaObject` to `transform` third argument, to get `required` properties
+                // questionToken will be inferred by `openapiTS`, if true, it will force `?` for parameter
+                questionToken: false,
               };
             }
           },
