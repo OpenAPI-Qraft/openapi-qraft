@@ -133,31 +133,52 @@ function PetCard({ pet }: { pet: components['schemas']['Pet'] }) {
 function PetUpdateForm({ petId }: { petId: number }) {
   const { setPetIdToEditToEdit } = usePetToEdit();
 
-  const petQueryKey = qraft.pet.getPetById.getQueryKey({
+  const petParameters: typeof qraft.pet.getPetById.types.parameters = {
     path: { petId },
-  });
+  };
 
   const {
     data: pet,
     isPending: isPetQueryPending,
     error: petQueryError,
-  } = qraft.pet.getPetById.useQuery(petQueryKey, { enabled: !!petId });
+  } = qraft.pet.getPetById.useQuery(petParameters, { enabled: !!petId });
 
   const queryClient = useQueryClient();
 
   const { isPending, mutate } = qraft.pet.updatePet.useMutation(undefined, {
-    onMutate(variables) {
+    async onMutate(variables) {
+      await qraft.pet.getPetById.cancelQueries(
+        { parameters: petParameters },
+        queryClient
+      );
+
+      const prevPet = qraft.pet.getPetById.getQueryData(
+        petParameters,
+        queryClient
+      );
+
       qraft.pet.getPetById.setQueryData(
-        petQueryKey,
+        petParameters,
         (oldData) => ({
           ...oldData,
           ...variables.body,
         }),
         queryClient
       );
+
+      return { prevPet };
+    },
+    async onError(_error, _variables, context) {
+      if (context?.prevPet) {
+        qraft.pet.getPetById.setQueryData(
+          petParameters,
+          context.prevPet,
+          queryClient
+        );
+      }
     },
     async onSuccess(updatedPet) {
-      qraft.pet.getPetById.setQueryData(petQueryKey, updatedPet, queryClient);
+      qraft.pet.getPetById.setQueryData(petParameters, updatedPet, queryClient);
       await qraft.pet.findPetsByStatus.invalidateQueries(queryClient);
       setPetIdToEditToEdit(undefined);
     },
