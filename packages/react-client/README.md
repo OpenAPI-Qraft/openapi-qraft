@@ -501,6 +501,11 @@ qraft.entities.getEntities.invalidateQueries(
 );
 ```
 
+### [cancelQueries(...) 🔗](https://tanstack.com/query/latest/docs/reference/QueryClient#queryclientcancelqueries)
+
+[Query Cancellation](https://tanstack.com/query/latest/docs/framework/react/guides/query-cancellation) has the
+same interface as `invalidateQueries(..)`, but it will cancel the queries instead of invalidating them.
+
 ### Suspense Queries
 
 Supported Suspense Queries are:
