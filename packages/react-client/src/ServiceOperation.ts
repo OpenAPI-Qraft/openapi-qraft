@@ -1,4 +1,5 @@
-import {
+import type {
+  CancelOptions,
   DefaultError,
   FetchStatus,
   InfiniteData,
@@ -14,7 +15,7 @@ import {
   SetDataOptions,
   Updater,
 } from '@tanstack/query-core';
-import {
+import type {
   DefinedInitialDataInfiniteOptions,
   DefinedInitialDataOptions,
   DefinedUseInfiniteQueryResult,
@@ -63,7 +64,8 @@ export interface ServiceOperationQuery<
     ServiceOperationGetInfiniteQueryData<TSchema, TData, TParams>,
     ServiceOperationSetQueryData<TSchema, TData, TParams>,
     ServiceOperationSetInfiniteQueryData<TSchema, TData, TParams>,
-    ServiceOperationInvalidateQueries<TSchema, TData, TParams, TError> {
+    ServiceOperationInvalidateQueries<TSchema, TData, TParams, TError>,
+    ServiceOperationCancelQueries<TSchema, TData, TParams, TError> {
   schema: TSchema;
   types: {
     parameters: TParams;
@@ -144,7 +146,7 @@ interface ServiceOperationUseQueries<
 
 type QueryTypeFilter = 'all' | 'active' | 'inactive';
 
-interface InvalidateQueryFiltersBase<
+interface QueryFiltersBase<
   TSchema extends { url: string; method: string },
   TData,
   TParams = {},
@@ -178,33 +180,43 @@ interface InvalidateQueryFiltersBase<
    * Include queries matching their fetchStatus
    */
   fetchStatus?: FetchStatus;
-
-  refetchType?: QueryTypeFilter | 'none';
 }
 
-interface InvalidateQueryFiltersByQueryKey<
+interface QueryFiltersByQueryKey<
   TSchema extends { url: string; method: string },
   TData,
   TParams = {},
   TError = DefaultError,
-> extends InvalidateQueryFiltersBase<TSchema, TData, TParams, TError> {
+> extends QueryFiltersBase<TSchema, TData, TParams, TError> {
   /**
    * Include queries matching this query key
    */
   queryKey?: ServiceOperationQueryKey<TSchema, TParams>;
 }
 
-interface InvalidateQueryFiltersByParameters<
+interface QueryFiltersByParameters<
   TSchema extends { url: string; method: string },
   TData,
   TParams = {},
   TError = DefaultError,
-> extends InvalidateQueryFiltersBase<TSchema, TData, TParams, TError> {
+> extends QueryFiltersBase<TSchema, TData, TParams, TError> {
   /**
    * Include queries matching parameters
    */
   parameters?: TParams;
 }
+
+type InvalidateQueryFilters<
+  TSchema extends { url: string; method: string },
+  TData,
+  TParams = {},
+  TError = DefaultError,
+> = (
+  | QueryFiltersByParameters<TSchema, TData, TParams, TError>
+  | QueryFiltersByQueryKey<TSchema, TData, TParams, TError>
+) & {
+  refetchType?: QueryTypeFilter | 'none';
+};
 
 interface ServiceOperationInvalidateQueries<
   TSchema extends { url: string; method: string },
@@ -213,21 +225,20 @@ interface ServiceOperationInvalidateQueries<
   TError = DefaultError,
 > {
   invalidateQueries(
-    filters:
-      | InvalidateQueryFiltersByParameters<TSchema, TData, TParams, TError>
-      | InvalidateQueryFiltersByQueryKey<TSchema, TData, TParams, TError>,
+    filters: InvalidateQueryFilters<TSchema, TData, TParams, TError>,
     options: InvalidateOptions,
     queryClient: QueryClient
   ): Promise<void>;
   invalidateQueries(
-    filters:
-      | InvalidateQueryFiltersByParameters<TSchema, TData, TParams, TError>
-      | InvalidateQueryFiltersByQueryKey<TSchema, TData, TParams, TError>,
+    filters: InvalidateQueryFilters<TSchema, TData, TParams, TError>,
     queryClient: QueryClient
   ): Promise<void>;
   invalidateQueries(queryClient: QueryClient): Promise<void>;
 }
 
+/**
+ * @internal
+ */
 export interface ServiceOperationInvalidateQueriesCallback<
   TSchema extends { url: string; method: string },
   TData,
@@ -236,10 +247,51 @@ export interface ServiceOperationInvalidateQueriesCallback<
 > extends ServiceOperationInvalidateQueries<TSchema, TData, TParams, TError> {
   invalidateQueries(
     filters:
-      | InvalidateQueryFiltersByParameters<TSchema, TData, TParams, TError>
-      | InvalidateQueryFiltersByQueryKey<TSchema, TData, TParams, TError>
+      | QueryFiltersByParameters<TSchema, TData, TParams, TError>
+      | QueryFiltersByQueryKey<TSchema, TData, TParams, TError>
       | QueryClient,
     options?: InvalidateOptions | QueryClient,
+    queryClient?: QueryClient
+  ): Promise<void>;
+}
+
+interface ServiceOperationCancelQueries<
+  TSchema extends { url: string; method: string },
+  TData,
+  TParams = {},
+  TError = DefaultError,
+> {
+  cancelQueries(
+    filters:
+      | QueryFiltersByParameters<TSchema, TData, TParams, TError>
+      | QueryFiltersByQueryKey<TSchema, TData, TParams, TError>,
+    options: CancelOptions,
+    queryClient: QueryClient
+  ): Promise<void>;
+  cancelQueries(
+    filters:
+      | QueryFiltersByParameters<TSchema, TData, TParams, TError>
+      | QueryFiltersByQueryKey<TSchema, TData, TParams, TError>,
+    queryClient: QueryClient
+  ): Promise<void>;
+  cancelQueries(queryClient: QueryClient): Promise<void>;
+}
+
+/**
+ * @internal
+ */
+export interface ServiceOperationCancelQueriesCallback<
+  TSchema extends { url: string; method: string },
+  TData,
+  TParams = {},
+  TError = DefaultError,
+> extends ServiceOperationCancelQueries<TSchema, TData, TParams, TError> {
+  cancelQueries(
+    filters:
+      | QueryFiltersByParameters<TSchema, TData, TParams, TError>
+      | QueryFiltersByQueryKey<TSchema, TData, TParams, TError>
+      | QueryClient,
+    options?: CancelOptions | QueryClient,
     queryClient?: QueryClient
   ): Promise<void>;
 }

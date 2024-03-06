@@ -186,4 +186,5 @@ const serviceCallbacks = [
   'useQueries',
   'useSuspenseQueries',
   'invalidateQueries',
+  'cancelQueries',
 ] as const;

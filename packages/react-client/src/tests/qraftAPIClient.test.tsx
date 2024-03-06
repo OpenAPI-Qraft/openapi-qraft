@@ -1803,6 +1803,90 @@ describe('Qraft uses Queries Invalidation', () => {
   });
 });
 
+describe('Qraft uses Queries Cancellation', () => {
+  const parameters: typeof qraft.approvalPolicies.getApprovalPoliciesId.types.parameters =
+    {
+      header: {
+        'x-monite-version': '1.0.0',
+      },
+      path: {
+        approval_policy_id: '1',
+      },
+      query: {
+        items_order: ['asc', 'desc'],
+      },
+    };
+
+  it('supports cancelQueries by parameters', async () => {
+    const queryClient = new QueryClient();
+
+    const counterFn = vi.fn();
+
+    const { result: result_01 } = renderHook(
+      () =>
+        qraft.approvalPolicies.getApprovalPoliciesId.useQuery(parameters, {
+          queryFn({ signal }) {
+            return new Promise((_, reject) =>
+              signal.addEventListener('abort', () => {
+                counterFn();
+                reject(new Error('cancelQueries succeeded'));
+              })
+            );
+          },
+        }),
+      {
+        wrapper: (props: { children: ReactNode }) => (
+          <Providers {...props} queryClient={queryClient} />
+        ),
+      }
+    );
+
+    expect(result_01.current.isError).toBeFalsy();
+
+    await expect(
+      qraft.approvalPolicies.getApprovalPoliciesId.cancelQueries(
+        { parameters },
+        queryClient
+      )
+    ).resolves.toBeUndefined();
+
+    expect(counterFn.mock.calls.length).toEqual(1);
+  });
+
+  it('supports cancelQueries without parameters', async () => {
+    const queryClient = new QueryClient();
+
+    const counterFn = vi.fn();
+
+    const { result: result } = renderHook(
+      () =>
+        qraft.approvalPolicies.getApprovalPoliciesId.useQuery(parameters, {
+          queryFn({ signal }) {
+            return new Promise((_, reject) =>
+              signal.addEventListener('abort', () => {
+                counterFn();
+                reject(new Error('cancelQueries succeeded'));
+              })
+            );
+          },
+        }),
+      {
+        wrapper: (props: { children: ReactNode }) => (
+          <Providers {...props} queryClient={queryClient} />
+        ),
+      }
+    );
+
+    expect(result.current.isFetching).toBeTruthy();
+
+    await expect(
+      qraft.approvalPolicies.getApprovalPoliciesId.cancelQueries(queryClient)
+    ).resolves.toBeUndefined();
+
+    expect(counterFn.mock.calls.length).toEqual(1);
+  });
+});
+
 function Providers({
   children,
   queryClient,
