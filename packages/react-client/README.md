@@ -174,7 +174,7 @@ function App() {
 With the client set up, you can now use the generated Hooks in your React Components to fetch data, execute mutations,
 and more.
 
-### [useQuery 🔗](https://tanstack.com/query/latest/docs/framework/react/reference/useQuery)
+### [useQuery(...) 🔗](https://tanstack.com/query/latest/docs/framework/react/reference/useQuery)
 
 ```ts
 /**
@@ -193,7 +193,7 @@ const { data, error, isPending } = qraft.entities.getEntities.useQuery({
 });
 ```
 
-### [useMutation 🔗](https://tanstack.com/query/latest/docs/framework/react/reference/useMutation)
+### [useMutation(...) 🔗](https://tanstack.com/query/latest/docs/framework/react/reference/useMutation)
 
 #### With predefined parameters
 
@@ -253,7 +253,7 @@ mutation.mutate({
 });
 ```
 
-### [useMutationState 🔗](https://tanstack.com/query/latest/docs/framework/react/reference/useMutationState)
+### [useMutationState(...) 🔗](https://tanstack.com/query/latest/docs/framework/react/reference/useMutationState)
 
 Mutation state is a helper hook that provides the current state of a mutation globally.
 It could be used to track the status of a mutation in any component, which is useful for showing loading spinners or
@@ -281,7 +281,7 @@ useEffect(() => {
 }, [mutate, mutationState?.status]);
 ```
 
-### [useInfiniteQuery 🔗](https://tanstack.com/query/latest/docs/framework/react/reference/useInfiniteQuery)
+### [useInfiniteQuery(...) 🔗](https://tanstack.com/query/latest/docs/framework/react/reference/useInfiniteQuery)
 
 #### _Offset-based_
 
@@ -358,7 +358,7 @@ infiniteQuery.fetchNextPage();
 infiniteQuery.fetchPreviousPage();
 ```
 
-### [useQueries 🔗](https://tanstack.com/query/latest/docs/framework/react/reference/useQueries)
+### [useQueries(...) 🔗](https://tanstack.com/query/latest/docs/framework/react/reference/useQueries)
 
 ```ts
 /**
@@ -397,7 +397,7 @@ qraft.entities.getEntities.useQueries({
 });
 ```
 
-### [invalidateQueries 🔗](https://tanstack.com/query/latest/docs/reference/QueryClient#queryclientinvalidatequeries)
+### [invalidateQueries(...) 🔗](https://tanstack.com/query/latest/docs/reference/QueryClient#queryclientinvalidatequeries)
 
 [Queries Invalidation 🔗](https://tanstack.com/query/latest/docs/framework/react/guides/query-invalidation) is possible
 using `<operation>.invalidateQueries(..)` method.
@@ -501,13 +501,18 @@ qraft.entities.getEntities.invalidateQueries(
 );
 ```
 
+### [cancelQueries(...) 🔗](https://tanstack.com/query/latest/docs/reference/QueryClient#queryclientcancelqueries)
+
+[Query Cancellation](https://tanstack.com/query/latest/docs/framework/react/guides/query-cancellation) has the
+same interface as `invalidateQueries(..)`, but it will cancel the queries instead of invalidating them.
+
 ### Suspense Queries
 
 Supported Suspense Queries are:
 
-- [useSuspenseQuery 🔗](https://tanstack.com/query/latest/docs/framework/react/reference/useSuspenseQuery)
-- [useSuspenseInfiniteQuery 🔗](https://tanstack.com/query/latest/docs/framework/react/reference/useSuspenseInfiniteQuery)
-- [useSuspenseQueries 🔗](https://tanstack.com/query/latest/docs/framework/react/reference/useSuspenseQueries)
+- [useSuspenseQuery(...) 🔗](https://tanstack.com/query/latest/docs/framework/react/reference/useSuspenseQuery)
+- [useSuspenseInfiniteQuery(...) 🔗](https://tanstack.com/query/latest/docs/framework/react/reference/useSuspenseInfiniteQuery)
+- [useSuspenseQueries(...) 🔗](https://tanstack.com/query/latest/docs/framework/react/reference/useSuspenseQueries)
 
 ### Documentation in Progress 🚧
 
