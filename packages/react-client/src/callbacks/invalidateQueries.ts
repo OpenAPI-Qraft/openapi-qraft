@@ -1,4 +1,4 @@
-import type { InvalidateOptions, QueryClient } from '@tanstack/query-core';
+import type { QueryClient } from '@tanstack/query-core';
 
 import { composeQueryKey } from '../lib/composeQueryKey.js';
 import type { QraftClientOptions } from '../qraftAPIClient.js';
@@ -16,6 +16,33 @@ export function invalidateQueries<TData>(
     >['invalidateQueries']
   >
 ): Promise<void> {
+  return callQueryClientMethodWithQueryFilters(
+    'invalidateQueries',
+    schema,
+    args as never
+  ) as never;
+}
+
+type QueryFiltersMethod<QFMethod extends keyof typeof QueryClient.prototype> =
+  QFMethod;
+
+type QueryFilterMethods =
+  | QueryFiltersMethod<'isFetching'>
+  | QueryFiltersMethod<'getQueriesData'>
+  | QueryFiltersMethod<'setQueriesData'>
+  | QueryFiltersMethod<'removeQueries'>
+  | QueryFiltersMethod<'resetQueries'>
+  | QueryFiltersMethod<'cancelQueries'>
+  | QueryFiltersMethod<'invalidateQueries'>
+  | QueryFiltersMethod<'refetchQueries'>;
+
+function callQueryClientMethodWithQueryFilters<
+  QFMethod extends QueryFilterMethods,
+>(
+  queryFilterMethod: QFMethod,
+  schema: RequestClientSchema,
+  args: [QueryClient, ...Parameters<(typeof QueryClient.prototype)[QFMethod]>]
+) {
   const queryClient = (
     args.length === 1
       ? args[0]
@@ -27,43 +54,44 @@ export function invalidateQueries<TData>(
   ) as QueryClient | undefined;
 
   const filters = args.length === 1 ? undefined : args[0];
-  const options = (args.length === 3 ? args[1] : undefined) as
-    | InvalidateOptions
-    | undefined;
+  const options = args.length === 3 ? args[1] : undefined;
 
   if (!queryClient) throw new Error('queryClient is required');
-  if (!queryClient.invalidateQueries) throw new Error('queryClient is invalid');
+  if (!queryClient[queryFilterMethod])
+    throw new Error(
+      `queryClient is invalid, ${queryFilterMethod} method does not exist`
+    );
 
   if (!filters) {
-    return queryClient.invalidateQueries(
+    return queryClient[queryFilterMethod](
       {
         queryKey: composeQueryKey(schema, undefined),
       },
-      options
+      options as never
     );
   }
 
   if ('queryKey' in filters) {
-    return queryClient.invalidateQueries(filters as never, options);
+    return queryClient[queryFilterMethod](filters as never, options as never);
   }
 
   if ('parameters' in filters) {
     const { parameters, ...filtersRest } = filters;
 
-    return queryClient.invalidateQueries(
+    return queryClient[queryFilterMethod](
       {
         ...filtersRest,
         queryKey: composeQueryKey(schema, parameters),
       } as never,
-      options
+      options as never
     );
   }
 
-  return queryClient.invalidateQueries(
+  return queryClient[queryFilterMethod](
     {
       ...filters,
       queryKey: composeQueryKey(schema, undefined),
     } as never,
-    options
+    options as never
   );
 }
