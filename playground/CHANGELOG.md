@@ -1,5 +1,13 @@
 # playground
 
+## 0.0.13
+
+### Patch Changes
+
+- 2d92043: feature: add support for `cancelQueries` method
+- Updated dependencies [2d92043]
+  - @openapi-qraft/react@1.1.2
+
 ## 0.0.12
 
 ### Patch Changes
