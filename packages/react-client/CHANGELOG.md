@@ -1,5 +1,11 @@
 # @openapi-qraft/react
 
+## 1.1.2
+
+### Patch Changes
+
+- 2d92043: feature: add support for `cancelQueries` method
+
 ## 1.1.1
 
 ### Patch Changes
