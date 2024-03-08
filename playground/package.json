@@ -9,16 +9,16 @@
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",
-    "generate-types": "openapi-qraft-typescript https://petstore3.swagger.io/api/v3/openapi.json -o ./schema.d.ts",
+    "generate-types": "openapi-typescript https://petstore3.swagger.io/api/v3/openapi.json -o ./schema.d.ts",
     "generate-qraft": "openapi-qraft https://petstore3.swagger.io/api/v3/openapi.json --clean -o src/api --openapi-types-import-path '../../../schema.d.ts'",
     "e2e:pre-build": "npm run generate-types && npm run generate-qraft"
   },
   "dependencies": {
+    "@openapi-qraft/cli": "workspace:~",
+    "@openapi-qraft/react": "workspace:~",
     "constate": "^3.3.2",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "@openapi-qraft/cli": "workspace:~",
-    "@openapi-qraft/react": "workspace:~"
+    "react-dom": "^18.2.0"
   },
   "devDependencies": {
     "@types/react": "^18.2.43",
@@ -31,6 +31,7 @@
     "eslint": "^8.55.0",
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.4.5",
+    "openapi-typescript": "latest",
     "typescript": "^5.2.2",
     "vite": "^5.0.11"
   }
