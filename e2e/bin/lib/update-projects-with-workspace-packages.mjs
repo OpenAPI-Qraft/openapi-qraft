@@ -18,22 +18,28 @@ function getWorkspacesPublishingPackages() {
     throw new Error('NPM_PUBLISH_SCOPES env variable is not set');
 
   const scopes = process.env.NPM_PUBLISH_SCOPES.split(' ').reduce(
-    (acc, scope) => `${acc} '@${scope}/*'`,
+    (acc, scope) => `${acc} --from '@${scope}/*'`,
     ''
   );
 
-  const result = execSync(
-    `(cd "${findMonorepoRoot()}" && yarn workspaces foreach --no-private ${scopes} \
-    exec node -p "'${prefixSalt}' + require('./package.json').name + '@' + require('./package.json').version")`
-  );
+  try {
+    let cmd = '';
+    const result = execSync(
+      (cmd = `(cd "${findMonorepoRoot()}" && yarn workspaces foreach --recursive --topological --no-private ${scopes} \
+    exec node -p "'${prefixSalt}' + require('./package.json').name + '@' + require('./package.json').version")`)
+    );
 
-  return result
-    .toString()
-    .split('\n')
-    .reduce((acc, row) => {
-      if (!row.startsWith(prefixSalt)) return acc;
-      return [...acc, row.slice(prefixSalt.length)];
-    }, []);
+    return result
+      .toString()
+      .split('\n')
+      .reduce((acc, row) => {
+        if (!row.startsWith(prefixSalt)) return acc;
+        return [...acc, row.slice(prefixSalt.length)];
+      }, []);
+  } catch (error) {
+    console.error(error.output.toString());
+    process.exit(1);
+  }
 }
 
 /**
