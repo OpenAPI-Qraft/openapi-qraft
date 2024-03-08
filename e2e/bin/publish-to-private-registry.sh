@@ -10,7 +10,7 @@ BASE_DIR=$(dirname "$(readlink -f "$0")")
 # Patch `.yarnrc.yml` file
 use_private_registry() {
   if [ -z "$NPM_PUBLISH_SCOPES" ]; then
-    echo "Error: NPM_PUBLISH_SCOPES is not set."
+    echo "Error: NPM_PUBLISH_SCOPES is not set." >&2
     exit 1
   fi
 
@@ -21,7 +21,7 @@ use_private_registry() {
     done
 
     yarn config set 'unsafeHttpWhitelist' --json '["${UNSAFE_HTTP_WHITELIST:-localhost}"]'
-  } >> /dev/null || echo 'Error: Failed to patch `.yarnrc.yml` file.'
+  } >> /dev/null || (echo 'Error: Failed to patch `.yarnrc.yml` file.' >&2 && exit 1)
 }
 
 # Remove patch from `.yarnrc.yml` file
@@ -32,7 +32,7 @@ use_default_registry() {
       yarn config unset "npmScopes['$scope']"
     done
     yarn config unset 'unsafeHttpWhitelist'
-  } >> /dev/null || echo 'Error: Failed to remove patch from `.yarnrc.yml` file.'
+  } >> /dev/null || (echo 'Error: Failed to remove patch from `.yarnrc.yml` file.' >&2 && exit 1)
 }
 
 # Publish packages to Verdaccio
@@ -40,7 +40,7 @@ publish_to_registry() {
   echo 'Publishing packages to private registry...'
   (cd "$(monorepo_root)" && CI=1 NPM_PUBLISH_REGISTRY="${NPM_PUBLISH_REGISTRY:-http://localhost:4873/}" . ".changeset/publish.sh") \
    | grep -E "Package archive published|Registry already knows about version" \
-    || echo 'Error: Failed to publish packages to private registry.'
+    || (echo 'Error: Failed to publish packages to private registry.' >&2 && exit 1)
 }
 
 # Cleanup on exit or interrupt
