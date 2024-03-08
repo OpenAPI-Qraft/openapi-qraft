@@ -26,6 +26,9 @@ jobs:
       - name: Install Dependencies
         run: yarn install --immutable
 
+      - name: Build
+        run: yarn build
+
       - name: Create dummy npmrc # Prevent creation of '.npmrc' by 'changesets-gitlab' with the 'NPM_TOKEN'
         run: touch ".npmrc"
 
