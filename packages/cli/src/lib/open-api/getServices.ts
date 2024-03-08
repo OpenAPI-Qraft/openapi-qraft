@@ -101,7 +101,11 @@ export const getServices = (
         description: methodOperation.description,
         summary: methodOperation.summary,
         deprecated: methodOperation.deprecated,
-        parameters: methodOperation.parameters,
+        parameters:
+          Array.isArray(methodOperation.parameters) &&
+          !methodOperation.parameters.length
+            ? undefined
+            : methodOperation.parameters,
         mediaType: methodOperation.requestBody?.content
           ? getContentMediaType(methodOperation.requestBody.content)
           : undefined,
