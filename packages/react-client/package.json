@@ -8,7 +8,7 @@
     "test": "vitest run",
     "test:coverage": "vitest run --coverage",
     "typecheck": "tsc --noEmit",
-    "generate-qraft": "openapi-qraft src/tests/fixtures/openapi.json --clean -o src/tests/fixtures/api --openapi-types-import-path '../../openapi.js' --explicit-import-extensions && prettier --write src/tests/fixtures/api/**/*.ts",
+    "generate-qraft": "openapi-qraft src/tests/fixtures/openapi.json --clean -o src/tests/fixtures/api --openapi-types-import-path '../../openapi.js' --explicit-import-extensions --filter-services '/approval_policies/**,/entities/**,/files/**,!/internal/**' && prettier --write src/tests/fixtures/api/**/*.ts",
     "generate-types": "openapi-qraft-typescript src/tests/fixtures/openapi.json -o src/tests/fixtures/openapi.ts"
   },
   "type": "module",
