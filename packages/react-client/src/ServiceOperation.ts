@@ -1,4 +1,4 @@
-import type {
+import {
   CancelOptions,
   DefaultError,
   FetchStatus,
@@ -12,6 +12,7 @@ import type {
   QueriesPlaceholderDataFunction,
   Query,
   QueryClient,
+  ResetOptions,
   SetDataOptions,
   Updater,
 } from '@tanstack/query-core';
@@ -65,7 +66,8 @@ export interface ServiceOperationQuery<
     ServiceOperationSetQueryData<TSchema, TData, TParams>,
     ServiceOperationSetInfiniteQueryData<TSchema, TData, TParams>,
     ServiceOperationInvalidateQueries<TSchema, TData, TParams, TError>,
-    ServiceOperationCancelQueries<TSchema, TData, TParams, TError> {
+    ServiceOperationCancelQueries<TSchema, TData, TParams, TError>,
+    ServiceOperationResetQueries<TSchema, TData, TParams, TError> {
   schema: TSchema;
   types: {
     parameters: TParams;
@@ -292,6 +294,47 @@ export interface ServiceOperationCancelQueriesCallback<
       | QueryFiltersByQueryKey<TSchema, TData, TParams, TError>
       | QueryClient,
     options?: CancelOptions | QueryClient,
+    queryClient?: QueryClient
+  ): Promise<void>;
+}
+
+interface ServiceOperationResetQueries<
+  TSchema extends { url: string; method: string },
+  TData,
+  TParams = {},
+  TError = DefaultError,
+> {
+  resetQueries(
+    filters:
+      | QueryFiltersByParameters<TSchema, TData, TParams, TError>
+      | QueryFiltersByQueryKey<TSchema, TData, TParams, TError>,
+    options: ResetOptions,
+    queryClient: QueryClient
+  ): Promise<void>;
+  resetQueries(
+    filters:
+      | QueryFiltersByParameters<TSchema, TData, TParams, TError>
+      | QueryFiltersByQueryKey<TSchema, TData, TParams, TError>,
+    queryClient: QueryClient
+  ): Promise<void>;
+  resetQueries(queryClient: QueryClient): Promise<void>;
+}
+
+/**
+ * @internal
+ */
+export interface ServiceOperationResetQueriesCallback<
+  TSchema extends { url: string; method: string },
+  TData,
+  TParams = {},
+  TError = DefaultError,
+> extends ServiceOperationResetQueries<TSchema, TData, TParams, TError> {
+  resetQueries(
+    filters:
+      | QueryFiltersByParameters<TSchema, TData, TParams, TError>
+      | QueryFiltersByQueryKey<TSchema, TData, TParams, TError>
+      | QueryClient,
+    options?: ResetOptions | QueryClient,
     queryClient?: QueryClient
   ): Promise<void>;
 }
