@@ -1,5 +1,14 @@
 # @openapi-qraft/cli
 
+## 1.1.5
+
+### Patch Changes
+
+- 1f7c029: Added support for `useIsFetching(...)` hook
+- 8c833ec: Added support for `QueryClient.isFetching(...)` method
+- 982bab5: Added support for `--filter-services` option to filter unneeded services
+- e8861a3: Added support for `QueryClient.refetchQueries(...)` method
+
 ## 1.1.4
 
 ### Patch Changes
