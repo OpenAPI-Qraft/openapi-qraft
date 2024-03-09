@@ -8,5 +8,6 @@ PROJECTS=$(find "${TEST_PROJECTS_DIR:-"$BASE_DIR/../projects"}" -maxdepth 1 -min
 
 for project in $PROJECTS; do
   echo "Building $project..."
+  (cd "$project" && npm run e2e:pre-build)
   (cd "$project" && npm run build)
 done

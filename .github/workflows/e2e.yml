@@ -1,0 +1,58 @@
+name: E2E Suite
+
+on:
+  pull_request:
+    branches:
+      - '*'
+  push:
+    branches:
+      - main
+
+jobs:
+  e2e:
+    timeout-minutes: 10
+    runs-on: ubuntu-latest
+    name: E2E Tests
+    env:
+      NPM_PUBLISH_REGISTRY: 'http://localhost:4873'
+      UNSAFE_HTTP_WHITELIST: 'localhost'
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js 18.x
+        uses: actions/setup-node@v4
+        with:
+          cache: 'yarn'
+          node-version: 18.x
+
+      - name: Install Dependencies
+        run: yarn install --immutable
+
+      - name: Build
+        run: yarn build
+
+      - name: Setup Node.js 18.x for E2E
+        uses: actions/setup-node@v4
+        with:
+          cache: 'npm' # e2e tests are not using yarn
+          node-version: 18.x
+
+      - name: Copy Playground for E2E Tests
+        run: |
+          mkdir -p ${{ runner.temp }}/projects
+          cp -r playground ${{ runner.temp }}/projects
+
+      - name: Remove Verdaccio Storage
+        run: rm -rf e2e/verdaccio-storage
+
+      - name: Publish to Private Registry
+        run: yarn run "e2e:publish-to-private-registry"
+
+      - name: Update Projects from Private Registry
+        run: TEST_PROJECTS_DIR=${{ runner.temp }}/projects yarn run "e2e:update-projects-from-private-registry"
+
+      - name: Build E2E Projects
+        run: TEST_PROJECTS_DIR=${{ runner.temp }}/projects yarn run "e2e:build-projects"
