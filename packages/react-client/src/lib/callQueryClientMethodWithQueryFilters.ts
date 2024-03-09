@@ -24,7 +24,10 @@ export function callQueryClientMethodWithQueryFilters<
           : undefined
   ) as QueryClient | undefined;
 
-  const filters = args.length === 1 ? undefined : args[0];
+  const filters = composeFilters(
+    schema,
+    args.length === 1 ? undefined : args[0]
+  );
   const options = args.length === 3 ? args[1] : undefined;
 
   if (!queryClient) throw new Error('queryClient is required');
@@ -33,41 +36,48 @@ export function callQueryClientMethodWithQueryFilters<
       `queryClient is invalid, ${queryFilterMethod} method does not exist`
     );
 
+  if (options)
+    // @ts-expect-error
+    return queryClient[queryFilterMethod](filters, options);
+
+  // @ts-expect-error
+  return queryClient[queryFilterMethod](filters);
+}
+
+/**
+ * Replaces the `parameters` field in the filters with a `queryKey` field based on the schema.
+ * If no filters are provided, a `queryKey` will be composed schema's base query key.
+ * @param schema
+ * @param filters
+ */
+function composeFilters<Filters extends object>(
+  schema: RequestClientSchema,
+  filters: Filters | undefined
+) {
   if (!filters) {
-    return queryClient[queryFilterMethod](
-      {
-        queryKey: composeQueryKey(schema, undefined),
-      },
-      options as never
-    ) as never;
+    return {
+      queryKey: composeQueryKey(schema, undefined),
+    };
   }
 
   if ('queryKey' in filters) {
-    return queryClient[queryFilterMethod](
-      filters as never,
-      options as never
-    ) as never;
+    return filters;
   }
 
   if ('parameters' in filters) {
-    const { parameters, ...filtersRest } = filters;
+    const { parameters, ...filtersWithoutParameters } = filters;
 
-    return queryClient[queryFilterMethod](
-      {
-        ...filtersRest,
-        queryKey: composeQueryKey(schema, parameters),
-      } as never,
-      options as never
-    ) as never;
+    Object.assign(filtersWithoutParameters, {
+      queryKey: composeQueryKey(schema, parameters),
+    });
+
+    return filtersWithoutParameters;
   }
 
-  return queryClient[queryFilterMethod](
-    {
-      ...filters,
-      queryKey: composeQueryKey(schema, undefined),
-    } as never,
-    options as never
-  ) as never;
+  return {
+    ...filters,
+    queryKey: composeQueryKey(schema, undefined),
+  };
 }
 
 type QueryFiltersMethod<QFMethod extends keyof typeof QueryClient.prototype> =

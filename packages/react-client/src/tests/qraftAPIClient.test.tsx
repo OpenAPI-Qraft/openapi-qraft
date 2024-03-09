@@ -1887,6 +1887,68 @@ describe('Qraft uses Queries Cancellation', () => {
   });
 });
 
+describe('Qraft uses Queries Reset', () => {
+  const parameters: typeof qraft.approvalPolicies.getApprovalPoliciesId.types.parameters =
+    {
+      header: {
+        'x-monite-version': '1.0.0',
+      },
+      path: {
+        approval_policy_id: '1',
+      },
+      query: {
+        items_order: ['asc', 'desc'],
+      },
+    };
+
+  it('supports resetQueries by parameters', async () => {
+    const queryClient = new QueryClient();
+    const initialData = {
+      ...parameters,
+      header: {
+        'x-monite-version': 'initial data',
+      },
+    };
+
+    const { result: result_01 } = renderHook(
+      () =>
+        qraft.approvalPolicies.getApprovalPoliciesId.useQuery(parameters, {
+          initialData,
+        }),
+      {
+        wrapper: (props: { children: ReactNode }) => (
+          <Providers {...props} queryClient={queryClient} />
+        ),
+      }
+    );
+
+    expect(
+      qraft.approvalPolicies.getApprovalPoliciesId.getQueryData(
+        parameters,
+        queryClient
+      )
+    ).toEqual(initialData);
+
+    await waitFor(() => {
+      expect(result_01.current.data).toEqual(parameters);
+    });
+
+    act(() => {
+      qraft.approvalPolicies.getApprovalPoliciesId.resetQueries(
+        { parameters },
+        queryClient
+      );
+    });
+
+    expect(
+      qraft.approvalPolicies.getApprovalPoliciesId.getQueryData(
+        parameters,
+        queryClient
+      )
+    ).toEqual(initialData);
+  });
+});
+
 function Providers({
   children,
   queryClient,

@@ -397,7 +397,9 @@ qraft.entities.getEntities.useQueries({
 });
 ```
 
-### [invalidateQueries(...) 🔗](https://tanstack.com/query/latest/docs/reference/QueryClient#queryclientinvalidatequeries)
+### [`QueryClient`](https://tanstack.com/query/latest/docs/reference/QueryClient) Methods
+
+#### [invalidateQueries(...) 🔗](https://tanstack.com/query/latest/docs/reference/QueryClient#queryclientinvalidatequeries)
 
 [Queries Invalidation 🔗](https://tanstack.com/query/latest/docs/framework/react/guides/query-invalidation) is possible
 using `<operation>.invalidateQueries(..)` method.
@@ -501,10 +503,14 @@ qraft.entities.getEntities.invalidateQueries(
 );
 ```
 
-### [cancelQueries(...) 🔗](https://tanstack.com/query/latest/docs/reference/QueryClient#queryclientcancelqueries)
+#### [cancelQueries(...) 🔗](https://tanstack.com/query/latest/docs/reference/QueryClient#queryclientcancelqueries)
 
 [Query Cancellation](https://tanstack.com/query/latest/docs/framework/react/guides/query-cancellation) has the
 same interface as `invalidateQueries(..)`, but it will cancel the queries instead of invalidating them.
+
+#### [resetQueries(...) 🔗](https://tanstack.com/query/latest/docs/reference/QueryClient#queryclientresetqueries)
+
+The interface is the same as `invalidateQueries(..)`, but it will reset the queries instead of invalidating them.
 
 ### Suspense Queries
 
