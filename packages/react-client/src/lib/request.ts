@@ -2,49 +2,64 @@
  * @throws {error: object|string, response: Response} if the request fails
  */
 export async function request<T>(
-  config: { baseUrl: string },
-  requestInit: APIRequestInit,
-  {
-    urlSerializer: urlSerializerFunc,
-    bodySerializer: bodySerializerFunc,
-  }: {
-    urlSerializer: typeof urlSerializer;
-    bodySerializer: typeof bodySerializer;
-  }
+  options: RequestOptions,
+  requestInfo: APIOperationSchema,
+  requestInit: APIOperationRequestInfo
 ): Promise<T> {
-  const {
-    method,
-    url,
-    parameters,
-    mediaType,
-    headers,
-    body,
-    ...requestInitRest
-  } = requestInit;
+  return baseRequest(
+    isRequiredRequestOptions(options)
+      ? options
+      : {
+          urlSerializer,
+          bodySerializer,
+          ...options,
+        },
+    requestInfo,
+    requestInit
+  );
+}
 
-  const requestBody = bodySerializerFunc({
-    method,
-    mediaType,
-    body,
-  });
+export interface RequestOptions {
+  baseUrl: string;
+  urlSerializer?: URLSerializer;
+  bodySerializer?: BodySerializer;
+}
 
-  const response = await fetch(urlSerializerFunc(config, { url, parameters }), {
-    method: method.toUpperCase(),
-    body: requestBody,
-    headers: mergeHeaders(
-      {
-        Accept: 'application/json',
-        'Content-Type': mediaType ?? getBodyContentType(body),
-      },
-      headers,
-      parameters?.header,
-      requestBody instanceof FormData
-        ? // remove `Content-Type` if serialized body is FormData; browser will correctly set Content-Type & boundary expression
-          { 'Content-Type': null }
-        : undefined
-    ),
-    ...requestInitRest,
-  });
+type URLSerializer = typeof urlSerializer;
+type BodySerializer = typeof bodySerializer;
+
+/**
+ * @throws {error: object|string, response: Response} if the request fails
+ */
+export async function baseRequest<T>(
+  options: Required<RequestOptions>,
+  schema: APIOperationSchema,
+  requestInfo: APIOperationRequestInfo
+): Promise<T> {
+  const { parameters, headers, body, ...requestInfoRest } = requestInfo;
+
+  const requestBody = options.bodySerializer(schema, requestInfo);
+
+  const response = await fetch(
+    options.urlSerializer(options.baseUrl, schema, requestInfo),
+    {
+      method: schema.method.toUpperCase(),
+      body: requestBody,
+      headers: mergeHeaders(
+        {
+          Accept: 'application/json',
+          'Content-Type': schema.mediaType ?? getBodyContentType(body),
+        },
+        headers,
+        parameters?.header,
+        requestBody instanceof FormData
+          ? // remove `Content-Type` if serialized body is FormData; browser will correctly set Content-Type & boundary expression
+            { 'Content-Type': null }
+          : undefined
+      ),
+      ...requestInfoRest,
+    }
+  );
 
   // clone response to allow multiple reads
   const clonedResponse = response.clone();
@@ -57,21 +72,25 @@ export async function request<T>(
 }
 
 export function urlSerializer(
-  config: { baseUrl: string },
-  { url, parameters }: Pick<APIRequestInit, 'url' | 'parameters'>
+  baseUrl: string,
+  schema: APIOperationSchema,
+  info: APIOperationRequestInfo
 ): string {
-  const path = url.replace(/{(.*?)}/g, (substring: string, group: string) => {
-    if (parameters?.path?.hasOwnProperty(group)) {
-      return encodeURI(String(parameters?.path[group]));
+  const path = schema.url.replace(
+    /{(.*?)}/g,
+    (substring: string, group: string) => {
+      if (info.parameters?.path?.hasOwnProperty(group)) {
+        return encodeURI(String(info.parameters?.path[group]));
+      }
+      return substring;
     }
-    return substring;
-  });
+  );
 
-  if (parameters?.query) {
-    return `${config.baseUrl}${path}${getQueryString(parameters.query)}`;
+  if (info.parameters?.query) {
+    return `${baseUrl}${path}${getQueryString(info.parameters.query)}`;
   }
 
-  return `${config.baseUrl}${path}`;
+  return `${baseUrl}${path}`;
 }
 
 function getQueryString(params: Record<string, any>): string {
@@ -133,38 +152,37 @@ function mergeHeaders(...allHeaders: (HeadersOptions | undefined)[]) {
   return headers;
 }
 
-export function bodySerializer(options: {
-  method: APIRequestInit['method'];
-  mediaType: APIRequestInit['mediaType'];
-  body: APIRequestInit['body'];
-}) {
-  if (options.body === undefined) return;
+export function bodySerializer(
+  schema: APIOperationSchema,
+  info: APIOperationRequestInfo
+) {
+  if (info.body === undefined) return;
 
   if (
-    options.method === 'get' ||
-    options.method === 'head' ||
-    options.method === 'options'
+    schema.method === 'get' ||
+    schema.method === 'head' ||
+    schema.method === 'options'
   )
     return;
 
-  if (options.mediaType?.includes('/form-data'))
-    return getRequestBodyFormData(options);
+  if (schema.mediaType?.includes('/form-data'))
+    return getRequestBodyFormData(info);
 
   if (
-    !options.mediaType?.includes('/json') &&
-    (typeof options.body === 'string' ||
-      options.body instanceof Blob ||
-      options.body instanceof FormData)
+    !schema.mediaType?.includes('/json') &&
+    (typeof info.body === 'string' ||
+      info.body instanceof Blob ||
+      info.body instanceof FormData)
   ) {
-    return options.body;
+    return info.body;
   }
 
-  return JSON.stringify(options.body);
+  return JSON.stringify(info.body);
 }
 
 function getRequestBodyFormData({
   body,
-}: Pick<APIRequestInit, 'body'>): FormData | undefined {
+}: Pick<APIOperationRequestInfo, 'body'>): FormData | undefined {
   if (body instanceof FormData) return body;
   if (body === null) return;
 
@@ -203,7 +221,7 @@ function getRequestBodyFormData({
   return formData;
 }
 
-function getBodyContentType(body: APIRequestInit['body']) {
+function getBodyContentType(body: APIOperationRequestInfo['body']) {
   if (!body) return;
   if (body instanceof Blob) return body.type || 'application/octet-stream';
   if (typeof body === 'string') return 'text/plain';
@@ -242,12 +260,27 @@ async function getResponseBody<T>(response: Response): Promise<T | undefined> {
   return response.text() as Promise<T>;
 }
 
+function isRequiredRequestOptions<T extends RequestOptions>(
+  options: RequestOptions
+): options is Required<RequestOptions> {
+  return Boolean(options.urlSerializer && options.bodySerializer);
+}
+
 // To have definitely typed headers without a conversion to stings
 export type HeadersOptions =
   | HeadersInit
   | Record<string, string | number | boolean | null | undefined>;
 
-export type APIRequestInit = {
+export interface APIOperationSchema {
+  /**
+   * Operation path
+   * @example /user/{id}
+   */
+  readonly url: string;
+
+  /**
+   * Operation method
+   */
   readonly method:
     | 'get'
     | 'put'
@@ -257,14 +290,37 @@ export type APIRequestInit = {
     | 'options'
     | 'head'
     | 'trace';
-  readonly url: string;
+
+  /**
+   * Media type of the request body
+   * @example application/json
+   */
+  readonly mediaType?: string;
+}
+
+export interface APIOperationRequestInfo
+  extends Omit<RequestInit, 'headers' | 'method' | 'body'> {
+  /**
+   * OpenAPI parameters
+   * @example
+   * ```ts
+   * { path: {id: 1}, query: {search: 'hello'} }
+   * ```
+   */
   readonly parameters?: {
     readonly path?: Record<string, any>;
     readonly cookie?: Record<string, any>;
     readonly header?: Record<string, any>;
     readonly query?: Record<string, any>;
   };
+  /**
+   * Request body
+   * @example { name: 'John' }
+   */
   readonly body?: BodyInit | Record<string, unknown> | null;
-  readonly mediaType?: string;
+  /**
+   * Request headers
+   * @example { 'X-Auth': '123' }
+   */
   readonly headers?: HeadersOptions;
-} & Omit<RequestInit, 'headers' | 'method' | 'body'>;
+}

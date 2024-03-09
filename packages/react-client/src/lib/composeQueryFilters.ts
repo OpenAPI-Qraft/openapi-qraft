@@ -1,4 +1,4 @@
-import type { RequestClientSchema } from '../RequestClient.js';
+import type { RequestSchema } from '../RequestClient.js';
 import { composeQueryKey } from './composeQueryKey.js';
 
 /**
@@ -8,7 +8,7 @@ import { composeQueryKey } from './composeQueryKey.js';
  * @param filters
  */
 export function composeQueryFilters<Filters extends object>(
-  schema: RequestClientSchema,
+  schema: RequestSchema,
   filters: Filters | undefined
 ) {
   if (!filters) {

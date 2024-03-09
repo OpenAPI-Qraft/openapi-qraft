@@ -1,7 +1,7 @@
-import type { RequestClientSchema } from '../RequestClient.js';
+import type { RequestSchema } from '../RequestClient.js';
 import { ServiceOperationQueryKey } from '../ServiceOperation.js';
 
-export function composeQueryKey<TSchema extends RequestClientSchema, TParams>(
+export function composeQueryKey<TSchema extends RequestSchema, TParams>(
   schema: TSchema,
   parameters: TParams | undefined
 ): ServiceOperationQueryKey<TSchema, TParams> {

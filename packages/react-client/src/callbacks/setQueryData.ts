@@ -1,6 +1,6 @@
 import { composeQueryKey } from '../lib/composeQueryKey.js';
 import type { QraftClientOptions } from '../qraftAPIClient.js';
-import type { RequestClientSchema } from '../RequestClient.js';
+import type { RequestSchema } from '../RequestClient.js';
 import {
   ServiceOperationQuery,
   ServiceOperationQueryKey,
@@ -8,14 +8,14 @@ import {
 
 export function setQueryData<TData>(
   qraftOptions: QraftClientOptions | undefined,
-  schema: RequestClientSchema,
+  schema: RequestSchema,
   args: Parameters<
-    ServiceOperationQuery<RequestClientSchema, unknown, TData>['setQueryData']
+    ServiceOperationQuery<RequestSchema, unknown, TData>['setQueryData']
   >
 ): TData | undefined {
   const [parameters, updater, queryClient, options] = args;
 
-  const queryKey: ServiceOperationQueryKey<RequestClientSchema, unknown> =
+  const queryKey: ServiceOperationQueryKey<RequestSchema, unknown> =
     Array.isArray(parameters)
       ? parameters
       : composeQueryKey(schema, parameters);

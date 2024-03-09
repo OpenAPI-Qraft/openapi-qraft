@@ -21,15 +21,12 @@ import { createAPIClient } from './fixtures/api/index.js';
 
 const qraft = createAPIClient();
 
-const requestClient: RequestClient = async (schema, options) => {
-  return request(
-    {
-      baseUrl: 'https://api.sandbox.monite.com/v1',
-    },
-    { ...schema, ...options },
-    { urlSerializer, bodySerializer }
+const requestClient: RequestClient = async (requestSchema, requestInfo) =>
+  request(
+    { baseUrl: 'https://api.sandbox.monite.com/v1' },
+    requestSchema,
+    requestInfo
   );
-};
 
 describe('Qraft uses singular Query', () => {
   it('supports useQuery', async () => {
@@ -117,17 +114,18 @@ describe('Qraft uses singular Query', () => {
         wrapper: (props) => (
           <QraftCustomContext.Provider
             value={{
-              requestClient(schema, options) {
+              requestClient(schema, info) {
                 return request(
                   {
                     baseUrl: 'https://api.sandbox.monite.com/v1',
+                    urlSerializer,
+                    bodySerializer,
                   },
+                  schema,
                   {
                     headers: { 'x-custom-provider': 'true' },
-                    ...schema,
-                    ...options,
-                  },
-                  { urlSerializer, bodySerializer }
+                    ...info,
+                  }
                 );
               },
             }}

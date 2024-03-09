@@ -1,14 +1,14 @@
 import { callQueryClientMethodWithQueryFilters } from '../lib/callQueryClientMethodWithQueryFilters.js';
 import type { QraftClientOptions } from '../qraftAPIClient.js';
-import type { RequestClientSchema } from '../RequestClient.js';
+import type { RequestSchema } from '../RequestClient.js';
 import { ServiceOperationCancelQueriesCallback } from '../ServiceOperation.js';
 
 export function cancelQueries<TData>(
   qraftOptions: QraftClientOptions | undefined,
-  schema: RequestClientSchema,
+  schema: RequestSchema,
   args: Parameters<
     ServiceOperationCancelQueriesCallback<
-      RequestClientSchema,
+      RequestSchema,
       unknown,
       TData
     >['cancelQueries']

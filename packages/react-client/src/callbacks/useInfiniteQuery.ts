@@ -13,7 +13,7 @@ import { composeInfiniteQueryKey } from '../lib/composeInfiniteQueryKey.js';
 import { shelfMerge } from '../lib/shelfMerge.js';
 import type { QraftClientOptions } from '../qraftAPIClient.js';
 import { QraftContext } from '../QraftContext.js';
-import type { RequestClientSchema } from '../RequestClient.js';
+import type { RequestSchema } from '../RequestClient.js';
 import {
   ServiceOperationInfiniteQueryKey,
   ServiceOperationQuery,
@@ -25,13 +25,9 @@ export const useInfiniteQuery: <
   TData = InfiniteData<TQueryFnData>,
 >(
   qraftOptions: QraftClientOptions | undefined,
-  schema: RequestClientSchema,
+  schema: RequestSchema,
   args: Parameters<
-    ServiceOperationQuery<
-      RequestClientSchema,
-      unknown,
-      unknown
-    >['useInfiniteQuery']
+    ServiceOperationQuery<RequestSchema, unknown, unknown>['useInfiniteQuery']
   >
 ) => UseInfiniteQueryResult<TData, TError> = (qraftOptions, schema, args) => {
   const [parameters, options, queryClientByArg] = args;
@@ -41,12 +37,10 @@ export const useInfiniteQuery: <
 
   if (!requestClient) throw new Error(`QraftContext.requestClient not found`);
 
-  const queryKey: ServiceOperationInfiniteQueryKey<
-    RequestClientSchema,
-    unknown
-  > = Array.isArray(parameters)
-    ? (parameters as never)
-    : composeInfiniteQueryKey(schema, parameters);
+  const queryKey: ServiceOperationInfiniteQueryKey<RequestSchema, unknown> =
+    Array.isArray(parameters)
+      ? (parameters as never)
+      : composeInfiniteQueryKey(schema, parameters);
 
   return useInfiniteQueryBase(
     {

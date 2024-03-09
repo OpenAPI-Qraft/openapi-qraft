@@ -10,15 +10,15 @@ import {
 import { composeQueryFilters } from '../lib/composeQueryFilters.js';
 import type { QraftClientOptions } from '../qraftAPIClient.js';
 import { QraftContext } from '../QraftContext.js';
-import type { RequestClientSchema } from '../RequestClient.js';
+import type { RequestSchema } from '../RequestClient.js';
 import type { ServiceOperationQuery } from '../ServiceOperation.js';
 
 export const useIsFetching: <TVariables = unknown>(
   qraftOptions: QraftClientOptions | undefined,
-  schema: RequestClientSchema,
+  schema: RequestSchema,
   args: Parameters<
     ServiceOperationQuery<
-      RequestClientSchema,
+      RequestSchema,
       object | undefined,
       TVariables,
       unknown

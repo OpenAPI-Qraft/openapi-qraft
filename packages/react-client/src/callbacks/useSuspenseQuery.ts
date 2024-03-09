@@ -12,7 +12,7 @@ import {
 import { composeQueryKey } from '../lib/composeQueryKey.js';
 import type { QraftClientOptions } from '../qraftAPIClient.js';
 import { QraftContext } from '../QraftContext.js';
-import type { RequestClientSchema } from '../RequestClient.js';
+import type { RequestSchema } from '../RequestClient.js';
 import {
   ServiceOperationQuery,
   ServiceOperationQueryKey,
@@ -24,13 +24,9 @@ export const useSuspenseQuery: <
   TData = TQueryFnData,
 >(
   qraftOptions: QraftClientOptions | undefined,
-  schema: RequestClientSchema,
+  schema: RequestSchema,
   args: Parameters<
-    ServiceOperationQuery<
-      RequestClientSchema,
-      unknown,
-      unknown
-    >['useSuspenseQuery']
+    ServiceOperationQuery<RequestSchema, unknown, unknown>['useSuspenseQuery']
   >
 ) => UseQueryResult<TData, TError> = (qraftOptions, schema, args) => {
   const [parameters, options, queryClientByArg] = args;
@@ -40,7 +36,7 @@ export const useSuspenseQuery: <
 
   if (!requestClient) throw new Error(`QraftContext.requestClient not found`);
 
-  const queryKey: ServiceOperationQueryKey<RequestClientSchema, unknown> =
+  const queryKey: ServiceOperationQueryKey<RequestSchema, unknown> =
     Array.isArray(parameters)
       ? (parameters as never)
       : composeQueryKey(schema, parameters);

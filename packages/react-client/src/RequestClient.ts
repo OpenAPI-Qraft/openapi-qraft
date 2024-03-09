@@ -1,9 +1,9 @@
 export type RequestClient = <T>(
-  schema: RequestClientSchema,
-  options: RequestClientOptions
+  schema: RequestSchema,
+  info: RequestInfo
 ) => Promise<T>;
 
-export type RequestClientSchema = {
+export type RequestSchema = {
   url: string;
   method:
     | 'get'
@@ -17,14 +17,14 @@ export type RequestClientSchema = {
   mediaType?: string;
 };
 
-export type RequestClientOptions = {
+export type RequestInfo = {
+  parameters?: RequestInfoParameters;
   body?: BodyInit | Record<string, unknown> | null;
-  parameters?: RequestClientParams;
   signal?: AbortSignal;
   meta?: Record<string, unknown>;
 };
 
-export type RequestClientParams = {
+export type RequestInfoParameters = {
   header?: Record<string, any>;
   path?: Record<string, any>;
   query?: Record<string, any>;

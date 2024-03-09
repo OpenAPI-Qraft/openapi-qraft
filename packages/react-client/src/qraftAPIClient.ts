@@ -2,7 +2,7 @@ import { Context } from 'react';
 
 import { createRecursiveProxy } from './lib/createRecursiveProxy.js';
 import { QraftContextValue } from './QraftContext.js';
-import type { RequestClientSchema } from './RequestClient.js';
+import type { RequestSchema } from './RequestClient.js';
 
 export type QraftClientOptions = {
   context?: Context<QraftContextValue>;
@@ -50,7 +50,7 @@ export const qraftAPIClient = <
 
 function isServiceOperation(
   input: unknown
-): input is { schema: RequestClientSchema } {
+): input is { schema: RequestSchema } {
   return input !== null && typeof input === 'object' && 'schema' in input;
 }
 
@@ -63,7 +63,7 @@ function getByPath(obj: Record<string, unknown>, path: string[]) {
 
 type ServicesOutput<Services> = {
   [service in keyof Services]: {
-    [method in keyof Services[service]]: { schema: RequestClientSchema };
+    [method in keyof Services[service]]: { schema: RequestSchema };
   };
 };
 
@@ -82,7 +82,7 @@ type ServicesCallbacksFilter<
   Callbacks,
 > = Services extends {
   [serviceName in keyof Services]: {
-    [method in keyof Services[serviceName]]: { schema: RequestClientSchema };
+    [method in keyof Services[serviceName]]: { schema: RequestSchema };
   };
 }
   ? {

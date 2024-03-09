@@ -92,12 +92,7 @@ Every request will be handled by `requestClient`, which can be customized to fit
 ```tsx
 import { useMemo } from 'react';
 
-import {
-  request,
-  bodySerializer,
-  urlSerializer,
-  QraftContext,
-} from '@openapi-qraft/react';
+import { request, QraftContext } from '@openapi-qraft/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 // where `./api` is the '--output-dir' path to the services you generated
@@ -116,18 +111,17 @@ function Providers({ children }: { children: React.ReactNode }) {
           /**
            * Request client will be invoked for every request
            */
-          async requestClient(schema, options) {
+          async requestClient(schema, info) {
             return request(
               { baseUrl: 'https://api.sandbox.monite.com/v1' },
+              schema,
               {
-                ...schema,
-                ...options,
+                ...info,
                 headers: {
                   /** Specify your predefined header here **/
                   // Authorization: 'Bearer token',
                 },
-              },
-              { urlSerializer, bodySerializer } // Serializers for request body and URL
+              }
             );
           },
         }}

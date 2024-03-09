@@ -1,10 +1,7 @@
-import type { RequestClientSchema } from '../RequestClient.js';
+import type { RequestSchema } from '../RequestClient.js';
 import { ServiceOperationInfiniteQueryKey } from '../ServiceOperation.js';
 
-export function composeInfiniteQueryKey<
-  TSchema extends RequestClientSchema,
-  TParams,
->(
+export function composeInfiniteQueryKey<TSchema extends RequestSchema, TParams>(
   schema: TSchema,
   parameters: TParams | undefined
 ): ServiceOperationInfiniteQueryKey<TSchema, TParams> {

@@ -12,7 +12,7 @@ import {
 import { composeMutationKey } from '../lib/composeMutationKey.js';
 import type { QraftClientOptions } from '../qraftAPIClient.js';
 import { QraftContext } from '../QraftContext.js';
-import type { RequestClientSchema } from '../RequestClient.js';
+import type { RequestSchema } from '../RequestClient.js';
 import { ServiceOperationMutation } from '../ServiceOperation.js';
 
 export const useMutationState: <
@@ -22,10 +22,10 @@ export const useMutationState: <
   TContext = unknown,
 >(
   qraftOptions: QraftClientOptions | undefined,
-  schema: RequestClientSchema,
+  schema: RequestSchema,
   args: Parameters<
     ServiceOperationMutation<
-      RequestClientSchema,
+      RequestSchema,
       object | undefined,
       TVariables,
       TData
