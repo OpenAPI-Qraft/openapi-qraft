@@ -25,9 +25,6 @@ jobs:
           cache: 'yarn'
           node-version: 18.x
 
-      - name: Yarn Why Prettier
-        run: yarn why prettier
-
       - name: Install Dependencies
         run: yarn install --immutable
 
