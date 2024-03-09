@@ -1,7 +1,7 @@
 import type { QueryClient } from '@tanstack/query-core';
 
 import type { RequestClientSchema } from '../RequestClient.js';
-import { composeQueryKey } from './composeQueryKey.js';
+import { composeQueryFilters } from './composeQueryFilters.js';
 
 /**
  * Calls a query client method with query filters and options,
@@ -24,7 +24,7 @@ export function callQueryClientMethodWithQueryFilters<
           : undefined
   ) as QueryClient | undefined;
 
-  const filters = composeFilters(
+  const filters = composeQueryFilters(
     schema,
     args.length === 1 ? undefined : args[0]
   );
@@ -42,42 +42,6 @@ export function callQueryClientMethodWithQueryFilters<
 
   // @ts-expect-error
   return queryClient[queryFilterMethod](filters);
-}
-
-/**
- * Replaces the `parameters` field in the filters with a `queryKey` field based on the schema.
- * If no filters are provided, a `queryKey` will be composed schema's base query key.
- * @param schema
- * @param filters
- */
-function composeFilters<Filters extends object>(
-  schema: RequestClientSchema,
-  filters: Filters | undefined
-) {
-  if (!filters) {
-    return {
-      queryKey: composeQueryKey(schema, undefined),
-    };
-  }
-
-  if ('queryKey' in filters) {
-    return filters;
-  }
-
-  if ('parameters' in filters) {
-    const { parameters, ...filtersWithoutParameters } = filters;
-
-    Object.assign(filtersWithoutParameters, {
-      queryKey: composeQueryKey(schema, parameters),
-    });
-
-    return filtersWithoutParameters;
-  }
-
-  return {
-    ...filters,
-    queryKey: composeQueryKey(schema, undefined),
-  };
 }
 
 type QueryFiltersMethod<QFMethod extends keyof typeof QueryClient.prototype> =
