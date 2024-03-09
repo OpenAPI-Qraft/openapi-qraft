@@ -1,5 +1,11 @@
 # @openapi-qraft/cli
 
+## 1.1.3
+
+### Patch Changes
+
+- be3c43e: fix(cli): add handling of empty invalid parameters
+
 ## 1.1.2
 
 ### Patch Changes
