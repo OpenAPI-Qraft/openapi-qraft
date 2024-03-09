@@ -7,7 +7,7 @@ import {
   useQueryClient,
 } from '@tanstack/react-query';
 
-import { composeQueryFilters } from '../lib/callQueryClientMethodWithQueryFilters.js';
+import { composeQueryFilters } from '../lib/composeQueryFilters.js';
 import type { QraftClientOptions } from '../qraftAPIClient.js';
 import { QraftContext } from '../QraftContext.js';
 import type { RequestClientSchema } from '../RequestClient.js';

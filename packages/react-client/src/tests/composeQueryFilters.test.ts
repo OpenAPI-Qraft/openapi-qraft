@@ -1,4 +1,4 @@
-import { composeQueryFilters } from '../lib/callQueryClientMethodWithQueryFilters.js';
+import { composeQueryFilters } from '../lib/composeQueryFilters.js';
 
 describe('composeQueryFilters', () => {
   const predicate = (value: unknown): value is object =>
