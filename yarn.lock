@@ -1100,10 +1100,12 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@openapi-qraft/cli@workspace:packages/cli"
   dependencies:
+    "@types/micromatch": "npm:^4"
     "@types/node": "npm:^18.19.4"
     ansi-colors: "npm:^4.1.3"
     camelcase: "npm:^8.0.0"
     commander: "npm:^11.1.0"
+    micromatch: "npm:^4.0.5"
     openapi-typescript: "npm:7.0.0-next.7"
     ora: "npm:^8.0.1"
     rimraf: "npm:^5.0.5"
@@ -1576,6 +1578,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/braces@npm:*":
+  version: 3.0.4
+  resolution: "@types/braces@npm:3.0.4"
+  checksum: 05220f330814364318a1c2f403046d717690cabf3adc8417357b0b12713f92768cf9df76e0e25212b5a2727c8c56765ff19a284c7ece39e0985d0d6fadb6c4aa
+  languageName: node
+  linkType: hard
+
 "@types/cookie@npm:^0.4.1":
   version: 0.4.1
   resolution: "@types/cookie@npm:0.4.1"
@@ -1643,6 +1652,15 @@ __metadata:
   version: 4.14.202
   resolution: "@types/lodash@npm:4.14.202"
   checksum: 6064d43c8f454170841bd67c8266cc9069d9e570a72ca63f06bceb484cb4a3ee60c9c1f305c1b9e3a87826049fd41124b8ef265c4dd08b00f6766609c7fe9973
+  languageName: node
+  linkType: hard
+
+"@types/micromatch@npm:^4":
+  version: 4.0.6
+  resolution: "@types/micromatch@npm:4.0.6"
+  dependencies:
+    "@types/braces": "npm:*"
+  checksum: deba87b2bb740cb3f206c006baddc2d3f411fdba48e47452fb189a2a1a73cc3d6f6f2e6f52b970d1383e988afd9f12046e50f902ad740f1f8afa3faa273ab2a0
   languageName: node
   linkType: hard
 
@@ -6164,7 +6182,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"micromatch@npm:^4.0.2, micromatch@npm:^4.0.4":
+"micromatch@npm:^4.0.2, micromatch@npm:^4.0.4, micromatch@npm:^4.0.5":
   version: 4.0.5
   resolution: "micromatch@npm:4.0.5"
   dependencies:

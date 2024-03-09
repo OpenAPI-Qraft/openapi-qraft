@@ -1,5 +1,6 @@
 import camelCase from 'camelcase';
 import * as console from 'console';
+import micromatch from 'micromatch';
 
 import { getContentMediaType } from './getContent.js';
 import { getOperationName } from './getOperationName.js';
@@ -37,17 +38,22 @@ export type ServiceOperation = {
 
 export const getServices = (
   openApiJson: OpenAPISchemaType,
-  { postfixServices = 'Service' }: { postfixServices?: string } = {}
+  { postfixServices = 'Service' }: { postfixServices?: string } = {},
+  servicesGlob = ['**']
 ) => {
   const paths = openApiJson.paths;
 
   const services = new Map<string, Service>();
+
+  const isPathMatch = createServicePathMatch(servicesGlob);
 
   for (const path in paths) {
     if (!paths.hasOwnProperty(path)) continue;
 
     for (const method in paths[path]) {
       if (!paths[path].hasOwnProperty(method)) continue;
+      if (!isPathMatch(path)) continue;
+
       if (!supportedMethod(method)) {
         console.warn(
           `The path "${path}" HTTP method "${method}" is not supported`
@@ -115,6 +121,33 @@ export const getServices = (
   }
 
   return Array.from(services.values());
+};
+
+/**
+ * Create a function to match service paths
+ * @param servicesGlob
+ */
+export const createServicePathMatch = (servicesGlob: string[]) => {
+  const servicePathGlobs = servicesGlob.reduce<
+    Record<'match' | 'ignore', string[]>
+  >(
+    (acc, glob) => {
+      glob.startsWith('!')
+        ? acc.ignore.push(glob.slice(1))
+        : acc.match.push(glob);
+      return acc;
+    },
+    {
+      match: [],
+      ignore: [],
+    }
+  );
+
+  return function isServicePatchMatch(path: string) {
+    return micromatch.isMatch(path, servicePathGlobs.match, {
+      ignore: servicePathGlobs.ignore,
+    });
+  };
 };
 
 export const supportedMethod = (

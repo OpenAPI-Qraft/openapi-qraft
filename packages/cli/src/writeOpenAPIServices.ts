@@ -27,15 +27,17 @@ type OutputOptions = {
 
 export const writeOpenAPIServices = async ({
   source,
+  servicesGlob,
   serviceImports,
   output,
 }: {
   source: string | URL | OpenAPI3 | Readable | Buffer;
+  servicesGlob: string[] | undefined;
   serviceImports: ServiceImportsFactoryOptions;
   output: OutputOptions;
 }) => {
   const schema = await readSchema(source);
-  const services = getServices(schema, output);
+  const services = getServices(schema, output, servicesGlob);
 
   await writeServices(services, serviceImports, output);
   await writeServiceIndex(services, output);
