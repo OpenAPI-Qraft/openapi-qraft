@@ -1879,11 +1879,65 @@ describe('Qraft uses Queries Cancellation', () => {
 
     expect(result.current.isFetching).toBeTruthy();
 
-    await expect(
-      qraft.approvalPolicies.getApprovalPoliciesId.cancelQueries(queryClient)
-    ).resolves.toBeUndefined();
+    act(() => {
+      qraft.approvalPolicies.getApprovalPoliciesId.cancelQueries(queryClient);
+    });
 
     expect(counterFn.mock.calls.length).toEqual(1);
+  });
+});
+
+describe('Qraft uses Queries Refetch', () => {
+  const parameters: typeof qraft.approvalPolicies.getApprovalPoliciesId.types.parameters =
+    {
+      header: {
+        'x-monite-version': '1.0.0',
+      },
+      path: {
+        approval_policy_id: '1',
+      },
+      query: {
+        items_order: ['asc', 'desc'],
+      },
+    };
+
+  it('supports refetchQueries by parameters', async () => {
+    const queryClient = new QueryClient();
+
+    const counterFn = vi.fn();
+
+    const hook = () =>
+      qraft.approvalPolicies.getApprovalPoliciesId.useQuery(parameters, {
+        queryFn({ signal }) {
+          return new Promise((resolve) => {
+            counterFn();
+            return resolve(parameters);
+          });
+        },
+      });
+
+    const { result: result_01 } = renderHook(hook, {
+      wrapper: (props: { children: ReactNode }) => (
+        <Providers {...props} queryClient={queryClient} />
+      ),
+    });
+
+    await waitFor(() => {
+      expect(result_01.current.isSuccess).toBeTruthy();
+    });
+
+    expect(counterFn.mock.calls.length).toEqual(1);
+
+    act(() => {
+      qraft.approvalPolicies.getApprovalPoliciesId.refetchQueries(
+        {
+          parameters,
+        },
+        queryClient
+      );
+    });
+
+    expect(counterFn.mock.calls.length).toEqual(2);
   });
 });
 

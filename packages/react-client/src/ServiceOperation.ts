@@ -12,6 +12,7 @@ import {
   QueriesPlaceholderDataFunction,
   Query,
   QueryClient,
+  RefetchOptions,
   ResetOptions,
   SetDataOptions,
   Updater,
@@ -67,7 +68,8 @@ export interface ServiceOperationQuery<
     ServiceOperationSetInfiniteQueryData<TSchema, TData, TParams>,
     ServiceOperationInvalidateQueries<TSchema, TData, TParams, TError>,
     ServiceOperationCancelQueries<TSchema, TData, TParams, TError>,
-    ServiceOperationResetQueries<TSchema, TData, TParams, TError> {
+    ServiceOperationResetQueries<TSchema, TData, TParams, TError>,
+    ServiceOperationRefetchQueries<TSchema, TData, TParams, TError> {
   schema: TSchema;
   types: {
     parameters: TParams;
@@ -335,6 +337,47 @@ export interface ServiceOperationResetQueriesCallback<
       | QueryFiltersByQueryKey<TSchema, TData, TParams, TError>
       | QueryClient,
     options?: ResetOptions | QueryClient,
+    queryClient?: QueryClient
+  ): Promise<void>;
+}
+
+interface ServiceOperationRefetchQueries<
+  TSchema extends { url: string; method: string },
+  TData,
+  TParams = {},
+  TError = DefaultError,
+> {
+  refetchQueries(
+    filters:
+      | QueryFiltersByParameters<TSchema, TData, TParams, TError>
+      | QueryFiltersByQueryKey<TSchema, TData, TParams, TError>,
+    options: RefetchOptions,
+    queryClient: QueryClient
+  ): Promise<void>;
+  refetchQueries(
+    filters:
+      | QueryFiltersByParameters<TSchema, TData, TParams, TError>
+      | QueryFiltersByQueryKey<TSchema, TData, TParams, TError>,
+    queryClient: QueryClient
+  ): Promise<void>;
+  refetchQueries(queryClient: QueryClient): Promise<void>;
+}
+
+/**
+ * @internal
+ */
+export interface ServiceOperationResetQueriesCallback<
+  TSchema extends { url: string; method: string },
+  TData,
+  TParams = {},
+  TError = DefaultError,
+> extends ServiceOperationRefetchQueries<TSchema, TData, TParams, TError> {
+  refetchQueries(
+    filters:
+      | QueryFiltersByParameters<TSchema, TData, TParams, TError>
+      | QueryFiltersByQueryKey<TSchema, TData, TParams, TError>
+      | QueryClient,
+    options?: RefetchOptions | QueryClient,
     queryClient?: QueryClient
   ): Promise<void>;
 }

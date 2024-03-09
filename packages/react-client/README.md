@@ -512,6 +512,10 @@ same interface as `invalidateQueries(..)`, but it will cancel the queries instea
 
 The interface is the same as `invalidateQueries(..)`, but it will reset the queries instead of invalidating them.
 
+#### [refetchQueries(...) 🔗](https://tanstack.com/query/latest/docs/reference/QueryClient#queryclientrefetchqueries)
+
+The interface is the same as `invalidateQueries(..)`, but it will refetch the queries instead of invalidating them.
+
 ### Suspense Queries
 
 Supported Suspense Queries are:
