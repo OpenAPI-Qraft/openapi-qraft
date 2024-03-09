@@ -34,12 +34,6 @@ jobs:
       - name: Build
         run: yarn build
 
-      - name: Setup Node.js 18.x for E2E
-        uses: actions/setup-node@v4
-        with:
-          cache: 'npm' # e2e tests are not using yarn
-          node-version: 18.x
-
       - name: Copy Playground for E2E Tests
         run: |
           mkdir -p ${{ runner.temp }}/projects
