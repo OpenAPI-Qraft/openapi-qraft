@@ -61,6 +61,7 @@ export interface ServiceOperationQuery<
     ServiceOperationUseInfiniteQuery<TSchema, TData, TParams, TError>,
     ServiceOperationUseSuspenseQueryQuery<TSchema, TData, TParams, TError>,
     ServiceOperationUseSuspenseInfiniteQuery<TSchema, TData, TParams, TError>,
+    ServiceOperationUseIsFetchingQueries<TSchema, TData, TParams, TError>,
     ServiceOperationQueryFn<TSchema, TData, TParams>,
     ServiceOperationGetQueryData<TSchema, TData, TParams>,
     ServiceOperationGetInfiniteQueryData<TSchema, TData, TParams>,
@@ -412,6 +413,20 @@ export interface ServiceOperationIsFetchingQueriesCallback<
       | QueryFiltersByParameters<TSchema, TData, TParams, TError>
       | QueryFiltersByQueryKey<TSchema, TData, TParams, TError>
       | QueryClient,
+    queryClient?: QueryClient
+  ): number;
+}
+
+interface ServiceOperationUseIsFetchingQueries<
+  TSchema extends { url: string; method: string },
+  TData,
+  TParams = {},
+  TError = DefaultError,
+> {
+  useIsFetching(
+    filters?:
+      | QueryFiltersByParameters<TSchema, TData, TParams, TError>
+      | QueryFiltersByQueryKey<TSchema, TData, TParams, TError>,
     queryClient?: QueryClient
   ): number;
 }

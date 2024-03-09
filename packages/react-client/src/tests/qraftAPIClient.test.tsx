@@ -2073,6 +2073,86 @@ describe('Qraft uses IsFetching Query', () => {
   });
 });
 
+describe('Qraft uses useIsFetching Query', () => {
+  const parameters: typeof qraft.approvalPolicies.getApprovalPoliciesId.types.parameters =
+    {
+      header: {
+        'x-monite-version': '1.0.0',
+      },
+      path: {
+        approval_policy_id: '1',
+      },
+      query: {
+        items_order: ['asc', 'desc'],
+      },
+    };
+
+  it('supports useIsFetching with specific parameters', async () => {
+    const queryClient = new QueryClient();
+
+    renderHook(
+      () => {
+        qraft.approvalPolicies.getApprovalPoliciesId.useQuery({
+          ...parameters,
+          header: {
+            'x-monite-version': '1.2.0',
+          },
+        });
+
+        return qraft.approvalPolicies.getApprovalPoliciesId.useQuery(
+          parameters
+        );
+      },
+      {
+        wrapper: (props) => <Providers {...props} queryClient={queryClient} />,
+      }
+    );
+
+    const { result } = renderHook(
+      () =>
+        qraft.approvalPolicies.getApprovalPoliciesId.useIsFetching({
+          parameters,
+        }),
+      {
+        wrapper: (props) => <Providers {...props} queryClient={queryClient} />,
+      }
+    );
+
+    expect(result.current).toEqual(1);
+  });
+
+  it('supports useIsFetching without specific parameters', async () => {
+    const queryClient = new QueryClient();
+
+    renderHook(
+      () => {
+        qraft.approvalPolicies.getApprovalPoliciesId.useQuery({
+          ...parameters,
+          header: {
+            'x-monite-version': '1.2.0',
+          },
+        });
+
+        return qraft.approvalPolicies.getApprovalPoliciesId.useQuery(
+          parameters
+        );
+      },
+      {
+        wrapper: (props) => <Providers {...props} queryClient={queryClient} />,
+      }
+    );
+
+    const { result } = renderHook(
+      () => qraft.approvalPolicies.getApprovalPoliciesId.useIsFetching(),
+      {
+        wrapper: (props) => <Providers {...props} queryClient={queryClient} />,
+      }
+    );
+
+    expect(result.current).toEqual(2);
+  });
+});
+
 function Providers({
   children,
   queryClient,
