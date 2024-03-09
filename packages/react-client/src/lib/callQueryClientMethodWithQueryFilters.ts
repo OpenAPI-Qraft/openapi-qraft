@@ -24,7 +24,7 @@ export function callQueryClientMethodWithQueryFilters<
           : undefined
   ) as QueryClient | undefined;
 
-  const filters = composeFilters(
+  const filters = composeQueryFilters(
     schema,
     args.length === 1 ? undefined : args[0]
   );
@@ -50,7 +50,7 @@ export function callQueryClientMethodWithQueryFilters<
  * @param schema
  * @param filters
  */
-function composeFilters<Filters extends object>(
+export function composeQueryFilters<Filters extends object>(
   schema: RequestClientSchema,
   filters: Filters | undefined
 ) {
@@ -58,6 +58,12 @@ function composeFilters<Filters extends object>(
     return {
       queryKey: composeQueryKey(schema, undefined),
     };
+  }
+
+  if (filters && 'queryKey' in filters && 'parameters' in filters) {
+    throw new Error(
+      `'composeQueryFilters': 'queryKey' and 'parameters' cannot be used together`
+    );
   }
 
   if ('queryKey' in filters) {
