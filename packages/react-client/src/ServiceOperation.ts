@@ -69,7 +69,8 @@ export interface ServiceOperationQuery<
     ServiceOperationInvalidateQueries<TSchema, TData, TParams, TError>,
     ServiceOperationCancelQueries<TSchema, TData, TParams, TError>,
     ServiceOperationResetQueries<TSchema, TData, TParams, TError>,
-    ServiceOperationRefetchQueries<TSchema, TData, TParams, TError> {
+    ServiceOperationRefetchQueries<TSchema, TData, TParams, TError>,
+    ServiceOperationIsFetchingQueries<TSchema, TData, TParams, TError> {
   schema: TSchema;
   types: {
     parameters: TParams;
@@ -380,6 +381,39 @@ export interface ServiceOperationResetQueriesCallback<
     options?: RefetchOptions | QueryClient,
     queryClient?: QueryClient
   ): Promise<void>;
+}
+
+interface ServiceOperationIsFetchingQueries<
+  TSchema extends { url: string; method: string },
+  TData,
+  TParams = {},
+  TError = DefaultError,
+> {
+  isFetching(
+    filters:
+      | QueryFiltersByParameters<TSchema, TData, TParams, TError>
+      | QueryFiltersByQueryKey<TSchema, TData, TParams, TError>,
+    queryClient: QueryClient
+  ): number;
+  isFetching(queryClient: QueryClient): number;
+}
+
+/**
+ * @internal
+ */
+export interface ServiceOperationIsFetchingQueriesCallback<
+  TSchema extends { url: string; method: string },
+  TData,
+  TParams = {},
+  TError = DefaultError,
+> extends ServiceOperationIsFetchingQueries<TSchema, TData, TParams, TError> {
+  refetchQueries(
+    filters:
+      | QueryFiltersByParameters<TSchema, TData, TParams, TError>
+      | QueryFiltersByQueryKey<TSchema, TData, TParams, TError>
+      | QueryClient,
+    queryClient?: QueryClient
+  ): number;
 }
 
 interface ServiceOperationUseSuspenseQueries<

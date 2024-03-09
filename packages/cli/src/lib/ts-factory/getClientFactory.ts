@@ -189,4 +189,5 @@ const serviceCallbacks = [
   'cancelQueries',
   'resetQueries',
   'refetchQueries',
+  'isFetching',
 ] as const;

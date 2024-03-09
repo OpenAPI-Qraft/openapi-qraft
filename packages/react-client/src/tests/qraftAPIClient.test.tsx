@@ -2003,6 +2003,76 @@ describe('Qraft uses Queries Reset', () => {
   });
 });
 
+describe('Qraft uses IsFetching Query', () => {
+  const parameters: typeof qraft.approvalPolicies.getApprovalPoliciesId.types.parameters =
+    {
+      header: {
+        'x-monite-version': '1.0.0',
+      },
+      path: {
+        approval_policy_id: '1',
+      },
+      query: {
+        items_order: ['asc', 'desc'],
+      },
+    };
+
+  it('supports isFetching with specific parameters', async () => {
+    const queryClient = new QueryClient();
+
+    renderHook(
+      () => {
+        qraft.approvalPolicies.getApprovalPoliciesId.useQuery({
+          ...parameters,
+          header: {
+            'x-monite-version': '1.2.0',
+          },
+        });
+
+        return qraft.approvalPolicies.getApprovalPoliciesId.useQuery(
+          parameters
+        );
+      },
+      {
+        wrapper: (props) => <Providers {...props} queryClient={queryClient} />,
+      }
+    );
+
+    expect(
+      qraft.approvalPolicies.getApprovalPoliciesId.isFetching(
+        { parameters },
+        queryClient
+      )
+    ).toEqual(1);
+  });
+
+  it('supports isFetching without specific parameters', async () => {
+    const queryClient = new QueryClient();
+
+    renderHook(
+      () => {
+        qraft.approvalPolicies.getApprovalPoliciesId.useQuery({
+          ...parameters,
+          header: {
+            'x-monite-version': '1.2.0',
+          },
+        });
+
+        return qraft.approvalPolicies.getApprovalPoliciesId.useQuery(
+          parameters
+        );
+      },
+      {
+        wrapper: (props) => <Providers {...props} queryClient={queryClient} />,
+      }
+    );
+
+    expect(
+      qraft.approvalPolicies.getApprovalPoliciesId.isFetching(queryClient)
+    ).toEqual(2);
+  });
+});
+
 function Providers({
   children,
   queryClient,

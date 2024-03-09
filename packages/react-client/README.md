@@ -402,8 +402,8 @@ qraft.entities.getEntities.useQueries({
 #### [invalidateQueries(...) 🔗](https://tanstack.com/query/latest/docs/reference/QueryClient#queryclientinvalidatequeries)
 
 [Queries Invalidation 🔗](https://tanstack.com/query/latest/docs/framework/react/guides/query-invalidation) is possible
-using `<operation>.invalidateQueries(..)` method.
-This method is a wrapper around the `queryClient.invalidateQueries(..)`.
+using `<operation>.invalidateQueries(...)` method.
+This method is a wrapper around the `queryClient.invalidateQueries(...)`.
 
 ##### Invalidation with _parameters_:
 
@@ -475,9 +475,9 @@ qraft.entities.getEntities.invalidateQueries(
 );
 ```
 
-##### [Invalidation with _predicate_: 🔗](https://tanstack.com/query/latest/docs/framework/react/guides/filters#query-filters)
+##### [Invalidation with predicate: 🔗](https://tanstack.com/query/latest/docs/framework/react/guides/filters#query-filters)
 
-The `predicate(..)` function will be used as a final filter on all matching queries.
+The `predicate(...)` function will be used as a final filter on all matching queries.
 
 ```ts
 /**
@@ -506,15 +506,20 @@ qraft.entities.getEntities.invalidateQueries(
 #### [cancelQueries(...) 🔗](https://tanstack.com/query/latest/docs/reference/QueryClient#queryclientcancelqueries)
 
 [Query Cancellation](https://tanstack.com/query/latest/docs/framework/react/guides/query-cancellation) has the
-same interface as `invalidateQueries(..)`, but it will cancel the queries instead of invalidating them.
+same interface as `invalidateQueries(...)`, but it will cancel the queries instead of invalidating them.
 
 #### [resetQueries(...) 🔗](https://tanstack.com/query/latest/docs/reference/QueryClient#queryclientresetqueries)
 
-The interface is the same as `invalidateQueries(..)`, but it will reset the queries instead of invalidating them.
+The interface is the same as `invalidateQueries(...)`, but it will reset the queries instead of invalidating them.
 
 #### [refetchQueries(...) 🔗](https://tanstack.com/query/latest/docs/reference/QueryClient#queryclientrefetchqueries)
 
-The interface is the same as `invalidateQueries(..)`, but it will refetch the queries instead of invalidating them.
+The interface is the same as `invalidateQueries(...)`, but it will refetch the queries instead of invalidating them.
+
+#### [isFetching(...) 🔗](https://tanstack.com/query/latest/docs/reference/QueryClient#queryclientisfetching)
+
+The interface is the same as `invalidateQueries(...), but it will check if the queries are fetching, and there are no
+options.
 
 ### Suspense Queries
 
