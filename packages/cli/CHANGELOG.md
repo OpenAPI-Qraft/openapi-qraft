@@ -1,5 +1,11 @@
 # @openapi-qraft/cli
 
+## 1.1.4
+
+### Patch Changes
+
+- 3268dd6: Added support for `QueryClient.resetQueries(...)` method
+
 ## 1.1.3
 
 ### Patch Changes
