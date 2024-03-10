@@ -80,4 +80,23 @@ describe('callQueryClientFetchMethod', () => {
       })
     ).rejects.toThrow(`Missing queryFn: '["dummy"]'`);
   });
+
+  it('should throw and error when query client is invalid', () => {
+    expect(() => {
+      callQueryClientMethodWithQueryKey(
+        'fetchQuery',
+        { url: 'https://example.com', method: 'get' },
+        false,
+        [
+          {
+            queryKey: ['key'],
+            requestFn: () => Promise.resolve({}),
+            queryFn: () => Promise.resolve({}),
+            baseUrl: 'https://example.com',
+          },
+          {} as never,
+        ]
+      );
+    }).toThrow('queryClient is invalid, fetchQuery method does not exist');
+  });
 });
