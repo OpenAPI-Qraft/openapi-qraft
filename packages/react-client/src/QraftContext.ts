@@ -11,7 +11,7 @@ interface QraftContextValueBase {
    * The base URL to use for all requests.
    * @example 'https://api.example.com'
    */
-  baseUrl: string;
+  baseUrl?: string;
 
   /**
    * The `requestFn` will be invoked with every request.

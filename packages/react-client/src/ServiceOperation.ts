@@ -175,7 +175,11 @@ type FetchQueryOptionsQueryFn<
     }
   | {
       requestFn: RequestFn<TData>;
-      baseUrl: string;
+      /**
+       * Base URL to use for the request (used in the `queryFn`)
+       * @example 'https://api.example.com'
+       */
+      baseUrl?: string;
       queryFn?: never; // Workaround to fix union type error
     };
 
