@@ -40,6 +40,7 @@ export const useQueries: (
                   },
                   queryOptions
                 );
+                // @ts-expect-error
                 delete queryOptionsCopy.parameters;
                 return queryOptionsCopy;
               })()

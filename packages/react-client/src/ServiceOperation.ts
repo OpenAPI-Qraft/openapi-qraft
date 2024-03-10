@@ -163,6 +163,7 @@ interface FetchQueryOptionsByParameters<
    * Fetch Queries by parameters
    */
   parameters?: TParams;
+  queryKey?: never;
 }
 
 type FetchQueryOptionsQueryFn<
@@ -371,7 +372,7 @@ interface ServiceOperationUseQueries<
         > & {
           placeholderData?: TData | QueriesPlaceholderDataFunction<TData>;
         } & (
-            | { parameters: TParams }
+            | { parameters: TParams; queryKey?: never }
             | { queryKey: ServiceOperationQueryKey<TSchema, TParams> }
           )
       >;
@@ -685,7 +686,7 @@ interface ServiceOperationUseSuspenseQueries<
           'queryKey'
         > &
           (
-            | { parameters: TParams }
+            | { parameters: TParams; queryKey?: never }
             | { queryKey: ServiceOperationQueryKey<TSchema, TParams> }
           )
       >;
@@ -969,6 +970,7 @@ interface QueryFnOptionsByParameters<
   TSignal extends AbortSignal = AbortSignal,
 > extends QueryFnOptionsBase<TMeta, TSignal> {
   parameters: TParams;
+  queryKey?: never;
 }
 
 interface QueryFnOptionsByQueryKey<

@@ -44,6 +44,7 @@ export const useSuspenseQueries: (
                   },
                   queryOptions
                 );
+                // @ts-expect-error
                 delete queryOptionsCopy.parameters;
                 return queryOptionsCopy;
               })()
