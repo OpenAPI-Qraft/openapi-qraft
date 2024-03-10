@@ -92,7 +92,7 @@ Every request will be handled by `request` function, which can be customized to 
 ```tsx
 import { useMemo } from 'react';
 
-import { request, QraftContext } from '@openapi-qraft/react';
+import { QraftContext, requestFn } from '@openapi-qraft/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 // where `./api` is the '--output-dir' path to the services you generated with `@openapi-qraft/cli`
@@ -109,7 +109,7 @@ function Providers({ children }: { children: React.ReactNode }) {
       <QraftContext.Provider
         value={{
           baseUrl: 'https://api.sandbox.monite.com/v1', // base URL for all requests
-          request, // `request(...)` will be invoked for every request
+          requestFn, // `requestFn(...)` will be invoked for every request
         }}
       >
         {children}
@@ -556,7 +556,7 @@ In the example below, we provide a custom `request` function to the `QraftContex
 using a custom `fetchToken` async function.
 
 ```tsx
-import { request, QraftContext } from '@openapi-qraft/react';
+import { QraftContext, requestFn } from '@openapi-qraft/react';
 
 import { fetchToken } from './auth';
 
@@ -565,10 +565,10 @@ function QraftProvider({ children }: { children: React.ReactNode }) {
     <QraftContext.Provider
       value={{
         baseUrl: 'https://api.sandbox.monite.com/v1',
-        async request({ baseUrl }, schema, info) {
+        async requestFn({ baseUrl }, schema, info) {
           const token = await fetchToken();
 
-          return request({ baseUrl }, schema, {
+          return requestFn({ baseUrl }, schema, {
             ...info,
             /** Specify your predefined Headers **/
             headers: {
