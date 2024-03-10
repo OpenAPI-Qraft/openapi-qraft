@@ -947,21 +947,22 @@ describe('Qraft uses Mutation State', () => {
 });
 
 describe('Qraft uses Query Function', () => {
+  const parameters: typeof qraft.approvalPolicies.getApprovalPoliciesId.types.parameters =
+    {
+      header: {
+        'x-monite-version': '1.0.0',
+      },
+      path: {
+        approval_policy_id: '1',
+      },
+      query: {
+        items_order: ['asc', 'desc'],
+      },
+    };
+
   it('uses queryFn with `parameters`', async () => {
     const result = await qraft.approvalPolicies.getApprovalPoliciesId.queryFn(
-      {
-        parameters: {
-          header: {
-            'x-monite-version': '1.0.0',
-          },
-          path: {
-            approval_policy_id: '1',
-          },
-          query: {
-            items_order: ['asc', 'desc'],
-          },
-        },
-      },
+      { parameters },
       requestClient
     );
 
@@ -986,33 +987,13 @@ describe('Qraft uses Query Function', () => {
             url: '/approval_policies/{approval_policy_id}',
             method: 'get',
           },
-          {
-            header: {
-              'x-monite-version': '1.0.0',
-            },
-            path: {
-              approval_policy_id: '1',
-            },
-            query: {
-              items_order: ['asc', 'desc'],
-            },
-          },
+          parameters,
         ],
       },
       requestClient
     );
 
-    expect(result).toEqual({
-      header: {
-        'x-monite-version': '1.0.0',
-      },
-      path: {
-        approval_policy_id: '1',
-      },
-      query: {
-        items_order: ['asc', 'desc'],
-      },
-    });
+    expect(result).toEqual(parameters);
   });
 });
 
