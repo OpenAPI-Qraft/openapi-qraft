@@ -377,6 +377,34 @@ qraft.entities.getEntities.useQueries({
 });
 ```
 
+### [useIsFetching(...) 🔗](https://tanstack.com/query/latest/docs/framework/react/reference/useIsFetching)
+
+```tsx
+function FetchStatus() {
+  // Checks all queries `GET /entities`
+  const isFetchingTotal = qraft.entities.getEntities.useIsFetching();
+
+  // Cechks all queries `GET /entities/3e3e-3e3e-3e3e` and `x-monite-version: 2023-09-01` header
+  const isSpecificQueryFetching = qraft.entities.getEntities.useIsFetching({
+    parameters: {
+      header: {
+        'x-monite-version': '2023-09-01',
+      },
+      path: {
+        entity_id: '3e3e-3e3e-3e3e',
+      },
+    },
+  });
+
+  return (
+    <>
+      {!!isFetchingTotal && <div>Number of queries: {isFetchingTotal}...</div>}
+      {!!isSpecificQueryFetching && <div>Loading specific query...</div>}
+    </>
+  );
+}
+```
+
 ### [`QueryClient`](https://tanstack.com/query/latest/docs/reference/QueryClient) Methods
 
 #### [invalidateQueries(...) 🔗](https://tanstack.com/query/latest/docs/reference/QueryClient#queryclientinvalidatequeries)
@@ -500,33 +528,6 @@ The interface is the same as `invalidateQueries(...)`, but it will refetch the q
 
 The interface is the same as `invalidateQueries(...), but it will check if the queries are fetching, and there are no
 options.
-
-#### [useIsFetching(...) 🔗](https://tanstack.com/query/latest/docs/framework/react/reference/useIsFetching)
-
-The interface is the same as `QueryClient.isFetching(...)`, but without the need to pass the `QueryClient` instance:
-
-```tsx
-function FetchStatus() {
-  const isFetchingTotal = qraft.entities.getEntities.useIsFetching();
-  const isSpecificQueryFetching = qraft.entities.getEntities.useIsFetching({
-    parameters: {
-      header: {
-        'x-monite-version': '2023-09-01',
-      },
-      path: {
-        entity_id: '3e3e-3e3e-3e3e',
-      },
-    },
-  });
-
-  return (
-    <>
-      {!!isFetchingTotal && <div>Number of queries: {isFetchingTotal}...</div>}
-      {!!isSpecificQueryFetching && <div>Loading specific query...</div>}
-    </>
-  );
-}
-```
 
 ### Suspense Queries
 
