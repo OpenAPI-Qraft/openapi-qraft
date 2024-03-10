@@ -1,6 +1,6 @@
 {
   "name": "@openapi-qraft/react",
-  "version": "1.1.5",
+  "version": "1.2.0",
   "description": "API client for React, providing type-safe requests and dynamic Tanstack Query React Hooks via a modular, Proxy-based architecture.",
   "scripts": {
     "build": "rimraf dist/ && tsc --project tsconfig.build.json",
