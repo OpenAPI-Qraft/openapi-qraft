@@ -1,0 +1,64 @@
+'use client';
+
+import { useContext } from 'react';
+
+import type { QueryClient } from '@tanstack/query-core';
+import type { UseQueryOptions } from '@tanstack/react-query';
+
+import type { QraftClientOptions } from '../qraftAPIClient.js';
+import { QraftContext } from '../QraftContext.js';
+import type { ServiceOperationQueryKey } from '../ServiceOperation.js';
+import { composeInfiniteQueryKey } from './composeInfiniteQueryKey.js';
+import { composeQueryKey } from './composeQueryKey.js';
+import type { OperationSchema } from './requestFn.js';
+import { shelfMerge } from './shelfMerge.js';
+import { useQueryClient } from './useQueryClient.js';
+
+/**
+ * Composes the options for useQuery, useInfiniteQuery, useSuspenseQuery, and useSuspenseQueries.
+ * @internal
+ */
+export function useComposeUseQueryOptions(
+  qraftOptions: QraftClientOptions | undefined,
+  schema: OperationSchema,
+  args: UseQueryOptionsArgs,
+  infinite: boolean
+): never {
+  const [parameters, options, queryClient] = args;
+
+  const contextValue = useContext(qraftOptions?.context ?? QraftContext);
+  if (!contextValue?.requestFn)
+    throw new Error(`QraftContext.requestFn not found`);
+
+  const queryFn =
+    options?.queryFn ??
+    // @ts-expect-error
+    function ({ queryKey: [, queryParams], signal, meta, pageParam }) {
+      return contextValue.requestFn(schema, {
+        // @ts-expect-error
+        parameters: infinite
+          ? (shelfMerge(2, queryParams, pageParam) as never)
+          : queryParams,
+        baseUrl: contextValue.baseUrl,
+        signal,
+        meta,
+      });
+    };
+
+  const queryKey = Array.isArray(parameters)
+    ? (parameters as ServiceOperationQueryKey<OperationSchema, unknown>)
+    : infinite
+      ? composeInfiniteQueryKey(schema, parameters)
+      : composeQueryKey(schema, parameters);
+
+  return [
+    { ...options, queryFn, queryKey },
+    useQueryClient(qraftOptions, queryClient),
+  ] as never;
+}
+
+type UseQueryOptionsArgs = [
+  parameters: unknown,
+  options?: UseQueryOptions,
+  queryClient?: QueryClient,
+];
