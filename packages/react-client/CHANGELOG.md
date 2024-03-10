@@ -1,5 +1,11 @@
 # @openapi-qraft/react
 
+## 1.2.0
+
+### Minor Changes
+
+- d52d96e: Simplified `QraftContext` API
+
 ## 1.1.5
 
 ### Patch Changes
