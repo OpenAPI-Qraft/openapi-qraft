@@ -995,6 +995,58 @@ describe('Qraft uses Query Function', () => {
 
     expect(result).toEqual(parameters);
   });
+
+  it('uses fetchQuery with `parameters`', async () => {
+    const queryClient = new QueryClient();
+
+    const result = qraft.approvalPolicies.getApprovalPoliciesId.fetchQuery(
+      {
+        requestFn: request,
+        baseUrl: 'https://api.sandbox.monite.com/v1',
+        parameters,
+      },
+      queryClient
+    );
+
+    await expect(result).resolves.toEqual(parameters);
+  });
+
+  it('uses fetchQuery with `queryKey`', async () => {
+    const queryClient = new QueryClient();
+
+    const result = qraft.approvalPolicies.getApprovalPoliciesId.fetchQuery(
+      {
+        requestFn: request,
+        baseUrl: 'https://api.sandbox.monite.com/v1',
+        queryKey:
+          qraft.approvalPolicies.getApprovalPoliciesId.getQueryKey(parameters),
+      },
+      queryClient
+    );
+
+    await expect(result).resolves.toEqual(parameters);
+  });
+
+  it('uses fetchQuery with queryFn', async () => {
+    const queryClient = new QueryClient();
+
+    const customResult: typeof qraft.approvalPolicies.getApprovalPoliciesId.types.parameters =
+      {
+        ...parameters,
+        header: { 'x-monite-version': '2.0.0' },
+      };
+
+    const result = qraft.approvalPolicies.getApprovalPoliciesId.fetchQuery(
+      {
+        queryFn: () => Promise.resolve(customResult),
+        queryKey:
+          qraft.approvalPolicies.getApprovalPoliciesId.getQueryKey(parameters),
+      },
+      queryClient
+    );
+
+    await expect(result).resolves.toEqual(customResult);
+  });
 });
 
 describe('Qraft uses mutationFn', () => {
@@ -2151,7 +2203,7 @@ function Providers({
       <QraftContextDist.Provider
         value={{
           baseUrl: 'https://api.sandbox.monite.com/v1',
-          request,
+          request: request,
         }}
       >
         {children}

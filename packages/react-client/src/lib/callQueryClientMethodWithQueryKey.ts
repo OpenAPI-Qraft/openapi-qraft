@@ -5,7 +5,7 @@ import { composeQueryKey } from './composeQueryKey.js';
 import type { OperationRequestSchema } from './request.js';
 
 /**
- * Calls a query client method with query filters and options,
+ * Calls a query client method with parameters and options,
  * and automatically composes the `QueryKey` based on the schema and parameters.
  */
 export function callQueryClientMethodWithQueryKey<

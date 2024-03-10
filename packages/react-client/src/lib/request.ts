@@ -19,6 +19,8 @@ export async function request<T>(
   );
 }
 
+export type RequestFn<T> = typeof request<T>;
+
 export interface RequestOptions {
   baseUrl: string;
   urlSerializer?: URLSerializer;
@@ -299,8 +301,7 @@ export interface OperationRequestSchema {
   readonly mediaType?: string;
 }
 
-export interface OperationRequestInfo
-  extends Omit<RequestInit, 'headers' | 'method' | 'body'> {
+export interface QueryFnRequestInfo {
   /**
    * OpenAPI parameters
    * @example
@@ -314,19 +315,28 @@ export interface OperationRequestInfo
     readonly header?: Record<string, any>;
     readonly query?: Record<string, any>;
   };
+
   /**
    * Request body
    * @example { name: 'John' }
    */
   readonly body?: BodyInit | Record<string, unknown> | null;
-  /**
-   * Request headers
-   * @example { 'X-Auth': '123' }
-   */
-  readonly headers?: HeadersOptions;
 
   /**
    * Tanstack Query Meta
    */
   meta?: Record<string, unknown>;
+
+  /** An AbortSignal to set request's signal. */
+  signal?: AbortSignal | null;
+}
+
+export interface OperationRequestInfo
+  extends QueryFnRequestInfo,
+    Omit<RequestInit, 'headers' | 'method' | 'body' | 'signal'> {
+  /**
+   * Request headers
+   * @example { 'X-Auth': '123' }
+   */
+  readonly headers?: HeadersOptions;
 }

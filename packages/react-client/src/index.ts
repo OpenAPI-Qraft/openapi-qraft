@@ -9,6 +9,7 @@ export {
   type OperationRequestSchema,
   type RequestOptions,
   type HeadersOptions,
+  type QueryFnRequestInfo,
 } from './lib/request.js';
 export type {
   ServiceOperationQuery,
