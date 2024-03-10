@@ -4,10 +4,7 @@ import { createContext } from 'react';
 
 import type { QueryClient } from '@tanstack/react-query';
 
-import type {
-  OperationRequestSchema,
-  RequestFnPayload,
-} from './lib/requestFn.js';
+import type { OperationSchema, RequestFnPayload } from './lib/requestFn.js';
 
 interface QraftContextValueBase {
   /**
@@ -20,7 +17,7 @@ interface QraftContextValueBase {
    * The `requestFn` will be invoked with every request.
    */
   requestFn<T>(
-    requestSchema: OperationRequestSchema,
+    requestSchema: OperationSchema,
     requestInfo: RequestFnPayload
   ): Promise<T>;
 

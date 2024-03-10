@@ -17,13 +17,13 @@ import {
   requestFn,
   urlSerializer,
 } from '../index.js';
-import type { OperationRequestSchema } from '../lib/requestFn.js';
+import type { OperationSchema } from '../lib/requestFn.js';
 import { createAPIClient } from './fixtures/api/index.js';
 
 const qraft = createAPIClient();
 
 const requestClient = async <T,>(
-  requestSchema: OperationRequestSchema,
+  requestSchema: OperationSchema,
   requestInfo: Omit<RequestFnPayload, 'baseUrl'>
 ): Promise<T> =>
   requestFn(requestSchema, {

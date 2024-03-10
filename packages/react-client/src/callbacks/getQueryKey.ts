@@ -1,17 +1,13 @@
 import { composeQueryKey } from '../lib/composeQueryKey.js';
-import type { OperationRequestSchema } from '../lib/requestFn.js';
+import type { OperationSchema } from '../lib/requestFn.js';
 import type { QraftClientOptions } from '../qraftAPIClient.js';
 import { ServiceOperationQuery } from '../ServiceOperation.js';
 
 export const getQueryKey = (
   qraftOptions: QraftClientOptions | undefined,
-  schema: OperationRequestSchema,
+  schema: OperationSchema,
   args: Parameters<
-    ServiceOperationQuery<
-      OperationRequestSchema,
-      unknown,
-      unknown
-    >['getQueryKey']
+    ServiceOperationQuery<OperationSchema, unknown, unknown>['getQueryKey']
   >
 ) => {
   return composeQueryKey(schema, args[0]);

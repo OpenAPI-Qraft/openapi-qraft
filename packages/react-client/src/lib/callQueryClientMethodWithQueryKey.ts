@@ -2,7 +2,7 @@ import type { QueryClient } from '@tanstack/query-core';
 
 import { composeInfiniteQueryKey } from './composeInfiniteQueryKey.js';
 import { composeQueryKey } from './composeQueryKey.js';
-import type { OperationRequestSchema } from './requestFn.js';
+import type { OperationSchema } from './requestFn.js';
 
 /**
  * Calls a query client method with parameters and options,
@@ -12,7 +12,7 @@ export function callQueryClientMethodWithQueryKey<
   QFMethod extends QueryKeyMethods,
 >(
   queryFilterMethod: QFMethod,
-  schema: OperationRequestSchema,
+  schema: OperationSchema,
   infinite: boolean,
   args: [...Parameters<(typeof QueryClient.prototype)[QFMethod]>, QueryClient]
 ): ReturnType<(typeof QueryClient.prototype)[QFMethod]> {

@@ -9,7 +9,7 @@ import {
 } from '@tanstack/react-query';
 
 import { composeQueryKey } from '../lib/composeQueryKey.js';
-import type { OperationRequestSchema } from '../lib/requestFn.js';
+import type { OperationSchema } from '../lib/requestFn.js';
 import { useQueryClient } from '../lib/useQueryClient.js';
 import type { QraftClientOptions } from '../qraftAPIClient.js';
 import { QraftContext } from '../QraftContext.js';
@@ -24,13 +24,9 @@ export const useSuspenseQuery: <
   TData = TQueryFnData,
 >(
   qraftOptions: QraftClientOptions | undefined,
-  schema: OperationRequestSchema,
+  schema: OperationSchema,
   args: Parameters<
-    ServiceOperationQuery<
-      OperationRequestSchema,
-      unknown,
-      unknown
-    >['useSuspenseQuery']
+    ServiceOperationQuery<OperationSchema, unknown, unknown>['useSuspenseQuery']
   >
 ) => UseQueryResult<TData, TError> = (qraftOptions, schema, args) => {
   const [parameters, options, queryClientByArg] = args;
@@ -39,7 +35,7 @@ export const useSuspenseQuery: <
   if (!contextValue?.requestFn)
     throw new Error(`QraftContext.requestFn not found`);
 
-  const queryKey: ServiceOperationQueryKey<OperationRequestSchema, unknown> =
+  const queryKey: ServiceOperationQueryKey<OperationSchema, unknown> =
     Array.isArray(parameters)
       ? (parameters as never)
       : composeQueryKey(schema, parameters);

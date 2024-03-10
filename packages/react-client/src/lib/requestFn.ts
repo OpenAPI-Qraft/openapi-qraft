@@ -2,7 +2,7 @@
  * @throws {error: object|string, response: Response} if the request fails
  */
 export async function requestFn<T>(
-  schema: OperationRequestSchema,
+  schema: OperationSchema,
   requestInfo: RequestFnInfo,
   options?: RequestFnOptions
 ): Promise<T> {
@@ -18,7 +18,7 @@ export async function requestFn<T>(
  * @throws {error: object|string, response: Response} if the request fails
  */
 export async function baseRequestFn<T>(
-  requestSchema: OperationRequestSchema,
+  requestSchema: OperationSchema,
   requestInfo: RequestFnInfo,
   options: Required<RequestFnOptions>
 ): Promise<T> {
@@ -58,7 +58,7 @@ export async function baseRequestFn<T>(
 }
 
 export function urlSerializer(
-  schema: OperationRequestSchema,
+  schema: OperationSchema,
   info: RequestFnPayload
 ): string {
   const path = schema.url.replace(
@@ -140,7 +140,7 @@ function mergeHeaders(...allHeaders: (HeadersOptions | undefined)[]) {
 }
 
 export function bodySerializer(
-  schema: OperationRequestSchema,
+  schema: OperationSchema,
   info: RequestFnPayload
 ) {
   if (info.body === undefined) return;
@@ -252,7 +252,7 @@ export type HeadersOptions =
   | HeadersInit
   | Record<string, string | number | boolean | null | undefined>;
 
-export interface OperationRequestSchema {
+export interface OperationSchema {
   /**
    * Operation path
    * @example /user/{id}

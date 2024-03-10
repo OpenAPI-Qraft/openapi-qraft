@@ -6,7 +6,7 @@ export {
   urlSerializer,
   bodySerializer,
   type RequestFnPayload,
-  type OperationRequestSchema,
+  type OperationSchema,
   type RequestFnOptions,
   type HeadersOptions,
 } from './lib/requestFn.js';
