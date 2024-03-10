@@ -28,7 +28,8 @@ export const useSuspenseQueries: (
   const [options, queryClientByArg] = args;
 
   const contextValue = useContext(qraftOptions?.context ?? QraftContext);
-  if (!contextValue?.request) throw new Error(`QraftContext.request not found`);
+  if (!contextValue?.requestFn)
+    throw new Error(`QraftContext.requestFn not found`);
 
   return useSuspenseQueriesTanstack(
     {
@@ -53,7 +54,7 @@ export const useSuspenseQueries: (
           queryFn:
             optionsWithQueryKey.queryFn ??
             function ({ queryKey: [, queryParams], signal, meta }) {
-              return contextValue.request(
+              return contextValue.requestFn(
                 { baseUrl: contextValue.baseUrl },
                 schema,
                 {

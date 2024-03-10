@@ -36,7 +36,8 @@ export const useSuspenseQuery: <
   const [parameters, options, queryClientByArg] = args;
 
   const contextValue = useContext(qraftOptions?.context ?? QraftContext);
-  if (!contextValue?.request) throw new Error(`QraftContext.request not found`);
+  if (!contextValue?.requestFn)
+    throw new Error(`QraftContext.requestFn not found`);
 
   const queryKey: ServiceOperationQueryKey<OperationRequestSchema, unknown> =
     Array.isArray(parameters)
@@ -50,7 +51,7 @@ export const useSuspenseQuery: <
       queryFn:
         options?.queryFn ??
         function ({ queryKey: [, queryParams], signal, meta }) {
-          return contextValue.request(
+          return contextValue.requestFn(
             { baseUrl: contextValue.baseUrl },
             schema,
             {

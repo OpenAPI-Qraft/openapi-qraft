@@ -37,7 +37,8 @@ export const useInfiniteQuery: <
   const [parameters, options, queryClientByArg] = args;
 
   const contextValue = useContext(qraftOptions?.context ?? QraftContext);
-  if (!contextValue?.request) throw new Error(`QraftContext.request not found`);
+  if (!contextValue?.requestFn)
+    throw new Error(`QraftContext.requestFn not found`);
 
   const queryKey: ServiceOperationInfiniteQueryKey<
     OperationRequestSchema,
@@ -53,7 +54,7 @@ export const useInfiniteQuery: <
       queryFn:
         options?.queryFn ??
         function ({ queryKey: [, queryParams], signal, meta, pageParam }) {
-          return contextValue.request(
+          return contextValue.requestFn(
             { baseUrl: contextValue.baseUrl },
             schema,
             {
