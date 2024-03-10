@@ -1,14 +1,14 @@
 import { callQueryClientMethodWithQueryFilters } from '../lib/callQueryClientMethodWithQueryFilters.js';
+import type { OperationRequestSchema } from '../lib/request.js';
 import type { QraftClientOptions } from '../qraftAPIClient.js';
-import type { RequestClientSchema } from '../RequestClient.js';
 import type { ServiceOperationResetQueriesCallback } from '../ServiceOperation.js';
 
 export function resetQueries<TData>(
   qraftOptions: QraftClientOptions | undefined,
-  schema: RequestClientSchema,
+  schema: OperationRequestSchema,
   args: Parameters<
     ServiceOperationResetQueriesCallback<
-      RequestClientSchema,
+      OperationRequestSchema,
       unknown,
       TData
     >['resetQueries']

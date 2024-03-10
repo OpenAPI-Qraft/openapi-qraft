@@ -1,26 +1,26 @@
-import type { RequestClientSchema } from '../RequestClient.js';
-import { ServiceOperationMutationKey } from '../ServiceOperation.js';
+import type { ServiceOperationMutationKey } from '../ServiceOperation.js';
+import type { OperationRequestSchema } from './request.js';
 
 /**
  * Omit `body` or `requestBody` from mutation parameters if exists
  * and return the rest of the parameters
  */
 export function composeMutationKey<
-  TSchema extends RequestClientSchema,
+  TSchema extends OperationRequestSchema,
   TParams = undefined,
 >(
   schema: TSchema,
   parameters: undefined
 ): ServiceOperationMutationKey<TSchema, undefined>;
 export function composeMutationKey<
-  TSchema extends RequestClientSchema,
+  TSchema extends OperationRequestSchema,
   TParams,
 >(
   schema: TSchema,
   parameters: TParams
 ): ServiceOperationMutationKey<TSchema, TParams>;
 export function composeMutationKey<
-  TSchema extends RequestClientSchema,
+  TSchema extends OperationRequestSchema,
   TParams = unknown,
 >(schema: TSchema, parameters: TParams | undefined) {
   return parameters === undefined

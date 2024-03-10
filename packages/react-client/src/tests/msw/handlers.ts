@@ -16,6 +16,7 @@ export const handlers = [
     openApiToMswPath(
       services.approvalPolicies.getApprovalPoliciesId.schema.url
     ),
+    // @ts-expect-error // todo::fixme
     ({ params: { '0': _, ...path }, request }) => {
       const query = getQueryParameters<
         Services['approvalPolicies']['getApprovalPoliciesId']
@@ -95,21 +96,25 @@ export const handlers = [
     ServicePathParameters<Services['files']['getFiles']>,
     undefined,
     ServiceResponseParameters<Services['files']['getFiles']>
-  >(openApiToMswPath(services.files.getFiles.schema.url), ({ request }) => {
-    const query = getQueryParameters<Services['files']['getFiles']>(
-      request.url
-    );
+  >(
+    openApiToMswPath(services.files.getFiles.schema.url),
+    // @ts-expect-error // todo::fixme
+    ({ request }) => {
+      const query = getQueryParameters<Services['files']['getFiles']>(
+        request.url
+      );
 
-    const header = getHeaders<Services['files']['getFiles']>(
-      request.headers,
-      'x-'
-    );
+      const header = getHeaders<Services['files']['getFiles']>(
+        request.headers,
+        'x-'
+      );
 
-    return HttpResponse.json({
-      query,
-      header,
-    });
-  }),
+      return HttpResponse.json({
+        query,
+        header,
+      });
+    }
+  ),
 
   http.get<
     ServicePathParameters<Services['files']['getFileList']>,

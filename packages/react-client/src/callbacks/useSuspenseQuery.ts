@@ -4,15 +4,15 @@ import { useContext } from 'react';
 
 import type { DefaultError } from '@tanstack/query-core';
 import {
-  useQueryClient,
   UseQueryResult,
   useSuspenseQuery as useSuspenseQueryTanstack,
 } from '@tanstack/react-query';
 
 import { composeQueryKey } from '../lib/composeQueryKey.js';
+import type { OperationRequestSchema } from '../lib/request.js';
+import { useQueryClient } from '../lib/useQueryClient.js';
 import type { QraftClientOptions } from '../qraftAPIClient.js';
 import { QraftContext } from '../QraftContext.js';
-import type { RequestClientSchema } from '../RequestClient.js';
 import {
   ServiceOperationQuery,
   ServiceOperationQueryKey,
@@ -24,10 +24,10 @@ export const useSuspenseQuery: <
   TData = TQueryFnData,
 >(
   qraftOptions: QraftClientOptions | undefined,
-  schema: RequestClientSchema,
+  schema: OperationRequestSchema,
   args: Parameters<
     ServiceOperationQuery<
-      RequestClientSchema,
+      OperationRequestSchema,
       unknown,
       unknown
     >['useSuspenseQuery']
@@ -35,12 +35,10 @@ export const useSuspenseQuery: <
 ) => UseQueryResult<TData, TError> = (qraftOptions, schema, args) => {
   const [parameters, options, queryClientByArg] = args;
 
-  const { requestClient, queryClient: queryClientByContext } =
-    useContext(qraftOptions?.context ?? QraftContext) ?? {};
+  const contextValue = useContext(qraftOptions?.context ?? QraftContext);
+  if (!contextValue?.request) throw new Error(`QraftContext.request not found`);
 
-  if (!requestClient) throw new Error(`QraftContext.requestClient not found`);
-
-  const queryKey: ServiceOperationQueryKey<RequestClientSchema, unknown> =
+  const queryKey: ServiceOperationQueryKey<OperationRequestSchema, unknown> =
     Array.isArray(parameters)
       ? (parameters as never)
       : composeQueryKey(schema, parameters);
@@ -52,13 +50,17 @@ export const useSuspenseQuery: <
       queryFn:
         options?.queryFn ??
         function ({ queryKey: [, queryParams], signal, meta }) {
-          return requestClient(schema, {
-            parameters: queryParams as never,
-            signal,
-            meta,
-          });
+          return contextValue.request(
+            { baseUrl: contextValue.baseUrl },
+            schema,
+            {
+              parameters: queryParams as never,
+              signal,
+              meta,
+            }
+          );
         },
     },
-    useQueryClient(queryClientByArg ?? queryClientByContext)
+    useQueryClient(qraftOptions, queryClientByArg)
   ) as never;
 };

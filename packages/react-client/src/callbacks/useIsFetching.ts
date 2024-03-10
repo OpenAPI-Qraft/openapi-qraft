@@ -1,24 +1,19 @@
 'use client';
 
-import { useContext } from 'react';
-
-import {
-  useIsFetching as useIsFetchingTanstack,
-  useQueryClient,
-} from '@tanstack/react-query';
+import { useIsFetching as useIsFetchingTanstack } from '@tanstack/react-query';
 
 import { composeQueryFilters } from '../lib/composeQueryFilters.js';
+import type { OperationRequestSchema } from '../lib/request.js';
+import { useQueryClient } from '../lib/useQueryClient.js';
 import type { QraftClientOptions } from '../qraftAPIClient.js';
-import { QraftContext } from '../QraftContext.js';
-import type { RequestClientSchema } from '../RequestClient.js';
 import type { ServiceOperationQuery } from '../ServiceOperation.js';
 
 export const useIsFetching: <TVariables = unknown>(
   qraftOptions: QraftClientOptions | undefined,
-  schema: RequestClientSchema,
+  schema: OperationRequestSchema,
   args: Parameters<
     ServiceOperationQuery<
-      RequestClientSchema,
+      OperationRequestSchema,
       object | undefined,
       TVariables,
       unknown
@@ -33,11 +28,8 @@ export const useIsFetching: <TVariables = unknown>(
     );
   }
 
-  const { queryClient: queryClientByContext } =
-    useContext(qraftOptions?.context ?? QraftContext) ?? {};
-
   return useIsFetchingTanstack(
     composeQueryFilters(schema, filters) as never,
-    useQueryClient(queryClientByArg ?? queryClientByContext)
+    useQueryClient(qraftOptions, queryClientByArg)
   ) as never;
 };

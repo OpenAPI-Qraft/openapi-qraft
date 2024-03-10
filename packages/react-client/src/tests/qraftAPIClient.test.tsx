@@ -10,26 +10,27 @@ import { act, renderHook, waitFor } from '@testing-library/react';
 
 import { vi } from 'vitest';
 
-import type { RequestClient } from '../index.js';
+import type { OperationRequestInfo } from '../index.js';
 import {
   bodySerializer,
   QraftContextValue,
   request,
   urlSerializer,
 } from '../index.js';
+import type { OperationRequestSchema } from '../lib/request.js';
 import { createAPIClient } from './fixtures/api/index.js';
 
 const qraft = createAPIClient();
 
-const requestClient: RequestClient = async (schema, options) => {
-  return request(
-    {
-      baseUrl: 'https://api.sandbox.monite.com/v1',
-    },
-    { ...schema, ...options },
-    { urlSerializer, bodySerializer }
+const requestClient = async <T,>(
+  requestSchema: OperationRequestSchema,
+  requestInfo: OperationRequestInfo
+): Promise<T> =>
+  request(
+    { baseUrl: 'https://api.sandbox.monite.com/v1' },
+    requestSchema,
+    requestInfo
   );
-};
 
 describe('Qraft uses singular Query', () => {
   it('supports useQuery', async () => {
@@ -117,17 +118,15 @@ describe('Qraft uses singular Query', () => {
         wrapper: (props) => (
           <QraftCustomContext.Provider
             value={{
-              requestClient(schema, options) {
+              baseUrl: 'https://api.sandbox.monite.com/v1',
+              request({ baseUrl }, schema, info) {
                 return request(
+                  { baseUrl, urlSerializer, bodySerializer },
+                  schema,
                   {
-                    baseUrl: 'https://api.sandbox.monite.com/v1',
-                  },
-                  {
+                    ...info,
                     headers: { 'x-custom-provider': 'true' },
-                    ...schema,
-                    ...options,
-                  },
-                  { urlSerializer, bodySerializer }
+                  }
                 );
               },
             }}
@@ -2167,7 +2166,12 @@ function Providers({
       {/* We should use precompiled `QraftContextDist`,
        * because callbacks are imported from `@openapi-qraft` package `/dist` folder
        */}
-      <QraftContextDist.Provider value={{ requestClient }}>
+      <QraftContextDist.Provider
+        value={{
+          baseUrl: 'https://api.sandbox.monite.com/v1',
+          request,
+        }}
+      >
         {children}
       </QraftContextDist.Provider>
     </QueryClientProvider>

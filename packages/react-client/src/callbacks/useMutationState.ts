@@ -6,13 +6,12 @@ import type { DefaultError } from '@tanstack/query-core';
 import {
   UseMutationResult,
   useMutationState as useMutationStateTanstack,
-  useQueryClient,
 } from '@tanstack/react-query';
 
 import { composeMutationKey } from '../lib/composeMutationKey.js';
+import type { OperationRequestSchema } from '../lib/request.js';
+import { useQueryClient } from '../lib/useQueryClient.js';
 import type { QraftClientOptions } from '../qraftAPIClient.js';
-import { QraftContext } from '../QraftContext.js';
-import type { RequestClientSchema } from '../RequestClient.js';
 import { ServiceOperationMutation } from '../ServiceOperation.js';
 
 export const useMutationState: <
@@ -22,10 +21,10 @@ export const useMutationState: <
   TContext = unknown,
 >(
   qraftOptions: QraftClientOptions | undefined,
-  schema: RequestClientSchema,
+  schema: OperationRequestSchema,
   args: Parameters<
     ServiceOperationMutation<
-      RequestClientSchema,
+      OperationRequestSchema,
       object | undefined,
       TVariables,
       TData
@@ -48,11 +47,6 @@ export const useMutationState: <
     );
   }
 
-  const { requestClient, queryClient: queryClientByContext } =
-    useContext(qraftOptions?.context ?? QraftContext) ?? {};
-
-  if (!requestClient) throw new Error(`QraftContext.requestClient not found`);
-
   const filters = options?.filters;
 
   return useMutationStateTanstack(
@@ -71,6 +65,6 @@ export const useMutationState: <
               ),
             },
     } as never,
-    useQueryClient(queryClientByArg ?? queryClientByContext)
+    useQueryClient(qraftOptions, queryClientByArg)
   ) as never;
 };

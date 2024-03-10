@@ -87,20 +87,15 @@ parameters, ensuring that your application remains robust and error-free.
 
 Finally, provide the request client to the `QraftContext` to enable the generated hooks to make API requests.
 
-Every request will be handled by `requestClient`, which can be customized to fit your project's needs.
+Every request will be handled by `request` function, which can be customized to fit your project's needs.
 
 ```tsx
 import { useMemo } from 'react';
 
-import {
-  request,
-  bodySerializer,
-  urlSerializer,
-  QraftContext,
-} from '@openapi-qraft/react';
+import { request, QraftContext } from '@openapi-qraft/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
-// where `./api` is the '--output-dir' path to the services you generated
+// where `./api` is the '--output-dir' path to the services you generated with `@openapi-qraft/cli`
 import { createAPIClient } from './api';
 
 // create a client anywhere
@@ -113,23 +108,8 @@ function Providers({ children }: { children: React.ReactNode }) {
     <QueryClientProvider client={queryClient}>
       <QraftContext.Provider
         value={{
-          /**
-           * Request client will be invoked for every request
-           */
-          async requestClient(schema, options) {
-            return request(
-              { baseUrl: 'https://api.sandbox.monite.com/v1' },
-              {
-                ...schema,
-                ...options,
-                headers: {
-                  /** Specify your predefined header here **/
-                  // Authorization: 'Bearer token',
-                },
-              },
-              { urlSerializer, bodySerializer } // Serializers for request body and URL
-            );
-          },
+          baseUrl: 'https://api.sandbox.monite.com/v1', // base URL for all requests
+          request, // `request(...)` will be invoked for every request
         }}
       >
         {children}
@@ -566,6 +546,42 @@ Supported Suspense Queries are:
 - `setInfinityQueryData(parameters, updater)`
 - `schema` - object with schema: `{method, url, mediaType}`
 - `types` - object with types: `{parameters, data, error, body}`
+
+### Authorization and Custom Requests
+
+To override any request, you can provide a custom `request` function to the `QraftContext`.
+
+In the example below, we provide a custom `request` function to the `QraftContext` to handle the authorization token
+using a custom `fetchToken` async function.
+
+```tsx
+import { request, QraftContext } from '@openapi-qraft/react';
+
+import { fetchToken } from './auth';
+
+function QraftProvider({ children }: { children: React.ReactNode }) {
+  return (
+    <QraftContext.Provider
+      value={{
+        baseUrl: 'https://api.sandbox.monite.com/v1',
+        async request({ baseUrl }, schema, info) {
+          const token = await fetchToken();
+
+          return request({ baseUrl }, schema, {
+            ...info,
+            /** Specify your predefined Headers **/
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+        },
+      }}
+    >
+      {children}
+    </QraftContext.Provider>
+  );
+}
+```
 
 ## Contributing
 

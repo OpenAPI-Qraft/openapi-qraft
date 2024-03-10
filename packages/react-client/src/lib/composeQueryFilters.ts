@@ -1,5 +1,5 @@
-import type { RequestClientSchema } from '../RequestClient.js';
 import { composeQueryKey } from './composeQueryKey.js';
+import type { OperationRequestSchema } from './request.js';
 
 /**
  * Replaces the `parameters` field in the filters with a `queryKey` field based on the schema.
@@ -8,7 +8,7 @@ import { composeQueryKey } from './composeQueryKey.js';
  * @param filters
  */
 export function composeQueryFilters<Filters extends object>(
-  schema: RequestClientSchema,
+  schema: OperationRequestSchema,
   filters: Filters | undefined
 ) {
   if (!filters) {

@@ -6,14 +6,14 @@ import type { DefaultError, InfiniteData } from '@tanstack/query-core';
 import {
   useInfiniteQuery as useInfiniteQueryBase,
   UseInfiniteQueryResult,
-  useQueryClient,
 } from '@tanstack/react-query';
 
 import { composeInfiniteQueryKey } from '../lib/composeInfiniteQueryKey.js';
+import type { OperationRequestSchema } from '../lib/request.js';
 import { shelfMerge } from '../lib/shelfMerge.js';
+import { useQueryClient } from '../lib/useQueryClient.js';
 import type { QraftClientOptions } from '../qraftAPIClient.js';
 import { QraftContext } from '../QraftContext.js';
-import type { RequestClientSchema } from '../RequestClient.js';
 import {
   ServiceOperationInfiniteQueryKey,
   ServiceOperationQuery,
@@ -25,10 +25,10 @@ export const useInfiniteQuery: <
   TData = InfiniteData<TQueryFnData>,
 >(
   qraftOptions: QraftClientOptions | undefined,
-  schema: RequestClientSchema,
+  schema: OperationRequestSchema,
   args: Parameters<
     ServiceOperationQuery<
-      RequestClientSchema,
+      OperationRequestSchema,
       unknown,
       unknown
     >['useInfiniteQuery']
@@ -36,13 +36,11 @@ export const useInfiniteQuery: <
 ) => UseInfiniteQueryResult<TData, TError> = (qraftOptions, schema, args) => {
   const [parameters, options, queryClientByArg] = args;
 
-  const { requestClient, queryClient: queryClientByContext } =
-    useContext(qraftOptions?.context ?? QraftContext) ?? {};
-
-  if (!requestClient) throw new Error(`QraftContext.requestClient not found`);
+  const contextValue = useContext(qraftOptions?.context ?? QraftContext);
+  if (!contextValue?.request) throw new Error(`QraftContext.request not found`);
 
   const queryKey: ServiceOperationInfiniteQueryKey<
-    RequestClientSchema,
+    OperationRequestSchema,
     unknown
   > = Array.isArray(parameters)
     ? (parameters as never)
@@ -55,13 +53,17 @@ export const useInfiniteQuery: <
       queryFn:
         options?.queryFn ??
         function ({ queryKey: [, queryParams], signal, meta, pageParam }) {
-          return requestClient(schema, {
-            parameters: shelfMerge(2, queryParams, pageParam) as never,
-            signal,
-            meta,
-          });
+          return contextValue.request(
+            { baseUrl: contextValue.baseUrl },
+            schema,
+            {
+              parameters: shelfMerge(2, queryParams, pageParam) as never,
+              signal,
+              meta,
+            }
+          );
         },
     },
-    useQueryClient(queryClientByArg ?? queryClientByContext)
+    useQueryClient(qraftOptions, queryClientByArg)
   ) as never;
 };

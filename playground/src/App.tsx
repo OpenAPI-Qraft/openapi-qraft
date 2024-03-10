@@ -1,11 +1,6 @@
 import { ComponentProps, ReactNode, useState } from 'react';
 
-import {
-  bodySerializer,
-  QraftContext,
-  request,
-  urlSerializer,
-} from '@openapi-qraft/react';
+import { QraftContext, request } from '@openapi-qraft/react';
 import {
   QueryClient,
   QueryClientProvider,
@@ -399,18 +394,8 @@ export const QraftProviders = ({ children }: { children: ReactNode }) => {
     <QueryClientProvider client={queryClient}>
       <QraftContext.Provider
         value={{
-          async requestClient(schema, options) {
-            return request(
-              {
-                baseUrl: 'https://petstore3.swagger.io/api/v3',
-              },
-              {
-                ...schema,
-                ...options,
-              },
-              { urlSerializer, bodySerializer }
-            );
-          },
+          baseUrl: 'https://petstore3.swagger.io/api/v3',
+          request,
         }}
       >
         {children}

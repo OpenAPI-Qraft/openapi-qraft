@@ -5,28 +5,30 @@ import { useContext } from 'react';
 import {
   QueriesResults,
   useQueries as useQueriesTanstack,
-  useQueryClient,
 } from '@tanstack/react-query';
 
 import { composeQueryKey } from '../lib/composeQueryKey.js';
+import type { OperationRequestSchema } from '../lib/request.js';
+import { useQueryClient } from '../lib/useQueryClient.js';
 import type { QraftClientOptions } from '../qraftAPIClient.js';
 import { QraftContext } from '../QraftContext.js';
-import type { RequestClientSchema } from '../RequestClient.js';
 import { ServiceOperationQuery } from '../ServiceOperation.js';
 
 export const useQueries: (
   qraftOptions: QraftClientOptions | undefined,
-  schema: RequestClientSchema,
+  schema: OperationRequestSchema,
   args: Parameters<
-    ServiceOperationQuery<RequestClientSchema, unknown, unknown>['useQueries']
+    ServiceOperationQuery<
+      OperationRequestSchema,
+      unknown,
+      unknown
+    >['useQueries']
   >
 ) => QueriesResults<never> = (qraftOptions, schema, args) => {
   const [options, queryClientByArg] = args;
 
-  const { requestClient, queryClient: queryClientByContext } =
-    useContext(qraftOptions?.context ?? QraftContext) ?? {};
-
-  if (!requestClient) throw new Error(`QraftContext.requestClient not found`);
+  const contextValue = useContext(qraftOptions?.context ?? QraftContext);
+  if (!contextValue?.request) throw new Error(`QraftContext.request not found`);
 
   return useQueriesTanstack(
     {
@@ -51,15 +53,19 @@ export const useQueries: (
           queryFn:
             optionsWithQueryKey.queryFn ??
             function ({ queryKey: [, queryParams], signal, meta }) {
-              return requestClient(schema, {
-                parameters: queryParams as never,
-                signal,
-                meta,
-              });
+              return contextValue.request(
+                { baseUrl: contextValue.baseUrl },
+                schema,
+                {
+                  parameters: queryParams as never,
+                  signal,
+                  meta,
+                }
+              );
             },
         };
       }),
     },
-    useQueryClient(queryClientByArg ?? queryClientByContext)
+    useQueryClient(qraftOptions, queryClientByArg)
   ) as never;
 };
