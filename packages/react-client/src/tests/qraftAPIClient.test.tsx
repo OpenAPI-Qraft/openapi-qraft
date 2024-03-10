@@ -1180,6 +1180,7 @@ describe('Qraft uses setQueryData', () => {
     qraft.files.getFiles.setQueryData(
       getFilesQueryKey,
       getFilesSetQueryData,
+      { updatedAt: Date.now() },
       queryClient
     );
 

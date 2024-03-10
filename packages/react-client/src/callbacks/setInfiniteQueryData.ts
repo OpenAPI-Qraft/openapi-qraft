@@ -1,5 +1,6 @@
 import { InfiniteData } from '@tanstack/query-core';
 
+import { callQueryClientMethodWithQueryKey } from '../lib/callQueryClientMethodWithQueryKey.js';
 import { composeInfiniteQueryKey } from '../lib/composeInfiniteQueryKey.js';
 import type { OperationRequestSchema } from '../lib/request.js';
 import type { QraftClientOptions } from '../qraftAPIClient.js';
@@ -19,14 +20,10 @@ export function setInfiniteQueryData<TData>(
     >['setInfiniteQueryData']
   >
 ): InfiniteData<TData> | undefined {
-  const [parameters, updater, queryClient, options] = args;
-
-  const queryKey: ServiceOperationInfiniteQueryKey<
-    OperationRequestSchema,
-    unknown
-  > = Array.isArray(parameters)
-    ? parameters
-    : composeInfiniteQueryKey(schema, parameters);
-
-  return queryClient.setQueryData(queryKey, updater as never, options);
+  return callQueryClientMethodWithQueryKey(
+    'setQueryData',
+    schema,
+    true,
+    args as never
+  ) as never;
 }

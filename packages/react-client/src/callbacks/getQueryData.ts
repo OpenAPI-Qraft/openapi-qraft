@@ -1,10 +1,10 @@
-import { composeQueryKey } from '../lib/composeQueryKey.js';
+import { callQueryClientMethodWithQueryKey } from '../lib/callQueryClientMethodWithQueryKey.js';
 import type { OperationRequestSchema } from '../lib/request.js';
 import type { QraftClientOptions } from '../qraftAPIClient.js';
-import { ServiceOperationQuery } from '../ServiceOperation.js';
+import type { ServiceOperationQuery } from '../ServiceOperation.js';
 
 export function getQueryData<TData>(
-  qraftOptions: QraftClientOptions | undefined,
+  _: QraftClientOptions | undefined,
   schema: OperationRequestSchema,
   args: Parameters<
     ServiceOperationQuery<
@@ -14,8 +14,10 @@ export function getQueryData<TData>(
     >['getQueryData']
   >
 ): TData | undefined {
-  const [parameters, queryClient] = args;
-  return queryClient.getQueryData(
-    Array.isArray(parameters) ? parameters : composeQueryKey(schema, parameters)
-  );
+  return callQueryClientMethodWithQueryKey(
+    'getQueryData',
+    schema,
+    false,
+    args as never
+  ) as never;
 }

@@ -1,15 +1,12 @@
-import { InfiniteData } from '@tanstack/query-core';
+import type { InfiniteData } from '@tanstack/query-core';
 
-import { composeInfiniteQueryKey } from '../lib/composeInfiniteQueryKey.js';
+import { callQueryClientMethodWithQueryKey } from '../lib/callQueryClientMethodWithQueryKey.js';
 import type { OperationRequestSchema } from '../lib/request.js';
 import type { QraftClientOptions } from '../qraftAPIClient.js';
-import {
-  ServiceOperationInfiniteQueryKey,
-  ServiceOperationQuery,
-} from '../ServiceOperation.js';
+import type { ServiceOperationQuery } from '../ServiceOperation.js';
 
 export function getInfiniteQueryData<TData>(
-  qraftOptions: QraftClientOptions | undefined,
+  _: QraftClientOptions | undefined,
   schema: OperationRequestSchema,
   args: Parameters<
     ServiceOperationQuery<
@@ -19,10 +16,10 @@ export function getInfiniteQueryData<TData>(
     >['getInfiniteQueryData']
   >
 ): InfiniteData<TData> | undefined {
-  const [parameters, queryClient] = args;
-  return queryClient.getQueryData(
-    Array.isArray(parameters)
-      ? parameters
-      : composeInfiniteQueryKey(schema, parameters)
-  );
+  return callQueryClientMethodWithQueryKey(
+    'getQueryData',
+    schema,
+    true,
+    args as never
+  ) as never;
 }
