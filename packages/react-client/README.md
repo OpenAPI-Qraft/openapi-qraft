@@ -529,6 +529,38 @@ The interface is the same as `invalidateQueries(...)`, but it will refetch the q
 The interface is the same as `invalidateQueries(...), but it will check if the queries are fetching, and there are no
 options.
 
+#### [fetchInfiniteQuery(...) 🔗](https://tanstack.com/query/latest/docs/reference/QueryClient#queryclientfetchinfinitequery)
+
+```ts
+/**
+ * Will execute the initial request:
+ * ###
+ * GET /posts?limit=10&page=1
+ * ###
+ * And then will execute the next page request:
+ * GET /posts?limit=10&page=2
+ **/
+const posts = qraft.posts.getPosts.fetchInfiniteQuery({
+  parameters: { query: { limit: 10 } },
+  pages: 2, // How many pages to fetch
+  initialPageParam: {
+    query: { pagination_token: undefined }, // will be used in initial request
+  },
+  getNextPageParam: (lastPage, allPages, lastPageParam) => ({
+    query: { pagination_token: lastPage.next_pagination_token },
+  }),
+});
+
+console.log(
+  posts.pages, // all fetched pages
+  posts.pageParams // all page parameters
+);
+```
+
+#### [prefetchInfiniteQuery(...) 🔗](https://tanstack.com/query/latest/docs/reference/QueryClient#queryclientprefetchinfinitequery)
+
+The interface is the same as `fetchInfiniteQuery(...)`, but returns empty Promise.
+
 ### Suspense Queries
 
 Supported Suspense Queries are:
