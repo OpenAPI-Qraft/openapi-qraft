@@ -42,10 +42,11 @@ export function callQueryClientMethodWithQueryKey<
     (requestFn
       ? // @ts-expect-error
         function ({ queryKey: [, queryParams], signal, meta, pageParam }) {
-          return requestFn({ baseUrl: baseUrl! }, schema, {
+          return requestFn(schema, {
             parameters: infinite
               ? (shelfMerge(2, queryParams, pageParam) as never)
               : queryParams,
+            baseUrl,
             signal,
             meta,
           });

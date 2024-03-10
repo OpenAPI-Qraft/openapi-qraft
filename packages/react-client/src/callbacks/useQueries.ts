@@ -54,15 +54,12 @@ export const useQueries: (
           queryFn:
             optionsWithQueryKey.queryFn ??
             function ({ queryKey: [, queryParams], signal, meta }) {
-              return contextValue.requestFn(
-                { baseUrl: contextValue.baseUrl },
-                schema,
-                {
-                  parameters: queryParams as never,
-                  signal,
-                  meta,
-                }
-              );
+              return contextValue.requestFn(schema, {
+                parameters: queryParams as never,
+                baseUrl: contextValue.baseUrl,
+                signal,
+                meta,
+              });
             },
         };
       }),

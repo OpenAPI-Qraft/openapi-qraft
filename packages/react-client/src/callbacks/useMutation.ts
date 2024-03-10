@@ -71,28 +71,22 @@ export const useMutation: <
         options?.mutationFn ??
         (parameters
           ? function (bodyPayload) {
-              return contextValue.requestFn(
-                { baseUrl: contextValue.baseUrl },
-                schema,
-                {
-                  parameters,
-                  body: bodyPayload as never,
-                }
-              );
+              return contextValue.requestFn(schema, {
+                parameters,
+                baseUrl: contextValue.baseUrl,
+                body: bodyPayload as never,
+              });
             }
           : function (parametersAndBodyPayload) {
               const { body, ...parameters } = parametersAndBodyPayload as {
                 body: unknown;
               };
 
-              return contextValue.requestFn(
-                { baseUrl: contextValue.baseUrl },
-                schema,
-                {
-                  body,
-                  parameters,
-                } as never
-              );
+              return contextValue.requestFn(schema, {
+                parameters,
+                baseUrl: contextValue.baseUrl,
+                body,
+              } as never);
             }),
     },
     useQueryClient(qraftOptions, queryClientByArg)

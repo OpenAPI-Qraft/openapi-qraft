@@ -58,15 +58,12 @@ export const useSuspenseInfiniteQuery: <
       queryFn:
         options?.queryFn ??
         function ({ queryKey: [, queryParams], signal, meta, pageParam }) {
-          return contextValue.requestFn(
-            { baseUrl: contextValue.baseUrl },
-            schema,
-            {
-              parameters: shelfMerge(2, queryParams, pageParam) as never,
-              signal,
-              meta,
-            }
-          );
+          return contextValue.requestFn(schema, {
+            parameters: shelfMerge(2, queryParams, pageParam) as never,
+            baseUrl: contextValue.baseUrl,
+            signal,
+            meta,
+          });
         },
     },
     useQueryClient(qraftOptions, queryClientByArg)

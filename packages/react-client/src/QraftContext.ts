@@ -5,8 +5,8 @@ import { createContext } from 'react';
 import type { QueryClient } from '@tanstack/react-query';
 
 import type {
-  OperationRequestInfo,
   OperationRequestSchema,
+  RequestFnPayload,
 } from './lib/requestFn.js';
 
 interface QraftContextValueBase {
@@ -20,9 +20,8 @@ interface QraftContextValueBase {
    * The `requestFn` will be invoked with every request.
    */
   requestFn<T>(
-    options: { baseUrl: string },
-    schema: OperationRequestSchema,
-    requestInfo: OperationRequestInfo
+    requestSchema: OperationRequestSchema,
+    requestInfo: RequestFnPayload
   ): Promise<T>;
 
   /** The QueryClient to use in Hooks */

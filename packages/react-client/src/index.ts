@@ -5,11 +5,10 @@ export {
   baseRequestFn,
   urlSerializer,
   bodySerializer,
-  type OperationRequestInfo,
+  type RequestFnPayload,
   type OperationRequestSchema,
   type RequestFnOptions,
   type HeadersOptions,
-  type QueryFnRequestInfo,
 } from './lib/requestFn.js';
 export type {
   ServiceOperationQuery,

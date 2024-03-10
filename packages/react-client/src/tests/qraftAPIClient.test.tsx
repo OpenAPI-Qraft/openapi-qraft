@@ -10,7 +10,7 @@ import { act, renderHook, waitFor } from '@testing-library/react';
 
 import { vi } from 'vitest';
 
-import type { OperationRequestInfo } from '../index.js';
+import type { RequestFnPayload } from '../index.js';
 import {
   bodySerializer,
   QraftContextValue,
@@ -24,13 +24,12 @@ const qraft = createAPIClient();
 
 const requestClient = async <T,>(
   requestSchema: OperationRequestSchema,
-  requestInfo: OperationRequestInfo
+  requestInfo: Omit<RequestFnPayload, 'baseUrl'>
 ): Promise<T> =>
-  requestFn(
-    { baseUrl: 'https://api.sandbox.monite.com/v1' },
-    requestSchema,
-    requestInfo
-  );
+  requestFn(requestSchema, {
+    ...requestInfo,
+    baseUrl: 'https://api.sandbox.monite.com/v1',
+  });
 
 describe('Qraft uses singular Query', () => {
   it('supports useQuery', async () => {
@@ -119,14 +118,14 @@ describe('Qraft uses singular Query', () => {
           <QraftCustomContext.Provider
             value={{
               baseUrl: 'https://api.sandbox.monite.com/v1',
-              requestFn({ baseUrl }, schema, info) {
+              requestFn(schema, info) {
                 return requestFn(
-                  { baseUrl, urlSerializer, bodySerializer },
                   schema,
                   {
                     ...info,
                     headers: { 'x-custom-provider': 'true' },
-                  }
+                  },
+                  { urlSerializer, bodySerializer }
                 );
               },
             }}

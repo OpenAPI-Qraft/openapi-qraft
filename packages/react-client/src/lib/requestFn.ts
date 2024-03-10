@@ -2,56 +2,39 @@
  * @throws {error: object|string, response: Response} if the request fails
  */
 export async function requestFn<T>(
-  options: RequestFnOptions,
   schema: OperationRequestSchema,
-  requestInfo: OperationRequestInfo
+  requestInfo: RequestFnInfo,
+  options?: RequestFnOptions
 ): Promise<T> {
-  return baseRequestFn(
-    isRequiredRequestOptions(options)
-      ? options
-      : {
-          urlSerializer,
-          bodySerializer,
-          ...options,
-        },
-    schema,
-    requestInfo
-  );
+  return baseRequestFn(schema, requestInfo, {
+    urlSerializer,
+    bodySerializer,
+    fetch,
+    ...options,
+  });
 }
-
-export type RequestFn<T> = typeof requestFn<T>;
-
-export interface RequestFnOptions {
-  baseUrl: string;
-  urlSerializer?: URLSerializer;
-  bodySerializer?: BodySerializer;
-}
-
-type URLSerializer = typeof urlSerializer;
-type BodySerializer = typeof bodySerializer;
 
 /**
  * @throws {error: object|string, response: Response} if the request fails
  */
 export async function baseRequestFn<T>(
-  options: Required<RequestFnOptions>,
-  schema: OperationRequestSchema,
-  requestInfo: OperationRequestInfo,
-  customFetch = fetch
+  requestSchema: OperationRequestSchema,
+  requestInfo: RequestFnInfo,
+  options: Required<RequestFnOptions>
 ): Promise<T> {
   const { parameters, headers, body, ...requestInfoRest } = requestInfo;
 
-  const requestBody = options.bodySerializer(schema, requestInfo);
+  const requestBody = options.bodySerializer(requestSchema, requestInfo);
 
-  const response = await customFetch(
-    options.urlSerializer(options.baseUrl, schema, requestInfo),
+  const response = await options.fetch(
+    options.urlSerializer(requestSchema, requestInfo),
     {
-      method: schema.method.toUpperCase(),
+      method: requestSchema.method.toUpperCase(),
       body: requestBody,
       headers: mergeHeaders(
         {
           Accept: 'application/json',
-          'Content-Type': schema.mediaType ?? getBodyContentType(body),
+          'Content-Type': requestSchema.mediaType ?? getBodyContentType(body),
         },
         headers,
         parameters?.header,
@@ -75,9 +58,8 @@ export async function baseRequestFn<T>(
 }
 
 export function urlSerializer(
-  baseUrl: string,
   schema: OperationRequestSchema,
-  info: OperationRequestInfo
+  info: RequestFnPayload
 ): string {
   const path = schema.url.replace(
     /{(.*?)}/g,
@@ -88,6 +70,8 @@ export function urlSerializer(
       return substring;
     }
   );
+
+  const baseUrl = info.baseUrl ?? '';
 
   if (info.parameters?.query) {
     return `${baseUrl}${path}${getQueryString(info.parameters.query)}`;
@@ -157,7 +141,7 @@ function mergeHeaders(...allHeaders: (HeadersOptions | undefined)[]) {
 
 export function bodySerializer(
   schema: OperationRequestSchema,
-  info: OperationRequestInfo
+  info: RequestFnPayload
 ) {
   if (info.body === undefined) return;
 
@@ -185,7 +169,7 @@ export function bodySerializer(
 
 function getRequestBodyFormData({
   body,
-}: Pick<OperationRequestInfo, 'body'>): FormData | undefined {
+}: Pick<RequestFnPayload, 'body'>): FormData | undefined {
   if (body instanceof FormData) return body;
   if (body === null) return;
 
@@ -224,7 +208,7 @@ function getRequestBodyFormData({
   return formData;
 }
 
-function getBodyContentType(body: OperationRequestInfo['body']) {
+function getBodyContentType(body: RequestFnPayload['body']) {
   if (!body) return;
   if (body instanceof Blob) return body.type || 'application/octet-stream';
   if (typeof body === 'string') return 'text/plain';
@@ -263,12 +247,6 @@ async function getResponseBody<T>(response: Response): Promise<T | undefined> {
   return response.text() as Promise<T>;
 }
 
-function isRequiredRequestOptions<T extends RequestFnOptions>(
-  options: T
-): options is Required<T> {
-  return Boolean(options.urlSerializer && options.bodySerializer);
-}
-
 // To have definitely typed headers without a conversion to stings
 export type HeadersOptions =
   | HeadersInit
@@ -301,7 +279,12 @@ export interface OperationRequestSchema {
   readonly mediaType?: string;
 }
 
-export interface QueryFnRequestInfo {
+export interface RequestFnPayload {
+  /**
+   * Base URL to use for the request
+   */
+  baseUrl: string | undefined;
+
   /**
    * OpenAPI parameters
    * @example
@@ -331,8 +314,8 @@ export interface QueryFnRequestInfo {
   signal?: AbortSignal | null;
 }
 
-export interface OperationRequestInfo
-  extends QueryFnRequestInfo,
+interface RequestFnInfo
+  extends RequestFnPayload,
     Omit<RequestInit, 'headers' | 'method' | 'body' | 'signal'> {
   /**
    * Request headers
@@ -340,3 +323,11 @@ export interface OperationRequestInfo
    */
   readonly headers?: HeadersOptions;
 }
+
+export interface RequestFnOptions {
+  urlSerializer?: typeof urlSerializer;
+  bodySerializer?: typeof bodySerializer;
+  fetch?: typeof fetch;
+}
+
+export type RequestFn<T> = typeof requestFn<T>;
