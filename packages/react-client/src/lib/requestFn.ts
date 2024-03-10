@@ -2,7 +2,7 @@
  * @throws {error: object|string, response: Response} if the request fails
  */
 export async function requestFn<T>(
-  options: RequestOptions,
+  options: RequestFnOptions,
   schema: OperationRequestSchema,
   requestInfo: OperationRequestInfo
 ): Promise<T> {
@@ -21,7 +21,7 @@ export async function requestFn<T>(
 
 export type RequestFn<T> = typeof requestFn<T>;
 
-export interface RequestOptions {
+export interface RequestFnOptions {
   baseUrl: string;
   urlSerializer?: URLSerializer;
   bodySerializer?: BodySerializer;
@@ -34,7 +34,7 @@ type BodySerializer = typeof bodySerializer;
  * @throws {error: object|string, response: Response} if the request fails
  */
 export async function baseRequestFn<T>(
-  options: Required<RequestOptions>,
+  options: Required<RequestFnOptions>,
   schema: OperationRequestSchema,
   requestInfo: OperationRequestInfo,
   customFetch = fetch
@@ -263,9 +263,9 @@ async function getResponseBody<T>(response: Response): Promise<T | undefined> {
   return response.text() as Promise<T>;
 }
 
-function isRequiredRequestOptions<T extends RequestOptions>(
-  options: RequestOptions
-): options is Required<RequestOptions> {
+function isRequiredRequestOptions<T extends RequestFnOptions>(
+  options: T
+): options is Required<T> {
   return Boolean(options.urlSerializer && options.bodySerializer);
 }
 

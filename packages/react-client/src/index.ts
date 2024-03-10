@@ -7,7 +7,7 @@ export {
   bodySerializer,
   type OperationRequestInfo,
   type OperationRequestSchema,
-  type RequestOptions,
+  type RequestFnOptions,
   type HeadersOptions,
   type QueryFnRequestInfo,
 } from './lib/requestFn.js';
