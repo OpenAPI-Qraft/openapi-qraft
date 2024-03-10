@@ -1068,6 +1068,109 @@ describe('Qraft uses Query Function', () => {
       )
     ).toEqual(parameters);
   });
+
+  it('uses fetchInfiniteQuery with multiple pages', async () => {
+    const queryClient = new QueryClient();
+
+    const result =
+      qraft.approvalPolicies.getApprovalPoliciesId.fetchInfiniteQuery(
+        {
+          requestFn: requestFn,
+          baseUrl: 'https://api.sandbox.monite.com/v1',
+          parameters,
+          initialPageParam: {
+            query: {
+              items_order: ['asc', 'asc', 'asc'],
+            },
+          },
+          pages: 2,
+          getNextPageParam: (lastPage, allPages, params) => {
+            return {
+              query: {
+                items_order: [...(params.query?.items_order || []), 'desc'],
+              },
+            };
+          },
+        },
+        queryClient
+      );
+
+    await expect(result).resolves.toEqual({
+      pageParams: [
+        {
+          query: {
+            items_order: ['asc', 'asc', 'asc'],
+          },
+        },
+        {
+          query: {
+            items_order: ['asc', 'asc', 'asc', 'desc'],
+          },
+        },
+      ],
+      pages: [
+        {
+          ...parameters,
+          query: {
+            ...parameters.query,
+            items_order: ['asc', 'asc', 'asc'],
+          },
+        },
+        {
+          ...parameters,
+          query: {
+            ...parameters.query,
+            items_order: ['asc', 'asc', 'asc', 'desc'],
+          },
+        },
+      ],
+    });
+  });
+
+  it('uses prefetchInfiniteQuery', async () => {
+    const queryClient = new QueryClient();
+
+    const result =
+      qraft.approvalPolicies.getApprovalPoliciesId.prefetchInfiniteQuery(
+        {
+          requestFn: requestFn,
+          baseUrl: 'https://api.sandbox.monite.com/v1',
+          parameters,
+          initialPageParam: {
+            query: {
+              items_order: ['asc', 'asc', 'asc'],
+            },
+          },
+        },
+        queryClient
+      );
+
+    await expect(result).resolves.toBeUndefined();
+
+    expect(
+      qraft.approvalPolicies.getApprovalPoliciesId.getInfiniteQueryData(
+        parameters,
+        queryClient
+      )
+    ).toEqual({
+      pageParams: [
+        {
+          query: {
+            items_order: ['asc', 'asc', 'asc'],
+          },
+        },
+      ],
+      pages: [
+        {
+          ...parameters,
+          query: {
+            ...parameters.query,
+            items_order: ['asc', 'asc', 'asc'],
+          },
+        },
+      ],
+    });
+  });
 });
 
 describe('Qraft uses mutationFn', () => {
