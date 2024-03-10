@@ -6,10 +6,10 @@ import type { DefaultError } from '@tanstack/query-core';
 import {
   useMutation as useMutationBase,
   UseMutationResult,
-  useQueryClient,
 } from '@tanstack/react-query';
 
 import { composeMutationKey } from '../lib/composeMutationKey.js';
+import { useQueryClient } from '../lib/useQueryClient.js';
 import type { QraftClientOptions } from '../qraftAPIClient.js';
 import { QraftContext } from '../QraftContext.js';
 import type { RequestSchema } from '../RequestClient.js';
@@ -51,10 +51,8 @@ export const useMutation: <
       `'useMutation': parameters and 'options.mutationKey' cannot be used together`
     );
 
-  const { requestClient, queryClient: queryClientByContext } =
-    useContext(qraftOptions?.context ?? QraftContext) ?? {};
-
-  if (!requestClient) throw new Error(`QraftContext.requestClient not found`);
+  const contextValue = useContext(qraftOptions?.context ?? QraftContext);
+  if (!contextValue?.request) throw new Error(`QraftContext.request not found`);
 
   const mutationKey =
     options && 'mutationKey' in options
@@ -72,22 +70,30 @@ export const useMutation: <
         options?.mutationFn ??
         (parameters
           ? function (bodyPayload) {
-              return requestClient(schema, {
-                parameters,
-                body: bodyPayload as never,
-              });
+              return contextValue.request(
+                { baseUrl: contextValue.baseUrl },
+                schema,
+                {
+                  parameters,
+                  body: bodyPayload as never,
+                }
+              );
             }
           : function (parametersAndBodyPayload) {
               const { body, ...parameters } = parametersAndBodyPayload as {
                 body: unknown;
               };
 
-              return requestClient(schema, {
-                body,
-                parameters,
-              } as never);
+              return contextValue.request(
+                { baseUrl: contextValue.baseUrl },
+                schema,
+                {
+                  body,
+                  parameters,
+                } as never
+              );
             }),
     },
-    useQueryClient(queryClientByArg ?? queryClientByContext)
+    useQueryClient(qraftOptions, queryClientByArg)
   ) as never;
 };

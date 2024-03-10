@@ -4,15 +4,30 @@ import { createContext } from 'react';
 
 import type { QueryClient } from '@tanstack/react-query';
 
-import type { RequestClient } from './RequestClient.js';
+import type {
+  APIOperationRequestInfo,
+  APIOperationSchema,
+} from './lib/request.js';
 
-export type QraftContextValue =
-  | {
-      /** The request client to use for making requests. Will be invoked with every request. */
-      requestClient: RequestClient;
-      /** The QueryClient to use in Hooks */
-      queryClient?: QueryClient;
-    }
-  | undefined;
+interface QraftContextValueBase {
+  /** The QueryClient to use in Hooks */
+  queryClient?: QueryClient;
+
+  /**
+   * The request client to use for making requests. Will be invoked with every request.
+   */
+  request<T>(
+    options: { baseUrl: string },
+    schema: APIOperationSchema,
+    requestInfo: APIOperationRequestInfo
+  ): Promise<T>;
+  /**
+   * The base URL to use for all requests.
+   * @example 'https://api.example.com'
+   */
+  baseUrl: string;
+}
+
+export type QraftContextValue = QraftContextValueBase | undefined;
 
 export const QraftContext = createContext<QraftContextValue>(undefined);

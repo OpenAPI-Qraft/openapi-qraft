@@ -4,11 +4,11 @@ import { useContext } from 'react';
 
 import {
   SuspenseQueriesResults,
-  useQueryClient,
   useSuspenseQueries as useSuspenseQueriesTanstack,
 } from '@tanstack/react-query';
 
 import { composeQueryKey } from '../lib/composeQueryKey.js';
+import { useQueryClient } from '../lib/useQueryClient.js';
 import type { QraftClientOptions } from '../qraftAPIClient.js';
 import { QraftContext } from '../QraftContext.js';
 import type { RequestSchema } from '../RequestClient.js';
@@ -23,10 +23,8 @@ export const useSuspenseQueries: (
 ) => SuspenseQueriesResults<never> = (qraftOptions, schema, args) => {
   const [options, queryClientByArg] = args;
 
-  const { requestClient, queryClient: queryClientByContext } =
-    useContext(qraftOptions?.context ?? QraftContext) ?? {};
-
-  if (!requestClient) throw new Error(`QraftContext.requestClient not found`);
+  const contextValue = useContext(qraftOptions?.context ?? QraftContext);
+  if (!contextValue?.request) throw new Error(`QraftContext.request not found`);
 
   return useSuspenseQueriesTanstack(
     {
@@ -51,15 +49,19 @@ export const useSuspenseQueries: (
           queryFn:
             optionsWithQueryKey.queryFn ??
             function ({ queryKey: [, queryParams], signal, meta }) {
-              return requestClient(schema, {
-                parameters: queryParams as never,
-                signal,
-                meta,
-              });
+              return contextValue.request(
+                { baseUrl: contextValue.baseUrl },
+                schema,
+                {
+                  parameters: queryParams as never,
+                  signal,
+                  meta,
+                }
+              );
             },
         };
       }),
     },
-    useQueryClient(queryClientByArg ?? queryClientByContext)
+    useQueryClient(qraftOptions, queryClientByArg)
   ) as never;
 };

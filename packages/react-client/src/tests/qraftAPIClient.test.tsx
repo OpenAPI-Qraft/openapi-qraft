@@ -10,18 +10,22 @@ import { act, renderHook, waitFor } from '@testing-library/react';
 
 import { vi } from 'vitest';
 
-import type { RequestClient } from '../index.js';
+import type { APIOperationRequestInfo } from '../index.js';
 import {
   bodySerializer,
   QraftContextValue,
   request,
   urlSerializer,
 } from '../index.js';
+import type { APIOperationSchema } from '../lib/request.js';
 import { createAPIClient } from './fixtures/api/index.js';
 
 const qraft = createAPIClient();
 
-const requestClient: RequestClient = async (requestSchema, requestInfo) =>
+const requestClient = async <T,>(
+  requestSchema: APIOperationSchema,
+  requestInfo: APIOperationRequestInfo
+): Promise<T> =>
   request(
     { baseUrl: 'https://api.sandbox.monite.com/v1' },
     requestSchema,
@@ -114,17 +118,14 @@ describe('Qraft uses singular Query', () => {
         wrapper: (props) => (
           <QraftCustomContext.Provider
             value={{
-              requestClient(schema, info) {
+              baseUrl: 'https://api.sandbox.monite.com/v1',
+              request({ baseUrl }, schema, info) {
                 return request(
-                  {
-                    baseUrl: 'https://api.sandbox.monite.com/v1',
-                    urlSerializer,
-                    bodySerializer,
-                  },
+                  { baseUrl, urlSerializer, bodySerializer },
                   schema,
                   {
-                    headers: { 'x-custom-provider': 'true' },
                     ...info,
+                    headers: { 'x-custom-provider': 'true' },
                   }
                 );
               },
@@ -2165,7 +2166,12 @@ function Providers({
       {/* We should use precompiled `QraftContextDist`,
        * because callbacks are imported from `@openapi-qraft` package `/dist` folder
        */}
-      <QraftContextDist.Provider value={{ requestClient }}>
+      <QraftContextDist.Provider
+        value={{
+          baseUrl: 'https://api.sandbox.monite.com/v1',
+          request,
+        }}
+      >
         {children}
       </QraftContextDist.Provider>
     </QueryClientProvider>

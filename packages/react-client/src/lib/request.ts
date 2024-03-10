@@ -34,13 +34,14 @@ type BodySerializer = typeof bodySerializer;
 export async function baseRequest<T>(
   options: Required<RequestOptions>,
   schema: APIOperationSchema,
-  requestInfo: APIOperationRequestInfo
+  requestInfo: APIOperationRequestInfo,
+  customFetch = fetch
 ): Promise<T> {
   const { parameters, headers, body, ...requestInfoRest } = requestInfo;
 
   const requestBody = options.bodySerializer(schema, requestInfo);
 
-  const response = await fetch(
+  const response = await customFetch(
     options.urlSerializer(options.baseUrl, schema, requestInfo),
     {
       method: schema.method.toUpperCase(),
@@ -323,4 +324,9 @@ export interface APIOperationRequestInfo
    * @example { 'X-Auth': '123' }
    */
   readonly headers?: HeadersOptions;
+
+  /**
+   * Tanstack Query Meta
+   */
+  meta?: Record<string, unknown>;
 }

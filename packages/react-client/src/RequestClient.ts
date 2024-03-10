@@ -1,6 +1,13 @@
-export type RequestClient = <T>(
-  schema: RequestSchema,
-  info: RequestInfo
+import type {
+  APIOperationRequestInfo,
+  APIOperationSchema,
+  RequestOptions,
+} from './lib/request.js';
+
+export type RequestClient<T> = (
+  options: RequestOptions,
+  requestSchema: APIOperationSchema,
+  requestInfo: APIOperationRequestInfo
 ) => Promise<T>;
 
 export type RequestSchema = {
@@ -15,18 +22,4 @@ export type RequestSchema = {
     | 'head'
     | 'trace';
   mediaType?: string;
-};
-
-export type RequestInfo = {
-  parameters?: RequestInfoParameters;
-  body?: BodyInit | Record<string, unknown> | null;
-  signal?: AbortSignal;
-  meta?: Record<string, unknown>;
-};
-
-export type RequestInfoParameters = {
-  header?: Record<string, any>;
-  path?: Record<string, any>;
-  query?: Record<string, any>;
-  cookie?: Record<string, any>;
 };

@@ -17,4 +17,3 @@ export type {
   ServiceOperationQuery,
   ServiceOperationMutation,
 } from './ServiceOperation.js';
-export type { RequestClient } from './RequestClient.js';
