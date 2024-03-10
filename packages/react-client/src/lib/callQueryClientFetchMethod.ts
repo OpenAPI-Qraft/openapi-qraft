@@ -2,7 +2,7 @@ import type { QueryClient } from '@tanstack/query-core';
 
 import { composeInfiniteQueryKey } from './composeInfiniteQueryKey.js';
 import { composeQueryKey } from './composeQueryKey.js';
-import type { OperationRequestSchema, RequestFn } from './request.js';
+import type { OperationRequestSchema, RequestFn } from './requestFn.js';
 import { shelfMerge } from './shelfMerge.js';
 
 /**

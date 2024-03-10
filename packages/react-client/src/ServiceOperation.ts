@@ -37,7 +37,7 @@ import type {
   UseSuspenseQueryResult,
 } from '@tanstack/react-query';
 
-import type { RequestFn } from './lib/request.js';
+import type { RequestFn } from './lib/requestFn.js';
 
 export type ServiceOperationQueryKey<
   S extends { url: string; method: string },

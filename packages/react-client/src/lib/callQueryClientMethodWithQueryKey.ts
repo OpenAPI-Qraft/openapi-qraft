@@ -2,7 +2,7 @@ import type { QueryClient } from '@tanstack/query-core';
 
 import { composeInfiniteQueryKey } from './composeInfiniteQueryKey.js';
 import { composeQueryKey } from './composeQueryKey.js';
-import type { OperationRequestSchema } from './request.js';
+import type { OperationRequestSchema } from './requestFn.js';
 
 /**
  * Calls a query client method with parameters and options,

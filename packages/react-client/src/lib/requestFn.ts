@@ -1,12 +1,12 @@
 /**
  * @throws {error: object|string, response: Response} if the request fails
  */
-export async function request<T>(
+export async function requestFn<T>(
   options: RequestOptions,
   schema: OperationRequestSchema,
   requestInfo: OperationRequestInfo
 ): Promise<T> {
-  return baseRequest(
+  return baseRequestFn(
     isRequiredRequestOptions(options)
       ? options
       : {
@@ -19,7 +19,7 @@ export async function request<T>(
   );
 }
 
-export type RequestFn<T> = typeof request<T>;
+export type RequestFn<T> = typeof requestFn<T>;
 
 export interface RequestOptions {
   baseUrl: string;
@@ -33,7 +33,7 @@ type BodySerializer = typeof bodySerializer;
 /**
  * @throws {error: object|string, response: Response} if the request fails
  */
-export async function baseRequest<T>(
+export async function baseRequestFn<T>(
   options: Required<RequestOptions>,
   schema: OperationRequestSchema,
   requestInfo: OperationRequestInfo,

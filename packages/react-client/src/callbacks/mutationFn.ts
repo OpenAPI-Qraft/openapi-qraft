@@ -1,4 +1,4 @@
-import type { OperationRequestSchema } from '../lib/request.js';
+import type { OperationRequestSchema } from '../lib/requestFn.js';
 import type { QraftClientOptions } from '../qraftAPIClient.js';
 import { ServiceOperationMutation } from '../ServiceOperation.js';
 

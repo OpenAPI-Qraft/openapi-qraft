@@ -2,7 +2,7 @@ import type {
   OperationRequestInfo,
   OperationRequestSchema,
   RequestOptions,
-} from './lib/request.js';
+} from './lib/requestFn.js';
 
 export type RequestClient<T> = (
   options: RequestOptions,

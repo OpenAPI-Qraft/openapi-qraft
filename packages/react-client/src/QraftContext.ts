@@ -7,7 +7,7 @@ import type { QueryClient } from '@tanstack/react-query';
 import type {
   OperationRequestInfo,
   OperationRequestSchema,
-} from './lib/request.js';
+} from './lib/requestFn.js';
 
 interface QraftContextValueBase {
   /**

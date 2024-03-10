@@ -14,10 +14,10 @@ import type { OperationRequestInfo } from '../index.js';
 import {
   bodySerializer,
   QraftContextValue,
-  request,
+  requestFn,
   urlSerializer,
 } from '../index.js';
-import type { OperationRequestSchema } from '../lib/request.js';
+import type { OperationRequestSchema } from '../lib/requestFn.js';
 import { createAPIClient } from './fixtures/api/index.js';
 
 const qraft = createAPIClient();
@@ -26,7 +26,7 @@ const requestClient = async <T,>(
   requestSchema: OperationRequestSchema,
   requestInfo: OperationRequestInfo
 ): Promise<T> =>
-  request(
+  requestFn(
     { baseUrl: 'https://api.sandbox.monite.com/v1' },
     requestSchema,
     requestInfo
@@ -119,8 +119,8 @@ describe('Qraft uses singular Query', () => {
           <QraftCustomContext.Provider
             value={{
               baseUrl: 'https://api.sandbox.monite.com/v1',
-              request({ baseUrl }, schema, info) {
-                return request(
+              requestFn({ baseUrl }, schema, info) {
+                return requestFn(
                   { baseUrl, urlSerializer, bodySerializer },
                   schema,
                   {
@@ -1001,7 +1001,7 @@ describe('Qraft uses Query Function', () => {
 
     const result = qraft.approvalPolicies.getApprovalPoliciesId.fetchQuery(
       {
-        requestFn: request,
+        requestFn: requestFn,
         baseUrl: 'https://api.sandbox.monite.com/v1',
         parameters,
       },
@@ -1016,7 +1016,7 @@ describe('Qraft uses Query Function', () => {
 
     const result = qraft.approvalPolicies.getApprovalPoliciesId.fetchQuery(
       {
-        requestFn: request,
+        requestFn: requestFn,
         baseUrl: 'https://api.sandbox.monite.com/v1',
         queryKey:
           qraft.approvalPolicies.getApprovalPoliciesId.getQueryKey(parameters),
@@ -1053,7 +1053,7 @@ describe('Qraft uses Query Function', () => {
 
     const result = qraft.approvalPolicies.getApprovalPoliciesId.prefetchQuery(
       {
-        requestFn: request,
+        requestFn: requestFn,
         baseUrl: 'https://api.sandbox.monite.com/v1',
         parameters,
       },
@@ -2225,7 +2225,7 @@ function Providers({
       <QraftContextDist.Provider
         value={{
           baseUrl: 'https://api.sandbox.monite.com/v1',
-          request: request,
+          requestFn: requestFn,
         }}
       >
         {children}

@@ -1,5 +1,5 @@
 import type { ServiceOperationQueryKey } from '../ServiceOperation.js';
-import type { OperationRequestSchema } from './request.js';
+import type { OperationRequestSchema } from './requestFn.js';
 
 export function composeQueryKey<
   TSchema extends OperationRequestSchema,

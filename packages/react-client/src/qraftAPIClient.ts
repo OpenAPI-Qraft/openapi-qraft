@@ -1,7 +1,7 @@
 import type { Context } from 'react';
 
 import { createRecursiveProxy } from './lib/createRecursiveProxy.js';
-import type { OperationRequestSchema } from './lib/request.js';
+import type { OperationRequestSchema } from './lib/requestFn.js';
 import type { QraftContextValue } from './QraftContext.js';
 
 export interface QraftClientOptions {

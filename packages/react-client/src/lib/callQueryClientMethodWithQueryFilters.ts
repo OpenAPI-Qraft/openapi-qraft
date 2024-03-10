@@ -1,7 +1,7 @@
 import type { QueryClient } from '@tanstack/query-core';
 
 import { composeQueryFilters } from './composeQueryFilters.js';
-import type { OperationRequestSchema } from './request.js';
+import type { OperationRequestSchema } from './requestFn.js';
 
 /**
  * Calls a query client method with query filters and options,

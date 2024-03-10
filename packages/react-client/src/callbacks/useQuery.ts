@@ -9,7 +9,7 @@ import {
 } from '@tanstack/react-query';
 
 import { composeQueryKey } from '../lib/composeQueryKey.js';
-import type { OperationRequestSchema } from '../lib/request.js';
+import type { OperationRequestSchema } from '../lib/requestFn.js';
 import { useQueryClient } from '../lib/useQueryClient.js';
 import type { QraftClientOptions } from '../qraftAPIClient.js';
 import { QraftContext } from '../QraftContext.js';

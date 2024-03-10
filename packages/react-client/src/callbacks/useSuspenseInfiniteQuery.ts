@@ -9,7 +9,7 @@ import {
 } from '@tanstack/react-query';
 
 import { composeInfiniteQueryKey } from '../lib/composeInfiniteQueryKey.js';
-import type { OperationRequestSchema } from '../lib/request.js';
+import type { OperationRequestSchema } from '../lib/requestFn.js';
 import { shelfMerge } from '../lib/shelfMerge.js';
 import { useQueryClient } from '../lib/useQueryClient.js';
 import type { QraftClientOptions } from '../qraftAPIClient.js';
