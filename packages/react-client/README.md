@@ -565,11 +565,11 @@ function QraftProvider({ children }: { children: React.ReactNode }) {
     <QraftContext.Provider
       value={{
         baseUrl: 'https://api.sandbox.monite.com/v1',
-        async requestFn({ baseUrl }, schema, info) {
+        async requestFn(schema, requestInfo) {
           const token = await fetchToken();
 
-          return requestFn({ baseUrl }, schema, {
-            ...info,
+          return requestFn(schema, {
+            ...requestInfo,
             /** Specify your predefined Headers **/
             headers: {
               Authorization: `Bearer ${token}`,
