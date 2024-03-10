@@ -22,12 +22,6 @@ export const useIsFetching: <TVariables = unknown>(
 ) => number = (qraftOptions, schema, args) => {
   const [filters, queryClientByArg] = args;
 
-  if (filters && 'parameters' in filters && 'mutationKey' in filters) {
-    throw new Error(
-      `'useMutationState': 'parameters' and 'mutationKey' cannot be used together`
-    );
-  }
-
   return useIsFetchingTanstack(
     composeQueryFilters(schema, filters) as never,
     useQueryClient(qraftOptions, queryClientByArg)
