@@ -1,5 +1,5 @@
 import type { RequestSchema } from '../RequestClient.js';
-import { ServiceOperationInfiniteQueryKey } from '../ServiceOperation.js';
+import type { ServiceOperationInfiniteQueryKey } from '../ServiceOperation.js';
 
 export function composeInfiniteQueryKey<TSchema extends RequestSchema, TParams>(
   schema: TSchema,

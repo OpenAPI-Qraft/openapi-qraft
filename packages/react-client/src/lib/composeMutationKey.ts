@@ -1,5 +1,5 @@
 import type { RequestSchema } from '../RequestClient.js';
-import { ServiceOperationMutationKey } from '../ServiceOperation.js';
+import type { ServiceOperationMutationKey } from '../ServiceOperation.js';
 
 /**
  * Omit `body` or `requestBody` from mutation parameters if exists
