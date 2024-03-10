@@ -193,6 +193,14 @@ interface ServiceOperationFetchQuery<
           FetchQueryOptionsQueryFn<TSchema, TData, TParams>),
     queryClient: QueryClient
   ): Promise<TData>;
+  prefetchQuery(
+    options:
+      | (FetchQueryOptionsByQueryKey<TSchema, TData, TParams, TError> &
+          FetchQueryOptionsQueryFn<TSchema, TData, TParams>)
+      | (FetchQueryOptionsByParameters<TSchema, TData, TParams, TError> &
+          FetchQueryOptionsQueryFn<TSchema, TData, TParams>),
+    queryClient: QueryClient
+  ): Promise<void>;
 }
 
 interface ServiceOperationUseQueries<

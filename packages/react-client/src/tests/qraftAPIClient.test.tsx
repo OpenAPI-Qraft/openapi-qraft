@@ -1047,6 +1047,28 @@ describe('Qraft uses Query Function', () => {
 
     await expect(result).resolves.toEqual(customResult);
   });
+
+  it('uses prefetchQuery with `parameters`', async () => {
+    const queryClient = new QueryClient();
+
+    const result = qraft.approvalPolicies.getApprovalPoliciesId.prefetchQuery(
+      {
+        requestFn: request,
+        baseUrl: 'https://api.sandbox.monite.com/v1',
+        parameters,
+      },
+      queryClient
+    );
+
+    await expect(result).resolves.toEqual(undefined);
+
+    expect(
+      qraft.approvalPolicies.getApprovalPoliciesId.getQueryData(
+        parameters,
+        queryClient
+      )
+    ).toEqual(parameters);
+  });
 });
 
 describe('Qraft uses mutationFn', () => {

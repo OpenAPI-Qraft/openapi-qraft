@@ -192,4 +192,5 @@ const serviceCallbacks = [
   'isFetching',
   'useIsFetching',
   'fetchQuery',
+  'prefetchQuery',
 ] as const;
