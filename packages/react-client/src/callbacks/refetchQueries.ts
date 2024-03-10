@@ -1,14 +1,14 @@
 import { callQueryClientMethodWithQueryFilters } from '../lib/callQueryClientMethodWithQueryFilters.js';
+import type { OperationRequestSchema } from '../lib/request.js';
 import type { QraftClientOptions } from '../qraftAPIClient.js';
-import type { RequestSchema } from '../RequestClient.js';
-import { ServiceOperationResetQueriesCallback } from '../ServiceOperation.js';
+import type { ServiceOperationResetQueriesCallback } from '../ServiceOperation.js';
 
 export function refetchQueries<TData>(
   qraftOptions: QraftClientOptions | undefined,
-  schema: RequestSchema,
+  schema: OperationRequestSchema,
   args: Parameters<
     ServiceOperationResetQueriesCallback<
-      RequestSchema,
+      OperationRequestSchema,
       unknown,
       TData
     >['refetchQueries']

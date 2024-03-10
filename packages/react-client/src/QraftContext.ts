@@ -5,8 +5,8 @@ import { createContext } from 'react';
 import type { QueryClient } from '@tanstack/react-query';
 
 import type {
-  APIOperationRequestInfo,
-  APIOperationSchema,
+  OperationRequestInfo,
+  OperationRequestSchema,
 } from './lib/request.js';
 
 interface QraftContextValueBase {
@@ -18,8 +18,8 @@ interface QraftContextValueBase {
    */
   request<T>(
     options: { baseUrl: string },
-    schema: APIOperationSchema,
-    requestInfo: APIOperationRequestInfo
+    schema: OperationRequestSchema,
+    requestInfo: OperationRequestInfo
   ): Promise<T>;
   /**
    * The base URL to use for all requests.

@@ -9,10 +9,10 @@ import {
 } from '@tanstack/react-query';
 
 import { composeQueryKey } from '../lib/composeQueryKey.js';
+import type { OperationRequestSchema } from '../lib/request.js';
 import { useQueryClient } from '../lib/useQueryClient.js';
 import type { QraftClientOptions } from '../qraftAPIClient.js';
 import { QraftContext } from '../QraftContext.js';
-import type { RequestSchema } from '../RequestClient.js';
 import {
   ServiceOperationQuery,
   ServiceOperationQueryKey,
@@ -20,9 +20,9 @@ import {
 
 export const useQuery: <TData = unknown, TError = DefaultError>(
   qraftOptions: QraftClientOptions | undefined,
-  schema: RequestSchema,
+  schema: OperationRequestSchema,
   args: Parameters<
-    ServiceOperationQuery<RequestSchema, unknown, unknown>['useQuery']
+    ServiceOperationQuery<OperationRequestSchema, unknown, unknown>['useQuery']
   >
 ) => UseQueryResult<TData, TError> = (qraftOptions, schema, args) => {
   const [parameters, options, queryClientByArg] = args;
@@ -30,9 +30,12 @@ export const useQuery: <TData = unknown, TError = DefaultError>(
   const contextValue = useContext(qraftOptions?.context ?? QraftContext);
   if (!contextValue?.request) throw new Error(`QraftContext.request not found`);
 
-  const queryKey: ServiceOperationQueryKey<RequestSchema, unknown> =
+  const queryKey: ServiceOperationQueryKey<OperationRequestSchema, unknown> =
     Array.isArray(parameters)
-      ? (parameters as ServiceOperationQueryKey<RequestSchema, unknown>)
+      ? (parameters as ServiceOperationQueryKey<
+          OperationRequestSchema,
+          unknown
+        >)
       : composeQueryKey(schema, parameters);
 
   return useQueryTanstack(

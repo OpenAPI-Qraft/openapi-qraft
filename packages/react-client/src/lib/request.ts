@@ -3,8 +3,8 @@
  */
 export async function request<T>(
   options: RequestOptions,
-  requestInfo: APIOperationSchema,
-  requestInit: APIOperationRequestInfo
+  schema: OperationRequestSchema,
+  requestInfo: OperationRequestInfo
 ): Promise<T> {
   return baseRequest(
     isRequiredRequestOptions(options)
@@ -14,8 +14,8 @@ export async function request<T>(
           bodySerializer,
           ...options,
         },
-    requestInfo,
-    requestInit
+    schema,
+    requestInfo
   );
 }
 
@@ -33,8 +33,8 @@ type BodySerializer = typeof bodySerializer;
  */
 export async function baseRequest<T>(
   options: Required<RequestOptions>,
-  schema: APIOperationSchema,
-  requestInfo: APIOperationRequestInfo,
+  schema: OperationRequestSchema,
+  requestInfo: OperationRequestInfo,
   customFetch = fetch
 ): Promise<T> {
   const { parameters, headers, body, ...requestInfoRest } = requestInfo;
@@ -74,8 +74,8 @@ export async function baseRequest<T>(
 
 export function urlSerializer(
   baseUrl: string,
-  schema: APIOperationSchema,
-  info: APIOperationRequestInfo
+  schema: OperationRequestSchema,
+  info: OperationRequestInfo
 ): string {
   const path = schema.url.replace(
     /{(.*?)}/g,
@@ -154,8 +154,8 @@ function mergeHeaders(...allHeaders: (HeadersOptions | undefined)[]) {
 }
 
 export function bodySerializer(
-  schema: APIOperationSchema,
-  info: APIOperationRequestInfo
+  schema: OperationRequestSchema,
+  info: OperationRequestInfo
 ) {
   if (info.body === undefined) return;
 
@@ -183,7 +183,7 @@ export function bodySerializer(
 
 function getRequestBodyFormData({
   body,
-}: Pick<APIOperationRequestInfo, 'body'>): FormData | undefined {
+}: Pick<OperationRequestInfo, 'body'>): FormData | undefined {
   if (body instanceof FormData) return body;
   if (body === null) return;
 
@@ -222,7 +222,7 @@ function getRequestBodyFormData({
   return formData;
 }
 
-function getBodyContentType(body: APIOperationRequestInfo['body']) {
+function getBodyContentType(body: OperationRequestInfo['body']) {
   if (!body) return;
   if (body instanceof Blob) return body.type || 'application/octet-stream';
   if (typeof body === 'string') return 'text/plain';
@@ -272,7 +272,7 @@ export type HeadersOptions =
   | HeadersInit
   | Record<string, string | number | boolean | null | undefined>;
 
-export interface APIOperationSchema {
+export interface OperationRequestSchema {
   /**
    * Operation path
    * @example /user/{id}
@@ -299,7 +299,7 @@ export interface APIOperationSchema {
   readonly mediaType?: string;
 }
 
-export interface APIOperationRequestInfo
+export interface OperationRequestInfo
   extends Omit<RequestInit, 'headers' | 'method' | 'body'> {
   /**
    * OpenAPI parameters

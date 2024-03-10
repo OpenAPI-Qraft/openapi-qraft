@@ -1,25 +1,11 @@
 import type {
-  APIOperationRequestInfo,
-  APIOperationSchema,
+  OperationRequestInfo,
+  OperationRequestSchema,
   RequestOptions,
 } from './lib/request.js';
 
 export type RequestClient<T> = (
   options: RequestOptions,
-  requestSchema: APIOperationSchema,
-  requestInfo: APIOperationRequestInfo
+  requestSchema: OperationRequestSchema,
+  requestInfo: OperationRequestInfo
 ) => Promise<T>;
-
-export type RequestSchema = {
-  url: string;
-  method:
-    | 'get'
-    | 'put'
-    | 'post'
-    | 'patch'
-    | 'delete'
-    | 'options'
-    | 'head'
-    | 'trace';
-  mediaType?: string;
-};

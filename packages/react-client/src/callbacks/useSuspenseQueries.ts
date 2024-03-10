@@ -8,17 +8,21 @@ import {
 } from '@tanstack/react-query';
 
 import { composeQueryKey } from '../lib/composeQueryKey.js';
+import type { OperationRequestSchema } from '../lib/request.js';
 import { useQueryClient } from '../lib/useQueryClient.js';
 import type { QraftClientOptions } from '../qraftAPIClient.js';
 import { QraftContext } from '../QraftContext.js';
-import type { RequestSchema } from '../RequestClient.js';
 import { ServiceOperationQuery } from '../ServiceOperation.js';
 
 export const useSuspenseQueries: (
   qraftOptions: QraftClientOptions | undefined,
-  schema: RequestSchema,
+  schema: OperationRequestSchema,
   args: Parameters<
-    ServiceOperationQuery<RequestSchema, unknown, unknown>['useSuspenseQueries']
+    ServiceOperationQuery<
+      OperationRequestSchema,
+      unknown,
+      unknown
+    >['useSuspenseQueries']
   >
 ) => SuspenseQueriesResults<never> = (qraftOptions, schema, args) => {
   const [options, queryClientByArg] = args;

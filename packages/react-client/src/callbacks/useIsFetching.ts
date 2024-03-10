@@ -3,17 +3,17 @@
 import { useIsFetching as useIsFetchingTanstack } from '@tanstack/react-query';
 
 import { composeQueryFilters } from '../lib/composeQueryFilters.js';
+import type { OperationRequestSchema } from '../lib/request.js';
 import { useQueryClient } from '../lib/useQueryClient.js';
 import type { QraftClientOptions } from '../qraftAPIClient.js';
-import type { RequestSchema } from '../RequestClient.js';
 import type { ServiceOperationQuery } from '../ServiceOperation.js';
 
 export const useIsFetching: <TVariables = unknown>(
   qraftOptions: QraftClientOptions | undefined,
-  schema: RequestSchema,
+  schema: OperationRequestSchema,
   args: Parameters<
     ServiceOperationQuery<
-      RequestSchema,
+      OperationRequestSchema,
       object | undefined,
       TVariables,
       unknown

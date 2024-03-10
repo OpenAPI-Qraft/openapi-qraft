@@ -9,9 +9,9 @@ import {
 } from '@tanstack/react-query';
 
 import { composeMutationKey } from '../lib/composeMutationKey.js';
+import type { OperationRequestSchema } from '../lib/request.js';
 import { useQueryClient } from '../lib/useQueryClient.js';
 import type { QraftClientOptions } from '../qraftAPIClient.js';
-import type { RequestSchema } from '../RequestClient.js';
 import { ServiceOperationMutation } from '../ServiceOperation.js';
 
 export const useMutationState: <
@@ -21,10 +21,10 @@ export const useMutationState: <
   TContext = unknown,
 >(
   qraftOptions: QraftClientOptions | undefined,
-  schema: RequestSchema,
+  schema: OperationRequestSchema,
   args: Parameters<
     ServiceOperationMutation<
-      RequestSchema,
+      OperationRequestSchema,
       object | undefined,
       TVariables,
       TData

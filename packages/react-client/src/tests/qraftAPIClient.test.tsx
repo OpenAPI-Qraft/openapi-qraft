@@ -10,21 +10,21 @@ import { act, renderHook, waitFor } from '@testing-library/react';
 
 import { vi } from 'vitest';
 
-import type { APIOperationRequestInfo } from '../index.js';
+import type { OperationRequestInfo } from '../index.js';
 import {
   bodySerializer,
   QraftContextValue,
   request,
   urlSerializer,
 } from '../index.js';
-import type { APIOperationSchema } from '../lib/request.js';
+import type { OperationRequestSchema } from '../lib/request.js';
 import { createAPIClient } from './fixtures/api/index.js';
 
 const qraft = createAPIClient();
 
 const requestClient = async <T,>(
-  requestSchema: APIOperationSchema,
-  requestInfo: APIOperationRequestInfo
+  requestSchema: OperationRequestSchema,
+  requestInfo: OperationRequestInfo
 ): Promise<T> =>
   request(
     { baseUrl: 'https://api.sandbox.monite.com/v1' },
