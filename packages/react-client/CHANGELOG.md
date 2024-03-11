@@ -1,5 +1,19 @@
 # @openapi-qraft/react
 
+## 1.3.0
+
+### Minor Changes
+
+- 7c81509: Add support for `QueryClinet.fetchInfiniteQuery(...)` and `QueryClinet.prefetchInfiniteQuery(...)` methods
+- 8e47c05: Simplified `QueryClient.setQueryData(...)` API
+- 48e662d: Added support for `QueryClient.fetchQuery(...)` method
+- 315883b: Changed `requestFn(...)` API to simplify the usage
+- d48a40e: Renamed the `request` property to `requestFn` for `QraftContext.value`
+
+### Patch Changes
+
+- 472ae32: Added support for `QueryClient.prefetchQuery(...)` method
+
 ## 1.2.0
 
 ### Minor Changes
