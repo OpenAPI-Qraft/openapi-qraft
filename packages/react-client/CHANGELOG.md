@@ -1,5 +1,11 @@
 # @openapi-qraft/react
 
+## 1.3.2
+
+### Patch Changes
+
+- cc36283: Republished
+
 ## 1.3.1
 
 ### Patch Changes
