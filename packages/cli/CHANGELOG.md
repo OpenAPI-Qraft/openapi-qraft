@@ -1,5 +1,16 @@
 # @openapi-qraft/cli
 
+## 1.3.0
+
+### Minor Changes
+
+- 7c81509: Add support for `QueryClinet.fetchInfiniteQuery(...)` and `QueryClinet.prefetchInfiniteQuery(...)` methods
+- 48e662d: Added support for `QueryClient.fetchQuery(...)` method
+
+### Patch Changes
+
+- 472ae32: Added support for `QueryClient.prefetchQuery(...)` method
+
 ## 1.2.0
 
 ## 1.1.5
