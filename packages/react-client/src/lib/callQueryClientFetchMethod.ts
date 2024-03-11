@@ -57,7 +57,8 @@ export function callQueryClientMethodWithQueryKey<
     // @ts-expect-error
     return queryClient[queryFilterMethod]({
       ...options,
-      queryFn,
+      // Event if queryFn is undefined, it will override the default queryFn from `setQueryDefaults(...)`
+      ...(queryFn ? { queryFn } : {}),
       queryKey: infinite
         ? composeInfiniteQueryKey(schema, parameters)
         : composeQueryKey(schema, parameters),
