@@ -1,15 +1,15 @@
 export { qraftAPIClient, type QraftClientOptions } from './qraftAPIClient.js';
 export { QraftContext, type QraftContextValue } from './QraftContext.js';
 export {
-  request,
-  baseRequest,
+  requestFn,
+  baseRequestFn,
   urlSerializer,
   bodySerializer,
-  type OperationRequestInfo,
-  type OperationRequestSchema,
-  type RequestOptions,
+  type RequestFnPayload,
+  type OperationSchema,
+  type RequestFnOptions,
   type HeadersOptions,
-} from './lib/request.js';
+} from './lib/requestFn.js';
 export type {
   ServiceOperationQuery,
   ServiceOperationMutation,

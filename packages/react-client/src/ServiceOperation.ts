@@ -12,10 +12,14 @@ import {
   QueriesPlaceholderDataFunction,
   Query,
   QueryClient,
+  FetchQueryOptions,
   RefetchOptions,
   ResetOptions,
   SetDataOptions,
   Updater,
+  QueryFunction,
+  InitialPageParam,
+  GetNextPageParamFunction,
 } from '@tanstack/query-core';
 import type {
   DefinedInitialDataInfiniteOptions,
@@ -34,6 +38,8 @@ import type {
   UseSuspenseQueryOptions,
   UseSuspenseQueryResult,
 } from '@tanstack/react-query';
+
+import type { RequestFn } from './lib/requestFn.js';
 
 export type ServiceOperationQueryKey<
   S extends { url: string; method: string },
@@ -63,6 +69,8 @@ export interface ServiceOperationQuery<
     ServiceOperationUseSuspenseInfiniteQuery<TSchema, TData, TParams, TError>,
     ServiceOperationUseIsFetchingQueries<TSchema, TData, TParams, TError>,
     ServiceOperationQueryFn<TSchema, TData, TParams>,
+    ServiceOperationFetchQuery<TSchema, TData, TParams, TError>,
+    ServiceOperationFetchInfiniteQuery<TSchema, TData, TParams, TError>,
     ServiceOperationGetQueryData<TSchema, TData, TParams>,
     ServiceOperationGetInfiniteQueryData<TSchema, TData, TParams>,
     ServiceOperationSetQueryData<TSchema, TData, TParams>,
@@ -118,6 +126,232 @@ interface ServiceOperationUseQuery<
   ): DefinedUseQueryResult<TData, TError | Error>;
 }
 
+type FetchQueryOptionsBase<
+  TSchema extends { url: string; method: string },
+  TData,
+  TParams = {},
+  TError = DefaultError,
+> = Omit<
+  FetchQueryOptions<
+    TData,
+    TError,
+    TData,
+    ServiceOperationQueryKey<TSchema, TParams>
+  >,
+  'queryKey' | 'queryFn'
+>;
+
+interface FetchQueryOptionsByQueryKey<
+  TSchema extends { url: string; method: string },
+  TData,
+  TParams = {},
+  TError = DefaultError,
+> extends FetchQueryOptionsBase<TSchema, TData, TParams, TError> {
+  /**
+   * Fetch Queries by query key
+   */
+  queryKey?: ServiceOperationQueryKey<TSchema, TParams>;
+}
+
+interface FetchQueryOptionsByParameters<
+  TSchema extends { url: string; method: string },
+  TData,
+  TParams = {},
+  TError = DefaultError,
+> extends FetchQueryOptionsBase<TSchema, TData, TParams, TError> {
+  /**
+   * Fetch Queries by parameters
+   */
+  parameters?: TParams;
+  queryKey?: never;
+}
+
+type FetchQueryOptionsQueryFn<
+  TSchema extends { url: string; method: string },
+  TData,
+  TParams = {},
+> =
+  | {
+      queryFn?: QueryFunction<
+        TData,
+        ServiceOperationQueryKey<TSchema, TParams>
+      >;
+    }
+  | {
+      requestFn: RequestFn<TData>;
+      /**
+       * Base URL to use for the request (used in the `queryFn`)
+       * @example 'https://api.example.com'
+       */
+      baseUrl: string | undefined;
+      queryFn?: never; // Workaround to fix union type error
+    };
+
+interface ServiceOperationFetchQuery<
+  TSchema extends { url: string; method: string },
+  TData,
+  TParams = {},
+  TError = DefaultError,
+> {
+  fetchQuery(
+    options:
+      | (FetchQueryOptionsByQueryKey<TSchema, TData, TParams, TError> &
+          FetchQueryOptionsQueryFn<TSchema, TData, TParams>)
+      | (FetchQueryOptionsByParameters<TSchema, TData, TParams, TError> &
+          FetchQueryOptionsQueryFn<TSchema, TData, TParams>),
+    queryClient: QueryClient
+  ): Promise<TData>;
+  prefetchQuery(
+    options:
+      | (FetchQueryOptionsByQueryKey<TSchema, TData, TParams, TError> &
+          FetchQueryOptionsQueryFn<TSchema, TData, TParams>)
+      | (FetchQueryOptionsByParameters<TSchema, TData, TParams, TError> &
+          FetchQueryOptionsQueryFn<TSchema, TData, TParams>),
+    queryClient: QueryClient
+  ): Promise<void>;
+}
+
+type FetchInfiniteQueryOptionsBase<
+  TSchema extends { url: string; method: string },
+  TData,
+  TParams = {},
+  TPageParam = unknown,
+  TError = DefaultError,
+> = Omit<
+  FetchQueryOptions<
+    TData,
+    TError,
+    InfiniteData<TData, TPageParam>,
+    ServiceOperationQueryKey<TSchema, TParams>,
+    TPageParam
+  >,
+  'queryKey'
+> &
+  InitialPageParam<PartialParameters<TPageParam>> &
+  FetchInfiniteQueryPages<TData, TPageParam>;
+
+type FetchInfiniteQueryPages<TData = unknown, TPageParam = unknown> =
+  | {
+      pages?: never;
+    }
+  | {
+      pages: number;
+      getNextPageParam: GetNextPageParamFunction<
+        PartialParameters<TPageParam>,
+        TData
+      >;
+    };
+
+type FetchInfiniteQueryOptionsByQueryKey<
+  TSchema extends { url: string; method: string },
+  TData,
+  TParams = {},
+  TPageParam = {},
+  TError = DefaultError,
+> = FetchInfiniteQueryOptionsBase<
+  TSchema,
+  TData,
+  TParams,
+  TPageParam,
+  TError
+> & {
+  /**
+   * Fetch Queries by query key
+   */
+  queryKey?: ServiceOperationInfiniteQueryKey<TSchema, TParams>;
+  parameters?: never;
+};
+
+type FetchInfiniteQueryOptionsByParameters<
+  TSchema extends { url: string; method: string },
+  TData,
+  TParams = {},
+  TPageParam = {},
+  TError = DefaultError,
+> = FetchInfiniteQueryOptionsBase<
+  TSchema,
+  TData,
+  TParams,
+  TPageParam,
+  TError
+> & {
+  /**
+   * Fetch Queries by parameters
+   */
+  parameters?: TParams;
+  queryKey?: never;
+};
+
+type FetchInfiniteQueryOptionsQueryFn<
+  TSchema extends { url: string; method: string },
+  TData,
+  TParams = {},
+> =
+  | {
+      queryFn?: QueryFunction<
+        TData,
+        ServiceOperationInfiniteQueryKey<TSchema, TParams>
+      >;
+    }
+  | {
+      requestFn: RequestFn<TData>;
+      /**
+       * Base URL to use for the request (used in the `queryFn`)
+       * @example 'https://api.example.com'
+       */
+      baseUrl: string | undefined;
+      queryFn?: never; // Workaround to fix union type error
+    };
+
+interface ServiceOperationFetchInfiniteQuery<
+  TSchema extends { url: string; method: string },
+  TData,
+  TParams = {},
+  TError = DefaultError,
+> {
+  fetchInfiniteQuery<TPageParam extends TParams>(
+    options:
+      | (FetchInfiniteQueryOptionsByQueryKey<
+          TSchema,
+          TData,
+          TParams,
+          TPageParam,
+          TError
+        > &
+          FetchInfiniteQueryOptionsQueryFn<TSchema, TData, TParams>)
+      | (FetchInfiniteQueryOptionsByParameters<
+          TSchema,
+          TData,
+          TParams,
+          TPageParam,
+          TError
+        > &
+          FetchInfiniteQueryOptionsQueryFn<TSchema, TData, TParams>),
+    queryClient: QueryClient
+  ): Promise<InfiniteData<TData, TPageParam>>;
+
+  prefetchInfiniteQuery<TPageParam extends TParams>(
+    options:
+      | (FetchInfiniteQueryOptionsByQueryKey<
+          TSchema,
+          TData,
+          TParams,
+          TPageParam,
+          TError
+        > &
+          FetchInfiniteQueryOptionsQueryFn<TSchema, TData, TParams>)
+      | (FetchInfiniteQueryOptionsByParameters<
+          TSchema,
+          TData,
+          TParams,
+          TPageParam,
+          TError
+        > &
+          FetchInfiniteQueryOptionsQueryFn<TSchema, TData, TParams>),
+    queryClient: QueryClient
+  ): Promise<void>;
+}
+
 interface ServiceOperationUseQueries<
   TSchema extends { url: string; method: string },
   TData,
@@ -138,7 +372,7 @@ interface ServiceOperationUseQueries<
         > & {
           placeholderData?: TData | QueriesPlaceholderDataFunction<TData>;
         } & (
-            | { parameters: TParams }
+            | { parameters: TParams; queryKey?: never }
             | { queryKey: ServiceOperationQueryKey<TSchema, TParams> }
           )
       >;
@@ -452,7 +686,7 @@ interface ServiceOperationUseSuspenseQueries<
           'queryKey'
         > &
           (
-            | { parameters: TParams }
+            | { parameters: TParams; queryKey?: never }
             | { queryKey: ServiceOperationQueryKey<TSchema, TParams> }
           )
       >;
@@ -736,6 +970,7 @@ interface QueryFnOptionsByParameters<
   TSignal extends AbortSignal = AbortSignal,
 > extends QueryFnOptionsBase<TMeta, TSignal> {
   parameters: TParams;
+  queryKey?: never;
 }
 
 interface QueryFnOptionsByQueryKey<
@@ -795,8 +1030,30 @@ interface ServiceOperationSetQueryData<
   setQueryData(
     parameters: TParams | ServiceOperationQueryKey<TSchema, TParams>,
     updater: Updater<NoInfer<TData> | undefined, NoInfer<TData> | undefined>,
-    queryClient: QueryClient,
-    options?: SetDataOptions
+    options: SetDataOptions,
+    queryClient: QueryClient
+  ): TData | undefined;
+
+  setQueryData(
+    parameters: TParams | ServiceOperationQueryKey<TSchema, TParams>,
+    updater: Updater<NoInfer<TData> | undefined, NoInfer<TData> | undefined>,
+    queryClient: QueryClient
+  ): TData | undefined;
+}
+
+/**
+ * @internal
+ */
+export interface ServiceOperationSetQueryDataCallback<
+  TSchema extends { url: string; method: string },
+  TData,
+  TParams = {},
+> extends ServiceOperationSetQueryData<TSchema, TData, TParams> {
+  setQueryData(
+    parameters: TParams | ServiceOperationQueryKey<TSchema, TParams>,
+    updater: Updater<NoInfer<TData> | undefined, NoInfer<TData> | undefined>,
+    options: SetDataOptions | QueryClient,
+    queryClient?: QueryClient
   ): TData | undefined;
 }
 

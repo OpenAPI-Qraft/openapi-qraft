@@ -10,27 +10,26 @@ import { act, renderHook, waitFor } from '@testing-library/react';
 
 import { vi } from 'vitest';
 
-import type { OperationRequestInfo } from '../index.js';
+import type { RequestFnPayload } from '../index.js';
 import {
   bodySerializer,
   QraftContextValue,
-  request,
+  requestFn,
   urlSerializer,
 } from '../index.js';
-import type { OperationRequestSchema } from '../lib/request.js';
+import type { OperationSchema } from '../lib/requestFn.js';
 import { createAPIClient } from './fixtures/api/index.js';
 
 const qraft = createAPIClient();
 
 const requestClient = async <T,>(
-  requestSchema: OperationRequestSchema,
-  requestInfo: OperationRequestInfo
+  requestSchema: OperationSchema,
+  requestInfo: Omit<RequestFnPayload, 'baseUrl'>
 ): Promise<T> =>
-  request(
-    { baseUrl: 'https://api.sandbox.monite.com/v1' },
-    requestSchema,
-    requestInfo
-  );
+  requestFn(requestSchema, {
+    ...requestInfo,
+    baseUrl: 'https://api.sandbox.monite.com/v1',
+  });
 
 describe('Qraft uses singular Query', () => {
   it('supports useQuery', async () => {
@@ -119,14 +118,14 @@ describe('Qraft uses singular Query', () => {
           <QraftCustomContext.Provider
             value={{
               baseUrl: 'https://api.sandbox.monite.com/v1',
-              request({ baseUrl }, schema, info) {
-                return request(
-                  { baseUrl, urlSerializer, bodySerializer },
+              requestFn(schema, info) {
+                return requestFn(
                   schema,
                   {
                     ...info,
                     headers: { 'x-custom-provider': 'true' },
-                  }
+                  },
+                  { urlSerializer, bodySerializer }
                 );
               },
             }}
@@ -947,21 +946,22 @@ describe('Qraft uses Mutation State', () => {
 });
 
 describe('Qraft uses Query Function', () => {
+  const parameters: typeof qraft.approvalPolicies.getApprovalPoliciesId.types.parameters =
+    {
+      header: {
+        'x-monite-version': '1.0.0',
+      },
+      path: {
+        approval_policy_id: '1',
+      },
+      query: {
+        items_order: ['asc', 'desc'],
+      },
+    };
+
   it('uses queryFn with `parameters`', async () => {
     const result = await qraft.approvalPolicies.getApprovalPoliciesId.queryFn(
-      {
-        parameters: {
-          header: {
-            'x-monite-version': '1.0.0',
-          },
-          path: {
-            approval_policy_id: '1',
-          },
-          query: {
-            items_order: ['asc', 'desc'],
-          },
-        },
-      },
+      { parameters },
       requestClient
     );
 
@@ -986,32 +986,205 @@ describe('Qraft uses Query Function', () => {
             url: '/approval_policies/{approval_policy_id}',
             method: 'get',
           },
-          {
-            header: {
-              'x-monite-version': '1.0.0',
-            },
-            path: {
-              approval_policy_id: '1',
-            },
-            query: {
-              items_order: ['asc', 'desc'],
-            },
-          },
+          parameters,
         ],
       },
       requestClient
     );
 
-    expect(result).toEqual({
-      header: {
-        'x-monite-version': '1.0.0',
+    expect(result).toEqual(parameters);
+  });
+
+  it('uses fetchQuery with `parameters`', async () => {
+    const queryClient = new QueryClient();
+
+    const result = qraft.approvalPolicies.getApprovalPoliciesId.fetchQuery(
+      {
+        requestFn: requestFn,
+        baseUrl: 'https://api.sandbox.monite.com/v1',
+        parameters,
       },
-      path: {
-        approval_policy_id: '1',
+      queryClient
+    );
+
+    await expect(result).resolves.toEqual(parameters);
+  });
+
+  it('uses fetchQuery with `queryKey`', async () => {
+    const queryClient = new QueryClient();
+
+    const result = qraft.approvalPolicies.getApprovalPoliciesId.fetchQuery(
+      {
+        requestFn: requestFn,
+        baseUrl: 'https://api.sandbox.monite.com/v1',
+        queryKey:
+          qraft.approvalPolicies.getApprovalPoliciesId.getQueryKey(parameters),
       },
-      query: {
-        items_order: ['asc', 'desc'],
+      queryClient
+    );
+
+    await expect(result).resolves.toEqual(parameters);
+  });
+
+  it('uses fetchQuery with queryFn', async () => {
+    const queryClient = new QueryClient();
+
+    const customResult: typeof qraft.approvalPolicies.getApprovalPoliciesId.types.parameters =
+      {
+        ...parameters,
+        header: { 'x-monite-version': '2.0.0' },
+      };
+
+    const result = qraft.approvalPolicies.getApprovalPoliciesId.fetchQuery(
+      {
+        queryFn: () => Promise.resolve(customResult),
+        queryKey:
+          qraft.approvalPolicies.getApprovalPoliciesId.getQueryKey(parameters),
       },
+      queryClient
+    );
+
+    await expect(result).resolves.toEqual(customResult);
+  });
+
+  it('uses fetchQuery without requestFn', async () => {
+    const queryClient = new QueryClient();
+
+    queryClient.setQueryDefaults(
+      qraft.approvalPolicies.getApprovalPoliciesId.getQueryKey(parameters),
+      { queryFn: () => Promise.resolve(parameters) }
+    );
+
+    const result = qraft.approvalPolicies.getApprovalPoliciesId.fetchQuery(
+      { parameters },
+      queryClient
+    );
+
+    await expect(result).resolves.toEqual(parameters);
+  });
+
+  it('uses prefetchQuery with `parameters`', async () => {
+    const queryClient = new QueryClient();
+
+    const result = qraft.approvalPolicies.getApprovalPoliciesId.prefetchQuery(
+      {
+        requestFn: requestFn,
+        baseUrl: 'https://api.sandbox.monite.com/v1',
+        parameters,
+      },
+      queryClient
+    );
+
+    await expect(result).resolves.toEqual(undefined);
+
+    expect(
+      qraft.approvalPolicies.getApprovalPoliciesId.getQueryData(
+        parameters,
+        queryClient
+      )
+    ).toEqual(parameters);
+  });
+
+  it('uses fetchInfiniteQuery with multiple pages', async () => {
+    const queryClient = new QueryClient();
+
+    const result =
+      qraft.approvalPolicies.getApprovalPoliciesId.fetchInfiniteQuery(
+        {
+          requestFn: requestFn,
+          baseUrl: 'https://api.sandbox.monite.com/v1',
+          parameters,
+          initialPageParam: {
+            query: {
+              items_order: ['asc', 'asc', 'asc'],
+            },
+          },
+          pages: 2,
+          getNextPageParam: (lastPage, allPages, params) => {
+            return {
+              query: {
+                items_order: [...(params.query?.items_order || []), 'desc'],
+              },
+            };
+          },
+        },
+        queryClient
+      );
+
+    await expect(result).resolves.toEqual({
+      pageParams: [
+        {
+          query: {
+            items_order: ['asc', 'asc', 'asc'],
+          },
+        },
+        {
+          query: {
+            items_order: ['asc', 'asc', 'asc', 'desc'],
+          },
+        },
+      ],
+      pages: [
+        {
+          ...parameters,
+          query: {
+            ...parameters.query,
+            items_order: ['asc', 'asc', 'asc'],
+          },
+        },
+        {
+          ...parameters,
+          query: {
+            ...parameters.query,
+            items_order: ['asc', 'asc', 'asc', 'desc'],
+          },
+        },
+      ],
+    });
+  });
+
+  it('uses prefetchInfiniteQuery', async () => {
+    const queryClient = new QueryClient();
+
+    const result =
+      qraft.approvalPolicies.getApprovalPoliciesId.prefetchInfiniteQuery(
+        {
+          requestFn: requestFn,
+          baseUrl: 'https://api.sandbox.monite.com/v1',
+          parameters,
+          initialPageParam: {
+            query: {
+              items_order: ['asc', 'asc', 'asc'],
+            },
+          },
+        },
+        queryClient
+      );
+
+    await expect(result).resolves.toBeUndefined();
+
+    expect(
+      qraft.approvalPolicies.getApprovalPoliciesId.getInfiniteQueryData(
+        parameters,
+        queryClient
+      )
+    ).toEqual({
+      pageParams: [
+        {
+          query: {
+            items_order: ['asc', 'asc', 'asc'],
+          },
+        },
+      ],
+      pages: [
+        {
+          ...parameters,
+          query: {
+            ...parameters.query,
+            items_order: ['asc', 'asc', 'asc'],
+          },
+        },
+      ],
     });
   });
 });
@@ -1180,6 +1353,7 @@ describe('Qraft uses setQueryData', () => {
     qraft.files.getFiles.setQueryData(
       getFilesQueryKey,
       getFilesSetQueryData,
+      { updatedAt: Date.now() },
       queryClient
     );
 
@@ -2169,7 +2343,7 @@ function Providers({
       <QraftContextDist.Provider
         value={{
           baseUrl: 'https://api.sandbox.monite.com/v1',
-          request,
+          requestFn: requestFn,
         }}
       >
         {children}

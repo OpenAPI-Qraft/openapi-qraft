@@ -1,15 +1,15 @@
-import type { OperationRequestSchema } from '../lib/request.js';
+import type { OperationSchema } from '../lib/requestFn.js';
 import type { QraftClientOptions } from '../qraftAPIClient.js';
 import { ServiceOperationMutation } from '../ServiceOperation.js';
 
 export const mutationFn = (
   qraftOptions: QraftClientOptions | undefined,
-  schema: OperationRequestSchema,
+  schema: OperationSchema,
   args: unknown
 ) => {
   const [client, options] = args as Parameters<
     ServiceOperationMutation<
-      OperationRequestSchema,
+      OperationSchema,
       unknown,
       unknown,
       never

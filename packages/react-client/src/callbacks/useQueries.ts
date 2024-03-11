@@ -8,7 +8,7 @@ import {
 } from '@tanstack/react-query';
 
 import { composeQueryKey } from '../lib/composeQueryKey.js';
-import type { OperationRequestSchema } from '../lib/request.js';
+import type { OperationSchema } from '../lib/requestFn.js';
 import { useQueryClient } from '../lib/useQueryClient.js';
 import type { QraftClientOptions } from '../qraftAPIClient.js';
 import { QraftContext } from '../QraftContext.js';
@@ -16,19 +16,16 @@ import { ServiceOperationQuery } from '../ServiceOperation.js';
 
 export const useQueries: (
   qraftOptions: QraftClientOptions | undefined,
-  schema: OperationRequestSchema,
+  schema: OperationSchema,
   args: Parameters<
-    ServiceOperationQuery<
-      OperationRequestSchema,
-      unknown,
-      unknown
-    >['useQueries']
+    ServiceOperationQuery<OperationSchema, unknown, unknown>['useQueries']
   >
 ) => QueriesResults<never> = (qraftOptions, schema, args) => {
   const [options, queryClientByArg] = args;
 
   const contextValue = useContext(qraftOptions?.context ?? QraftContext);
-  if (!contextValue?.request) throw new Error(`QraftContext.request not found`);
+  if (!contextValue?.requestFn)
+    throw new Error(`QraftContext.requestFn not found`);
 
   return useQueriesTanstack(
     {
@@ -43,6 +40,7 @@ export const useQueries: (
                   },
                   queryOptions
                 );
+                // @ts-expect-error
                 delete queryOptionsCopy.parameters;
                 return queryOptionsCopy;
               })()
@@ -53,15 +51,12 @@ export const useQueries: (
           queryFn:
             optionsWithQueryKey.queryFn ??
             function ({ queryKey: [, queryParams], signal, meta }) {
-              return contextValue.request(
-                { baseUrl: contextValue.baseUrl },
-                schema,
-                {
-                  parameters: queryParams as never,
-                  signal,
-                  meta,
-                }
-              );
+              return contextValue.requestFn(schema, {
+                parameters: queryParams as never,
+                baseUrl: contextValue.baseUrl,
+                signal,
+                meta,
+              });
             },
         };
       }),

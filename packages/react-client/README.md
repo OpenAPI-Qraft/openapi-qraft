@@ -92,7 +92,7 @@ Every request will be handled by `request` function, which can be customized to 
 ```tsx
 import { useMemo } from 'react';
 
-import { request, QraftContext } from '@openapi-qraft/react';
+import { QraftContext, requestFn } from '@openapi-qraft/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 // where `./api` is the '--output-dir' path to the services you generated with `@openapi-qraft/cli`
@@ -109,7 +109,7 @@ function Providers({ children }: { children: React.ReactNode }) {
       <QraftContext.Provider
         value={{
           baseUrl: 'https://api.sandbox.monite.com/v1', // base URL for all requests
-          request, // `request(...)` will be invoked for every request
+          requestFn, // `requestFn(...)` will be invoked for every request
         }}
       >
         {children}
@@ -529,6 +529,85 @@ The interface is the same as `invalidateQueries(...)`, but it will refetch the q
 The interface is the same as `invalidateQueries(...), but it will check if the queries are fetching, and there are no
 options.
 
+#### [fetchQuery(...) 🔗](https://tanstack.com/query/latest/docs/reference/QueryClient#queryclientfetchquery)
+
+```ts
+/**
+ * Will execute the request:
+ * ###
+ * GET /posts?limit=10
+ **/
+import { requestFn } from '@openapi-qraft/react';
+import { QueryClient } from '@tanstack/react-query';
+
+const queryClient = new QueryClient();
+
+const posts = qraft.posts.getPosts.fetchInfiniteQuery(
+  {
+    parameters: { query: { limit: 10 } },
+    /**
+     * Request function should be provided, otherwise it will throw an error
+     * if default `queryFn` is not set previously using
+     * `QueryClient.setDefaultOptions(...)` method
+     */
+    requestFn: requestFn,
+    baseUrl: 'https://api.sandbox.monite.com/v1', // must be provided if `requestFn` is set
+  },
+  queryClient
+);
+```
+
+#### [prefetchQuery(...) 🔗](https://tanstack.com/query/latest/docs/reference/QueryClient#queryclientprefetchquery)
+
+The interface is the same as `fetchQuery(...)`, but returns empty Promise.
+
+#### [fetchInfiniteQuery(...) 🔗](https://tanstack.com/query/latest/docs/reference/QueryClient#queryclientfetchinfinitequery)
+
+```ts
+/**
+ * Will execute the initial request:
+ * ###
+ * GET /posts?limit=10&page=1
+ * ###
+ * And then will execute the next page request:
+ * GET /posts?limit=10&page=2
+ **/
+import { requestFn } from '@openapi-qraft/react';
+import { QueryClient } from '@tanstack/react-query';
+
+const queryClient = new QueryClient();
+
+const posts = qraft.posts.getPosts.fetchInfiniteQuery(
+  {
+    parameters: { query: { limit: 10 } },
+    pages: 2, // How many pages to fetch
+    initialPageParam: {
+      query: { pagination_token: undefined }, // will be used in initial request
+    },
+    getNextPageParam: (lastPage, allPages, lastPageParam) => ({
+      query: { pagination_token: lastPage.next_pagination_token },
+    }),
+    /**
+     * Request function should be provided, otherwise it will throw an error
+     * if default `queryFn` is not set previously using
+     * `QueryClient.setDefaultOptions(...)` method
+     */
+    requestFn: requestFn,
+    baseUrl: 'https://api.sandbox.monite.com/v1', // must be provided if `requestFn` is set
+  },
+  queryClient
+);
+
+console.log(
+  posts.pages, // all fetched pages
+  posts.pageParams // all page parameters
+);
+```
+
+#### [prefetchInfiniteQuery(...) 🔗](https://tanstack.com/query/latest/docs/reference/QueryClient#queryclientprefetchinfinitequery)
+
+The interface is the same as `fetchInfiniteQuery(...)`, but returns empty Promise.
+
 ### Suspense Queries
 
 Supported Suspense Queries are:
@@ -556,7 +635,7 @@ In the example below, we provide a custom `request` function to the `QraftContex
 using a custom `fetchToken` async function.
 
 ```tsx
-import { request, QraftContext } from '@openapi-qraft/react';
+import { QraftContext, requestFn } from '@openapi-qraft/react';
 
 import { fetchToken } from './auth';
 
@@ -565,11 +644,11 @@ function QraftProvider({ children }: { children: React.ReactNode }) {
     <QraftContext.Provider
       value={{
         baseUrl: 'https://api.sandbox.monite.com/v1',
-        async request({ baseUrl }, schema, info) {
+        async requestFn(schema, requestInfo) {
           const token = await fetchToken();
 
-          return request({ baseUrl }, schema, {
-            ...info,
+          return requestFn(schema, {
+            ...requestInfo,
             /** Specify your predefined Headers **/
             headers: {
               Authorization: `Bearer ${token}`,

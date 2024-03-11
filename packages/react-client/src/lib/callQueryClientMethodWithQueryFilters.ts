@@ -1,7 +1,7 @@
 import type { QueryClient } from '@tanstack/query-core';
 
 import { composeQueryFilters } from './composeQueryFilters.js';
-import type { OperationRequestSchema } from './request.js';
+import type { OperationSchema } from './requestFn.js';
 
 /**
  * Calls a query client method with query filters and options,
@@ -11,24 +11,11 @@ export function callQueryClientMethodWithQueryFilters<
   QFMethod extends QueryFilterMethods,
 >(
   queryFilterMethod: QFMethod,
-  schema: OperationRequestSchema,
-  args: [QueryClient, ...Parameters<(typeof QueryClient.prototype)[QFMethod]>]
+  schema: OperationSchema,
+  args: [...Parameters<(typeof QueryClient.prototype)[QFMethod]>, QueryClient]
 ): ReturnType<(typeof QueryClient.prototype)[QFMethod]> {
-  const queryClient = (
-    args.length === 1
-      ? args[0]
-      : args.length === 2
-        ? args[1]
-        : args.length === 3
-          ? args[2]
-          : undefined
-  ) as QueryClient | undefined;
-
-  const filters = composeQueryFilters(
-    schema,
-    args.length === 1 ? undefined : args[0]
-  );
-  const options = args.length === 3 ? args[1] : undefined;
+  const filters = args[0];
+  const queryClient = args[args.length - 1] as QueryClient | undefined;
 
   if (!queryClient) throw new Error('queryClient is required');
   if (!queryClient[queryFilterMethod])
@@ -36,12 +23,12 @@ export function callQueryClientMethodWithQueryFilters<
       `queryClient is invalid, ${queryFilterMethod} method does not exist`
     );
 
-  if (options)
-    // @ts-expect-error
-    return queryClient[queryFilterMethod](filters, options);
-
   // @ts-expect-error
-  return queryClient[queryFilterMethod](filters);
+  return queryClient[queryFilterMethod](
+    composeQueryFilters(schema, filters as never),
+    // @ts-expect-error
+    ...args.slice(1, -1)
+  );
 }
 
 type QueryFiltersMethod<QFMethod extends keyof typeof QueryClient.prototype> =

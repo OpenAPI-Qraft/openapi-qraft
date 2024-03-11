@@ -1,28 +1,23 @@
-import { composeQueryKey } from '../lib/composeQueryKey.js';
-import type { OperationRequestSchema } from '../lib/request.js';
+import { callQueryClientMethodWithQueryKey } from '../lib/callQueryClientMethodWithQueryKey.js';
+import type { OperationSchema } from '../lib/requestFn.js';
 import type { QraftClientOptions } from '../qraftAPIClient.js';
-import {
-  ServiceOperationQuery,
-  ServiceOperationQueryKey,
-} from '../ServiceOperation.js';
+import type { ServiceOperationSetQueryDataCallback } from '../ServiceOperation.js';
 
 export function setQueryData<TData>(
-  qraftOptions: QraftClientOptions | undefined,
-  schema: OperationRequestSchema,
+  _: QraftClientOptions | undefined,
+  schema: OperationSchema,
   args: Parameters<
-    ServiceOperationQuery<
-      OperationRequestSchema,
+    ServiceOperationSetQueryDataCallback<
+      OperationSchema,
       unknown,
       TData
     >['setQueryData']
   >
 ): TData | undefined {
-  const [parameters, updater, queryClient, options] = args;
-
-  const queryKey: ServiceOperationQueryKey<OperationRequestSchema, unknown> =
-    Array.isArray(parameters)
-      ? parameters
-      : composeQueryKey(schema, parameters);
-
-  return queryClient.setQueryData(queryKey, updater as never, options);
+  return callQueryClientMethodWithQueryKey(
+    'setQueryData',
+    schema,
+    false,
+    args as never
+  ) as never;
 }

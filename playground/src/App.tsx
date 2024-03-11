@@ -1,6 +1,6 @@
 import { ComponentProps, ReactNode, useState } from 'react';
 
-import { QraftContext, request } from '@openapi-qraft/react';
+import { QraftContext, requestFn } from '@openapi-qraft/react';
 import {
   QueryClient,
   QueryClientProvider,
@@ -395,7 +395,7 @@ export const QraftProviders = ({ children }: { children: ReactNode }) => {
       <QraftContext.Provider
         value={{
           baseUrl: 'https://petstore3.swagger.io/api/v3',
-          request,
+          requestFn,
         }}
       >
         {children}

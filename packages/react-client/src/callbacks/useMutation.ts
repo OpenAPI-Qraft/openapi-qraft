@@ -9,7 +9,7 @@ import {
 } from '@tanstack/react-query';
 
 import { composeMutationKey } from '../lib/composeMutationKey.js';
-import type { OperationRequestSchema } from '../lib/request.js';
+import type { OperationSchema } from '../lib/requestFn.js';
 import { useQueryClient } from '../lib/useQueryClient.js';
 import type { QraftClientOptions } from '../qraftAPIClient.js';
 import { QraftContext } from '../QraftContext.js';
@@ -25,10 +25,10 @@ export const useMutation: <
   TContext = unknown,
 >(
   qraftOptions: QraftClientOptions | undefined,
-  schema: OperationRequestSchema,
+  schema: OperationSchema,
   args: Parameters<
     ServiceOperationMutation<
-      OperationRequestSchema,
+      OperationSchema,
       object | undefined,
       TVariables,
       TData
@@ -52,7 +52,8 @@ export const useMutation: <
     );
 
   const contextValue = useContext(qraftOptions?.context ?? QraftContext);
-  if (!contextValue?.request) throw new Error(`QraftContext.request not found`);
+  if (!contextValue?.requestFn)
+    throw new Error(`QraftContext.request not found`);
 
   const mutationKey =
     options && 'mutationKey' in options
@@ -70,28 +71,22 @@ export const useMutation: <
         options?.mutationFn ??
         (parameters
           ? function (bodyPayload) {
-              return contextValue.request(
-                { baseUrl: contextValue.baseUrl },
-                schema,
-                {
-                  parameters,
-                  body: bodyPayload as never,
-                }
-              );
+              return contextValue.requestFn(schema, {
+                parameters,
+                baseUrl: contextValue.baseUrl,
+                body: bodyPayload as never,
+              });
             }
           : function (parametersAndBodyPayload) {
               const { body, ...parameters } = parametersAndBodyPayload as {
                 body: unknown;
               };
 
-              return contextValue.request(
-                { baseUrl: contextValue.baseUrl },
-                schema,
-                {
-                  body,
-                  parameters,
-                } as never
-              );
+              return contextValue.requestFn(schema, {
+                parameters,
+                baseUrl: contextValue.baseUrl,
+                body,
+              } as never);
             }),
     },
     useQueryClient(qraftOptions, queryClientByArg)

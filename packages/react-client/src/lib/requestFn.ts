@@ -1,55 +1,40 @@
 /**
  * @throws {error: object|string, response: Response} if the request fails
  */
-export async function request<T>(
-  options: RequestOptions,
-  schema: OperationRequestSchema,
-  requestInfo: OperationRequestInfo
+export async function requestFn<T>(
+  schema: OperationSchema,
+  requestInfo: RequestFnInfo,
+  options?: RequestFnOptions
 ): Promise<T> {
-  return baseRequest(
-    isRequiredRequestOptions(options)
-      ? options
-      : {
-          urlSerializer,
-          bodySerializer,
-          ...options,
-        },
-    schema,
-    requestInfo
-  );
+  return baseRequestFn(schema, requestInfo, {
+    urlSerializer,
+    bodySerializer,
+    fetch,
+    ...options,
+  });
 }
-
-export interface RequestOptions {
-  baseUrl: string;
-  urlSerializer?: URLSerializer;
-  bodySerializer?: BodySerializer;
-}
-
-type URLSerializer = typeof urlSerializer;
-type BodySerializer = typeof bodySerializer;
 
 /**
  * @throws {error: object|string, response: Response} if the request fails
  */
-export async function baseRequest<T>(
-  options: Required<RequestOptions>,
-  schema: OperationRequestSchema,
-  requestInfo: OperationRequestInfo,
-  customFetch = fetch
+export async function baseRequestFn<T>(
+  requestSchema: OperationSchema,
+  requestInfo: RequestFnInfo,
+  options: Required<RequestFnOptions>
 ): Promise<T> {
   const { parameters, headers, body, ...requestInfoRest } = requestInfo;
 
-  const requestBody = options.bodySerializer(schema, requestInfo);
+  const requestBody = options.bodySerializer(requestSchema, requestInfo);
 
-  const response = await customFetch(
-    options.urlSerializer(options.baseUrl, schema, requestInfo),
+  const response = await options.fetch(
+    options.urlSerializer(requestSchema, requestInfo),
     {
-      method: schema.method.toUpperCase(),
+      method: requestSchema.method.toUpperCase(),
       body: requestBody,
       headers: mergeHeaders(
         {
           Accept: 'application/json',
-          'Content-Type': schema.mediaType ?? getBodyContentType(body),
+          'Content-Type': requestSchema.mediaType ?? getBodyContentType(body),
         },
         headers,
         parameters?.header,
@@ -73,9 +58,8 @@ export async function baseRequest<T>(
 }
 
 export function urlSerializer(
-  baseUrl: string,
-  schema: OperationRequestSchema,
-  info: OperationRequestInfo
+  schema: OperationSchema,
+  info: RequestFnPayload
 ): string {
   const path = schema.url.replace(
     /{(.*?)}/g,
@@ -86,6 +70,8 @@ export function urlSerializer(
       return substring;
     }
   );
+
+  const baseUrl = info.baseUrl ?? '';
 
   if (info.parameters?.query) {
     return `${baseUrl}${path}${getQueryString(info.parameters.query)}`;
@@ -154,8 +140,8 @@ function mergeHeaders(...allHeaders: (HeadersOptions | undefined)[]) {
 }
 
 export function bodySerializer(
-  schema: OperationRequestSchema,
-  info: OperationRequestInfo
+  schema: OperationSchema,
+  info: RequestFnPayload
 ) {
   if (info.body === undefined) return;
 
@@ -183,7 +169,7 @@ export function bodySerializer(
 
 function getRequestBodyFormData({
   body,
-}: Pick<OperationRequestInfo, 'body'>): FormData | undefined {
+}: Pick<RequestFnPayload, 'body'>): FormData | undefined {
   if (body instanceof FormData) return body;
   if (body === null) return;
 
@@ -222,7 +208,7 @@ function getRequestBodyFormData({
   return formData;
 }
 
-function getBodyContentType(body: OperationRequestInfo['body']) {
+function getBodyContentType(body: RequestFnPayload['body']) {
   if (!body) return;
   if (body instanceof Blob) return body.type || 'application/octet-stream';
   if (typeof body === 'string') return 'text/plain';
@@ -244,11 +230,7 @@ async function getResponseBody<T>(response: Response): Promise<T | undefined> {
     const errorFallbackResponse = response.clone(); // clone to allow multiple reads
 
     return response.json().catch(() => {
-      if (
-        typeof process !== 'undefined' &&
-        typeof process.env !== 'undefined' &&
-        process.env.NODE_ENV === 'development'
-      ) {
+      if (process.env.NODE_ENV === 'development') {
         console.warn(
           'Failed to parse response body as JSON. Falling back to .text()'
         );
@@ -261,18 +243,12 @@ async function getResponseBody<T>(response: Response): Promise<T | undefined> {
   return response.text() as Promise<T>;
 }
 
-function isRequiredRequestOptions<T extends RequestOptions>(
-  options: RequestOptions
-): options is Required<RequestOptions> {
-  return Boolean(options.urlSerializer && options.bodySerializer);
-}
-
 // To have definitely typed headers without a conversion to stings
 export type HeadersOptions =
   | HeadersInit
   | Record<string, string | number | boolean | null | undefined>;
 
-export interface OperationRequestSchema {
+export interface OperationSchema {
   /**
    * Operation path
    * @example /user/{id}
@@ -299,8 +275,12 @@ export interface OperationRequestSchema {
   readonly mediaType?: string;
 }
 
-export interface OperationRequestInfo
-  extends Omit<RequestInit, 'headers' | 'method' | 'body'> {
+export interface RequestFnPayload {
+  /**
+   * Base URL to use for the request
+   */
+  baseUrl: string | undefined;
+
   /**
    * OpenAPI parameters
    * @example
@@ -314,19 +294,36 @@ export interface OperationRequestInfo
     readonly header?: Record<string, any>;
     readonly query?: Record<string, any>;
   };
+
   /**
    * Request body
    * @example { name: 'John' }
    */
   readonly body?: BodyInit | Record<string, unknown> | null;
-  /**
-   * Request headers
-   * @example { 'X-Auth': '123' }
-   */
-  readonly headers?: HeadersOptions;
 
   /**
    * Tanstack Query Meta
    */
   meta?: Record<string, unknown>;
+
+  /** An AbortSignal to set request's signal. */
+  signal?: AbortSignal | null;
 }
+
+interface RequestFnInfo
+  extends RequestFnPayload,
+    Omit<RequestInit, 'headers' | 'method' | 'body' | 'signal'> {
+  /**
+   * Request headers
+   * @example { 'X-Auth': '123' }
+   */
+  readonly headers?: HeadersOptions;
+}
+
+export interface RequestFnOptions {
+  urlSerializer?: typeof urlSerializer;
+  bodySerializer?: typeof bodySerializer;
+  fetch?: typeof fetch;
+}
+
+export type RequestFn<T> = typeof requestFn<T>;
