@@ -1,5 +1,11 @@
 # @openapi-qraft/react
 
+## 1.3.1
+
+### Patch Changes
+
+- df98bc2: Fixed issue with `fetch(this, ...)`
+
 ## 1.3.0
 
 ### Minor Changes
