@@ -9,7 +9,6 @@ export async function requestFn<T>(
   return baseRequestFn(schema, requestInfo, {
     urlSerializer,
     bodySerializer,
-    fetch,
     ...options,
   });
 }
@@ -20,13 +19,15 @@ export async function requestFn<T>(
 export async function baseRequestFn<T>(
   requestSchema: OperationSchema,
   requestInfo: RequestFnInfo,
-  options: Required<RequestFnOptions>
+  options: WithRequired<RequestFnOptions, 'urlSerializer' | 'bodySerializer'>
 ): Promise<T> {
   const { parameters, headers, body, ...requestInfoRest } = requestInfo;
 
   const requestBody = options.bodySerializer(requestSchema, requestInfo);
 
-  const response = await options.fetch(
+  const baseFetch = options.fetch ?? fetch;
+
+  const response = await baseFetch(
     options.urlSerializer(requestSchema, requestInfo),
     {
       method: requestSchema.method.toUpperCase(),
@@ -327,3 +328,7 @@ export interface RequestFnOptions {
 }
 
 export type RequestFn<T> = typeof requestFn<T>;
+
+type WithRequired<T, K extends keyof T> = T & {
+  [_ in K]: {};
+};
