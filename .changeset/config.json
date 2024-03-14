@@ -7,5 +7,5 @@
   "access": "public",
   "baseBranch": "origin/main",
   "updateInternalDependencies": "patch",
-  "ignore": ["@openapi-qraft/e2e", "playground"]
+  "ignore": ["@openapi-qraft/e2e", "playground", "openapi-qraft-website"]
 }

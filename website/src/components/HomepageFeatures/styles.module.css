@@ -1,0 +1,14 @@
+.features {
+  display: flex;
+  align-items: center;
+  padding: 2rem 0;
+  width: 100%;
+}
+
+.featureEmoji {
+  display: inline-block;
+  height: 1em;
+  width: 1em;
+  margin-bottom: 0.6em;
+  font-size: 70px;
+}
