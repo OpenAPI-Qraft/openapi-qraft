@@ -2,7 +2,7 @@
 
 `@openapi-qraft/react` is a modular TypeScript client designed to facilitate type-safe API requests in React
 applications,
-leveraging the power of **Tanstack Query v5**. It utilizes a Proxy-based architecture to dynamically generate
+leveraging the power of **TanStack Query v5**. It utilizes a Proxy-based architecture to dynamically generate
 hooks with typed parameters, ensuring that your API requests are both type-safe and efficient.
 
 ## Features
@@ -11,7 +11,7 @@ hooks with typed parameters, ensuring that your API requests are both type-safe 
   developer experience.
 - **Modular Design:** Customize the utility with a set of callbacks to handle API calls according to your project's
   needs.
-- **Integration with [Tanstack Query v5](https://tanstack.com/query/v5):** Seamlessly integrate with _Tanstack Query_
+- **Integration with [TanStack Query v5](https://tanstack.com/query/v5):** Seamlessly integrate with _TanStack Query_
   for handling server state, caching, and data synchronization.
 - **Dynamic Proxy-Based Hooks:** Automatically generate React Query hooks for your API endpoints without manual
   boilerplate.
@@ -56,7 +56,7 @@ npx openapi-typescript https://api.dev.monite.com/openapi.json?version=2023-09-0
 
 #### Generating Qraft Services
 
-Next, use `@openapi-qraft/cli` to generate the services and typed Tanstack Query React Hooks. Ensure to specify the path
+Next, use `@openapi-qraft/cli` to generate the services and typed TanStack Query React Hooks. Ensure to specify the path
 to the TypeScript definitions generated in the previous step.
 
 ```bash
@@ -274,7 +274,7 @@ useEffect(() => {
 const infiniteQuery = qraft.posts.getPosts.useInfiniteQuery(
   { query: { limit: 10 } },
   {
-    // * required by Tanstack Query
+    // * required by TanStack Query
     getNextPageParam: (lastPage, allPages, lastPageParams) => {
       if (lastPage.length < 10) return; // if less than 10 items, there are no more pages
       return {
@@ -283,7 +283,7 @@ const infiniteQuery = qraft.posts.getPosts.useInfiniteQuery(
         },
       };
     },
-    // * required by Tanstack Query
+    // * required by TanStack Query
     initialPageParam: {
       query: {
         page: 1, // will be used in initial request
@@ -316,11 +316,11 @@ const infiniteQuery = qraft.dataExports.getDataExports.useInfiniteQuery(
     },
   },
   {
-    // * required by Tanstack Query
+    // * required by TanStack Query
     initialPageParam: {
       query: { pagination_token: undefined }, // will be used in initial request
     },
-    // * required by Tanstack Query
+    // * required by TanStack Query
     getNextPageParam: (lastPage, allPages, lastPageParam) => ({
       query: { pagination_token: lastPage.next_pagination_token },
     }),
