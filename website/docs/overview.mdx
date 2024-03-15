@@ -7,8 +7,9 @@ import TabItem from '@theme/TabItem';
 
 # Overview
 
-Meet **OpenAPI Qraft**: your go-to library for crafting type-safe API Hooks for React apps from OpenAPI Documents.
-Harnessing **Tanstack Query v5**, it introduces a smart Proxy-based design to seamlessly generate custom
+Meet **OpenAPI Qraft**: your go-to library for crafting type-safe API Hooks for React apps from
+[OpenAPI Documents](https://learn.openapis.org/).
+By leveraging **Tanstack Query v5**, it introduces a smart Proxy-based API client design to seamlessly generate custom
 hooks with strictly-typed parameters.
 
 ## Features
@@ -22,7 +23,7 @@ hooks with strictly-typed parameters.
 - **Dynamic Proxy-Based Hooks:** Automatically generate React Query hooks for your API endpoints without manual
   boilerplate.
 
-## Short Example
+## Fast Run
 
 <Tabs>
   <TabItem value="react" label="React" default>
@@ -74,8 +75,29 @@ hooks with strictly-typed parameters.
         return <div>Error: {error.message}</div>;
       }
 
-      return <div>Pet Name: {pet.name}</div>;
+      return <div>Pet Name: {pet?.name}</div>;
     }
+    ```
+  </TabItem>
+  <TabItem value="setup" label="Setup">
+    **Installation**:
+
+    ```bash npm2yarn
+    npm install @openapi-qraft/react
+    npm install -D @openapi-qraft/cli
+    npm install -D openapi-typescript
+    # If you don't already installed Tanstack Query:
+    npm install @tanstack/react-query
+    ```
+
+    **API Client Generation**:
+    ```bash npm2yarn
+    npx openapi-typescript https://raw.githubusercontent.com/swagger-api/swagger-petstore/master/src/main/resources/openapi.yaml \
+      --output src/api/openapi.d.ts
+
+    npx openapi-qraft https://raw.githubusercontent.com/swagger-api/swagger-petstore/master/src/main/resources/openapi.yaml \
+      --output-dir src/api \
+      --openapi-types-import-path '../openapi.d.ts'
     ```
   </TabItem>
   <TabItem value="openapi" label="OpenAPI Document">
