@@ -5,6 +5,7 @@
 // See: https://docusaurus.io/docs/api/docusaurus-config
 
 import { themes as prismThemes } from 'prism-react-renderer';
+import npmToYarn from 'npm-to-yarn';
 
 /** @type {import('@docusaurus/types').Config} */
 const config = {
@@ -43,7 +44,32 @@ const config = {
           // Please change this to your repo.
           // Remove this to remove the "edit this page" links.
           editUrl: 'https://github.com/OpenAPI-Qraft/openapi-qraft/website/',
-          remarkPlugins: [[require('@docusaurus/remark-plugin-npm2yarn'), { sync: true, converters: ['yarn', 'pnpm'] }]],
+          remarkPlugins: [
+            [
+              require('@docusaurus/remark-plugin-npm2yarn'),
+              {
+                sync: true,
+                converters: [
+                  [
+                    'yarn',
+                    (code) => {
+                      if (code.match(getNpxWithYarnRegExp())) return code.replace(getNpxWithYarnRegExp(), 'yarn exec');
+                      if (code.match(getNpmExecRegExp())) return code.replace(getNpmExecRegExp(), 'yarn exec');
+                      return npmToYarn(code, 'yarn');
+                    },
+                  ],
+                  [
+                    'pnpm',
+                    (code) => {
+                      if (code.match(getNpxWithYarnRegExp())) return code.replace(getNpxWithYarnRegExp(), 'pnpm exec');
+                      if (code.match(getNpmExecRegExp())) return code.replace(getNpmExecRegExp(), 'pnpm exec');
+                      return npmToYarn(code, 'pnpm');
+                    },
+                  ],
+                ],
+              },
+            ],
+          ],
         },
         theme: {
           customCss: './src/css/custom.css',
@@ -65,7 +91,6 @@ const config = {
             position: 'left',
             label: 'Tutorial',
           },
-          { to: '/blog', label: 'Blog', position: 'left' },
           {
             href: 'https://github.com/OpenAPI-Qraft/openapi-qraft',
             label: 'GitHub',
@@ -124,5 +149,13 @@ const config = {
       },
     }),
 };
+
+function getNpxWithYarnRegExp() {
+  return /\bnpx\b/g;
+}
+
+function getNpmExecRegExp() {
+  return /\bnpm exec (?:-c|--call)\b/g;
+}
 
 export default config;
