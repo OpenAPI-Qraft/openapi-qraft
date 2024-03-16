@@ -331,10 +331,10 @@ const infiniteQuery = qraft.dataExports.getDataExports.useInfiniteQuery(
   }
 );
 
-// ⬇︎ will execute GET /data_exports?pagination_token=...NEXT_PAGE_TOKEN....
+// ⬇︎ will execute GET /data_exports?pagination_token=<NEXT_PAGINATION_TOKEN>
 infiniteQuery.fetchNextPage();
 
-// ⬇︎ will execute GET /data_exports?pagination_token=...PREV_PAGE_TOKEN....
+// ⬇︎ will execute GET /data_exports?pagination_token=<PREV_PAGINATION_TOKEN>
 infiniteQuery.fetchPreviousPage();
 ```
 
