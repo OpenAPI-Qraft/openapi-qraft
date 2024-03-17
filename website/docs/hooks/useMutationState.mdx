@@ -1,0 +1,78 @@
+---
+sidebar_label: useMutationState
+---
+
+# useMutationState(...)
+
+The Hook offers a way to access the state of a mutation,
+including its current status and any associated data or errors.
+It's particularly useful for managing UI feedback based on the mutation's lifecycle, such as displaying loading indicators,
+or alerts. See the TanStack [_useMutationState(...) 🌴_](https://tanstack.com/query/latest/docs/framework/react/reference/useMutationState)
+documentation for more details.
+
+```ts
+const mutations = qraft.<service>.<operation>.useMutationState(
+  filters,
+  queryClient,
+)
+```
+
+### Arguments
+
+1. `options?: { filters, select }`,
+   - **Optional** filters and select options
+   - _If not provided_, all mutations matching to `<service>.<operation>` will be returned
+     - `filters?: UseMutationStateFiltersByParameters | UseMutationStateFiltersByMutationKey`
+       - **Optional**, represents the [_Mutation Filters 🌴_](https://tanstack.com/query/latest/docs/framework/react/guides/filters#mutation-filters)
+         to be used, strictly-typed ✨
+       - `filters.parameters: Record<'path' | 'query' | 'header', Record<string, any>>` will be used for filtering mutations by parameters
+       - `filters.mutationKey: MutationKey` will be used for filtering mutations by _MutationKey_ instead of parameters
+         - `filters.mutationKey` and `filters.parameters` are mutually exclusive
+     - `filters.predicate?: (query: Mutation) => boolean` will be used for filtering mutations by custom predicate
+   - `select?: <T>(mutation: Mutation) => T`
+     - **Optional**, a function to select the data from the mutation
+     - _If not provided_, the `MutationState` will be returned
+     - _If provided_, the result of the function will be returned
+2. `queryClient?: QueryClient`
+   - **Optional** [_QueryClient 🌴_](https://tanstack.com/query/latest/docs/reference/QueryClient) to be used
+   - _If not provided_
+     - `QraftContext.queryClient` will be used if available
+     - [_useQueryClient() 🌴_](https://tanstack.com/query/latest/docs/framework/react/reference/useQueryClient)
+       result will be used as a fallback
+
+### Returns
+`mutations: Array<MutationState> | T`: Mutation state or the selection by the given filters
+
+### Example
+
+```tsx title="src/FetchStatus.tsx"
+function UploadedDocuments() {
+  const createdDocuments = qraft.entities.postEntitiesIdDocuments.useMutationState({
+    filters: {
+      status: 'success',
+      parameters: {
+        path: {
+          entity_id: '1',
+        },
+      },
+    },
+    select(mutation): Statuses | undefined {
+      return {
+        // `mutation.state.data` is the result of the mutation
+        id: mutation.state.data?.id,
+        name: mutation.state.data?.name,
+      };
+    },
+  });
+
+  return (
+    <ul>
+      {documents.map(document => (
+        <li key={document.id}>
+          {document.name}
+        </li>
+      ))}
+    </ul>
+  );
+}
+```
