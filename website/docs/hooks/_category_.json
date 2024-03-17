@@ -1,8 +1,7 @@
 {
   "label": "Hooks",
   "position": 4,
-  "link": {
-    "type": "generated-index",
-    "description": "OpenAPI Qraft generated React Hooks"
-  }
+  "collapsible": false,
+  "collapsed": false,
+  "link": null
 }
