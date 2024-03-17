@@ -87,9 +87,9 @@ const config = {
         items: [
           {
             type: 'docSidebar',
-            sidebarId: 'tutorialSidebar',
+            sidebarId: 'mainDocsSidebar',
             position: 'left',
-            label: 'Tutorial',
+            label: 'Docs',
           },
           {
             href: 'https://github.com/OpenAPI-Qraft/openapi-qraft',
