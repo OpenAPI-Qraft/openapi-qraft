@@ -382,10 +382,10 @@ qraft.entities.getEntities.useQueries({
 ```tsx
 function FetchStatus() {
   // Checks all queries `GET /entities`
-  const isFetchingTotal = qraft.entities.getEntities.useIsFetching();
+  const fetchingTotal = qraft.entities.getEntities.useIsFetching();
 
-  // Cechks all queries `GET /entities/3e3e-3e3e-3e3e` and `x-monite-version: 2023-09-01` header
-  const isSpecificQueryFetching = qraft.entities.getEntities.useIsFetching({
+  // Checks all queries `GET /entities/3e3e-3e3e-3e3e` and `x-monite-version: 2023-09-01` header
+  const specificQueryKeyTotal = qraft.entities.getEntities.useIsFetching({
     parameters: {
       header: {
         'x-monite-version': '2023-09-01',
@@ -398,8 +398,8 @@ function FetchStatus() {
 
   return (
     <>
-      {!!isFetchingTotal && <div>Number of queries: {isFetchingTotal}...</div>}
-      {!!isSpecificQueryFetching && <div>Loading specific query...</div>}
+      {!!fetchingTotal && <div>Number of queries: {fetchingTotal}...</div>}
+      {!!specificQueryKeyTotal && <div>Loading specific query...</div>}
     </>
   );
 }
