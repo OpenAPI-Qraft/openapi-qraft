@@ -542,7 +542,7 @@ import { QueryClient } from '@tanstack/react-query';
 
 const queryClient = new QueryClient();
 
-const posts = qraft.posts.getPosts.fetchInfiniteQuery(
+const posts = qraft.posts.getPosts.fetchQuery(
   {
     parameters: { query: { limit: 10 } },
     /**
