@@ -100,7 +100,7 @@ const config = {
       },
       footer: {
         style: 'dark',
-        copyright: `Copyright © ${new Date().getFullYear()} My Project, Inc. Built with Docusaurus.`,
+        copyright: `© ${new Date().getFullYear()} Alexandr Batalov`,
       },
       prism: {
         theme: prismThemes.github,
