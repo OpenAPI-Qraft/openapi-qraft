@@ -47,6 +47,9 @@ export default {
     ['remark-lint-no-duplicate-headings', false],
     ['remark-lint-list-item-spacing', false],
     ['remark-lint-heading-increment', false],
+    ['remark-lint-no-file-name-mixed-case', false],
+    ['remark-lint-code-block-style', false],
+    ['remark-lint-fenced-code-flag', false],
 
     // Style options that differ from presets above
     ['remark-lint-ordered-list-marker-value', 'ordered'],
