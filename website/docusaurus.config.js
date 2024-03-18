@@ -44,7 +44,7 @@ const config = {
           sidebarPath: './sidebars.js',
           // Please change this to your repo.
           // Remove this to remove the "edit this page" links.
-          editUrl: 'https://github.com/OpenAPI-Qraft/openapi-qraft/website/',
+          editUrl: 'https://github.com/OpenAPI-Qraft/openapi-qraft/edit/main/website/',
           remarkPlugins: [
             [
               require('@docusaurus/remark-plugin-npm2yarn'),
