@@ -622,8 +622,8 @@ Supported Suspense Queries are:
 - `getQueryData(parameters)`
 - `setQueryData(parameters, updater)`
 - `getInfiniteQueryKey(parameters)`
-- `getInfinityQueryData(parameters)`
-- `setInfinityQueryData(parameters, updater)`
+- `getInfiniteQueryData(parameters)`
+- `setInfiniteQueryData(parameters, updater)`
 - `schema` - object with schema: `{method, url, mediaType}`
 - `types` - object with types: `{parameters, data, error, body}`
 
