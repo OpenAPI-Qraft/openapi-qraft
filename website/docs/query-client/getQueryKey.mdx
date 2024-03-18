@@ -1,0 +1,35 @@
+---
+sidebar_label: getQueryKey
+---
+
+# getQueryKey(...)
+
+The method provides a standardized way to generate `QueryKey` for _Queries_.
+See TanStack [_Query Keys 🌴_](https://tanstack.com/query/latest/docs/framework/react/guides/query-keys) guide for more information.
+
+```ts
+const queryKey = qraft.<service>.<operation>.getQueryKey({
+  path: Record<string, any>,
+  query: Record<string, any>,
+  header: Record<string, any>,
+});
+```
+
+## Example
+
+```tsx
+const queryKey = qraft.files.getFiles.getQueryKey({
+  header: { 'x-monite-version': '1.0.0' },
+  query: { id__in: ['1', '2'] },
+});
+
+// `queryKey` will be an array of objects
+
+expect(queryKey).toEqual([
+  { method: 'get', url: '/files' },
+  {
+    header: { 'x-monite-version': '1.0.0' },
+    query: { id__in: ['1', '2'] }
+  }
+]);
+```

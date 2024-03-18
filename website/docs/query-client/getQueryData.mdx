@@ -1,0 +1,60 @@
+---
+sidebar_label: getQueryData
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# getQueryData(...)
+
+The method enables direct access to the `QueryClient` cache to retrieve the data for a specific _Query_.
+See the TanStack [_queryClient.getQueryData 🌴_](https://tanstack.com/query/latest/docs/reference/QueryClient#queryclientgetquerydata) documentation.
+
+```ts
+const data = qraft.<service>.<operation>.getQueryData(
+  parameters,
+  queryClient
+);
+```
+
+## Arguments
+
+1. `parameters: Record<'path' | 'query' | 'header', Record<string, any>> | QueryKey`
+   - **Required** parameters to retrieve the data from the cache.
+   - Instead of an object with `{path, query, header}`, you can pass a `QueryKey` as an array
+     which is also strictly-typed ✨
+2. `queryClient: QueryClient`
+   - **Required** `QueryClient` instance to use
+
+## Returns
+The data from the _Query Cache_ for the specific query, strictly-typed ✨
+
+## Example
+
+<Tabs>
+  <TabItem value="parameters" label="Parameters">
+    ```tsx
+    const pet = qraft.pet.getPetById.getQueryData(
+      {
+        path: { petId: 123 },
+      },
+      queryClient
+    );
+
+    expect(pet?.id).toEqual(123);
+    ```
+  </TabItem>
+  <TabItem value="query-key" label="QueryKey">
+    ```tsx
+    const pet = qraft.pet.getPetById.getQueryData(
+      [
+        { method: 'get', url: '/pet/{petId}' },
+        { petId: 123 },
+      ],
+      queryClient
+    );
+
+    expect(pet?.id).toEqual(123);
+    ```
+  </TabItem>
+</Tabs>

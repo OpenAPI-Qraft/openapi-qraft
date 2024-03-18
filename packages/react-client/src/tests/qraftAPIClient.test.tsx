@@ -1,4 +1,4 @@
-import React, { createContext, ReactNode } from 'react';
+import React, { createContext, ReactNode, useEffect } from 'react';
 
 import { QraftContext as QraftContextDist } from '@openapi-qraft/react';
 import {
@@ -100,6 +100,8 @@ describe('Qraft uses singular Query', () => {
 
     const customQraft = createAPIClient({ context: QraftCustomContext });
 
+    const queryClient = new QueryClient();
+
     const { result } = renderHook(
       () =>
         customQraft.approvalPolicies.getApprovalPoliciesId.useQuery({
@@ -114,27 +116,39 @@ describe('Qraft uses singular Query', () => {
           },
         }),
       {
-        wrapper: (props) => (
-          <QraftCustomContext.Provider
-            value={{
-              baseUrl: 'https://api.sandbox.monite.com/v1',
-              requestFn(schema, info) {
-                return requestFn(
-                  schema,
-                  {
-                    ...info,
-                    headers: { 'x-custom-provider': 'true' },
-                  },
-                  { urlSerializer, bodySerializer }
-                );
-              },
-            }}
-          >
-            <Providers {...props} />
-          </QraftCustomContext.Provider>
-        ),
+        wrapper: ({ children }) => {
+          useEffect(() => {
+            queryClient.mount();
+            return () => {
+              queryClient.unmount();
+            };
+          }, [queryClient]);
+
+          return (
+            <QraftCustomContext.Provider
+              value={{
+                queryClient,
+                baseUrl: 'https://api.sandbox.monite.com/v1',
+                requestFn(schema, info) {
+                  return requestFn(
+                    schema,
+                    {
+                      ...info,
+                      headers: { 'x-custom-provider': 'true' },
+                    },
+                    { urlSerializer, bodySerializer }
+                  );
+                },
+              }}
+            >
+              {children}
+            </QraftCustomContext.Provider>
+          );
+        },
       }
     );
+
+    expect(result.current.status).toEqual('pending');
 
     await waitFor(() => {
       expect(result.current.data).toEqual({
