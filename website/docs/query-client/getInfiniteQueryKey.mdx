@@ -1,0 +1,38 @@
+---
+sidebar_label: getInfiniteQueryKey
+---
+
+# getInfiniteQueryKey(...)
+
+The method provides a standardized way to generate `QueryKey` the _Infinite Queries_.
+See TanStack [_Query Keys 🌴_](https://tanstack.com/query/latest/docs/framework/react/guides/query-keys)
+guide for more information.
+
+```ts
+const queryKey = qraft.<service>.<operation>.getInfiniteQueryKey({
+  path: Record<string, any>,
+  query: Record<string, any>,
+  header: Record<string, any>,
+});
+```
+
+## Example
+
+```tsx
+const queryKey = qraft.files.getFiles.getInfiniteQueryKey({
+  header: { 'x-monite-version': '1.0.0' },
+  query: { id__in: ['1', '2'] },
+});
+
+expect(queryKey).toEqual([
+  {
+    method: 'get',
+    url: '/files',
+    infinite: true // ⬅︎ this is the only difference from the `getQueryKey` method result
+  },
+  {
+    header: { 'x-monite-version': '1.0.0' },
+    query: { id__in: ['1', '2'] }
+  }
+]);
+```
