@@ -10,7 +10,7 @@ import npmToYarn from 'npm-to-yarn';
 /** @type {import('@docusaurus/types').Config} */
 const config = {
   title: 'OpenAPI Qraft',
-  tagline: 'Generate a Strictly-typed typed OpenAPI client for your React app, powered by TanStack Query.',
+  tagline: 'Generate a Strictly-typed OpenAPI client for your React app, powered by TanStack Query.',
 
   // Set the production url of your site here
   url: 'https://openapi-qraft.github.io',
