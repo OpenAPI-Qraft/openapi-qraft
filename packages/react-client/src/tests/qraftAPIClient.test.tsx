@@ -1061,11 +1061,27 @@ describe('Qraft uses Query Function', () => {
     await expect(result).resolves.toEqual(customResult);
   });
 
-  it('uses fetchQuery without requestFn', async () => {
+  it('uses fetchQuery with default requestFn set by specific "QueryKey"', async () => {
     const queryClient = new QueryClient();
 
     queryClient.setQueryDefaults(
       qraft.approvalPolicies.getApprovalPoliciesId.getQueryKey(parameters),
+      { queryFn: () => Promise.resolve(parameters) }
+    );
+
+    const result = qraft.approvalPolicies.getApprovalPoliciesId.fetchQuery(
+      { parameters },
+      queryClient
+    );
+
+    await expect(result).resolves.toEqual(parameters);
+  });
+
+  it('uses fetchQuery with default requestFn set by base "QueryKey"', async () => {
+    const queryClient = new QueryClient();
+
+    queryClient.setQueryDefaults(
+      qraft.approvalPolicies.getApprovalPoliciesId.getQueryKey(),
       { queryFn: () => Promise.resolve(parameters) }
     );
 
