@@ -1,4 +1,4 @@
-name: Test deployment
+name: Docs Validation
 
 on:
   pull_request:
@@ -8,8 +8,8 @@ on:
     # https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#on
 
 jobs:
-  test-deploy:
-    name: Test deployment
+  install:
+    name: Lint and Build
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repo
@@ -26,8 +26,8 @@ jobs:
       - name: Install dependencies
         run: yarn install --immutable
 
-      - name: Lint Documentation
+      - name: Lint
         run: yarn workspace openapi-qraft-website run lint
 
-      - name: Build website
+      - name: Build
         run: yarn workspace openapi-qraft-website run build
