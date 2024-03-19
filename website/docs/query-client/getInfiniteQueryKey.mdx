@@ -9,14 +9,21 @@ See TanStack [_Query Keys 🌴_](https://tanstack.com/query/latest/docs/framewor
 guide for more information.
 
 ```ts
-const queryKey = qraft.<service>.<operation>.getInfiniteQueryKey({
-  path: Record<string, any>,
-  query: Record<string, any>,
-  header: Record<string, any>,
-});
+const queryKey = qraft.<service>.<operation>.getInfiniteQueryKey(parameters);
 ```
 
-## Example
+### Arguments
+
+1. - `parameters: Record<'path' | 'query' | 'header', Record<string, any>> | QueryKey | {}`
+     - **Required**, OpenAPI request parameters for the query, strictly-typed ✨
+     - `parameters` will be used to generate the `QueryKey`
+     - If operation does not require parameters, you must pass an empty object `{}` for strictness
+
+### Returns
+
+`QueryKey` - a query key for the _Infinite Queries_
+
+### Example
 
 ```tsx
 const queryKey = qraft.files.getFiles.getInfiniteQueryKey({

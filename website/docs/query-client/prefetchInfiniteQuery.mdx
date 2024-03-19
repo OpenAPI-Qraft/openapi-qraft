@@ -1,0 +1,29 @@
+---
+sidebar_label: prefetchInfiniteQuery
+---
+
+# prefetchInfiniteQuery(...)
+
+The method facilitates the fetching of paginated data.
+See TanStack [_queryClient.prefetchInfiniteQuery 🌴_](https://tanstack.com/query/latest/docs/reference/QueryClient#queryclientprefetchinfinitequery)
+documentation for more details.
+
+```ts
+const result = qraft.<service>.<operation>.prefetchInfiniteQuery(
+  {
+    parameters,
+    requestFn,
+    baseUrl,
+    ...prefetchInfiniteQueryOptions,
+  },
+  queryClient
+);
+```
+
+### Arguments
+
+See [fetchInfiniteQuery](fetchInfiniteQuery.mdx) for the list of arguments.
+
+### Returns
+
+`Promise<void>` - a promise that resolves when the query is successfully fetched

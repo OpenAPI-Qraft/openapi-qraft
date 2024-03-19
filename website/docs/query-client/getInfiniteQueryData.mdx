@@ -14,7 +14,7 @@ const data = qraft.<service>.<operation>.getInfiniteQueryData(
 );
 ```
 
-## Arguments
+### Arguments
 
 1. `parameters: Record<'path' | 'query' | 'header', Record<string, any>> | {} | QueryKey`
    - **Required** parameters to retrieve the data from the cache.
@@ -23,10 +23,11 @@ const data = qraft.<service>.<operation>.getInfiniteQueryData(
 2. `queryClient: QueryClient`
    - **Required** `QueryClient` instance to use
 
-## Returns
+### Returns
+
 The data from the _Query Cache_ for the specific query, strictly-typed ✨
 
-## Example
+### Example
 
 ```tsx
 const fileListPages = qraft.files.getFiles.getInfiniteQueryData({}, queryClient);

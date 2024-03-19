@@ -8,14 +8,21 @@ The method provides a standardized way to generate `QueryKey` for _Queries_.
 See TanStack [_Query Keys 🌴_](https://tanstack.com/query/latest/docs/framework/react/guides/query-keys) guide for more information.
 
 ```ts
-const queryKey = qraft.<service>.<operation>.getQueryKey({
-  path: Record<string, any>,
-  query: Record<string, any>,
-  header: Record<string, any>,
-});
+const queryKey = qraft.<service>.<operation>.getQueryKey(parameters);
 ```
 
-## Example
+### Arguments
+
+1. - `parameters: Record<'path' | 'query' | 'header', Record<string, any>> | QueryKey | {}`
+     - **Required**, OpenAPI request parameters for the query, strictly-typed ✨
+     - `parameters` will be used to generate the `QueryKey`
+     - If operation does not require parameters, you must pass an empty object `{}` for strictness
+
+### Returns
+
+`QueryKey` - a query key for the _Queries_
+
+### Example
 
 ```tsx
 const queryKey = qraft.files.getFiles.getQueryKey({
