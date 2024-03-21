@@ -67,7 +67,7 @@ guide for more information.
 ### Examples
 
 <Tabs>
-  <TabItem value="with-filters" label={<span style={{verticalAlign: "middle"}}>With <code>filters</code></span>}>
+  <TabItem value="with-filters" label={<span style={{verticalAlign: "middle"}}><code>filters</code></span>}>
     Queries invalidation with the specified parameters:
 
     ```ts
@@ -92,7 +92,7 @@ guide for more information.
     );
     ```
   </TabItem>
-  <TabItem value="without-filters" label={<span style={{verticalAlign: "middle"}}>Without <code>filters</code></span>}>
+  <TabItem value="without-filters" label={<span style={{verticalAlign: "middle"}}><code style={{textDecoration: 'line-through'}}>filters</code></span>}>
     To invalidate _all queries for a particular endpoint_, you can call `invalidateQueries(...)` without `parameters`:
 
     ```ts
@@ -110,7 +110,7 @@ guide for more information.
     qraft.entities.getEntities.invalidateQueries(queryClient);
     ```
   </TabItem>
-  <TabItem value="with-predicate" label={<span style={{verticalAlign: "middle"}}>With <code>predicate</code></span>}>
+  <TabItem value="with-predicate" label={<span style={{verticalAlign: "middle"}}><code>predicate</code></span>}>
     Invalidates queries with a custom `predicate(...)` function,
     which will be used as a final filter on all matching queries.
     See [_Query Filters 🌴_](https://tanstack.com/query/latest/docs/framework/react/guides/filters#query-filters)
@@ -140,7 +140,7 @@ guide for more information.
     );
     ```
   </TabItem>
-  <TabItem value="with-query-key" label={<span style={{verticalAlign: "middle"}}>With <code>queryKey</code></span>}>
+  <TabItem value="with-query-key" label={<span style={{verticalAlign: "middle"}}><code>queryKey</code></span>}>
     It could be useful to invalidate queries using `queryKey` directly:
 
     ```ts
@@ -161,6 +161,21 @@ guide for more information.
             entity_id: '3e3e-3e3e-3e3e',
           },
         }),
+      },
+      queryClient
+    );
+    ```
+  </TabItem>
+  <TabItem value="only-infinite" label={<span style={{verticalAlign: "middle"}}>Only <em>Infinite</em></span>}>
+    Using predicate to invalidate only _Infinite Queries_:
+
+    ```ts
+    qraft.entities.getEntities.invalidateQueries(
+      {
+        predicate: (query) => {
+          // `infinite`⬇︎ property will preset for Infinite Queries
+          return 'infinite' in query.queryKey[0];
+        },
       },
       queryClient
     );
