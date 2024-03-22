@@ -62,6 +62,7 @@
   "bugs": {
     "url": "https://github.com/OpenAPI-Qraft/openapi-qraft/issues"
   },
+  "homepage": "https://openapi-qraft.github.io/openapi-qraft/",
   "keywords": [
     "openapi",
     "swagger",
