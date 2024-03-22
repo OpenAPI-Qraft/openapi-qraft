@@ -23,7 +23,7 @@ const query = qraft.<service>.<operation>.useInfiniteQuery(
 
 ### Arguments
 
-1. `parameters: Record<'path' | 'query' | 'header', Record<string, any>> | QueryKey | {}`
+1. `parameters: { path, query, header } | QueryKey | {}`
    - **Required** and strictly-typed ✨ parameters for the query
    - `parameters` will be used to generate the `QueryKey`
    - Instead of an object with `{path, query, header}`, you can pass a `QueryKey` as an array

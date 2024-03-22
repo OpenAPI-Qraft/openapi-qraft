@@ -23,7 +23,7 @@ const query = qraft.<service>.<operation>.useMutation(
 
 ### Arguments
 
-1. `parameters?: Record<'path' | 'query' | 'header', Record<string, any>>`
+1. `parameters?: { path, query, header }`
    - **Optional**, OpenAPI request parameters for the query, strictly-typed ✨
    - When `parameters` provided, it will be used to generate the `mutationKey`
 
