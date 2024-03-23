@@ -9,9 +9,7 @@ import TabItem from '@theme/TabItem';
 # useInfiniteQuery(...)
 
 The Hook enables you to perform asynchronous data fetching operations with support for infinite scrolling scenarios.
-It automatically handles loading states, caching, and data invalidation for paginated or infinitely loaded data.
-See the TanStack [_useInfiniteQuery(...) 🌴_](https://tanstack.com/query/latest/docs/framework/react/reference/useInfiniteQuery)
-documentation for more details.
+See the TanStack [_useInfiniteQuery(...) 🌴_](https://tanstack.com/query/latest/docs/framework/react/reference/useInfiniteQuery) documentation for more details.
 
 ```ts
 const query = qraft.<service>.<operation>.useInfiniteQuery(
@@ -41,6 +39,10 @@ const query = qraft.<service>.<operation>.useInfiniteQuery(
      - `QraftContext.queryClient` will be used if available
      - [_useQueryClient() 🌴_](https://tanstack.com/query/latest/docs/framework/react/reference/useQueryClient)
        result will be used as a fallback
+
+### Returns
+
+`UseInfiniteQueryResult` object, see the TanStack [_useInfiniteQuery(...) 🌴_](https://tanstack.com/query/latest/docs/framework/react/reference/useInfiniteQuery#:~:text=directions%20when%20needed.-,Returns,-The%20returned%20properties) documentation for more details.
 
 ### Examples
 
