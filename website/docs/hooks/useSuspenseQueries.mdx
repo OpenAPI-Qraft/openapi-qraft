@@ -12,9 +12,8 @@ The functionality is similar to the [_useQueries_](/hooks/useQueries.mdx) hook, 
 For more detailed information, explore the TanStack
 [_useSuspenseQueries(...) 🌴_](https://tanstack.com/query/latest/docs/framework/react/reference/useSuspenseQueries) documentation.
 
-
 ```ts
-const queries = qraft.<service>.<operation>.useSuspenseQueries(
+const result = qraft.<service>.<operation>.useSuspenseQueries(
   options,
   queryClient
 )
@@ -23,7 +22,7 @@ const queries = qraft.<service>.<operation>.useSuspenseQueries(
 ### Arguments
 
 1. `options: UseQueriesOptions`
-   - **Required**, represents the options for queries
+   - **Required**, represents the options for queries, see [_useSuspenseQueries(...) 🌴_](https://tanstack.com/query/latest/docs/framework/react/reference/useSuspenseQueries) documentation
    - `options.queries: QueryOptions[]`
      - **Required** array of _Queries_ to be executed
      - `parameters: { path, query, header }` will be used for the request
