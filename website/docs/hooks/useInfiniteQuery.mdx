@@ -55,7 +55,8 @@ const query = qraft.<service>.<operation>.useInfiniteQuery(
 
     function PostList() {
       /**
-       * `qraft.posts.getPosts.useInfiniteQuery(...)` will execute the initial request:
+       * `qraft.posts.getPosts.useInfiniteQuery(...)` launches
+       * the initial query to fetch the first page of posts:
        * ###
        * GET /posts?limit=10&page=1
        */
@@ -88,7 +89,7 @@ const query = qraft.<service>.<operation>.useInfiniteQuery(
             </ul>
           ))}
           <button onClick={() => {
-            // ⬇︎ will execute GET /posts?limit=10&page=2
+            // ⬇︎ Initiates a GET request for the next page of posts: /posts?limit=10&page=2
             infiniteQuery.fetchNextPage()
           }}>
             Load More
@@ -106,7 +107,8 @@ const query = qraft.<service>.<operation>.useInfiniteQuery(
 
     function DataExportList({ initial_pagination_token }: { initial_pagination_token?: string }) {
       /**
-       * `qraft.dataExports.getDataExports.useInfiniteQuery(...)` will execute the initial request:
+       * `qraft.posts.getPosts.useInfiniteQuery(...)` launches
+       * the initial query to fetch the first page of posts:
        * ###
        * GET /data_exports?pagination_token=<INITIAL_PAGINATION_TOKEN>
        * x-monite-version: 2023-09-01
@@ -138,7 +140,7 @@ const query = qraft.<service>.<operation>.useInfiniteQuery(
             disabled={!infiniteQuery.hasPreviousPage}
             onClick={() => {
               /**
-              * ⬇︎ will execute the request:
+               * ⬇︎ Initiates a GET request:
               * GET /data_exports?pagination_token=<PREV_PAGINATION_TOKEN>
               * x-monite-version: 2023-09-01
               * x-monite-entity-id: 3e3e-3e3e-3e3e
@@ -159,7 +161,7 @@ const query = qraft.<service>.<operation>.useInfiniteQuery(
             disabled={!infiniteQuery.hasNextPage}
             onClick={() => {
               /**
-              * ⬇︎ will execute the request:
+              * ⬇︎ Initiates a GET request:
               * GET /data_exports?pagination_token=<NEXT_PAGINATION_TOKEN>
               * x-monite-version: 2023-09-01
               * x-monite-entity-id: 3e3e-3e3e-3e3e

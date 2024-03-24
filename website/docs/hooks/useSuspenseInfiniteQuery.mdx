@@ -50,7 +50,7 @@ const qraft = createAPIClient();
 
 function PostList() {
   /**
-   * `qraft.posts.getPosts.useSuspenseInfiniteQuery(...)` will execute the initial request:
+   * `qraft.posts.getPosts.useSuspenseInfiniteQuery(...)` launches the initial fetch operation:
    * ###
    * GET /posts?limit=10&page=1
    */
@@ -83,7 +83,7 @@ function PostList() {
         </ul>
       ))}
       <button onClick={() => {
-        // ⬇︎ will execute GET /posts?limit=10&page=2
+        // ⬇︎ Initiates a GET request: GET /posts?limit=10&page=2
         infiniteQuery.fetchNextPage()
       }}>
         Load More
