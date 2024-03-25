@@ -192,6 +192,7 @@ const serviceCallbacks = [
   'removeQueries',
   'refetchQueries',
   'isFetching',
+  'isMutating',
   'useIsFetching',
   'fetchQuery',
   'prefetchQuery',

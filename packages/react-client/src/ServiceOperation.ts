@@ -837,6 +837,7 @@ export interface ServiceOperationMutation<
 > extends ServiceOperationUseMutation<TSchema, TBody, TData, TParams, TError>,
     ServiceOperationUseIsMutating<TSchema, TBody, TData, TParams, TError>,
     ServiceOperationUseMutationState<TSchema, TBody, TData, TParams, TError>,
+    ServiceOperationIsMutatingQueries<TSchema, TData, TParams, TError>,
     ServiceOperationMutationFn<TSchema, TBody, TData, TParams> {
   schema: TSchema;
   types: {
@@ -1191,6 +1192,39 @@ export interface ServiceOperationMutationFn<
       body: TBody;
     }
   ): Promise<TData>;
+}
+
+interface ServiceOperationIsMutatingQueries<
+  TSchema extends { url: string; method: string },
+  TData,
+  TParams = {},
+  TError = DefaultError,
+> {
+  isMutating(
+    filters:
+      | QueryFiltersByParameters<TSchema, TData, TParams, TError>
+      | QueryFiltersByQueryKey<TSchema, TData, TParams, TError>,
+    queryClient: QueryClient
+  ): number;
+  isMutating(queryClient: QueryClient): number;
+}
+
+/**
+ * @internal
+ */
+export interface ServiceOperationIsMutatingQueriesCallback<
+  TSchema extends { url: string; method: string },
+  TData,
+  TParams = {},
+  TError = DefaultError,
+> extends ServiceOperationIsMutatingQueries<TSchema, TData, TParams, TError> {
+  isMutating(
+    filters:
+      | QueryFiltersByParameters<TSchema, TData, TParams, TError>
+      | QueryFiltersByQueryKey<TSchema, TData, TParams, TError>
+      | QueryClient,
+    queryClient?: QueryClient
+  ): number;
 }
 
 /**
