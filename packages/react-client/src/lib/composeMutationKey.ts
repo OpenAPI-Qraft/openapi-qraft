@@ -21,7 +21,7 @@ export function composeMutationKey<
   TParams = unknown,
 >(schema: TSchema, parameters: TParams | undefined) {
   return parameters === undefined
-    ? [{ url: schema.url, method: schema.method }]
+    ? [{ url: schema.url, method: schema.method }, {}]
     : [
         {
           url: schema.url,

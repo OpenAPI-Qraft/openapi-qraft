@@ -38,6 +38,7 @@ describe('composeMutationKey', () => {
         url: schema.url,
         method: schema.method,
       },
+      {},
     ]);
   });
 });
