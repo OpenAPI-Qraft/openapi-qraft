@@ -1,14 +1,12 @@
 'use client';
 
-import { useContext } from 'react';
-
 import type { DefaultError } from '@tanstack/query-core';
 import {
   UseMutationResult,
   useMutationState as useMutationStateTanstack,
 } from '@tanstack/react-query';
 
-import { composeMutationKey } from '../lib/composeMutationKey.js';
+import { composeMutationFilters } from '../lib/composeMutationFilters.js';
 import type { OperationSchema } from '../lib/requestFn.js';
 import { useQueryClient } from '../lib/useQueryClient.js';
 import type { QraftClientOptions } from '../qraftAPIClient.js';
@@ -37,33 +35,10 @@ export const useMutationState: <
 ) => {
   const [options, queryClientByArg] = args;
 
-  if (
-    options?.filters &&
-    'parameters' in options.filters &&
-    'mutationKey' in options.filters
-  ) {
-    throw new Error(
-      `'useMutationState': 'parameters' and 'mutationKey' cannot be used together`
-    );
-  }
-
-  const filters = options?.filters;
-
   return useMutationStateTanstack(
     {
       ...options,
-      filters:
-        filters && 'mutationKey' in filters
-          ? filters
-          : {
-              ...filters,
-              mutationKey: composeMutationKey(
-                schema,
-                filters && 'parameters' in filters
-                  ? filters.parameters
-                  : undefined
-              ),
-            },
+      filters: composeMutationFilters(schema, options?.filters),
     } as never,
     useQueryClient(qraftOptions, queryClientByArg)
   ) as never;
