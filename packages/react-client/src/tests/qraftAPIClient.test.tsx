@@ -2006,6 +2006,143 @@ describe('Qraft uses Queries Invalidation', () => {
   });
 });
 
+describe('Qraft uses Queries Removal', () => {
+  const parameters_1: typeof qraft.approvalPolicies.getApprovalPoliciesId.types.parameters =
+    {
+      header: {
+        'x-monite-version': '1.0.0',
+      },
+      path: {
+        approval_policy_id: '1',
+      },
+      query: {
+        items_order: ['asc', 'desc'],
+      },
+    };
+
+  const parameters_2: typeof qraft.approvalPolicies.getApprovalPoliciesId.types.parameters =
+    {
+      header: {
+        'x-monite-version': '1.0.0',
+      },
+      path: {
+        approval_policy_id: '2',
+      },
+      query: {
+        items_order: ['asc', 'desc'],
+      },
+    };
+
+  it('supports removeQueries by parameters', async () => {
+    const queryClient = new QueryClient();
+
+    const { result: result_01 } = renderHook(
+      () => {
+        qraft.approvalPolicies.getApprovalPoliciesId.useQuery(parameters_2);
+
+        return qraft.approvalPolicies.getApprovalPoliciesId.useQuery(
+          parameters_1
+        );
+      },
+      {
+        wrapper: (props: { children: ReactNode }) => (
+          <Providers {...props} queryClient={queryClient} />
+        ),
+      }
+    );
+
+    await waitFor(() => {
+      expect(result_01.current.isSuccess).toBeTruthy();
+    });
+
+    expect(
+      qraft.approvalPolicies.getApprovalPoliciesId.getQueryData(
+        parameters_1,
+        queryClient
+      )
+    ).toBeDefined();
+
+    expect(
+      qraft.approvalPolicies.getApprovalPoliciesId.getQueryData(
+        parameters_2,
+        queryClient
+      )
+    ).toBeDefined();
+
+    qraft.approvalPolicies.getApprovalPoliciesId.removeQueries(
+      { parameters: parameters_1 },
+      queryClient
+    );
+
+    expect(
+      qraft.approvalPolicies.getApprovalPoliciesId.getQueryData(
+        parameters_1,
+        queryClient
+      )
+    ).not.toBeDefined();
+
+    expect(
+      qraft.approvalPolicies.getApprovalPoliciesId.getQueryData(
+        parameters_2,
+        queryClient
+      )
+    ).toBeDefined();
+  });
+
+  it('supports removeQueries without parameters', async () => {
+    const queryClient = new QueryClient();
+
+    const { result: result_01 } = renderHook(
+      () => {
+        qraft.approvalPolicies.getApprovalPoliciesId.useQuery(parameters_2);
+
+        return qraft.approvalPolicies.getApprovalPoliciesId.useQuery(
+          parameters_1
+        );
+      },
+      {
+        wrapper: (props: { children: ReactNode }) => (
+          <Providers {...props} queryClient={queryClient} />
+        ),
+      }
+    );
+
+    await waitFor(() => {
+      expect(result_01.current.isSuccess).toBeTruthy();
+    });
+
+    expect(
+      qraft.approvalPolicies.getApprovalPoliciesId.getQueryData(
+        parameters_1,
+        queryClient
+      )
+    ).toBeDefined();
+
+    expect(
+      qraft.approvalPolicies.getApprovalPoliciesId.getQueryData(
+        parameters_2,
+        queryClient
+      )
+    ).toBeDefined();
+
+    qraft.approvalPolicies.getApprovalPoliciesId.removeQueries(queryClient);
+
+    expect(
+      qraft.approvalPolicies.getApprovalPoliciesId.getQueryData(
+        parameters_1,
+        queryClient
+      )
+    ).not.toBeDefined();
+
+    expect(
+      qraft.approvalPolicies.getApprovalPoliciesId.getQueryData(
+        parameters_2,
+        queryClient
+      )
+    ).not.toBeDefined();
+  });
+});
+
 describe('Qraft uses Queries Cancellation', () => {
   const parameters: typeof qraft.approvalPolicies.getApprovalPoliciesId.types.parameters =
     {

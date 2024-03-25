@@ -188,6 +188,7 @@ const serviceCallbacks = [
   'invalidateQueries',
   'cancelQueries',
   'resetQueries',
+  'removeQueries',
   'refetchQueries',
   'isFetching',
   'useIsFetching',

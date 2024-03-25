@@ -77,6 +77,7 @@ export interface ServiceOperationQuery<
     ServiceOperationSetInfiniteQueryData<TSchema, TData, TParams>,
     ServiceOperationInvalidateQueries<TSchema, TData, TParams, TError>,
     ServiceOperationCancelQueries<TSchema, TData, TParams, TError>,
+    ServiceOperationRemoveQueries<TSchema, TData, TParams, TError>,
     ServiceOperationResetQueries<TSchema, TData, TParams, TError>,
     ServiceOperationRefetchQueries<TSchema, TData, TParams, TError>,
     ServiceOperationIsFetchingQueries<TSchema, TData, TParams, TError> {
@@ -534,6 +535,39 @@ export interface ServiceOperationCancelQueriesCallback<
     options?: CancelOptions | QueryClient,
     queryClient?: QueryClient
   ): Promise<void>;
+}
+
+interface ServiceOperationRemoveQueries<
+  TSchema extends { url: string; method: string },
+  TData,
+  TParams = {},
+  TError = DefaultError,
+> {
+  removeQueries(
+    filters:
+      | QueryFiltersByParameters<TSchema, TData, TParams, TError>
+      | QueryFiltersByQueryKey<TSchema, TData, TParams, TError>,
+    queryClient: QueryClient
+  ): void;
+  removeQueries(queryClient: QueryClient): void;
+}
+
+/**
+ * @internal
+ */
+export interface ServiceOperationRemoveQueriesCallback<
+  TSchema extends { url: string; method: string },
+  TData,
+  TParams = {},
+  TError = DefaultError,
+> extends ServiceOperationRemoveQueries<TSchema, TData, TParams, TError> {
+  removeQueries(
+    filters:
+      | QueryFiltersByParameters<TSchema, TData, TParams, TError>
+      | QueryFiltersByQueryKey<TSchema, TData, TParams, TError>
+      | QueryClient,
+    queryClient?: QueryClient
+  ): void;
 }
 
 interface ServiceOperationResetQueries<
