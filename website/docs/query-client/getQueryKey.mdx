@@ -2,6 +2,9 @@
 sidebar_label: getQueryKey
 ---
 
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
 # getQueryKey(...)
 
 The method provides a standardized way to generate `QueryKey` for _Queries_.
@@ -13,30 +16,44 @@ const queryKey = qraft.<service>.<operation>.getQueryKey(parameters);
 
 ### Arguments
 
-1. - `parameters: { path, query, header } | QueryKey | {}`
-     - **Required**, OpenAPI request parameters for the query, strictly-typed ✨
+1. - `parameters: { path, query, header } | undefined`
+     - **Optional**, OpenAPI request parameters for the query, strictly-typed ✨
      - `parameters` will be used to generate the `QueryKey`
-     - If operation does not require parameters, you must pass an empty object `{}` for strictness
+     - If not specified, returns a `QueryKey` with `{}` as a _Query_ parameters
 
 ### Returns
 
-`QueryKey` - a query key for the _Queries_
+`QueryKey` - a query key for the _operation_ _parameters_
 
 ### Example
 
-```tsx
-const queryKey = qraft.files.getFiles.getQueryKey({
-  header: { 'x-monite-version': '1.0.0' },
-  query: { id__in: ['1', '2'] },
-});
+<Tabs>
+  <TabItem value="with-parameters" label={<span style={{verticalAlign: 'middle'}}>With <code style={{display: 'inline-block'}}>parameters</code></span>} default>
+    ```tsx
+    const queryKey = qraft.files.getFiles.getQueryKey({
+      header: { 'x-monite-version': '1.0.0' },
+      query: { id__in: ['1', '2'] },
+    });
 
-// `queryKey` will be an array of objects
+    // `queryKey` will be an array of objects
+    expect(queryKey).toEqual([
+      { method: 'get', url: '/files' },
+      {
+        header: { 'x-monite-version': '1.0.0' },
+        query: { id__in: ['1', '2'] }
+      }
+    ]);
+    ```
+  </TabItem>
+  <TabItem value="without-parameters" label={<span style={{verticalAlign: 'middle'}}>Without <code style={{display: 'inline-block', textDecoration: 'line-through'}}>parameters</code></span>} default>
+    ```tsx
+    const queryKey = qraft.files.getFiles.getQueryKey();
 
-expect(queryKey).toEqual([
-  { method: 'get', url: '/files' },
-  {
-    header: { 'x-monite-version': '1.0.0' },
-    query: { id__in: ['1', '2'] }
-  }
-]);
-```
+    // `queryKey` will be an array of objects
+    expect(queryKey).toEqual([
+      { method: 'get', url: '/files' },
+      {}
+    ]);
+    ```
+  </TabItem>
+</Tabs>
