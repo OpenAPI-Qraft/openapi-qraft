@@ -819,8 +819,8 @@ interface ServiceOperationUseMutation<
   TParams,
   TError = DefaultError,
 > {
-  getMutationKey<TMutationKeyParams extends TParams>(
-    parameters: TMutationKeyParams | undefined
+  getMutationKey<TMutationKeyParams extends TParams | undefined = undefined>(
+    parameters?: TMutationKeyParams
   ): ServiceOperationMutationKey<TSchema, TMutationKeyParams>;
 
   useMutation<
