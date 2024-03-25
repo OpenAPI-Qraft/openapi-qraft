@@ -835,6 +835,7 @@ export interface ServiceOperationMutation<
   TParams,
   TError = DefaultError,
 > extends ServiceOperationUseMutation<TSchema, TBody, TData, TParams, TError>,
+    ServiceOperationUseIsMutating<TSchema, TBody, TData, TParams, TError>,
     ServiceOperationUseMutationState<TSchema, TBody, TData, TParams, TError>,
     ServiceOperationMutationFn<TSchema, TBody, TData, TParams> {
   schema: TSchema;
@@ -988,6 +989,34 @@ interface ServiceOperationUseMutationState<
     },
     queryClient?: QueryClient
   ): Array<TResult>;
+}
+
+interface ServiceOperationUseIsMutating<
+  TSchema extends { url: string; method: string },
+  TBody,
+  TData,
+  TParams,
+  TError = DefaultError,
+> {
+  useIsMutating<TContext = unknown>(
+    filters?:
+      | UseMutationStateFiltersByParameters<
+          TBody,
+          TData,
+          TParams,
+          TError,
+          TContext
+        >
+      | UseMutationStateFiltersByMutationKey<
+          TSchema,
+          TBody,
+          TData,
+          TParams,
+          TError,
+          TContext
+        >,
+    queryClient?: QueryClient
+  ): number;
 }
 
 interface QueryFnOptionsBase<
