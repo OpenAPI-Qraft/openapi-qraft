@@ -1,10 +1,76 @@
 ---
-id: getMutationKey
-sidebar_label: getMutationKey 📝
+sidebar_label: getMutationKey
 ---
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 
 # getMutationKey(...)
 
-:::info
-Documentation is actively being updated 🚧
-:::
+The method provides a standardized way to generate `MutationKey` for _Mutations_.
+It could be used to check mutation status, or to cancel a mutation.
+
+```ts
+qraft.<service>.<operation>.getMutationKey(parameters)
+```
+
+### Arguments
+
+1. - `parameters: { path, query, header } | undefined`
+     - **Optional**, OpenAPI request parameters for the mutation, strictly-typed ✨
+     - `parameters` will be used to generate the `MutationKey`
+     - If not specified, returns a `MutationKey` with `{}` as a _Mutation_ parameters
+
+### Returns
+
+`MutationKey` - a mutation key for the _operation_ _parameters_
+
+### Example
+
+<Tabs>
+  <TabItem value="with-parameters" label={<span style={{verticalAlign: 'middle'}}>With <code style={{display: 'inline-block'}}>parameters</code></span>} default>
+    ```tsx
+    expect(
+      qraft.entities.postEntitiesIdDocuments.getMutationKey({
+        header: {
+          'x-monite-version': '1.0.0',
+        },
+        path: {
+          entity_id: '1',
+        },
+        query: {
+          referer: 'https://example.com',
+        },
+      })
+    ).toEqual([
+      {
+        url: qraft.entities.postEntitiesIdDocuments.schema.url,
+        method: qraft.entities.postEntitiesIdDocuments.schema.method,
+      },
+      {
+        header: {
+          'x-monite-version': '1.0.0',
+        },
+        path: {
+          entity_id: '1',
+        },
+        query: {
+          referer: 'https://example.com',
+        },
+      },
+    ]);
+    ```
+  </TabItem>
+  <TabItem value="without-parameters" label={<span style={{verticalAlign: 'middle'}}>Without <code style={{display: 'inline-block', textDecoration: 'line-through'}}>parameters</code></span>} default>
+    ```tsx
+    expect(
+      qraft.entities.postEntitiesIdDocuments.getMutationKey()
+    ).toEqual([
+      {
+        url: qraft.entities.postEntitiesIdDocuments.schema.url,
+        method: qraft.entities.postEntitiesIdDocuments.schema.method,
+      },
+      {},
+    ]);
+    ```
+  </TabItem>
+</Tabs>
