@@ -8,7 +8,7 @@
 
 ### Minor Changes
 
-- 7c81509: Add support for `QueryClinet.fetchInfiniteQuery(...)` and `QueryClinet.prefetchInfiniteQuery(...)` methods
+- 7c81509: Add support for `QueryClient.fetchInfiniteQuery(...)` and `QueryClient.prefetchInfiniteQuery(...)` methods
 - 48e662d: Added support for `QueryClient.fetchQuery(...)` method
 
 ### Patch Changes

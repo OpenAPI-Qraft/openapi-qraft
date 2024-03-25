@@ -16,7 +16,7 @@
 
 ### Minor Changes
 
-- 7c81509: Add support for `QueryClinet.fetchInfiniteQuery(...)` and `QueryClinet.prefetchInfiniteQuery(...)` methods
+- 7c81509: Add support for `QueryClient.fetchInfiniteQuery(...)` and `QueryClient.prefetchInfiniteQuery(...)` methods
 - 8e47c05: Simplified `QueryClient.setQueryData(...)` API
 - 48e662d: Added support for `QueryClient.fetchQuery(...)` method
 - 315883b: Changed `requestFn(...)` API to simplify the usage
