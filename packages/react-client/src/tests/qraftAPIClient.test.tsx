@@ -2356,6 +2356,98 @@ describe('Qraft uses useIsFetching Query', () => {
   });
 });
 
+describe('Qraft uses getQueryKey', () => {
+  it('returns query key with parameters', async () => {
+    expect(
+      qraft.approvalPolicies.getApprovalPoliciesId.getQueryKey({
+        header: {
+          'x-monite-version': '1.0.0',
+        },
+        path: {
+          approval_policy_id: '1',
+        },
+        query: {
+          items_order: ['asc', 'desc'],
+        },
+      })
+    ).toEqual([
+      {
+        url: qraft.approvalPolicies.getApprovalPoliciesId.schema.url,
+        method: qraft.approvalPolicies.getApprovalPoliciesId.schema.method,
+      },
+      {
+        header: {
+          'x-monite-version': '1.0.0',
+        },
+        path: {
+          approval_policy_id: '1',
+        },
+        query: {
+          items_order: ['asc', 'desc'],
+        },
+      },
+    ]);
+  });
+
+  it('returns query key without parameters', async () => {
+    expect(qraft.approvalPolicies.getApprovalPoliciesId.getQueryKey()).toEqual([
+      {
+        url: qraft.approvalPolicies.getApprovalPoliciesId.schema.url,
+        method: qraft.approvalPolicies.getApprovalPoliciesId.schema.method,
+      },
+      {},
+    ]);
+  });
+});
+
+describe('Qraft uses getMutationKey', () => {
+  it('returns mutation key with parameters', async () => {
+    expect(
+      qraft.entities.postEntitiesIdDocuments.getMutationKey({
+        header: {
+          'x-monite-version': '1.0.0',
+        },
+        path: {
+          entity_id: '1',
+        },
+        query: {
+          referer: 'https://example.com',
+        },
+        body: {
+          verification_document_back: 'back',
+          verification_document_front: 'front',
+        },
+      })
+    ).toEqual([
+      {
+        url: qraft.entities.postEntitiesIdDocuments.schema.url,
+        method: qraft.entities.postEntitiesIdDocuments.schema.method,
+      },
+      {
+        header: {
+          'x-monite-version': '1.0.0',
+        },
+        path: {
+          entity_id: '1',
+        },
+        query: {
+          referer: 'https://example.com',
+        },
+      },
+    ]);
+  });
+
+  it('returns mutation key without parameters', async () => {
+    expect(qraft.entities.postEntitiesIdDocuments.getMutationKey()).toEqual([
+      {
+        url: qraft.entities.postEntitiesIdDocuments.schema.url,
+        method: qraft.entities.postEntitiesIdDocuments.schema.method,
+      },
+      {},
+    ]);
+  });
+});
+
 function Providers({
   children,
   queryClient,

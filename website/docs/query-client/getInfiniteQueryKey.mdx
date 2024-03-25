@@ -14,7 +14,7 @@ const queryKey = qraft.<service>.<operation>.getInfiniteQueryKey(parameters);
 
 ### Arguments
 
-1. - `parameters: Record<'path' | 'query' | 'header', Record<string, any>> | QueryKey | {}`
+1. - `parameters: { path, query, header } | QueryKey | {}`
      - **Required**, OpenAPI request parameters for the query, strictly-typed ✨
      - `parameters` will be used to generate the `QueryKey`
      - If operation does not require parameters, you must pass an empty object `{}` for strictness

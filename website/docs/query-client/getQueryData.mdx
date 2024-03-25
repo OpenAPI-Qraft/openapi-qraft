@@ -19,7 +19,7 @@ const data = qraft.<service>.<operation>.getQueryData(
 
 ## Arguments
 
-1. `parameters: Record<'path' | 'query' | 'header', Record<string, any>> | QueryKey`
+1. `parameters: { path, query, header } | QueryKey`
    - **Required** parameters to retrieve the data from the _Query Cache_.
    - Instead of an object with `{path, query, header}`, you can pass a `QueryKey` as an array
      which is also strictly-typed ✨

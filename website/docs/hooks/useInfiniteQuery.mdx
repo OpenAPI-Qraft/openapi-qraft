@@ -9,9 +9,7 @@ import TabItem from '@theme/TabItem';
 # useInfiniteQuery(...)
 
 The Hook enables you to perform asynchronous data fetching operations with support for infinite scrolling scenarios.
-It automatically handles loading states, caching, and data invalidation for paginated or infinitely loaded data.
-See the TanStack [_useInfiniteQuery(...) 🌴_](https://tanstack.com/query/latest/docs/framework/react/reference/useInfiniteQuery)
-documentation for more details.
+See the TanStack [_useInfiniteQuery(...) 🌴_](https://tanstack.com/query/latest/docs/framework/react/reference/useInfiniteQuery) documentation for more details.
 
 ```ts
 const query = qraft.<service>.<operation>.useInfiniteQuery(
@@ -23,7 +21,7 @@ const query = qraft.<service>.<operation>.useInfiniteQuery(
 
 ### Arguments
 
-1. `parameters: Record<'path' | 'query' | 'header', Record<string, any>> | QueryKey | {}`
+1. `parameters: { path, query, header } | QueryKey | {}`
    - **Required** and strictly-typed ✨ parameters for the query
    - `parameters` will be used to generate the `QueryKey`
    - Instead of an object with `{path, query, header}`, you can pass a `QueryKey` as an array
@@ -42,6 +40,10 @@ const query = qraft.<service>.<operation>.useInfiniteQuery(
      - [_useQueryClient() 🌴_](https://tanstack.com/query/latest/docs/framework/react/reference/useQueryClient)
        result will be used as a fallback
 
+### Returns
+
+`UseInfiniteQueryResult` object, see the TanStack [_useInfiniteQuery(...) 🌴_](https://tanstack.com/query/latest/docs/framework/react/reference/useInfiniteQuery#:~:text=directions%20when%20needed.-,Returns,-The%20returned%20properties) documentation for more details.
+
 ### Examples
 
 <Tabs>
@@ -53,7 +55,8 @@ const query = qraft.<service>.<operation>.useInfiniteQuery(
 
     function PostList() {
       /**
-       * `qraft.posts.getPosts.useInfiniteQuery(...)` will execute the initial request:
+       * `qraft.posts.getPosts.useInfiniteQuery(...)` launches
+       * the initial query to fetch the first page of posts:
        * ###
        * GET /posts?limit=10&page=1
        */
@@ -86,7 +89,7 @@ const query = qraft.<service>.<operation>.useInfiniteQuery(
             </ul>
           ))}
           <button onClick={() => {
-            // ⬇︎ will execute GET /posts?limit=10&page=2
+            // ⬇︎ Initiates a GET request for the next page of posts: /posts?limit=10&page=2
             infiniteQuery.fetchNextPage()
           }}>
             Load More
@@ -104,7 +107,8 @@ const query = qraft.<service>.<operation>.useInfiniteQuery(
 
     function DataExportList({ initial_pagination_token }: { initial_pagination_token?: string }) {
       /**
-       * `qraft.dataExports.getDataExports.useInfiniteQuery(...)` will execute the initial request:
+       * `qraft.posts.getPosts.useInfiniteQuery(...)` launches
+       * the initial query to fetch the first page of posts:
        * ###
        * GET /data_exports?pagination_token=<INITIAL_PAGINATION_TOKEN>
        * x-monite-version: 2023-09-01
@@ -136,7 +140,7 @@ const query = qraft.<service>.<operation>.useInfiniteQuery(
             disabled={!infiniteQuery.hasPreviousPage}
             onClick={() => {
               /**
-              * ⬇︎ will execute the request:
+               * ⬇︎ Initiates a GET request:
               * GET /data_exports?pagination_token=<PREV_PAGINATION_TOKEN>
               * x-monite-version: 2023-09-01
               * x-monite-entity-id: 3e3e-3e3e-3e3e
@@ -157,7 +161,7 @@ const query = qraft.<service>.<operation>.useInfiniteQuery(
             disabled={!infiniteQuery.hasNextPage}
             onClick={() => {
               /**
-              * ⬇︎ will execute the request:
+              * ⬇︎ Initiates a GET request:
               * GET /data_exports?pagination_token=<NEXT_PAGINATION_TOKEN>
               * x-monite-version: 2023-09-01
               * x-monite-entity-id: 3e3e-3e3e-3e3e

@@ -22,9 +22,13 @@ const query = qraft.<service>.<operation>.useQuery(
 )
 ```
 
+### Returns
+
+`UseQueryResult` object, see the TanStack [_UseQueryResult 🌴_](https://tanstack.com/query/latest/docs/framework/react/reference/useQuery#:~:text=will%20be%20used.-,Returns,-status%3A%20String)
+
 ### Arguments
 
-1. `parameters: Record<'path' | 'query' | 'header', Record<string, any>> | QueryKey | {}`
+1. `parameters: { path, query, header } | QueryKey | {}`
    - **Required**, OpenAPI request parameters for the query, strictly-typed ✨
    - `parameters` will be used to generate the `QueryKey`
    - Instead of an object with `{path, query, header}`, you can pass a `QueryKey` as an array
@@ -54,7 +58,7 @@ const query = qraft.<service>.<operation>.useQuery(
 
     function ApprovalPolicyName() {
       /**
-       * `<service>.<operation>.useQuery(...)` will execute the request:
+       * `<service>.<operation>.useQuery(...)` initiates the request to retrieve data:
        * ###
        * GET /approval_policies/321?items_order=asc&items_order=desc
        * x-monite-version: 1.0.0
@@ -94,7 +98,7 @@ const query = qraft.<service>.<operation>.useQuery(
 
     function ApprovalPolicyName() {
       /**
-       * `<service>.<operation>.useQuery(...)` will execute the request:
+       * `<service>.<operation>.useQuery(...)` initiates the request to retrieve data:
        * ###
        * GET /approval_policies/123?items_order=asc&items_order=desc
        * x-monite-version: 2.0.0
