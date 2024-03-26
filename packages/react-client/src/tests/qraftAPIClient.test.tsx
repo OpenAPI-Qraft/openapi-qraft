@@ -1533,6 +1533,34 @@ describe('Qraft uses setQueryData', () => {
   });
 });
 
+describe('Qraft uses setQueriesData', () => {
+  it('uses setQueriesData with parameters', async () => {
+    const queryClient = new QueryClient();
+
+    const parameters: typeof qraft.files.getFiles.types.parameters = {
+      header: {
+        'x-monite-version': '1.0.0',
+      },
+      query: {
+        id__in: ['1', '2'],
+      },
+    };
+
+    qraft.files.getFiles.setQueryData(parameters, parameters, queryClient);
+
+    qraft.files.getFiles.setQueriesData(
+      { parameters },
+      { ...parameters, header: { 'x-monite-version': '2.0.0' } },
+      queryClient
+    );
+
+    expect(qraft.files.getFiles.getQueryData(parameters, queryClient)).toEqual({
+      ...parameters,
+      header: { 'x-monite-version': '2.0.0' },
+    });
+  });
+});
+
 describe('Qraft uses setInfiniteQueryData', () => {
   it('uses setInfiniteQueryData & getInfiniteQueryData with parameters', async () => {
     const queryClient = new QueryClient();
