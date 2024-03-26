@@ -11,6 +11,7 @@ codegen
 csr
 dracula
 emoji
+fddbf
 Firefox
 gitlab
 groupnames
@@ -19,8 +20,6 @@ iddle
 idx
 ifm
 INADDR
-keytar
-kubb
 linkcheck
 linting
 maxdepth
@@ -31,20 +30,15 @@ monite
 msw
 njsproj
 nodenext
-nojekyll
-NONINFRINGEMENT
 npmjs
 ntvs
 openapi
 ordercer
-orval
 petstore
 pgrep
 pids
 QMethod
 qraft
-Qwebsite
-radist
 redoc
 redocly
 refetched
@@ -80,6 +74,3 @@ website
 workaround
 workflows
 workspaces
-QCHANGELOG
-Qpackage
-Qyarn
