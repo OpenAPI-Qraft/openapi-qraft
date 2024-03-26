@@ -1,10 +1,26 @@
-^\Q.yarn/releases/yarn-4.0.2.cjs\E$
-^\Qwebsite/static/.nojekyll\E$
-^\Qwebsite/static/img/docusaurus-social-card.jpg\E$
-^\Qwebsite/static/img/docusaurus.png\E$
-^\Qwebsite/static/img/favicon.ico\E$
-^\Qwebsite/static/img/logo.svg\E$
-\QCHANGELOG.md\E$
-\Qyarn.lock\E$
-\Qpackage.json\E$
-\Qpackage-lock.json\E$
+# Ignore npm files
+(?:^|/)package(?:-lock|)\.json$
+
+# Ignore files named (yarn for Node.js) `yarn.lock`
+(?:^|/)yarn\.lock$
+
+# Ignore named `.yarn/*`
+(?:^|/).yarn/
+
+# Ignore `node_modules`
+(?:^|/)node_modules/
+
+# Ignore files or directories that case-insensitively have `LICENSE` somewhere in their path
+(?:(?i)LICENSE)
+
+# Ignore files ending in...
+\.(?:ico|png|jpg|svg|json)$
+
+# Ignore `CHANGELOG.md` files
+(?:^|/)CHANGELOG\.md$
+
+# Ignore the website's static files
+^\website/static/
+
+# Ignore the action's configuration data
+^\.github/action/spelling/
