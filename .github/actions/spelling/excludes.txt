@@ -23,4 +23,4 @@
 ^\website/static/
 
 # Ignore the action's configuration data
-^\.github/action/spelling/
+^\.github/actions/spelling/
