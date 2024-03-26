@@ -1,5 +1,17 @@
 # @openapi-qraft/react
 
+## 1.4.0
+
+### Minor Changes
+
+- 6343a8d: Added support for `QueryClient.isMutating(...)` method
+- b297c10: Unified `composeMutationKey(...)` to return the same key structure as `composeQueryKey(...)` if no parameters are passed
+- 42a0b11: Added support for `QueryClient.removeQueries(...)` method
+
+### Patch Changes
+
+- 34fd459: Fixed `fetchQuery(...)` documentation
+
 ## 1.3.2
 
 ### Patch Changes

@@ -1,5 +1,16 @@
 # @openapi-qraft/cli
 
+## 1.4.0
+
+### Minor Changes
+
+- 6343a8d: Added support for `QueryClient.isMutating(...)` method
+- 42a0b11: Added support for `QueryClient.removeQueries(...)` method
+
+### Patch Changes
+
+- e8fc151: Changed CLI options order
+
 ## 1.3.2
 
 ## 1.3.1
