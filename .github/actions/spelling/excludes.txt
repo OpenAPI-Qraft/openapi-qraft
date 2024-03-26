@@ -1,0 +1,10 @@
+^\Q.yarn/releases/yarn-4.0.2.cjs\E$
+^\Qwebsite/static/.nojekyll\E$
+^\Qwebsite/static/img/docusaurus-social-card.jpg\E$
+^\Qwebsite/static/img/docusaurus.png\E$
+^\Qwebsite/static/img/favicon.ico\E$
+^\Qwebsite/static/img/logo.svg\E$
+\QCHANGELOG.md\E$
+\Qyarn.lock\E$
+\Qpackage.json\E$
+\Qpackage-lock.json\E$

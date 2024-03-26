@@ -30,7 +30,7 @@ const query = qraft.<service>.<operation>.useMutation(
 2. `mutationOptions?: UseMutationOptions`
    - **Optional**, represents the options of the [_useMutation(...) 🌴_](https://tanstack.com/query/latest/docs/framework/react/reference/useMutation) Hook
    - When `qraft.<srv>.<op>.useMutation(parameters)` is used (with the predefined _parameters_), `mutationKey` will contain the `parameters` and _operation schema_
-   - When `qraft.<srv>.<op>.useMutation(unedfined)` is used (without predefined _parameters_), `mutationKey` will contain just _operation schema_
+   - When `qraft.<srv>.<op>.useMutation(undefined)` is used (without predefined _parameters_), `mutationKey` will contain just _operation schema_
    - `mutationOptions.mutationFn` could be provided to override the default `mutationFn` used by Qraft, strictly-typed ✨
    - `mutationOptions.mutationKey` could be provided to override the generated key from `parameters`, strictly-typed ✨
 
