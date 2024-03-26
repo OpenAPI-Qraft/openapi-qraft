@@ -1,9 +1,9 @@
 # Automatically suggested patterns
-# hit-count: 252 file-count: 52
+# hit-count: 230 file-count: 46
 # https/http/file urls
 (?:\b(?:https?|ftp|file)://)[-A-Za-z0-9+&@#/%?=~_|!:,.;]+[-A-Za-z0-9+&@#/%=~_|]
 
-# hit-count: 89 file-count: 49
+# hit-count: 80 file-count: 45
 # node packages
 (["'])@[^/'" ]+/[^/'" ]+\g{-1}
 
@@ -11,7 +11,7 @@
 # githubusercontent
 /[-a-z0-9]+\.githubusercontent\.com/[-a-zA-Z0-9?&=_\/.]*
 
-# hit-count: 5 file-count: 3
+# hit-count: 4 file-count: 2
 # GitHub SHAs (markdown)
 (?:\[`?[0-9a-f]+`?\]\(https:/|)/(?:www\.|)github\.com(?:/[^/\s"]+){2,}(?:/[^/\s")]+)(?:[0-9a-f]+(?:[-0-9a-zA-Z/#.]*|)\b|)
 
@@ -26,7 +26,3 @@
 # hit-count: 1 file-count: 1
 # regex choice
 \(\?:[^)]+\|[^)]+\)
-
-# hit-count: 1 file-count: 1
-# version suffix <word>v#
-(?:(?<=[A-Z]{2})V|(?<=[a-z]{2}|[A-Z]{2})v)\d+(?:\b|(?=[a-zA-Z_]))
