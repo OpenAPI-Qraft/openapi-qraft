@@ -735,6 +735,101 @@ describe('Qraft uses Mutations', () => {
   });
 });
 
+describe('Qraft uses useIsMutating', () => {
+  const parameters: typeof qraft.entities.postEntitiesIdDocuments.types.parameters =
+    {
+      header: {
+        'x-monite-version': '1.0.0',
+      },
+      path: {
+        entity_id: '1',
+      },
+      query: {
+        referer: 'https://example.com',
+      },
+    };
+
+  it('supports useIsMutating with filters', async () => {
+    const queryClient = new QueryClient();
+
+    const { result: mutationResult } = renderHook(
+      () => qraft.entities.postEntitiesIdDocuments.useMutation(parameters),
+      {
+        wrapper: (props) => <Providers {...props} queryClient={queryClient} />,
+      }
+    );
+
+    act(() => {
+      mutationResult.current.mutate({
+        verification_document_back: 'back',
+        verification_document_front: 'front',
+      });
+    });
+
+    const { result: isMutatingResult } = renderHook(
+      () =>
+        qraft.entities.postEntitiesIdDocuments.useIsMutating({ parameters }),
+      {
+        wrapper: (props) => <Providers {...props} queryClient={queryClient} />,
+      }
+    );
+
+    await waitFor(() => {
+      expect(isMutatingResult.current).toEqual(1);
+    });
+  });
+
+  it('supports useIsMutating without filters', async () => {
+    const queryClient = new QueryClient();
+
+    const { result: mutationResult } = renderHook(
+      () => {
+        return {
+          mutation_01:
+            qraft.entities.postEntitiesIdDocuments.useMutation(parameters),
+          mutation_02: qraft.entities.postEntitiesIdDocuments.useMutation({
+            ...parameters,
+            header: {
+              'x-monite-version': '2.2.2',
+            },
+          }),
+        };
+      },
+      {
+        wrapper: (props) => <Providers {...props} queryClient={queryClient} />,
+      }
+    );
+
+    act(() => {
+      mutationResult.current.mutation_01.mutate({
+        verification_document_back: 'back',
+        verification_document_front: 'front',
+      });
+      mutationResult.current.mutation_02.mutate({
+        verification_document_back: 'back',
+        verification_document_front: 'front',
+      });
+    });
+
+    const { result: isMutatingResult } = renderHook(
+      () => {
+        return {
+          noParams: qraft.entities.postEntitiesIdDocuments.useIsMutating(),
+          withParams: qraft.entities.postEntitiesIdDocuments.useIsMutating({
+            parameters,
+          }),
+        };
+      },
+      {
+        wrapper: (props) => <Providers {...props} queryClient={queryClient} />,
+      }
+    );
+
+    expect(isMutatingResult.current.withParams).toEqual(1);
+    expect(isMutatingResult.current.noParams).toEqual(2);
+  });
+});
+
 describe('Qraft uses Mutation State', () => {
   const parameters = {
     header: {
@@ -2006,6 +2101,143 @@ describe('Qraft uses Queries Invalidation', () => {
   });
 });
 
+describe('Qraft uses Queries Removal', () => {
+  const parameters_1: typeof qraft.approvalPolicies.getApprovalPoliciesId.types.parameters =
+    {
+      header: {
+        'x-monite-version': '1.0.0',
+      },
+      path: {
+        approval_policy_id: '1',
+      },
+      query: {
+        items_order: ['asc', 'desc'],
+      },
+    };
+
+  const parameters_2: typeof qraft.approvalPolicies.getApprovalPoliciesId.types.parameters =
+    {
+      header: {
+        'x-monite-version': '1.0.0',
+      },
+      path: {
+        approval_policy_id: '2',
+      },
+      query: {
+        items_order: ['asc', 'desc'],
+      },
+    };
+
+  it('supports removeQueries by parameters', async () => {
+    const queryClient = new QueryClient();
+
+    const { result: result_01 } = renderHook(
+      () => {
+        qraft.approvalPolicies.getApprovalPoliciesId.useQuery(parameters_2);
+
+        return qraft.approvalPolicies.getApprovalPoliciesId.useQuery(
+          parameters_1
+        );
+      },
+      {
+        wrapper: (props: { children: ReactNode }) => (
+          <Providers {...props} queryClient={queryClient} />
+        ),
+      }
+    );
+
+    await waitFor(() => {
+      expect(result_01.current.isSuccess).toBeTruthy();
+    });
+
+    expect(
+      qraft.approvalPolicies.getApprovalPoliciesId.getQueryData(
+        parameters_1,
+        queryClient
+      )
+    ).toBeDefined();
+
+    expect(
+      qraft.approvalPolicies.getApprovalPoliciesId.getQueryData(
+        parameters_2,
+        queryClient
+      )
+    ).toBeDefined();
+
+    qraft.approvalPolicies.getApprovalPoliciesId.removeQueries(
+      { parameters: parameters_1 },
+      queryClient
+    );
+
+    expect(
+      qraft.approvalPolicies.getApprovalPoliciesId.getQueryData(
+        parameters_1,
+        queryClient
+      )
+    ).not.toBeDefined();
+
+    expect(
+      qraft.approvalPolicies.getApprovalPoliciesId.getQueryData(
+        parameters_2,
+        queryClient
+      )
+    ).toBeDefined();
+  });
+
+  it('supports removeQueries without parameters', async () => {
+    const queryClient = new QueryClient();
+
+    const { result: result_01 } = renderHook(
+      () => {
+        qraft.approvalPolicies.getApprovalPoliciesId.useQuery(parameters_2);
+
+        return qraft.approvalPolicies.getApprovalPoliciesId.useQuery(
+          parameters_1
+        );
+      },
+      {
+        wrapper: (props: { children: ReactNode }) => (
+          <Providers {...props} queryClient={queryClient} />
+        ),
+      }
+    );
+
+    await waitFor(() => {
+      expect(result_01.current.isSuccess).toBeTruthy();
+    });
+
+    expect(
+      qraft.approvalPolicies.getApprovalPoliciesId.getQueryData(
+        parameters_1,
+        queryClient
+      )
+    ).toBeDefined();
+
+    expect(
+      qraft.approvalPolicies.getApprovalPoliciesId.getQueryData(
+        parameters_2,
+        queryClient
+      )
+    ).toBeDefined();
+
+    qraft.approvalPolicies.getApprovalPoliciesId.removeQueries(queryClient);
+
+    expect(
+      qraft.approvalPolicies.getApprovalPoliciesId.getQueryData(
+        parameters_1,
+        queryClient
+      )
+    ).not.toBeDefined();
+
+    expect(
+      qraft.approvalPolicies.getApprovalPoliciesId.getQueryData(
+        parameters_2,
+        queryClient
+      )
+    ).not.toBeDefined();
+  });
+});
+
 describe('Qraft uses Queries Cancellation', () => {
   const parameters: typeof qraft.approvalPolicies.getApprovalPoliciesId.types.parameters =
     {
@@ -2272,6 +2504,92 @@ describe('Qraft uses IsFetching Query', () => {
 
     expect(
       qraft.approvalPolicies.getApprovalPoliciesId.isFetching(queryClient)
+    ).toEqual(2);
+  });
+});
+
+describe('Qraft uses IsMutating Query', () => {
+  const parameters: typeof qraft.entities.postEntitiesIdDocuments.types.parameters =
+    {
+      header: {
+        'x-monite-version': '1.0.0',
+      },
+      path: {
+        entity_id: '1',
+      },
+      query: {
+        referer: 'https://example.com',
+      },
+    };
+
+  it('supports isMutating with specific parameters', async () => {
+    const queryClient = new QueryClient();
+
+    const { result } = renderHook(
+      () => {
+        qraft.entities.postEntitiesIdDocuments.useMutation({
+          ...parameters,
+          header: {
+            'x-monite-version': '1.2.0',
+          },
+        });
+
+        return qraft.entities.postEntitiesIdDocuments.useMutation(parameters);
+      },
+      {
+        wrapper: (props) => <Providers {...props} queryClient={queryClient} />,
+      }
+    );
+
+    act(() => {
+      result.current.mutate({
+        verification_document_back: 'back',
+        verification_document_front: 'front',
+      });
+    });
+
+    expect(
+      qraft.entities.postEntitiesIdDocuments.isMutating(
+        { parameters },
+        queryClient
+      )
+    ).toEqual(1);
+  });
+
+  it('supports isMutating without specific parameters', async () => {
+    const queryClient = new QueryClient();
+
+    const { result: mutationResult } = renderHook(
+      () => {
+        return {
+          mutation_01:
+            qraft.entities.postEntitiesIdDocuments.useMutation(parameters),
+          mutation_02: qraft.entities.postEntitiesIdDocuments.useMutation({
+            ...parameters,
+            header: {
+              'x-monite-version': '2.2.2',
+            },
+          }),
+        };
+      },
+      {
+        wrapper: (props) => <Providers {...props} queryClient={queryClient} />,
+      }
+    );
+
+    act(() => {
+      mutationResult.current.mutation_01.mutate({
+        verification_document_back: 'back',
+        verification_document_front: 'front',
+      });
+      mutationResult.current.mutation_02.mutate({
+        verification_document_back: 'back',
+        verification_document_front: 'front',
+      });
+    });
+
+    expect(
+      qraft.entities.postEntitiesIdDocuments.isMutating(queryClient)
     ).toEqual(2);
   });
 });

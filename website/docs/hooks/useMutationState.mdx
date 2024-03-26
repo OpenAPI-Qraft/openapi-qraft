@@ -28,7 +28,7 @@ const mutations = qraft.<service>.<operation>.useMutationState(
        - `filters.parameters: { path, query, header }` will be used for filtering mutations by parameters
        - `filters.mutationKey: MutationKey` will be used for filtering mutations by _MutationKey_ instead of parameters
          - `filters.mutationKey` and `filters.parameters` are mutually exclusive
-     - `filters.predicate?: (query: Mutation) => boolean` will be used for filtering mutations by custom predicate
+     - `filters.predicate?: (mutation: Mutation) => boolean` will be used for filtering mutations by custom predicate
    - `select?: <T>(mutation: Mutation) => T`
      - **Optional**, a function to select the data from the mutation
      - _If not provided_, the `MutationState` will be returned

@@ -3,7 +3,7 @@
 import type { DefaultError } from '@tanstack/query-core';
 import {
   UseMutationResult,
-  useMutationState as useMutationStateTanstack,
+  useIsMutating as useIsMutatingStateTanstack,
 } from '@tanstack/react-query';
 
 import { composeMutationFilters } from '../lib/composeMutationFilters.js';
@@ -12,13 +12,13 @@ import { useQueryClient } from '../lib/useQueryClient.js';
 import type { QraftClientOptions } from '../qraftAPIClient.js';
 import { ServiceOperationMutation } from '../ServiceOperation.js';
 
-export const useMutationState: <
+export const useIsMutating: <
   TData = unknown,
   TError = DefaultError,
   TVariables = unknown,
   TContext = unknown,
 >(
-  qraftOptions: QraftClientOptions | undefined,
+  _: QraftClientOptions | undefined,
   schema: OperationSchema,
   args: Parameters<
     ServiceOperationMutation<
@@ -26,20 +26,17 @@ export const useMutationState: <
       object | undefined,
       TVariables,
       TData
-    >['useMutationState']
+    >['useIsMutating']
   >
 ) => UseMutationResult<TData, TError, TVariables, TContext> = (
   qraftOptions,
   schema,
   args
 ) => {
-  const [options, queryClientByArg] = args;
+  const [filters, queryClientByArg] = args;
 
-  return useMutationStateTanstack(
-    {
-      ...options,
-      filters: composeMutationFilters(schema, options?.filters),
-    } as never,
+  return useIsMutatingStateTanstack(
+    composeMutationFilters(schema, filters) as never,
     useQueryClient(qraftOptions, queryClientByArg)
   ) as never;
 };
