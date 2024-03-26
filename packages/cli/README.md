@@ -77,7 +77,7 @@ the `schema.json` file.
   comments _(optional)_.
   - Example: `--file-header '/* eslint-disable */'`
 - **`--postfix-services <string>`:** Customize the generated service names with a specific postfix _(optional, default: `Service`)_.
-  - Example: `--postfix-services Enpoint` will generate `services/UserEndpoint.ts` instead of `services/UserService.ts`.
+  - Example: `--postfix-services Endpoint` will generate `services/UserEndpoint.ts` instead of `services/UserService.ts`.
 - **`--explicit-import-extensions`:** Include explicit `.js` extensions in all import statements. Ideal for projects
   using ECMAScript modules when TypeScript's _--moduleResolution_ is `node16` or `nodenext` _(optional)_.
 - **`-h, --help`:** Display help for the command (optional).
