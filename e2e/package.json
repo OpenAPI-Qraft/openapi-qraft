@@ -12,10 +12,8 @@
     "e2e:test": "yarn e2e:publish-to-private-registry && yarn e2e:update-projects-from-private-registry && yarn e2e:build-projects && yarn e2e:unpublish-from-private-registry"
   },
   "packageManager": "yarn@3.5.0",
-  "dependencies": {
-    "verdaccio": "~5.29.0"
-  },
   "devDependencies": {
-    "rimraf": "~5.0.0"
+    "rimraf": "~5.0.0",
+    "verdaccio": "^5.30.2"
   }
 }
