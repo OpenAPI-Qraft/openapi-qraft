@@ -72,6 +72,7 @@ export interface ServiceOperationQuery<
     ServiceOperationFetchQuery<TSchema, TData, TParams, TError>,
     ServiceOperationFetchInfiniteQuery<TSchema, TData, TParams, TError>,
     ServiceOperationGetQueryData<TSchema, TData, TParams>,
+    ServiceOperationGetQueriesData<TSchema, TData, TParams, TError>,
     ServiceOperationGetInfiniteQueryData<TSchema, TData, TParams>,
     ServiceOperationSetQueryData<TSchema, TData, TParams>,
     ServiceOperationSetQueriesData<TSchema, TData, TParams, TError>,
@@ -1163,6 +1164,57 @@ export interface ServiceOperationSetQueriesDataCallback<
     options: SetDataOptions | QueryClient,
     queryClient?: QueryClient
   ): Array<TData | undefined>;
+}
+
+interface ServiceOperationGetQueriesData<
+  TSchema extends { url: string; method: string },
+  TData,
+  TParams = {}, // todo::try to replace `TParams = {}` with `TParams = undefined`
+  TError = DefaultError,
+> {
+  getQueriesData(
+    filters:
+      | QueryFiltersByParameters<TSchema, TData, TParams, TError>
+      | QueryFiltersByQueryKey<TSchema, TData, TParams, TError>,
+    queryClient: QueryClient
+  ): Array<
+    [
+      queryKey: ServiceOperationQueryKey<TSchema, TParams>,
+      data: TData | undefined,
+    ]
+  >;
+
+  getQueriesData(
+    queryClient: QueryClient
+  ): Array<
+    [
+      queryKey: ServiceOperationQueryKey<TSchema, TParams>,
+      data: TData | undefined,
+    ]
+  >;
+}
+
+/**
+ * @internal
+ */
+export interface ServiceOperationGetQueriesDataCallback<
+  TSchema extends { url: string; method: string },
+  TData,
+  TParams = {},
+  TError = DefaultError,
+> extends ServiceOperationGetQueriesData<TSchema, TData, TParams, TError> {
+  getQueriesData(
+    filters:
+      | QueryFiltersByParameters<TSchema, TData, TParams, TError>
+      | QueryFiltersByQueryKey<TSchema, TData, TParams, TError>
+      | QueryClient,
+    queryClient?: QueryClient
+  ): Array<
+    [
+      queryKey: ServiceOperationQueryKey<TSchema, TParams>,
+      data: TData | undefined,
+    ]
+  >;
 }
 
 interface ServiceOperationSetInfiniteQueryData<

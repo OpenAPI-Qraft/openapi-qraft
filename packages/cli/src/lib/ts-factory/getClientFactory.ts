@@ -172,6 +172,7 @@ const serviceCallbacks = [
   'getInfiniteQueryKey',
   'getMutationKey',
   'getQueryData',
+  'getQueriesData',
   'getQueryKey',
   'mutationFn',
   'queryFn',
