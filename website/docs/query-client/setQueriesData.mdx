@@ -118,27 +118,4 @@ See the TanStack [_queryClient.setQueriesData 🌴_](https://tanstack.com/query/
     );
     ```
   </TabItem>
-
-  <TabItem value="only-infinite" label={<span style={{verticalAlign: "middle"}}>Only <em>Infinite</em></span>}>
-    Using predicate to set only _Infinite Queries_:
-
-    ```ts
-    qraft.entities.getEntities.setQueriesData(
-      {
-        parameters: { path: { entity_id: '3e3e3e' } },
-        predicate: (query) => {
-          // `infinite`⬇︎ property will preset for Infinite Queries
-          return 'infinite' in query.queryKey[0];
-        },
-      },
-      function updater(prev) {
-        return {
-          ...prev,
-          name: 'Updated Entity',
-        };
-      },
-      queryClient
-    );
-    ```
-  </TabItem>
 </Tabs>
