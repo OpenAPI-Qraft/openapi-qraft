@@ -44,7 +44,7 @@ import type { RequestFn } from './lib/requestFn.js';
 export type ServiceOperationQueryKey<
   S extends { url: string; method: string },
   T,
-> = [S, T];
+> = [S & { infinite: false }, T];
 
 export type ServiceOperationInfiniteQueryKey<
   S extends { url: string; method: string },
@@ -391,6 +391,7 @@ type QueryTypeFilter = 'all' | 'active' | 'inactive';
 
 interface QueryFiltersBase<
   TSchema extends { url: string; method: string },
+  TInfinite extends boolean,
   TData,
   TParams = {},
   TError = DefaultError,
@@ -408,11 +409,12 @@ interface QueryFiltersBase<
    */
   predicate?: (
     query: Query<
-      TData,
+      TInfinite extends true ? InfiniteData<TData, TParams> : TData,
       TError,
-      TData,
-      | ServiceOperationQueryKey<TSchema, TParams>
-      | ServiceOperationInfiniteQueryKey<TSchema, TParams>
+      TInfinite extends true ? InfiniteData<TData, TParams> : TData,
+      TInfinite extends true
+        ? ServiceOperationInfiniteQueryKey<TSchema, TParams>
+        : ServiceOperationQueryKey<TSchema, TParams>
     >
   ) => boolean;
   /**
@@ -428,35 +430,54 @@ interface QueryFiltersBase<
 interface QueryFiltersByQueryKey<
   TSchema extends { url: string; method: string },
   TData,
+  TInfinite extends boolean,
   TParams = {},
   TError = DefaultError,
-> extends QueryFiltersBase<TSchema, TData, TParams, TError> {
+> extends QueryFiltersBase<TSchema, TInfinite, TData, TParams, TError> {
+  /**
+   * Is the query infinite
+   */
+  infinite: TInfinite;
+
   /**
    * Include queries matching this query key
    */
-  queryKey?: ServiceOperationQueryKey<TSchema, TParams>;
+  queryKey: TInfinite extends true
+    ? ServiceOperationInfiniteQueryKey<TSchema, TParams>
+    : ServiceOperationQueryKey<TSchema, TParams>;
+
+  parameters?: never;
 }
 
 interface QueryFiltersByParameters<
   TSchema extends { url: string; method: string },
   TData,
+  TInfinite extends boolean,
   TParams = {},
   TError = DefaultError,
-> extends QueryFiltersBase<TSchema, TData, TParams, TError> {
+> extends QueryFiltersBase<TSchema, TInfinite, TData, TParams, TError> {
+  /**
+   * Is the query infinite
+   */
+  infinite: TInfinite;
+
   /**
    * Include queries matching parameters
    */
   parameters?: TParams;
+
+  queryKey?: never;
 }
 
 type InvalidateQueryFilters<
   TSchema extends { url: string; method: string },
   TData,
+  TInfinite extends boolean,
   TParams = {},
   TError = DefaultError,
 > = (
-  | QueryFiltersByParameters<TSchema, TData, TParams, TError>
-  | QueryFiltersByQueryKey<TSchema, TData, TParams, TError>
+  | QueryFiltersByParameters<TSchema, TData, TInfinite, TParams, TError>
+  | QueryFiltersByQueryKey<TSchema, TData, TInfinite, TParams, TError> //
 ) & {
   refetchType?: QueryTypeFilter | 'none';
 };
@@ -467,13 +488,13 @@ interface ServiceOperationInvalidateQueries<
   TParams = {},
   TError = DefaultError,
 > {
-  invalidateQueries(
-    filters: InvalidateQueryFilters<TSchema, TData, TParams, TError>,
+  invalidateQueries<TInfinite extends boolean>(
+    filters: InvalidateQueryFilters<TSchema, TData, TInfinite, TParams, TError>,
     options: InvalidateOptions,
     queryClient: QueryClient
   ): Promise<void>;
-  invalidateQueries(
-    filters: InvalidateQueryFilters<TSchema, TData, TParams, TError>,
+  invalidateQueries<TInfinite extends boolean>(
+    filters: InvalidateQueryFilters<TSchema, TData, TInfinite, TParams, TError>,
     queryClient: QueryClient
   ): Promise<void>;
   invalidateQueries(queryClient: QueryClient): Promise<void>;
@@ -488,10 +509,9 @@ export interface ServiceOperationInvalidateQueriesCallback<
   TParams = {},
   TError = DefaultError,
 > extends ServiceOperationInvalidateQueries<TSchema, TData, TParams, TError> {
-  invalidateQueries(
+  invalidateQueries<TInfinite extends boolean>(
     filters:
-      | QueryFiltersByParameters<TSchema, TData, TParams, TError>
-      | QueryFiltersByQueryKey<TSchema, TData, TParams, TError>
+      | InvalidateQueryFilters<TSchema, TData, TInfinite, TParams, TError>
       | QueryClient,
     options?: InvalidateOptions | QueryClient,
     queryClient?: QueryClient
@@ -504,17 +524,17 @@ interface ServiceOperationCancelQueries<
   TParams = {},
   TError = DefaultError,
 > {
-  cancelQueries(
+  cancelQueries<TInfinite extends boolean>(
     filters:
-      | QueryFiltersByParameters<TSchema, TData, TParams, TError>
-      | QueryFiltersByQueryKey<TSchema, TData, TParams, TError>,
+      | QueryFiltersByParameters<TSchema, TData, TInfinite, TParams, TError>
+      | QueryFiltersByQueryKey<TSchema, TData, TInfinite, TParams, TError>,
     options: CancelOptions,
     queryClient: QueryClient
   ): Promise<void>;
-  cancelQueries(
+  cancelQueries<TInfinite extends boolean>(
     filters:
-      | QueryFiltersByParameters<TSchema, TData, TParams, TError>
-      | QueryFiltersByQueryKey<TSchema, TData, TParams, TError>,
+      | QueryFiltersByParameters<TSchema, TData, TInfinite, TParams, TError>
+      | QueryFiltersByQueryKey<TSchema, TData, TInfinite, TParams, TError>,
     queryClient: QueryClient
   ): Promise<void>;
   cancelQueries(queryClient: QueryClient): Promise<void>;
@@ -529,10 +549,10 @@ export interface ServiceOperationCancelQueriesCallback<
   TParams = {},
   TError = DefaultError,
 > extends ServiceOperationCancelQueries<TSchema, TData, TParams, TError> {
-  cancelQueries(
+  cancelQueries<TInfinite extends boolean>(
     filters:
-      | QueryFiltersByParameters<TSchema, TData, TParams, TError>
-      | QueryFiltersByQueryKey<TSchema, TData, TParams, TError>
+      | QueryFiltersByParameters<TSchema, TData, TInfinite, TParams, TError>
+      | QueryFiltersByQueryKey<TSchema, TData, TInfinite, TParams, TError>
       | QueryClient,
     options?: CancelOptions | QueryClient,
     queryClient?: QueryClient
@@ -545,10 +565,10 @@ interface ServiceOperationRemoveQueries<
   TParams = {},
   TError = DefaultError,
 > {
-  removeQueries(
+  removeQueries<TInfinite extends boolean>(
     filters:
-      | QueryFiltersByParameters<TSchema, TData, TParams, TError>
-      | QueryFiltersByQueryKey<TSchema, TData, TParams, TError>,
+      | QueryFiltersByParameters<TSchema, TData, TInfinite, TParams, TError>
+      | QueryFiltersByQueryKey<TSchema, TData, TInfinite, TParams, TError>,
     queryClient: QueryClient
   ): void;
   removeQueries(queryClient: QueryClient): void;
@@ -563,10 +583,10 @@ export interface ServiceOperationRemoveQueriesCallback<
   TParams = {},
   TError = DefaultError,
 > extends ServiceOperationRemoveQueries<TSchema, TData, TParams, TError> {
-  removeQueries(
+  removeQueries<TInfinite extends boolean>(
     filters:
-      | QueryFiltersByParameters<TSchema, TData, TParams, TError>
-      | QueryFiltersByQueryKey<TSchema, TData, TParams, TError>
+      | QueryFiltersByParameters<TSchema, TData, TInfinite, TParams, TError>
+      | QueryFiltersByQueryKey<TSchema, TData, TInfinite, TParams, TError>
       | QueryClient,
     queryClient?: QueryClient
   ): void;
@@ -578,17 +598,17 @@ interface ServiceOperationResetQueries<
   TParams = {},
   TError = DefaultError,
 > {
-  resetQueries(
+  resetQueries<TInfinite extends boolean>(
     filters:
-      | QueryFiltersByParameters<TSchema, TData, TParams, TError>
-      | QueryFiltersByQueryKey<TSchema, TData, TParams, TError>,
+      | QueryFiltersByParameters<TSchema, TData, TInfinite, TParams, TError>
+      | QueryFiltersByQueryKey<TSchema, TData, TInfinite, TParams, TError>,
     options: ResetOptions,
     queryClient: QueryClient
   ): Promise<void>;
-  resetQueries(
+  resetQueries<TInfinite extends boolean>(
     filters:
-      | QueryFiltersByParameters<TSchema, TData, TParams, TError>
-      | QueryFiltersByQueryKey<TSchema, TData, TParams, TError>,
+      | QueryFiltersByParameters<TSchema, TData, TInfinite, TParams, TError>
+      | QueryFiltersByQueryKey<TSchema, TData, TInfinite, TParams, TError>,
     queryClient: QueryClient
   ): Promise<void>;
   resetQueries(queryClient: QueryClient): Promise<void>;
@@ -603,10 +623,10 @@ export interface ServiceOperationResetQueriesCallback<
   TParams = {},
   TError = DefaultError,
 > extends ServiceOperationResetQueries<TSchema, TData, TParams, TError> {
-  resetQueries(
+  resetQueries<TInfinite extends boolean>(
     filters:
-      | QueryFiltersByParameters<TSchema, TData, TParams, TError>
-      | QueryFiltersByQueryKey<TSchema, TData, TParams, TError>
+      | QueryFiltersByParameters<TSchema, TData, TInfinite, TParams, TError>
+      | QueryFiltersByQueryKey<TSchema, TData, TInfinite, TParams, TError>
       | QueryClient,
     options?: ResetOptions | QueryClient,
     queryClient?: QueryClient
@@ -619,17 +639,17 @@ interface ServiceOperationRefetchQueries<
   TParams = {},
   TError = DefaultError,
 > {
-  refetchQueries(
+  refetchQueries<TInfinite extends boolean>(
     filters:
-      | QueryFiltersByParameters<TSchema, TData, TParams, TError>
-      | QueryFiltersByQueryKey<TSchema, TData, TParams, TError>,
+      | QueryFiltersByParameters<TSchema, TData, TInfinite, TParams, TError>
+      | QueryFiltersByQueryKey<TSchema, TData, TInfinite, TParams, TError>,
     options: RefetchOptions,
     queryClient: QueryClient
   ): Promise<void>;
-  refetchQueries(
+  refetchQueries<TInfinite extends boolean>(
     filters:
-      | QueryFiltersByParameters<TSchema, TData, TParams, TError>
-      | QueryFiltersByQueryKey<TSchema, TData, TParams, TError>,
+      | QueryFiltersByParameters<TSchema, TData, TInfinite, TParams, TError>
+      | QueryFiltersByQueryKey<TSchema, TData, TInfinite, TParams, TError>,
     queryClient: QueryClient
   ): Promise<void>;
   refetchQueries(queryClient: QueryClient): Promise<void>;
@@ -644,10 +664,10 @@ export interface ServiceOperationResetQueriesCallback<
   TParams = {},
   TError = DefaultError,
 > extends ServiceOperationRefetchQueries<TSchema, TData, TParams, TError> {
-  refetchQueries(
+  refetchQueries<TInfinite extends boolean>(
     filters:
-      | QueryFiltersByParameters<TSchema, TData, TParams, TError>
-      | QueryFiltersByQueryKey<TSchema, TData, TParams, TError>
+      | QueryFiltersByParameters<TSchema, TData, TInfinite, TParams, TError>
+      | QueryFiltersByQueryKey<TSchema, TData, TInfinite, TParams, TError>
       | QueryClient,
     options?: RefetchOptions | QueryClient,
     queryClient?: QueryClient
@@ -660,10 +680,10 @@ interface ServiceOperationIsFetchingQueries<
   TParams = {},
   TError = DefaultError,
 > {
-  isFetching(
+  isFetching<TInfinite extends boolean>(
     filters:
-      | QueryFiltersByParameters<TSchema, TData, TParams, TError>
-      | QueryFiltersByQueryKey<TSchema, TData, TParams, TError>,
+      | QueryFiltersByParameters<TSchema, TData, TInfinite, TParams, TError>
+      | QueryFiltersByQueryKey<TSchema, TData, TInfinite, TParams, TError>,
     queryClient: QueryClient
   ): number;
   isFetching(queryClient: QueryClient): number;
@@ -678,10 +698,10 @@ export interface ServiceOperationIsFetchingQueriesCallback<
   TParams = {},
   TError = DefaultError,
 > extends ServiceOperationIsFetchingQueries<TSchema, TData, TParams, TError> {
-  refetchQueries(
+  refetchQueries<TInfinite extends boolean>(
     filters:
-      | QueryFiltersByParameters<TSchema, TData, TParams, TError>
-      | QueryFiltersByQueryKey<TSchema, TData, TParams, TError>
+      | QueryFiltersByParameters<TSchema, TData, TInfinite, TParams, TError>
+      | QueryFiltersByQueryKey<TSchema, TData, TInfinite, TParams, TError>
       | QueryClient,
     queryClient?: QueryClient
   ): number;
@@ -693,10 +713,10 @@ interface ServiceOperationUseIsFetchingQueries<
   TParams = {},
   TError = DefaultError,
 > {
-  useIsFetching(
+  useIsFetching<TInfinite extends boolean>(
     filters?:
-      | QueryFiltersByParameters<TSchema, TData, TParams, TError>
-      | QueryFiltersByQueryKey<TSchema, TData, TParams, TError>,
+      | QueryFiltersByParameters<TSchema, TData, TInfinite, TParams, TError>
+      | QueryFiltersByQueryKey<TSchema, TData, TInfinite, TParams, TError>,
     queryClient?: QueryClient
   ): number;
 }
@@ -750,7 +770,7 @@ interface ServiceOperationUseInfiniteQuery<
       UndefinedInitialDataInfiniteOptions<
         TData,
         TError,
-        InfiniteData<TData>,
+        InfiniteData<TData, TParams>,
         ServiceOperationInfiniteQueryKey<TSchema, TParams>,
         PartialParameters<TPageParam>
       >,
@@ -761,14 +781,14 @@ interface ServiceOperationUseInfiniteQuery<
     > &
       InfiniteQueryPageParamsOptions<TData, PartialParameters<TPageParam>>,
     queryClient?: QueryClient
-  ): UseInfiniteQueryResult<InfiniteData<TData>, TError | Error>;
+  ): UseInfiniteQueryResult<InfiniteData<TData, TParams>, TError | Error>;
   useInfiniteQuery<TPageParam extends TParams>(
     parameters: TParams | ServiceOperationInfiniteQueryKey<TSchema, TParams>,
     options: Omit<
       DefinedInitialDataInfiniteOptions<
         TData,
         TError,
-        InfiniteData<TData>,
+        InfiniteData<TData, TParams>,
         ServiceOperationInfiniteQueryKey<TSchema, TParams>,
         PartialParameters<TPageParam>
       >,
@@ -779,7 +799,10 @@ interface ServiceOperationUseInfiniteQuery<
     > &
       InfiniteQueryPageParamsOptions<TData, PartialParameters<TPageParam>>,
     queryClient?: QueryClient
-  ): DefinedUseInfiniteQueryResult<InfiniteData<TData>, TError | Error>;
+  ): DefinedUseInfiniteQueryResult<
+    InfiniteData<TData, TParams>,
+    TError | Error
+  >;
 }
 
 interface ServiceOperationUseSuspenseInfiniteQuery<
@@ -794,7 +817,7 @@ interface ServiceOperationUseSuspenseInfiniteQuery<
       UseSuspenseInfiniteQueryOptions<
         TData,
         TError,
-        InfiniteData<TData>,
+        InfiniteData<TData, TParams>,
         TData,
         ServiceOperationInfiniteQueryKey<TSchema, TParams>,
         PartialParameters<TPageParam>
@@ -806,7 +829,10 @@ interface ServiceOperationUseSuspenseInfiniteQuery<
     > &
       InfiniteQueryPageParamsOptions<TData, PartialParameters<TPageParam>>,
     queryClient?: QueryClient
-  ): UseSuspenseInfiniteQueryResult<InfiniteData<TData>, TError | Error>;
+  ): UseSuspenseInfiniteQueryResult<
+    InfiniteData<TData, TParams>,
+    TError | Error
+  >;
 }
 
 interface ServiceOperationUseSuspenseQueryQuery<
@@ -839,7 +865,7 @@ export interface ServiceOperationMutation<
 > extends ServiceOperationUseMutation<TSchema, TBody, TData, TParams, TError>,
     ServiceOperationUseIsMutating<TSchema, TBody, TData, TParams, TError>,
     ServiceOperationUseMutationState<TSchema, TBody, TData, TParams, TError>,
-    ServiceOperationIsMutatingQueries<TSchema, TData, TParams, TError>,
+    ServiceOperationIsMutatingQueries<TSchema, TBody, TData, TParams, TError>,
     ServiceOperationMutationFn<TSchema, TBody, TData, TParams> {
   schema: TSchema;
   types: {
@@ -1119,19 +1145,19 @@ interface ServiceOperationSetQueriesData<
   TParams = {}, // todo::try to replace `TParams = {}` with `TParams = undefined`
   TError = DefaultError,
 > {
-  setQueriesData(
+  setQueriesData<TInfinite extends boolean>(
     filters:
-      | QueryFiltersByParameters<TSchema, TData, TParams, TError>
-      | QueryFiltersByQueryKey<TSchema, TData, TParams, TError>,
+      | QueryFiltersByParameters<TSchema, TData, TInfinite, TParams, TError>
+      | QueryFiltersByQueryKey<TSchema, TData, TInfinite, TParams, TError>,
     updater: Updater<NoInfer<TData> | undefined, NoInfer<TData> | undefined>,
     options: SetDataOptions,
     queryClient: QueryClient
   ): Array<TData | undefined>;
 
-  setQueriesData(
+  setQueriesData<TInfinite extends boolean>(
     filters:
-      | QueryFiltersByParameters<TSchema, TData, TParams, TError>
-      | QueryFiltersByQueryKey<TSchema, TData, TParams, TError>,
+      | QueryFiltersByParameters<TSchema, TData, TInfinite, TParams, TError>
+      | QueryFiltersByQueryKey<TSchema, TData, TInfinite, TParams, TError>,
     updater: Updater<NoInfer<TData> | undefined, NoInfer<TData> | undefined>,
     queryClient: QueryClient
   ): Array<TData | undefined>;
@@ -1146,10 +1172,10 @@ export interface ServiceOperationSetQueriesDataCallback<
   TParams = {},
   TError = DefaultError,
 > extends ServiceOperationSetQueriesData<TSchema, TData, TParams, TError> {
-  setQueriesData(
+  setQueriesData<TInfinite extends boolean>(
     filters:
-      | QueryFiltersByParameters<TSchema, TData, TParams, TError>
-      | QueryFiltersByQueryKey<TSchema, TData, TParams, TError>,
+      | QueryFiltersByParameters<TSchema, TData, TInfinite, TParams, TError>
+      | QueryFiltersByQueryKey<TSchema, TData, TInfinite, TParams, TError>,
     updater: Updater<NoInfer<TData> | undefined, NoInfer<TData> | undefined>,
     options: SetDataOptions | QueryClient,
     queryClient?: QueryClient
@@ -1162,10 +1188,10 @@ interface ServiceOperationGetQueriesData<
   TParams = {}, // todo::try to replace `TParams = {}` with `TParams = undefined`
   TError = DefaultError,
 > {
-  getQueriesData(
+  getQueriesData<TInfinite extends boolean>(
     filters:
-      | QueryFiltersByParameters<TSchema, TData, TParams, TError>
-      | QueryFiltersByQueryKey<TSchema, TData, TParams, TError>,
+      | QueryFiltersByParameters<TSchema, TData, TInfinite, TParams, TError>
+      | QueryFiltersByQueryKey<TSchema, TData, TInfinite, TParams, TError>,
     queryClient: QueryClient
   ): Array<
     [
@@ -1193,10 +1219,10 @@ export interface ServiceOperationGetQueriesDataCallback<
   TParams = {},
   TError = DefaultError,
 > extends ServiceOperationGetQueriesData<TSchema, TData, TParams, TError> {
-  getQueriesData(
+  getQueriesData<TInfinite extends boolean>(
     filters:
-      | QueryFiltersByParameters<TSchema, TData, TParams, TError>
-      | QueryFiltersByQueryKey<TSchema, TData, TParams, TError>
+      | QueryFiltersByParameters<TSchema, TData, TInfinite, TParams, TError>
+      | QueryFiltersByQueryKey<TSchema, TData, TInfinite, TParams, TError>
       | QueryClient,
     queryClient?: QueryClient
   ): Array<
@@ -1215,12 +1241,12 @@ interface ServiceOperationSetInfiniteQueryData<
   setInfiniteQueryData(
     parameters: TParams | ServiceOperationInfiniteQueryKey<TSchema, TParams>,
     updater: Updater<
-      NoInfer<InfiniteData<TData>> | undefined,
-      NoInfer<InfiniteData<TData>> | undefined
+      NoInfer<InfiniteData<TData, TParams>> | undefined,
+      NoInfer<InfiniteData<TData, TParams>> | undefined
     >,
     queryClient: QueryClient,
     options?: SetDataOptions
-  ): InfiniteData<TData> | undefined;
+  ): InfiniteData<TData, TParams> | undefined;
 }
 
 interface ServiceOperationGetQueryData<
@@ -1242,7 +1268,7 @@ interface ServiceOperationGetInfiniteQueryData<
   getInfiniteQueryData(
     parameters: TParams | ServiceOperationInfiniteQueryKey<TSchema, TParams>,
     queryClient: QueryClient
-  ): InfiniteData<TData> | undefined;
+  ): InfiniteData<TData, TParams> | undefined;
 }
 
 export interface ServiceOperationMutationFn<
