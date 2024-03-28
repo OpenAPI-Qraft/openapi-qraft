@@ -160,9 +160,6 @@ guide for more information.
       {
         parameters, // * optional, or specific parameters, alternatively, you can use `queryKey`
         predicate: (query) => {
-          // `infinite`⬇︎ property will preset for Infinite Queries
-          if ('infinite' in query.queryKey[0]) return false;
-
           // `queryKey`⬇︎ is fully typed to `qraft.entities.getEntities` operation parameters
           if (query.queryKey[1].path.entity_id === '4c4c-4c4c-4c4c') return false;
 
@@ -194,21 +191,6 @@ guide for more information.
             entity_id: '3e3e-3e3e-3e3e',
           },
         }),
-      },
-      queryClient
-    );
-    ```
-  </TabItem>
-  <TabItem value="only-infinite" label={<span style={{verticalAlign: "middle"}}>Only <em>Infinite</em></span>}>
-    Using predicate to cancel only _Infinite Queries_:
-
-    ```ts
-    qraft.entities.getEntities.cancelQueries(
-      {
-        predicate: (query) => {
-          // `infinite`⬇︎ property will preset for Infinite Queries
-          return 'infinite' in query.queryKey[0];
-        },
       },
       queryClient
     );
