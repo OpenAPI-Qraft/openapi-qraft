@@ -5,5 +5,5 @@ export function composeQueryKey<TSchema extends OperationSchema, TParams>(
   schema: TSchema,
   parameters: TParams | undefined
 ): ServiceOperationQueryKey<TSchema, TParams> {
-  return [schema, parameters ?? ({} as TParams)];
+  return [{ ...schema, infinite: false }, parameters ?? ({} as TParams)];
 }
