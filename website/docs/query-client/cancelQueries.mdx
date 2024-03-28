@@ -36,10 +36,6 @@ guide for more information.
          - All queries for the specified endpoint will be canceled
     2. `queryClient: QueryClient`
        - **Required** [_QueryClient 🌴_](https://tanstack.com/query/latest/docs/reference/QueryClient) to be used
-       - _If not provided_
-         - `QraftContext.queryClient` will be used if available
-         - [_useQueryClient() 🌴_](https://tanstack.com/query/latest/docs/framework/react/reference/useQueryClient)
-           result will be used as a fallback
   </TabItem>
   <TabItem value="with-filter-and-options" label={<span style={{verticalAlign: "middle"}}>With <code>filters</code>, <code>options</code></span>}>
     Cancels queries for the specified endpoint using the provided filters with the specified options.
@@ -68,10 +64,6 @@ guide for more information.
         to be used
     2. `queryClient: QueryClient`
        - **Required** [_QueryClient 🌴_](https://tanstack.com/query/latest/docs/reference/QueryClient) to be used
-       - _If not provided_
-         - `QraftContext.queryClient` will be used if available
-         - [_useQueryClient() 🌴_](https://tanstack.com/query/latest/docs/framework/react/reference/useQueryClient)
-           result will be used as a fallback
   </TabItem>
   <TabItem value="without-filters" label={<span style={{verticalAlign: "middle"}}>No <code style={{textDecoration: "line-through"}}>filters</code>, <code style={{textDecoration: "line-through"}}>options</code></span>}>
     Cancels _all_ queries for the specified endpoint.
@@ -86,10 +78,6 @@ guide for more information.
 
     1. `queryClient: QueryClient`
        - **Required** [_QueryClient 🌴_](https://tanstack.com/query/latest/docs/reference/QueryClient) to be used
-       - _If not provided_
-         - `QraftContext.queryClient` will be used if available
-         - [_useQueryClient() 🌴_](https://tanstack.com/query/latest/docs/framework/react/reference/useQueryClient)
-           result will be used as a fallback
   </TabItem>
 </Tabs>
 
