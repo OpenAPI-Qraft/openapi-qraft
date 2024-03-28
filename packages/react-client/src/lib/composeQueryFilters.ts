@@ -1,3 +1,4 @@
+import { composeBaseQueryKey } from './composeBaseQueryKey.js';
 import { composeInfiniteQueryKey } from './composeInfiniteQueryKey.js';
 import { composeQueryKey } from './composeQueryKey.js';
 import type { OperationSchema } from './requestFn.js';
@@ -16,7 +17,7 @@ export function composeQueryFilters<
 >(schema: OperationSchema, filters: Filters | undefined) {
   if (!filters) {
     return {
-      queryKey: composeQueryKey(schema, undefined),
+      queryKey: composeBaseQueryKey(schema, undefined, undefined),
     };
   }
 

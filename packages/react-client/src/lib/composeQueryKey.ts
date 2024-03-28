@@ -1,9 +1,10 @@
 import type { ServiceOperationQueryKey } from '../ServiceOperation.js';
+import { composeBaseQueryKey } from './composeBaseQueryKey.js';
 import type { OperationSchema } from './requestFn.js';
 
 export function composeQueryKey<TSchema extends OperationSchema, TParams>(
   schema: TSchema,
   parameters: TParams | undefined
 ): ServiceOperationQueryKey<TSchema, TParams> {
-  return [{ ...schema, infinite: false }, parameters ?? ({} as TParams)];
+  return composeBaseQueryKey(schema, parameters, false);
 }
