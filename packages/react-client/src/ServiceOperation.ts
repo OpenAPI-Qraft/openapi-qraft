@@ -914,7 +914,7 @@ interface UseMutationStateFiltersBase<
   status?: MutationStatus;
 }
 
-interface UseMutationStateFiltersByParameters<
+interface MutationFiltersByParameters<
   TBody,
   TData,
   TParams,
@@ -925,9 +925,10 @@ interface UseMutationStateFiltersByParameters<
    * Include mutations matching these parameters
    */
   parameters?: PartialParameters<TParams>;
+  mutationKey?: never;
 }
 
-interface UseMutationStateFiltersByMutationKey<
+interface MutationFiltersByMutationKey<
   TSchema extends { url: string; method: string },
   TBody,
   TData,
@@ -942,6 +943,7 @@ interface UseMutationStateFiltersByMutationKey<
     TSchema,
     PartialParameters<TParams>
   >;
+  parameters?: never;
 }
 
 type MutationVariables<TBody, TParams> = {
@@ -966,14 +968,8 @@ interface ServiceOperationUseMutationState<
   >(
     options?: {
       filters?:
-        | UseMutationStateFiltersByParameters<
-            TBody,
-            TData,
-            TParams,
-            TError,
-            TContext
-          >
-        | UseMutationStateFiltersByMutationKey<
+        | MutationFiltersByParameters<TBody, TData, TParams, TError, TContext>
+        | MutationFiltersByMutationKey<
             TSchema,
             TBody,
             TData,
@@ -1003,14 +999,8 @@ interface ServiceOperationUseIsMutating<
 > {
   useIsMutating<TContext = unknown>(
     filters?:
-      | UseMutationStateFiltersByParameters<
-          TBody,
-          TData,
-          TParams,
-          TError,
-          TContext
-        >
-      | UseMutationStateFiltersByMutationKey<
+      | MutationFiltersByParameters<TBody, TData, TParams, TError, TContext>
+      | MutationFiltersByMutationKey<
           TSchema,
           TBody,
           TData,
@@ -1292,14 +1282,22 @@ export interface ServiceOperationMutationFn<
 
 interface ServiceOperationIsMutatingQueries<
   TSchema extends { url: string; method: string },
+  TBody,
   TData,
   TParams = {},
   TError = DefaultError,
 > {
-  isMutating(
+  isMutating<TContext>(
     filters:
-      | QueryFiltersByParameters<TSchema, TData, TParams, TError>
-      | QueryFiltersByQueryKey<TSchema, TData, TParams, TError>,
+      | MutationFiltersByParameters<TBody, TData, TParams, TError, TContext>
+      | MutationFiltersByMutationKey<
+          TSchema,
+          TBody,
+          TData,
+          TParams,
+          TError,
+          TContext
+        >,
     queryClient: QueryClient
   ): number;
   isMutating(queryClient: QueryClient): number;
@@ -1310,14 +1308,28 @@ interface ServiceOperationIsMutatingQueries<
  */
 export interface ServiceOperationIsMutatingQueriesCallback<
   TSchema extends { url: string; method: string },
+  TBody,
   TData,
   TParams = {},
   TError = DefaultError,
-> extends ServiceOperationIsMutatingQueries<TSchema, TData, TParams, TError> {
-  isMutating(
+> extends ServiceOperationIsMutatingQueries<
+    TSchema,
+    TBody,
+    TData,
+    TParams,
+    TError
+  > {
+  isMutating<TContext>(
     filters:
-      | QueryFiltersByParameters<TSchema, TData, TParams, TError>
-      | QueryFiltersByQueryKey<TSchema, TData, TParams, TError>
+      | MutationFiltersByParameters<TBody, TData, TParams, TError, TContext>
+      | MutationFiltersByMutationKey<
+          TSchema,
+          TBody,
+          TData,
+          TParams,
+          TError,
+          TContext
+        >
       | QueryClient,
     queryClient?: QueryClient
   ): number;
