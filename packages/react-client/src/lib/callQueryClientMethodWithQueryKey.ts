@@ -16,7 +16,7 @@ export function callQueryClientMethodWithQueryKey<
   infinite: boolean,
   args: [...Parameters<(typeof QueryClient.prototype)[QFMethod]>, QueryClient]
 ): ReturnType<(typeof QueryClient.prototype)[QFMethod]> {
-  const parameters = args[0];
+  const parameters = args.length > 1 ? args[0] : undefined;
   const queryClient = args[args.length - 1] as QueryClient | undefined;
 
   if (!queryClient) throw new Error('queryClient is required');
