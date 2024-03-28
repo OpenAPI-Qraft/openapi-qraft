@@ -1193,44 +1193,19 @@ interface ServiceOperationGetQueriesData<
       | QueryFiltersByParameters<TSchema, TData, TInfinite, TParams, TError>
       | QueryFiltersByQueryKey<TSchema, TData, TInfinite, TParams, TError>,
     queryClient: QueryClient
-  ): Array<
-    [
-      queryKey: ServiceOperationQueryKey<TSchema, TParams>,
-      data: TData | undefined,
-    ]
-  >;
-
-  getQueriesData(
-    queryClient: QueryClient
-  ): Array<
-    [
-      queryKey: ServiceOperationQueryKey<TSchema, TParams>,
-      data: TData | undefined,
-    ]
-  >;
-}
-
-/**
- * @internal
- */
-export interface ServiceOperationGetQueriesDataCallback<
-  TSchema extends { url: string; method: string },
-  TData,
-  TParams = {},
-  TError = DefaultError,
-> extends ServiceOperationGetQueriesData<TSchema, TData, TParams, TError> {
-  getQueriesData<TInfinite extends boolean>(
-    filters:
-      | QueryFiltersByParameters<TSchema, TData, TInfinite, TParams, TError>
-      | QueryFiltersByQueryKey<TSchema, TData, TInfinite, TParams, TError>
-      | QueryClient,
-    queryClient?: QueryClient
-  ): Array<
-    [
-      queryKey: ServiceOperationQueryKey<TSchema, TParams>,
-      data: TData | undefined,
-    ]
-  >;
+  ): TInfinite extends true
+    ? Array<
+        [
+          queryKey: ServiceOperationInfiniteQueryKey<TSchema, TParams>,
+          data: NoInfer<InfiniteData<TData, TParams>> | undefined,
+        ]
+      >
+    : Array<
+        [
+          queryKey: ServiceOperationQueryKey<TSchema, TParams>,
+          data: TData | undefined,
+        ]
+      >;
 }
 
 interface ServiceOperationSetInfiniteQueryData<

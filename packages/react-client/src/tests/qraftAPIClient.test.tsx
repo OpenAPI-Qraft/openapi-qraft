@@ -1548,17 +1548,17 @@ describe('Qraft uses setQueriesData', () => {
 });
 
 describe('Qraft uses getQueriesData', () => {
+  const parameters: typeof qraft.files.getFiles.types.parameters = {
+    header: {
+      'x-monite-version': '1.0.0',
+    },
+    query: {
+      id__in: ['1', '2'],
+    },
+  };
+
   it('uses getQueriesData with parameters', async () => {
     const queryClient = new QueryClient();
-
-    const parameters: typeof qraft.files.getFiles.types.parameters = {
-      header: {
-        'x-monite-version': '1.0.0',
-      },
-      query: {
-        id__in: ['1', '2'],
-      },
-    };
 
     qraft.files.getFiles.setQueryData(parameters, parameters, queryClient);
 
@@ -1568,6 +1568,39 @@ describe('Qraft uses getQueriesData', () => {
         queryClient
       )
     ).toEqual([[qraft.files.getFiles.getQueryKey(parameters), parameters]]);
+  });
+
+  it('uses getQueriesData Infinite Queries', async () => {
+    const queryClient = new QueryClient();
+
+    qraft.files.getFiles.setInfiniteQueryData(
+      parameters,
+      {
+        pages: [parameters],
+        pageParams: [parameters],
+      },
+      queryClient
+    );
+
+    const queries = qraft.files.getFiles.getQueriesData(
+      { parameters, infinite: true },
+      queryClient
+    );
+
+    const [query] = queries;
+
+    expect(query).toBeDefined();
+
+    expect(
+      // TS Type quick test
+      query?.[1]?.pages?.[0]?.header?.['x-monite-version'] ===
+        parameters.header['x-monite-version']
+    ).toBeTruthy();
+
+    expect(
+      // TS Type quick test
+      query?.[1]?.pages?.[0]
+    ).toEqual(parameters);
   });
 });
 
