@@ -55,6 +55,7 @@ qraft.<service>.<operation>.removeQueries(
      **/
     qraft.entities.getEntities.removeQueries(
       {
+        infinite: false,
         parameters: {
           header: {
             'x-monite-version': '2023-09-01',
@@ -101,6 +102,7 @@ qraft.<service>.<operation>.removeQueries(
      **/
     qraft.entities.getEntities.removeQueries(
       {
+        infinite: false,
         parameters, // * optional, or specific parameters, alternatively, you can use `queryKey`
         predicate: (query) => {
           // `queryKey`⬇︎ is fully typed to `qraft.entities.getEntities` operation parameters
@@ -125,6 +127,7 @@ qraft.<service>.<operation>.removeQueries(
      **/
     qraft.entities.getEntities.removeQueries(
       {
+        infinite: false,
         // `queryKey` is fully typed to `qraft.entities.getEntities`
         queryKey: qraft.entities.getEntities.getQueryKey({
           header: {

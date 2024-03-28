@@ -80,6 +80,7 @@ guide for more information.
      **/
     qraft.entities.getEntities.invalidateQueries(
       {
+        infinite: false,
         parameters: {
           header: {
             'x-monite-version': '2023-09-01',
@@ -126,6 +127,7 @@ guide for more information.
      **/
     qraft.entities.getEntities.invalidateQueries(
       {
+        infinite: false,
         parameters, // * optional, or specific parameters, alternatively, you can use `queryKey`
         predicate: (query) => {
           // `queryKey`⬇︎ is fully typed to `qraft.entities.getEntities` operation parameters
@@ -150,6 +152,7 @@ guide for more information.
      **/
     qraft.entities.getEntities.invalidateQueries(
       {
+        infinite: false,
         // `queryKey` is fully typed to `qraft.entities.getEntities`
         queryKey: qraft.entities.getEntities.getQueryKey({
           header: {
