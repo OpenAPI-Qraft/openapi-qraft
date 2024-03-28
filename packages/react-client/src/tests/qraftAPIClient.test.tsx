@@ -1834,9 +1834,25 @@ describe('Qraft uses Queries Invalidation', () => {
       },
     });
 
-    const { result: result_01 } = renderHook(hook, {
-      wrapper: wrapper.bind(null, queryClient),
-    });
+    const { result: result_01 } = renderHook(
+      () => {
+        return [
+          qraft.approvalPolicies.getApprovalPoliciesId.useInfiniteQuery(
+            parameters,
+            {
+              initialPageParam: {},
+              getNextPageParam: () => {
+                return {};
+              },
+            }
+          ),
+          qraft.approvalPolicies.getApprovalPoliciesId.useQuery(parameters),
+        ] as const;
+      },
+      {
+        wrapper: wrapper.bind(null, queryClient),
+      }
+    );
 
     const { result: getFilesResult_01 } = renderHook(
       () => qraft.files.getFileList.useQuery({}),
@@ -1846,19 +1862,17 @@ describe('Qraft uses Queries Invalidation', () => {
     );
 
     await waitFor(() => {
-      expect(result_01.current.isSuccess).toBeTruthy();
-      expect(result_01.current.isFetching).toBeFalsy();
+      expect(result_01.current[0].isSuccess).toBeTruthy();
+      expect(result_01.current[0].isFetching).toBeFalsy();
       expect(getFilesResult_01.current.isSuccess).toBeTruthy();
     });
 
-    expect(
-      qraft.approvalPolicies.getApprovalPoliciesId.invalidateQueries(
-        queryClient
-      )
-    ).toBeInstanceOf(Promise);
-
-    const { result: result_02 } = renderHook(hook, {
-      wrapper: wrapper.bind(null, queryClient),
+    act(() => {
+      expect(
+        qraft.approvalPolicies.getApprovalPoliciesId.invalidateQueries(
+          queryClient
+        )
+      ).toBeInstanceOf(Promise);
     });
 
     const { result: getFilesResult_02 } = renderHook(
@@ -1868,7 +1882,33 @@ describe('Qraft uses Queries Invalidation', () => {
       }
     );
 
-    expect(result_02.current.isFetching).toBeTruthy();
+    expect(
+      renderHook(
+        () =>
+          qraft.approvalPolicies.getApprovalPoliciesId.useInfiniteQuery(
+            parameters,
+            {
+              initialPageParam: {},
+              getNextPageParam: () => {
+                return {};
+              },
+            }
+          ),
+        {
+          wrapper: wrapper.bind(null, queryClient),
+        }
+      ).result.current.isFetching
+    ).toBeTruthy();
+
+    expect(
+      renderHook(
+        () => qraft.approvalPolicies.getApprovalPoliciesId.useQuery(parameters),
+        {
+          wrapper: wrapper.bind(null, queryClient),
+        }
+      ).result.current.isFetching
+    ).toBeTruthy();
+
     expect(getFilesResult_02.current.isFetching).toBeFalsy();
   });
 

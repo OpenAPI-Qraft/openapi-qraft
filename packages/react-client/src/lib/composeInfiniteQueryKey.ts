@@ -1,4 +1,5 @@
 import type { ServiceOperationInfiniteQueryKey } from '../ServiceOperation.js';
+import { composeBaseQueryKey } from './composeBaseQueryKey.js';
 import type { OperationSchema } from './requestFn.js';
 
 export function composeInfiniteQueryKey<
@@ -8,5 +9,5 @@ export function composeInfiniteQueryKey<
   schema: TSchema,
   parameters: TParams | undefined
 ): ServiceOperationInfiniteQueryKey<TSchema, TParams> {
-  return [{ ...schema, infinite: true }, parameters ?? ({} as TParams)];
+  return composeBaseQueryKey(schema, parameters, true);
 }
