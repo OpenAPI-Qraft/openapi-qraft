@@ -72,6 +72,7 @@ guide for more information.
     **/
     const numberOfFetchingEntities = qraft.entities.getEntities.isFetching(
       {
+        infinite: false,
         parameters: {
           header: {
             'x-monite-version': '2023-09-01',
@@ -88,7 +89,7 @@ guide for more information.
     ```
   </TabItem>
   <TabItem value="without-filters" label={<span style={{verticalAlign: "middle"}}><code style={{textDecoration: 'line-through'}}>filters</code></span>}>
-    To check _all queries for a particular endpoint_, you can call `isFetching(...)` without `parameters`:
+    To check _all normal queries for a particular endpoint_, you can call `isFetching(...)` without `parameters`:
 
     ```ts
     /**

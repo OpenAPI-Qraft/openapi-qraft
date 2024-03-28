@@ -49,6 +49,7 @@ function FetchStatus() {
 
   // Checks all queries `GET /entities/3e3e-3e3e-3e3e` and `x-monite-version: 2023-09-01` header
   const specificQueryKeyTotal = qraft.entities.getEntities.useIsFetching({
+    infinite: false,
     parameters: {
       header: {
         'x-monite-version': '2023-09-01',

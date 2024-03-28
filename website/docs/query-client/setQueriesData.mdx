@@ -78,7 +78,7 @@ See the TanStack [_queryClient.setQueriesData 🌴_](https://tanstack.com/query/
     const parameters = { path: { petId: 123 } };
 
     qraft.pet.getPetById.setQueriesData(
-      { parameters },
+      { parameters, infinite: false },
       { id: 123, name: 'Rex' },
       queryClient
     );
@@ -97,7 +97,7 @@ See the TanStack [_queryClient.setQueriesData 🌴_](https://tanstack.com/query/
   <TabItem value="with-options" label={<span style={{verticalAlign: 'middle'}}>With <code>options</code></span>}>
     ```tsx
     const pets = qraft.pet.getPetById.setQueriesData(
-      { parameters: { path: { petId: 123 } } },
+      { parameters: { path: { petId: 123 } }, infinite: false },
       { id: 123, name: 'Rex' },
       { updatedAt: Date.now() - 60_000 },
       queryClient
@@ -111,9 +111,9 @@ See the TanStack [_queryClient.setQueriesData 🌴_](https://tanstack.com/query/
     const pets = qraft.pet.getPetById.setQueriesData(
       {
         queryKey: [
-          { method: 'get', url: '/pet/{petId}' },
+          { method: 'get', url: '/pet/{petId}', infinite: false },
           { petId: 123 },
-        ]
+        ],
       },
       { id: 123, name: 'Rex' },
       queryClient

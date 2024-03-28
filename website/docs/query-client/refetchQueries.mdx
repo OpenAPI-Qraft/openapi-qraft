@@ -99,6 +99,7 @@ See also the TanStack [_queryClient.refetchQueries(...) 🌴_](https://tanstack.
      **/
     qraft.entities.getEntities.refetchQueries(
       {
+        infinite: false,
         parameters: {
           header: {
             'x-monite-version': '2023-09-01',
@@ -145,6 +146,7 @@ See also the TanStack [_queryClient.refetchQueries(...) 🌴_](https://tanstack.
      **/
     qraft.entities.getEntities.refetchQueries(
       {
+        infinite: false,
         parameters, // * optional, or specific parameters, alternatively, you can use `queryKey`
         predicate: (query) => {
           // `queryKey`⬇︎ is fully typed to `qraft.entities.getEntities` operation parameters
