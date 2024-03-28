@@ -23,7 +23,7 @@ export const useIsFetching: <TVariables = unknown>(
   const [filters, queryClientByArg] = args;
 
   return useIsFetchingTanstack(
-    composeQueryFilters(schema, filters) as never,
+    composeQueryFilters(schema, filters as never) as never,
     useQueryClient(qraftOptions, queryClientByArg)
   ) as never;
 };
