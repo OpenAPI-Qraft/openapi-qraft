@@ -63,7 +63,7 @@ See also the TanStack [_queryClient.refetchQueries(...) 🌴_](https://tanstack.
        - **Required** [_QueryClient 🌴_](https://tanstack.com/query/latest/docs/reference/QueryClient) to be used
   </TabItem>
   <TabItem value="without-filters" label={<span style={{verticalAlign: "middle"}}>No <code style={{textDecoration: "line-through"}}>filters</code>, <code style={{textDecoration: "line-through"}}>options</code></span>}>
-    Refetches _all_ queries for the specified endpoint.
+    Refetches _all_ normal and _Infinite_ queries for the specified endpoint.
 
     ```ts
     qraft.<service>.<operation>.refetchQueries(
