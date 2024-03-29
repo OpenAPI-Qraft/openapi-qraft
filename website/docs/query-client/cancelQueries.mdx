@@ -29,6 +29,7 @@ guide for more information.
        - **Required**, represents the [_Query Filters 🌴_](https://tanstack.com/query/latest/docs/framework/react/guides/filters#query-filters)
          to be used, strictly-typed ✨
        - `filters.parameters: { path, query, header }` will be used for filtering queries by parameters
+       - `filters.infinite: boolean` will be used to filter infinite or normal queries
        - `filters.queryKey: QueryKey` will be used for filtering queries by _QueryKey_ instead of parameters
          - `filters.queryKey` and `filters.parameters` are mutually exclusive
        - `filters.predicate?: (query: Query) => boolean` will be used for filtering queries by custom predicate
@@ -36,10 +37,6 @@ guide for more information.
          - All queries for the specified endpoint will be canceled
     2. `queryClient: QueryClient`
        - **Required** [_QueryClient 🌴_](https://tanstack.com/query/latest/docs/reference/QueryClient) to be used
-       - _If not provided_
-         - `QraftContext.queryClient` will be used if available
-         - [_useQueryClient() 🌴_](https://tanstack.com/query/latest/docs/framework/react/reference/useQueryClient)
-           result will be used as a fallback
   </TabItem>
   <TabItem value="with-filter-and-options" label={<span style={{verticalAlign: "middle"}}>With <code>filters</code>, <code>options</code></span>}>
     Cancels queries for the specified endpoint using the provided filters with the specified options.
@@ -58,6 +55,7 @@ guide for more information.
        - **Required**, represents the [_Query Filters 🌴_](https://tanstack.com/query/latest/docs/framework/react/guides/filters#query-filters)
          to be used, strictly-typed ✨
        - `filters.parameters: { path, query, header }` will be used for filtering queries by parameters
+       - `filters.infinite: boolean` will be used to filter infinite or normal queries
        - `filters.queryKey: QueryKey` will be used for filtering queries by _QueryKey_ instead of parameters
          - `filters.queryKey` and `filters.parameters` are mutually exclusive
        - `filters.predicate?: (query: Query) => boolean` will be used for filtering queries by custom predicate
@@ -68,13 +66,9 @@ guide for more information.
         to be used
     2. `queryClient: QueryClient`
        - **Required** [_QueryClient 🌴_](https://tanstack.com/query/latest/docs/reference/QueryClient) to be used
-       - _If not provided_
-         - `QraftContext.queryClient` will be used if available
-         - [_useQueryClient() 🌴_](https://tanstack.com/query/latest/docs/framework/react/reference/useQueryClient)
-           result will be used as a fallback
   </TabItem>
   <TabItem value="without-filters" label={<span style={{verticalAlign: "middle"}}>No <code style={{textDecoration: "line-through"}}>filters</code>, <code style={{textDecoration: "line-through"}}>options</code></span>}>
-    Cancels _all_ queries for the specified endpoint.
+    Cancels _all_ normal and _Infinite_ queries for the specified endpoint.
 
     ```ts
     qraft.<service>.<operation>.cancelQueries(
@@ -86,10 +80,6 @@ guide for more information.
 
     1. `queryClient: QueryClient`
        - **Required** [_QueryClient 🌴_](https://tanstack.com/query/latest/docs/reference/QueryClient) to be used
-       - _If not provided_
-         - `QraftContext.queryClient` will be used if available
-         - [_useQueryClient() 🌴_](https://tanstack.com/query/latest/docs/framework/react/reference/useQueryClient)
-           result will be used as a fallback
   </TabItem>
 </Tabs>
 
@@ -112,6 +102,7 @@ guide for more information.
      **/
     qraft.entities.getEntities.cancelQueries(
       {
+        infinite: false,
         parameters: {
           header: {
             'x-monite-version': '2023-09-01',
@@ -158,11 +149,9 @@ guide for more information.
      **/
     qraft.entities.getEntities.cancelQueries(
       {
+        infinite: false,
         parameters, // * optional, or specific parameters, alternatively, you can use `queryKey`
         predicate: (query) => {
-          // `infinite`⬇︎ property will preset for Infinite Queries
-          if ('infinite' in query.queryKey[0]) return false;
-
           // `queryKey`⬇︎ is fully typed to `qraft.entities.getEntities` operation parameters
           if (query.queryKey[1].path.entity_id === '4c4c-4c4c-4c4c') return false;
 
@@ -194,21 +183,6 @@ guide for more information.
             entity_id: '3e3e-3e3e-3e3e',
           },
         }),
-      },
-      queryClient
-    );
-    ```
-  </TabItem>
-  <TabItem value="only-infinite" label={<span style={{verticalAlign: "middle"}}>Only <em>Infinite</em></span>}>
-    Using predicate to cancel only _Infinite Queries_:
-
-    ```ts
-    qraft.entities.getEntities.cancelQueries(
-      {
-        predicate: (query) => {
-          // `infinite`⬇︎ property will preset for Infinite Queries
-          return 'infinite' in query.queryKey[0];
-        },
       },
       queryClient
     );

@@ -1,0 +1,123 @@
+---
+sidebar_label: setQueriesData
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# setQueriesData(...)
+
+The synchronous function that can be used to immediately update cached data of multiple queries by using filter.
+Only queries that match the passed _QueryKey_ will be updated. _No_ new cache entries will be created.
+See the TanStack [_queryClient.setQueriesData 🌴_](https://tanstack.com/query/latest/docs/reference/QueryClient#queryclientsetqueriesdata) documentation.
+
+<Tabs>
+  <TabItem value="without-options" label={<span style={{verticalAlign: 'middle'}}>Without <code>options</code></span>} default>
+    ```ts
+    const data = qraft.<service>.<operation>.setQueriesData(
+      filters,
+      updater,
+      queryClient
+    );
+    ```
+
+    ## Arguments
+
+    1. `filters: QueryFiltersByParameters | QueryFiltersByQueryKey`
+       - **Required**, represents the [_Query Filters 🌴_](https://tanstack.com/query/latest/docs/framework/react/guides/filters#query-filters)
+         to be used, strictly-typed ✨
+       - `filters.parameters: { path, query, header }` will be used for filtering queries by parameters
+       - `filters.infinite: boolean` will be used to filter infinite or normal queries
+       - `filters.queryKey: QueryKey` will be used for filtering queries by _QueryKey_ instead of parameters
+         - `filters.queryKey` and `filters.parameters` are mutually exclusive
+       - `filters.predicate?: (query: Query) => boolean` will be used for filtering queries by custom predicate
+    2. `updater: TData | (oldData: TData | undefined) => TData | undefined`
+         - **Required** updater to be used to set the data in the _Query Cache_
+    3. `queryClient: QueryClient`
+         - **Required** `QueryClient` instance to use
+  </TabItem>
+  <TabItem value="with-options" label={<span style={{verticalAlign: 'middle'}}>With <code>options</code></span>}>
+    ```ts
+    const data = qraft.<service>.<operation>.setQueriesData(
+      filters,
+      updater,
+      options,
+      queryClient
+    );
+    ```
+
+    ## Arguments
+
+    1. `filters: QueryFiltersByParameters | QueryFiltersByQueryKey`
+       - **Required**, represents the [_Query Filters 🌴_](https://tanstack.com/query/latest/docs/framework/react/guides/filters#query-filters)
+         to be used, strictly-typed ✨
+       - `filters.parameters: { path, query, header }` will be used for filtering queries by parameters
+       - `filters.infinite: boolean` will be used to filter infinite or normal queries
+       - `filters.queryKey: QueryKey` will be used for filtering queries by _QueryKey_ instead of parameters
+         - `filters.queryKey` and `filters.parameters` are mutually exclusive
+       - `filters.predicate?: (query: Query) => boolean` will be used for filtering queries by custom predicate
+    2. `updater: TData | (oldData: TData | undefined) => TData | undefined`
+         - **Required** updater to be used to set the data in the _Query Cache_
+    3. `options: SetQueryDataOptions`
+         - **Required** options to set the data in the cache
+         - See the TanStack [_queryClient.setQueriesData 🌴_](https://tanstack.com/query/latest/docs/reference/QueryClient#queryclientsetquerydata) documentation.
+    4. `queryClient: QueryClient`
+         - **Required** `QueryClient` instance to use
+  </TabItem>
+</Tabs>
+
+## Returns
+
+`Array<TData | undefined>` - The data that was set in the cache.
+
+## Example
+
+<Tabs>
+  <TabItem value="without-options" label={<span style={{verticalAlign: 'middle'}}>Without <code>options</code></span>}>
+    ```tsx
+    const parameters = { path: { petId: 123 } };
+
+    qraft.pet.getPetById.setQueriesData(
+      { parameters, infinite: false },
+      { id: 123, name: 'Rex' },
+      queryClient
+    );
+
+    const pet = qraft.pet.getPetById.getQueryData(
+      parameters,
+      queryClient
+    );
+
+    expect(pet).toEqual({
+      id: 123,
+      name: 'Rex',
+    });
+    ```
+  </TabItem>
+  <TabItem value="with-options" label={<span style={{verticalAlign: 'middle'}}>With <code>options</code></span>}>
+    ```tsx
+    const pets = qraft.pet.getPetById.setQueriesData(
+      { parameters: { path: { petId: 123 } }, infinite: false },
+      { id: 123, name: 'Rex' },
+      { updatedAt: Date.now() - 60_000 },
+      queryClient
+    );
+    ```
+  </TabItem>
+  <TabItem value="with-query-key" label={<span style={{verticalAlign: 'middle'}}>With <code>QueryKey</code></span>}>
+    It's also possible to use a `QueryKey` as an array instead of an object with `{path, query, header}`:
+
+    ```tsx
+    const pets = qraft.pet.getPetById.setQueriesData(
+      {
+        queryKey: [
+          { method: 'get', url: '/pet/{petId}', infinite: false },
+          { petId: 123 },
+        ],
+      },
+      { id: 123, name: 'Rex' },
+      queryClient
+    );
+    ```
+  </TabItem>
+</Tabs>

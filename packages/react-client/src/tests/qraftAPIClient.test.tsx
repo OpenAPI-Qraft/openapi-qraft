@@ -1094,6 +1094,7 @@ describe('Qraft uses Query Function', () => {
           {
             url: '/approval_policies/{approval_policy_id}',
             method: 'get',
+            infinite: false,
           },
           parameters,
         ],
@@ -1372,14 +1373,14 @@ describe('Proxy call manipulations', () => {
 
   it('uses "apply" on proxy', async () => {
     expect(qraft.files.getFiles.getQueryKey.apply(null, [parameters])).toEqual([
-      qraft.files.getFiles.schema,
+      { ...qraft.files.getFiles.schema, infinite: false },
       parameters,
     ]);
   });
 
   it('uses "call" on proxy', async () => {
     expect(qraft.files.getFiles.getQueryKey.call(null, parameters)).toEqual([
-      qraft.files.getFiles.schema,
+      { ...qraft.files.getFiles.schema, infinite: false },
       parameters,
     ]);
   });
@@ -1506,23 +1507,8 @@ describe('Qraft uses setQueryData', () => {
     qraft.files.getFiles.setInfiniteQueryData(
       parameters,
       {
-        pages: [
-          {
-            header: {
-              'x-monite-version': '1.0.0',
-            },
-            query: {
-              id__in: ['1', '2'],
-            },
-          },
-        ],
-        pageParams: [
-          {
-            query: {
-              page: '1',
-            },
-          },
-        ],
+        pages: [parameters],
+        pageParams: [parameters],
       },
       queryClient
     );
@@ -1530,6 +1516,91 @@ describe('Qraft uses setQueryData', () => {
     expect(
       qraft.files.getFiles.getQueryData(parameters, queryClient)
     ).not.toBeDefined();
+  });
+});
+
+describe('Qraft uses setQueriesData', () => {
+  it('uses setQueriesData with parameters', async () => {
+    const queryClient = new QueryClient();
+
+    const parameters: typeof qraft.files.getFiles.types.parameters = {
+      header: {
+        'x-monite-version': '1.0.0',
+      },
+      query: {
+        id__in: ['1', '2'],
+      },
+    };
+
+    qraft.files.getFiles.setQueryData(parameters, parameters, queryClient);
+
+    qraft.files.getFiles.setQueriesData(
+      { parameters, infinite: false },
+      { ...parameters, header: { 'x-monite-version': '2.0.0' } },
+      queryClient
+    );
+
+    expect(qraft.files.getFiles.getQueryData(parameters, queryClient)).toEqual({
+      ...parameters,
+      header: { 'x-monite-version': '2.0.0' },
+    });
+  });
+});
+
+describe('Qraft uses getQueriesData', () => {
+  const parameters: typeof qraft.files.getFiles.types.parameters = {
+    header: {
+      'x-monite-version': '1.0.0',
+    },
+    query: {
+      id__in: ['1', '2'],
+    },
+  };
+
+  it('uses getQueriesData with parameters', async () => {
+    const queryClient = new QueryClient();
+
+    qraft.files.getFiles.setQueryData(parameters, parameters, queryClient);
+
+    expect(
+      qraft.files.getFiles.getQueriesData(
+        { parameters, infinite: false },
+        queryClient
+      )
+    ).toEqual([[qraft.files.getFiles.getQueryKey(parameters), parameters]]);
+  });
+
+  it('uses getQueriesData Infinite Queries', async () => {
+    const queryClient = new QueryClient();
+
+    qraft.files.getFiles.setInfiniteQueryData(
+      parameters,
+      {
+        pages: [parameters],
+        pageParams: [parameters],
+      },
+      queryClient
+    );
+
+    const queries = qraft.files.getFiles.getQueriesData(
+      { parameters, infinite: true },
+      queryClient
+    );
+
+    const [query] = queries;
+
+    expect(query).toBeDefined();
+
+    expect(
+      // TS Type quick test
+      query?.[1]?.pages?.[0]?.header?.['x-monite-version'] ===
+        parameters.header['x-monite-version']
+    ).toBeTruthy();
+
+    expect(
+      // TS Type quick test
+      query?.[1]?.pages?.[0]
+    ).toEqual(parameters);
   });
 });
 
@@ -1549,36 +1620,15 @@ describe('Qraft uses setInfiniteQueryData', () => {
     qraft.files.getFiles.setInfiniteQueryData(
       parameters,
       {
-        pages: [
-          {
-            header: {
-              'x-monite-version': '1.0.0',
-            },
-            query: {
-              id__in: ['1', '2'],
-            },
-          },
-        ],
-        pageParams: [
-          {
-            query: {
-              page: '1',
-            },
-          },
-        ],
+        pages: [parameters],
+        pageParams: [parameters],
       },
       queryClient
     );
 
     const expectedResult = {
       pages: [parameters],
-      pageParams: [
-        {
-          query: {
-            page: '1',
-          },
-        },
-      ],
+      pageParams: [parameters],
     };
 
     expect(
@@ -1608,36 +1658,15 @@ describe('Qraft uses setInfiniteQueryData', () => {
     qraft.files.getFiles.setInfiniteQueryData(
       qraft.files.getFiles.getInfiniteQueryKey(parameters),
       {
-        pages: [
-          {
-            header: {
-              'x-monite-version': '1.0.0',
-            },
-            query: {
-              id__in: ['1', '2'],
-            },
-          },
-        ],
-        pageParams: [
-          {
-            query: {
-              page: '1',
-            },
-          },
-        ],
+        pages: [parameters],
+        pageParams: [parameters],
       },
       queryClient
     );
 
     const expectedResult = {
       pages: [parameters],
-      pageParams: [
-        {
-          query: {
-            page: '1',
-          },
-        },
-      ],
+      pageParams: [parameters],
     };
 
     expect(
@@ -1725,7 +1754,7 @@ describe('Qraft uses Queries Invalidation', () => {
 
     expect(
       qraft.approvalPolicies.getApprovalPoliciesId.invalidateQueries(
-        { parameters },
+        { parameters, infinite: false },
         queryClient
       )
     ).toBeInstanceOf(Promise);
@@ -1774,6 +1803,69 @@ describe('Qraft uses Queries Invalidation', () => {
     expect(result_02.current.isFetching).toBeTruthy();
   });
 
+  describe('Qraft uses getQueryState', () => {
+    it('supports getQueryState by parameters', async () => {
+      const queryClient = new QueryClient({
+        defaultOptions: {
+          queries: {
+            refetchOnMount: false,
+          },
+        },
+      });
+
+      const { result: result_01 } = renderHook(
+        () => qraft.approvalPolicies.getApprovalPoliciesId.useQuery(parameters),
+        {
+          wrapper: wrapper.bind(null, queryClient),
+        }
+      );
+
+      await waitFor(() => {
+        expect(
+          qraft.approvalPolicies.getApprovalPoliciesId.getQueryState(
+            parameters,
+            queryClient
+          )?.status
+        ).toEqual('success');
+      });
+    });
+
+    it('supports getQueryState by parameters and infinite query', async () => {
+      const queryClient = new QueryClient({
+        defaultOptions: {
+          queries: {
+            refetchOnMount: false,
+          },
+        },
+      });
+
+      const { result: result_01 } = renderHook(
+        () =>
+          qraft.approvalPolicies.getApprovalPoliciesId.useInfiniteQuery(
+            parameters,
+            {
+              initialPageParam: {},
+              getNextPageParam: () => {
+                return {};
+              },
+            }
+          ),
+        {
+          wrapper: wrapper.bind(null, queryClient),
+        }
+      );
+
+      await waitFor(() => {
+        expect(
+          qraft.approvalPolicies.getApprovalPoliciesId.getInfiniteQueryState(
+            parameters,
+            queryClient
+          )?.status
+        ).toEqual('success');
+      });
+    });
+  });
+
   it('supports invalidateQueries with options', async () => {
     const queryClient = new QueryClient({
       defaultOptions: {
@@ -1806,7 +1898,7 @@ describe('Qraft uses Queries Invalidation', () => {
 
     await expect(
       qraft.approvalPolicies.getApprovalPoliciesId.invalidateQueries(
-        { parameters },
+        { parameters, infinite: false },
         { throwOnError: true },
         queryClient
       )
@@ -1837,9 +1929,25 @@ describe('Qraft uses Queries Invalidation', () => {
       },
     });
 
-    const { result: result_01 } = renderHook(hook, {
-      wrapper: wrapper.bind(null, queryClient),
-    });
+    const { result: result_01 } = renderHook(
+      () => {
+        return [
+          qraft.approvalPolicies.getApprovalPoliciesId.useInfiniteQuery(
+            parameters,
+            {
+              initialPageParam: {},
+              getNextPageParam: () => {
+                return {};
+              },
+            }
+          ),
+          qraft.approvalPolicies.getApprovalPoliciesId.useQuery(parameters),
+        ] as const;
+      },
+      {
+        wrapper: wrapper.bind(null, queryClient),
+      }
+    );
 
     const { result: getFilesResult_01 } = renderHook(
       () => qraft.files.getFileList.useQuery({}),
@@ -1849,19 +1957,17 @@ describe('Qraft uses Queries Invalidation', () => {
     );
 
     await waitFor(() => {
-      expect(result_01.current.isSuccess).toBeTruthy();
-      expect(result_01.current.isFetching).toBeFalsy();
+      expect(result_01.current[0].isSuccess).toBeTruthy();
+      expect(result_01.current[0].isFetching).toBeFalsy();
       expect(getFilesResult_01.current.isSuccess).toBeTruthy();
     });
 
-    expect(
-      qraft.approvalPolicies.getApprovalPoliciesId.invalidateQueries(
-        queryClient
-      )
-    ).toBeInstanceOf(Promise);
-
-    const { result: result_02 } = renderHook(hook, {
-      wrapper: wrapper.bind(null, queryClient),
+    act(() => {
+      expect(
+        qraft.approvalPolicies.getApprovalPoliciesId.invalidateQueries(
+          queryClient
+        )
+      ).toBeInstanceOf(Promise);
     });
 
     const { result: getFilesResult_02 } = renderHook(
@@ -1871,7 +1977,33 @@ describe('Qraft uses Queries Invalidation', () => {
       }
     );
 
-    expect(result_02.current.isFetching).toBeTruthy();
+    expect(
+      renderHook(
+        () =>
+          qraft.approvalPolicies.getApprovalPoliciesId.useInfiniteQuery(
+            parameters,
+            {
+              initialPageParam: {},
+              getNextPageParam: () => {
+                return {};
+              },
+            }
+          ),
+        {
+          wrapper: wrapper.bind(null, queryClient),
+        }
+      ).result.current.isFetching
+    ).toBeTruthy();
+
+    expect(
+      renderHook(
+        () => qraft.approvalPolicies.getApprovalPoliciesId.useQuery(parameters),
+        {
+          wrapper: wrapper.bind(null, queryClient),
+        }
+      ).result.current.isFetching
+    ).toBeTruthy();
+
     expect(getFilesResult_02.current.isFetching).toBeFalsy();
   });
 
@@ -1910,6 +2042,7 @@ describe('Qraft uses Queries Invalidation', () => {
       qraft.approvalPolicies.getApprovalPoliciesId.invalidateQueries(
         {
           parameters,
+          infinite: true,
           predicate: (query) => {
             counterFn({
               infinite:
@@ -2086,6 +2219,7 @@ describe('Qraft uses Queries Invalidation', () => {
     expect(
       qraft.approvalPolicies.getApprovalPoliciesId.invalidateQueries(
         {
+          infinite: false,
           predicate: (query) => {
             counterFn(query.queryKey[1]);
             return true;
@@ -2165,7 +2299,7 @@ describe('Qraft uses Queries Removal', () => {
     ).toBeDefined();
 
     qraft.approvalPolicies.getApprovalPoliciesId.removeQueries(
-      { parameters: parameters_1 },
+      { parameters: parameters_1, infinite: false },
       queryClient
     );
 
@@ -2280,7 +2414,7 @@ describe('Qraft uses Queries Cancellation', () => {
 
     await expect(
       qraft.approvalPolicies.getApprovalPoliciesId.cancelQueries(
-        { parameters },
+        { parameters, infinite: false },
         queryClient
       )
     ).resolves.toBeUndefined();
@@ -2367,6 +2501,7 @@ describe('Qraft uses Queries Refetch', () => {
       qraft.approvalPolicies.getApprovalPoliciesId.refetchQueries(
         {
           parameters,
+          infinite: false,
         },
         queryClient
       );
@@ -2424,7 +2559,7 @@ describe('Qraft uses Queries Reset', () => {
 
     act(() => {
       qraft.approvalPolicies.getApprovalPoliciesId.resetQueries(
-        { parameters },
+        { parameters, infinite: false },
         queryClient
       );
     });
@@ -2475,7 +2610,7 @@ describe('Qraft uses IsFetching Query', () => {
 
     expect(
       qraft.approvalPolicies.getApprovalPoliciesId.isFetching(
-        { parameters },
+        { parameters, infinite: false },
         queryClient
       )
     ).toEqual(1);
@@ -2633,6 +2768,7 @@ describe('Qraft uses useIsFetching Query', () => {
       () =>
         qraft.approvalPolicies.getApprovalPoliciesId.useIsFetching({
           parameters,
+          infinite: false,
         }),
       {
         wrapper: (props) => <Providers {...props} queryClient={queryClient} />,
@@ -2692,6 +2828,7 @@ describe('Qraft uses getQueryKey', () => {
       {
         url: qraft.approvalPolicies.getApprovalPoliciesId.schema.url,
         method: qraft.approvalPolicies.getApprovalPoliciesId.schema.method,
+        infinite: false,
       },
       {
         header: {
@@ -2712,6 +2849,7 @@ describe('Qraft uses getQueryKey', () => {
       {
         url: qraft.approvalPolicies.getApprovalPoliciesId.schema.url,
         method: qraft.approvalPolicies.getApprovalPoliciesId.schema.method,
+        infinite: false,
       },
       {},
     ]);
@@ -2763,6 +2901,106 @@ describe('Qraft uses getMutationKey', () => {
       },
       {},
     ]);
+  });
+});
+
+describe('Qraft respects Types', () => {
+  const parameters: typeof qraft.approvalPolicies.getApprovalPoliciesId.types.parameters =
+    {
+      header: {
+        'x-monite-version': '1.0.0',
+      },
+      path: {
+        approval_policy_id: '1',
+      },
+      query: {
+        items_order: ['asc', 'desc'],
+      },
+    };
+
+  const queryClient = new QueryClient();
+
+  it('supports infinite QueryKey predicate query filter strict types', () => {
+    qraft.approvalPolicies.getApprovalPoliciesId.getQueriesData(
+      {
+        queryKey: [
+          {
+            ...qraft.approvalPolicies.getApprovalPoliciesId.schema,
+            infinite: true,
+          },
+          parameters,
+        ],
+        predicate: (query) => {
+          // Will report TS error if 'false'
+          const isTrue = query.queryKey?.[0]?.infinite === true; // todo::improve type checking
+
+          return Boolean(
+            // Check if queryKey has correct type
+            query.queryKey?.[1]?.query?.items_order?.includes('asc')
+          );
+        },
+      },
+      queryClient
+    );
+  });
+
+  it('supports regular QueryKey predicate query filter strict types', () => {
+    qraft.approvalPolicies.getApprovalPoliciesId.getQueriesData(
+      {
+        queryKey: [
+          {
+            ...qraft.approvalPolicies.getApprovalPoliciesId.schema,
+            infinite: false,
+          },
+          parameters,
+        ],
+        predicate: (query) => {
+          // Will report TS error if 'true'
+          const isTrue = query.queryKey?.[0]?.infinite === false; // todo::improve type checking
+
+          return Boolean(
+            query.queryKey?.[1]?.query?.items_order?.includes('asc')
+          );
+        },
+      },
+      queryClient
+    );
+  });
+
+  it('supports regular parameters predicate query filter strict types', () => {
+    qraft.approvalPolicies.getApprovalPoliciesId.getQueriesData(
+      {
+        parameters,
+        infinite: false,
+        predicate: (query) => {
+          // Will report TS error if 'true'
+          const isTrue = query.queryKey?.[0]?.infinite === false; // todo::improve type checking
+
+          return Boolean(
+            query.queryKey?.[1]?.query?.items_order?.includes('asc')
+          );
+        },
+      },
+      queryClient
+    );
+  });
+
+  it('does not supports  predicate without ', () => {
+    qraft.approvalPolicies.getApprovalPoliciesId.getQueriesData(
+      {
+        // @ts-expect-error - `query` should be infinite or regular query, todo::improve type checking
+        predicate: (query) => {
+          // Will report TS error if 'true'
+          const isInfinite =
+            query.queryKey?.[0] && 'infinite' in query.queryKey[0];
+
+          return Boolean(
+            query.queryKey?.[1]?.query?.items_order?.includes('asc')
+          );
+        },
+      },
+      queryClient
+    );
   });
 });
 

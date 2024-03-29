@@ -20,8 +20,9 @@ const queriesNumber = qraft.<service>.<operation>.useIsFetching(
 
 1. `filters?: QueryFiltersByParameters | QueryFiltersByQueryKey`
    - **Optional**, represents the [_Query Filters 🌴_](https://tanstack.com/query/latest/docs/framework/react/guides/filters#query-filters)
-     to be used, strictly-typed ✨
+     to be used. If not provided, _all_ normal and _Infinite_ queries will be used to filter.
    - `filters.parameters: { path, query, header }` will be used for filtering queries by parameters
+   - `filters.infinite: boolean` will be used to filter infinite or normal queries
    - `filters.queryKey: QueryKey` will be used for filtering queries by _QueryKey_ instead of parameters
      - `filters.queryKey` and `filters.parameters` are mutually exclusive
    - `filters.predicate?: (query: Query) => boolean` will be used for filtering queries by custom predicate
@@ -48,6 +49,7 @@ function FetchStatus() {
 
   // Checks all queries `GET /entities/3e3e-3e3e-3e3e` and `x-monite-version: 2023-09-01` header
   const specificQueryKeyTotal = qraft.entities.getEntities.useIsFetching({
+    infinite: false,
     parameters: {
       header: {
         'x-monite-version': '2023-09-01',

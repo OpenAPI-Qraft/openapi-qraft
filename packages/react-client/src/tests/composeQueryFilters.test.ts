@@ -9,7 +9,7 @@ describe('composeQueryFilters', () => {
     method: 'get',
   } as const;
 
-  it('should return filters with default queryKey', () => {
+  it('should return filters with default base queryKey', () => {
     const result = composeQueryFilters(schema, undefined);
 
     expect(result).toEqual({
@@ -18,10 +18,10 @@ describe('composeQueryFilters', () => {
   });
 
   it('should return filters with default queryKey and predicate', () => {
-    const result = composeQueryFilters(schema, { predicate });
+    const result = composeQueryFilters(schema, { predicate, infinite: false });
 
     expect(result).toEqual({
-      queryKey: [schema, {}],
+      queryKey: [{ ...schema, infinite: false }, {}],
       predicate,
     });
   });
@@ -35,7 +35,11 @@ describe('composeQueryFilters', () => {
       {},
     ];
 
-    const result = composeQueryFilters(schema, { queryKey, predicate });
+    const result = composeQueryFilters(schema, {
+      queryKey,
+      predicate,
+      infinite: false,
+    });
 
     expect(result).toEqual({ queryKey, predicate });
   });
@@ -47,14 +51,22 @@ describe('composeQueryFilters', () => {
       },
     };
 
-    const result = composeQueryFilters(schema, { parameters, predicate });
+    const result = composeQueryFilters(schema, {
+      parameters,
+      predicate,
+      infinite: false,
+    });
 
-    expect(result).toEqual({ queryKey: [schema, parameters], predicate });
+    expect(result).toEqual({
+      queryKey: [{ ...schema, infinite: false }, parameters],
+      predicate,
+    });
   });
 
   it('should throw error if both queryKey and parameters are provided', () => {
     expect(() =>
       composeQueryFilters(schema, {
+        infinite: false,
         queryKey: [schema, {}],
         parameters: {
           path: {
