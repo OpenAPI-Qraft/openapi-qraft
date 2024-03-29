@@ -41,15 +41,21 @@ import type {
 
 import type { RequestFn } from './lib/requestFn.js';
 
+type ServiceOperationBaseQueryKey<
+  S extends { url: string; method: string },
+  Infinite extends boolean,
+  T,
+> = [S & { infinite: Infinite }, T];
+
 export type ServiceOperationQueryKey<
   S extends { url: string; method: string },
   T,
-> = [S & { infinite: false }, T];
+> = ServiceOperationBaseQueryKey<S, false, T>;
 
 export type ServiceOperationInfiniteQueryKey<
   S extends { url: string; method: string },
   T,
-> = [S & { infinite: true }, T];
+> = ServiceOperationBaseQueryKey<S, true, T>;
 
 export type ServiceOperationMutationKey<
   S extends Record<'url' | 'method', string>,
@@ -391,11 +397,19 @@ type QueryTypeFilter = 'all' | 'active' | 'inactive';
 
 interface QueryFiltersBase<
   TSchema extends { url: string; method: string },
-  TInfinite extends boolean,
   TData,
+  TInfinite extends boolean,
   TParams = {},
   TError = DefaultError,
 > {
+  /**
+   * Include queries matching this predicate function
+   */
+  predicate?: TInfinite extends true
+    ? QueryFilterInfinitePredicate<TSchema, TData, TParams, TError>
+    : TInfinite extends false
+      ? QueryFilterRegularPredicate<TSchema, TData, TParams, TError>
+      : (query: string) => boolean;
   /**
    * Filter to active queries, inactive queries or all queries
    */
@@ -404,19 +418,6 @@ interface QueryFiltersBase<
    * Match query key exactly
    */
   exact?: boolean;
-  /**
-   * Include queries matching this predicate function
-   */
-  predicate?: (
-    query: Query<
-      TInfinite extends true ? InfiniteData<TData, TParams> : TData,
-      TError,
-      TInfinite extends true ? InfiniteData<TData, TParams> : TData,
-      TInfinite extends true
-        ? ServiceOperationInfiniteQueryKey<TSchema, TParams>
-        : ServiceOperationQueryKey<TSchema, TParams>
-    >
-  ) => boolean;
   /**
    * Include or exclude stale queries
    */
@@ -433,19 +434,13 @@ interface QueryFiltersByQueryKey<
   TInfinite extends boolean,
   TParams = {},
   TError = DefaultError,
-> extends QueryFiltersBase<TSchema, TInfinite, TData, TParams, TError> {
-  /**
-   * Is the query infinite
-   */
-  infinite: TInfinite;
-
+> extends QueryFiltersBase<TSchema, TData, TInfinite, TParams, TError> {
   /**
    * Include queries matching this query key
    */
-  queryKey: TInfinite extends true
-    ? ServiceOperationInfiniteQueryKey<TSchema, TParams>
-    : ServiceOperationQueryKey<TSchema, TParams>;
+  queryKey?: ServiceOperationBaseQueryKey<TSchema, TInfinite, TParams>;
 
+  infinite?: never;
   parameters?: never;
 }
 
@@ -455,11 +450,11 @@ interface QueryFiltersByParameters<
   TInfinite extends boolean,
   TParams = {},
   TError = DefaultError,
-> extends QueryFiltersBase<TSchema, TInfinite, TData, TParams, TError> {
+> extends QueryFiltersBase<TSchema, TData, TInfinite, TParams, TError> {
   /**
    * Is the query infinite
    */
-  infinite: TInfinite;
+  infinite?: TInfinite;
 
   /**
    * Include queries matching parameters
@@ -467,6 +462,44 @@ interface QueryFiltersByParameters<
   parameters?: TParams;
 
   queryKey?: never;
+}
+
+interface QueryFilterInfinitePredicate<
+  TSchema extends { url: string; method: string },
+  TData,
+  TParams = {},
+  TError = DefaultError,
+> {
+  /**
+   * Include queries matching this predicate function
+   */
+  (
+    query: Query<
+      InfiniteData<TData, TParams>,
+      TError,
+      InfiniteData<TData, TParams>,
+      ServiceOperationInfiniteQueryKey<TSchema, TParams>
+    >
+  ): boolean;
+}
+
+interface QueryFilterRegularPredicate<
+  TSchema extends { url: string; method: string },
+  TData,
+  TParams = {},
+  TError = DefaultError,
+> {
+  /**
+   * Include queries matching this predicate function
+   */
+  (
+    query: Query<
+      TData,
+      TError,
+      TData,
+      ServiceOperationQueryKey<TSchema, TParams>
+    >
+  ): boolean;
 }
 
 type InvalidateQueryFilters<
@@ -477,7 +510,7 @@ type InvalidateQueryFilters<
   TError = DefaultError,
 > = (
   | QueryFiltersByParameters<TSchema, TData, TInfinite, TParams, TError>
-  | QueryFiltersByQueryKey<TSchema, TData, TInfinite, TParams, TError> //
+  | QueryFiltersByQueryKey<TSchema, TData, TInfinite, TParams, TError>
 ) & {
   refetchType?: QueryTypeFilter | 'none';
 };

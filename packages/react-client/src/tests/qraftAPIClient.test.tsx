@@ -1787,7 +1787,6 @@ describe('Qraft uses Queries Invalidation', () => {
     expect(
       qraft.approvalPolicies.getApprovalPoliciesId.invalidateQueries(
         {
-          infinite: false,
           queryKey:
             qraft.approvalPolicies.getApprovalPoliciesId.getQueryKey(
               parameters
@@ -2027,7 +2026,6 @@ describe('Qraft uses Queries Invalidation', () => {
     expect(
       qraft.approvalPolicies.getApprovalPoliciesId.invalidateQueries(
         {
-          infinite: false,
           queryKey: qraft.approvalPolicies.getApprovalPoliciesId.getQueryKey({
             ...parameters,
             path: {
@@ -2095,7 +2093,6 @@ describe('Qraft uses Queries Invalidation', () => {
             header: parameters.header,
             path: parameters.path,
           }),
-          infinite: false,
           predicate: (query) => {
             counterFn(query.queryKey[1]);
 
@@ -2841,6 +2838,106 @@ describe('Qraft uses getMutationKey', () => {
       },
       {},
     ]);
+  });
+});
+
+describe('Qraft respects Types', () => {
+  const parameters: typeof qraft.approvalPolicies.getApprovalPoliciesId.types.parameters =
+    {
+      header: {
+        'x-monite-version': '1.0.0',
+      },
+      path: {
+        approval_policy_id: '1',
+      },
+      query: {
+        items_order: ['asc', 'desc'],
+      },
+    };
+
+  const queryClient = new QueryClient();
+
+  it('supports infinite QueryKey predicate query filter strict types', () => {
+    qraft.approvalPolicies.getApprovalPoliciesId.getQueriesData(
+      {
+        queryKey: [
+          {
+            ...qraft.approvalPolicies.getApprovalPoliciesId.schema,
+            infinite: true,
+          },
+          parameters,
+        ],
+        predicate: (query) => {
+          // Will report TS error if 'false'
+          const isTrue = query.queryKey?.[0]?.infinite === true; // todo::improve type checking
+
+          return Boolean(
+            // Check if queryKey has correct type
+            query.queryKey?.[1]?.query?.items_order?.includes('asc')
+          );
+        },
+      },
+      queryClient
+    );
+  });
+
+  it('supports regular QueryKey predicate query filter strict types', () => {
+    qraft.approvalPolicies.getApprovalPoliciesId.getQueriesData(
+      {
+        queryKey: [
+          {
+            ...qraft.approvalPolicies.getApprovalPoliciesId.schema,
+            infinite: false,
+          },
+          parameters,
+        ],
+        predicate: (query) => {
+          // Will report TS error if 'true'
+          const isTrue = query.queryKey?.[0]?.infinite === false; // todo::improve type checking
+
+          return Boolean(
+            query.queryKey?.[1]?.query?.items_order?.includes('asc')
+          );
+        },
+      },
+      queryClient
+    );
+  });
+
+  it('supports regular parameters predicate query filter strict types', () => {
+    qraft.approvalPolicies.getApprovalPoliciesId.getQueriesData(
+      {
+        parameters,
+        infinite: false,
+        predicate: (query) => {
+          // Will report TS error if 'true'
+          const isTrue = query.queryKey?.[0]?.infinite === false; // todo::improve type checking
+
+          return Boolean(
+            query.queryKey?.[1]?.query?.items_order?.includes('asc')
+          );
+        },
+      },
+      queryClient
+    );
+  });
+
+  it('does not supports  predicate without ', () => {
+    qraft.approvalPolicies.getApprovalPoliciesId.getQueriesData(
+      {
+        // @ts-expect-error - `query` should be infinite or regular query, todo::improve type checking
+        predicate: (query) => {
+          // Will report TS error if 'true'
+          const isInfinite =
+            query.queryKey?.[0] && 'infinite' in query.queryKey[0];
+
+          return Boolean(
+            query.queryKey?.[1]?.query?.items_order?.includes('asc')
+          );
+        },
+      },
+      queryClient
+    );
   });
 });
 
