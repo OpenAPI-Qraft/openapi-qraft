@@ -1,5 +1,17 @@
 # @openapi-qraft/react
 
+## 1.5.0
+
+### Minor Changes
+
+- 5c965ab: Unified QueryKey for Infinite and regular Queries: `[TSchema & { infinite: boolean}, TParams]`
+- 8db4067: Added support for `QueryClient.getQueriesData(...)` method
+
+### Patch Changes
+
+- c761191: Added support for `QueryClient.setQueriesData(...)` method
+- bf43192: feature: add support for `QueryClient.getQueryState(...)` method
+
 ## 1.4.0
 
 ### Minor Changes
