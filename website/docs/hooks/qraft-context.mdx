@@ -69,8 +69,9 @@ import TabItem from '@theme/TabItem';
       return (
         <QraftContext.Provider
           value={{
+            // ⬇︎ the `requestFn` will be called for each request
             requestFn: async (requestSchema, requestInfo) => {
-              // ⬇︎ make any async request inside the `requestFn` function
+              // ⬇︎ make any async request inside the `requestFn`
               const token = await fetchToken();
 
               return requestFn(requestSchema, {
