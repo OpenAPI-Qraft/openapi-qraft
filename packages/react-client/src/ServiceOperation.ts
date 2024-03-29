@@ -20,6 +20,7 @@ import {
   QueryFunction,
   InitialPageParam,
   GetNextPageParamFunction,
+  QueryState,
 } from '@tanstack/query-core';
 import type {
   DefinedInitialDataInfiniteOptions,
@@ -78,6 +79,7 @@ export interface ServiceOperationQuery<
     ServiceOperationFetchQuery<TSchema, TData, TParams, TError>,
     ServiceOperationFetchInfiniteQuery<TSchema, TData, TParams, TError>,
     ServiceOperationGetQueryData<TSchema, TData, TParams>,
+    ServiceOperationGetQueryState<TSchema, TData, TParams, TError>,
     ServiceOperationGetQueriesData<TSchema, TData, TParams, TError>,
     ServiceOperationGetInfiniteQueryData<TSchema, TData, TParams>,
     ServiceOperationSetQueryData<TSchema, TData, TParams>,
@@ -1277,6 +1279,25 @@ interface ServiceOperationGetInfiniteQueryData<
     parameters: TParams | ServiceOperationInfiniteQueryKey<TSchema, TParams>,
     queryClient: QueryClient
   ): InfiniteData<TData, TParams> | undefined;
+}
+
+interface ServiceOperationGetQueryState<
+  TSchema extends { url: string; method: string },
+  TData,
+  TParams = {},
+  TError = DefaultError,
+> {
+  getQueryState(
+    parameters: TParams | ServiceOperationQueryKey<TSchema, TParams>,
+    queryClient: QueryClient
+  ): QueryState<TData, TError> | undefined;
+
+  getInfiniteQueryState(
+    parameters: TParams | ServiceOperationInfiniteQueryKey<TSchema, TParams>,
+    queryClient: QueryClient
+  ):
+    | QueryState<InfiniteData<TData, PartialParameters<TParams>>, TError>
+    | undefined;
 }
 
 export interface ServiceOperationMutationFn<

@@ -200,4 +200,6 @@ const serviceCallbacks = [
   'prefetchQuery',
   'fetchInfiniteQuery',
   'prefetchInfiniteQuery',
+  'getQueryState',
+  'getInfiniteQueryState',
 ] as const;

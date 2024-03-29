@@ -1803,6 +1803,69 @@ describe('Qraft uses Queries Invalidation', () => {
     expect(result_02.current.isFetching).toBeTruthy();
   });
 
+  describe('Qraft uses getQueryState', () => {
+    it('supports getQueryState by parameters', async () => {
+      const queryClient = new QueryClient({
+        defaultOptions: {
+          queries: {
+            refetchOnMount: false,
+          },
+        },
+      });
+
+      const { result: result_01 } = renderHook(
+        () => qraft.approvalPolicies.getApprovalPoliciesId.useQuery(parameters),
+        {
+          wrapper: wrapper.bind(null, queryClient),
+        }
+      );
+
+      await waitFor(() => {
+        expect(
+          qraft.approvalPolicies.getApprovalPoliciesId.getQueryState(
+            parameters,
+            queryClient
+          )?.status
+        ).toEqual('success');
+      });
+    });
+
+    it('supports getQueryState by parameters and infinite query', async () => {
+      const queryClient = new QueryClient({
+        defaultOptions: {
+          queries: {
+            refetchOnMount: false,
+          },
+        },
+      });
+
+      const { result: result_01 } = renderHook(
+        () =>
+          qraft.approvalPolicies.getApprovalPoliciesId.useInfiniteQuery(
+            parameters,
+            {
+              initialPageParam: {},
+              getNextPageParam: () => {
+                return {};
+              },
+            }
+          ),
+        {
+          wrapper: wrapper.bind(null, queryClient),
+        }
+      );
+
+      await waitFor(() => {
+        expect(
+          qraft.approvalPolicies.getApprovalPoliciesId.getInfiniteQueryState(
+            parameters,
+            queryClient
+          )?.status
+        ).toEqual('success');
+      });
+    });
+  });
+
   it('supports invalidateQueries with options', async () => {
     const queryClient = new QueryClient({
       defaultOptions: {
