@@ -43,10 +43,3 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           # Build output to publish to the `gh-pages` branch:
           publish_dir: ./website/build
-
-      - name: Update Algolia index
-        uses: darrenjennings/algolia-docsearch-action@v0.2.0
-        with:
-          algolia_application_id: ${{ vars.ALGOLIA_APP_ID }}
-          algolia_api_key: ${{ secrets.ALGOLIA_WRITE_API_KEY }}
-          file: 'website/tools/algolia/config.json'
