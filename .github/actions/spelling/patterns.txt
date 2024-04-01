@@ -10,3 +10,7 @@
 # hit-count: 2 file-count: 2
 # GitHub actions
 \buses:\s+[-\w.]+/[-\w./]+@[-\w.]+
+
+# Algolia App ID and API key
+\b(?:B42903JOPT)
+\b(?:8893cd4cd8803573114bf5d2eaa1c651)

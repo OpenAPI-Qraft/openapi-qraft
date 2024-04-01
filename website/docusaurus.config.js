@@ -107,6 +107,11 @@ const config = {
         theme: prismThemes.github,
         darkTheme: prismThemes.dracula,
       },
+      algolia: {
+        appId: 'B42903JOPT',
+        apiKey: '8893cd4cd8803573114bf5d2eaa1c651',
+        indexName: 'openapi-qraftio',
+      },
     }),
 };
 

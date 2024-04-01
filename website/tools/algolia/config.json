@@ -1,0 +1,7 @@
+{
+  "index_name": "openapi-qraftio",
+  "start_urls": ["https://openapi-qraft.github.io/openapi-qraft/"],
+  "sitemap_urls": ["https://openapi-qraft.github.io/openapi-qraft/sitemap.xml"],
+  "stop_urls": [],
+  "strip_chars": "#"
+}
