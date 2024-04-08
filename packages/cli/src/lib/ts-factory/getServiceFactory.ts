@@ -59,6 +59,13 @@ const getServiceOperationGenericsPathImportsFactory = (
 
   const queryMethods = ['get', 'head', 'options'] as const;
 
+  const operationIncludesQueryMethods = operations.some((operation) =>
+    queryMethods.some((method) => method === operation.method)
+  );
+  const operationDoesIncludesQueryMethods = operations.some(
+    (operation) => !queryMethods.some((method) => method === operation.method)
+  );
+
   return factory.createImportDeclaration(
     undefined,
     factory.createImportClause(
@@ -66,19 +73,14 @@ const getServiceOperationGenericsPathImportsFactory = (
       undefined,
       factory.createNamedImports(
         [
-          operations.some((operation) =>
-            queryMethods.some((method) => method === operation.method)
-          )
+          operationIncludesQueryMethods
             ? factory.createImportSpecifier(
                 false,
                 undefined,
                 factory.createIdentifier('ServiceOperationQuery')
               )
             : null,
-          operations.some(
-            (operation) =>
-              !queryMethods.some((method) => method === operation.method)
-          )
+          operationDoesIncludesQueryMethods
             ? factory.createImportSpecifier(
                 false,
                 undefined,
@@ -98,7 +100,9 @@ const getServiceInterfaceFactory = (
 ) => {
   return factory.createInterfaceDeclaration(
     [factory.createToken(ts.SyntaxKind.ExportKeyword)],
-    factory.createIdentifier(typeName),
+    factory.createIdentifier(
+      typeName.slice(0, 1).toUpperCase() + typeName.slice(1)
+    ),
     undefined,
     undefined,
     operations.map(getServiceInterfaceOperationFactory)
@@ -307,7 +311,9 @@ const getServiceVariableFactory = (
         factory.createVariableDeclaration(
           factory.createIdentifier(variableName),
           undefined,
-          getServiceVariableTypeFactory({ typeName }),
+          getServiceVariableTypeFactory({
+            typeName: typeName.slice(0, 1).toUpperCase() + typeName.slice(1),
+          }),
           factory.createAsExpression(
             factory.createObjectLiteralExpression(
               operations.map(getServiceVariablePropertyFactory),

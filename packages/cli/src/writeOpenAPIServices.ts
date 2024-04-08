@@ -23,6 +23,7 @@ type OutputOptions = {
   postfixServices?: string;
   explicitImportExtensions?: boolean;
   servicesDirName: string;
+  useTagsAsServiceNames?: boolean;
 };
 
 export const writeOpenAPIServices = async ({

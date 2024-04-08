@@ -29,7 +29,9 @@ const getServiceIndexInterfaceFactory = (services: Service[]) => {
           factory.createIdentifier(name),
           undefined,
           factory.createTypeReferenceNode(
-            factory.createIdentifier(typeName),
+            factory.createIdentifier(
+              typeName.slice(0, 1).toUpperCase() + typeName.slice(1)
+            ),
             undefined
           )
         )
@@ -87,7 +89,9 @@ const getServicesImportsFactory = (
           factory.createImportSpecifier(
             false,
             undefined,
-            factory.createIdentifier(typeName)
+            factory.createIdentifier(
+              typeName.slice(0, 1).toUpperCase() + typeName.slice(1)
+            )
           ),
           factory.createImportSpecifier(
             false,
