@@ -42,9 +42,9 @@ program
     'All import statements will include explicit `.js` extensions. Ideal for projects using ECMAScript modules.'
   )
   .option(
-    '--use-tags-as-service-names <boolean>',
+    '--service-name-base <endpoint | tags>',
     'Use openapi tags as service names',
-    false
+    'endpoint'
   )
   .action(async (input, args) => {
     const { version: packageVersion, name: packageName } = JSON.parse(
@@ -92,7 +92,7 @@ program
         postfixServices: args.postfixServices,
         explicitImportExtensions: args.explicitImportExtensions,
         servicesDirName: 'services',
-        useTagsAsServiceNames: args.useTagsAsServiceNames,
+        useTagsAsServiceNames: args.serviceNameBase === 'tags',
       },
     }).catch((error) => {
       if (error instanceof Error)
