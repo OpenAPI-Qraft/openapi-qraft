@@ -307,9 +307,7 @@ const getServiceVariableFactory = (
         factory.createVariableDeclaration(
           factory.createIdentifier(variableName),
           undefined,
-          getServiceVariableTypeFactory({
-            typeName,
-          }),
+          getServiceVariableTypeFactory({ typeName }),
           factory.createAsExpression(
             factory.createObjectLiteralExpression(
               operations.map(getServiceVariablePropertyFactory),
