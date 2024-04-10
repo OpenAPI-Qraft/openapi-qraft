@@ -1,12 +1,13 @@
 import camelCase from 'camelcase';
 import * as console from 'console';
 import micromatch from 'micromatch';
-import { ServiceBaseName } from 'src/writeOpenAPIServices.js';
 
 import { getContentMediaType } from './getContent.js';
 import { getOperationName } from './getOperationName.js';
 import { getServiceName } from './getServiceName.js';
 import type { OpenAPISchemaType } from './OpenAPISchemaType.ts';
+
+export type ServiceBaseName = 'endpoint' | 'tags';
 
 export type Service = {
   name: string;
@@ -92,12 +93,10 @@ export const getServices = (
         {} as Record<'errors' | 'success', Record<string, string | undefined>>
       );
 
-      const serviceName = getServiceName(path.split('/')[1]);
-
       const serviceNames =
         serviceNameBase === 'tags'
           ? paths[path][method]?.tags?.map(getServiceName) || ['Default']
-          : [serviceName];
+          : [getServiceName(path.split('/')[1])];
 
       for (const name of serviceNames) {
         if (!services.has(name)) {
