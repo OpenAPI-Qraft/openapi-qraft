@@ -96,7 +96,7 @@ export const getServices = (
 
       const serviceNames =
         serviceNameBase === 'tags'
-          ? paths[path][method]?.tags || ['default']
+          ? paths[path][method]?.tags?.map(getServiceName) || ['Default']
           : [serviceName];
 
       for (const name of serviceNames) {
