@@ -16,6 +16,8 @@ import {
 } from './lib/ts-factory/getServiceFactory.js';
 import { getServiceIndexFactory } from './lib/ts-factory/getServiceIndexFactory.js';
 
+export type ServiceBaseName = 'endpoint' | 'tags';
+
 type OutputOptions = {
   fileHeader?: string;
   dir: string;
@@ -23,7 +25,7 @@ type OutputOptions = {
   postfixServices?: string;
   explicitImportExtensions?: boolean;
   servicesDirName: string;
-  useTagsAsServiceNames?: boolean;
+  serviceNameBase?: ServiceBaseName;
 };
 
 export const writeOpenAPIServices = async ({

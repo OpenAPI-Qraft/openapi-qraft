@@ -92,7 +92,7 @@ program
         postfixServices: args.postfixServices,
         explicitImportExtensions: args.explicitImportExtensions,
         servicesDirName: 'services',
-        useTagsAsServiceNames: args.serviceNameBase === 'tags',
+        serviceNameBase: args.serviceNameBase,
       },
     }).catch((error) => {
       if (error instanceof Error)

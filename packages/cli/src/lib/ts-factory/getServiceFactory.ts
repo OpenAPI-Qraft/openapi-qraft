@@ -59,13 +59,6 @@ const getServiceOperationGenericsPathImportsFactory = (
 
   const queryMethods = ['get', 'head', 'options'] as const;
 
-  const operationIncludesQueryMethods = operations.some((operation) =>
-    queryMethods.some((method) => method === operation.method)
-  );
-  const operationDoesIncludesQueryMethods = operations.some(
-    (operation) => !queryMethods.some((method) => method === operation.method)
-  );
-
   return factory.createImportDeclaration(
     undefined,
     factory.createImportClause(
@@ -73,14 +66,19 @@ const getServiceOperationGenericsPathImportsFactory = (
       undefined,
       factory.createNamedImports(
         [
-          operationIncludesQueryMethods
+          operations.some((operation) =>
+            queryMethods.some((method) => method === operation.method)
+          )
             ? factory.createImportSpecifier(
                 false,
                 undefined,
                 factory.createIdentifier('ServiceOperationQuery')
               )
             : null,
-          operationDoesIncludesQueryMethods
+          operations.some(
+            (operation) =>
+              !queryMethods.some((method) => method === operation.method)
+          )
             ? factory.createImportSpecifier(
                 false,
                 undefined,
@@ -100,9 +98,7 @@ const getServiceInterfaceFactory = (
 ) => {
   return factory.createInterfaceDeclaration(
     [factory.createToken(ts.SyntaxKind.ExportKeyword)],
-    factory.createIdentifier(
-      typeName.slice(0, 1).toUpperCase() + typeName.slice(1)
-    ),
+    factory.createIdentifier(typeName),
     undefined,
     undefined,
     operations.map(getServiceInterfaceOperationFactory)
@@ -312,7 +308,7 @@ const getServiceVariableFactory = (
           factory.createIdentifier(variableName),
           undefined,
           getServiceVariableTypeFactory({
-            typeName: typeName.slice(0, 1).toUpperCase() + typeName.slice(1),
+            typeName,
           }),
           factory.createAsExpression(
             factory.createObjectLiteralExpression(

@@ -167,29 +167,25 @@ const getCreateClientFunctionFactory = () => {
   );
 };
 
-export const mutationCallbacks = [
-  'getMutationKey',
-  'mutationFn',
-  'useMutation',
-  'useMutationState',
-  'useIsMutating',
-  'isMutating',
-];
-
-export const queryCallbacks = [
+const serviceCallbacks = [
   'getInfiniteQueryData',
   'getInfiniteQueryKey',
+  'getMutationKey',
   'getQueryData',
   'getQueriesData',
   'getQueryKey',
+  'mutationFn',
   'queryFn',
   'setInfiniteQueryData',
   'setQueryData',
   'setQueriesData',
   'useInfiniteQuery',
+  'useMutation',
   'useQuery',
   'useSuspenseQuery',
   'useSuspenseInfiniteQuery',
+  'useMutationState',
+  'useIsMutating',
   'useQueries',
   'useSuspenseQueries',
   'invalidateQueries',
@@ -198,6 +194,7 @@ export const queryCallbacks = [
   'removeQueries',
   'refetchQueries',
   'isFetching',
+  'isMutating',
   'useIsFetching',
   'fetchQuery',
   'prefetchQuery',
@@ -205,9 +202,4 @@ export const queryCallbacks = [
   'prefetchInfiniteQuery',
   'getQueryState',
   'getInfiniteQueryState',
-];
-
-export const serviceCallbacks = [
-  ...queryCallbacks,
-  ...mutationCallbacks,
 ] as const;

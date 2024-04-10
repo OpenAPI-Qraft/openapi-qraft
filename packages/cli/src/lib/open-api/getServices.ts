@@ -1,6 +1,7 @@
 import camelCase from 'camelcase';
 import * as console from 'console';
 import micromatch from 'micromatch';
+import { ServiceBaseName } from 'src/writeOpenAPIServices.js';
 
 import { getContentMediaType } from './getContent.js';
 import { getOperationName } from './getOperationName.js';
@@ -40,8 +41,8 @@ export const getServices = (
   openApiJson: OpenAPISchemaType,
   {
     postfixServices = 'Service',
-    useTagsAsServiceNames = false,
-  }: { postfixServices?: string; useTagsAsServiceNames?: boolean } = {},
+    serviceNameBase = 'endpoint',
+  }: { postfixServices?: string; serviceNameBase?: ServiceBaseName } = {},
   servicesGlob = ['**']
 ) => {
   const paths = openApiJson.paths;
@@ -91,59 +92,29 @@ export const getServices = (
         {} as Record<'errors' | 'success', Record<string, string | undefined>>
       );
 
-      if (useTagsAsServiceNames) {
-        const serviceNames = paths[path][method]?.tags ?? [];
+      const serviceName = getServiceName(path.split('/')[1]);
 
-        for (const name of serviceNames) {
-          if (!services.has(name)) {
-            services.set(name, {
-              name: camelCase(name),
-              variableName: `${camelCase(name, {
-                preserveConsecutiveUppercase: false,
-              })}${postfixServices}`,
-              typeName: `${name}${postfixServices}`,
-              fileBaseName: `${name}${postfixServices}`,
-              operations: [],
-            });
-          }
-        }
+      const serviceNames =
+        serviceNameBase === 'tags'
+          ? paths[path][method]?.tags || ['default']
+          : [serviceName];
 
-        for (const name of serviceNames) {
-          services.get(name)!.operations.push({
-            method,
-            path,
-            errors,
-            name: getOperationName(path, method, methodOperation.operationId),
-            description: methodOperation.description,
-            summary: methodOperation.summary,
-            deprecated: methodOperation.deprecated,
-            parameters:
-              Array.isArray(methodOperation.parameters) &&
-              !methodOperation.parameters.length
-                ? undefined
-                : methodOperation.parameters,
-            mediaType: methodOperation.requestBody?.content
-              ? getContentMediaType(methodOperation.requestBody.content)
-              : undefined,
-            success: success,
-          });
-        }
-      } else {
-        const serviceName = getServiceName(path.split('/')[1]);
-
-        if (!services.has(serviceName)) {
-          services.set(serviceName, {
-            name: camelCase(serviceName),
-            variableName: `${camelCase(serviceName, {
+      for (const name of serviceNames) {
+        if (!services.has(name)) {
+          services.set(name, {
+            name: camelCase(name),
+            variableName: `${camelCase(name, {
               preserveConsecutiveUppercase: false,
             })}${postfixServices}`,
-            typeName: `${serviceName}${postfixServices}`,
-            fileBaseName: `${serviceName}${postfixServices}`,
+            typeName: `${name}${postfixServices}`,
+            fileBaseName: `${name}${postfixServices}`,
             operations: [],
           });
         }
+      }
 
-        services.get(serviceName)!.operations.push({
+      for (const name of serviceNames) {
+        services.get(name)!.operations.push({
           method,
           path,
           errors,
