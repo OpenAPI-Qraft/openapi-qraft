@@ -109,7 +109,7 @@ const config = {
       },
       algolia: {
         appId: 'B42903JOPT',
-        apiKey: '8893cd4cd8803573114bf5d2eaa1c651',
+        apiKey: '68a397ed6b627ba01e722c54228bd79f',
         indexName: 'openapi-qraftio',
       },
     }),
