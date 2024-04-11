@@ -33,6 +33,7 @@ Options:
   --file-header <string>                   Header to be added to the generated file (eg: /* eslint-disable */)
   --postfix-services <string>              Postfix to be added to the generated service name (eg: Service)
   --explicit-import-extensions             All import statements will include explicit `.js` extensions. Ideal for projects using ECMAScript modules.
+  --service-name-base <endpoint | tags>    Use OpenAPI Operation `endpoint` or `tags` as service names (default: "endpoint")
   -h, --help                               display help for command
 ```
 
@@ -78,6 +79,12 @@ the `schema.json` file.
   - Example: `--file-header '/* eslint-disable */'`
 - **`--postfix-services <string>`:** Customize the generated service names with a specific postfix _(optional, default: `Service`)_.
   - Example: `--postfix-services Endpoint` will generate `services/UserEndpoint.ts` instead of `services/UserService.ts`.
+- **`--service-name-base <endpoint | tags>`:** Use OpenAPI Operation `endpoint` or `tags` as the base name of the service _(optional, default: `endpoint`)_.
+  - Examples:
+    - `--service-name-base endpoint` will generate services based on the OpenAPI Operation endpoint.
+    - `--service-name-base tags` will generate services based on the OpenAPI Operation tags instead of the endpoint.
+      - If multiple tags are present for the operation, similar services will be created for each tag.
+      - If there are no tags for the operation, the services will be created under the `default` tag.
 - **`--explicit-import-extensions`:** Include explicit `.js` extensions in all import statements. Ideal for projects
   using ECMAScript modules when TypeScript's _--moduleResolution_ is `node16` or `nodenext` _(optional)_.
 - **`-h, --help`:** Display help for the command (optional).
