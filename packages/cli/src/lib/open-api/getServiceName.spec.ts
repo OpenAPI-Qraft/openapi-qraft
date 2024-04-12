@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, expect, it } from 'vitest';
 
 import { getServiceName } from './getServiceName.js';
 
@@ -11,5 +11,8 @@ describe('getServiceName', () => {
     expect(getServiceName('@fooBar')).toEqual('FooBar');
     expect(getServiceName('$fooBar')).toEqual('FooBar');
     expect(getServiceName('123fooBar')).toEqual('FooBar');
+    expect(getServiceName('foo-bar')).toEqual('FooBar');
+    expect(getServiceName('foo bar')).toEqual('FooBar');
+    expect(getServiceName('foo_bar')).toEqual('FooBar');
   });
 });

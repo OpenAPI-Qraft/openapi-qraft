@@ -2,6 +2,7 @@ export type OpenAPISchemaType = {
   paths: {
     [path: string]: {
       [method: string]: {
+        tags?: string[];
         description?: string;
         summary?: string;
         operationId?: string;

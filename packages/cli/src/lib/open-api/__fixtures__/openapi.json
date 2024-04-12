@@ -12,7 +12,7 @@
   "paths": {
     "/approval_policies/{approval_policy_id}": {
       "get": {
-        "tags": ["Approval policies", "Main"],
+        "tags": [],
         "summary": "Get an approval policy by ID",
         "description": "Retrieve a specific approval policy.",
         "operationId": "get_approval_policies_id",

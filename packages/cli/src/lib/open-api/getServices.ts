@@ -4,8 +4,14 @@ import micromatch from 'micromatch';
 
 import { getContentMediaType } from './getContent.js';
 import { getOperationName } from './getOperationName.js';
-import { getServiceName } from './getServiceName.js';
+import {
+  getServiceNamesByOperationEndpoint,
+  ServiceBaseNameByEndpointOption,
+} from './getServiceNamesByOperationEndpoint.js';
+import { getServiceNamesByOperationTags } from './getServiceNamesByOperationTags.js';
 import type { OpenAPISchemaType } from './OpenAPISchemaType.js';
+
+export type ServiceBaseName = ServiceBaseNameByEndpointOption | 'tags';
 
 export type Service = {
   name: string;
@@ -38,7 +44,10 @@ export type ServiceOperation = {
 
 export const getServices = (
   openApiJson: OpenAPISchemaType,
-  { postfixServices = 'Service' }: { postfixServices?: string } = {},
+  {
+    postfixServices = 'Service',
+    serviceNameBase = 'endpoint[0]',
+  }: { postfixServices?: string; serviceNameBase?: ServiceBaseName } = {},
   servicesGlob = ['**']
 ) => {
   const paths = openApiJson.paths;
@@ -63,19 +72,20 @@ export const getServices = (
 
       const methodOperation = paths[path][method];
 
-      const serviceName = getServiceName(path.split('/')[1]);
-
       const { success, errors } = Object.entries(
         methodOperation.responses
       ).reduce(
         (acc, [statusCode, response]) => {
-          if (!response.content || typeof response.content !== 'object')
+          if (!response.content || typeof response.content !== 'object') {
             return acc;
+          }
+
           const statusType =
             statusCode !== 'default' && // See "default" response https://swagger.io/docs/specification/describing-responses/#default
             Number(statusCode) < 400
               ? 'success'
               : 'errors';
+
           return {
             ...acc,
             [statusType]: {
@@ -87,36 +97,54 @@ export const getServices = (
         {} as Record<'errors' | 'success', Record<string, string | undefined>>
       );
 
-      if (!services.has(serviceName)) {
-        services.set(serviceName, {
-          name: camelCase(serviceName),
-          variableName: `${camelCase(serviceName, {
-            preserveConsecutiveUppercase: false,
-          })}${postfixServices}`,
-          typeName: `${serviceName}${postfixServices}`,
-          fileBaseName: `${serviceName}${postfixServices}`,
-          operations: [],
-        });
+      const serviceFallbackBaseName = 'Default';
+
+      const serviceNames =
+        serviceNameBase === 'tags'
+          ? getServiceNamesByOperationTags(
+              paths[path][method]?.tags,
+              serviceFallbackBaseName
+            )
+          : getServiceNamesByOperationEndpoint(
+              path,
+              serviceNameBase,
+              serviceFallbackBaseName
+            );
+
+      for (const name of serviceNames) {
+        if (!services.has(name)) {
+          services.set(name, {
+            name: camelCase(name),
+            variableName: `${camelCase(name, {
+              preserveConsecutiveUppercase: false,
+            })}${postfixServices}`,
+            typeName: `${name}${postfixServices}`,
+            fileBaseName: `${name}${postfixServices}`,
+            operations: [],
+          });
+        }
       }
 
-      services.get(serviceName)!.operations.push({
-        method,
-        path,
-        errors,
-        name: getOperationName(path, method, methodOperation.operationId),
-        description: methodOperation.description,
-        summary: methodOperation.summary,
-        deprecated: methodOperation.deprecated,
-        parameters:
-          Array.isArray(methodOperation.parameters) &&
-          !methodOperation.parameters.length
-            ? undefined
-            : methodOperation.parameters,
-        mediaType: methodOperation.requestBody?.content
-          ? getContentMediaType(methodOperation.requestBody.content)
-          : undefined,
-        success: success,
-      });
+      for (const name of serviceNames) {
+        services.get(name)!.operations.push({
+          method,
+          path,
+          errors,
+          name: getOperationName(path, method, methodOperation.operationId),
+          description: methodOperation.description,
+          summary: methodOperation.summary,
+          deprecated: methodOperation.deprecated,
+          parameters:
+            Array.isArray(methodOperation.parameters) &&
+            !methodOperation.parameters.length
+              ? undefined
+              : methodOperation.parameters,
+          mediaType: methodOperation.requestBody?.content
+            ? getContentMediaType(methodOperation.requestBody.content)
+            : undefined,
+          success: success,
+        });
+      }
     }
   }
 
