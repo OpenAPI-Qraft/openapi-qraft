@@ -42,9 +42,9 @@ program
     'All import statements will include explicit `.js` extensions. Ideal for projects using ECMAScript modules.'
   )
   .option(
-    '--service-name-base <endpoint | tags>',
-    'Use OpenAPI Operation `endpoint` or `tags` as the base name of the service',
-    'endpoint'
+    '--service-name-base <endpoint[<index>] | tags>',
+    'Use OpenAPI Operation `endpoint[<index>]` path part (e.g.: "/0/1/2") or `tags` as the base name of the service.',
+    'endpoint[0]'
   )
   .action(async (input, args) => {
     const { version: packageVersion, name: packageName } = JSON.parse(

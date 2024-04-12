@@ -4,10 +4,14 @@ import micromatch from 'micromatch';
 
 import { getContentMediaType } from './getContent.js';
 import { getOperationName } from './getOperationName.js';
-import { getServiceName } from './getServiceName.js';
+import {
+  getServiceNamesByOperationEndpoint,
+  ServiceBaseNameByEndpointOption,
+} from './getServiceNamesByOperationEndpoint.js';
+import { getServiceNamesByOperationTags } from './getServiceNamesByOperationTags.js';
 import type { OpenAPISchemaType } from './OpenAPISchemaType.js';
 
-export type ServiceBaseName = 'endpoint' | 'tags';
+export type ServiceBaseName = ServiceBaseNameByEndpointOption | 'tags';
 
 export type Service = {
   name: string;
@@ -42,7 +46,7 @@ export const getServices = (
   openApiJson: OpenAPISchemaType,
   {
     postfixServices = 'Service',
-    serviceNameBase = 'endpoint',
+    serviceNameBase = 'endpoint[0]',
   }: { postfixServices?: string; serviceNameBase?: ServiceBaseName } = {},
   servicesGlob = ['**']
 ) => {
@@ -93,10 +97,19 @@ export const getServices = (
         {} as Record<'errors' | 'success', Record<string, string | undefined>>
       );
 
+      const serviceFallbackBaseName = 'Default';
+
       const serviceNames =
         serviceNameBase === 'tags'
-          ? paths[path][method]?.tags?.map(getServiceName) || ['Default']
-          : [getServiceName(path.split('/')[1])];
+          ? getServiceNamesByOperationTags(
+              paths[path][method]?.tags,
+              serviceFallbackBaseName
+            )
+          : getServiceNamesByOperationEndpoint(
+              path,
+              serviceNameBase,
+              serviceFallbackBaseName
+            );
 
       for (const name of serviceNames) {
         if (!services.has(name)) {

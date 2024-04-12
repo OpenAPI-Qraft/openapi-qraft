@@ -76,14 +76,15 @@ comments _(optional)_.
 - **`--postfix-services <string>`:** Customize the generated service names with a specific postfix _(optional, default: `Service`)_.
   - Example: `--postfix-services Endpoint` will generate `services/UserEndpoint.ts` instead of `services/UserService.ts`.
 using ECMAScript modules when TypeScript's _--moduleResolution_ is `node16` or `nodenext` _(optional)_.
-- **`--service-name-base <endpoint | tags>`:** Use OpenAPI Operation `endpoint` or `tags` as the base name of the service _(optional, default: `endpoint`)_.
+- **`--service-name-base <endpoint[<index>] | tags>`:** Use OpenAPI Operation `endpoint[<index>]` path part (e.g.: `/0/1/2`) or `tags` as the base name of the service. _(optional, default: `endpoint[0]`)_.
   - Examples:
-    - `--service-name-base endpoint` will generate services based on the OpenAPI Operation endpoint.
+    - `--service-name-base endpoint[0]` generates `services/FooService.ts`. from endpoint `/foo/bar/baz`
+    - `--service-name-base endpoint[1]` generates `services/BarService.ts`. from endpoint `/foo/bar/baz`
+    - `--service-name-base endpoint[2]` generates `services/BarService.ts`. from endpoint `/foo/bar` _(if the endpoint is shorter than the index, the last part is used)_
     - `--service-name-base tags` will generate services based on the OpenAPI Operation tags instead of the endpoint.
-      - If multiple tags are present for the operation, similar services will be created for each tag.
-      - If there are no tags for the operation, the services will be created under the `default` tag.
+      - If multiple tags are present for the operation, similar services will be created for each tag. Operation with `tags: [Foo, Bar]` will generate `services/FooService.ts` and `services/BarService.ts`.
+      - If there are no tags for the operation, the services will be created under the `default` tag. Operation with empty `tags: []` will generate `services/DefaultService.ts`.
 - **`--explicit-import-extensions`:** Include explicit `.js` extensions in all import statements. Ideal for projects
-
 - **`-h, --help`:** Display help for the command (optional).
 
 ## In-project Setup
