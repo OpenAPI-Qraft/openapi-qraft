@@ -43,7 +43,7 @@ program
   )
   .option(
     '--service-name-base <endpoint | tags>',
-    'Use openapi tags as service names',
+    'Use OpenAPI Operation `endpoint` or `tags` as the base name of the service',
     'endpoint'
   )
   .action(async (input, args) => {
