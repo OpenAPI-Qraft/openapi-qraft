@@ -16,7 +16,7 @@ describe('getServices', () => {
     expect(
       getServices(
         openAPI,
-        { serviceNameBase: 'endpoint', postfixServices: 'Service' },
+        { serviceNameBase: 'endpoint[0]', postfixServices: 'Service' },
         ['/files/**']
       )
     ).toMatchSnapshot();
@@ -24,7 +24,7 @@ describe('getServices', () => {
 
   it('matches snapshot with "serviceNameBase: endpoint"', () => {
     expect(
-      getServices(openAPI, { serviceNameBase: 'endpoint' })
+      getServices(openAPI, { serviceNameBase: 'endpoint[0]' })
     ).toMatchSnapshot();
   });
 

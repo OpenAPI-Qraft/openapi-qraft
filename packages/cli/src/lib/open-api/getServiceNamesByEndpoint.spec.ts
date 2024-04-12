@@ -7,16 +7,14 @@ import {
 } from './getServiceNamesByOperationEndpoint.js';
 
 describe('getEndpointPartIndex(...)', () => {
-  it('returns default index', () => {
-    expect(getEndpointPartIndex('endpoint')).toEqual(0);
-  });
-
   it('parses valid index', () => {
     expect(getEndpointPartIndex('endpoint[1]')).toEqual(1);
     expect(getEndpointPartIndex('endpoint[123]')).toEqual(123);
   });
 
   it('should throw on invalid cases', () => {
+    // @ts-expect-error
+    expect(() => getEndpointPartIndex('endpoint')).toThrow();
     // @ts-expect-error
     expect(() => getEndpointPartIndex('endpoints')).toThrow();
     // @ts-expect-error
@@ -32,9 +30,6 @@ describe('getEndpointPartIndex(...)', () => {
 
 describe('getServiceBaseNameByOperationEndpoint(...)', () => {
   it('returns valid endpoint base name', () => {
-    expect(
-      getServiceBaseNameByOperationEndpoint('foo/bar', 'endpoint')
-    ).toEqual('foo');
     expect(
       getServiceBaseNameByOperationEndpoint('foo/bar', 'endpoint[0]')
     ).toEqual('foo');
@@ -58,12 +53,6 @@ describe('getServiceBaseNameByOperationEndpoint(...)', () => {
 });
 
 describe('getServiceNamesByOperationEndpoint(...)', () => {
-  it('returns valid service name', () => {
-    expect(
-      getServiceNamesByOperationEndpoint('foo/bar', 'endpoint', 'fallback')
-    ).toEqual(['Foo']);
-  });
-
   it('returns fallback service name', () => {
     expect(
       getServiceNamesByOperationEndpoint('/', 'endpoint[1]', 'fallback')

@@ -1,8 +1,6 @@
 import { getServiceName } from './getServiceName.js';
 
-export type ServiceBaseNameByEndpointOption =
-  | `endpoint[${number}]`
-  | 'endpoint';
+export type ServiceBaseNameByEndpointOption = `endpoint[${number}]`;
 
 export const getServiceNamesByOperationEndpoint = (
   endpoint: string,
@@ -36,8 +34,6 @@ export const getServiceBaseNameByOperationEndpoint = (
 export const getEndpointPartIndex = (
   endpointOption: ServiceBaseNameByEndpointOption
 ) => {
-  if (endpointOption === 'endpoint') return 0;
-
   const startBracketString = 'endpoint[';
 
   const endpointIndexStart = endpointOption.indexOf(startBracketString);

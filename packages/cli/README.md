@@ -79,7 +79,7 @@ the `schema.json` file.
   - Example: `--file-header '/* eslint-disable */'`
 - **`--postfix-services <string>`:** Customize the generated service names with a specific postfix _(optional, default: `Service`)_.
   - Example: `--postfix-services Endpoint` will generate `services/UserEndpoint.ts` instead of `services/UserService.ts`.
-- **`--service-name-base <endpoint | endpoint[<index>] | tags>`:** Use OpenAPI Operation `endpoint[<index>]` path part (e.g.: `/0/1/2`) or `tags` as the base name of the service. _(optional, default: `endpoint[0]`)_.
+- **`--service-name-base <endpoint[<index>] | tags>`:** Use OpenAPI Operation `endpoint[<index>]` path part (e.g.: `/0/1/2`) or `tags` as the base name of the service. _(optional, default: `endpoint[0]`)_.
   - Examples:
     - `--service-name-base endpoint[0]` generates `services/FooService.ts`. from endpoint `/foo/bar/baz`
     - `--service-name-base endpoint[1]` generates `services/BarService.ts`. from endpoint `/foo/bar/baz`

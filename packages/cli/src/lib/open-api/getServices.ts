@@ -46,7 +46,7 @@ export const getServices = (
   openApiJson: OpenAPISchemaType,
   {
     postfixServices = 'Service',
-    serviceNameBase = 'endpoint',
+    serviceNameBase = 'endpoint[0]',
   }: { postfixServices?: string; serviceNameBase?: ServiceBaseName } = {},
   servicesGlob = ['**']
 ) => {
