@@ -5,7 +5,7 @@ import micromatch from 'micromatch';
 import { getContentMediaType } from './getContent.js';
 import { getOperationName } from './getOperationName.js';
 import { getServiceName } from './getServiceName.js';
-import type { OpenAPISchemaType } from './OpenAPISchemaType.ts';
+import type { OpenAPISchemaType } from './OpenAPISchemaType.js';
 
 export type ServiceBaseName = 'endpoint' | 'tags';
 
@@ -35,7 +35,7 @@ export type ServiceOperation = {
   mediaType: string | undefined;
   errors: Record<string, string | undefined>;
   success: Record<string, string | undefined>;
-  parameters: Record<string, never> | undefined;
+  parameters: Record<string, any> | undefined;
 };
 
 export const getServices = (
