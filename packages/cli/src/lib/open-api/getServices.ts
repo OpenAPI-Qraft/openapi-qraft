@@ -5,6 +5,7 @@ import micromatch from 'micromatch';
 import { getContentMediaType } from './getContent.js';
 import { getOperationName } from './getOperationName.js';
 import { getServiceName } from './getServiceName.js';
+import { getServiceNamesByOperationTags } from './getServiceNamesByOperationTags.js';
 import type { OpenAPISchemaType } from './OpenAPISchemaType.js';
 
 export type ServiceBaseName = 'endpoint' | 'tags';
@@ -93,9 +94,14 @@ export const getServices = (
         {} as Record<'errors' | 'success', Record<string, string | undefined>>
       );
 
+      const serviceFallbackBaseName = 'Default';
+
       const serviceNames =
         serviceNameBase === 'tags'
-          ? paths[path][method]?.tags?.map(getServiceName) || ['Default']
+          ? getServiceNamesByOperationTags(
+            paths[path][method]?.tags,
+            serviceFallbackBaseName
+          )
           : [getServiceName(path.split('/')[1])];
 
       for (const name of serviceNames) {
