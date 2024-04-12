@@ -13,6 +13,22 @@ describe('getServices', () => {
   });
 
   it('matches snapshot with custom `servicesGlob`', () => {
-    expect(getServices(openAPI, {}, ['/files/**'])).toMatchSnapshot();
+    expect(
+      getServices(
+        openAPI,
+        { serviceNameBase: 'endpoint', postfixServices: 'Service' },
+        ['/files/**']
+      )
+    ).toMatchSnapshot();
+  });
+
+  it('matches snapshot with "serviceNameBase: endpoint"', () => {
+    expect(
+      getServices(openAPI, { serviceNameBase: 'endpoint' })
+    ).toMatchSnapshot();
+  });
+
+  it('matches snapshot with "serviceNameBase: tags"', () => {
+    expect(getServices(openAPI, { serviceNameBase: 'tags' })).toMatchSnapshot();
   });
 });
