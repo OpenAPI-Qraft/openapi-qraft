@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="generator" content="Docusaurus v3.1.1">
 <title data-rh="true">OpenAPI Qraft CLI | OpenAPI Qraft</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:url" content="https://openapi-qraft.github.io/openapi-qraft/docs/codegen/cli"><meta data-rh="true" property="og:locale" content="en"><meta data-rh="true" name="docusaurus_locale" content="en"><meta data-rh="true" name="docsearch:language" content="en"><meta data-rh="true" name="docusaurus_version" content="current"><meta data-rh="true" name="docusaurus_tag" content="docs-default-current"><meta data-rh="true" name="docsearch:version" content="current"><meta data-rh="true" name="docsearch:docusaurus_tag" content="docs-default-current"><meta data-rh="true" property="og:title" content="OpenAPI Qraft CLI | OpenAPI Qraft"><meta data-rh="true" name="description" content="OpenAPI Qraft CLI is a command-line utility that generates API schemas and interfaces for the @openapi-qraft/react."><meta data-rh="true" property="og:description" content="OpenAPI Qraft CLI is a command-line utility that generates API schemas and interfaces for the @openapi-qraft/react."><link data-rh="true" rel="canonical" href="https://openapi-qraft.github.io/openapi-qraft/docs/codegen/cli"><link data-rh="true" rel="alternate" href="https://openapi-qraft.github.io/openapi-qraft/docs/codegen/cli" hreflang="en"><link data-rh="true" rel="alternate" href="https://openapi-qraft.github.io/openapi-qraft/docs/codegen/cli" hreflang="x-default"><link data-rh="true" rel="preconnect" href="https://B42903JOPT-dsn.algolia.net" crossorigin="anonymous"><link rel="search" type="application/opensearchdescription+xml" title="OpenAPI Qraft" href="/openapi-qraft/opensearch.xml"><link rel="stylesheet" href="/openapi-qraft/assets/css/styles.d588c75e.css">
-<script src="/openapi-qraft/assets/js/runtime~main.0462feab.js" defer="defer"></script>
+<script src="/openapi-qraft/assets/js/runtime~main.810b3ed2.js" defer="defer"></script>
 <script src="/openapi-qraft/assets/js/main.01bb83c8.js" defer="defer"></script>
 </head>
 <body class="navigation-with-keyboard">
@@ -57,46 +57,39 @@ package for more details.<!-- -->
 </ul>
 <h4 class="anchor anchorWithStickyNavbar_JmGV" id="edge-case-options">Edge-case Options<a href="#edge-case-options" class="hash-link" aria-label="Direct link to Edge-case Options" title="Direct link to Edge-case Options">​</a></h4>
 <ul>
-<li>
-<p><strong><code>--operation-generics-import-path &lt;path&gt;</code>:</strong> Define the path to the operation generics file, allowing for custom
-operation handling <em>(optional, default: <code>@openapi-qraft/react</code>)</em>.</p>
-</li>
-<li>
-<p><strong><code>--file-header &lt;string&gt;</code>:</strong> Add a custom header to each generated file, useful for disabling linting rules or adding file
-comments <em>(optional)</em>.</p>
+<li><strong><code>--operation-generics-import-path &lt;path&gt;</code>:</strong> Define the path to the operation generics file, allowing for custom
+operation handling <em>(optional, default: <code>@openapi-qraft/react</code>)</em>.</li>
+<li><strong><code>--file-header &lt;string&gt;</code>:</strong> Add a custom header to each generated file, useful for disabling linting rules or adding file
+comments <em>(optional)</em>.<!-- -->
 <ul>
 <li>Example: <code>--file-header &#x27;/* eslint-disable */&#x27;</code></li>
 </ul>
 </li>
-<li>
-<p><strong><code>--postfix-services &lt;string&gt;</code>:</strong> Customize the generated service names with a specific postfix <em>(optional, default: <code>Service</code>)</em>.</p>
+<li><strong><code>--postfix-services &lt;string&gt;</code>:</strong> Customize the generated service names with a specific postfix <em>(optional, default: <code>Service</code>)</em>.<!-- -->
 <ul>
 <li>Example: <code>--postfix-services Endpoint</code> will generate <code>services/UserEndpoint.ts</code> instead of <code>services/UserService.ts</code>.
 using ECMAScript modules when TypeScript&#x27;s <em>--moduleResolution</em> is <code>node16</code> or <code>nodenext</code> <em>(optional)</em>.</li>
 </ul>
 </li>
-<li>
-<p><strong><code>--service-name-base &lt;endpoint | tags&gt;</code>:</strong> Use OpenAPI Operation <code>endpoint</code> or <code>tags</code> as the base name of the service <em>(optional, default: <code>endpoint</code>)</em>.</p>
+<li><strong><code>--service-name-base &lt;endpoint[&lt;index&gt;] | tags&gt;</code>:</strong> Use OpenAPI Operation <code>endpoint[&lt;index&gt;]</code> path part (e.g.: <code>/0/1/2</code>) or <code>tags</code> as the base name of the service. <em>(optional, default: <code>endpoint[0]</code>)</em>.<!-- -->
 <ul>
 <li>Examples:<!-- -->
 <ul>
-<li><code>--service-name-base endpoint</code> will generate services based on the OpenAPI Operation endpoint.</li>
+<li><code>--service-name-base endpoint[0]</code> generates <code>services/FooService.ts</code>. from endpoint <code>/foo/bar/baz</code></li>
+<li><code>--service-name-base endpoint[1]</code> generates <code>services/BarService.ts</code>. from endpoint <code>/foo/bar/baz</code></li>
+<li><code>--service-name-base endpoint[2]</code> generates <code>services/BarService.ts</code>. from endpoint <code>/foo/bar</code> <em>(if the endpoint is shorter than the index, the last part is used)</em></li>
 <li><code>--service-name-base tags</code> will generate services based on the OpenAPI Operation tags instead of the endpoint.<!-- -->
 <ul>
-<li>If multiple tags are present for the operation, similar services will be created for each tag.</li>
-<li>If there are no tags for the operation, the services will be created under the <code>default</code> tag.</li>
+<li>If multiple tags are present for the operation, similar services will be created for each tag. Operation with <code>tags: [Foo, Bar]</code> will generate <code>services/FooService.ts</code> and <code>services/BarService.ts</code>.</li>
+<li>If there are no tags for the operation, the services will be created under the <code>default</code> tag. Operation with empty <code>tags: []</code> will generate <code>services/DefaultService.ts</code>.</li>
 </ul>
 </li>
 </ul>
 </li>
 </ul>
 </li>
-<li>
-<p><strong><code>--explicit-import-extensions</code>:</strong> Include explicit <code>.js</code> extensions in all import statements. Ideal for projects</p>
-</li>
-<li>
-<p><strong><code>-h, --help</code>:</strong> Display help for the command (optional).</p>
-</li>
+<li><strong><code>--explicit-import-extensions</code>:</strong> Include explicit <code>.js</code> extensions in all import statements. Ideal for projects</li>
+<li><strong><code>-h, --help</code>:</strong> Display help for the command (optional).</li>
 </ul>
 <h2 class="anchor anchorWithStickyNavbar_JmGV" id="in-project-setup">In-project Setup<a href="#in-project-setup" class="hash-link" aria-label="Direct link to In-project Setup" title="Direct link to In-project Setup">​</a></h2>
 <p>To use the <code>@openapi-qraft/cli</code> usefully, you can add a script to your <code>package.json</code> file or use CLIs in a bash script.</p>
