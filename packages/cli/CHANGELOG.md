@@ -1,5 +1,12 @@
 # @openapi-qraft/cli
 
+## 1.6.0
+
+### Minor Changes
+
+- 7a67dec: Added `--service-name-base <endpoint | tags>` option support
+- 41e0c40: Added support for `--service-name-base <endpoint[<index>]>` option
+
 ## 1.5.0
 
 ### Minor Changes
