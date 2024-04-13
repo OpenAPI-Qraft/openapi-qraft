@@ -4,9 +4,9 @@ import { createRecursiveProxy } from './lib/createRecursiveProxy.js';
 import type { OperationSchema } from './lib/requestFn.js';
 import type { QraftContextValue } from './QraftContext.js';
 
-export interface QraftClientOptions {
+export type QraftClientOptions = {
   context?: Context<QraftContextValue>;
-}
+} & QraftContextValue;
 
 export const qraftAPIClient = <
   Services extends ServicesOutput<Services>,
@@ -21,16 +21,34 @@ export const qraftAPIClient = <
       if (getPath.length !== 2 || key !== 'schema') return;
 
       const serviceOperation = getByPath(services, getPath);
-      if (!isServiceOperation(serviceOperation))
-        throw new Error(`Service operation not found: ${getPath.join('.')}`);
-      return serviceOperation.schema;
+
+      let operation = serviceOperation;
+      if (!isServiceOperation(serviceOperation)) {
+        const isService = getPath.join('.') in services;
+
+        if (isService) {
+          operation = serviceOperation[Object.keys(serviceOperation)[0]];
+        } else {
+          throw new Error(`Service operation not found: ${getPath.join('.')}`);
+        }
+      }
+
+      return operation.schema;
     },
     (applyPath, args) => {
       const path = applyPath.slice(0, -1);
       const serviceOperation = getByPath(services, path);
 
-      if (!isServiceOperation(serviceOperation))
-        throw new Error(`Service operation not found: ${path.join('.')}`);
+      let operation = serviceOperation;
+      if (!isServiceOperation(serviceOperation)) {
+        const isService = path.join('.') in services;
+
+        if (isService) {
+          operation = serviceOperation[Object.keys(serviceOperation)[0]];
+        } else {
+          throw new Error(`Service operation not found: ${path.join('.')}`);
+        }
+      }
 
       // The last arg is for instance `.useMutation` or `.useQuery()`
       const functionName = applyPath[applyPath.length - 1];
@@ -40,7 +58,7 @@ export const qraftAPIClient = <
 
       return callbacks[functionName as keyof Callbacks](
         options,
-        serviceOperation.schema,
+        operation.schema,
         args
       );
     },
@@ -55,7 +73,7 @@ function isServiceOperation(
 }
 
 function getByPath(obj: Record<string, unknown>, path: string[]) {
-  return path.reduce<unknown>((acc, key) => {
+  return path.reduce<any>((acc, key) => {
     if (acc && typeof acc === 'object' && key in acc)
       return acc[key as keyof typeof acc];
   }, obj);

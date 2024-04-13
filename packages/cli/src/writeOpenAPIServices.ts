@@ -41,7 +41,7 @@ export const writeOpenAPIServices = async ({
 
   await writeServices(services, serviceImports, output);
   await writeServiceIndex(services, output);
-  await writeClient(output);
+  await writeClient(output, services);
   await writeIndex(output);
 };
 
@@ -129,7 +129,7 @@ const writeServiceIndex = async (
   spinner.succeed(c.green('Services index has been generated'));
 };
 
-const writeClient = async (output: OutputOptions) => {
+const writeClient = async (output: OutputOptions, services: Service[]) => {
   const spinner = ora('Generating client').start();
 
   try {
@@ -139,6 +139,7 @@ const writeClient = async (output: OutputOptions) => {
         getClientFactory({
           servicesDirName: output.servicesDirName,
           explicitImportExtensions: Boolean(output.explicitImportExtensions),
+          services,
         })
       );
 

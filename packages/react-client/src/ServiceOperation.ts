@@ -63,6 +63,15 @@ export type ServiceOperationMutationKey<
   T extends unknown,
 > = NonNullable<T> extends never ? [S] : [S, T];
 
+type QueryFetchFn<TData, TParams = {}, TError = DefaultError> = (
+  parameters: TParams,
+  options?: RequestInit
+) => Promise<{
+  data: TData;
+  status: Response['status'];
+  headers: Response['headers'];
+}>;
+
 export interface ServiceOperationQuery<
   TSchema extends { url: string; method: string },
   TData,
@@ -90,7 +99,8 @@ export interface ServiceOperationQuery<
     ServiceOperationRemoveQueries<TSchema, TData, TParams, TError>,
     ServiceOperationResetQueries<TSchema, TData, TParams, TError>,
     ServiceOperationRefetchQueries<TSchema, TData, TParams, TError>,
-    ServiceOperationIsFetchingQueries<TSchema, TData, TParams, TError> {
+    ServiceOperationIsFetchingQueries<TSchema, TData, TParams, TError>,
+    QueryFetchFn<TData, TParams, TError> {
   schema: TSchema;
   types: {
     parameters: TParams;
@@ -891,6 +901,16 @@ interface ServiceOperationUseSuspenseQueryQuery<
   ): UseSuspenseQueryResult<TData, TError | Error>;
 }
 
+type MutationFetchFn<TBody, TData, TParams = {}, TError = DefaultError> = (
+  parameters: TParams,
+  body: TBody,
+  options?: RequestInit
+) => Promise<{
+  data: TData;
+  status: Response['status'];
+  headers: Response['headers'];
+}>;
+
 export interface ServiceOperationMutation<
   TSchema extends { url: string; method: string },
   TBody,
@@ -901,7 +921,8 @@ export interface ServiceOperationMutation<
     ServiceOperationUseIsMutating<TSchema, TBody, TData, TParams, TError>,
     ServiceOperationUseMutationState<TSchema, TBody, TData, TParams, TError>,
     ServiceOperationIsMutatingQueries<TSchema, TBody, TData, TParams, TError>,
-    ServiceOperationMutationFn<TSchema, TBody, TData, TParams> {
+    ServiceOperationMutationFn<TSchema, TBody, TData, TParams>,
+    MutationFetchFn<TBody, TData, TParams, TError> {
   schema: TSchema;
   types: {
     parameters: TParams;

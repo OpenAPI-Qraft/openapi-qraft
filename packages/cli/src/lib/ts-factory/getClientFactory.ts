@@ -1,14 +1,16 @@
+import { Service } from 'src/lib/open-api/getServices.js';
 import ts from 'typescript';
 
 type Options = {
   servicesDirName: string;
   explicitImportExtensions: boolean;
+  services?: Service[];
 };
 
 export const getClientFactory = (options: Options) => {
   return [
     ...getClientImportsFactory(options),
-    getCallbacksVariableFactory(),
+    getCallbacksVariableFactory(options),
     getCreateClientFunctionFactory(),
   ];
 };
@@ -87,8 +89,14 @@ const getClientImportsFactory = ({
   ];
 };
 
-const getCallbacksVariableFactory = () => {
+const getCallbacksVariableFactory = ({ services }: Options) => {
   const factory = ts.factory;
+
+  const operations = (services ?? [])
+    .map((service) => service.operations)
+    .reduce((acc, curr) => {
+      return acc.concat(curr);
+    }, []);
 
   return factory.createVariableStatement(
     undefined,
@@ -99,12 +107,52 @@ const getCallbacksVariableFactory = () => {
           undefined,
           undefined,
           factory.createObjectLiteralExpression(
-            serviceCallbacks.map((propertyName) =>
-              factory.createShorthandPropertyAssignment(
-                factory.createIdentifier(propertyName),
-                undefined
-              )
-            ),
+            [
+              ...serviceCallbacks.map((propertyName) =>
+                factory.createShorthandPropertyAssignment(
+                  factory.createIdentifier(propertyName),
+                  undefined
+                )
+              ),
+              ...operations.map((operation) => {
+                return factory.createPropertyAssignment(
+                  factory.createIdentifier(operation.name),
+                  factory.createIdentifier(`(options: any, schema: any, args: any) => {
+                    const ${operation.method === 'get' ? `[parameters, requestOptions]` : `[parameters, body, requestOptions]`} = args;
+
+                    const response = options.requestFn(schema, {
+                        parameters,
+                        ${operation.method === 'get' ? '' : 'body,'}
+                        baseUrl: options?.baseUrl,
+                        ...requestOptions
+                    });
+
+                    const contentType = response.headers.get('Content-Type');
+
+                    try {
+                      if (contentType.includes('application/json')) {
+                        const data = await response.json();
+                        return { data, status: response.status, headers: response.headers };
+                      }
+                      
+                      if (contentType.includes('text/plain')) {
+                        const data = await response.text();
+                        return { data, status: response.status, headers: response.headers };
+                      }  
+                      
+                      if (contentType.includes('text/xml') || contentType.includes('application/xml')) {
+                        const data = await response.text();
+                        return { data, status: response.status, headers: response.headers };
+                      } 
+                      
+                      throw new Error('Unsupported content type');
+                    } catch (error) {
+                      throw error;
+                    }
+                  }`)
+                );
+              }),
+            ],
             true
           )
         ),
