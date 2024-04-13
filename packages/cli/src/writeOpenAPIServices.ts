@@ -5,7 +5,11 @@ import { Readable } from 'node:stream';
 import { OpenAPI3 } from 'openapi-typescript';
 import ora from 'ora';
 
-import { getServices, Service } from './lib/open-api/getServices.js';
+import {
+  getServices,
+  Service,
+  ServiceBaseName,
+} from './lib/open-api/getServices.js';
 import { readSchema } from './lib/open-api/readSchema.js';
 import { astToString } from './lib/ts-factory/astToString.js';
 import { getClientFactory } from './lib/ts-factory/getClientFactory.js';
@@ -23,6 +27,7 @@ type OutputOptions = {
   postfixServices?: string;
   explicitImportExtensions?: boolean;
   servicesDirName: string;
+  serviceNameBase?: ServiceBaseName;
 };
 
 export const writeOpenAPIServices = async ({

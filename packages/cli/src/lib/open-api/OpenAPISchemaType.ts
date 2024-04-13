@@ -2,15 +2,16 @@ export type OpenAPISchemaType = {
   paths: {
     [path: string]: {
       [method: string]: {
+        tags?: string[];
         description?: string;
         summary?: string;
         operationId?: string;
-        parameters?: Record<string, never>;
+        parameters?: Record<string, any>;
         deprecated?: boolean;
         requestBody?: {
           content: {
             [contentType: string]: {
-              schema: never;
+              schema: any;
             };
           };
         };
@@ -19,7 +20,7 @@ export type OpenAPISchemaType = {
             description: string;
             content: {
               [contentType: string]: {
-                schema: never;
+                schema: any;
               };
             };
           };
