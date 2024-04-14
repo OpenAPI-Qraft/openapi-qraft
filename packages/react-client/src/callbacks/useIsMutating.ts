@@ -10,7 +10,7 @@ import { composeMutationFilters } from '../lib/composeMutationFilters.js';
 import type { OperationSchema } from '../lib/requestFn.js';
 import { useQueryClient } from '../lib/useQueryClient.js';
 import type { QraftClientOptions } from '../qraftAPIClient.js';
-import { ServiceOperationMutation } from '../ServiceOperation.js';
+import { ServiceOperationMutation } from '../service-operation/ServiceOperation.js';
 
 export const useIsMutating: <
   TData = unknown,

@@ -1,6 +1,6 @@
 import { callQueryClientMethodWithQueryKey } from '../lib/callQueryClientFetchMethod.js';
 import type { QraftClientOptions } from '../qraftAPIClient.js';
-import { ServiceOperationQuery } from '../ServiceOperation.js';
+import { ServiceOperationQuery } from '../service-operation/ServiceOperation.js';
 
 export const fetchInfiniteQuery: <
   TSchema extends { url: string; method: 'get' | 'head' | 'options' },

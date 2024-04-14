@@ -1,7 +1,7 @@
 import { composeMutationKey } from '../lib/composeMutationKey.js';
 import type { OperationSchema } from '../lib/requestFn.js';
 import type { QraftClientOptions } from '../qraftAPIClient.js';
-import { ServiceOperationMutation } from '../ServiceOperation.js';
+import { ServiceOperationMutation } from '../service-operation/ServiceOperation.js';
 
 export const getMutationKey = (
   qraftOptions: QraftClientOptions | undefined,

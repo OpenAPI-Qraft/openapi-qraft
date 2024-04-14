@@ -22,8 +22,8 @@ export default defineConfig({
     ],
     coverage: {
       exclude: [
-        'src/ServiceOperation.ts', // only types
-        'src/RequestClient.ts', // only types
+        'src/service-operation', // only types
+        'src/**/*.type.ts', // only types
         'src/tests/**',
         'src/**/*.d.ts',
         'src/**/*.test.*',

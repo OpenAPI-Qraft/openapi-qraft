@@ -1,7 +1,7 @@
 import { callQueryClientMethodWithQueryFilters } from '../lib/callQueryClientMethodWithQueryFilters.js';
 import type { OperationSchema } from '../lib/requestFn.js';
 import type { QraftClientOptions } from '../qraftAPIClient.js';
-import { ServiceOperationRemoveQueriesCallback } from '../ServiceOperation.js';
+import type { ServiceOperationRemoveQueriesCallback } from '../service-operation/ServiceOperationRemoveQueries.js';
 
 export function removeQueries<TData>(
   _: QraftClientOptions | undefined,
