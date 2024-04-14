@@ -76,3 +76,4 @@ workflows
 workspaces
 TInfinite
 qraftio
+typecheck

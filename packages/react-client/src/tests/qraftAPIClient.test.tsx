@@ -3004,6 +3004,87 @@ describe('Qraft respects Types', () => {
   });
 });
 
+describe('Qraft is type-safe on Query Filters', () => {
+  it('does not emit an error on the `exact` key', () => {
+    const queryClient = new QueryClient();
+
+    qraft.approvalPolicies.getApprovalPoliciesId.invalidateQueries(
+      {
+        exact: true,
+        parameters: {
+          header: {
+            'x-monite-version': '1.0.0',
+          },
+          path: {
+            approval_policy_id: '1',
+          },
+          query: {
+            items_order: ['asc', 'desc'],
+          },
+        },
+      },
+      queryClient
+    );
+  });
+
+  it('emits an error on the `exact` key and partial parameters', () => {
+    const queryClient = new QueryClient();
+
+    // Header is required, must emit an error
+    qraft.approvalPolicies.getApprovalPoliciesId.invalidateQueries(
+      // @ts-expect-error
+      {
+        exact: true,
+        parameters: {
+          // header: {
+          //   'x-monite-version': '1.0.0',
+          // },
+          path: {
+            approval_policy_id: '1',
+          },
+          query: {
+            items_order: ['asc', 'desc'],
+          },
+        },
+      },
+      queryClient
+    );
+  });
+
+  it('does not emit an error when `exact` is not specified', () => {
+    const queryClient = new QueryClient();
+
+    qraft.approvalPolicies.getApprovalPoliciesId.invalidateQueries(
+      {
+        // Partial parameters
+        parameters: {
+          query: {
+            items_order: ['asc', 'desc'],
+          },
+        },
+      },
+      queryClient
+    );
+  });
+
+  it('does not emit an error when `exact` is `false`', () => {
+    const queryClient = new QueryClient();
+
+    qraft.approvalPolicies.getApprovalPoliciesId.invalidateQueries(
+      {
+        // Partial parameters
+        exact: false,
+        parameters: {
+          query: {
+            items_order: ['asc', 'desc'],
+          },
+        },
+      },
+      queryClient
+    );
+  });
+});
+
 function Providers({
   children,
   queryClient,
