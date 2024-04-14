@@ -1,7 +1,7 @@
 import { callQueryClientMethodWithMutationFilters } from '../lib/callQueryClientMethodWithMutationFilters.js';
 import type { OperationSchema } from '../lib/requestFn.js';
 import type { QraftClientOptions } from '../qraftAPIClient.js';
-import { ServiceOperationIsMutatingQueriesCallback } from '../ServiceOperation.js';
+import type { ServiceOperationIsMutatingQueriesCallback } from '../types/ServiceOperationIsMutatingQueries.js';
 
 export function isMutating<TData>(
   _: QraftClientOptions | undefined,

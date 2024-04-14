@@ -1,4 +1,4 @@
-import type { ServiceOperationMutationKey } from '../ServiceOperation.js';
+import type { ServiceOperationMutationKey } from '../types/ServiceOperationKey.js';
 import type { OperationSchema } from './requestFn.js';
 
 /**

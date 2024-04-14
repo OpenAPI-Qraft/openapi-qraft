@@ -1,7 +1,7 @@
 import { callQueryClientMethodWithQueryFilters } from '../lib/callQueryClientMethodWithQueryFilters.js';
 import type { OperationSchema } from '../lib/requestFn.js';
 import type { QraftClientOptions } from '../qraftAPIClient.js';
-import { ServiceOperationIsFetchingQueriesCallback } from '../ServiceOperation.js';
+import type { ServiceOperationIsFetchingQueriesCallback } from '../types/ServiceOperationIsFetchingQueries.js';
 
 export function isFetching<TData>(
   qraftOptions: QraftClientOptions | undefined,
