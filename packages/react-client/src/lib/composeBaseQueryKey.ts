@@ -1,7 +1,7 @@
 import type {
   ServiceOperationInfiniteQueryKey,
   ServiceOperationQueryKey,
-} from '../types/ServiceOperationKey.js';
+} from '../service-operation/ServiceOperationKey.js';
 import type { OperationSchema } from './requestFn.js';
 
 export function composeBaseQueryKey<TSchema extends OperationSchema, TParams>(

@@ -7,7 +7,7 @@ import type { UseQueryOptions } from '@tanstack/react-query';
 
 import type { QraftClientOptions } from '../qraftAPIClient.js';
 import { QraftContext } from '../QraftContext.js';
-import type { ServiceOperationQueryKey } from '../types/ServiceOperationKey.js';
+import type { ServiceOperationQueryKey } from '../service-operation/ServiceOperationKey.js';
 import { composeInfiniteQueryKey } from './composeInfiniteQueryKey.js';
 import { composeQueryKey } from './composeQueryKey.js';
 import type { OperationSchema } from './requestFn.js';

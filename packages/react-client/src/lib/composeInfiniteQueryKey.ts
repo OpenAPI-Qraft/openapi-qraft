@@ -1,4 +1,4 @@
-import type { ServiceOperationInfiniteQueryKey } from '../types/ServiceOperationKey.js';
+import type { ServiceOperationInfiniteQueryKey } from '../service-operation/ServiceOperationKey.js';
 import { composeBaseQueryKey } from './composeBaseQueryKey.js';
 import type { OperationSchema } from './requestFn.js';
 

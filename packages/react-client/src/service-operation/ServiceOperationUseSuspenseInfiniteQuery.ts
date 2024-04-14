@@ -8,8 +8,8 @@ import type {
   UseSuspenseInfiniteQueryResult,
 } from '@tanstack/react-query';
 
+import type { PartialParameters } from '../lib/PartialParameters.type.js';
 import type { OperationInfiniteData } from './OperationInfiniteData.js';
-import type { PartialParameters } from './PartialParameters.js';
 import type { ServiceOperationInfiniteQueryKey } from './ServiceOperationKey.js';
 
 export interface ServiceOperationUseSuspenseInfiniteQuery<

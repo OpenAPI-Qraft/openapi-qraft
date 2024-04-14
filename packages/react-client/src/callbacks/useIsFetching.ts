@@ -6,7 +6,7 @@ import { composeQueryFilters } from '../lib/composeQueryFilters.js';
 import type { OperationSchema } from '../lib/requestFn.js';
 import { useQueryClient } from '../lib/useQueryClient.js';
 import type { QraftClientOptions } from '../qraftAPIClient.js';
-import type { ServiceOperationQuery } from '../ServiceOperation.js';
+import type { ServiceOperationQuery } from '../service-operation/ServiceOperation.js';
 
 export const useIsFetching: <TVariables = unknown>(
   qraftOptions: QraftClientOptions | undefined,

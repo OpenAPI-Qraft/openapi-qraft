@@ -12,7 +12,7 @@ import type { OperationSchema } from '../lib/requestFn.js';
 import { useQueryClient } from '../lib/useQueryClient.js';
 import type { QraftClientOptions } from '../qraftAPIClient.js';
 import { QraftContext } from '../QraftContext.js';
-import { ServiceOperationQuery } from '../ServiceOperation.js';
+import { ServiceOperationQuery } from '../service-operation/ServiceOperation.js';
 
 export const useQueries: (
   qraftOptions: QraftClientOptions | undefined,

@@ -10,5 +10,4 @@ export {
   type RequestFnOptions,
   type HeadersOptions,
 } from './lib/requestFn.js';
-export type { ServiceOperationQuery } from './ServiceOperation.js';
-export type { ServiceOperationMutation } from './ServiceOperation.js';
+export * from './service-operation/index.js';

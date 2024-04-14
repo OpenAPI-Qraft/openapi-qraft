@@ -9,7 +9,7 @@ import {
 import type { OperationSchema } from '../lib/requestFn.js';
 import { useComposeUseQueryOptions } from '../lib/useComposeUseQueryOptions.js';
 import type { QraftClientOptions } from '../qraftAPIClient.js';
-import type { ServiceOperationQuery } from '../ServiceOperation.js';
+import type { ServiceOperationQuery } from '../service-operation/ServiceOperation.js';
 
 export const useInfiniteQuery: <
   TQueryFnData,

@@ -7,9 +7,9 @@ import type {
   QueryFunction,
 } from '@tanstack/query-core';
 
+import type { PartialParameters } from '../lib/PartialParameters.type.js';
 import type { RequestFn } from '../lib/requestFn.js';
 import type { OperationInfiniteData } from './OperationInfiniteData.js';
-import type { PartialParameters } from './PartialParameters.js';
 import type {
   ServiceOperationInfiniteQueryKey,
   ServiceOperationQueryKey,
