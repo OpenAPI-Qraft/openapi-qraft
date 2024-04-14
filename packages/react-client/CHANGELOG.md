@@ -1,5 +1,15 @@
 # @openapi-qraft/react
 
+## 1.7.0
+
+### Minor Changes
+
+- 8e8ee11: `ServiceOperation` type has been moved to `/service-operation` and separated out
+
+### Patch Changes
+
+- 56ea791: Added support for a non-exact Query Key in Query Filters
+
 ## 1.6.0
 
 ## 1.5.0
