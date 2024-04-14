@@ -7,20 +7,23 @@ const FeatureList = [
   {
     title: 'Type-safe Requests',
     emoji: '🛡️',
-    description: <>OpenAPI Qraft generates a fully-typed API Client with TSDoc from your OpenAPI Document.</>,
+    description: <>API Client for React with strong types and TSDoc generation</>,
   },
   {
-    title: 'Minimal amount of runtime code',
+    title: 'Lightweight & Secure',
     emoji: '⚖️',
-    description: <>Qraft CLI generates a minimal amount of runtime code to optimize bundle size and enhance security checks.</>,
+    description: (
+      <>
+        Minimal amount of generated <em>runtime code</em> optimizes bundle size and enhances security checks
+      </>
+    ),
   },
   {
     title: 'Powered by TanStack Query',
     emoji: '⚡',
     description: (
       <>
-        OpenAPI Qraft is built on top of <Link href="https://tanstack.com/query/latest">TanStack Query</Link>, a powerful data fetching and caching library for
-        React.
+        Built on top of <Link href="https://tanstack.com/query/latest">TanStack Query</Link> with <em>all the power</em> of its features
       </>
     ),
   },
