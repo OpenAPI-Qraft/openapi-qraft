@@ -1,5 +1,5 @@
 ---
-"@openapi-qraft/react": patch
+'@openapi-qraft/react': patch
 ---
 
-Added support of not exact Query Key in Query Filters
+Added support for a non-exact Query Key in Query Filters
