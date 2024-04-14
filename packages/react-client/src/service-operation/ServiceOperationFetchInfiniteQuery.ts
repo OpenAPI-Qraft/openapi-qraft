@@ -15,6 +15,55 @@ import type {
   ServiceOperationQueryKey,
 } from './ServiceOperationKey.js';
 
+export interface ServiceOperationFetchInfiniteQuery<
+  TSchema extends { url: string; method: string },
+  TData,
+  TParams = {},
+  TError = DefaultError,
+> {
+  fetchInfiniteQuery<TPageParam extends TParams>(
+    options:
+      | (FetchInfiniteQueryOptionsByQueryKey<
+          TSchema,
+          TData,
+          TParams,
+          TPageParam,
+          TError
+        > &
+          FetchInfiniteQueryOptionsQueryFn<TSchema, TData, TParams>)
+      | (FetchInfiniteQueryOptionsByParameters<
+          TSchema,
+          TData,
+          TParams,
+          TPageParam,
+          TError
+        > &
+          FetchInfiniteQueryOptionsQueryFn<TSchema, TData, TParams>),
+    queryClient: QueryClient
+  ): Promise<OperationInfiniteData<TData, TParams>>;
+
+  prefetchInfiniteQuery<TPageParam extends TParams>(
+    options:
+      | (FetchInfiniteQueryOptionsByQueryKey<
+          TSchema,
+          TData,
+          TParams,
+          TPageParam,
+          TError
+        > &
+          FetchInfiniteQueryOptionsQueryFn<TSchema, TData, TParams>)
+      | (FetchInfiniteQueryOptionsByParameters<
+          TSchema,
+          TData,
+          TParams,
+          TPageParam,
+          TError
+        > &
+          FetchInfiniteQueryOptionsQueryFn<TSchema, TData, TParams>),
+    queryClient: QueryClient
+  ): Promise<void>;
+}
+
 type FetchInfiniteQueryPages<TData = unknown, TPageParam = unknown> =
   | {
       pages?: never;
@@ -65,7 +114,6 @@ type FetchInfiniteQueryOptionsByQueryKey<
   queryKey?: ServiceOperationInfiniteQueryKey<TSchema, TParams>;
   parameters?: never;
 };
-
 type FetchInfiniteQueryOptionsByParameters<
   TSchema extends { url: string; method: string },
   TData,
@@ -85,6 +133,7 @@ type FetchInfiniteQueryOptionsByParameters<
   parameters?: TParams;
   queryKey?: never;
 };
+
 type FetchInfiniteQueryOptionsQueryFn<
   TSchema extends { url: string; method: string },
   TData,
@@ -105,52 +154,3 @@ type FetchInfiniteQueryOptionsQueryFn<
       baseUrl: string | undefined;
       queryFn?: never; // Workaround to fix union type error
     };
-
-export interface ServiceOperationFetchInfiniteQuery<
-  TSchema extends { url: string; method: string },
-  TData,
-  TParams = {},
-  TError = DefaultError,
-> {
-  fetchInfiniteQuery<TPageParam extends TParams>(
-    options:
-      | (FetchInfiniteQueryOptionsByQueryKey<
-          TSchema,
-          TData,
-          TParams,
-          TPageParam,
-          TError
-        > &
-          FetchInfiniteQueryOptionsQueryFn<TSchema, TData, TParams>)
-      | (FetchInfiniteQueryOptionsByParameters<
-          TSchema,
-          TData,
-          TParams,
-          TPageParam,
-          TError
-        > &
-          FetchInfiniteQueryOptionsQueryFn<TSchema, TData, TParams>),
-    queryClient: QueryClient
-  ): Promise<OperationInfiniteData<TData, TParams>>;
-
-  prefetchInfiniteQuery<TPageParam extends TParams>(
-    options:
-      | (FetchInfiniteQueryOptionsByQueryKey<
-          TSchema,
-          TData,
-          TParams,
-          TPageParam,
-          TError
-        > &
-          FetchInfiniteQueryOptionsQueryFn<TSchema, TData, TParams>)
-      | (FetchInfiniteQueryOptionsByParameters<
-          TSchema,
-          TData,
-          TParams,
-          TPageParam,
-          TError
-        > &
-          FetchInfiniteQueryOptionsQueryFn<TSchema, TData, TParams>),
-    queryClient: QueryClient
-  ): Promise<void>;
-}

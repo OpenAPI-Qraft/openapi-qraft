@@ -8,6 +8,31 @@ import type {
 import type { RequestFn } from '../lib/requestFn.js';
 import type { ServiceOperationQueryKey } from './ServiceOperationKey.js';
 
+export interface ServiceOperationFetchQuery<
+  TSchema extends { url: string; method: string },
+  TData,
+  TParams = {},
+  TError = DefaultError,
+> {
+  fetchQuery(
+    options:
+      | (FetchQueryOptionsByQueryKey<TSchema, TData, TParams, TError> &
+          FetchQueryOptionsQueryFn<TSchema, TData, TParams>)
+      | (FetchQueryOptionsByParameters<TSchema, TData, TParams, TError> &
+          FetchQueryOptionsQueryFn<TSchema, TData, TParams>),
+    queryClient: QueryClient
+  ): Promise<TData>;
+
+  prefetchQuery(
+    options:
+      | (FetchQueryOptionsByQueryKey<TSchema, TData, TParams, TError> &
+          FetchQueryOptionsQueryFn<TSchema, TData, TParams>)
+      | (FetchQueryOptionsByParameters<TSchema, TData, TParams, TError> &
+          FetchQueryOptionsQueryFn<TSchema, TData, TParams>),
+    queryClient: QueryClient
+  ): Promise<void>;
+}
+
 type FetchQueryOptionsBase<
   TSchema extends { url: string; method: string },
   TData,
@@ -68,28 +93,3 @@ type FetchQueryOptionsQueryFn<
       baseUrl: string | undefined;
       queryFn?: never; // Workaround to fix union type error
     };
-
-export interface ServiceOperationFetchQuery<
-  TSchema extends { url: string; method: string },
-  TData,
-  TParams = {},
-  TError = DefaultError,
-> {
-  fetchQuery(
-    options:
-      | (FetchQueryOptionsByQueryKey<TSchema, TData, TParams, TError> &
-          FetchQueryOptionsQueryFn<TSchema, TData, TParams>)
-      | (FetchQueryOptionsByParameters<TSchema, TData, TParams, TError> &
-          FetchQueryOptionsQueryFn<TSchema, TData, TParams>),
-    queryClient: QueryClient
-  ): Promise<TData>;
-
-  prefetchQuery(
-    options:
-      | (FetchQueryOptionsByQueryKey<TSchema, TData, TParams, TError> &
-          FetchQueryOptionsQueryFn<TSchema, TData, TParams>)
-      | (FetchQueryOptionsByParameters<TSchema, TData, TParams, TError> &
-          FetchQueryOptionsQueryFn<TSchema, TData, TParams>),
-    queryClient: QueryClient
-  ): Promise<void>;
-}
