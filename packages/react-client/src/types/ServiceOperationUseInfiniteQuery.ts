@@ -1,6 +1,5 @@
 import type {
   DefaultError,
-  InfiniteData,
   InfiniteQueryPageParamsOptions,
   QueryClient,
 } from '@tanstack/query-core';
@@ -11,6 +10,7 @@ import type {
   UseInfiniteQueryResult,
 } from '@tanstack/react-query';
 
+import type { OperationInfiniteData } from './OperationInfiniteData.js';
 import type { PartialParameters } from './PartialParameters.js';
 import type { ServiceOperationInfiniteQueryKey } from './ServiceOperationKey.js';
 
@@ -30,7 +30,7 @@ export interface ServiceOperationUseInfiniteQuery<
       UndefinedInitialDataInfiniteOptions<
         TData,
         TError,
-        InfiniteData<TData, TParams>,
+        OperationInfiniteData<TData, TParams>,
         ServiceOperationInfiniteQueryKey<TSchema, TParams>,
         PartialParameters<TPageParam>
       >,
@@ -41,7 +41,10 @@ export interface ServiceOperationUseInfiniteQuery<
     > &
       InfiniteQueryPageParamsOptions<TData, PartialParameters<TPageParam>>,
     queryClient?: QueryClient
-  ): UseInfiniteQueryResult<InfiniteData<TData, TParams>, TError | Error>;
+  ): UseInfiniteQueryResult<
+    OperationInfiniteData<TData, TParams>,
+    TError | Error
+  >;
 
   useInfiniteQuery<TPageParam extends TParams>(
     parameters: TParams | ServiceOperationInfiniteQueryKey<TSchema, TParams>,
@@ -49,7 +52,7 @@ export interface ServiceOperationUseInfiniteQuery<
       DefinedInitialDataInfiniteOptions<
         TData,
         TError,
-        InfiniteData<TData, TParams>,
+        OperationInfiniteData<TData, TParams>,
         ServiceOperationInfiniteQueryKey<TSchema, TParams>,
         PartialParameters<TPageParam>
       >,
@@ -61,7 +64,7 @@ export interface ServiceOperationUseInfiniteQuery<
       InfiniteQueryPageParamsOptions<TData, PartialParameters<TPageParam>>,
     queryClient?: QueryClient
   ): DefinedUseInfiniteQueryResult<
-    InfiniteData<TData, TParams>,
+    OperationInfiniteData<TData, TParams>,
     TError | Error
   >;
 }

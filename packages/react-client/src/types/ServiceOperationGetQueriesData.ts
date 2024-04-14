@@ -1,10 +1,6 @@
-import type {
-  DefaultError,
-  InfiniteData,
-  NoInfer,
-  QueryClient,
-} from '@tanstack/query-core';
+import type { DefaultError, NoInfer, QueryClient } from '@tanstack/query-core';
 
+import type { OperationInfiniteData } from './OperationInfiniteData.js';
 import type {
   QueryFiltersByParameters,
   QueryFiltersByQueryKey,
@@ -29,7 +25,7 @@ export interface ServiceOperationGetQueriesData<
     ? Array<
         [
           queryKey: ServiceOperationInfiniteQueryKey<TSchema, TParams>,
-          data: NoInfer<InfiniteData<TData, TParams>> | undefined,
+          data: NoInfer<OperationInfiniteData<TData, TParams>> | undefined,
         ]
       >
     : Array<

@@ -1,5 +1,6 @@
-import type { InfiniteData, QueryClient } from '@tanstack/query-core';
+import type { QueryClient } from '@tanstack/query-core';
 
+import type { OperationInfiniteData } from './OperationInfiniteData.js';
 import type { ServiceOperationInfiniteQueryKey } from './ServiceOperationKey.js';
 
 export interface ServiceOperationGetInfiniteQueryData<
@@ -10,5 +11,5 @@ export interface ServiceOperationGetInfiniteQueryData<
   getInfiniteQueryData(
     parameters: TParams | ServiceOperationInfiniteQueryKey<TSchema, TParams>,
     queryClient: QueryClient
-  ): InfiniteData<TData, TParams> | undefined;
+  ): OperationInfiniteData<TData, TParams> | undefined;
 }

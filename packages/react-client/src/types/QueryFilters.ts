@@ -1,10 +1,6 @@
-import type {
-  DefaultError,
-  FetchStatus,
-  InfiniteData,
-  Query,
-} from '@tanstack/query-core';
+import type { DefaultError, FetchStatus, Query } from '@tanstack/query-core';
 
+import type { OperationInfiniteData } from './OperationInfiniteData.js';
 import type { PartialParameters } from './PartialParameters.js';
 import type {
   ServiceOperationBaseQueryKey,
@@ -203,9 +199,9 @@ interface QueryFilterInfinitePredicate<
    */
   (
     query: Query<
-      InfiniteData<TData, TParams>,
+      OperationInfiniteData<TData, TParams>,
       TError,
-      InfiniteData<TData, TParams>,
+      OperationInfiniteData<TData, TParams>,
       ServiceOperationInfiniteQueryKey<TSchema, TParams>
     >
   ): boolean;

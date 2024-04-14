@@ -2,13 +2,13 @@ import type {
   DefaultError,
   FetchQueryOptions,
   GetNextPageParamFunction,
-  InfiniteData,
   InitialPageParam,
   QueryClient,
   QueryFunction,
 } from '@tanstack/query-core';
 
 import type { RequestFn } from '../lib/requestFn.js';
+import type { OperationInfiniteData } from './OperationInfiniteData.js';
 import type { PartialParameters } from './PartialParameters.js';
 import type {
   ServiceOperationInfiniteQueryKey,
@@ -37,7 +37,7 @@ type FetchInfiniteQueryOptionsBase<
   FetchQueryOptions<
     TData,
     TError,
-    InfiniteData<TData, TPageParam>,
+    OperationInfiniteData<TData, TParams>,
     ServiceOperationQueryKey<TSchema, TParams>,
     TPageParam
   >,
@@ -131,7 +131,7 @@ export interface ServiceOperationFetchInfiniteQuery<
         > &
           FetchInfiniteQueryOptionsQueryFn<TSchema, TData, TParams>),
     queryClient: QueryClient
-  ): Promise<InfiniteData<TData, TPageParam>>;
+  ): Promise<OperationInfiniteData<TData, TParams>>;
 
   prefetchInfiniteQuery<TPageParam extends TParams>(
     options:
