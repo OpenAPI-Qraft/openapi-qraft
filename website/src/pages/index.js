@@ -29,7 +29,7 @@ function HomepageHeader() {
 export default function Home() {
   const { siteConfig } = useDocusaurusContext();
   return (
-    <Layout title={`OpenAPI Qraft`} description="Integrate a fully-typed OpenAPI client into your React application with the power of TanStack Query.">
+    <Layout title="OpenAPI Qraft" description="Integrate a type-safe OpenAPI client into your React application with the power of TanStack Query">
       <HomepageHeader />
       <main>
         <HomepageFeatures />
