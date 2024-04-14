@@ -2,6 +2,12 @@ name: Deploy to GitHub Pages
 
 on:
   push:
+    paths:
+      - 'website/**'
+      - 'package.json'
+      - 'yarn.lock'
+      - 'tsconfig.json'
+      - '.yarnrc.yml'
     branches:
       - main
     # Review gh actions docs if you want to further define triggers, paths, etc
