@@ -1,7 +1,7 @@
 import c from 'ansi-colors';
 import fs from 'node:fs';
-import { resolve } from 'node:path';
 import { Readable } from 'node:stream';
+import { URL } from 'node:url';
 import { OpenAPI3 } from 'openapi-typescript';
 import ora from 'ora';
 
@@ -22,7 +22,7 @@ import { getServiceIndexFactory } from './lib/ts-factory/getServiceIndexFactory.
 
 type OutputOptions = {
   fileHeader?: string;
-  dir: string;
+  dir: URL;
   clean: boolean;
   postfixServices?: string;
   explicitImportExtensions?: boolean;
@@ -55,7 +55,7 @@ const writeServices = async (
   serviceImports: ServiceImportsFactoryOptions,
   output: OutputOptions
 ) => {
-  const servicesDir = resolve(output.dir, output.servicesDirName);
+  const servicesDir = new URL(`${output.servicesDirName}/`, output.dir);
 
   if (output.clean)
     await fs.promises.rm(servicesDir, {
@@ -87,7 +87,7 @@ const writeServices = async (
         );
 
       await fs.promises.writeFile(
-        resolve(servicesDir, `${fileBaseName}.ts`),
+        new URL(`${fileBaseName}.ts`, servicesDir),
         code
       );
     } catch (error) {
@@ -120,7 +120,7 @@ const writeServiceIndex = async (
       );
 
     await fs.promises.writeFile(
-      resolve(output.dir, output.servicesDirName, 'index.ts'),
+      new URL('index.ts', new URL(`${output.servicesDirName}/`, output.dir)),
       code
     );
   } catch (error) {
@@ -148,7 +148,7 @@ const writeClient = async (output: OutputOptions) => {
       );
 
     await fs.promises.writeFile(
-      resolve(output.dir, 'create-api-client.ts'),
+      new URL('create-api-client.ts', output.dir),
       code
     );
   } catch (error) {
@@ -173,7 +173,7 @@ const writeIndex = async (output: OutputOptions) => {
         })
       );
 
-    await fs.promises.writeFile(resolve(output.dir, 'index.ts'), code);
+    await fs.promises.writeFile(new URL('index.ts', output.dir), code);
   } catch (error) {
     spinner.fail(c.redBright('Error occurred during index generation'));
 

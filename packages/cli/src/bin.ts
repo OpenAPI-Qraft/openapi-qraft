@@ -2,6 +2,8 @@
 import c from 'ansi-colors';
 import { program } from 'commander';
 import fs from 'node:fs';
+import { sep } from 'node:path';
+import { pathToFileURL } from 'node:url';
 
 import { fileHeader } from './lib/fileHeader.js';
 import { writeOpenAPIServices } from './writeOpenAPIServices.js';
@@ -59,7 +61,7 @@ program
     console.info(`✨ ${c.bold(`${packageName} ${packageVersion}`)}`);
 
     const source = input
-      ? new URL(input, new URL(`file://${process.cwd()}/`))
+      ? new URL(input, pathToFileURL(`${process.cwd()}/`))
       : process.stdin;
 
     if (source === process.stdin && source.isTTY) {
@@ -86,7 +88,11 @@ program
       },
       servicesGlob,
       output: {
-        dir: args.outputDir,
+        dir: pathToFileURL(
+          args.outputDir.endsWith(sep)
+            ? args.outputDir
+            : `${args.outputDir}${sep}`
+        ),
         clean: args.clean,
         fileHeader: args.fileHeader ?? fileHeader,
         postfixServices: args.postfixServices,
