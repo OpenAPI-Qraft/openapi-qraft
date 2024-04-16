@@ -44,10 +44,26 @@ export const writeOpenAPIServices = async ({
   const schema = await readSchema(source);
   const services = getServices(schema, output, servicesGlob);
 
+  await maybeRemoveServicesDir(output);
   await writeServices(services, serviceImports, output);
   await writeServiceIndex(services, output);
   await writeClient(output);
   await writeIndex(output);
+};
+
+const composeServicesDirPath = (
+  output: Pick<OutputOptions, 'servicesDirName' | 'dir'>
+) => {
+  return new URL(`${output.servicesDirName}/`, output.dir);
+};
+
+const maybeRemoveServicesDir = async (output: OutputOptions) => {
+  if (!output.clean) return;
+
+  await fs.promises.rm(composeServicesDirPath(output), {
+    recursive: true,
+    force: true,
+  });
 };
 
 const writeServices = async (
@@ -55,13 +71,7 @@ const writeServices = async (
   serviceImports: ServiceImportsFactoryOptions,
   output: OutputOptions
 ) => {
-  const servicesDir = new URL(`${output.servicesDirName}/`, output.dir);
-
-  if (output.clean)
-    await fs.promises.rm(servicesDir, {
-      recursive: true,
-      force: true,
-    });
+  const servicesDir = composeServicesDirPath(output);
 
   await fs.promises.mkdir(servicesDir, { recursive: true });
 
