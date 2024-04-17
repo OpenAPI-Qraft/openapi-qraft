@@ -6,8 +6,8 @@ import { sep } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import ora from 'ora';
 
-import plugin from './generators/tanstack-react/plugin.js';
-import { writeOpenAPIServices } from './generators/tanstack-react/writeOpenAPIServices.js';
+import plugin from './generators/tanstack-query-react/plugin.js';
+import { writeOpenAPIServices } from './generators/tanstack-query-react/writeOpenAPIServices.js';
 import { getDocumentServices } from './lib/open-api/getDocumentServices.js';
 
 export const program = createCommand()
