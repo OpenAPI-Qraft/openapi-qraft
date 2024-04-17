@@ -5,8 +5,8 @@ import fs from 'node:fs';
 import { sep } from 'node:path';
 import { pathToFileURL } from 'node:url';
 
+import { writeOpenAPIServices } from './generators/tanstack-react/writeOpenAPIServices.js';
 import { fileHeader } from './lib/fileHeader.js';
-import { writeOpenAPIServices } from './writeOpenAPIServices.js';
 
 export const program = createCommand()
   .description(

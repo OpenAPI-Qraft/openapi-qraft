@@ -9,16 +9,16 @@ import {
   getServices,
   Service,
   ServiceBaseName,
-} from './lib/open-api/getServices.js';
-import { readSchema } from './lib/open-api/readSchema.js';
-import { astToString } from './lib/ts-factory/astToString.js';
-import { getClientFactory } from './lib/ts-factory/getClientFactory.js';
-import { getIndexFactory } from './lib/ts-factory/getIndexFactory.js';
+} from '../../lib/open-api/getServices.js';
+import { readSchema } from '../../lib/open-api/readSchema.js';
+import { astToString } from './ts-factory/astToString.js';
+import { getClientFactory } from './ts-factory/getClientFactory.js';
+import { getIndexFactory } from './ts-factory/getIndexFactory.js';
 import {
   getServiceFactory,
   ServiceImportsFactoryOptions,
-} from './lib/ts-factory/getServiceFactory.js';
-import { getServiceIndexFactory } from './lib/ts-factory/getServiceIndexFactory.js';
+} from './ts-factory/getServiceFactory.js';
+import { getServiceIndexFactory } from './ts-factory/getServiceIndexFactory.js';
 
 type OutputOptions = {
   fileHeader?: string;

@@ -1,6 +1,6 @@
 import ts from 'typescript';
 
-import { Service } from '../open-api/getServices.js';
+import { Service } from '../../../lib/open-api/getServices.js';
 
 type Options = { explicitImportExtensions: boolean };
 
