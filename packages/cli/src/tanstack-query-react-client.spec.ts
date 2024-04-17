@@ -5,12 +5,15 @@ import process from 'node:process';
 import { afterAll, beforeAll, describe, test } from 'vitest';
 
 import { program } from './bin.js';
+import plugin from './generators/tanstack-react/plugin.js';
 
 describe('TanStack Query React Client Generation', () => {
   const mockFiles = loadInitialMockFiles();
 
   beforeAll(() => {
     mockFs(mockFiles);
+
+    plugin.setupCommand(program);
 
     program.parse([
       'dummy-node',
