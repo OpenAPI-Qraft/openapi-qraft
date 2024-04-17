@@ -2,7 +2,7 @@ import c from 'ansi-colors';
 import fs from 'node:fs';
 import { Ora } from 'ora';
 
-import { GeneratorFiles } from '../generators/tanstack-query-react/generateCode.js';
+import { GeneratorFiles } from './GeneratorFiles.js';
 
 export const writeGeneratorFiles = async ({
   spinner,

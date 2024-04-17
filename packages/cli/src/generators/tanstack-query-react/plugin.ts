@@ -2,9 +2,10 @@ import type { Command } from 'commander';
 import { Ora } from 'ora';
 
 import { fileHeader } from '../../lib/fileHeader.js';
+import { GeneratorFiles } from '../../lib/GeneratorFiles.js';
 import { Service } from '../../lib/open-api/getServices.js';
 import { OutputOptions } from '../../lib/OutputOptions.js';
-import { generateCode, GeneratorFiles } from './generateCode.js';
+import { generateCode } from './generateCode.js';
 
 interface Plugin {
   setupCommand(command: Command): void;

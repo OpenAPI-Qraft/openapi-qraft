@@ -2,6 +2,7 @@ import c from 'ansi-colors';
 import { URL } from 'node:url';
 import { Ora } from 'ora';
 
+import { GeneratorFiles } from '../../lib/GeneratorFiles.js';
 import { Service } from '../../lib/open-api/getServices.js';
 import { OutputOptions as OutputOptionsBase } from '../../lib/OutputOptions.js';
 import { astToString } from './ts-factory/astToString.js';
@@ -37,10 +38,6 @@ export const generateCode = async ({
     ...(await generateIndex(spinner, output)),
   ];
 };
-
-export type GeneratorFiles = Array<
-  { file: URL; code: string } | { directory: URL; clean: boolean }
->;
 
 const composeServicesDirPath = (
   output: Pick<OutputOptions, 'servicesDirName' | 'dir'>
