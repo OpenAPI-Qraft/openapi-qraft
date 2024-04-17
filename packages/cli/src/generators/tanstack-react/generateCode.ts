@@ -78,7 +78,7 @@ const generateServices = async (
 
       serviceFiles.push({
         file: new URL(`${fileBaseName}.ts`, servicesDir),
-        code,
+        code: getFileHeader(output) + code,
       });
     } catch (error) {
       spinner.fail(
@@ -119,7 +119,7 @@ const generateServiceIndex = async (
 
     serviceIndexFiles.push({
       file: new URL('index.ts', composeServicesDirPath(output)),
-      code,
+      code: getFileHeader(output) + code,
     });
   } catch (error) {
     spinner.fail(
@@ -149,7 +149,7 @@ const generateClient = async (spinner: Ora, output: OutputOptions) => {
 
     clientFiles.push({
       file: new URL('create-api-client.ts', output.dir),
-      code,
+      code: getFileHeader(output) + code,
     });
   } catch (error) {
     spinner.fail(c.redBright('Error occurred during client generation'));
@@ -177,7 +177,7 @@ const generateIndex = async (spinner: Ora, output: OutputOptions) => {
 
     indexFiles.push({
       file: new URL('index.ts', output.dir),
-      code,
+      code: getFileHeader(output) + code,
     });
   } catch (error) {
     spinner.fail(c.redBright('Error occurred during index generation'));

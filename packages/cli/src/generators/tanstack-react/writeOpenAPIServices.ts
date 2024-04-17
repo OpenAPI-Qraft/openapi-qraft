@@ -96,7 +96,7 @@ const writeFiles = async (
     spinner.text = `Writing ${c.magenta(file.pathname)}`;
 
     try {
-      await fs.promises.writeFile(file, getFileHeader(output) + code, {
+      await fs.promises.writeFile(file, code, {
         encoding: 'utf-8',
       });
     } catch (error) {
