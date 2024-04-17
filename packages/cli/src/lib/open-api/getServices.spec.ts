@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import openAPI from './__fixtures__/openapi.json' assert { type: 'json' };
+import openAPI from '../__fixtures__/openapi.json' assert { type: 'json' };
 import { getServices } from './getServices.js';
 
 describe('getServices', () => {
