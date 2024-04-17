@@ -3,7 +3,7 @@ import { URL } from 'node:url';
 import { Ora } from 'ora';
 
 import { Service } from '../../lib/open-api/getServices.js';
-import { OutputOptions } from '../../lib/OutputOptions.js';
+import { OutputOptions as OutputOptionsBase } from '../../lib/OutputOptions.js';
 import { astToString } from './ts-factory/astToString.js';
 import { getClientFactory } from './ts-factory/getClientFactory.js';
 import { getIndexFactory } from './ts-factory/getIndexFactory.js';
@@ -12,6 +12,12 @@ import {
   ServiceImportsFactoryOptions,
 } from './ts-factory/getServiceFactory.js';
 import { getServiceIndexFactory } from './ts-factory/getServiceIndexFactory.js';
+
+interface OutputOptions extends OutputOptionsBase {
+  fileHeader: string | undefined;
+  servicesDirName: string;
+  explicitImportExtensions: boolean;
+}
 
 export const generateCode = async ({
   spinner,

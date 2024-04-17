@@ -1,13 +1,6 @@
 import { URL } from 'node:url';
 
-import { ServiceBaseName } from './open-api/getServices.js';
-
-export type OutputOptions = {
-  fileHeader?: string;
+export interface OutputOptions {
   dir: URL;
   clean: boolean;
-  postfixServices?: string;
-  explicitImportExtensions?: boolean;
-  servicesDirName: string;
-  serviceNameBase?: ServiceBaseName;
-};
+}

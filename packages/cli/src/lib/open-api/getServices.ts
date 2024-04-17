@@ -42,12 +42,17 @@ export type ServiceOperation = {
   parameters: Record<string, any> | undefined;
 };
 
+export interface ServiceOutputOptions {
+  postfixServices?: string; // todo::rename to `postfixService`
+  serviceNameBase?: ServiceBaseName;
+}
+
 export const getServices = (
   openApiJson: OpenAPISchemaType,
   {
     postfixServices = 'Service',
     serviceNameBase = 'endpoint[0]',
-  }: { postfixServices?: string; serviceNameBase?: ServiceBaseName } = {},
+  }: ServiceOutputOptions = {},
   servicesGlob = ['**']
 ) => {
   const paths = openApiJson.paths;

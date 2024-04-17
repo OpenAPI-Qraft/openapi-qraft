@@ -1,43 +1,18 @@
 import c from 'ansi-colors';
 import fs from 'node:fs';
-import { Readable } from 'node:stream';
-import { URL } from 'node:url';
-import { OpenAPI3 } from 'openapi-typescript';
-import ora, { Ora } from 'ora';
+import { Ora } from 'ora';
 
-import { getServices } from '../../lib/open-api/getServices.js';
-import { readSchema } from '../../lib/open-api/readSchema.js';
-import { OutputOptions } from '../../lib/OutputOptions.js';
-import { generateCode, GeneratorFiles, getFileHeader } from './generateCode.js';
-import { ServiceImportsFactoryOptions } from './ts-factory/getServiceFactory.js';
+import { GeneratorFiles } from './generateCode.js';
 
 export const writeOpenAPIServices = async ({
-  source,
-  servicesGlob,
-  serviceImports,
-  output,
+  spinner,
+  fileItems,
 }: {
-  source: string | URL | OpenAPI3 | Readable | Buffer;
-  servicesGlob: string[] | undefined;
-  serviceImports: ServiceImportsFactoryOptions;
-  output: OutputOptions;
+  spinner: Ora;
+  fileItems: GeneratorFiles;
 }) => {
-  const schema = await readSchema(source);
-  const services = getServices(schema, output, servicesGlob);
-
-  const spinner = ora('Starting generation').start();
-
-  const fileItems = await generateCode({
-    spinner,
-    services,
-    serviceImports,
-    output,
-  });
-
   await setupDirectories(spinner, fileItems);
-  await writeFiles(spinner, fileItems, output);
-
-  spinner.succeed(c.green('Services has been generated'));
+  await writeFiles(spinner, fileItems);
 };
 
 const setupDirectories = async (spinner: Ora, fileItems: GeneratorFiles) => {
@@ -83,11 +58,7 @@ const setupDirectories = async (spinner: Ora, fileItems: GeneratorFiles) => {
   }
 };
 
-const writeFiles = async (
-  spinner: Ora,
-  fileItems: GeneratorFiles,
-  output: Pick<OutputOptions, 'fileHeader'>
-) => {
+const writeFiles = async (spinner: Ora, fileItems: GeneratorFiles) => {
   for (const fileItem of fileItems) {
     if ('directory' in fileItem) continue;
 
