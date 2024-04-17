@@ -2,20 +2,20 @@ import c from 'ansi-colors';
 import fs from 'node:fs';
 import { Ora } from 'ora';
 
-import { GeneratorFiles } from './GeneratorFiles.js';
+import { GeneratorFile } from './GeneratorFile.js';
 
 export const writeGeneratorFiles = async ({
   spinner,
   fileItems,
 }: {
   spinner: Ora;
-  fileItems: GeneratorFiles;
+  fileItems: GeneratorFile[];
 }) => {
   await setupDirectories(spinner, fileItems);
   await writeFiles(spinner, fileItems);
 };
 
-const setupDirectories = async (spinner: Ora, fileItems: GeneratorFiles) => {
+const setupDirectories = async (spinner: Ora, fileItems: GeneratorFile[]) => {
   for (const fileItem of fileItems) {
     if (!('directory' in fileItem)) continue;
 
@@ -58,7 +58,7 @@ const setupDirectories = async (spinner: Ora, fileItems: GeneratorFiles) => {
   }
 };
 
-const writeFiles = async (spinner: Ora, fileItems: GeneratorFiles) => {
+const writeFiles = async (spinner: Ora, fileItems: GeneratorFile[]) => {
   for (const fileItem of fileItems) {
     if ('directory' in fileItem) continue;
 

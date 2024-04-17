@@ -2,7 +2,7 @@ import type { Command } from 'commander';
 import { Ora } from 'ora';
 
 import { fileHeader } from '../../lib/fileHeader.js';
-import { GeneratorFiles } from '../../lib/GeneratorFiles.js';
+import { GeneratorFile } from '../../lib/GeneratorFile.js';
 import { Service } from '../../lib/open-api/getServices.js';
 import { OutputOptions } from '../../lib/OutputOptions.js';
 import { generateCode } from './generateCode.js';
@@ -18,7 +18,7 @@ interface Plugin {
     services: Service[];
     output: OutputOptions;
     args: Record<string, any>;
-  }): Promise<GeneratorFiles>;
+  }): Promise<GeneratorFile[]>;
 }
 
 const plugin: Plugin = {

@@ -2,7 +2,7 @@ import c from 'ansi-colors';
 import { URL } from 'node:url';
 import { Ora } from 'ora';
 
-import { GeneratorFiles } from '../../lib/GeneratorFiles.js';
+import { GeneratorFile } from '../../lib/GeneratorFile.js';
 import { Service } from '../../lib/open-api/getServices.js';
 import { OutputOptions as OutputOptionsBase } from '../../lib/OutputOptions.js';
 import { astToString } from './ts-factory/astToString.js';
@@ -55,7 +55,7 @@ const generateServices = async (
 
   spinner.start('Generating services');
 
-  const serviceFiles: GeneratorFiles = [
+  const serviceFiles: GeneratorFile[] = [
     {
       directory: servicesDir,
       clean: output.clean,
@@ -106,7 +106,7 @@ const generateServiceIndex = async (
 ) => {
   spinner.start('Generating services index');
 
-  const serviceIndexFiles: GeneratorFiles = [
+  const serviceIndexFiles: GeneratorFile[] = [
     {
       directory: composeServicesDirPath(output),
       clean: output.clean,
@@ -140,7 +140,7 @@ const generateServiceIndex = async (
 const generateClient = async (spinner: Ora, output: OutputOptions) => {
   spinner.start('Generating client');
 
-  const clientFiles: GeneratorFiles = [];
+  const clientFiles: GeneratorFile[] = [];
 
   try {
     const code = astToString(
@@ -168,7 +168,7 @@ const generateClient = async (spinner: Ora, output: OutputOptions) => {
 const generateIndex = async (spinner: Ora, output: OutputOptions) => {
   spinner.start('Generating index');
 
-  const indexFiles: GeneratorFiles = [];
+  const indexFiles: GeneratorFile[] = [];
 
   try {
     const code = astToString(
