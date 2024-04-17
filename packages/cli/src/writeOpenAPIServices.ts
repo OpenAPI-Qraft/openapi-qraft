@@ -3,7 +3,7 @@ import fs from 'node:fs';
 import { Readable } from 'node:stream';
 import { URL } from 'node:url';
 import { OpenAPI3 } from 'openapi-typescript';
-import ora from 'ora';
+import ora, { Ora } from 'ora';
 
 import {
   getServices,
@@ -44,12 +44,114 @@ export const writeOpenAPIServices = async ({
   const schema = await readSchema(source);
   const services = getServices(schema, output, servicesGlob);
 
-  await maybeRemoveServicesDir(output);
-  await writeServices(services, serviceImports, output);
-  await writeServiceIndex(services, output);
-  await writeClient(output);
-  await writeIndex(output);
+  const spinner = ora('Starting generation').start();
+
+  const fileItems = await generateCode({
+    spinner,
+    services,
+    serviceImports,
+    output,
+  });
+
+  await setupDirectories(spinner, fileItems);
+  await writeFiles(spinner, fileItems, output);
+
+  spinner.succeed(c.green('Services has been generated'));
 };
+
+const setupDirectories = async (spinner: Ora, fileItems: GeneratorFiles) => {
+  for (const fileItem of fileItems) {
+    if (!('directory' in fileItem)) continue;
+
+    if (fileItem.clean) {
+      spinner.text = `Cleaning ${c.magenta(fileItem.directory.pathname)}`;
+
+      try {
+        await fs.promises.rm(fileItem.directory, {
+          recursive: true,
+          force: true,
+        });
+      } catch (error) {
+        spinner.fail(
+          c.redBright(
+            `Error occurred during ${c.magenta(
+              fileItem.directory.pathname
+            )} directory cleaning`
+          )
+        );
+
+        throw error;
+      }
+    }
+
+    try {
+      spinner.text = `Creating directory ${c.magenta(fileItem.directory.pathname)}`;
+
+      await fs.promises.mkdir(fileItem.directory, { recursive: true });
+    } catch (error) {
+      spinner.fail(
+        c.redBright(
+          `Error occurred during ${c.magenta(
+            fileItem.directory.pathname
+          )} directory creation`
+        )
+      );
+
+      throw error;
+    }
+  }
+};
+
+const writeFiles = async (
+  spinner: Ora,
+  fileItems: GeneratorFiles,
+  output: Pick<OutputOptions, 'fileHeader'>
+) => {
+  for (const fileItem of fileItems) {
+    if ('directory' in fileItem) continue;
+
+    const { file, code } = fileItem;
+
+    spinner.text = `Writing ${c.magenta(file.pathname)}`;
+
+    try {
+      await fs.promises.writeFile(file, getFileHeader(output) + code, {
+        encoding: 'utf-8',
+      });
+    } catch (error) {
+      spinner.fail(
+        c.redBright(
+          `Error occurred during ${c.magenta(file.pathname)} file writing`
+        )
+      );
+
+      throw error;
+    }
+  }
+};
+
+const generateCode = async ({
+  spinner,
+  services,
+  serviceImports,
+  output,
+}: {
+  spinner: Ora;
+  services: Service[];
+  serviceImports: ServiceImportsFactoryOptions;
+  output: OutputOptions;
+}) => {
+  return [
+    ...(await generateServices(spinner, services, serviceImports, output)),
+    ...(await generateServiceIndex(spinner, services, output)),
+    ...(await generateClient(spinner, output)),
+    ...(await generateIndex(spinner, output)),
+  ];
+};
+
+type GeneratorFiles = Array<
+  { file: URL; code: string } | { directory: URL; clean: boolean }
+>;
 
 const composeServicesDirPath = (
   output: Pick<OutputOptions, 'servicesDirName' | 'dir'>
@@ -57,25 +159,22 @@ const composeServicesDirPath = (
   return new URL(`${output.servicesDirName}/`, output.dir);
 };
 
-const maybeRemoveServicesDir = async (output: OutputOptions) => {
-  if (!output.clean) return;
-
-  await fs.promises.rm(composeServicesDirPath(output), {
-    recursive: true,
-    force: true,
-  });
-};
-
-const writeServices = async (
+const generateServices = async (
+  spinner: Ora,
   services: Service[],
   serviceImports: ServiceImportsFactoryOptions,
   output: OutputOptions
 ) => {
   const servicesDir = composeServicesDirPath(output);
 
-  await fs.promises.mkdir(servicesDir, { recursive: true });
+  spinner.start('Generating services');
 
-  const spinner = ora(`Generating services`).start();
+  const serviceFiles: GeneratorFiles = [
+    {
+      directory: servicesDir,
+      clean: output.clean,
+    },
+  ];
 
   for (const service of services) {
     const { operations, name, typeName, variableName, fileBaseName } = service;
@@ -83,23 +182,21 @@ const writeServices = async (
     spinner.text = `Generating ${c.magenta(name)} service`;
 
     try {
-      const code =
-        getFileHeader(output) +
-        astToString(
-          getServiceFactory(
-            {
-              typeName,
-              variableName,
-            },
-            operations,
-            serviceImports
-          )
-        );
-
-      await fs.promises.writeFile(
-        new URL(`${fileBaseName}.ts`, servicesDir),
-        code
+      const code = astToString(
+        getServiceFactory(
+          {
+            typeName,
+            variableName,
+          },
+          operations,
+          serviceImports
+        )
       );
+
+      serviceFiles.push({
+        file: new URL(`${fileBaseName}.ts`, servicesDir),
+        code,
+      });
     } catch (error) {
       spinner.fail(
         c.redBright(
@@ -112,27 +209,35 @@ const writeServices = async (
   }
 
   spinner.succeed(c.green('Services has been generated'));
+
+  return serviceFiles;
 };
 
-const writeServiceIndex = async (
+const generateServiceIndex = async (
+  spinner: Ora,
   services: Service[],
   output: OutputOptions
 ) => {
-  const spinner = ora('Generating services index').start();
+  spinner.start('Generating services index');
+
+  const serviceIndexFiles: GeneratorFiles = [
+    {
+      directory: composeServicesDirPath(output),
+      clean: output.clean,
+    },
+  ];
 
   try {
-    const code =
-      getFileHeader(output) +
-      astToString(
-        getServiceIndexFactory(services, {
-          explicitImportExtensions: Boolean(output.explicitImportExtensions),
-        })
-      );
-
-    await fs.promises.writeFile(
-      new URL('index.ts', new URL(`${output.servicesDirName}/`, output.dir)),
-      code
+    const code = astToString(
+      getServiceIndexFactory(services, {
+        explicitImportExtensions: Boolean(output.explicitImportExtensions),
+      })
     );
+
+    serviceIndexFiles.push({
+      file: new URL('index.ts', composeServicesDirPath(output)),
+      code,
+    });
   } catch (error) {
     spinner.fail(
       c.redBright('Error occurred during services index generation')
@@ -142,25 +247,27 @@ const writeServiceIndex = async (
   }
 
   spinner.succeed(c.green('Services index has been generated'));
+
+  return serviceIndexFiles;
 };
 
-const writeClient = async (output: OutputOptions) => {
-  const spinner = ora('Generating client').start();
+const generateClient = async (spinner: Ora, output: OutputOptions) => {
+  spinner.start('Generating client');
+
+  const clientFiles: GeneratorFiles = [];
 
   try {
-    const code =
-      getFileHeader(output) +
-      astToString(
-        getClientFactory({
-          servicesDirName: output.servicesDirName,
-          explicitImportExtensions: Boolean(output.explicitImportExtensions),
-        })
-      );
-
-    await fs.promises.writeFile(
-      new URL('create-api-client.ts', output.dir),
-      code
+    const code = astToString(
+      getClientFactory({
+        servicesDirName: output.servicesDirName,
+        explicitImportExtensions: Boolean(output.explicitImportExtensions),
+      })
     );
+
+    clientFiles.push({
+      file: new URL('create-api-client.ts', output.dir),
+      code,
+    });
   } catch (error) {
     spinner.fail(c.redBright('Error occurred during client generation'));
 
@@ -168,22 +275,27 @@ const writeClient = async (output: OutputOptions) => {
   }
 
   spinner.succeed(c.green('Client has been generated'));
+
+  return clientFiles;
 };
 
-const writeIndex = async (output: OutputOptions) => {
-  const spinner = ora('Generating index').start();
+const generateIndex = async (spinner: Ora, output: OutputOptions) => {
+  spinner.start('Generating index');
+
+  const indexFiles: GeneratorFiles = [];
 
   try {
-    const code =
-      getFileHeader(output) +
-      astToString(
-        getIndexFactory({
-          servicesDirName: output.servicesDirName,
-          explicitImportExtensions: Boolean(output.explicitImportExtensions),
-        })
-      );
+    const code = astToString(
+      getIndexFactory({
+        servicesDirName: output.servicesDirName,
+        explicitImportExtensions: Boolean(output.explicitImportExtensions),
+      })
+    );
 
-    await fs.promises.writeFile(new URL('index.ts', output.dir), code);
+    indexFiles.push({
+      file: new URL('index.ts', output.dir),
+      code,
+    });
   } catch (error) {
     spinner.fail(c.redBright('Error occurred during index generation'));
 
@@ -191,6 +303,8 @@ const writeIndex = async (output: OutputOptions) => {
   }
 
   spinner.succeed(c.green('Index has been generated'));
+
+  return indexFiles;
 };
 
 const getFileHeader = ({ fileHeader }: Pick<OutputOptions, 'fileHeader'>) => {
