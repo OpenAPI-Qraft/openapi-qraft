@@ -24,7 +24,9 @@
   },
   "devDependencies": {
     "@types/micromatch": "^4",
+    "@types/mock-fs": "^4.13.4",
     "@types/node": "^18.19.4",
+    "mock-fs": "^5.2.0",
     "rimraf": "^5.0.5",
     "vitest": "^1.4.0"
   },
