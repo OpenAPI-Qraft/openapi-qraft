@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import c from 'ansi-colors';
-import { program } from 'commander';
+import { createCommand } from 'commander';
 import fs from 'node:fs';
 import { sep } from 'node:path';
 import { pathToFileURL } from 'node:url';
@@ -8,7 +8,7 @@ import { pathToFileURL } from 'node:url';
 import { fileHeader } from './lib/fileHeader.js';
 import { writeOpenAPIServices } from './writeOpenAPIServices.js';
 
-program
+export const program = createCommand()
   .description(
     'Generate services declarations and Typed React Query Interfaces from OpenAPI Schema'
   )
@@ -107,5 +107,3 @@ program
       process.exit(1);
     });
   });
-
-program.parse(process.argv);
