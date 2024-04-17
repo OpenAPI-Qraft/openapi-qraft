@@ -2,9 +2,9 @@ import c from 'ansi-colors';
 import fs from 'node:fs';
 import { Ora } from 'ora';
 
-import { GeneratorFiles } from './generateCode.js';
+import { GeneratorFiles } from '../generators/tanstack-query-react/generateCode.js';
 
-export const writeOpenAPIServices = async ({
+export const writeGeneratorFiles = async ({
   spinner,
   fileItems,
 }: {
