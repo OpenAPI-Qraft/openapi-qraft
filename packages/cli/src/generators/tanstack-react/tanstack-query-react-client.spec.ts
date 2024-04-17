@@ -4,8 +4,8 @@ import path from 'node:path';
 import process from 'node:process';
 import { afterAll, beforeAll, describe, test } from 'vitest';
 
-import { program } from './bin.js';
-import plugin from './generators/tanstack-react/plugin.js';
+import { program } from '../../bin.js';
+import plugin from './plugin.js';
 
 describe('TanStack Query React Client Generation', () => {
   const mockFiles = loadInitialMockFiles();
@@ -35,7 +35,7 @@ describe('TanStack Query React Client Generation', () => {
   test('index.ts', async () => {
     (
       await import(
-        './lib/__snapshots__/tanstack-query-react-client/index.ts.__snapshot__.spec.js'
+        './__snapshots__/tanstack-query-react-client/index.ts.__snapshot__.spec.js'
       )
     ).default();
   });
@@ -43,7 +43,7 @@ describe('TanStack Query React Client Generation', () => {
   test('create-api-client.ts', async () => {
     (
       await import(
-        './lib/__snapshots__/tanstack-query-react-client/create-api-client.ts.__snapshot__.spec.js'
+        './__snapshots__/tanstack-query-react-client/create-api-client.ts.__snapshot__.spec.js'
       )
     ).default();
   });
@@ -51,7 +51,7 @@ describe('TanStack Query React Client Generation', () => {
   test('services/ApprovalPoliciesService.ts', async () => {
     (
       await import(
-        './lib/__snapshots__/tanstack-query-react-client/services/ApprovalPoliciesService.ts.__snapshot__.spec.js'
+        './__snapshots__/tanstack-query-react-client/services/ApprovalPoliciesService.ts.__snapshot__.spec.js'
       )
     ).default();
   });
@@ -59,7 +59,7 @@ describe('TanStack Query React Client Generation', () => {
   test('services/FilesService.ts', async () => {
     (
       await import(
-        './lib/__snapshots__/tanstack-query-react-client/services/FilesService.ts.__snapshot__.spec.js'
+        './__snapshots__/tanstack-query-react-client/services/FilesService.ts.__snapshot__.spec.js'
       )
     ).default();
   });
@@ -67,7 +67,7 @@ describe('TanStack Query React Client Generation', () => {
   test('services/index.ts', async () => {
     (
       await import(
-        './lib/__snapshots__/tanstack-query-react-client/services/index.ts.__snapshot__.spec.js'
+        './__snapshots__/tanstack-query-react-client/services/index.ts.__snapshot__.spec.js'
       )
     ).default();
   });
