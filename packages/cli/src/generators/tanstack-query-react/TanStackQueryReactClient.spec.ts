@@ -1,10 +1,11 @@
+import { createCommand } from 'commander';
 import mockFs from 'mock-fs';
 import type FileSystem from 'mock-fs/lib/filesystem.js';
 import path from 'node:path';
 import process from 'node:process';
 import { afterAll, beforeAll, describe, test } from 'vitest';
 
-import { program } from '../../bin.js';
+import { QraftCommand } from '../../bin.js';
 import plugin from './plugin.js';
 
 describe('TanStack Query React Client Generation', () => {
@@ -12,22 +13,24 @@ describe('TanStack Query React Client Generation', () => {
 
   beforeAll(() => {
     mockFs(mockFiles);
-
-    plugin.setupCommand(program);
-
-    program.parse([
-      'dummy-node',
-      'dummy-qraft-bin',
-      'src/lib/__fixtures__/openapi.json',
-      '--clean',
-      '-o',
-      '/mock-fs',
-      '--openapi-types-import-path',
-      '../../openapi.js',
-      '--explicit-import-extensions',
-      '--filter-services',
-      '/approval_policies/**,/entities/**,/files/**,!/internal/**',
-    ]);
+    const command = new QraftCommand();
+    plugin.setupCommand(command);
+    createCommand()
+      .addCommand(command)
+      .parse([
+        'dummy-node',
+        'dummy-qraft-bin',
+        'tanstack-query-react',
+        'src/lib/__fixtures__/openapi.json',
+        '--clean',
+        '-o',
+        '/mock-fs',
+        '--openapi-types-import-path',
+        '../../openapi.js',
+        '--explicit-import-extensions',
+        '--filter-services',
+        '/approval_policies/**,/entities/**,/files/**,!/internal/**',
+      ]);
   });
 
   afterAll(() => mockFs.restore());

@@ -1,29 +1,18 @@
-import type { Command } from 'commander';
-import { Ora } from 'ora';
-
+import { QraftCommand } from '../../bin.js';
 import { fileHeader } from '../../lib/fileHeader.js';
-import { GeneratorFile } from '../../lib/GeneratorFile.js';
-import { Service } from '../../lib/open-api/getServices.js';
-import { OutputOptions } from '../../lib/OutputOptions.js';
 import { generateCode } from './generateCode.js';
 
 interface Plugin {
-  setupCommand(command: Command): void;
-  action({
-    spinner,
-    services,
-    output,
-  }: {
-    spinner: Ora;
-    services: Service[];
-    output: OutputOptions;
-    args: Record<string, any>;
-  }): Promise<GeneratorFile[]>;
+  setupCommand(command: QraftCommand): void;
 }
 
 const plugin: Plugin = {
-  setupCommand(command: Command) {
+  setupCommand(command: QraftCommand) {
     command
+      .name('tanstack-query-react')
+      .description(
+        'Generate services declarations and Typed React Query Interfaces from OpenAPI Schema'
+      )
       .requiredOption(
         '--openapi-types-import-path <path>', // todo::specify better param name to avoid confusion with real path
         'Path to schema types file (.d.ts), eg: "../openapi.d.ts"'
@@ -40,23 +29,23 @@ const plugin: Plugin = {
         '--operation-generics-import-path <path>',
         'Path to operation generics file',
         '@openapi-qraft/react'
-      );
-  },
-  async action({ spinner, services, output, args }) {
-    return await generateCode({
-      spinner,
-      services,
-      serviceImports: {
-        operationGenericsImportPath: args.operationGenericsImportPath,
-        openapiTypesImportPath: args.openapiTypesImportPath,
-      },
-      output: {
-        ...output,
-        fileHeader: args.fileHeader ?? fileHeader,
-        explicitImportExtensions: args.explicitImportExtensions,
-        servicesDirName: 'services',
-      },
-    });
+      )
+      .action(({ spinner, output, args, services }, resolve) => {
+        return void generateCode({
+          spinner,
+          services,
+          serviceImports: {
+            operationGenericsImportPath: args.operationGenericsImportPath,
+            openapiTypesImportPath: args.openapiTypesImportPath,
+          },
+          output: {
+            ...output,
+            fileHeader: args.fileHeader ?? fileHeader,
+            explicitImportExtensions: args.explicitImportExtensions,
+            servicesDirName: 'services',
+          },
+        }).then(resolve);
+      });
   },
 };
 
