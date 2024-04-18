@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import { QraftCommand } from './bin.js';
+import { QraftCommand } from './lib/QraftCommand.js';
 
 const command = new QraftCommand();
 

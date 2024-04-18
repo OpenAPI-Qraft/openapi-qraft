@@ -1,5 +1,5 @@
-import { QraftCommand } from '../../bin.js';
 import { fileHeader } from '../../lib/fileHeader.js';
+import { QraftCommand } from '../../lib/QraftCommand.js';
 import { QraftCommandPlugin } from '../../lib/QraftCommandPlugin.js';
 import { generateCode } from './generateCode.js';
 

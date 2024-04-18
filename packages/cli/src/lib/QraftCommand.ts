@@ -7,11 +7,11 @@ import process from 'node:process';
 import { pathToFileURL } from 'node:url';
 import ora, { Ora } from 'ora';
 
-import { GeneratorFile } from './lib/GeneratorFile.js';
-import { getDocumentServices } from './lib/open-api/getDocumentServices.js';
-import { Service } from './lib/open-api/getServices.js';
-import { OutputOptions } from './lib/OutputOptions.js';
-import { writeGeneratorFiles } from './lib/writeGeneratorFiles.js';
+import { GeneratorFile } from './GeneratorFile.js';
+import { getDocumentServices } from './open-api/getDocumentServices.js';
+import { Service } from './open-api/getServices.js';
+import { OutputOptions } from './OutputOptions.js';
+import { writeGeneratorFiles } from './writeGeneratorFiles.js';
 
 export class QraftCommand extends Command {
   constructor() {

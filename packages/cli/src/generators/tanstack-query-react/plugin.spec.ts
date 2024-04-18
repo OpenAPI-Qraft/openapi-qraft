@@ -5,7 +5,7 @@ import path from 'node:path';
 import process from 'node:process';
 import { afterAll, beforeAll, describe, test } from 'vitest';
 
-import { QraftCommand } from '../../bin.js';
+import { QraftCommand } from '../../lib/QraftCommand.js';
 import plugin from './plugin.js';
 
 describe('TanStack Query React Client Generation', () => {
