@@ -32,7 +32,11 @@
   },
   "files": [
     "dist",
-    "bin.mjs"
+    "src",
+    "!dist/**/*.test.*",
+    "!dist/**/*.spec.*",
+    "!src/**/*.test.*",
+    "!src/**/*.spec.*"
   ],
   "exports": {
     "./package.json": "./package.json",
