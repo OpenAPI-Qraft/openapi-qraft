@@ -5,4 +5,4 @@
  * Workaround to allow `rimraf dist/` on rebuilds and keep `bin` executable
  * without a need `yarn install`
  */
-import './dist/load.js';
+import './dist/bin.js';
