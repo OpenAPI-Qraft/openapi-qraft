@@ -49,28 +49,57 @@ export class QraftCommand extends Command {
   action(
     callback: (
       options: {
-        spinner: Ora;
-        services: Service[];
-        output: OutputOptions;
+        /**
+         * Command inputs, e.g. `bin <input> [options]` where `<input>` is the `inputs` item
+         */
+        inputs: string[];
+        /**
+         * Command arguments, e.g. `bin <input> [options]` where `[options]` is the `args`
+         */
         args: Record<string, any>;
+        /**
+         * Resolve the generator files
+         */
+        /**
+         * Spinner instance
+         */
+        spinner: Ora;
+        /**
+         * OpenAPI services
+         */
+        services: Service[];
+        /**
+         * Output options
+         */
+        output: OutputOptions;
       },
-      resolveFiles: (files: GeneratorFile[]) => Promise<void>
+      resolve: (files: GeneratorFile[]) => Promise<void>
     ) => void | Promise<void>
   ): this {
-    return super.action(async (input, args) => {
+    return super.action(async (...actionArgs) => {
       const spinner = ora('Starting generation').start();
+
+      const inputs = actionArgs.filter(
+        (arg) => typeof arg === 'string'
+      ) as string[];
+      const args = actionArgs.find(
+        (arg) => arg && typeof arg === 'object'
+      ) as Record<string, any>;
+
+      if (!args) throw new Error('Arguments object not found');
 
       await callback(
         {
-          spinner,
-          services: await this.#getServices(input, args),
+          inputs,
           args,
+          spinner,
+          services: await this.#getServices(inputs[0], args),
           output: {
             dir: normalizeOutputDirPath(args.outputDir),
             clean: args.clean,
           },
         },
-        async function done(fileItems) {
+        async function resolveGeneratorFiles(fileItems) {
           try {
             await writeGeneratorFiles({
               fileItems,
