@@ -17,11 +17,12 @@ export class QraftCommand extends Command {
   constructor() {
     super();
 
-    this.argument(
-      '[input]',
-      'Input OpenAPI Schema file path, URL (json, yml)',
-      null
-    )
+    this.usage('[input] [options]')
+      .argument(
+        '[input]',
+        'Input OpenAPI Schema file path, URL (json, yml)',
+        null
+      )
       .requiredOption(
         '-o, --output-dir <path>',
         'Output directory for generated services'
@@ -56,9 +57,9 @@ export class QraftCommand extends Command {
       resolveFiles: (files: GeneratorFile[]) => Promise<void>
     ) => void | Promise<void>
   ): this {
-    const spinner = ora('Starting generation').start();
-
     return super.action(async (input, args) => {
+      const spinner = ora('Starting generation').start();
+
       await callback(
         {
           spinner,

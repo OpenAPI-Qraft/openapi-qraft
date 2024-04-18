@@ -1,33 +1,40 @@
 #!/usr/bin/env node
-import { createCommand } from 'commander';
-
 import { QraftCommand } from './bin.js';
 
-const program = createCommand();
+const command = new QraftCommand();
 
-const { argv, plugins } = extractArgvPluginOptions(process.argv);
+const { argv, plugins } = extractArgvPluginOptions(process.argv); // todo::move parsing to the QraftCommand `parse` method
 
 if (plugins) {
   if (plugins?.includes('tanstack-query-react')) {
     import('./generators/tanstack-query-react/plugin.js').then(
       ({ default: plugin }) => {
-        const command = new QraftCommand();
         plugin.setupCommand(command);
-        program.addCommand(command).parse(argv);
+        addCommandUsageWithPlugins(command, plugins);
+        command.parse(argv);
       }
     );
   } else {
-    throw new Error(`Unknown plugin: ${plugins.join(', ')}`);
+    throw new Error(`Unknown plugin: '${plugins.join(', ')}'`);
   }
 } else {
   // default - setup tanstack-query-react plugin
   import('./generators/tanstack-query-react/plugin.js').then(
     ({ default: plugin }) => {
-      const command = new QraftCommand();
       plugin.setupCommand(command);
-      program.addCommand(command, { isDefault: true }).parse(argv);
+      command.option('--plugin <name>', 'Client generator plugin name', () => {
+        throw new Error(
+          'Plugin option must be handled before parsing the command and should not be passed to the commander'
+        );
+      });
+      command.parse(argv);
     }
   );
+}
+
+function addCommandUsageWithPlugins(command: QraftCommand, plugins: string[]) {
+  const pluginUsage = plugins.map((plugin) => `--plugin ${plugin}`).join(' ');
+  command.usage(`${pluginUsage} [input] [options]`);
 }
 
 function extractArgvPluginOptions(argv: string[]) {
@@ -49,6 +56,11 @@ function extractArgvPluginOptions(argv: string[]) {
       filteredArgv.push(argv[i]);
     }
   }
+
+  if (plugins.length > 1)
+    throw new Error(
+      `Only one plugin can be specified, got: '${plugins.join(', ')}'`
+    );
 
   return {
     argv: filteredArgv,

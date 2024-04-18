@@ -15,22 +15,19 @@ describe('TanStack Query React Client Generation', () => {
     mockFs(mockFiles);
     const command = new QraftCommand();
     plugin.setupCommand(command);
-    createCommand()
-      .addCommand(command)
-      .parse([
-        'dummy-node',
-        'dummy-qraft-bin',
-        'tanstack-query-react',
-        'src/lib/__fixtures__/openapi.json',
-        '--clean',
-        '-o',
-        '/mock-fs',
-        '--openapi-types-import-path',
-        '../../openapi.js',
-        '--explicit-import-extensions',
-        '--filter-services',
-        '/approval_policies/**,/entities/**,/files/**,!/internal/**',
-      ]);
+    command.parse([
+      'dummy-node',
+      'dummy-qraft-bin',
+      'src/lib/__fixtures__/openapi.json',
+      '--clean',
+      '-o',
+      '/mock-fs',
+      '--openapi-types-import-path',
+      '../../openapi.js',
+      '--explicit-import-extensions',
+      '--filter-services',
+      '/approval_policies/**,/entities/**,/files/**,!/internal/**',
+    ]);
   });
 
   afterAll(() => mockFs.restore());
