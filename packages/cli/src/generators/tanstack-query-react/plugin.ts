@@ -1,12 +1,9 @@
 import { QraftCommand } from '../../bin.js';
 import { fileHeader } from '../../lib/fileHeader.js';
+import { QraftCommandPlugin } from '../../lib/QraftCommandPlugin.js';
 import { generateCode } from './generateCode.js';
 
-interface Plugin {
-  setupCommand(command: QraftCommand): void;
-}
-
-const plugin: Plugin = {
+const plugin: QraftCommandPlugin = {
   setupCommand(command: QraftCommand) {
     command
       .description('Generate TanStack Query React client from OpenAPI Schema')
