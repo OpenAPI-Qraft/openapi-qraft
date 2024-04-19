@@ -77,3 +77,4 @@ workspaces
 TInfinite
 qraftio
 typecheck
+tseslint
