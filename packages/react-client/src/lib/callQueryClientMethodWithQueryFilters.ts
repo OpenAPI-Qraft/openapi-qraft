@@ -23,10 +23,10 @@ export function callQueryClientMethodWithQueryFilters<
       `queryClient is invalid, ${queryFilterMethod} method does not exist`
     );
 
-  // @ts-expect-error
+  // @ts-expect-error - Too complex to type
   return queryClient[queryFilterMethod](
     composeQueryFilters(schema, filters as never),
-    // @ts-expect-error
+    // @ts-expect-error - Argument types are too complex
     ...args.slice(1, -1)
   );
 }

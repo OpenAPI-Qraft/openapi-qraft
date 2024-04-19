@@ -23,7 +23,7 @@ export const useSuspenseQuery: <
   >
 ) => UseQueryResult<TData, TError> = (qraftOptions, schema, args) => {
   return useSuspenseQueryTanstack(
-    // @ts-expect-error
+    // @ts-expect-error - Too complex to type
     ...useComposeUseQueryOptions(qraftOptions, schema, args, false)
   ) as never;
 };

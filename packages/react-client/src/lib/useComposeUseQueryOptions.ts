@@ -32,10 +32,10 @@ export function useComposeUseQueryOptions(
 
   const queryFn =
     options?.queryFn ??
-    // @ts-expect-error
+    // @ts-expect-error - Too complex to type
     function ({ queryKey: [, queryParams], signal, meta, pageParam }) {
       return contextValue.requestFn(schema, {
-        // @ts-expect-error
+        // @ts-expect-error - Too complex to type
         parameters: infinite
           ? (shelfMerge(2, queryParams, pageParam) as never)
           : queryParams,

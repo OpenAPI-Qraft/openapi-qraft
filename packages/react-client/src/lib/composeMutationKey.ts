@@ -5,10 +5,7 @@ import type { OperationSchema } from './requestFn.js';
  * Omit `body` or `requestBody` from mutation parameters if exists
  * and return the rest of the parameters
  */
-export function composeMutationKey<
-  TSchema extends OperationSchema,
-  TParams = undefined,
->(
+export function composeMutationKey<TSchema extends OperationSchema>(
   schema: TSchema,
   parameters: undefined
 ): ServiceOperationMutationKey<TSchema, undefined>;
@@ -36,10 +33,11 @@ export function omitMutationPayload<T>(params: T) {
     throw new Error('`params` must be object');
 
   if ('body' in params || 'requestBody' in params) {
-    const { body, requestBody, ...paramsRest } = params as Record<
-      'body' | 'requestBody',
-      unknown
-    >;
+    const {
+      body: _,
+      requestBody: __,
+      ...paramsRest
+    } = params as Record<'body' | 'requestBody', unknown>;
     return paramsRest;
   }
 

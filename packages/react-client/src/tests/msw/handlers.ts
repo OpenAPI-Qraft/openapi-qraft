@@ -120,16 +120,7 @@ export const handlers = [
     ServicePathParameters<Services['files']['getFileList']>,
     undefined,
     ServiceResponseParameters<Services['files']['getFileList']>
-  >(openApiToMswPath(services.files.getFileList.schema.url), ({ request }) => {
-    const query = getQueryParameters<Services['files']['getFileList']>(
-      request.url
-    );
-
-    const header = getHeaders<Services['files']['getFileList']>(
-      request.headers,
-      'x-'
-    );
-
+  >(openApiToMswPath(services.files.getFileList.schema.url), () => {
     return HttpResponse.json({
       data: [
         {
