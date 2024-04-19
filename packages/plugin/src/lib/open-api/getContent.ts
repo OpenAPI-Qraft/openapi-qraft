@@ -1,13 +1,13 @@
 const BASIC_MEDIA_TYPES = [
-  "application/json-patch+json",
-  "application/json",
-  "application/x-www-form-urlencoded",
-  "text/json",
-  "text/plain",
-  "multipart/form-data",
-  "multipart/mixed",
-  "multipart/related",
-  "multipart/batch",
+  'application/json-patch+json',
+  'application/json',
+  'application/x-www-form-urlencoded',
+  'text/json',
+  'text/plain',
+  'multipart/form-data',
+  'multipart/mixed',
+  'multipart/related',
+  'multipart/batch',
 ];
 
 export const getContentMediaType = (content: {
@@ -15,7 +15,7 @@ export const getContentMediaType = (content: {
 }) => {
   const basicMediaTypeWithSchema = Object.keys(content)
     .filter((mediaType) => {
-      const cleanMediaType = mediaType.split(";")[0].trim();
+      const cleanMediaType = mediaType.split(';')[0].trim();
       return BASIC_MEDIA_TYPES.includes(cleanMediaType);
     })
     .find((mediaType) => content[mediaType]?.schema);

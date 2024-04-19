@@ -68,10 +68,10 @@ export const getServices = (
   const isPathMatch = createServicePathMatch(servicesGlob);
 
   for (const path in paths) {
-    if (!paths.hasOwnProperty(path)) continue;
+    if (!Object.prototype.hasOwnProperty.call(paths, path)) continue;
 
     for (const method in paths[path]) {
-      if (!paths[path].hasOwnProperty(method)) continue;
+      if (!Object.prototype.hasOwnProperty.call(paths[path], method)) continue;
       if (!isPathMatch(path)) continue;
 
       if (!supportedMethod(method)) {
