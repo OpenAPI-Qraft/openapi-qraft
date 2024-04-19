@@ -1,0 +1,45 @@
+{
+  "name": "@openapi-qraft/tanstack-query-react-plugin",
+  "version": "1.7.0",
+  "packageManager": "yarn@4.0.2",
+  "type": "module",
+  "scripts": {
+    "build": "rimraf dist/ && tsc --project tsconfig.build.json",
+    "dev": "yarn build --watch",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "exports": {
+    "./package.json": "./package.json",
+    ".": "./dist/index.js",
+    "./*": "./dist/*.js"
+  },
+  "typesVersions": {
+    "*": {
+      "*": [
+        "dist/*"
+      ]
+    }
+  },
+  "dependencies": {
+    "@openapi-qraft/plugin": "workspace:^",
+    "typescript": "^5.3.3"
+  },
+  "devDependencies": {
+    "@types/mock-fs": "^4.13.4",
+    "mock-fs": "^5.2.0",
+    "rimraf": "^5.0.5",
+    "vitest": "^1.4.0"
+  },
+  "files": [
+    "dist",
+    "src",
+    "!dist/**/*.test.*",
+    "!dist/**/*.spec.*",
+    "!src/**/*.test.*",
+    "!src/**/*.spec.*"
+  ],
+  "publishConfig": {
+    "access": "public"
+  }
+}

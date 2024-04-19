@@ -1,14 +1,20 @@
-import { createCommand } from 'commander';
+import { QraftCommand } from '@openapi-qraft/plugin/lib/QraftCommand';
+
 import mockFs from 'mock-fs';
 import type FileSystem from 'mock-fs/lib/filesystem.js';
+import { createRequire } from 'node:module';
 import path from 'node:path';
 import process from 'node:process';
 import { afterAll, beforeAll, describe, test } from 'vitest';
 
-import { QraftCommand } from '../../lib/QraftCommand.js';
-import plugin from './plugin.js';
+import { plugin } from './plugin.js';
 
 describe('TanStack Query React Client Generation', () => {
+  const nodeRequire = createRequire(process.cwd());
+  const openAPIDocumentFixturePath = nodeRequire.resolve(
+    '@openapi-qraft/test-fixtures/openapi.json'
+  );
+
   const mockFiles = loadInitialMockFiles();
 
   beforeAll(() => {
@@ -18,7 +24,7 @@ describe('TanStack Query React Client Generation', () => {
     command.parse([
       'dummy-node',
       'dummy-qraft-bin',
-      'src/lib/__fixtures__/openapi.json',
+      openAPIDocumentFixturePath,
       '--clean',
       '-o',
       '/mock-fs',
@@ -35,7 +41,7 @@ describe('TanStack Query React Client Generation', () => {
   test('index.ts', async () => {
     (
       await import(
-        './__snapshots__/tanstack-query-react-client/index.ts.__snapshot__.spec.js'
+        './__snapshots__/tanstack-query-react-client/index.ts.snapshot.js'
       )
     ).default();
   });
@@ -43,7 +49,7 @@ describe('TanStack Query React Client Generation', () => {
   test('create-api-client.ts', async () => {
     (
       await import(
-        './__snapshots__/tanstack-query-react-client/create-api-client.ts.__snapshot__.spec.js'
+        './__snapshots__/tanstack-query-react-client/create-api-client.ts.snapshot.js'
       )
     ).default();
   });
@@ -51,7 +57,7 @@ describe('TanStack Query React Client Generation', () => {
   test('services/ApprovalPoliciesService.ts', async () => {
     (
       await import(
-        './__snapshots__/tanstack-query-react-client/services/ApprovalPoliciesService.ts.__snapshot__.spec.js'
+        './__snapshots__/tanstack-query-react-client/services/ApprovalPoliciesService.ts.snapshot.js'
       )
     ).default();
   });
@@ -59,7 +65,7 @@ describe('TanStack Query React Client Generation', () => {
   test('services/FilesService.ts', async () => {
     (
       await import(
-        './__snapshots__/tanstack-query-react-client/services/FilesService.ts.__snapshot__.spec.js'
+        './__snapshots__/tanstack-query-react-client/services/FilesService.ts.snapshot.js'
       )
     ).default();
   });
@@ -67,21 +73,21 @@ describe('TanStack Query React Client Generation', () => {
   test('services/index.ts', async () => {
     (
       await import(
-        './__snapshots__/tanstack-query-react-client/services/index.ts.__snapshot__.spec.js'
+        './__snapshots__/tanstack-query-react-client/services/index.ts.snapshot.js'
       )
     ).default();
   });
+
+  function loadInitialMockFiles() {
+    const filesToLoad = [openAPIDocumentFixturePath, 'package.json'];
+
+    return filesToLoad.reduce<Record<string, FileSystem.DirectoryItem>>(
+      (acc, file) => {
+        const filePath = path.resolve(process.cwd(), file);
+        acc[filePath] = mockFs.load(filePath);
+        return acc;
+      },
+      {}
+    );
+  }
 });
-
-function loadInitialMockFiles() {
-  const filesToLoad = ['src/lib/__fixtures__/openapi.json', 'package.json'];
-
-  return filesToLoad.reduce<Record<string, FileSystem.DirectoryItem>>(
-    (acc, file) => {
-      const filePath = path.resolve(process.cwd(), file);
-      acc[filePath] = mockFs.load(filePath);
-      return acc;
-    },
-    {}
-  );
-}

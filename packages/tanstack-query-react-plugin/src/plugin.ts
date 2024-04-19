@@ -1,9 +1,10 @@
-import { fileHeader } from '../../lib/fileHeader.js';
-import { QraftCommand } from '../../lib/QraftCommand.js';
-import { QraftCommandPlugin } from '../../lib/QraftCommandPlugin.js';
+import { fileHeader } from '@openapi-qraft/plugin/lib/fileHeader';
+import { QraftCommand } from '@openapi-qraft/plugin/lib/QraftCommand';
+import { QraftCommandPlugin } from '@openapi-qraft/plugin/lib/QraftCommandPlugin';
+
 import { generateCode } from './generateCode.js';
 
-const plugin: QraftCommandPlugin = {
+export const plugin: QraftCommandPlugin = {
   setupCommand(command: QraftCommand) {
     command
       .description('Generate TanStack Query React client from OpenAPI Schema')
@@ -42,5 +43,3 @@ const plugin: QraftCommandPlugin = {
       });
   },
 };
-
-export default plugin;

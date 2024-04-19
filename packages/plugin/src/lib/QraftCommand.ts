@@ -1,10 +1,8 @@
 import c from 'ansi-colors';
 import { Command } from 'commander';
-import fs from 'node:fs';
-import { createRequire } from 'node:module';
 import { sep } from 'node:path';
 import process from 'node:process';
-import { pathToFileURL } from 'node:url';
+import { pathToFileURL, URL } from 'node:url';
 import ora, { Ora } from 'ora';
 
 import { GeneratorFile } from './GeneratorFile.js';
@@ -46,38 +44,14 @@ export class QraftCommand extends Command {
       );
   }
 
-  action(
-    callback: (
-      options: {
-        /**
-         * Command inputs, e.g. `bin <input> [options]` where `<input>` is the `inputs` item
-         */
-        inputs: string[];
-        /**
-         * Command arguments, e.g. `bin <input> [options]` where `[options]` is the `args`
-         */
-        args: Record<string, any>;
-        /**
-         * Resolve the generator files
-         */
-        /**
-         * Spinner instance
-         */
-        spinner: Ora;
-        /**
-         * OpenAPI services
-         */
-        services: Service[];
-        /**
-         * Output options
-         */
-        output: OutputOptions;
-      },
-      resolve: (files: GeneratorFile[]) => Promise<void>
-    ) => void | Promise<void>
-  ): this {
+  action(callback: QraftCommandActionCallback): this {
     return super.action(async (...actionArgs) => {
-      const spinner = ora('Starting generation').start();
+      const { version: packageVersion } = await import(
+        '@openapi-qraft/plugin/package.json',
+        {
+          assert: { type: 'json' },
+        }
+      ).then(({ default: packageJSON }) => packageJSON);
 
       const inputs = actionArgs.filter(
         (arg) => typeof arg === 'string'
@@ -87,6 +61,15 @@ export class QraftCommand extends Command {
       ) as Record<string, any>;
 
       if (!args) throw new Error('Arguments object not found');
+
+      if (args.version) {
+        console.info(`v${packageVersion}`);
+        process.exit(0);
+      }
+
+      console.info(`✨ ${c.bold(`OpenAPI Qraft ${packageVersion}`)}`);
+
+      const spinner = ora('Starting the Qraft ⛏︎').start();
 
       await callback(
         {
@@ -105,7 +88,7 @@ export class QraftCommand extends Command {
               fileItems,
               spinner,
             });
-            spinner.succeed(c.green('Services has been generated'));
+            spinner.succeed(c.green('Qraft has been finished'));
           } catch (error) {
             spinner.fail(c.red('Error occurred during generation'));
 
@@ -123,19 +106,6 @@ export class QraftCommand extends Command {
 
   async #getServices(input: unknown, args: Record<string, any>) {
     const cwd = `${process.cwd()}/`;
-    const { version: packageVersion, name: packageName } = JSON.parse(
-      fs.readFileSync(
-        createRequire(cwd).resolve('@openapi-qraft/cli/package.json'),
-        'utf8'
-      )
-    );
-
-    if (args.version) {
-      console.info(`v${packageVersion}`);
-      process.exit(0);
-    }
-
-    console.info(`✨ ${c.bold(`${packageName} ${packageVersion}`)}`);
 
     const source =
       input && typeof input === 'string'
@@ -191,3 +161,32 @@ function parseServicesFilterOption(
         )
     : undefined;
 }
+
+export type QraftCommandActionCallback = (
+  options: {
+    /**
+     * Command inputs, e.g. `bin <input> [options]` where `<input>` is the `inputs` item
+     */
+    inputs: string[];
+    /**
+     * Command arguments, e.g. `bin <input> [options]` where `[options]` is the `args`
+     */
+    args: Record<string, any>;
+    /**
+     * Resolve the generator files
+     */
+    /**
+     * Spinner instance
+     */
+    spinner: Ora;
+    /**
+     * OpenAPI services
+     */
+    services: Service[];
+    /**
+     * Output options
+     */
+    output: OutputOptions;
+  },
+  resolve: (files: GeneratorFile[]) => Promise<void>
+) => void | Promise<void>;

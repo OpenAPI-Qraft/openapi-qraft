@@ -13,6 +13,9 @@ import type { OpenAPISchemaType } from './OpenAPISchemaType.js';
 
 export type ServiceBaseName = ServiceBaseNameByEndpointOption | 'tags';
 
+/**
+ * @deprecated move to separate file
+ */
 export type Service = {
   name: string;
   variableName: string;
@@ -21,6 +24,9 @@ export type Service = {
   operations: ServiceOperation[];
 };
 
+/**
+ * @deprecated move to separate file
+ */
 export type ServiceOperation = {
   method:
     | 'get'

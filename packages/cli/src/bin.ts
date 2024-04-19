@@ -1,5 +1,7 @@
 #!/usr/bin/env node
-import { QraftCommand } from './lib/QraftCommand.js';
+import { QraftCommand } from '@openapi-qraft/plugin/lib/QraftCommand';
+
+import process from 'node:process';
 
 const command = new QraftCommand();
 
@@ -7,7 +9,7 @@ const { argv, plugins } = extractArgvPluginOptions(process.argv); // todo::move 
 
 if (plugins) {
   if (plugins?.includes('tanstack-query-react')) {
-    import('./generators/tanstack-query-react/plugin.js').then(
+    import('@openapi-qraft/tanstack-query-react-plugin').then(
       ({ default: plugin }) => {
         plugin.setupCommand(command);
         addCommandUsageWithPlugins(command, plugins);
@@ -19,7 +21,7 @@ if (plugins) {
   }
 } else {
   // default - setup tanstack-query-react plugin
-  import('./generators/tanstack-query-react/plugin.js').then(
+  import('@openapi-qraft/tanstack-query-react-plugin').then(
     ({ default: plugin }) => {
       plugin.setupCommand(command);
       command.option('--plugin <name>', 'Client generator plugin name', () => {
