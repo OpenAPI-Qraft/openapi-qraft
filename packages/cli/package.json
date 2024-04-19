@@ -6,7 +6,8 @@
     "build": "rimraf dist/ && tsc --project tsconfig.build.json",
     "dev": "yarn build --watch",
     "test": "vitest run",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint"
   },
   "type": "module",
   "bin": {
@@ -17,7 +18,10 @@
     "commander": "^11.1.0"
   },
   "devDependencies": {
+    "@openapi-qraft/eslint-config": "workspace:~",
     "@types/node": "^18.19.4",
+    "eslint": "^9.0.0",
+    "globals": "^15.0.0",
     "rimraf": "^5.0.5",
     "typescript": "^5.3.3",
     "vitest": "^1.4.0"

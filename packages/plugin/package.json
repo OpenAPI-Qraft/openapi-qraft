@@ -7,7 +7,8 @@
     "build": "rimraf dist/ && tsc --project tsconfig.build.json",
     "dev": "yarn build --watch",
     "test": "vitest run",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint"
   },
   "exports": {
     "./package.json": "./package.json",
@@ -33,6 +34,7 @@
     "@types/micromatch": "^4",
     "@types/node": "^18.19.4",
     "commander": "^11.1.0",
+    "eslint": "^9.0.0",
     "rimraf": "^5.0.5",
     "typescript": "^5.3.3",
     "vitest": "^1.4.0"

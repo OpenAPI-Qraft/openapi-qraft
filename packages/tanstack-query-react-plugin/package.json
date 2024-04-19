@@ -7,7 +7,8 @@
     "build": "rimraf dist/ && tsc --project tsconfig.build.json",
     "dev": "yarn build --watch",
     "test": "vitest run",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint"
   },
   "exports": {
     "./package.json": "./package.json",
@@ -26,7 +27,9 @@
     "typescript": "^5.3.3"
   },
   "devDependencies": {
+    "@openapi-qraft/eslint-config": "workspace:~",
     "@types/mock-fs": "^4.13.4",
+    "eslint": "^9.0.0",
     "mock-fs": "^5.2.0",
     "rimraf": "^5.0.5",
     "vitest": "^1.4.0"
