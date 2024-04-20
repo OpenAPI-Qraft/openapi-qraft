@@ -39,7 +39,7 @@ function addCommandUsageWithPlugins(command: QraftCommand, plugins: string[]) {
   command.usage(`${pluginUsage} [input] [options]`);
 }
 
-function extractArgvPluginOptions(argv: string[]) {
+export function extractArgvPluginOptions(argv: string[]) {
   const pluginIndex = argv.indexOf('--plugin');
   if (pluginIndex === -1) return { argv };
 
