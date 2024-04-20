@@ -31,6 +31,9 @@ export interface ServiceOperationQueryFn<
   TData,
   TParams,
 > {
+  /**
+   * @deprecated Use `<service>.<operation>(...)` instead.
+   */
   queryFn<
     TMeta extends Record<string, any>,
     TSignal extends AbortSignal = AbortSignal,
@@ -48,7 +51,44 @@ export interface ServiceOperationQueryFn<
     ) => TData
   ): TData;
 
+  /**
+   * @deprecated Use `<service>.<operation>(...)` instead.
+   */
   queryFn<
+    TMeta extends Record<string, any>,
+    TSignal extends AbortSignal = AbortSignal,
+  >(
+    options:
+      | QueryFnOptionsByParameters<TParams, TMeta, TSignal>
+      | QueryFnOptionsByQueryKey<TSchema, TParams, TMeta, TSignal>,
+    client: (
+      schema: TSchema,
+      options: {
+        parameters: TParams;
+        signal?: TSignal;
+        meta?: TMeta;
+      }
+    ) => Promise<TData>
+  ): Promise<TData>;
+
+  <
+    TMeta extends Record<string, any>,
+    TSignal extends AbortSignal = AbortSignal,
+  >(
+    options:
+      | QueryFnOptionsByParameters<TParams, TMeta, TSignal>
+      | QueryFnOptionsByQueryKey<TSchema, TParams, TMeta, TSignal>,
+    client: (
+      schema: TSchema,
+      options: {
+        parameters: TParams;
+        signal?: TSignal;
+        meta?: TMeta;
+      }
+    ) => TData
+  ): TData;
+
+  <
     TMeta extends Record<string, any>,
     TSignal extends AbortSignal = AbortSignal,
   >(

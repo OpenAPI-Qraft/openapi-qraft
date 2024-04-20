@@ -1,5 +1,6 @@
 import type { Context } from 'react';
 
+import type * as operationInvokeModule from './callbacks/operationInvokeFn.js';
 import { createRecursiveProxy } from './lib/createRecursiveProxy.js';
 import type { OperationSchema } from './lib/requestFn.js';
 import type { QraftContextValue } from './QraftContext.js';
@@ -17,28 +18,26 @@ export const qraftAPIClient = <
   options?: QraftClientOptions
 ): ServicesCallbacksFilter<Services, keyof Callbacks> => {
   return createRecursiveProxy(
-    (getPath, key) => {
-      if (getPath.length !== 2 || key !== 'schema') return;
+    function getCallback(getPath, key) {
+      if (getPath.length !== 2 || key !== 'schema') return; // todo::maybe return callback?
 
       const serviceOperation = getByPath(services, getPath);
       if (!isServiceOperation(serviceOperation))
         throw new Error(`Service operation not found: ${getPath.join('.')}`);
       return serviceOperation.schema;
     },
-    (applyPath, args) => {
-      const path = applyPath.slice(0, -1);
+    function applyCallback(applyPath, args) {
+      const { path, callbackName } = extractCallbackDetails(applyPath);
+
+      if (!(callbackName in callbacks))
+        throw new Error(`Function ${callbackName} is not supported`);
+
       const serviceOperation = getByPath(services, path);
 
       if (!isServiceOperation(serviceOperation))
         throw new Error(`Service operation not found: ${path.join('.')}`);
 
-      // The last arg is for instance `.useMutation` or `.useQuery()`
-      const functionName = applyPath[applyPath.length - 1];
-
-      if (!(functionName in callbacks))
-        throw new Error(`Function ${functionName} is not supported`);
-
-      return callbacks[functionName as keyof Callbacks](
+      return callbacks[callbackName as keyof Callbacks](
         options,
         serviceOperation.schema,
         args
@@ -47,6 +46,30 @@ export const qraftAPIClient = <
     []
   ) as never;
 };
+
+/**
+ * Extracts Callback details from the applyPath
+ * @param applyPath
+ */
+function extractCallbackDetails(applyPath: string[]) {
+  // <service>.<operation>()
+  if (applyPath.length === 2) {
+    return {
+      path: applyPath,
+      callbackName: 'operationInvokeFn' satisfies Extract<
+        keyof typeof operationInvokeModule,
+        'operationInvokeFn'
+      >,
+    };
+  } else {
+    // <service>.<operation>.<method>()
+    return {
+      path: applyPath.slice(0, -1),
+      // The last arg is for instance `.useMutation` or `.useQuery()`
+      callbackName: applyPath[applyPath.length - 1],
+    };
+  }
+}
 
 function isServiceOperation(
   input: unknown

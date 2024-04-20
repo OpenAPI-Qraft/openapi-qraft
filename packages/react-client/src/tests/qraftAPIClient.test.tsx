@@ -1068,6 +1068,9 @@ describe('Qraft uses Query Function', () => {
       },
     };
 
+  /**
+   * @deprecated
+   */
   it('uses queryFn with `parameters`', async () => {
     const result = await qraft.approvalPolicies.getApprovalPoliciesId.queryFn(
       { parameters },
@@ -1087,8 +1090,27 @@ describe('Qraft uses Query Function', () => {
     });
   });
 
-  it('uses queryFn with `queryKey`', async () => {
-    const result = await qraft.approvalPolicies.getApprovalPoliciesId.queryFn(
+  it('uses Operation Query with `parameters`', async () => {
+    const result = await qraft.approvalPolicies.getApprovalPoliciesId(
+      { parameters },
+      requestClient
+    );
+
+    expect(result).toEqual({
+      header: {
+        'x-monite-version': '1.0.0',
+      },
+      path: {
+        approval_policy_id: '1',
+      },
+      query: {
+        items_order: ['asc', 'desc'],
+      },
+    });
+  });
+
+  it('uses Operation Query with `queryKey`', async () => {
+    const result = await qraft.approvalPolicies.getApprovalPoliciesId(
       {
         queryKey: [
           {
@@ -1316,6 +1338,9 @@ describe('Qraft uses Query Function', () => {
 });
 
 describe('Qraft uses mutationFn', () => {
+  /**
+   * @deprecated
+   */
   it('supports mutationFn', async () => {
     const result = await qraft.entities.postEntitiesIdDocuments.mutationFn(
       requestClient,
@@ -1336,6 +1361,47 @@ describe('Qraft uses mutationFn', () => {
           verification_document_front: 'front',
         },
       }
+    );
+
+    await waitFor(() => {
+      expect(result).toEqual({
+        header: {
+          'x-monite-version': '1.0.0',
+        },
+        path: {
+          entity_id: '1',
+        },
+        query: {
+          referer: 'https://example.com',
+        },
+        body: {
+          verification_document_back: 'back',
+          verification_document_front: 'front',
+        },
+      });
+    });
+  });
+
+  it('supports Operation Mutation', async () => {
+    const result = await qraft.entities.postEntitiesIdDocuments(
+      {
+        parameters: {
+          header: {
+            'x-monite-version': '1.0.0',
+          },
+          path: {
+            entity_id: '1',
+          },
+          query: {
+            referer: 'https://example.com',
+          },
+        },
+        body: {
+          verification_document_back: 'back',
+          verification_document_front: 'front',
+        },
+      },
+      requestClient
     );
 
     await waitFor(() => {
@@ -2129,10 +2195,7 @@ describe('Qraft uses Queries Invalidation', () => {
     await queryClient.fetchQuery({
       queryKey: filesQueryKey,
       queryFn: () =>
-        qraft.files.getFiles.queryFn(
-          { queryKey: filesQueryKey },
-          requestClient
-        ),
+        qraft.files.getFiles({ queryKey: filesQueryKey }, requestClient),
     });
 
     const { result: result_01 } = renderHook(hook, {
@@ -2196,10 +2259,7 @@ describe('Qraft uses Queries Invalidation', () => {
     await queryClient.fetchQuery({
       queryKey: filesQueryKey,
       queryFn: () =>
-        qraft.files.getFiles.queryFn(
-          { queryKey: filesQueryKey },
-          requestClient
-        ),
+        qraft.files.getFiles({ queryKey: filesQueryKey }, requestClient),
     });
 
     const { result: result_01 } = renderHook(hook, {

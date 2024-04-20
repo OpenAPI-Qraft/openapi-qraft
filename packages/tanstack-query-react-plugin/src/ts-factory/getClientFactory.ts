@@ -203,4 +203,5 @@ const serviceCallbacks = [
   'prefetchInfiniteQuery',
   'getQueryState',
   'getInfiniteQueryState',
+  'operationInvokeFn',
 ] as const;

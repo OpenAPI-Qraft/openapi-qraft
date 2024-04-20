@@ -4,6 +4,9 @@ export interface ServiceOperationMutationFn<
   TData,
   TParams,
 > {
+  /**
+   * @deprecated Use `<service>.<operation>(...)` instead.
+   */
   mutationFn(
     client: (
       schema: TSchema,
@@ -18,6 +21,9 @@ export interface ServiceOperationMutationFn<
     }
   ): TData;
 
+  /**
+   * @deprecated Use `<service>.<operation>(...)` instead.
+   */
   mutationFn(
     client: (
       schema: TSchema,
@@ -30,5 +36,33 @@ export interface ServiceOperationMutationFn<
       parameters: TParams;
       body: TBody;
     }
+  ): Promise<TData>;
+
+  (
+    options: {
+      parameters: TParams;
+      body: TBody;
+    },
+    client: (
+      schema: TSchema,
+      options: {
+        parameters: TParams;
+        body: TBody;
+      }
+    ) => TData
+  ): TData;
+
+  (
+    options: {
+      parameters: TParams;
+      body: TBody;
+    },
+    client: (
+      schema: TSchema,
+      options: {
+        parameters: TParams;
+        body: TBody;
+      }
+    ) => Promise<TData>
   ): Promise<TData>;
 }
