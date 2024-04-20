@@ -39,43 +39,31 @@ describe('TanStack Query React Client Generation', () => {
   afterAll(() => mockFs.restore());
 
   test('index.ts', async () => {
-    (
-      await import(
-        './__snapshots__/tanstack-query-react-client/index.ts.snapshot.js'
-      )
-    ).default();
+    (await import('./__snapshots__/index.ts.snapshot.js')).default();
   });
 
   test('create-api-client.ts', async () => {
     (
-      await import(
-        './__snapshots__/tanstack-query-react-client/create-api-client.ts.snapshot.js'
-      )
+      await import('./__snapshots__/create-api-client.ts.snapshot.js')
     ).default();
   });
 
   test('services/ApprovalPoliciesService.ts', async () => {
     (
       await import(
-        './__snapshots__/tanstack-query-react-client/services/ApprovalPoliciesService.ts.snapshot.js'
+        './__snapshots__/services/ApprovalPoliciesService.ts.snapshot.js'
       )
     ).default();
   });
 
   test('services/FilesService.ts', async () => {
     (
-      await import(
-        './__snapshots__/tanstack-query-react-client/services/FilesService.ts.snapshot.js'
-      )
+      await import('./__snapshots__/services/FilesService.ts.snapshot.js')
     ).default();
   });
 
   test('services/index.ts', async () => {
-    (
-      await import(
-        './__snapshots__/tanstack-query-react-client/services/index.ts.snapshot.js'
-      )
-    ).default();
+    (await import('./__snapshots__/services/index.ts.snapshot.js')).default();
   });
 
   function loadInitialMockFiles() {

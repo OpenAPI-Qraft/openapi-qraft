@@ -7,8 +7,6 @@ export default function () {
   ).toMatchInlineSnapshot(`
     "/* generated using @openapi-qraft/cli -- do no edit */
     /* istanbul ignore file */
-    /* tslint:disable */
-    /* eslint-disable */
     import type { paths } from "../../openapi.js";
     import type { ServiceOperationQuery, ServiceOperationMutation } from "@openapi-qraft/react";
     export interface ApprovalPoliciesService {
