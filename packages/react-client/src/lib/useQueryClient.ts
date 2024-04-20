@@ -19,8 +19,9 @@ export function useQueryClient(
   qraftOptions: QraftClientOptions | undefined,
   queryClient: QueryClient | undefined
 ) {
-  const queryClientByContext = useContext(qraftOptions?.context ?? QraftContext)
-    ?.queryClient;
+  const queryClientByContext = useContext(
+    qraftOptions?.context ?? QraftContext
+  )?.queryClient;
 
   return useQueryClientTanstack(queryClient ?? queryClientByContext);
 }

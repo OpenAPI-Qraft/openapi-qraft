@@ -65,7 +65,10 @@ export function urlSerializer(
   const path = schema.url.replace(
     /{(.*?)}/g,
     (substring: string, group: string) => {
-      if (info.parameters?.path?.hasOwnProperty(group)) {
+      if (
+        info.parameters?.path &&
+        Object.prototype.hasOwnProperty.call(info.parameters.path, group)
+      ) {
         return encodeURI(String(info.parameters?.path[group]));
       }
       return substring;

@@ -1389,14 +1389,14 @@ describe('Proxy call manipulations', () => {
 describe('Qraft uses utils', () => {
   it('throws an error when calling an unsupported service ', () => {
     expect(() =>
-      // @ts-ignore
+      // @ts-expect-error - Invalid usage
       qraft.counterparts.postCounterpartsIdAddresses.useQuery()
     ).toThrowError(/Service operation not found/i);
   });
 
   it('throws an error when calling an unsupported method ', () => {
     expect(() =>
-      // @ts-ignore
+      // @ts-expect-error - Invalid usage of method
       qraft.files.getFileList.unsupportedMethod()
     ).toThrowError(/Function unsupportedMethod is not supported/i);
   });
@@ -1813,7 +1813,7 @@ describe('Qraft uses Queries Invalidation', () => {
         },
       });
 
-      const { result: result_01 } = renderHook(
+      renderHook(
         () => qraft.approvalPolicies.getApprovalPoliciesId.useQuery(parameters),
         {
           wrapper: wrapper.bind(null, queryClient),
@@ -1839,7 +1839,7 @@ describe('Qraft uses Queries Invalidation', () => {
         },
       });
 
-      const { result: result_01 } = renderHook(
+      renderHook(
         () =>
           qraft.approvalPolicies.getApprovalPoliciesId.useInfiniteQuery(
             parameters,
@@ -1907,7 +1907,7 @@ describe('Qraft uses Queries Invalidation', () => {
 
   it('requires invalidateQueries queryClient instance', async () => {
     expect(() =>
-      // @ts-expect-error
+      // @ts-expect-error - Invalid usage
       qraft.approvalPolicies.getApprovalPoliciesId.invalidateQueries()
     ).toThrowError();
   });
@@ -2477,7 +2477,7 @@ describe('Qraft uses Queries Refetch', () => {
 
     const hook = () =>
       qraft.approvalPolicies.getApprovalPoliciesId.useQuery(parameters, {
-        queryFn({ signal }) {
+        queryFn() {
           return new Promise((resolve) => {
             counterFn();
             return resolve(parameters);
@@ -2932,7 +2932,7 @@ describe('Qraft respects Types', () => {
         ],
         predicate: (query) => {
           // Will report TS error if 'false'
-          const isTrue = query.queryKey?.[0]?.infinite === true; // todo::improve type checking
+          const _isTrue = query.queryKey?.[0]?.infinite === true; // todo::improve type checking
 
           return Boolean(
             // Check if queryKey has correct type
@@ -2956,7 +2956,7 @@ describe('Qraft respects Types', () => {
         ],
         predicate: (query) => {
           // Will report TS error if 'true'
-          const isTrue = query.queryKey?.[0]?.infinite === false; // todo::improve type checking
+          const _isTrue = query.queryKey?.[0]?.infinite === false; // todo::improve type checking
 
           return Boolean(
             query.queryKey?.[1]?.query?.items_order?.includes('asc')
@@ -2974,7 +2974,7 @@ describe('Qraft respects Types', () => {
         infinite: false,
         predicate: (query) => {
           // Will report TS error if 'true'
-          const isTrue = query.queryKey?.[0]?.infinite === false; // todo::improve type checking
+          const _isTrue = query.queryKey?.[0]?.infinite === false; // todo::improve type checking
 
           return Boolean(
             query.queryKey?.[1]?.query?.items_order?.includes('asc')
@@ -2991,7 +2991,7 @@ describe('Qraft respects Types', () => {
         // @ts-expect-error - `query` should be infinite or regular query, todo::improve type checking
         predicate: (query) => {
           // Will report TS error if 'true'
-          const isInfinite =
+          const _isInfinite =
             query.queryKey?.[0] && 'infinite' in query.queryKey[0];
 
           return Boolean(
@@ -3032,7 +3032,7 @@ describe('Qraft is type-safe on Query Filters', () => {
 
     // Header is required, must emit an error
     qraft.approvalPolicies.getApprovalPoliciesId.invalidateQueries(
-      // @ts-expect-error
+      // @ts-expect-error - `header` is required
       {
         exact: true,
         parameters: {

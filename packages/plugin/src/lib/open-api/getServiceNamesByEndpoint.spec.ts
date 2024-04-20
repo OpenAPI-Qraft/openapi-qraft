@@ -13,17 +13,17 @@ describe('getEndpointPartIndex(...)', () => {
   });
 
   it('should throw on invalid cases', () => {
-    // @ts-expect-error
+    // @ts-expect-error - invalid input
     expect(() => getEndpointPartIndex('endpoint')).toThrow();
-    // @ts-expect-error
+    // @ts-expect-error - invalid input
     expect(() => getEndpointPartIndex('endpoints')).toThrow();
-    // @ts-expect-error
+    // @ts-expect-error - invalid input
     expect(() => getEndpointPartIndex('endpoints[1]')).toThrow();
-    // @ts-expect-error
+    // @ts-expect-error - invalid input
     expect(() => getEndpointPartIndex('endpoint[1')).toThrow();
-    // @ts-expect-error
+    // @ts-expect-error - invalid input
     expect(() => getEndpointPartIndex('endpoint1]')).toThrow();
-    // @ts-expect-error
+    // @ts-expect-error - invalid input
     expect(() => getEndpointPartIndex('[1]')).toThrow();
   });
 });
@@ -46,7 +46,7 @@ describe('getServiceBaseNameByOperationEndpoint(...)', () => {
 
   it('should throw on invalid cases', () => {
     expect(() =>
-      // @ts-expect-error
+      // @ts-expect-error - invalid input
       getServiceBaseNameByOperationEndpoint('foo/bar', '[1]')
     ).toThrow();
   });

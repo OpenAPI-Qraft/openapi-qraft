@@ -1,6 +1,6 @@
-import ts from 'typescript';
+import { Service } from '@openapi-qraft/plugin/lib/open-api/getServices';
 
-import { Service } from '../open-api/getServices.js';
+import ts from 'typescript';
 
 type Options = { explicitImportExtensions: boolean };
 

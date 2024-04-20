@@ -2,7 +2,7 @@
   "$schema": "https://unpkg.com/@changesets/config@3.0.0/schema.json",
   "changelog": "@changesets/cli/changelog",
   "commit": ["@changesets/cli/commit", { "skipCI": false }],
-  "fixed": [["@openapi-qraft/react", "@openapi-qraft/cli"]],
+  "fixed": [["@openapi-qraft/react", "@openapi-qraft/cli", "@openapi-qraft/plugin"]],
   "linked": [],
   "access": "public",
   "baseBranch": "origin/main",

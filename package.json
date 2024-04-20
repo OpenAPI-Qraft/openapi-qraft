@@ -6,7 +6,7 @@
     "build": "yarn workspaces foreach --verbose --recursive --topological --from '@openapi-qraft/*' run build",
     "dev": "yarn workspaces foreach --verbose --recursive --parallel --no-private --from '@openapi-qraft/*' run dev",
     "test": "yarn workspaces foreach --verbose --recursive --topological --no-private --from '@openapi-qraft/*' run test",
-    "lint": "yarn workspaces foreach --verbose --recursive --topological --from '@openapi-qraft/*' run lint",
+    "lint": "yarn workspaces foreach --verbose --recursive --topological --from '@openapi-qraft/*' --from 'playground' run lint",
     "typecheck": "yarn workspaces foreach --verbose --recursive --topological --from '@openapi-qraft/*' run typecheck"
   },
   "devDependencies": {

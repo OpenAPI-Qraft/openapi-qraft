@@ -75,7 +75,7 @@ type ServicesDeclaration<Services extends ServicesOutput<Services>> = {
   };
 };
 
-type ServicesCallbacks = Record<string, (...rest: any[]) => any>;
+type ServicesCallbacks = Record<string, (...rest: any[]) => unknown>;
 
 type ServicesCallbacksFilter<
   Services extends ServicesOutput<Services>,

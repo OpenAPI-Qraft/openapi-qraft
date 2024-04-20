@@ -19,7 +19,7 @@ export const useQuery: <TData = unknown, TError = DefaultError>(
   >
 ) => UseQueryResult<TData, TError> = (qraftOptions, schema, args) => {
   return useQueryTanstack(
-    // @ts-expect-error
+    // @ts-expect-error - Too complex to type
     ...useComposeUseQueryOptions(qraftOptions, schema, args, false)
   ) as never;
 };

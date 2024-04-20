@@ -135,7 +135,7 @@ function done(input: string, output: string, time: number) {
 }
 
 function errorAndExit(message: string) {
-  console.error(c.red(` ✘  ${message}`)); // eslint-disable-line no-console
+  console.error(c.red(` ✘  ${message}`));
   throw new Error(message);
 }
 

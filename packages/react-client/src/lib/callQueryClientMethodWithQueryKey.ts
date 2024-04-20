@@ -31,7 +31,7 @@ export function callQueryClientMethodWithQueryKey<
       ? composeInfiniteQueryKey(schema, parameters)
       : composeQueryKey(schema, parameters);
 
-  // @ts-expect-error
+  // @ts-expect-error - Too complex to type
   return queryClient[queryFilterMethod](queryKey, ...args.slice(1, -1));
 }
 

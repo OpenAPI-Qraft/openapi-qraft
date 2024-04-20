@@ -3,6 +3,63 @@
 exports[`getServices > matches snapshot with "serviceNameBase: endpoint" 1`] = `
 [
   {
+    "fileBaseName": "EntitiesService",
+    "name": "entities",
+    "operations": [
+      {
+        "deprecated": undefined,
+        "description": "Update the onboarding documents of an entity.",
+        "errors": {
+          "400": "application/json",
+          "401": "application/json",
+          "422": "application/json",
+          "default": "application/json",
+        },
+        "mediaType": "application/json",
+        "method": "post",
+        "name": "postEntitiesIdDocuments",
+        "parameters": [
+          {
+            "example": "2023-06-04",
+            "in": "header",
+            "name": "x-monite-version",
+            "required": true,
+            "schema": {
+              "format": "date",
+              "type": "string",
+            },
+          },
+          {
+            "in": "path",
+            "name": "entity_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string",
+            },
+          },
+          {
+            "description": "Document referer",
+            "in": "query",
+            "name": "referer",
+            "required": false,
+            "schema": {
+              "description": "Referer of the document",
+              "type": "string",
+            },
+          },
+        ],
+        "path": "/entities/{entity_id}/documents",
+        "success": {
+          "201": "application/json",
+        },
+        "summary": "Update entity onboarding documents",
+      },
+    ],
+    "typeName": "EntitiesService",
+    "variableName": "entitiesService",
+  },
+  {
     "fileBaseName": "ApprovalPoliciesService",
     "name": "approvalPolicies",
     "operations": [
@@ -229,6 +286,46 @@ exports[`getServices > matches snapshot with "serviceNameBase: endpoint" 1`] = `
           "200": "application/json",
         },
         "summary": "Upload a files by ID",
+      },
+      {
+        "deprecated": true,
+        "description": undefined,
+        "errors": {
+          "default": "application/json",
+        },
+        "mediaType": undefined,
+        "method": "get",
+        "name": "getFileList",
+        "parameters": [
+          {
+            "example": "2023-06-04",
+            "in": "header",
+            "name": "x-monite-version",
+            "required": false,
+            "schema": {
+              "format": "date",
+              "type": "string",
+            },
+          },
+          {
+            "in": "query",
+            "name": "id__in",
+            "required": false,
+            "schema": {
+              "items": {
+                "format": "uuid",
+                "type": "string",
+              },
+              "maxItems": 100,
+              "type": "array",
+            },
+          },
+        ],
+        "path": "/files/list",
+        "success": {
+          "200": "application/json",
+        },
+        "summary": "Get a file list",
       },
     ],
     "typeName": "FilesService",
@@ -240,8 +337,65 @@ exports[`getServices > matches snapshot with "serviceNameBase: endpoint" 1`] = `
 exports[`getServices > matches snapshot with "serviceNameBase: tags" 1`] = `
 [
   {
-    "fileBaseName": "DefaultService",
-    "name": "default",
+    "fileBaseName": "OnboardingDocumentsService",
+    "name": "onboardingDocuments",
+    "operations": [
+      {
+        "deprecated": undefined,
+        "description": "Update the onboarding documents of an entity.",
+        "errors": {
+          "400": "application/json",
+          "401": "application/json",
+          "422": "application/json",
+          "default": "application/json",
+        },
+        "mediaType": "application/json",
+        "method": "post",
+        "name": "postEntitiesIdDocuments",
+        "parameters": [
+          {
+            "example": "2023-06-04",
+            "in": "header",
+            "name": "x-monite-version",
+            "required": true,
+            "schema": {
+              "format": "date",
+              "type": "string",
+            },
+          },
+          {
+            "in": "path",
+            "name": "entity_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string",
+            },
+          },
+          {
+            "description": "Document referer",
+            "in": "query",
+            "name": "referer",
+            "required": false,
+            "schema": {
+              "description": "Referer of the document",
+              "type": "string",
+            },
+          },
+        ],
+        "path": "/entities/{entity_id}/documents",
+        "success": {
+          "201": "application/json",
+        },
+        "summary": "Update entity onboarding documents",
+      },
+    ],
+    "typeName": "OnboardingDocumentsService",
+    "variableName": "onboardingDocumentsService",
+  },
+  {
+    "fileBaseName": "ApprovalPoliciesService",
+    "name": "approvalPolicies",
     "operations": [
       {
         "deprecated": undefined,
@@ -295,14 +449,6 @@ exports[`getServices > matches snapshot with "serviceNameBase: tags" 1`] = `
         },
         "summary": "Get an approval policy by ID",
       },
-    ],
-    "typeName": "DefaultService",
-    "variableName": "defaultService",
-  },
-  {
-    "fileBaseName": "ApprovalPoliciesService",
-    "name": "approvalPolicies",
-    "operations": [
       {
         "deprecated": undefined,
         "description": "Delete an existing approval policy.",
@@ -404,178 +550,6 @@ exports[`getServices > matches snapshot with "serviceNameBase: tags" 1`] = `
     "variableName": "approvalPoliciesService",
   },
   {
-    "fileBaseName": "MainService",
-    "name": "main",
-    "operations": [
-      {
-        "deprecated": undefined,
-        "description": "Delete an existing approval policy.",
-        "errors": {
-          "401": "application/json",
-          "422": "application/json",
-          "default": "application/json",
-        },
-        "mediaType": undefined,
-        "method": "delete",
-        "name": "deleteApprovalPoliciesId",
-        "parameters": [
-          {
-            "example": "2023-06-04",
-            "in": "header",
-            "name": "x-monite-version",
-            "required": true,
-            "schema": {
-              "format": "date",
-              "type": "string",
-            },
-          },
-          {
-            "in": "path",
-            "name": "approval_policy_id",
-            "required": true,
-            "schema": {
-              "format": "uuid",
-              "type": "string",
-            },
-          },
-          {
-            "description": "Limit of records to delete",
-            "in": "query",
-            "name": "limit",
-            "required": false,
-            "schema": {
-              "description": "Limit",
-              "type": "number",
-            },
-          },
-        ],
-        "path": "/approval_policies/{approval_policy_id}",
-        "success": {
-          "200": "application/json",
-        },
-        "summary": "Delete an approval policy",
-      },
-      {
-        "deprecated": undefined,
-        "description": "Update an existing approval policy.",
-        "errors": {
-          "401": "application/json",
-          "422": "application/json",
-          "default": "application/json",
-        },
-        "mediaType": "application/json",
-        "method": "patch",
-        "name": "patchApprovalPoliciesId",
-        "parameters": [
-          {
-            "example": "2023-06-04",
-            "in": "header",
-            "name": "x-monite-version",
-            "required": true,
-            "schema": {
-              "format": "date",
-              "type": "string",
-            },
-          },
-          {
-            "in": "path",
-            "name": "approval_policy_id",
-            "required": true,
-            "schema": {
-              "format": "uuid",
-              "type": "string",
-            },
-          },
-          {
-            "description": "Limit of records to patch",
-            "in": "query",
-            "name": "limit",
-            "required": false,
-            "schema": {
-              "description": "Limit",
-              "type": "number",
-            },
-          },
-        ],
-        "path": "/approval_policies/{approval_policy_id}",
-        "success": {
-          "200": "application/json",
-        },
-        "summary": "Update an approval policy",
-      },
-      {
-        "deprecated": undefined,
-        "description": undefined,
-        "errors": {
-          "405": "application/json",
-          "422": "application/json",
-          "default": "application/json",
-        },
-        "mediaType": undefined,
-        "method": "get",
-        "name": "getFiles",
-        "parameters": [
-          {
-            "example": "2023-06-04",
-            "in": "header",
-            "name": "x-monite-version",
-            "required": true,
-            "schema": {
-              "format": "date",
-              "type": "string",
-            },
-          },
-          {
-            "in": "query",
-            "name": "id__in",
-            "required": true,
-            "schema": {
-              "items": {
-                "format": "uuid",
-                "type": "string",
-              },
-              "maxItems": 100,
-              "type": "array",
-            },
-          },
-          {
-            "description": "Page number",
-            "in": "query",
-            "name": "page",
-            "required": false,
-            "schema": {
-              "description": "Page number",
-              "type": "string",
-            },
-          },
-        ],
-        "path": "/files",
-        "success": {
-          "200": "application/json",
-        },
-        "summary": "Get a files by ID",
-      },
-      {
-        "deprecated": undefined,
-        "description": undefined,
-        "errors": {
-          "default": "application/json",
-        },
-        "mediaType": "multipart/form-data",
-        "method": "post",
-        "name": "postFiles",
-        "parameters": undefined,
-        "path": "/files",
-        "success": {
-          "200": "application/json",
-        },
-        "summary": "Upload a files by ID",
-      },
-    ],
-    "typeName": "MainService",
-    "variableName": "mainService",
-  },
-  {
     "fileBaseName": "FilesService",
     "name": "files",
     "operations": [
@@ -647,6 +621,46 @@ exports[`getServices > matches snapshot with "serviceNameBase: tags" 1`] = `
         },
         "summary": "Upload a files by ID",
       },
+      {
+        "deprecated": true,
+        "description": undefined,
+        "errors": {
+          "default": "application/json",
+        },
+        "mediaType": undefined,
+        "method": "get",
+        "name": "getFileList",
+        "parameters": [
+          {
+            "example": "2023-06-04",
+            "in": "header",
+            "name": "x-monite-version",
+            "required": false,
+            "schema": {
+              "format": "date",
+              "type": "string",
+            },
+          },
+          {
+            "in": "query",
+            "name": "id__in",
+            "required": false,
+            "schema": {
+              "items": {
+                "format": "uuid",
+                "type": "string",
+              },
+              "maxItems": 100,
+              "type": "array",
+            },
+          },
+        ],
+        "path": "/files/list",
+        "success": {
+          "200": "application/json",
+        },
+        "summary": "Get a file list",
+      },
     ],
     "typeName": "FilesService",
     "variableName": "filesService",
@@ -656,6 +670,63 @@ exports[`getServices > matches snapshot with "serviceNameBase: tags" 1`] = `
 
 exports[`getServices > matches snapshot with custom \`postfixServices\` 1`] = `
 [
+  {
+    "fileBaseName": "EntitiesSrv",
+    "name": "entities",
+    "operations": [
+      {
+        "deprecated": undefined,
+        "description": "Update the onboarding documents of an entity.",
+        "errors": {
+          "400": "application/json",
+          "401": "application/json",
+          "422": "application/json",
+          "default": "application/json",
+        },
+        "mediaType": "application/json",
+        "method": "post",
+        "name": "postEntitiesIdDocuments",
+        "parameters": [
+          {
+            "example": "2023-06-04",
+            "in": "header",
+            "name": "x-monite-version",
+            "required": true,
+            "schema": {
+              "format": "date",
+              "type": "string",
+            },
+          },
+          {
+            "in": "path",
+            "name": "entity_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string",
+            },
+          },
+          {
+            "description": "Document referer",
+            "in": "query",
+            "name": "referer",
+            "required": false,
+            "schema": {
+              "description": "Referer of the document",
+              "type": "string",
+            },
+          },
+        ],
+        "path": "/entities/{entity_id}/documents",
+        "success": {
+          "201": "application/json",
+        },
+        "summary": "Update entity onboarding documents",
+      },
+    ],
+    "typeName": "EntitiesSrv",
+    "variableName": "entitiesSrv",
+  },
   {
     "fileBaseName": "ApprovalPoliciesSrv",
     "name": "approvalPolicies",
@@ -884,6 +955,46 @@ exports[`getServices > matches snapshot with custom \`postfixServices\` 1`] = `
         },
         "summary": "Upload a files by ID",
       },
+      {
+        "deprecated": true,
+        "description": undefined,
+        "errors": {
+          "default": "application/json",
+        },
+        "mediaType": undefined,
+        "method": "get",
+        "name": "getFileList",
+        "parameters": [
+          {
+            "example": "2023-06-04",
+            "in": "header",
+            "name": "x-monite-version",
+            "required": false,
+            "schema": {
+              "format": "date",
+              "type": "string",
+            },
+          },
+          {
+            "in": "query",
+            "name": "id__in",
+            "required": false,
+            "schema": {
+              "items": {
+                "format": "uuid",
+                "type": "string",
+              },
+              "maxItems": 100,
+              "type": "array",
+            },
+          },
+        ],
+        "path": "/files/list",
+        "success": {
+          "200": "application/json",
+        },
+        "summary": "Get a file list",
+      },
     ],
     "typeName": "FilesSrv",
     "variableName": "filesSrv",
@@ -965,6 +1076,46 @@ exports[`getServices > matches snapshot with custom \`servicesGlob\` 1`] = `
         },
         "summary": "Upload a files by ID",
       },
+      {
+        "deprecated": true,
+        "description": undefined,
+        "errors": {
+          "default": "application/json",
+        },
+        "mediaType": undefined,
+        "method": "get",
+        "name": "getFileList",
+        "parameters": [
+          {
+            "example": "2023-06-04",
+            "in": "header",
+            "name": "x-monite-version",
+            "required": false,
+            "schema": {
+              "format": "date",
+              "type": "string",
+            },
+          },
+          {
+            "in": "query",
+            "name": "id__in",
+            "required": false,
+            "schema": {
+              "items": {
+                "format": "uuid",
+                "type": "string",
+              },
+              "maxItems": 100,
+              "type": "array",
+            },
+          },
+        ],
+        "path": "/files/list",
+        "success": {
+          "200": "application/json",
+        },
+        "summary": "Get a file list",
+      },
     ],
     "typeName": "FilesService",
     "variableName": "filesService",
@@ -974,6 +1125,63 @@ exports[`getServices > matches snapshot with custom \`servicesGlob\` 1`] = `
 
 exports[`getServices > matches snapshot with default options 1`] = `
 [
+  {
+    "fileBaseName": "EntitiesService",
+    "name": "entities",
+    "operations": [
+      {
+        "deprecated": undefined,
+        "description": "Update the onboarding documents of an entity.",
+        "errors": {
+          "400": "application/json",
+          "401": "application/json",
+          "422": "application/json",
+          "default": "application/json",
+        },
+        "mediaType": "application/json",
+        "method": "post",
+        "name": "postEntitiesIdDocuments",
+        "parameters": [
+          {
+            "example": "2023-06-04",
+            "in": "header",
+            "name": "x-monite-version",
+            "required": true,
+            "schema": {
+              "format": "date",
+              "type": "string",
+            },
+          },
+          {
+            "in": "path",
+            "name": "entity_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string",
+            },
+          },
+          {
+            "description": "Document referer",
+            "in": "query",
+            "name": "referer",
+            "required": false,
+            "schema": {
+              "description": "Referer of the document",
+              "type": "string",
+            },
+          },
+        ],
+        "path": "/entities/{entity_id}/documents",
+        "success": {
+          "201": "application/json",
+        },
+        "summary": "Update entity onboarding documents",
+      },
+    ],
+    "typeName": "EntitiesService",
+    "variableName": "entitiesService",
+  },
   {
     "fileBaseName": "ApprovalPoliciesService",
     "name": "approvalPolicies",
@@ -1201,6 +1409,46 @@ exports[`getServices > matches snapshot with default options 1`] = `
           "200": "application/json",
         },
         "summary": "Upload a files by ID",
+      },
+      {
+        "deprecated": true,
+        "description": undefined,
+        "errors": {
+          "default": "application/json",
+        },
+        "mediaType": undefined,
+        "method": "get",
+        "name": "getFileList",
+        "parameters": [
+          {
+            "example": "2023-06-04",
+            "in": "header",
+            "name": "x-monite-version",
+            "required": false,
+            "schema": {
+              "format": "date",
+              "type": "string",
+            },
+          },
+          {
+            "in": "query",
+            "name": "id__in",
+            "required": false,
+            "schema": {
+              "items": {
+                "format": "uuid",
+                "type": "string",
+              },
+              "maxItems": 100,
+              "type": "array",
+            },
+          },
+        ],
+        "path": "/files/list",
+        "success": {
+          "200": "application/json",
+        },
+        "summary": "Get a file list",
       },
     ],
     "typeName": "FilesService",

@@ -40,7 +40,7 @@ export function callQueryClientMethodWithQueryKey<
   const queryFn =
     options.queryFn ??
     (requestFn
-      ? // @ts-expect-error
+      ? // @ts-expect-error - Not inferring the correct type for `queryFn`
         function ({ queryKey: [, queryParams], signal, meta, pageParam }) {
           return requestFn(schema, {
             parameters: infinite
@@ -54,7 +54,7 @@ export function callQueryClientMethodWithQueryKey<
       : undefined);
 
   if (parameters) {
-    // @ts-expect-error
+    // @ts-expect-error - Too complex union to type
     return queryClient[queryFilterMethod]({
       ...options,
       // Event if queryFn is undefined, it will override the default queryFn from `setQueryDefaults(...)`
@@ -65,7 +65,7 @@ export function callQueryClientMethodWithQueryKey<
     });
   }
 
-  // @ts-expect-error
+  // @ts-expect-error - Too complex union to type
   return queryClient[queryFilterMethod]({ ...options, queryFn });
 }
 

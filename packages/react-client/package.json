@@ -8,14 +8,17 @@
     "test": "vitest run",
     "test:coverage": "vitest run --coverage",
     "typecheck": "tsc --noEmit",
-    "generate-qraft": "openapi-qraft src/tests/fixtures/openapi.json --clean -o src/tests/fixtures/api --openapi-types-import-path '../../openapi.js' --explicit-import-extensions --filter-services '/approval_policies/**,/entities/**,/files/**,!/internal/**' && prettier --write src/tests/fixtures/api/**/*.ts",
-    "generate-types": "openapi-qraft-typescript src/tests/fixtures/openapi.json -o src/tests/fixtures/openapi.ts"
+    "lint": "eslint",
+    "generate-qraft": "openapi-qraft --plugin tanstack-query-react ../test-fixtures/openapi.json --clean -o src/tests/fixtures/api --openapi-types-import-path '../../openapi.js' --explicit-import-extensions --filter-services '/approval_policies/**,/entities/**,/files/**,!/internal/**' && prettier --write src/tests/fixtures/api/**/*.ts",
+    "generate-types": "openapi-qraft-typescript ../test-fixtures/openapi.json -o src/tests/fixtures/openapi.ts"
   },
   "type": "module",
   "sideEffects": false,
   "devDependencies": {
     "@openapi-qraft/cli": "workspace:~",
+    "@openapi-qraft/eslint-config": "workspace:~",
     "@openapi-qraft/openapi-typescript": "workspace:^",
+    "@openapi-qraft/test-fixtures": "workspace:~",
     "@tanstack/react-query": "^5.17.3",
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^13.4.0",
@@ -23,6 +26,8 @@
     "@types/react": "^18.2.47",
     "@vitejs/plugin-react": "latest",
     "@vitest/coverage-v8": "^1.1.3",
+    "eslint": "^9.0.0",
+    "globals": "^15.0.0",
     "jsdom": "latest",
     "msw": "^2.0.12",
     "prettier": "^3.1.1",

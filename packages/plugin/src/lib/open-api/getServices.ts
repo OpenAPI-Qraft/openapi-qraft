@@ -13,6 +13,9 @@ import type { OpenAPISchemaType } from './OpenAPISchemaType.js';
 
 export type ServiceBaseName = ServiceBaseNameByEndpointOption | 'tags';
 
+/**
+ * @deprecated move to separate file
+ */
 export type Service = {
   name: string;
   variableName: string;
@@ -21,6 +24,9 @@ export type Service = {
   operations: ServiceOperation[];
 };
 
+/**
+ * @deprecated move to separate file
+ */
 export type ServiceOperation = {
   method:
     | 'get'
@@ -42,12 +48,17 @@ export type ServiceOperation = {
   parameters: Record<string, any> | undefined;
 };
 
+export interface ServiceOutputOptions {
+  postfixServices?: string; // todo::rename to `postfixService`
+  serviceNameBase?: ServiceBaseName;
+}
+
 export const getServices = (
   openApiJson: OpenAPISchemaType,
   {
     postfixServices = 'Service',
     serviceNameBase = 'endpoint[0]',
-  }: { postfixServices?: string; serviceNameBase?: ServiceBaseName } = {},
+  }: ServiceOutputOptions = {},
   servicesGlob = ['**']
 ) => {
   const paths = openApiJson.paths;
@@ -57,10 +68,10 @@ export const getServices = (
   const isPathMatch = createServicePathMatch(servicesGlob);
 
   for (const path in paths) {
-    if (!paths.hasOwnProperty(path)) continue;
+    if (!Object.prototype.hasOwnProperty.call(paths, path)) continue;
 
     for (const method in paths[path]) {
-      if (!paths[path].hasOwnProperty(method)) continue;
+      if (!Object.prototype.hasOwnProperty.call(paths[path], method)) continue;
       if (!isPathMatch(path)) continue;
 
       if (!supportedMethod(method)) {

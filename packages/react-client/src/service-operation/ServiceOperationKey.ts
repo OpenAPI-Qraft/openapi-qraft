@@ -16,5 +16,5 @@ export type ServiceOperationInfiniteQueryKey<
 
 export type ServiceOperationMutationKey<
   S extends Record<'url' | 'method', string>,
-  T extends unknown,
+  T,
 > = NonNullable<T> extends never ? [S] : [S, T];
