@@ -167,6 +167,7 @@ const getCreateClientFunctionFactory = () => {
   );
 };
 
+// todo::make callbacks type-safe
 const serviceCallbacks = [
   'getInfiniteQueryData',
   'getInfiniteQueryKey',
