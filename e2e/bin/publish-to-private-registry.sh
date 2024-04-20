@@ -39,7 +39,6 @@ use_default_registry() {
 publish_to_registry() {
   echo 'Publishing packages to private registry...'
   (cd "$(monorepo_root)" && CI=1 NPM_PUBLISH_REGISTRY="${NPM_PUBLISH_REGISTRY:-http://localhost:4873/}" . ".changeset/publish.sh") \
-   | grep -E "Package archive published|Registry already knows about version" \
     || (echo 'Error: Failed to publish packages to private registry.' >&2 && exit 1)
 }
 
