@@ -1,13 +1,11 @@
 import c from 'ansi-colors';
 import { Command } from 'commander';
-import * as console from 'node:console';
 import { sep } from 'node:path';
 import process from 'node:process';
 import { pathToFileURL, URL } from 'node:url';
 import ora, { Ora } from 'ora';
 
 import { GeneratorFile } from './GeneratorFile.js';
-import { maybeGetModulePath } from './maybeGetModulePath.js';
 import { getDocumentServices } from './open-api/getDocumentServices.js';
 import { Service } from './open-api/getServices.js';
 import { OutputOptions } from './OutputOptions.js';
@@ -107,11 +105,11 @@ export class QraftCommand extends Command {
   }
 
   async #getServices(input: unknown, args: Record<string, any>) {
-    const cwd = pathToFileURL(`${process.cwd()}/`);
+    const cwd = `${process.cwd()}/`;
 
     const source =
       input && typeof input === 'string'
-        ? new URL(maybeGetModulePath(input, cwd) || input, cwd)
+        ? new URL(input, pathToFileURL(cwd))
         : process.stdin;
 
     if (source === process.stdin && source.isTTY) {
