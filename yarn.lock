@@ -3338,6 +3338,7 @@ __metadata:
     "@openapi-qraft/cli": "workspace:~"
     "@openapi-qraft/eslint-config": "workspace:~"
     "@openapi-qraft/openapi-typescript": "workspace:^"
+    "@openapi-qraft/test-fixtures": "workspace:~"
     "@tanstack/react-query": "npm:^5.17.3"
     "@testing-library/jest-dom": "npm:^5.17.0"
     "@testing-library/react": "npm:^13.4.0"

@@ -10,9 +10,136 @@
     }
   },
   "paths": {
+    "/entities/{entity_id}/documents": {
+      "post": {
+        "tags": ["Onboarding documents"],
+        "summary": "Update entity onboarding documents",
+        "description": "Update the onboarding documents of an entity.",
+        "operationId": "post_entities_id_documents",
+        "parameters": [
+          {
+            "required": true,
+            "schema": { "type": "string", "format": "date" },
+            "example": "2023-06-04",
+            "name": "x-monite-version",
+            "in": "header"
+          },
+          {
+            "required": true,
+            "schema": { "type": "string", "format": "uuid" },
+            "name": "entity_id",
+            "in": "path"
+          },
+          {
+            "description": "Document referer",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "description": "Referer of the document"
+            },
+            "name": "referer",
+            "in": "query"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EntityOnboardingDocuments"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "header": {
+                      "type": "object",
+                      "properties": {
+                        "x-monite-version": {
+                          "type": "string",
+                          "format": "date"
+                        }
+                      }
+                    },
+                    "path": {
+                      "type": "object",
+                      "properties": {
+                        "entity_id": {
+                          "type": "string",
+                          "format": "uuid"
+                        }
+                      }
+                    },
+                    "query": {
+                      "type": "object",
+                      "properties": {
+                        "referer": {
+                          "type": "string",
+                          "description": "Referer of the document"
+                        }
+                      }
+                    },
+                    "body": {
+                      "type": "object",
+                      "properties": {
+                        "verification_document_front": {
+                          "type": "string"
+                        },
+                        "verification_document_back": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorSchemaResponse" }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorSchemaResponse" }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          },
+          "default": {
+            "description": "Unexpected error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorSchemaResponse" }
+              }
+            }
+          }
+        },
+        "security": [{ "HTTPBearer": [] }]
+      }
+    },
     "/approval_policies/{approval_policy_id}": {
       "get": {
-        "tags": [],
+        "tags": ["Approval policies"],
         "summary": "Get an approval policy by ID",
         "description": "Retrieve a specific approval policy.",
         "operationId": "get_approval_policies_id",
@@ -112,7 +239,7 @@
         "security": [{ "HTTPBearer": [] }]
       },
       "delete": {
-        "tags": ["Approval policies", "Main"],
+        "tags": ["Approval policies"],
         "summary": "Delete an approval policy",
         "description": "Delete an existing approval policy.",
         "operationId": "delete_approval_policies_id",
@@ -189,7 +316,7 @@
         "security": [{ "HTTPBearer": [] }]
       },
       "patch": {
-        "tags": ["Approval policies", "Main"],
+        "tags": ["Approval policies"],
         "summary": "Update an approval policy",
         "description": "Update an existing approval policy.",
         "operationId": "patch_approval_policies_id",
@@ -267,7 +394,7 @@
     },
     "/files": {
       "get": {
-        "tags": ["Files", "Main"],
+        "tags": ["Files"],
         "summary": "Get a files by ID",
         "operationId": "get_files",
         "parameters": [
@@ -365,7 +492,7 @@
         "security": [{ "HTTPBearer": [] }]
       },
       "post": {
-        "tags": ["Files", "Main"],
+        "tags": ["Files"],
         "summary": "Upload a files by ID",
         "operationId": "post_files",
         "requestBody": {
@@ -419,6 +546,52 @@
             }
           }
         }
+      }
+    },
+    "/files/list": {
+      "get": {
+        "deprecated": true,
+        "tags": ["Files"],
+        "summary": "Get a file list",
+        "operationId": "get_file_list",
+        "parameters": [
+          {
+            "required": false,
+            "schema": { "type": "string", "format": "date" },
+            "example": "2023-06-04",
+            "name": "x-monite-version",
+            "in": "header"
+          },
+          {
+            "required": false,
+            "schema": {
+              "items": { "type": "string", "format": "uuid" },
+              "type": "array",
+              "maxItems": 100
+            },
+            "name": "id__in",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/FilesResponse" }
+              }
+            }
+          },
+          "default": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorSchemaResponse" }
+              }
+            }
+          }
+        },
+        "security": [{ "HTTPBearer": [] }]
       }
     }
   },
