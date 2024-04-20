@@ -20,6 +20,14 @@ export default function () {
               url: "/files";
               mediaType: "multipart/form-data";
           }, NonNullable<paths["/files"]["post"]["requestBody"]>["content"]["multipart/form-data"], paths["/files"]["post"]["responses"]["200"]["content"]["application/json"], undefined, paths["/files"]["post"]["responses"]["default"]["content"]["application/json"]>;
+          /**
+           * @deprecated
+           * @summary Get a file list
+           */
+          getFileList: ServiceOperationQuery<{
+              method: "get";
+              url: "/files/list";
+          }, paths["/files/list"]["get"]["responses"]["200"]["content"]["application/json"], paths["/files/list"]["get"]["parameters"], paths["/files/list"]["get"]["responses"]["default"]["content"]["application/json"]>;
       }
       export const filesService: {
           [key in keyof FilesService]: Pick<FilesService[key], "schema">;
@@ -35,6 +43,12 @@ export default function () {
                   method: "post",
                   url: "/files",
                   mediaType: "multipart/form-data"
+              }
+          },
+          getFileList: {
+              schema: {
+                  method: "get",
+                  url: "/files/list"
               }
           }
       } as const;
