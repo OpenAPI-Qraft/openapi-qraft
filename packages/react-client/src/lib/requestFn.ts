@@ -295,7 +295,6 @@ export interface RequestFnPayload {
    */
   readonly parameters?: {
     readonly path?: Record<string, any>;
-    readonly cookie?: Record<string, any>;
     readonly header?: Record<string, any>;
     readonly query?: Record<string, any>;
   };
