@@ -79,3 +79,4 @@ TInfinite
 qraftio
 typecheck
 tseslint
+devDepencencies
