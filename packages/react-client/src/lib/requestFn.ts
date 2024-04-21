@@ -257,7 +257,7 @@ export interface OperationSchema {
    * Operation path
    * @example /user/{id}
    */
-  readonly url: string;
+  readonly url: string; //todo::rename to `path`
 
   /**
    * Operation method
