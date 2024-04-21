@@ -8,7 +8,7 @@ import type { OperationSchema, RequestFnPayload } from './lib/requestFn.js';
 
 interface QraftContextValueBase {
   /**
-   * The base URL to use for all requests.
+   * Base URL to use for the request
    * @example 'https://api.example.com'
    */
   baseUrl?: string;

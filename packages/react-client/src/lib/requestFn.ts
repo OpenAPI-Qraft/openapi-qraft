@@ -282,6 +282,7 @@ export interface OperationSchema {
 export interface RequestFnPayload {
   /**
    * Base URL to use for the request
+   * @example 'https://api.example.com'
    */
   baseUrl: string | undefined;
 
