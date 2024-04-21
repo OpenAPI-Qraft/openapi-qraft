@@ -34,7 +34,7 @@ const result = qraft.<service>.<operation>.fetchQuery(
      - The function should be provided, otherwise it will throw an error if default `queryFn` is not set previously using `QueryClient.setDefaultOptions(...)` method
    - `baseUrl: string`
      - **Required if `requestFn` is set**, the base URL of the API
-   - `fetchQueryOptions?: FetchQueryOptions`
+   - `...fetchQueryOptions?: FetchQueryOptions`
      - **Optional**, represents the rest options of the [_fetchQuery(...) 🌴_](https://tanstack.com/query/latest/docs/reference/QueryClient#queryclientfetchquery) method
        - `queryOptions.queryFn` could be provided instead of ~~`requestFn`~~
        - `queryOptions.queryKey` could be provided instead of ~~`parameters`~~
