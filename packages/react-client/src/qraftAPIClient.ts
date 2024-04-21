@@ -10,13 +10,13 @@ export interface QraftClientOptions {
 }
 
 export const qraftAPIClient = <
-  Services extends ServicesOutput<Services>,
+  Services extends ServicesBaseDeclaration<Services>,
   Callbacks extends ServicesCallbacks,
 >(
   services: ServicesDeclaration<Services>,
   callbacks: Callbacks,
   options?: QraftClientOptions
-): ServicesCallbacksFilter<Services, keyof Callbacks> => {
+): Services => {
   return createRecursiveProxy(
     function getCallback(getPath, key) {
       if (getPath.length !== 2 || key !== 'schema') return; // todo::maybe return callback?
@@ -84,13 +84,13 @@ function getByPath(obj: Record<string, unknown>, path: string[]) {
   }, obj);
 }
 
-type ServicesOutput<Services> = {
+type ServicesBaseDeclaration<Services> = {
   [service in keyof Services]: {
     [method in keyof Services[service]]: { schema: OperationSchema };
   };
 };
 
-type ServicesDeclaration<Services extends ServicesOutput<Services>> = {
+type ServicesDeclaration<Services extends ServicesBaseDeclaration<Services>> = {
   [service in keyof Services]: {
     [method in keyof Services[service]]: {
       schema: Services[service][method]['schema'];
@@ -99,26 +99,3 @@ type ServicesDeclaration<Services extends ServicesOutput<Services>> = {
 };
 
 type ServicesCallbacks = Record<string, (...rest: any[]) => unknown>;
-
-type ServicesCallbacksFilter<
-  Services extends ServicesOutput<Services>,
-  Callbacks,
-> = Services extends {
-  [serviceName in keyof Services]: {
-    [method in keyof Services[serviceName]]: { schema: OperationSchema };
-  };
-}
-  ? {
-      [serviceName in keyof Services]: {
-        [method in keyof Services[serviceName]]: Pick<
-          Services[serviceName][method],
-          FilterKeys<
-            keyof Services[serviceName][method],
-            Callbacks | 'schema' | 'types'
-          >
-        >;
-      };
-    }
-  : never;
-
-type FilterKeys<T, K> = K extends T ? K : never;
