@@ -1,5 +1,13 @@
 # @openapi-qraft/cli
 
+## 1.8.0
+
+### Patch Changes
+
+- 878c002: Replaced string-based path handling with URL objects to ensure path normalization and enhance security.
+- Updated dependencies [27d501a]
+  - @openapi-qraft/tanstack-query-react-plugin@1.8.0
+
 ## 1.7.0
 
 ## 1.6.0
