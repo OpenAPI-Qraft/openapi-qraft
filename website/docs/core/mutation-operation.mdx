@@ -1,0 +1,124 @@
+---
+sidebar_label: POST, PUT, PATCH, DELETE
+sidebar_position: 20
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# POST, PUT, PATCH, DELETE
+
+The method allows you to execute a _Mutations_ without TanStack's ~~_QueryClient_~~.
+
+<Tabs>
+  <TabItem value="with-base-url" label={<span style={{verticalAlign: 'middle'}}>With <code>baseUrl</code></span>} default>
+    ```ts
+    import { requestFn } from '@openapi-qraft/react';
+
+    const result = qraft.<service>.<operation>(
+      {
+        parameters,
+        baseUrl,
+        signal,
+        meta,
+      },
+      requestFn
+    );
+    ```
+
+    ### Arguments
+
+    1. - `parameters: { path, query, header } | {}`
+         - **Required**, OpenAPI request parameters for the query, strictly-typed ✨
+          - If operation does not require parameters, you must pass an empty object `{}` for strictness
+       - `baseUrl` - **Required** base URL for the `requestFn`
+    2. `requestFn: RequestFn`
+       - **Required**, a function that will be used to execute the request
+  </TabItem>
+  <TabItem value="no-base-url" label={<span style={{verticalAlign: 'middle'}}>No <code style={{textDecoration: 'line-through'}}>baseUrl</code></span>} default>
+    ```ts
+    const result = qraft.<service>.<operation>(
+      {
+        parameters,
+        signal,
+        meta,
+      },
+      requestFn
+    );
+    ```
+    ### Arguments
+
+    1. - `parameters: { path, query, header } | {}`
+         - **Required**, OpenAPI request parameters for the query, strictly-typed ✨
+          - If operation does not require parameters, you must pass an empty object `{}` for strictness
+    2. `requestFn: Omit<RequestFn, 'baseUrl'>`
+       - **Required**, a function that will be used to execute the request. Note,
+         that `baseUrl` will not be provided in the `requestFn`.
+  </TabItem>
+</Tabs>
+
+### Returns
+
+`result: Promise<T>` - The result of the query execution
+
+### Examples
+
+<Tabs>
+  <TabItem value="with-base-url" label={<span style={{verticalAlign: 'middle'}}>With <code>baseUrl</code></span>} default>
+    ```ts
+    import { requestFn } from '@openapi-qraft/react';
+
+    /**
+     * Executes the request:
+     * ###
+     * PATCH /posts/123
+     *
+     * { "title": "New title" }
+     **/
+    const posts = await qraft.posts.updatePost(
+      {
+        parameters: { path: { post_id: 123 } },
+        body: { title: 'New title' },
+        baseUrl: 'https://api.sandbox.monite.com/v1',
+      },
+      requestFn
+    );
+    ```
+  </TabItem>
+  <TabItem value="no-base-url" label={<span style={{verticalAlign: 'middle'}}>No <code style={{textDecoration: 'line-through'}}>baseUrl</code></span>}>
+    ```ts
+    import {
+      requestFn,
+      type RequestFnPayload,
+      type OperationSchema,
+    } from '@openapi-qraft/react';
+
+    /**
+     * Executes the request:
+     * ###
+     * PATCH /posts/123
+     *
+     * { "title": "New title" }
+     **/
+    const posts = await qraft.posts.updatePost(
+      {
+        parameters: { path: { post_id: 123 } },
+        body: { title: 'New title' },
+      },
+      customRequestFn
+    );
+
+    /**
+     * Custom request function with the predefined base URL
+     **/
+    const customRequestFn = async <T,>(
+      requestSchema: OperationSchema,
+      requestInfo: Omit<RequestFnPayload, 'baseUrl'>
+    ): Promise<T> =>
+      requestFn(requestSchema, {
+        ...requestInfo,
+        baseUrl: 'https://api.sandbox.monite.com/v1',
+      });
+    ```
+  </TabItem>
+</Tabs>

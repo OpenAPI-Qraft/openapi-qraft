@@ -16,7 +16,7 @@ export const mutationFn = (
     >['mutationFn']
   >;
   return client(schema, {
-    parameters: options.parameters,
-    body: options.body,
+    parameters: options?.parameters,
+    body: options?.body,
   });
 };

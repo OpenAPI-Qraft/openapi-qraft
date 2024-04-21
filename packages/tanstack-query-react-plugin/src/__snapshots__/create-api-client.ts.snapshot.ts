@@ -41,6 +41,7 @@ export default function () {
       import { prefetchInfiniteQuery } from "@openapi-qraft/react/callbacks/prefetchInfiniteQuery";
       import { getQueryState } from "@openapi-qraft/react/callbacks/getQueryState";
       import { getInfiniteQueryState } from "@openapi-qraft/react/callbacks/getInfiniteQueryState";
+      import { operationInvokeFn } from "@openapi-qraft/react/callbacks/operationInvokeFn";
       import { services, Services } from "./services/index.js";
       const callbacks = {
           getInfiniteQueryData,
@@ -76,7 +77,8 @@ export default function () {
           fetchInfiniteQuery,
           prefetchInfiniteQuery,
           getQueryState,
-          getInfiniteQueryState
+          getInfiniteQueryState,
+          operationInvokeFn
       };
       export function createAPIClient(options?: QraftClientOptions): Services {
           return qraftAPIClient<Services, typeof callbacks>(services, callbacks, options);

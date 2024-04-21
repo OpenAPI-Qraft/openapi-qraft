@@ -5,6 +5,13 @@ type ProxyApplyCallback = (path: string[], args: unknown[]) => unknown;
  */
 type ProxyGetCallback = (path: string[], key: string) => unknown | undefined;
 
+// todo::rename to `qraftRecursiveProxy` with deprecated `createRecursiveProxy`
+/**
+ * Creates a recursive proxy that calls the `getCallback` and `applyCallback` functions
+ * @param getCallback The callback to call when a proxy property is accessed
+ * @param applyCallback The callback to call when a proxy is called as a function
+ * @param path The current path of the proxy
+ */
 export function createRecursiveProxy(
   getCallback: ProxyGetCallback,
   applyCallback: ProxyApplyCallback,
