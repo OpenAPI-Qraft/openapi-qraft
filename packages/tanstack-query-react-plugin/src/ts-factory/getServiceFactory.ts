@@ -57,7 +57,7 @@ const getServiceOperationGenericsPathImportsFactory = (
 ) => {
   const factory = ts.factory;
 
-  const queryMethods = ['get', 'head', 'options'] as const;
+  const queryMethods = ['get', 'head', 'options'] as const; // todo::make it shared
 
   return factory.createImportDeclaration(
     undefined,

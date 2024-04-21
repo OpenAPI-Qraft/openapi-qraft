@@ -1,5 +1,15 @@
 /**
- * @throws {error: object|string, response: Response} if the request fails
+ * This function is used to make a request to a specified endpoint.
+ *
+ * @template T The expected return type of the request.
+ *
+ * @param schema The schema of the operation to be performed. It includes the OpenAPI path, HTTP method and media type.
+ * @param requestInfo The information required to make the request. It includes parameters, headers, body, etc.
+ * @param [options] Optional. Additional options for the request. It includes custom urlSerializer, bodySerializer, and fetch function.
+ *
+ * @returns {Promise<T>} Returns a promise that resolves with the response of the request.
+ *
+ * @throws {error: object|string, response: Response} Throws an error if the request fails. The error includes the error message and the response from the server.
  */
 export async function requestFn<T>(
   schema: OperationSchema,
@@ -14,7 +24,20 @@ export async function requestFn<T>(
 }
 
 /**
- * @throws {error: object|string, response: Response} if the request fails
+ * This function is used to make a request to a specified endpoint.
+ * It's needed to create a custom `requestFn` with a custom `urlSerializer`
+ * and `bodySerializer`, with the tree-shaking of the default `requestFn`
+ * and its serializers.
+ *
+ * @template T The expected return type of the request.
+ *
+ * @param requestSchema The schema of the operation to be performed. It includes the OpenAPI path, HTTP method and media type.
+ * @param requestInfo The information required to make the request. It includes parameters, headers, body, etc.
+ * @param options The options for the request. It includes urlSerializer, bodySerializer, and fetch function. The 'urlSerializer' and 'bodySerializer' are required.
+ *
+ * @returns {Promise<T>} Returns a promise that resolves with the response of the request.
+ *
+ * @throws {error: object|string, response: Response} Throws an error if the request fails. The error includes the error message and the response from the server.
  */
 export async function baseRequestFn<T>(
   requestSchema: OperationSchema,
@@ -257,7 +280,7 @@ export interface OperationSchema {
    * Operation path
    * @example /user/{id}
    */
-  readonly url: string;
+  readonly url: string; //todo::rename to `path`
 
   /**
    * Operation method
@@ -282,6 +305,7 @@ export interface OperationSchema {
 export interface RequestFnPayload {
   /**
    * Base URL to use for the request
+   * @example 'https://api.example.com'
    */
   baseUrl: string | undefined;
 
@@ -294,7 +318,6 @@ export interface RequestFnPayload {
    */
   readonly parameters?: {
     readonly path?: Record<string, any>;
-    readonly cookie?: Record<string, any>;
     readonly header?: Record<string, any>;
     readonly query?: Record<string, any>;
   };

@@ -65,6 +65,7 @@ TResult
 TSchema
 TSignal
 TVariables
+TOptions
 typesafe
 Unpublishing
 usernames

@@ -2,7 +2,14 @@
   "$schema": "https://unpkg.com/@changesets/config@3.0.0/schema.json",
   "changelog": "@changesets/cli/changelog",
   "commit": ["@changesets/cli/commit", { "skipCI": false }],
-  "fixed": [["@openapi-qraft/react", "@openapi-qraft/cli", "@openapi-qraft/plugin"]],
+  "fixed": [
+    [
+      "@openapi-qraft/cli",
+      "@openapi-qraft/plugin",
+      "@openapi-qraft/tanstack-query-react-plugin",
+      "@openapi-qraft/react"
+    ]
+  ],
   "linked": [],
   "access": "public",
   "baseBranch": "origin/main",
