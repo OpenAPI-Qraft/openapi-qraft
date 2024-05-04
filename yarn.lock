@@ -3321,9 +3321,9 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@openapi-qraft/openapi-typescript@workspace:^, @openapi-qraft/openapi-typescript@workspace:packages/openapi-typescript":
+"@openapi-qraft/openapi-typescript-plugin@workspace:^, @openapi-qraft/openapi-typescript-plugin@workspace:packages/openapi-typescript-plugin":
   version: 0.0.0-use.local
-  resolution: "@openapi-qraft/openapi-typescript@workspace:packages/openapi-typescript"
+  resolution: "@openapi-qraft/openapi-typescript-plugin@workspace:packages/openapi-typescript-plugin"
   dependencies:
     "@openapi-qraft/eslint-config": "workspace:~"
     "@types/node": "npm:^18.19.4"
@@ -3369,7 +3369,7 @@ __metadata:
   dependencies:
     "@openapi-qraft/cli": "workspace:~"
     "@openapi-qraft/eslint-config": "workspace:~"
-    "@openapi-qraft/openapi-typescript": "workspace:^"
+    "@openapi-qraft/openapi-typescript-plugin": "workspace:^"
     "@openapi-qraft/test-fixtures": "workspace:~"
     "@tanstack/react-query": "npm:^5.17.3"
     "@testing-library/jest-dom": "npm:^5.17.0"

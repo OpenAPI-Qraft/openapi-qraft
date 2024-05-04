@@ -1,5 +1,5 @@
 {
-  "name": "@openapi-qraft/openapi-typescript",
+  "name": "@openapi-qraft/openapi-typescript-plugin",
   "version": "1.0.0",
   "private": true,
   "packageManager": "yarn@4.0.2",
