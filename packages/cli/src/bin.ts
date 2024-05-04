@@ -24,16 +24,23 @@ if (plugins) {
   import('@openapi-qraft/tanstack-query-react-plugin').then(
     ({ default: plugin }) => {
       plugin.setupCommand(command);
-      command.option('--plugin <name>', 'Client generator plugin name', () => {
-        throw new Error(
-          'Plugin option must be handled before parsing the command and should not be passed to the commander'
-        );
-      });
+      command.option(
+        '--plugin <name>',
+        'Client generator plugin name (tanstack-query-react)',
+        () => {
+          throw new Error(
+            'Plugin option must be handled before parsing the command and should not be passed to the commander'
+          );
+        }
+      );
       command.parse(argv);
     }
   );
 }
 
+/**
+ * Add plugin's usage instructions calling `command.usage(...)`
+ */
 function addCommandUsageWithPlugins(command: QraftCommand, plugins: string[]) {
   const pluginUsage = plugins.map((plugin) => `--plugin ${plugin}`).join(' ');
   command.usage(`${pluginUsage} [input] [options]`);
