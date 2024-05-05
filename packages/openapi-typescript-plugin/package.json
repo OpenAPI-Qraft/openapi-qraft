@@ -2,13 +2,27 @@
   "name": "@openapi-qraft/openapi-typescript-plugin",
   "version": "1.0.0",
   "private": true,
-  "packageManager": "yarn@4.0.2",
   "type": "module",
   "scripts": {
     "build": "rimraf dist/ && tsc --project tsconfig.build.json",
     "dev": "yarn build --watch",
     "typecheck": "tsc --noEmit",
     "lint": "eslint"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "exports": {
+    "./package.json": "./package.json",
+    ".": "./dist/index.js",
+    "./*": "./dist/*.js"
+  },
+  "typesVersions": {
+    "*": {
+      "*": [
+        "dist/*"
+      ]
+    }
   },
   "dependencies": {
     "@openapi-qraft/plugin": "workspace:^",
@@ -38,16 +52,5 @@
     "!src/**/*.test.*",
     "!src/**/*.spec.*"
   ],
-  "exports": {
-    "./package.json": "./package.json",
-    ".": "./dist/index.js",
-    "./*": "./dist/*.js"
-  },
-  "typesVersions": {
-    "*": {
-      "*": [
-        "dist/*"
-      ]
-    }
-  }
+  "packageManager": "yarn@4.0.2"
 }
