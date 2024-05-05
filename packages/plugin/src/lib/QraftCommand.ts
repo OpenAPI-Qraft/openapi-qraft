@@ -95,6 +95,8 @@ export class QraftCommand extends Command {
       spinner.text = 'Generating code';
 
       await new Promise<void>((resolve, reject) => {
+        const outputDir = normalizeOutputDirPath(args.outputDir);
+
         callback(
           {
             inputs,
@@ -103,14 +105,17 @@ export class QraftCommand extends Command {
             services,
             schema,
             output: {
-              dir: normalizeOutputDirPath(args.outputDir),
+              dir: outputDir,
               clean: args.clean,
             },
           },
           async function resolveGeneratorFiles(fileItems) {
             try {
               await writeGeneratorFiles({
-                fileItems,
+                fileItems: [
+                  { directory: outputDir, clean: false },
+                  ...fileItems,
+                ],
                 spinner,
               });
               spinner.succeed(c.green('Qraft has been finished'));
