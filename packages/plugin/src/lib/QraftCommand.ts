@@ -71,36 +71,40 @@ export class QraftCommand extends Command {
 
       const spinner = ora('Starting the Qraft ⛏︎').start();
 
-      await callback(
-        {
-          inputs,
-          args,
-          spinner,
-          services: await this.#getServices(inputs[0], args),
-          output: {
-            dir: normalizeOutputDirPath(args.outputDir),
-            clean: args.clean,
+      // eslint-disable-next-line no-async-promise-executor
+      await new Promise(async (resolve, reject) => {
+        await callback(
+          {
+            inputs,
+            args,
+            spinner,
+            services: await this.#getServices(inputs[0], args),
+            output: {
+              dir: normalizeOutputDirPath(args.outputDir),
+              clean: args.clean,
+            },
           },
-        },
-        async function resolveGeneratorFiles(fileItems) {
-          try {
-            await writeGeneratorFiles({
-              fileItems,
-              spinner,
-            });
-            spinner.succeed(c.green('Qraft has been finished'));
-          } catch (error) {
-            spinner.fail(c.red('Error occurred during generation'));
+          async function resolveGeneratorFiles(fileItems) {
+            try {
+              await writeGeneratorFiles({
+                fileItems,
+                spinner,
+              }).then(resolve);
+              spinner.succeed(c.green('Qraft has been finished'));
+            } catch (error) {
+              spinner.fail(c.red('Error occurred during generation'));
 
-            if (error instanceof Error) {
-              console.error(c.red(error.message), c.red(error.stack ?? ''));
+              if (error instanceof Error) {
+                console.error(c.red(error.message), c.red(error.stack ?? ''));
+              }
+
+              console.error(error);
+              reject(error);
+              process.exit(1);
             }
-
-            console.error(error);
-            process.exit(1);
           }
-        }
-      );
+        );
+      });
     });
   }
 
