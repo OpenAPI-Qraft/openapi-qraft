@@ -197,5 +197,5 @@ const generateIndex = async (spinner: Ora, output: OutputOptions) => {
 export const getFileHeader = ({
   fileHeader,
 }: Pick<OutputOptions, 'fileHeader'>) => {
-  return fileHeader && `${fileHeader}\n`;
+  return fileHeader && `${fileHeader}${fileHeader.endsWith('\n') ? '' : '\n'}`;
 };
