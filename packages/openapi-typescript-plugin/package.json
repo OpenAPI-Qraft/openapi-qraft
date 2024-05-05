@@ -4,9 +4,6 @@
   "private": true,
   "packageManager": "yarn@4.0.2",
   "type": "module",
-  "bin": {
-    "openapi-qraft-typescript": "./bin.mjs"
-  },
   "scripts": {
     "build": "rimraf dist/ && tsc --project tsconfig.build.json",
     "dev": "yarn build --watch",
