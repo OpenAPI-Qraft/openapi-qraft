@@ -16,6 +16,14 @@ if (plugins) {
         command.parse(argv);
       }
     );
+  } else if (plugins?.includes('openapi-typescript')) {
+    import('@openapi-qraft/openapi-typescript-plugin').then(
+      ({ default: plugin }) => {
+        plugin.setupCommand(command);
+        addCommandUsageWithPlugins(command, plugins);
+        command.parse(argv);
+      }
+    );
   } else {
     throw new Error(`Unknown plugin: '${plugins.join(', ')}'`);
   }

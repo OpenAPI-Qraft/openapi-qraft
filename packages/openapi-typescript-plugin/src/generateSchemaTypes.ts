@@ -1,24 +1,20 @@
 import { createConfig } from '@redocly/openapi-core';
 
-import fs from 'node:fs';
-import type { Readable, Writable } from 'node:stream';
+import type { Readable } from 'node:stream';
 import openapiTS, {
   astToString,
-  COMMENT_HEADER,
-  OpenAPI3,
-  OpenAPITSOptions,
+  type OpenAPI3,
+  type OpenAPITSOptions,
 } from 'openapi-typescript';
 import ts from 'typescript';
 
-export async function generateAndWriteSchema(
+export async function generateSchemaTypes(
   schema: string | URL | OpenAPI3 | Readable | Buffer,
   {
-    cwd,
-    output,
+    silent,
     args,
   }: {
-    cwd: URL;
-    output: string | Writable;
+    silent: boolean;
     args: Pick<
       OpenAPITSOptions,
       | 'additionalProperties'
@@ -34,7 +30,7 @@ export async function generateAndWriteSchema(
     >;
   }
 ) {
-  const result = `${COMMENT_HEADER}${astToString(
+  return astToString(
     await openapiTS(schema, {
       transform(schemaObject) {
         if (schemaObject.format === 'binary') {
@@ -68,16 +64,7 @@ export async function generateAndWriteSchema(
       immutable: args.immutable,
       pathParamsAsTypes: args.pathParamsAsTypes,
       redocly: await createConfig({}, { extends: ['minimal'] }),
-      silent: typeof output !== 'string',
+      silent,
     })
-  )}`;
-
-  if (typeof output === 'string') {
-    const outFile = new URL(output, cwd);
-    fs.mkdirSync(new URL('.', outFile), { recursive: true });
-    fs.writeFileSync(outFile, result, 'utf8');
-  } else {
-    // if stdout, (still) don’t log anything to console!
-    output.write(result);
-  }
+  );
 }
