@@ -1,7 +1,6 @@
 {
   "name": "@openapi-qraft/tanstack-query-react-plugin",
   "version": "1.8.0",
-  "packageManager": "yarn@4.0.2",
   "type": "module",
   "scripts": {
     "build": "rimraf dist/ && tsc --project tsconfig.build.json",
@@ -9,6 +8,9 @@
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
     "lint": "eslint"
+  },
+  "publishConfig": {
+    "access": "public"
   },
   "exports": {
     "./package.json": "./package.json",
@@ -41,7 +43,5 @@
     "!src/**/*.test.*",
     "!src/**/*.spec.*"
   ],
-  "publishConfig": {
-    "access": "public"
-  }
+  "packageManager": "yarn@4.0.2"
 }
