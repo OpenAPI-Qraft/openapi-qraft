@@ -24,7 +24,7 @@ export class QraftCommand extends Command {
     this.usage('[input] [options]')
       .argument(
         '[input]',
-        'Input OpenAPI Schema file path, URL (json, yml)',
+        'Input OpenAPI Document file path, URL (json, yml)',
         null
       )
       .requiredOption(
