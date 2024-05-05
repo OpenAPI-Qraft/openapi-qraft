@@ -22,11 +22,11 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Setup Node.js 18.x
+      - name: Setup Node.js 20.x
         uses: actions/setup-node@v4
         with:
           cache: 'yarn'
-          node-version: 18.x
+          node-version: 20.12.2
 
       - name: Install dependencies
         run: yarn install --immutable
