@@ -1,4 +1,5 @@
 import { fileHeader } from '@openapi-qraft/plugin/lib/fileHeader';
+import { formatFileHeader } from '@openapi-qraft/plugin/lib/formatFileHeader';
 import { QraftCommand } from '@openapi-qraft/plugin/lib/QraftCommand';
 import { QraftCommandPlugin } from '@openapi-qraft/plugin/lib/QraftCommandPlugin';
 
@@ -55,7 +56,7 @@ export const plugin: QraftCommandPlugin = {
         await resolve([
           {
             file: new URL('openapi.ts', output.dir),
-            code: `${args.fileHeader ?? fileHeader}${code}`,
+            code: formatFileHeader(args.fileHeader ?? fileHeader) + code,
           },
         ]);
       });
