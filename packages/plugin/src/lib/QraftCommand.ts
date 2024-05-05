@@ -1,5 +1,6 @@
 import c from 'ansi-colors';
-import { Command } from 'commander';
+import { Command, type Option } from 'commander';
+import * as console from 'node:console';
 import { sep } from 'node:path';
 import process from 'node:process';
 import { pathToFileURL, URL } from 'node:url';
@@ -134,6 +135,116 @@ export class QraftCommand extends Command {
       });
     });
   }
+
+  option(
+    flags: string,
+    description?: string,
+    defaultValue?: string | boolean | string[]
+  ): this;
+  option<T>(
+    flags: string,
+    description: string,
+    parseArg: (value: string, previous: T) => T,
+    defaultValue?: T
+  ): this;
+  /** @deprecated since v7, instead use choices or a custom function */
+  option(
+    flags: string,
+    description: string,
+    regexp: RegExp,
+    defaultValue?: string | boolean | string[]
+  ): this;
+  option<T>(
+    flags: string,
+    description?: string,
+    parseArg?:
+      | ((value: string, previous: T) => T)
+      | string
+      | boolean
+      | string[]
+      | RegExp,
+    defaultValue?: T
+  ): this {
+    if (
+      this.findSimilarOption({
+        flags,
+        mandatory: false,
+      })
+    ) {
+      return this;
+    }
+
+    return super.option(
+      flags,
+      // @ts-expect-error - Issues with overloading
+      description,
+      parseArg,
+      defaultValue
+    );
+  }
+
+  requiredOption(
+    flags: string,
+    description?: string,
+    defaultValue?: string | boolean | string[]
+  ): this;
+  requiredOption<T>(
+    flags: string,
+    description: string,
+    parseArg: (value: string, previous: T) => T,
+    defaultValue?: T
+  ): this;
+  /** @deprecated since v7, instead use choices or a custom function */
+  requiredOption(
+    flags: string,
+    description: string,
+    regexp: RegExp,
+    defaultValue?: string | boolean | string[]
+  ): this;
+  requiredOption<T>(
+    flags: string,
+    description?: string,
+    regexpOrDefaultValue?:
+      | string
+      | boolean
+      | string[]
+      | RegExp
+      | ((value: string, previous: T) => T),
+    defaultValue?: string | boolean | string[]
+  ): this {
+    if (
+      this.findSimilarOption({
+        flags,
+        mandatory: true,
+      })
+    ) {
+      return this;
+    }
+
+    return super.requiredOption(
+      flags,
+      // @ts-expect-error - Issues with overloading
+      description,
+      regexpOrDefaultValue,
+      defaultValue
+    );
+  }
+
+  protected findSimilarOption(option: { flags: string; mandatory: boolean }) {
+    try {
+      return findSimilarOption(option, this.options);
+    } catch (error) {
+      console.error(
+        c.red(
+          error instanceof Error
+            ? error.message
+            : 'Error occurred during option setup'
+        )
+      );
+
+      throw error;
+    }
+  }
 }
 
 /**
@@ -194,3 +305,110 @@ export type QraftCommandActionCallback = (
   },
   resolve: (files: GeneratorFile[]) => Promise<void>
 ) => void | Promise<void>;
+
+function findSimilarOption(
+  {
+    flags,
+    mandatory,
+  }: {
+    flags: string;
+    mandatory: boolean;
+  },
+  options: readonly Option[]
+) {
+  const newOptionParsedFlags = splitOptionFlags(flags);
+  /** @see {@link https://github.com/tj/commander.js/blob/83c3f4e391754d2f80b179acc4bccc2d4d0c863d/lib/option.js#L15} Source implementation */
+  const optional = flags.includes('['); // A value is optional when the option is specified.
+  const required = flags.includes('<'); // A value must be supplied when the option is specified.
+  // variadic test ignores <value,...> et al which might be used to describe custom splitting of single argument
+  const variadic = /\w\.\.\.[>\]]$/.test(flags); // The option can take multiple values.
+
+  return options.find((existingOption) => {
+    const existingOptionParsedFlags = splitOptionFlags(existingOption.flags);
+
+    if (
+      !(
+        (existingOptionParsedFlags.longFlag !== undefined &&
+          existingOptionParsedFlags.longFlag ===
+            newOptionParsedFlags.longFlag) ||
+        (existingOptionParsedFlags.shortFlag !== undefined &&
+          existingOptionParsedFlags.shortFlag ===
+            newOptionParsedFlags.shortFlag)
+      )
+    ) {
+      return false;
+    }
+
+    if (
+      existingOptionParsedFlags.longFlag !== undefined &&
+      newOptionParsedFlags.longFlag !== undefined &&
+      existingOptionParsedFlags.longFlag !== newOptionParsedFlags.longFlag
+    ) {
+      throw new Error(
+        `Long flag ${flags} already exists in the option list with flags: "${existingOption.flags}" and description: "${existingOption.description}"`
+      );
+    }
+
+    if (
+      existingOptionParsedFlags.shortFlag !== undefined &&
+      newOptionParsedFlags.shortFlag !== undefined &&
+      existingOptionParsedFlags.shortFlag !== newOptionParsedFlags.shortFlag
+    ) {
+      throw new Error(
+        `Short flag ${flags} already exists in the option list with flags: "${existingOption.flags}" and description: "${existingOption.description}"`
+      );
+    }
+
+    if (required !== existingOption.required) {
+      throw new Error(
+        `Flag ${flags} already exists in the option list with flags: "${existingOption.flags}" and description: "${existingOption.description}" but with different required status`
+      );
+    }
+
+    if (optional !== existingOption.optional) {
+      throw new Error(
+        `Flag ${flags} already exists in the option list with flags: "${existingOption.flags}" and description: "${existingOption.description}" but with different optional status`
+      );
+    }
+
+    if (mandatory !== existingOption.mandatory) {
+      throw new Error(
+        `Flag ${flags} already exists in the option list with flags: "${existingOption.flags}" and description: "${existingOption.description}" but with different mandatory status`
+      );
+    }
+
+    if (variadic !== existingOption.variadic) {
+      throw new Error(
+        `Flag ${flags} already exists in the option list with flags: "${existingOption.flags}" and description: "${existingOption.description}" but with different variadic status`
+      );
+    }
+
+    return existingOption;
+  });
+}
+
+/**
+ * Split the short and long flag out of something like '-m,--mixed <value>'
+ * @link https://github.com/tj/commander.js/blob/83c3f4e391754d2f80b179acc4bccc2d4d0c863d/lib/option.js#L310
+ */
+export function splitOptionFlags(flags: string) {
+  let shortFlag;
+  let longFlag;
+
+  // Use original very loose parsing to maintain backwards compatibility for now,
+  // which allowed, for example, unintended `-sw, --short-word` [sic].
+  const flagParts = flags.split(/[ |,]+/);
+
+  if (flagParts.length > 1 && !/^[[<]/.test(flagParts[1]))
+    shortFlag = flagParts.shift();
+
+  longFlag = flagParts.shift();
+
+  // Add support for a lone short flag without significantly changing parsing!
+  if (!shortFlag && /^-[^-]$/.test(longFlag ?? '')) {
+    shortFlag = longFlag;
+    longFlag = undefined;
+  }
+
+  return { shortFlag, longFlag };
+}
