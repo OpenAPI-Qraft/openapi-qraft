@@ -101,6 +101,7 @@ export class QraftCommand extends Command {
             args,
             spinner,
             services,
+            schema,
             output: {
               dir: normalizeOutputDirPath(args.outputDir),
               clean: args.clean,
@@ -177,6 +178,10 @@ export type QraftCommandActionCallback = (
      * OpenAPI services
      */
     services: Service[];
+    /**
+     * OpenAPI schema
+     */
+    schema: OpenAPISchemaType;
     /**
      * Output options
      */
