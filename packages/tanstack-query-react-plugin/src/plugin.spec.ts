@@ -1,27 +1,22 @@
-import { QraftCommand } from '@openapi-qraft/plugin/lib/QraftCommand';
+import '@openapi-qraft/plugin/lib/vitestFsMock';
 
-import mockFs from 'mock-fs';
-import type FileSystem from 'mock-fs/lib/filesystem.js';
 import { createRequire } from 'node:module';
-import path from 'node:path';
-import process from 'node:process';
-import { afterAll, beforeAll, describe, test } from 'vitest';
-
-import { plugin } from './plugin.js';
+import { beforeAll, describe, test } from 'vitest';
 
 describe('TanStack Query React Client Generation', () => {
-  const nodeRequire = createRequire(process.cwd());
-  const openAPIDocumentFixturePath = nodeRequire.resolve(
+  const openAPIDocumentFixturePath = createRequire(process.cwd()).resolve(
     '@openapi-qraft/test-fixtures/openapi.json'
   );
 
-  const mockFiles = loadInitialMockFiles();
-
-  beforeAll(() => {
-    mockFs(mockFiles);
+  beforeAll(async () => {
+    const { QraftCommand } = await import(
+      '@openapi-qraft/plugin/lib/QraftCommand'
+    );
+    const { plugin } = await import('./plugin.js');
     const command = new QraftCommand();
     plugin.setupCommand(command);
-    command.parse([
+
+    await command.parseAsync([
       'dummy-node',
       'dummy-qraft-bin',
       openAPIDocumentFixturePath,
@@ -35,8 +30,6 @@ describe('TanStack Query React Client Generation', () => {
       '/approval_policies/**,/entities/**,/files/**,!/internal/**',
     ]);
   });
-
-  afterAll(() => mockFs.restore());
 
   test('index.ts', async () => {
     (await import('./__snapshots__/index.ts.snapshot.js')).default();
@@ -65,17 +58,4 @@ describe('TanStack Query React Client Generation', () => {
   test('services/index.ts', async () => {
     (await import('./__snapshots__/services/index.ts.snapshot.js')).default();
   });
-
-  function loadInitialMockFiles() {
-    const filesToLoad = [openAPIDocumentFixturePath, 'package.json'];
-
-    return filesToLoad.reduce<Record<string, FileSystem.DirectoryItem>>(
-      (acc, file) => {
-        const filePath = path.resolve(process.cwd(), file);
-        acc[filePath] = mockFs.load(filePath);
-        return acc;
-      },
-      {}
-    );
-  }
 });

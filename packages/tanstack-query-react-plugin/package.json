@@ -28,10 +28,8 @@
   },
   "devDependencies": {
     "@openapi-qraft/eslint-config": "workspace:~",
-    "@types/mock-fs": "^4.13.4",
     "eslint": "^9.0.0",
     "memfs": "^4.9.2",
-    "mock-fs": "^5.2.0",
     "rimraf": "^5.0.5",
     "vitest": "^1.4.0"
   },
