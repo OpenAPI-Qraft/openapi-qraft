@@ -1,49 +1,54 @@
 #!/usr/bin/env node
 import { QraftCommand } from '@openapi-qraft/plugin/lib/QraftCommand';
 
+import { Option } from 'commander';
 import process from 'node:process';
 
-const command = new QraftCommand();
+import { builtInPlugins } from './builtInPlugins.js';
 
-const { argv, plugins } = extractArgvPluginOptions(process.argv); // todo::move parsing to the QraftCommand `parse` method
+export async function main() {
+  const command = new QraftCommand();
 
-if (plugins) {
-  if (plugins?.includes('tanstack-query-react')) {
-    import('@openapi-qraft/tanstack-query-react-plugin').then(
-      ({ default: plugin }) => {
-        plugin.setupCommand(command);
-        addCommandUsageWithPlugins(command, plugins);
-        command.parse(argv);
-      }
-    );
-  } else if (plugins?.includes('openapi-typescript')) {
-    import('@openapi-qraft/openapi-typescript-plugin').then(
-      ({ default: plugin }) => {
-        plugin.setupCommand(command);
-        addCommandUsageWithPlugins(command, plugins);
-        command.parse(argv);
-      }
-    );
+  const { argv, plugins } = extractArgvPluginOptions(process.argv);
+
+  if (plugins) {
+    await setupPlugins(command, plugins);
   } else {
-    throw new Error(`Unknown plugin: '${plugins.join(', ')}'`);
-  }
-} else {
-  // default - setup tanstack-query-react plugin
-  import('@openapi-qraft/tanstack-query-react-plugin').then(
-    ({ default: plugin }) => {
-      plugin.setupCommand(command);
-      command.option(
-        '--plugin <name>',
-        'Client generator plugin name (tanstack-query-react)',
-        () => {
+    // default - setup tanstack-query-react plugin
+    await (
+      await builtInPlugins['tanstack-query-react']()
+    ).default.setupCommand(command);
+
+    // option to display help
+    command.addOption(
+      new Option(
+        '--plugin <name_1> --plugin <name_2>',
+        `Generator plugins to be used.`
+      )
+        .choices(Object.keys(builtInPlugins))
+        .argParser(() => {
+          // Fallback, if plugins parsing went wrong
           throw new Error(
             'Plugin option must be handled before parsing the command and should not be passed to the commander'
           );
-        }
-      );
-      command.parse(argv);
-    }
-  );
+        })
+    );
+  }
+
+  return void (await command.parseAsync(argv));
+}
+
+async function setupPlugins(command: QraftCommand, plugins: string[]) {
+  for (const pluginName of plugins) {
+    if (!(pluginName in builtInPlugins))
+      throw new Error(`Unknown plugin: '${pluginName}'`);
+
+    await (
+      await builtInPlugins[pluginName as keyof typeof builtInPlugins]()
+    ).default.setupCommand(command);
+
+    addCommandUsageWithPlugins(command, plugins);
+  }
 }
 
 /**
@@ -54,6 +59,10 @@ function addCommandUsageWithPlugins(command: QraftCommand, plugins: string[]) {
   command.usage(`${pluginUsage} [input] [options]`);
 }
 
+/**
+ * Extracts multiple `--plugin <name>` options from the `argv`
+ * and returns the filtered `argv` and the list of plugins.
+ */
 export function extractArgvPluginOptions(argv: string[]) {
   const pluginIndex = argv.indexOf('--plugin');
   if (pluginIndex === -1) return { argv };
@@ -73,11 +82,6 @@ export function extractArgvPluginOptions(argv: string[]) {
       filteredArgv.push(argv[i]);
     }
   }
-
-  if (plugins.length > 1)
-    throw new Error(
-      `Only one plugin can be specified, got: '${plugins.join(', ')}'`
-    );
 
   return {
     argv: filteredArgv,

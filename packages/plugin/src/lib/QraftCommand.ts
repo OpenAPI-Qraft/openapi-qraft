@@ -16,7 +16,8 @@ import { OutputOptions } from './OutputOptions.js';
 import { writeGeneratorFiles } from './writeGeneratorFiles.js';
 
 export class QraftCommand extends Command {
-  private readonly cwd: URL;
+  protected readonly cwd: URL;
+  protected registeredPluginActions: QraftCommandActionCallback[] = [];
 
   constructor() {
     super();
@@ -52,88 +53,101 @@ export class QraftCommand extends Command {
   }
 
   action(callback: QraftCommandActionCallback): this {
-    return super.action(async (...actionArgs) => {
-      const { version: packageVersion } = await import(
-        '@openapi-qraft/plugin/package.json',
-        {
-          assert: { type: 'json' },
-        }
-      ).then(({ default: packageJSON }) => packageJSON);
+    this.registerPluginAction(callback);
+    return super.action(this.actionCallback.bind(this));
+  }
 
-      const inputs = actionArgs.filter(
-        (arg) => typeof arg === 'string'
-      ) as string[];
-      const args = actionArgs.find(
-        (arg) => arg && typeof arg === 'object'
-      ) as Record<string, any>;
-
-      if (!args) throw new Error('Arguments object not found');
-
-      if (args.version) {
-        console.info(`v${packageVersion}`);
-        process.exit(0);
+  async actionCallback(...actionArgs: any[]) {
+    const { version: packageVersion } = await import(
+      '@openapi-qraft/plugin/package.json',
+      {
+        assert: { type: 'json' },
       }
+    ).then(({ default: packageJSON }) => packageJSON);
 
-      console.info(`✨ ${c.bold(`OpenAPI Qraft ${packageVersion}`)}`);
+    const inputs = actionArgs.filter(
+      (arg) => typeof arg === 'string'
+    ) as string[];
+    const args = actionArgs.find(
+      (arg) => arg && typeof arg === 'object'
+    ) as Record<string, any>;
 
-      const spinner = ora('Starting ⛏︎').start();
+    if (!args) throw new Error('Arguments object not found');
 
-      const input = handleSchemaInput(inputs[0], this.cwd, spinner);
+    if (args.version) {
+      console.info(`v${packageVersion}`); // todo::add displaying of the used plugin version
+      process.exit(0);
+    }
 
-      spinner.text = 'Reading OpenAPI Schema';
-      const schema = await readSchema(input);
+    console.info(`✨ ${c.bold(`OpenAPI Qraft ${packageVersion}`)}`);
 
-      spinner.text = 'Getting OpenAPI Services';
-      const services = await getDocumentServices({
-        schema,
-        output: {
-          postfixServices: args.postfixServices,
-          serviceNameBase: args.serviceNameBase,
-        },
-        servicesGlob: parseServicesFilterOption(args.filterServices),
-      });
+    const spinner = ora('Starting ⛏︎').start();
 
-      spinner.text = 'Generating code';
+    const input = handleSchemaInput(inputs[0], this.cwd, spinner);
 
-      await new Promise<void>((resolve, reject) => {
-        const outputDir = normalizeOutputDirPath(args.outputDir);
+    spinner.text = 'Reading OpenAPI Schema';
+    const schema = await readSchema(input);
 
-        callback(
-          {
-            inputs,
-            args,
-            spinner,
-            services,
-            schema,
-            output: {
-              dir: outputDir,
-              clean: args.clean,
-            },
-          },
-          async function resolveGeneratorFiles(fileItems) {
-            try {
-              await writeGeneratorFiles({
-                fileItems: [
-                  { directory: outputDir, clean: false },
-                  ...fileItems,
-                ],
-                spinner,
-              });
-              spinner.succeed(c.green('Qraft has been finished'));
-              resolve();
-            } catch (error) {
-              spinner.fail(c.red('Error occurred during generation'));
-
-              if (error instanceof Error) {
-                console.error(c.red(error.message), c.red(error.stack ?? ''));
-              }
-
-              reject(error);
-            }
-          }
-        )?.catch(reject);
-      });
+    spinner.text = 'Getting OpenAPI Services';
+    const services = await getDocumentServices({
+      schema,
+      output: {
+        postfixServices: args.postfixServices,
+        serviceNameBase: args.serviceNameBase,
+      },
+      servicesGlob: parseServicesFilterOption(args.filterServices),
     });
+
+    spinner.text = 'Generating code';
+
+    const outputDir = normalizeOutputDirPath(args.outputDir);
+
+    for (const pluginAction of this.registeredPluginActions) {
+      const fileItems = await new Promise<GeneratorFile[]>(
+        (resolve, reject) => {
+          pluginAction(
+            {
+              inputs,
+              args,
+              spinner,
+              services,
+              schema,
+              output: {
+                dir: outputDir,
+                clean: args.clean,
+              },
+            },
+            resolve
+          ).catch(reject);
+        }
+      );
+
+      try {
+        if (this.registeredPluginActions.indexOf(pluginAction) === 0) {
+          await writeGeneratorFiles({
+            // Create output directory first, but for the first plugin only
+            fileItems: [{ directory: outputDir, clean: false }, ...fileItems],
+            spinner,
+          });
+        } else {
+          await writeGeneratorFiles({ fileItems, spinner });
+        }
+      } catch (error) {
+        spinner.fail(c.red('Error occurred during generation'));
+
+        if (error instanceof Error) {
+          console.error(c.red(error.message), c.red(error.stack ?? ''));
+        }
+
+        throw error;
+      }
+    }
+
+    spinner.succeed(c.green('Qraft has been finished'));
+  }
+
+  protected registerPluginAction(callback: QraftCommandActionCallback) {
+    this.registeredPluginActions.push(callback);
   }
 
   option(
@@ -303,8 +317,8 @@ export type QraftCommandActionCallback = (
      */
     output: OutputOptions;
   },
-  resolve: (files: GeneratorFile[]) => Promise<void>
-) => void | Promise<void>;
+  resolve: (files: GeneratorFile[]) => void
+) => Promise<void>;
 
 function findSimilarOption(
   {

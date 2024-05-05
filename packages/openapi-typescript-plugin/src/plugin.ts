@@ -53,7 +53,7 @@ export const plugin: QraftCommandPlugin = {
 
         spinner.succeed('OpenAPI Document types generated');
 
-        await resolve([
+        resolve([
           {
             file: new URL('openapi.ts', output.dir),
             code: formatFileHeader(args.fileHeader ?? fileHeader) + code,

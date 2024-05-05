@@ -25,8 +25,8 @@ export const plugin: QraftCommandPlugin = {
         'Path to operation generics file',
         '@openapi-qraft/react'
       )
-      .action(({ spinner, output, args, services }, resolve) => {
-        return void generateCode({
+      .action(async ({ spinner, output, args, services }, resolve) => {
+        return void (await generateCode({
           spinner,
           services,
           serviceImports: {
@@ -39,7 +39,7 @@ export const plugin: QraftCommandPlugin = {
             explicitImportExtensions: args.explicitImportExtensions,
             servicesDirName: 'services',
           },
-        }).then(resolve);
+        }).then(resolve));
       });
   },
 };
