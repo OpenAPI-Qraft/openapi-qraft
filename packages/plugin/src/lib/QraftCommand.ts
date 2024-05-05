@@ -6,14 +6,20 @@ import { pathToFileURL, URL } from 'node:url';
 import ora, { Ora } from 'ora';
 
 import { GeneratorFile } from './GeneratorFile.js';
+import { handleSchemaInput } from './handleSchemaInput.js';
 import { getDocumentServices } from './open-api/getDocumentServices.js';
-import { Service } from './open-api/getServices.js';
+import { type Service } from './open-api/getServices.js';
+import { OpenAPISchemaType } from './open-api/OpenAPISchemaType.js';
+import { readSchema } from './open-api/readSchema.js';
 import { OutputOptions } from './OutputOptions.js';
 import { writeGeneratorFiles } from './writeGeneratorFiles.js';
 
 export class QraftCommand extends Command {
+  private readonly cwd: URL;
+
   constructor() {
     super();
+    this.cwd = pathToFileURL(`${process.cwd()}/`);
 
     this.usage('[input] [options]')
       .argument(
@@ -69,16 +75,32 @@ export class QraftCommand extends Command {
 
       console.info(`✨ ${c.bold(`OpenAPI Qraft ${packageVersion}`)}`);
 
-      const spinner = ora('Starting the Qraft ⛏︎').start();
+      const spinner = ora('Starting ⛏︎').start();
 
-      // eslint-disable-next-line no-async-promise-executor
-      await new Promise(async (resolve, reject) => {
-        await callback(
+      const input = handleSchemaInput(inputs[0], this.cwd, spinner);
+
+      spinner.text = 'Reading OpenAPI Schema';
+      const schema = await readSchema(input);
+
+      spinner.text = 'Getting OpenAPI Services';
+      const services = await getDocumentServices({
+        schema,
+        output: {
+          postfixServices: args.postfixServices,
+          serviceNameBase: args.serviceNameBase,
+        },
+        servicesGlob: parseServicesFilterOption(args.filterServices),
+      });
+
+      spinner.text = 'Generating code';
+
+      await new Promise<void>((resolve, reject) => {
+        callback(
           {
             inputs,
             args,
             spinner,
-            services: await this.#getServices(inputs[0], args),
+            services,
             output: {
               dir: normalizeOutputDirPath(args.outputDir),
               clean: args.clean,
@@ -89,8 +111,9 @@ export class QraftCommand extends Command {
               await writeGeneratorFiles({
                 fileItems,
                 spinner,
-              }).then(resolve);
+              });
               spinner.succeed(c.green('Qraft has been finished'));
+              resolve();
             } catch (error) {
               spinner.fail(c.red('Error occurred during generation'));
 
@@ -98,41 +121,11 @@ export class QraftCommand extends Command {
                 console.error(c.red(error.message), c.red(error.stack ?? ''));
               }
 
-              console.error(error);
               reject(error);
-              process.exit(1);
             }
           }
-        );
+        )?.catch(reject);
       });
-    });
-  }
-
-  async #getServices(input: unknown, args: Record<string, any>) {
-    const cwd = `${process.cwd()}/`;
-
-    const source =
-      input && typeof input === 'string'
-        ? new URL(input, pathToFileURL(cwd))
-        : process.stdin;
-
-    if (source === process.stdin && source.isTTY) {
-      console.error(
-        c.red(
-          'Input file not found or stdin is empty. Please specify `--input` option or pipe OpenAPI Schema to stdin.'
-        )
-      );
-
-      process.exit(1);
-    }
-
-    return await getDocumentServices({
-      output: {
-        postfixServices: args.postfixServices,
-        serviceNameBase: args.serviceNameBase,
-      },
-      servicesGlob: parseServicesFilterOption(args.filterServices),
-      source,
     });
   }
 }
@@ -176,9 +169,6 @@ export type QraftCommandActionCallback = (
      * Command arguments, e.g. `bin <input> [options]` where `[options]` is the `args`
      */
     args: Record<string, any>;
-    /**
-     * Resolve the generator files
-     */
     /**
      * Spinner instance
      */
