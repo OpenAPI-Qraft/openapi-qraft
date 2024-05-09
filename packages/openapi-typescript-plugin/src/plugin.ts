@@ -3,13 +3,44 @@ import { formatFileHeader } from '@openapi-qraft/plugin/lib/formatFileHeader';
 import { QraftCommand } from '@openapi-qraft/plugin/lib/QraftCommand';
 import { QraftCommandPlugin } from '@openapi-qraft/plugin/lib/QraftCommandPlugin';
 
+import { CommanderError } from 'commander';
+
 import { generateSchemaTypes } from './generateSchemaTypes.js';
+import {
+  createOpenapiTypesImportPath,
+  isValidTypeScriptFileName,
+} from './lib/createOpenapiTypesImportPath.js';
 
 export const plugin: QraftCommandPlugin = {
   setupCommand(command: QraftCommand) {
+    const openapiTypesImportPathOption = command.options.find(
+      (option) => option.attributeName() === 'openapiTypesImportPath'
+    );
+
+    if (openapiTypesImportPathOption) {
+      // will be set in `preAction` hook if not provided
+      openapiTypesImportPathOption.makeOptionMandatory(false);
+    }
+
     command
+      .hook('preAction', (thisCommand) => {
+        if (!command.getOptionValue('openapiTypesImportPath'))
+          thisCommand.setOptionValue(
+            'openapiTypesImportPath',
+            createOpenapiTypesImportPath(
+              thisCommand.getOptionValue('openapiTypesFileName'),
+              thisCommand.getOptionValue('explicitImportExtensions')
+            )
+          );
+      })
       .description(
         'Generate TypeScript types from OpenAPI 3.x Document. Based on "openapi-typescript" (https://github.com/drwpow/openapi-typescript/)'
+      )
+      .option(
+        '--openapi-types-file-name <path>',
+        'OpenAPI Schema types file name, eg: "schema.d.ts"',
+        openapiTypesFileNameOptionParser,
+        'schema.ts'
       )
       .option('--enum', 'Export true TS enums instead of unions')
       .option(
@@ -55,10 +86,38 @@ export const plugin: QraftCommandPlugin = {
 
         resolve([
           {
-            file: new URL('openapi.ts', output.dir),
+            file: new URL(args.openapiTypesFileName, output.dir),
             code: formatFileHeader(args.fileHeader ?? fileHeader) + code,
           },
         ]);
       });
   },
 };
+
+export function openapiTypesFileNameOptionParser(value: string) {
+  if (!isValidTypeScriptFileName(value)) {
+    throw new CommanderError(
+      1,
+      'ERR_INVALID_SCHEMA_FILE_NAME',
+      'OpenAPI Schema types file name must end with ".ts" or ".d.ts"'
+    );
+  }
+
+  if (value.includes('/') || value.includes('\\')) {
+    throw new CommanderError(
+      1,
+      'ERR_INVALID_SCHEMA_FILE_NAME',
+      'OpenAPI Schema types file name must not include path'
+    );
+  }
+
+  if (value.startsWith('.')) {
+    throw new CommanderError(
+      1,
+      'ERR_INVALID_SCHEMA_FILE_NAME',
+      'OpenAPI Schema types file name must not start with "."'
+    );
+  }
+
+  return value;
+}
