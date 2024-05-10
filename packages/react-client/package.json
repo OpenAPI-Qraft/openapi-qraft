@@ -9,7 +9,7 @@
     "test:coverage": "vitest run --coverage",
     "typecheck": "tsc --noEmit",
     "lint": "eslint",
-    "generate-api": "openapi-qraft --plugin tanstack-query-react --plugin openapi-typescript ../test-fixtures/openapi.json -o src/tests/fixtures/api --openapi-types-file-name openapi.ts --explicit-import-extensions --filter-services '/approval_policies/**,/entities/**,/files/**,!/internal/**' && yarn _prettify-api",
+    "generate-api": "openapi-qraft --plugin tanstack-query-react --plugin openapi-typescript ../test-fixtures/openapi.json -rm -o src/tests/fixtures/api --openapi-types-file-name openapi.ts --explicit-import-extensions --filter-services '/approval_policies/**,/entities/**,/files/**,!/internal/**' && yarn _prettify-api",
     "_prettify-api": "prettier --write src/tests/fixtures/api/**/*.ts"
   },
   "type": "module",
