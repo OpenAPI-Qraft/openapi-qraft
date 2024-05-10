@@ -5,6 +5,7 @@
   "scripts": {
     "build": "rimraf dist/ && tsc --project tsconfig.build.json",
     "dev": "yarn build --watch",
+    "test": "vitest run",
     "typecheck": "tsc --noEmit",
     "lint": "eslint"
   },
@@ -25,23 +26,17 @@
   },
   "dependencies": {
     "@openapi-qraft/plugin": "workspace:^",
-    "commander": "^11.1.0",
-    "openapi-typescript": "7.0.0-next.11"
+    "openapi-typescript": "7.0.0-next.11",
+    "typescript": "^5.3.3"
   },
   "devDependencies": {
     "@openapi-qraft/eslint-config": "workspace:~",
+    "@openapi-qraft/test-fixtures": "workspace:~",
     "@types/node": "^18.19.4",
     "eslint": "^9.0.0",
+    "memfs": "^4.9.2",
     "rimraf": "^5.0.5",
-    "typescript": "^5.3.3"
-  },
-  "peerDependencies": {
-    "typescript": "^5.x"
-  },
-  "peerDependenciesMeta": {
-    "typescript": {
-      "optional": false
-    }
+    "vitest": "^1.4.0"
   },
   "files": [
     "dist",

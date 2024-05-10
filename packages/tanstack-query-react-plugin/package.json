@@ -30,6 +30,7 @@
   },
   "devDependencies": {
     "@openapi-qraft/eslint-config": "workspace:~",
+    "@openapi-qraft/test-fixtures": "workspace:~",
     "eslint": "^9.0.0",
     "memfs": "^4.9.2",
     "rimraf": "^5.0.5",
