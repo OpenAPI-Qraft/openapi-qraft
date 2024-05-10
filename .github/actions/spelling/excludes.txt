@@ -20,7 +20,11 @@
 (?:^|/)CHANGELOG\.md$
 
 # Ignore the website's static files
-^\website/static/
+^website/static/
 
 # Ignore the action's configuration data
 ^\.github/actions/spelling/
+
+# Ignore __snapshots__
+^packages/tanstack-query-react-plugin/src/__snapshots__/
+^packages/openapi-typescript-plugin/src/__snapshots__/
