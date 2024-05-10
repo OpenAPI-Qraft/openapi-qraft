@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 
-import { createServicePathMatch } from './getServices.js';
+import { createServicePathMatch } from './filterDocumentPaths.js';
 
 describe('createServicePathMatch', () => {
   it('should match with multiple include glob', () => {

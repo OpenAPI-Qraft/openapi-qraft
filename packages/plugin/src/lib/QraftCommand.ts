@@ -6,10 +6,10 @@ import process from 'node:process';
 import { pathToFileURL, URL } from 'node:url';
 import ora, { Ora } from 'ora';
 
+import { filterDocumentPaths } from './filterDocumentPaths.js';
 import { GeneratorFile } from './GeneratorFile.js';
 import { handleSchemaInput } from './handleSchemaInput.js';
-import { getDocumentServices } from './open-api/getDocumentServices.js';
-import { type Service } from './open-api/getServices.js';
+import { getServices, type Service } from './open-api/getServices.js';
 import { OpenAPISchemaType } from './open-api/OpenAPISchemaType.js';
 import { readSchema } from './open-api/readSchema.js';
 import { OutputOptions } from './OutputOptions.js';
@@ -86,16 +86,15 @@ export class QraftCommand extends Command {
     const input = handleSchemaInput(inputs[0], this.cwd, spinner);
 
     spinner.text = 'Reading OpenAPI Schema';
-    const schema = await readSchema(input);
+    const schema = filterDocumentPaths(
+      await readSchema(input),
+      parseServicesFilterOption(args.filterServices)
+    );
 
     spinner.text = 'Getting OpenAPI Services';
-    const services = await getDocumentServices({
-      schema,
-      output: {
-        postfixServices: args.postfixServices,
-        serviceNameBase: args.serviceNameBase,
-      },
-      servicesGlob: parseServicesFilterOption(args.filterServices),
+    const services = getServices(schema, {
+      postfixServices: args.postfixServices,
+      serviceNameBase: args.serviceNameBase,
     });
 
     spinner.text = 'Generating code';

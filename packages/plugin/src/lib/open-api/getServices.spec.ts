@@ -2,6 +2,7 @@ import openAPI from '@openapi-qraft/test-fixtures/openapi.json' assert { type: '
 
 import { describe, expect, it } from 'vitest';
 
+import { filterDocumentPaths } from '../filterDocumentPaths.js';
 import { getServices } from './getServices.js';
 
 describe('getServices', () => {
@@ -15,11 +16,10 @@ describe('getServices', () => {
 
   it('matches snapshot with custom `servicesGlob`', () => {
     expect(
-      getServices(
-        openAPI,
-        { serviceNameBase: 'endpoint[0]', postfixServices: 'Service' },
-        ['/files/**']
-      )
+      getServices(filterDocumentPaths(openAPI, ['/files/**']), {
+        serviceNameBase: 'endpoint[0]',
+        postfixServices: 'Service',
+      })
     ).toMatchSnapshot();
   });
 
