@@ -69,10 +69,10 @@ export const getServices = (
 
   for (const path in paths) {
     if (!Object.prototype.hasOwnProperty.call(paths, path)) continue;
+    if (!isPathMatch(path)) continue;
 
     for (const method in paths[path]) {
       if (!Object.prototype.hasOwnProperty.call(paths[path], method)) continue;
-      if (!isPathMatch(path)) continue;
 
       if (!supportedMethod(method)) {
         console.warn(
