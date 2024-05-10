@@ -27,6 +27,7 @@ export async function generateSchemaTypes(
       | 'exportType'
       | 'immutable'
       | 'pathParamsAsTypes'
+      | 'propertiesRequiredByDefault'
     >;
   }
 ) {
@@ -64,6 +65,7 @@ export async function generateSchemaTypes(
       immutable: args.immutable,
       pathParamsAsTypes: args.pathParamsAsTypes,
       redocly: await createConfig({}, { extends: ['minimal'] }),
+      propertiesRequiredByDefault: args.propertiesRequiredByDefault,
       silent,
     })
   );

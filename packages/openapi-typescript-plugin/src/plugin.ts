@@ -61,6 +61,10 @@ export const plugin: QraftCommandPlugin = {
         'Set to `false` to ignore default values when generating non-nullable types'
       )
       .option(
+        '--properties-required-by-default',
+        'Treat schema objects as if `required` is set to all properties by default'
+      )
+      .option(
         '--array-length',
         'Generate tuples using array minItems / maxItems'
       )
