@@ -26,7 +26,7 @@
   "dependencies": {
     "@openapi-qraft/plugin": "workspace:^",
     "commander": "^11.1.0",
-    "openapi-typescript": "7.0.0-next.7"
+    "openapi-typescript": "7.0.0-next.11"
   },
   "devDependencies": {
     "@openapi-qraft/eslint-config": "workspace:~",
