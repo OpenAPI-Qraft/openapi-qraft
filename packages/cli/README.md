@@ -34,6 +34,7 @@ Options:
   --postfix-services <string>              Postfix to be added to the generated service name (eg: Service)
   --explicit-import-extensions             All import statements will include explicit `.js` extensions. Ideal for projects using ECMAScript modules.
   --service-name-base <endpoint | tags>    Use OpenAPI Operation `endpoint` or `tags` as service names (default: "endpoint")
+  --plugin <name_1> --plugin <name_2>      Generator plugins to be used. (choices: "tanstack-query-react", "openapi-typescript")
   -h, --help                               display help for command
 ```
 
@@ -89,6 +90,7 @@ the `schema.json` file.
       - If there are no tags for the operation, the services will be created under the `default` tag. Operation with empty `tags: []` will generate `services/DefaultService.ts`.
 - **`--explicit-import-extensions`:** Include explicit `.js` extensions in all import statements. Ideal for projects
   using ECMAScript modules when TypeScript's _--moduleResolution_ is `node16` or `nodenext` _(optional)_.
+- **`--plugin <name_1> --plugin <name_2>`**: Generator plugins to be used. (choices: `tanstack-query-react`, `openapi-typescript`)
 - **`-h, --help`:** Display help for the command (optional).
 
 ## Contributing

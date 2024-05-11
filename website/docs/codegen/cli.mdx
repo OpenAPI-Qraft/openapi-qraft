@@ -85,6 +85,7 @@ using ECMAScript modules when TypeScript's _--moduleResolution_ is `node16` or `
       - If multiple tags are present for the operation, similar services will be created for each tag. Operation with `tags: [Foo, Bar]` will generate `services/FooService.ts` and `services/BarService.ts`.
       - If there are no tags for the operation, the services will be created under the `default` tag. Operation with empty `tags: []` will generate `services/DefaultService.ts`.
 - **`--explicit-import-extensions`:** Include explicit `.js` extensions in all import statements. Ideal for projects
+- **`--plugin <name_1> --plugin <name_2>`**: Generator plugins to be used. (choices: `tanstack-query-react`, `openapi-typescript`)
 - **`-h, --help`:** Display help for the command (optional).
 
 ## In-project Setup
