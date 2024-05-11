@@ -5,6 +5,7 @@ import openapiTS, {
   astToString,
   type OpenAPI3,
   type OpenAPITSOptions,
+  SchemaObject,
 } from 'openapi-typescript';
 import ts from 'typescript';
 
@@ -28,31 +29,14 @@ export async function generateSchemaTypes(
       | 'immutable'
       | 'pathParamsAsTypes'
       | 'propertiesRequiredByDefault'
-    >;
+    > & {
+      blobFromBinary?: boolean;
+    };
   }
 ) {
   return astToString(
     await openapiTS(schema, {
-      transform(schemaObject) {
-        if (schemaObject.format === 'binary') {
-          return {
-            schema: schemaObject.nullable
-              ? ts.factory.createUnionTypeNode([
-                  ts.factory.createTypeReferenceNode(
-                    ts.factory.createIdentifier('Blob'),
-                    undefined
-                  ),
-                  ts.factory.createLiteralTypeNode(ts.factory.createNull()),
-                ])
-              : ts.factory.createTypeReferenceNode(
-                  ts.factory.createIdentifier('Blob'),
-                  undefined
-                ),
-            // questionToken will be inferred by `openapiTS`, if true, it will force `?` for parameter
-            questionToken: false,
-          };
-        }
-      },
+      transform: args.blobFromBinary ? transformFormatBinary : undefined,
       additionalProperties: args.additionalProperties,
       alphabetize: args.alphabetize,
       arrayLength: args.arrayLength,
@@ -69,4 +53,25 @@ export async function generateSchemaTypes(
       silent,
     })
   );
+}
+
+function transformFormatBinary(schemaObject: SchemaObject) {
+  if (schemaObject.format !== 'binary') return;
+
+  return {
+    schema: schemaObject.nullable
+      ? ts.factory.createUnionTypeNode([
+          ts.factory.createTypeReferenceNode(
+            ts.factory.createIdentifier('Blob'),
+            undefined
+          ),
+          ts.factory.createLiteralTypeNode(ts.factory.createNull()),
+        ])
+      : ts.factory.createTypeReferenceNode(
+          ts.factory.createIdentifier('Blob'),
+          undefined
+        ),
+    // questionToken will be inferred by `openapiTS`, if true, it will force `?` for parameter
+    questionToken: false,
+  };
 }

@@ -48,6 +48,7 @@ describe('openapi-typescript types generation', () => {
       '/mock-fs',
       '--openapi-types-file-name',
       'openapi.ts',
+      '--no-blob-from-binary',
       '--filter-services',
       '/files/**',
     ]);

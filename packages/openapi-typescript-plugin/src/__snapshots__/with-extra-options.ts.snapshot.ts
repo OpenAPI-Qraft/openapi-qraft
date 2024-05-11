@@ -191,7 +191,7 @@ export interface operations {
             content: {
                 "multipart/form-data": {
                     /** Format: binary */
-                    file?: Blob;
+                    file?: string;
                     file_description?: string;
                 };
             };
