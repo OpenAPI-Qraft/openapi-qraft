@@ -17,45 +17,27 @@ which is a powerful tool for generating types from an OpenAPI schema.
 
 :::tip
 
-If you missed the [installation](/getting-started/installation.mdx) step, you can install the `@openapi-qraft/cli` and `openapi-typescript`
-packages using the following command:
+If you missed the [installation](/getting-started/installation.mdx) step, you can install the `@openapi-qraft/cli` using the following command:
 
 ```bash npm2yarn
 npm install -D @openapi-qraft/cli
-npm install -D openapi-typescript
 ```
 
 :::
 
 ## Usage example
 
-```bash npm2yarn
-##
-# 1️⃣ Generate Qraft API client
-##
-npx openapi-qraft https://raw.githubusercontent.com/swagger-api/swagger-petstore/master/src/main/resources/openapi.yaml \
-  --output-dir src/api \
-  --openapi-types-import-path '../openapi.d.ts'
+The command below generates Qraft API services for the OpenAPI schema and places them in the `src/api` directory:
 
-##
-# 2️⃣ Generate types OpenAPI types
-##
-npx openapi-typescript https://raw.githubusercontent.com/swagger-api/swagger-petstore/master/src/main/resources/openapi.yaml \
-  --output src/api/openapi.d.ts
+```bash npm2yarn
+npx openapi-qraft --plugin tanstack-query-react --plugin openapi-typescript https://raw.githubusercontent.com/swagger-api/swagger-petstore/master/src/main/resources/openapi.yaml \
+  --output-dir src/api
 ```
 
 #### Required Options
 
 - **`-o <path>, --output-dir <path>`:** Specify where to output the generated services.
   - Example: `--output-dir src/api`
-- **`--openapi-types-import-path <path>`:** Set the path to the schema types definition file to ensure consistent type
-  usage (assumed, you already have `openapi.d.ts` as a result of the [`openapi-typescript`](https://github.com/drwpow/openapi-typescript) utility).
-  - The path is the exact import specifier used in the _generated services_. It should be _relative to the service
-    output directory.
-  - Examples:
-    - `--openapi-types-import-path ../openapi.d.ts`
-    - `--openapi-types-import-path '@/api/openapi.d.ts'`
-    - `--openapi-types-import-path '@external-package-types'`
 
 #### Useful Options
 
@@ -68,14 +50,6 @@ package for more details.
 
 #### Edge-case Options
 
-- **`--operation-generics-import-path <path>`:** Define the path to the operation generics file, allowing for custom
-operation handling _(optional, default: `@openapi-qraft/react`)_.
-- **`--file-header <string>`:** Add a custom header to each generated file, useful for disabling linting rules or adding file
-comments _(optional)_.
-  - Example: `--file-header '/* eslint-disable */'`
-- **`--postfix-services <string>`:** Customize the generated service names with a specific postfix _(optional, default: `Service`)_.
-  - Example: `--postfix-services Endpoint` will generate `services/UserEndpoint.ts` instead of `services/UserService.ts`.
-using ECMAScript modules when TypeScript's _--moduleResolution_ is `node16` or `nodenext` _(optional)_.
 - **`--service-name-base <endpoint[<index>] | tags>`:** Use OpenAPI Operation `endpoint[<index>]` path part (e.g.: `/0/1/2`) or `tags` as the base name of the service. _(optional, default: `endpoint[0]`)_.
   - Examples:
     - `--service-name-base endpoint[0]` generates `services/FooService.ts` for the endpoint `/foo/bar/baz`
@@ -85,50 +59,40 @@ using ECMAScript modules when TypeScript's _--moduleResolution_ is `node16` or `
       - If multiple tags are present for the operation, similar services will be created for each tag. Operation with `tags: [Foo, Bar]` will generate `services/FooService.ts` and `services/BarService.ts`.
       - If there are no tags for the operation, the services will be created under the `default` tag. Operation with empty `tags: []` will generate `services/DefaultService.ts`.
 - **`--explicit-import-extensions`:** Include explicit `.js` extensions in all import statements. Ideal for projects
+- **`--file-header <string>`:** Add a custom header to each generated file, useful for disabling linting rules or adding file
+comments _(optional)_.
+  - Example: `--file-header '/* eslint-disable */'`
+- **`--postfix-services <string>`:** Customize the generated service names with a specific postfix _(optional, default: `Service`)_.
+  - Example: `--postfix-services Endpoint` will generate `services/UserEndpoint.ts` instead of `services/UserService.ts`.
+using ECMAScript modules when TypeScript's _--moduleResolution_ is `node16` or `nodenext` _(optional)_.
 - **`--plugin <name_1> --plugin <name_2>`**: Generator plugins to be used. (choices: `tanstack-query-react`, `openapi-typescript`)
+  - Examples:
+    - `--plugin tanstack-query-react --plugin openapi-typescript` generates Qraft Services and `openapi-typescript` types file.
+    - `--plugin tanstack-query-react` generates Qraft Services only.
+    - `--plugin openapi-typescript` generates [`openapi-typescript`](https://github.com/drwpow/openapi-typescript) types file only.
+- **`--openapi-types-import-path <path>`:** Set the path to the schema types definition file to ensure consistent type
+usage (assumed, you already have `schema.d.ts` as a result of the [`openapi-typescript`](https://github.com/drwpow/openapi-typescript) utility). You also probably
+don't need the ~~`--plugin openapi-typescript`~~ option in this case.
+  - The path is the exact import specifier used in the _generated services_. It should be _relative_ to the service
+  output directory.
+    - Examples:
+      - `--openapi-types-import-path ../openapi.d.ts`
+      - `--openapi-types-import-path '@/api/openapi.d.ts'`
+      - `--openapi-types-import-path '@external-package-types'`
+- **`--operation-generics-import-path <path>`:** Define the path to the operation generics file, allowing for custom
+operation handling _(optional, default: `@openapi-qraft/react`)_.
+- **`--no-blob-from-binary`**: If this option is enabled, `format: binary` fields will not be converted to Blob types, preserving the native
 - **`-h, --help`:** Display help for the command (optional).
 
 ## In-project Setup
 
-To use the `@openapi-qraft/cli` usefully, you can add a script to your `package.json` file or use CLIs in a bash script.
+Add the following `"scripts"` to your `package.json` file:
 
-<Tabs>
-  <TabItem value="package-json" label="package.json" default>
-    Add the following `"scripts"` to your `package.json` file:
-
-    ```json
-    {
-      "scripts": {
-        "generate-client": "openapi-qraft https://raw.githubusercontent.com/swagger-api/swagger-petstore/master/src/main/resources/openapi.yaml --output-dir src/api --openapi-types-import-path '../openapi.d.ts'",
-        "generate-types": "openapi-typescript https://raw.githubusercontent.com/swagger-api/swagger-petstore/master/src/main/resources/openapi.yaml --output src/api/openapi.d.ts"
-      }
-    }
-    ```
-  </TabItem>
-  <TabItem value="codegen-sh" label={<span style={{verticalAlign: "middle"}}><code>codegen.sh</code></span>}>
-    Create a file named `codegen.sh` in your project and add the following code:
-
-    ```bash npm2yarn
-    #!/usr/bin/env bash
-
-    npx openapi-qraft https://raw.githubusercontent.com/swagger-api/swagger-petstore/master/src/main/resources/openapi.yaml \
-      --output-dir src/api \
-      --openapi-types-import-path '../openapi.d.ts'
-
-    npx openapi-typescript https://raw.githubusercontent.com/swagger-api/swagger-petstore/master/src/main/resources/openapi.yaml \
-      --output src/api/openapi.d.ts
-    ```
-
-:::tip
-
-Make sure to run `chmod +x ./codegen.sh` to make the script executable.
-Additionally, to make sure that script has the `PATH`, run it using your package manger:
-
-```bash npm2yarn
-npm exec --call ./codegen.sh
+```json5 title="package.json"
+{
+  "scripts": {
+    "generate-client": "openapi-qraft --plugin tanstack-query-react --plugin openapi-typescript https://raw.githubusercontent.com/swagger-api/swagger-petstore/master/src/main/resources/openapi.yaml --output-dir src/api",
+    // ...other scripts
+  }
+}
 ```
-
-:::
-
-  </TabItem>
-</Tabs>
