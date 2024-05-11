@@ -1,7 +1,8 @@
 import '@openapi-qraft/plugin/lib/vitestFsMock';
 
+import fs from 'node:fs';
 import { createRequire } from 'node:module';
-import { beforeAll, describe, test } from 'vitest';
+import { beforeAll, describe, expect, test } from 'vitest';
 
 describe('TanStack Query React Client Generation', () => {
   const openAPIDocumentFixturePath = createRequire(process.cwd()).resolve(
@@ -32,30 +33,36 @@ describe('TanStack Query React Client Generation', () => {
   });
 
   test('index.ts', async () => {
-    (await import('./__snapshots__/index.ts.snapshot.js')).default();
+    expect(fs.readFileSync('/mock-fs/index.ts', 'utf-8')).toMatchFileSnapshot(
+      './__snapshots__/index.ts.snapshot.ts'
+    );
   });
 
   test('create-api-client.ts', async () => {
-    (
-      await import('./__snapshots__/create-api-client.ts.snapshot.js')
-    ).default();
+    expect(
+      fs.readFileSync('/mock-fs/create-api-client.ts', 'utf-8')
+    ).toMatchFileSnapshot('./__snapshots__/create-api-client.ts.snapshot.ts');
   });
 
   test('services/ApprovalPoliciesService.ts', async () => {
-    (
-      await import(
-        './__snapshots__/services/ApprovalPoliciesService.ts.snapshot.js'
-      )
-    ).default();
+    expect(
+      fs.readFileSync('/mock-fs/services/ApprovalPoliciesService.ts', 'utf-8')
+    ).toMatchFileSnapshot(
+      './__snapshots__/services/ApprovalPoliciesService.ts.snapshot.ts'
+    );
   });
 
   test('services/FilesService.ts', async () => {
-    (
-      await import('./__snapshots__/services/FilesService.ts.snapshot.js')
-    ).default();
+    expect(
+      fs.readFileSync('/mock-fs/services/FilesService.ts', 'utf-8')
+    ).toMatchFileSnapshot(
+      './__snapshots__/services/FilesService.ts.snapshot.ts'
+    );
   });
 
   test('services/index.ts', async () => {
-    (await import('./__snapshots__/services/index.ts.snapshot.js')).default();
+    expect(
+      fs.readFileSync('/mock-fs/services/index.ts', 'utf-8')
+    ).toMatchFileSnapshot('./__snapshots__/services/index.ts.snapshot.ts');
   });
 });
