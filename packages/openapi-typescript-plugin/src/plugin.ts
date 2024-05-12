@@ -88,17 +88,29 @@ export const plugin: QraftCommandPlugin = {
       .find((option) => option.attributeName() === 'openapiTypesImportPath')
       ?.makeOptionMandatory(false);
 
+    // Highlight the `--export-openapi-types` option default value
+    command.options
+      .find((option) => {
+        return option.attributeName() === 'exportOpenapiTypes';
+      })
+      ?.default(true);
+
     command.hook('preAction', (thisCommand) => {
       // Do not override if a custom value already exists
-      if (command.getOptionValue('openapiTypesImportPath')) return;
+      if (!command.getOptionValue('openapiTypesImportPath')) {
+        thisCommand.setOptionValue(
+          'openapiTypesImportPath',
+          createOpenapiTypesImportPath(
+            thisCommand.getOptionValue('openapiTypesFileName'),
+            thisCommand.getOptionValue('explicitImportExtensions')
+          )
+        );
+      }
 
-      thisCommand.setOptionValue(
-        'openapiTypesImportPath',
-        createOpenapiTypesImportPath(
-          thisCommand.getOptionValue('openapiTypesFileName'),
-          thisCommand.getOptionValue('explicitImportExtensions')
-        )
-      );
+      // If the option is not set, set it to true
+      if (command.getOptionValue('exportOpenapiTypes') === undefined) {
+        thisCommand.setOptionValue('exportOpenapiTypes', true);
+      }
     });
   },
 };

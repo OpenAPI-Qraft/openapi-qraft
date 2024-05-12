@@ -27,6 +27,7 @@ describe('TanStack Query React Client Generation', () => {
       '--openapi-types-import-path',
       '../../openapi.js',
       '--explicit-import-extensions',
+      '--export-openapi-types',
       '--filter-services',
       '/approval_policies/**,/entities/**,/files/**,!/internal/**',
     ]);

@@ -20,6 +20,7 @@ interface OutputOptions extends OutputOptionsBase {
   fileHeader: string | undefined;
   servicesDirName: string;
   explicitImportExtensions: boolean;
+  exportSchemaTypes: boolean | undefined;
 }
 
 export const generateCode = async ({
@@ -37,7 +38,7 @@ export const generateCode = async ({
     ...(await generateServices(spinner, services, serviceImports, output)),
     ...(await generateServiceIndex(spinner, services, output)),
     ...(await generateClient(spinner, output)),
-    ...(await generateIndex(spinner, output)),
+    ...(await generateIndex(spinner, serviceImports, output)),
   ];
 };
 
@@ -167,7 +168,11 @@ const generateClient = async (spinner: Ora, output: OutputOptions) => {
   return clientFiles;
 };
 
-const generateIndex = async (spinner: Ora, output: OutputOptions) => {
+const generateIndex = async (
+  spinner: Ora,
+  serviceImports: ServiceImportsFactoryOptions,
+  output: OutputOptions
+) => {
   spinner.start('Generating index');
 
   const indexFiles: GeneratorFile[] = [];
@@ -177,6 +182,9 @@ const generateIndex = async (spinner: Ora, output: OutputOptions) => {
       getIndexFactory({
         servicesDirName: output.servicesDirName,
         explicitImportExtensions: Boolean(output.explicitImportExtensions),
+        openapiTypesImportPath: output.exportSchemaTypes
+          ? serviceImports.openapiTypesImportPath
+          : undefined,
       })
     );
 

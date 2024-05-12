@@ -21,6 +21,13 @@ export const plugin: QraftCommandPlugin = {
         'All import statements will include explicit `.js` extensions. Ideal for projects using ECMAScript modules.'
       )
       .option(
+        '--export-openapi-types [bool]',
+        'Export the OpenAPI schema types from the generated `./index.ts` file',
+        (arg) => {
+          return arg?.toLowerCase() !== 'false';
+        }
+      )
+      .option(
         '--operation-generics-import-path <path>',
         'Path to operation generics file',
         '@openapi-qraft/react'
@@ -38,6 +45,7 @@ export const plugin: QraftCommandPlugin = {
             fileHeader: args.fileHeader ?? fileHeader,
             explicitImportExtensions: args.explicitImportExtensions,
             servicesDirName: 'services',
+            exportSchemaTypes: args.exportOpenapiTypes,
           },
         }).then(resolve));
       });

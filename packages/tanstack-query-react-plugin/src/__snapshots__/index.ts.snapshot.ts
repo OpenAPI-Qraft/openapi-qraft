@@ -3,6 +3,7 @@
  * Do not make direct changes to the file.
  */
 
+export type * from "./../openapi.js";
 export { services } from "./services/index.js";
 export type { Services } from "./services/index.js";
 export { createAPIClient } from "./create-api-client.js";
