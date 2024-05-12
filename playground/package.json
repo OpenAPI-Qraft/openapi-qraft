@@ -9,7 +9,7 @@
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",
-    "generate-types": "openapi-typescript https://raw.githubusercontent.com/swagger-api/swagger-petstore/7767363b841961221a38c0be9c6b1066a5120051/src/main/resources/openapi.yaml -o ./schema.d.ts",
+    "generate-types": "openapi-typescript https://raw.githubusercontent.com/swagger-api/swagger-petstore/7767363b841961221a38c0be9c6b1066a5120051/src/main/resources/openapi.yaml -o src/api/schema.d.ts",
     "generate-qraft": "openapi-qraft https://raw.githubusercontent.com/swagger-api/swagger-petstore/7767363b841961221a38c0be9c6b1066a5120051/src/main/resources/openapi.yaml --clean -o src/api --openapi-types-import-path '../../../schema.d.ts'",
     "e2e:pre-build": "npm run generate-types && npm run generate-qraft"
   },
