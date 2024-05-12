@@ -55,10 +55,6 @@ export const plugin: QraftCommandPlugin = {
       .option('--alphabetize', 'Sort object keys alphabetically')
       .option('--exclude-deprecated', 'Exclude deprecated types')
       .option(
-        '--file-header <string>',
-        'Header to be added to the generated file (eg: /* eslint-disable */)'
-      )
-      .option(
         '--no-blob-from-binary',
         'If this option is enabled, binary format fields will not be converted to Blob types, preserving the native representation'
       )

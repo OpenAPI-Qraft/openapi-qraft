@@ -13,10 +13,6 @@ export const plugin: QraftCommandPlugin = {
         'Path to schema types file (.d.ts), eg: "../schema.d.ts"'
       )
       .option(
-        '--file-header <string>',
-        'Header to be added to the generated file (eg: /* eslint-disable */)'
-      )
-      .option(
         '--explicit-import-extensions',
         'All import statements will include explicit `.js` extensions. Ideal for projects using ECMAScript modules.'
       )

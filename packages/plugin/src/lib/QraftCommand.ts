@@ -49,6 +49,10 @@ export class QraftCommand extends Command {
         '--service-name-base <endpoint[<index>] | tags>',
         'Use OpenAPI Operation `endpoint[<index>]` path part (e.g.: "/0/1/2") or `tags` as the base name of the service.',
         'endpoint[0]'
+      )
+      .option(
+        '--file-header <string>',
+        'Header to be added to the generated file (eg: /* eslint-disable */)'
       );
   }
 
