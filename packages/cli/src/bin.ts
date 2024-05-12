@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 import { QraftCommand } from '@openapi-qraft/plugin/lib/QraftCommand';
+import type { QraftCommandPlugin } from '@openapi-qraft/plugin/lib/QraftCommandPlugin';
 
 import { Option } from 'commander';
 import process from 'node:process';
@@ -15,11 +16,11 @@ export async function main() {
     await setupPlugins(command, plugins);
   } else {
     // default - setup tanstack-query-react plugin
-    await (
-      await builtInPlugins['tanstack-query-react']()
-    ).default.setupCommand(command);
+    await setupPlugins(command, [
+      'tanstack-query-react',
+    ] satisfies (keyof typeof builtInPlugins)[]);
 
-    // option to display help
+    // option to display help with all available plugins
     command.addOption(
       new Option(
         '--plugin <name_1> --plugin <name_2>',
@@ -39,16 +40,24 @@ export async function main() {
 }
 
 async function setupPlugins(command: QraftCommand, plugins: string[]) {
+  const pluginList: QraftCommandPlugin[] = [];
+
   for (const pluginName of plugins) {
     if (!(pluginName in builtInPlugins))
       throw new Error(`Unknown plugin: '${pluginName}'`);
 
-    await (
-      await builtInPlugins[pluginName as keyof typeof builtInPlugins]()
-    ).default.setupCommand(command);
+    pluginList.push(
+      (await builtInPlugins[pluginName as keyof typeof builtInPlugins]())
+        .default
+    );
 
     addCommandUsageWithPlugins(command, plugins);
   }
+
+  await Promise.all(pluginList.map((plugin) => plugin.setupCommand(command)));
+  await Promise.all(
+    pluginList.map((plugin) => plugin.postSetupCommand?.(command, plugins))
+  );
 }
 
 /**

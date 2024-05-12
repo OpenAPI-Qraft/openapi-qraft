@@ -1,6 +1,5 @@
 import { fileHeader } from '@openapi-qraft/plugin/lib/fileHeader';
 import { formatFileHeader } from '@openapi-qraft/plugin/lib/formatFileHeader';
-import { QraftCommand } from '@openapi-qraft/plugin/lib/QraftCommand';
 import { QraftCommandPlugin } from '@openapi-qraft/plugin/lib/QraftCommandPlugin';
 
 import { CommanderError } from 'commander';
@@ -12,27 +11,8 @@ import {
 } from './lib/createOpenapiTypesImportPath.js';
 
 export const plugin: QraftCommandPlugin = {
-  setupCommand(command: QraftCommand) {
-    const openapiTypesImportPathOption = command.options.find(
-      (option) => option.attributeName() === 'openapiTypesImportPath'
-    );
-
-    if (openapiTypesImportPathOption) {
-      // will be set in `preAction` hook if not provided
-      openapiTypesImportPathOption.makeOptionMandatory(false);
-    }
-
+  setupCommand(command) {
     command
-      .hook('preAction', (thisCommand) => {
-        if (!command.getOptionValue('openapiTypesImportPath'))
-          thisCommand.setOptionValue(
-            'openapiTypesImportPath',
-            createOpenapiTypesImportPath(
-              thisCommand.getOptionValue('openapiTypesFileName'),
-              thisCommand.getOptionValue('explicitImportExtensions')
-            )
-          );
-      })
       .description(
         'Generate TypeScript types from OpenAPI 3.x Document. Based on "openapi-typescript" (https://github.com/drwpow/openapi-typescript/)'
       )
@@ -99,6 +79,27 @@ export const plugin: QraftCommandPlugin = {
           },
         ]);
       });
+  },
+  postSetupCommand(command, plugins) {
+    if (!plugins.includes('tanstack-query-react')) return;
+
+    // Makes `--openapi-types-import-path` option to be optional
+    command.options
+      .find((option) => option.attributeName() === 'openapiTypesImportPath')
+      ?.makeOptionMandatory(false);
+
+    command.hook('preAction', (thisCommand) => {
+      // Do not override if a custom value already exists
+      if (command.getOptionValue('openapiTypesImportPath')) return;
+
+      thisCommand.setOptionValue(
+        'openapiTypesImportPath',
+        createOpenapiTypesImportPath(
+          thisCommand.getOptionValue('openapiTypesFileName'),
+          thisCommand.getOptionValue('explicitImportExtensions')
+        )
+      );
+    });
   },
 };
 
