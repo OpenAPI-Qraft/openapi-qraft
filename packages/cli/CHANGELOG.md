@@ -1,5 +1,22 @@
 # @openapi-qraft/cli
 
+## 1.9.0
+
+### Minor Changes
+
+- 3a75364: **Plugin Support in CLI**: Introduced the `--plugin <name>` option in the OpenAPI Qraft CLI to allow users to specify
+  plugins such as `tanstack-query-react` for React service generation and `openapi-typescript` for TypeScript type
+  generation. This enhancement provides greater flexibility and customization options in the API generation process. The
+  CLI now supports using multiple plugins simultaneously, enhancing the tool's versatility for developers.
+
+### Patch Changes
+
+- Updated dependencies [943a9d3]
+- Updated dependencies [3a75364]
+  - @openapi-qraft/plugin@1.9.0
+  - @openapi-qraft/openapi-typescript-plugin@1.0.1
+  - @openapi-qraft/tanstack-query-react-plugin@1.9.0
+
 ## 1.8.0
 
 ### Patch Changes

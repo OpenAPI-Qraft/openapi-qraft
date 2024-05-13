@@ -1,5 +1,13 @@
 # @openapi-qraft/tanstack-query-react-plugin
 
+## 1.9.0
+
+### Patch Changes
+
+- Updated dependencies [943a9d3]
+- Updated dependencies [3a75364]
+  - @openapi-qraft/plugin@1.9.0
+
 ## 1.8.0
 
 ### Minor Changes
