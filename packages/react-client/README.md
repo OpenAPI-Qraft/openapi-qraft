@@ -149,12 +149,53 @@ function App() {
 > The Qraft is designed to be as modular as possible, enabling you to integrate your own request client and serializers.
 > To ensure optimal tree-shaking, we do not include default serializers in the functions.
 
+## Supported Hooks
+
+- [x] [`useQuery(...)`](https://openapi-qraft.github.io/openapi-qraft/docs/hooks/useQuery)
+- [x] [`useMutation(...)`](https://openapi-qraft.github.io/openapi-qraft/docs/hooks/useMutation)
+- [x] [`useInfiniteQuery(...)`](https://openapi-qraft.github.io/openapi-qraft/docs/hooks/useInfiniteQuery)
+- [x] [`useQueries(...)`](https://openapi-qraft.github.io/openapi-qraft/docs/hooks/useQueries)
+- [x] [`useSuspenseQuery(...)`](https://openapi-qraft.github.io/openapi-qraft/docs/hooks/useSuspenseQuery)
+- [x] [`useSuspenseInfiniteQuery(...)`](https://openapi-qraft.github.io/openapi-qraft/docs/hooks/useSuspenseInfiniteQuery)
+- [x] [`useSuspenseQueries(...)`](https://openapi-qraft.github.io/openapi-qraft/docs/hooks/useSuspenseQueries)
+- [x] [`useIsFetching(...)`](https://openapi-qraft.github.io/openapi-qraft/docs/hooks/useIsFetching)
+- [x] [`useMutationState(...)`](https://openapi-qraft.github.io/openapi-qraft/docs/hooks/useMutationState)
+- [x] [`useIsMutating(...)`](https://openapi-qraft.github.io/openapi-qraft/docs/hooks/useIsMutating)
+
+## `QueryClient` methods
+
+- [x] [`fetchQuery(...)`](https://openapi-qraft.github.io/openapi-qraft/docs/query-client/fetchQuery)
+- [x] [`fetchInfiniteQuery(...)`](https://openapi-qraft.github.io/openapi-qraft/docs/query-client/fetchInfiniteQuery)
+- [x] [`prefetchQuery(...)`](https://openapi-qraft.github.io/openapi-qraft/docs/query-client/prefetchQuery)
+- [x] [`prefetchInfiniteQuery(...)`](https://openapi-qraft.github.io/openapi-qraft/docs/query-client/prefetchInfiniteQuery)
+- [x] [`getQueryData(...)`](https://openapi-qraft.github.io/openapi-qraft/docs/query-client/getQueryData)
+- [x] [`getQueriesData(...)`](https://openapi-qraft.github.io/openapi-qraft/docs/query-client/getQueriesData)
+- [x] [`setQueryData(...)`](https://openapi-qraft.github.io/openapi-qraft/docs/query-client/setQueryData)
+- [x] [`getQueryState(...)`](https://openapi-qraft.github.io/openapi-qraft/docs/query-client/getQueryState)
+- [x] [`setQueriesData(...)`](https://openapi-qraft.github.io/openapi-qraft/docs/query-client/setQueriesData)
+- [x] [`invalidateQueries(...)`](https://openapi-qraft.github.io/openapi-qraft/docs/query-client/invalidateQueries)
+- [x] [`refetchQueries(...)`](https://openapi-qraft.github.io/openapi-qraft/docs/query-client/refetchQueries)
+- [x] [`cancelQueries(...)`](https://openapi-qraft.github.io/openapi-qraft/docs/query-client/cancelQueries)
+- [x] [`removeQueries(...)`](https://openapi-qraft.github.io/openapi-qraft/docs/query-client/removeQueries)
+- [x] [`resetQueries(...)`](https://openapi-qraft.github.io/openapi-qraft/docs/query-client/resetQueries)
+- [x] [`isFetching(...)`](https://openapi-qraft.github.io/openapi-qraft/docs/query-client/isFetching)
+- [x] [`isMutating(...)`](https://openapi-qraft.github.io/openapi-qraft/docs/query-client/isMutating)
+
+## Qraft Utility Functions
+
+- [x] [`getQueryKey(...)`](https://openapi-qraft.github.io/openapi-qraft/docs/query-client/getQueryKey)
+- [x] [`setInfiniteQueryData(...)`](https://openapi-qraft.github.io/openapi-qraft/docs/query-client/setInfiniteQueryData)
+- [x] [`getInfiniteQueryKey(...)`](https://openapi-qraft.github.io/openapi-qraft/docs/query-client/getInfiniteQueryKey)
+- [x] [`getInfiniteQueryData(...)`](https://openapi-qraft.github.io/openapi-qraft/docs/query-client/getInfiniteQueryData)
+- [x] [`getInfiniteQueryState(...)`](https://openapi-qraft.github.io/openapi-qraft/docs/query-client/getInfiniteQueryState)
+- [x] [`getMutationKey(...)`](https://openapi-qraft.github.io/openapi-qraft/docs/query-client/getMutationKey)
+
 ## Usage
 
 With the client set up, you can now use the generated Hooks in your React Components to fetch data, execute mutations,
 and more.
 
-### [useQuery(...) 🔗](https://tanstack.com/query/latest/docs/framework/react/reference/useQuery)
+### [useQuery(...) 🔗](https://openapi-qraft.github.io/openapi-qraft/docs/hooks/useQuery)
 
 ```ts
 /**
@@ -173,7 +214,7 @@ const { data, error, isPending } = qraft.entities.getEntities.useQuery({
 });
 ```
 
-### [useMutation(...) 🔗](https://tanstack.com/query/latest/docs/framework/react/reference/useMutation)
+### [useMutation(...) 🔗](https://openapi-qraft.github.io/openapi-qraft/docs/hooks/useMutation)
 
 #### With predefined parameters
 
@@ -233,7 +274,7 @@ mutation.mutate({
 });
 ```
 
-### [useMutationState(...) 🔗](https://tanstack.com/query/latest/docs/framework/react/reference/useMutationState)
+### [useMutationState(...) 🔗](https://openapi-qraft.github.io/openapi-qraft/docs/hooks/useMutationState)
 
 Mutation state is a helper hook that provides the current state of a mutation globally.
 It could be used to track the status of a mutation in any component, which is useful for showing loading spinners or
@@ -261,7 +302,7 @@ useEffect(() => {
 }, [mutate, mutationState?.status]);
 ```
 
-### [useInfiniteQuery(...) 🔗](https://tanstack.com/query/latest/docs/framework/react/reference/useInfiniteQuery)
+### [useInfiniteQuery(...) 🔗](https://openapi-qraft.github.io/openapi-qraft/docs/hooks/useInfiniteQuery)
 
 #### _Offset-based_
 
@@ -338,7 +379,7 @@ infiniteQuery.fetchNextPage();
 infiniteQuery.fetchPreviousPage();
 ```
 
-### [useQueries(...) 🔗](https://tanstack.com/query/latest/docs/framework/react/reference/useQueries)
+### [useQueries(...) 🔗](https://openapi-qraft.github.io/openapi-qraft/docs/hooks/useQueries)
 
 ```ts
 /**
@@ -377,7 +418,7 @@ qraft.entities.getEntities.useQueries({
 });
 ```
 
-### [useIsFetching(...) 🔗](https://tanstack.com/query/latest/docs/framework/react/reference/useIsFetching)
+### [useIsFetching(...) 🔗](https://openapi-qraft.github.io/openapi-qraft/docs/hooks/useIsFetching)
 
 ```tsx
 function FetchStatus() {
@@ -405,9 +446,19 @@ function FetchStatus() {
 }
 ```
 
-### [`QueryClient`](https://tanstack.com/query/latest/docs/reference/QueryClient) Methods
+## [`QueryClient`](https://tanstack.com/query/latest/docs/reference/QueryClient) Methods
 
-#### [invalidateQueries(...) 🔗](https://tanstack.com/query/latest/docs/reference/QueryClient#queryclientinvalidatequeries)
+#### [setQueryData(...) 🔗](https://openapi-qraft.github.io/openapi-qraft/docs/query-client/setQueryData)
+
+```ts
+qraft.pet.getPetById.setQueryData(
+  { path: { petId: 123 } }, // Query Key parameters
+  { id: 123, name: 'Rex' }, // Data to set
+  queryClient
+);
+```
+
+#### [invalidateQueries(...) 🔗](https://openapi-qraft.github.io/openapi-qraft/docs/query-client/invalidateQueries)
 
 [Queries Invalidation 🔗](https://tanstack.com/query/latest/docs/framework/react/guides/query-invalidation) is possible
 using `<operation>.invalidateQueries(...)` method.
@@ -511,25 +562,7 @@ qraft.entities.getEntities.invalidateQueries(
 );
 ```
 
-#### [cancelQueries(...) 🔗](https://tanstack.com/query/latest/docs/reference/QueryClient#queryclientcancelqueries)
-
-[Query Cancellation](https://tanstack.com/query/latest/docs/framework/react/guides/query-cancellation) has the
-same interface as `invalidateQueries(...)`, but it will cancel the queries instead of invalidating them.
-
-#### [resetQueries(...) 🔗](https://tanstack.com/query/latest/docs/reference/QueryClient#queryclientresetqueries)
-
-The interface is the same as `invalidateQueries(...)`, but it will reset the queries instead of invalidating them.
-
-#### [refetchQueries(...) 🔗](https://tanstack.com/query/latest/docs/reference/QueryClient#queryclientrefetchqueries)
-
-The interface is the same as `invalidateQueries(...)`, but it will refetch the queries instead of invalidating them.
-
-#### [isFetching(...) 🔗](https://tanstack.com/query/latest/docs/reference/QueryClient#queryclientisfetching)
-
-The interface is the same as `invalidateQueries(...), but it will check if the queries are fetching, and there are no
-options.
-
-#### [fetchQuery(...) 🔗](https://tanstack.com/query/latest/docs/reference/QueryClient#queryclientfetchquery)
+#### [fetchQuery(...) 🔗](https://openapi-qraft.github.io/openapi-qraft/docs/query-client/fetchQuery)
 
 ```ts
 /**
@@ -557,11 +590,7 @@ const posts = qraft.posts.getPosts.fetchQuery(
 );
 ```
 
-#### [prefetchQuery(...) 🔗](https://tanstack.com/query/latest/docs/reference/QueryClient#queryclientprefetchquery)
-
-The interface is the same as `fetchQuery(...)`, but returns empty Promise.
-
-#### [fetchInfiniteQuery(...) 🔗](https://tanstack.com/query/latest/docs/reference/QueryClient#queryclientfetchinfinitequery)
+#### [fetchInfiniteQuery(...) 🔗](https://openapi-qraft.github.io/openapi-qraft/docs/query-client/fetchInfiniteQuery)
 
 ```ts
 /**
@@ -603,29 +632,6 @@ console.log(
   posts.pageParams // all page parameters
 );
 ```
-
-#### [prefetchInfiniteQuery(...) 🔗](https://tanstack.com/query/latest/docs/reference/QueryClient#queryclientprefetchinfinitequery)
-
-The interface is the same as `fetchInfiniteQuery(...)`, but returns empty Promise.
-
-### Suspense Queries
-
-Supported Suspense Queries are:
-
-- [useSuspenseQuery(...) 🔗](https://tanstack.com/query/latest/docs/framework/react/reference/useSuspenseQuery)
-- [useSuspenseInfiniteQuery(...) 🔗](https://tanstack.com/query/latest/docs/framework/react/reference/useSuspenseInfiniteQuery)
-- [useSuspenseQueries(...) 🔗](https://tanstack.com/query/latest/docs/framework/react/reference/useSuspenseQueries)
-
-### Documentation in Progress 🚧
-
-- `getQueryKey(parameters)`
-- `getQueryData(parameters)`
-- `setQueryData(parameters, updater)`
-- `getInfiniteQueryKey(parameters)`
-- `getInfiniteQueryData(parameters)`
-- `setInfiniteQueryData(parameters, updater)`
-- `schema` - object with schema: `{method, url, mediaType}`
-- `types` - object with types: `{parameters, data, error, body}`
 
 ### Authorization and Custom Requests
 
