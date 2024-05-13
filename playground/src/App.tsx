@@ -9,8 +9,8 @@ import {
 
 import constate from 'constate';
 
-import { components } from '../schema';
 import { createAPIClient } from './api';
+import { components } from './api/schema';
 
 const qraft = createAPIClient();
 

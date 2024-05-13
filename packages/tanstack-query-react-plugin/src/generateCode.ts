@@ -1,3 +1,4 @@
+import { formatFileHeader } from '@openapi-qraft/plugin/lib/formatFileHeader';
 import { GeneratorFile } from '@openapi-qraft/plugin/lib/GeneratorFile';
 import { Service } from '@openapi-qraft/plugin/lib/open-api/getServices';
 import { OutputOptions as OutputOptionsBase } from '@openapi-qraft/plugin/lib/OutputOptions';
@@ -19,6 +20,7 @@ interface OutputOptions extends OutputOptionsBase {
   fileHeader: string | undefined;
   servicesDirName: string;
   explicitImportExtensions: boolean;
+  exportSchemaTypes: boolean | undefined;
 }
 
 export const generateCode = async ({
@@ -36,7 +38,7 @@ export const generateCode = async ({
     ...(await generateServices(spinner, services, serviceImports, output)),
     ...(await generateServiceIndex(spinner, services, output)),
     ...(await generateClient(spinner, output)),
-    ...(await generateIndex(spinner, output)),
+    ...(await generateIndex(spinner, serviceImports, output)),
   ];
 };
 
@@ -82,7 +84,7 @@ const generateServices = async (
 
       serviceFiles.push({
         file: new URL(`${fileBaseName}.ts`, servicesDir),
-        code: getFileHeader(output) + code,
+        code: formatFileHeader(output.fileHeader) + code,
       });
     } catch (error) {
       spinner.fail(
@@ -123,7 +125,7 @@ const generateServiceIndex = async (
 
     serviceIndexFiles.push({
       file: new URL('index.ts', composeServicesDirPath(output)),
-      code: getFileHeader(output) + code,
+      code: formatFileHeader(output.fileHeader) + code,
     });
   } catch (error) {
     spinner.fail(
@@ -153,7 +155,7 @@ const generateClient = async (spinner: Ora, output: OutputOptions) => {
 
     clientFiles.push({
       file: new URL('create-api-client.ts', output.dir),
-      code: getFileHeader(output) + code,
+      code: formatFileHeader(output.fileHeader) + code,
     });
   } catch (error) {
     spinner.fail(c.redBright('Error occurred during client generation'));
@@ -166,7 +168,11 @@ const generateClient = async (spinner: Ora, output: OutputOptions) => {
   return clientFiles;
 };
 
-const generateIndex = async (spinner: Ora, output: OutputOptions) => {
+const generateIndex = async (
+  spinner: Ora,
+  serviceImports: ServiceImportsFactoryOptions,
+  output: OutputOptions
+) => {
   spinner.start('Generating index');
 
   const indexFiles: GeneratorFile[] = [];
@@ -176,12 +182,15 @@ const generateIndex = async (spinner: Ora, output: OutputOptions) => {
       getIndexFactory({
         servicesDirName: output.servicesDirName,
         explicitImportExtensions: Boolean(output.explicitImportExtensions),
+        openapiTypesImportPath: output.exportSchemaTypes
+          ? serviceImports.openapiTypesImportPath
+          : undefined,
       })
     );
 
     indexFiles.push({
       file: new URL('index.ts', output.dir),
-      code: getFileHeader(output) + code,
+      code: formatFileHeader(output.fileHeader) + code,
     });
   } catch (error) {
     spinner.fail(c.redBright('Error occurred during index generation'));
@@ -192,10 +201,4 @@ const generateIndex = async (spinner: Ora, output: OutputOptions) => {
   spinner.succeed(c.green('Index has been generated'));
 
   return indexFiles;
-};
-
-export const getFileHeader = ({
-  fileHeader,
-}: Pick<OutputOptions, 'fileHeader'>) => {
-  return fileHeader && `${fileHeader}\n`;
 };

@@ -1,16 +1,32 @@
 import ts from 'typescript';
 
+import type { ServiceImportsFactoryOptions } from './getServiceFactory.js';
+
 export const getIndexFactory = ({
+  openapiTypesImportPath,
   servicesDirName,
   explicitImportExtensions,
 }: {
   servicesDirName: string;
   explicitImportExtensions: boolean;
-}) => {
+} & Partial<Pick<ServiceImportsFactoryOptions, 'openapiTypesImportPath'>>) => {
   const factory = ts.factory;
   const importExtension = explicitImportExtensions ? '.js' : '';
 
   return [
+    ...(openapiTypesImportPath
+      ? [
+          factory.createExportDeclaration(
+            undefined,
+            true,
+            undefined,
+            factory.createStringLiteral(
+              maybeResolveImport({ openapiTypesImportPath, servicesDirName })
+            ),
+            undefined
+          ),
+        ]
+      : []),
     factory.createExportDeclaration(
       undefined,
       false,
@@ -56,3 +72,23 @@ export const getIndexFactory = ({
     ),
   ];
 };
+
+/**
+ * Resolve the import path if it's a relative path.
+ * Normally,`openapiTypesImportPath` is a relative path to services directory.
+ */
+export function maybeResolveImport<T extends string | undefined>({
+  openapiTypesImportPath,
+  servicesDirName,
+}: {
+  openapiTypesImportPath: T;
+  servicesDirName: string;
+}) {
+  if (openapiTypesImportPath?.startsWith('../')) {
+    return `./${openapiTypesImportPath.slice(3)}`;
+  } else if (openapiTypesImportPath?.startsWith('./')) {
+    return `./${servicesDirName}/${openapiTypesImportPath.slice(2)}`;
+  }
+
+  return openapiTypesImportPath;
+}

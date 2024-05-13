@@ -14,6 +14,8 @@
     "openapi-qraft": "./bin.mjs"
   },
   "dependencies": {
+    "@openapi-qraft/openapi-typescript-plugin": "workspace:~",
+    "@openapi-qraft/plugin": "workspace:~",
     "@openapi-qraft/tanstack-query-react-plugin": "workspace:~",
     "commander": "^11.1.0"
   },

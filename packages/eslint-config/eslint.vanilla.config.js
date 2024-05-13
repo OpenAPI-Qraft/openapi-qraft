@@ -26,5 +26,5 @@ export default [
       '@typescript-eslint/ban-types': 'off',
     },
   },
-  { ignores: ['dist/**', 'coverage/**'] },
+  { ignores: ['dist/**', 'coverage/**', '**/__snapshots__/**'] },
 ];

@@ -1,4 +1,9 @@
 export type OpenAPISchemaType = {
+  openapi: string;
+  info: {
+    title: string;
+    version: string;
+  };
   paths: {
     [path: string]: {
       [method: string]: {

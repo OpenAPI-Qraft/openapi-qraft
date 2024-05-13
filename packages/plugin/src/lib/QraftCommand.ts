@@ -1,24 +1,32 @@
 import c from 'ansi-colors';
-import { Command } from 'commander';
+import { Command, type Option } from 'commander';
+import * as console from 'node:console';
 import { sep } from 'node:path';
 import process from 'node:process';
 import { pathToFileURL, URL } from 'node:url';
 import ora, { Ora } from 'ora';
 
+import { filterDocumentPaths } from './filterDocumentPaths.js';
 import { GeneratorFile } from './GeneratorFile.js';
-import { getDocumentServices } from './open-api/getDocumentServices.js';
-import { Service } from './open-api/getServices.js';
+import { handleSchemaInput } from './handleSchemaInput.js';
+import { getServices, type Service } from './open-api/getServices.js';
+import { OpenAPISchemaType } from './open-api/OpenAPISchemaType.js';
+import { readSchema } from './open-api/readSchema.js';
 import { OutputOptions } from './OutputOptions.js';
 import { writeGeneratorFiles } from './writeGeneratorFiles.js';
 
 export class QraftCommand extends Command {
+  protected readonly cwd: URL;
+  protected registeredPluginActions: QraftCommandActionCallback[] = [];
+
   constructor() {
     super();
+    this.cwd = pathToFileURL(`${process.cwd()}/`);
 
     this.usage('[input] [options]')
       .argument(
         '[input]',
-        'Input OpenAPI Schema file path, URL (json, yml)',
+        'Input OpenAPI Document file path, URL (json, yml)',
         null
       )
       .requiredOption(
@@ -41,99 +49,218 @@ export class QraftCommand extends Command {
         '--service-name-base <endpoint[<index>] | tags>',
         'Use OpenAPI Operation `endpoint[<index>]` path part (e.g.: "/0/1/2") or `tags` as the base name of the service.',
         'endpoint[0]'
+      )
+      .option(
+        '--file-header <string>',
+        'Header to be added to the generated file (eg: /* eslint-disable */)'
       );
   }
 
   action(callback: QraftCommandActionCallback): this {
-    return super.action(async (...actionArgs) => {
-      const { version: packageVersion } = await import(
-        '@openapi-qraft/plugin/package.json',
-        {
-          assert: { type: 'json' },
-        }
-      ).then(({ default: packageJSON }) => packageJSON);
-
-      const inputs = actionArgs.filter(
-        (arg) => typeof arg === 'string'
-      ) as string[];
-      const args = actionArgs.find(
-        (arg) => arg && typeof arg === 'object'
-      ) as Record<string, any>;
-
-      if (!args) throw new Error('Arguments object not found');
-
-      if (args.version) {
-        console.info(`v${packageVersion}`);
-        process.exit(0);
-      }
-
-      console.info(`✨ ${c.bold(`OpenAPI Qraft ${packageVersion}`)}`);
-
-      const spinner = ora('Starting the Qraft ⛏︎').start();
-
-      // eslint-disable-next-line no-async-promise-executor
-      await new Promise(async (resolve, reject) => {
-        await callback(
-          {
-            inputs,
-            args,
-            spinner,
-            services: await this.#getServices(inputs[0], args),
-            output: {
-              dir: normalizeOutputDirPath(args.outputDir),
-              clean: args.clean,
-            },
-          },
-          async function resolveGeneratorFiles(fileItems) {
-            try {
-              await writeGeneratorFiles({
-                fileItems,
-                spinner,
-              }).then(resolve);
-              spinner.succeed(c.green('Qraft has been finished'));
-            } catch (error) {
-              spinner.fail(c.red('Error occurred during generation'));
-
-              if (error instanceof Error) {
-                console.error(c.red(error.message), c.red(error.stack ?? ''));
-              }
-
-              console.error(error);
-              reject(error);
-              process.exit(1);
-            }
-          }
-        );
-      });
-    });
+    this.registerPluginAction(callback);
+    return super.action(this.actionCallback.bind(this));
   }
 
-  async #getServices(input: unknown, args: Record<string, any>) {
-    const cwd = `${process.cwd()}/`;
+  async actionCallback(...actionArgs: any[]) {
+    const { version: packageVersion } = await import(
+      '@openapi-qraft/plugin/package.json',
+      {
+        assert: { type: 'json' },
+      }
+    ).then(({ default: packageJSON }) => packageJSON);
 
-    const source =
-      input && typeof input === 'string'
-        ? new URL(input, pathToFileURL(cwd))
-        : process.stdin;
+    const inputs = actionArgs.filter(
+      (arg) => typeof arg === 'string'
+    ) as string[];
+    const args = actionArgs.find(
+      (arg) => arg && typeof arg === 'object'
+    ) as Record<string, any>;
 
-    if (source === process.stdin && source.isTTY) {
+    if (!args) throw new Error('Arguments object not found');
+
+    if (args.version) {
+      console.info(`v${packageVersion}`); // todo::add displaying of the used plugin version
+      process.exit(0);
+    }
+
+    console.info(`✨ ${c.bold(`OpenAPI Qraft ${packageVersion}`)}`);
+
+    const spinner = ora('Starting ⛏︎').start();
+
+    const input = handleSchemaInput(inputs[0], this.cwd, spinner);
+
+    spinner.text = 'Reading OpenAPI Schema';
+    const schema = filterDocumentPaths(
+      await readSchema(input),
+      parseServicesFilterOption(args.filterServices)
+    );
+
+    spinner.text = 'Getting OpenAPI Services';
+    const services = getServices(schema, {
+      postfixServices: args.postfixServices,
+      serviceNameBase: args.serviceNameBase,
+    });
+
+    spinner.text = 'Generating code';
+
+    const outputDir = normalizeOutputDirPath(args.outputDir);
+
+    for (const pluginAction of this.registeredPluginActions) {
+      const fileItems = await new Promise<GeneratorFile[]>(
+        (resolve, reject) => {
+          pluginAction(
+            {
+              inputs,
+              args,
+              spinner,
+              services,
+              schema,
+              output: {
+                dir: outputDir,
+                clean: args.clean,
+              },
+            },
+            resolve
+          ).catch(reject);
+        }
+      );
+
+      try {
+        if (this.registeredPluginActions.indexOf(pluginAction) === 0) {
+          await writeGeneratorFiles({
+            // Create output directory first, but for the first plugin only
+            fileItems: [{ directory: outputDir, clean: false }, ...fileItems],
+            spinner,
+          });
+        } else {
+          await writeGeneratorFiles({ fileItems, spinner });
+        }
+      } catch (error) {
+        spinner.fail(c.red('Error occurred during generation'));
+
+        if (error instanceof Error) {
+          console.error(c.red(error.message), c.red(error.stack ?? ''));
+        }
+
+        throw error;
+      }
+    }
+
+    spinner.succeed(c.green('Qraft has been finished'));
+  }
+
+  protected registerPluginAction(callback: QraftCommandActionCallback) {
+    this.registeredPluginActions.push(callback);
+  }
+
+  option(
+    flags: string,
+    description?: string,
+    defaultValue?: string | boolean | string[]
+  ): this;
+  option<T>(
+    flags: string,
+    description: string,
+    parseArg: (value: string, previous: T) => T,
+    defaultValue?: T
+  ): this;
+  /** @deprecated since v7, instead use choices or a custom function */
+  option(
+    flags: string,
+    description: string,
+    regexp: RegExp,
+    defaultValue?: string | boolean | string[]
+  ): this;
+  option<T>(
+    flags: string,
+    description?: string,
+    parseArg?:
+      | ((value: string, previous: T) => T)
+      | string
+      | boolean
+      | string[]
+      | RegExp,
+    defaultValue?: T
+  ): this {
+    if (
+      this.findSimilarOption({
+        flags,
+        mandatory: false,
+      })
+    ) {
+      return this;
+    }
+
+    return super.option(
+      flags,
+      // @ts-expect-error - Issues with overloading
+      description,
+      parseArg,
+      defaultValue
+    );
+  }
+
+  requiredOption(
+    flags: string,
+    description?: string,
+    defaultValue?: string | boolean | string[]
+  ): this;
+  requiredOption<T>(
+    flags: string,
+    description: string,
+    parseArg: (value: string, previous: T) => T,
+    defaultValue?: T
+  ): this;
+  /** @deprecated since v7, instead use choices or a custom function */
+  requiredOption(
+    flags: string,
+    description: string,
+    regexp: RegExp,
+    defaultValue?: string | boolean | string[]
+  ): this;
+  requiredOption<T>(
+    flags: string,
+    description?: string,
+    regexpOrDefaultValue?:
+      | string
+      | boolean
+      | string[]
+      | RegExp
+      | ((value: string, previous: T) => T),
+    defaultValue?: string | boolean | string[]
+  ): this {
+    if (
+      this.findSimilarOption({
+        flags,
+        mandatory: true,
+      })
+    ) {
+      return this;
+    }
+
+    return super.requiredOption(
+      flags,
+      // @ts-expect-error - Issues with overloading
+      description,
+      regexpOrDefaultValue,
+      defaultValue
+    );
+  }
+
+  protected findSimilarOption(option: { flags: string; mandatory: boolean }) {
+    try {
+      return findSimilarOption(option, this.options);
+    } catch (error) {
       console.error(
         c.red(
-          'Input file not found or stdin is empty. Please specify `--input` option or pipe OpenAPI Schema to stdin.'
+          error instanceof Error
+            ? error.message
+            : 'Error occurred during option setup'
         )
       );
 
-      process.exit(1);
+      throw error;
     }
-
-    return await getDocumentServices({
-      output: {
-        postfixServices: args.postfixServices,
-        serviceNameBase: args.serviceNameBase,
-      },
-      servicesGlob: parseServicesFilterOption(args.filterServices),
-      source,
-    });
   }
 }
 
@@ -177,9 +304,6 @@ export type QraftCommandActionCallback = (
      */
     args: Record<string, any>;
     /**
-     * Resolve the generator files
-     */
-    /**
      * Spinner instance
      */
     spinner: Ora;
@@ -188,9 +312,120 @@ export type QraftCommandActionCallback = (
      */
     services: Service[];
     /**
+     * OpenAPI schema
+     */
+    schema: OpenAPISchemaType;
+    /**
      * Output options
      */
     output: OutputOptions;
   },
-  resolve: (files: GeneratorFile[]) => Promise<void>
-) => void | Promise<void>;
+  resolve: (files: GeneratorFile[]) => void
+) => Promise<void>;
+
+function findSimilarOption(
+  {
+    flags,
+    mandatory,
+  }: {
+    flags: string;
+    mandatory: boolean;
+  },
+  options: readonly Option[]
+) {
+  const newOptionParsedFlags = splitOptionFlags(flags);
+  /** @see {@link https://github.com/tj/commander.js/blob/83c3f4e391754d2f80b179acc4bccc2d4d0c863d/lib/option.js#L15} Source implementation */
+  const optional = flags.includes('['); // A value is optional when the option is specified.
+  const required = flags.includes('<'); // A value must be supplied when the option is specified.
+  // variadic test ignores <value,...> et al which might be used to describe custom splitting of single argument
+  const variadic = /\w\.\.\.[>\]]$/.test(flags); // The option can take multiple values.
+
+  return options.find((existingOption) => {
+    const existingOptionParsedFlags = splitOptionFlags(existingOption.flags);
+
+    if (
+      !(
+        (existingOptionParsedFlags.longFlag !== undefined &&
+          existingOptionParsedFlags.longFlag ===
+            newOptionParsedFlags.longFlag) ||
+        (existingOptionParsedFlags.shortFlag !== undefined &&
+          existingOptionParsedFlags.shortFlag ===
+            newOptionParsedFlags.shortFlag)
+      )
+    ) {
+      return false;
+    }
+
+    if (
+      existingOptionParsedFlags.longFlag !== undefined &&
+      newOptionParsedFlags.longFlag !== undefined &&
+      existingOptionParsedFlags.longFlag !== newOptionParsedFlags.longFlag
+    ) {
+      throw new Error(
+        `Long flag ${flags} already exists in the option list with flags: "${existingOption.flags}" and description: "${existingOption.description}"`
+      );
+    }
+
+    if (
+      existingOptionParsedFlags.shortFlag !== undefined &&
+      newOptionParsedFlags.shortFlag !== undefined &&
+      existingOptionParsedFlags.shortFlag !== newOptionParsedFlags.shortFlag
+    ) {
+      throw new Error(
+        `Short flag ${flags} already exists in the option list with flags: "${existingOption.flags}" and description: "${existingOption.description}"`
+      );
+    }
+
+    if (required !== existingOption.required) {
+      throw new Error(
+        `Flag ${flags} already exists in the option list with flags: "${existingOption.flags}" and description: "${existingOption.description}" but with different required status`
+      );
+    }
+
+    if (optional !== existingOption.optional) {
+      throw new Error(
+        `Flag ${flags} already exists in the option list with flags: "${existingOption.flags}" and description: "${existingOption.description}" but with different optional status`
+      );
+    }
+
+    if (mandatory !== existingOption.mandatory) {
+      throw new Error(
+        `Flag ${flags} already exists in the option list with flags: "${existingOption.flags}" and description: "${existingOption.description}" but with different mandatory status`
+      );
+    }
+
+    if (variadic !== existingOption.variadic) {
+      throw new Error(
+        `Flag ${flags} already exists in the option list with flags: "${existingOption.flags}" and description: "${existingOption.description}" but with different variadic status`
+      );
+    }
+
+    return existingOption;
+  });
+}
+
+/**
+ * Split the short and long flag out of something like '-m,--mixed <value>'
+ * @link https://github.com/tj/commander.js/blob/83c3f4e391754d2f80b179acc4bccc2d4d0c863d/lib/option.js#L310
+ */
+export function splitOptionFlags(flags: string) {
+  let shortFlag;
+  let longFlag;
+
+  // Use original very loose parsing to maintain backwards compatibility for now,
+  // which allowed, for example, unintended `-sw, --short-word` [sic].
+  const flagParts = flags.split(/[ |,]+/);
+
+  if (flagParts.length > 1 && !/^[[<]/.test(flagParts[1]))
+    shortFlag = flagParts.shift();
+
+  longFlag = flagParts.shift();
+
+  // Add support for a lone short flag without significantly changing parsing!
+  if (!shortFlag && /^-[^-]$/.test(longFlag ?? '')) {
+    shortFlag = longFlag;
+    longFlag = undefined;
+  }
+
+  return { shortFlag, longFlag };
+}

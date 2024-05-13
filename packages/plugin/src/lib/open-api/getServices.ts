@@ -1,6 +1,4 @@
 import camelCase from 'camelcase';
-import * as console from 'console';
-import micromatch from 'micromatch';
 
 import { getContentMediaType } from './getContent.js';
 import { getOperationName } from './getOperationName.js';
@@ -58,21 +56,17 @@ export const getServices = (
   {
     postfixServices = 'Service',
     serviceNameBase = 'endpoint[0]',
-  }: ServiceOutputOptions = {},
-  servicesGlob = ['**']
+  }: ServiceOutputOptions = {}
 ) => {
   const paths = openApiJson.paths;
 
   const services = new Map<string, Service>();
-
-  const isPathMatch = createServicePathMatch(servicesGlob);
 
   for (const path in paths) {
     if (!Object.prototype.hasOwnProperty.call(paths, path)) continue;
 
     for (const method in paths[path]) {
       if (!Object.prototype.hasOwnProperty.call(paths[path], method)) continue;
-      if (!isPathMatch(path)) continue;
 
       if (!supportedMethod(method)) {
         console.warn(
@@ -160,33 +154,6 @@ export const getServices = (
   }
 
   return Array.from(services.values());
-};
-
-/**
- * Create a function to match service paths
- * @param servicesGlob
- */
-export const createServicePathMatch = (servicesGlob: string[]) => {
-  const servicePathGlobs = servicesGlob.reduce<
-    Record<'match' | 'ignore', string[]>
-  >(
-    (acc, glob) => {
-      glob.startsWith('!')
-        ? acc.ignore.push(glob.slice(1))
-        : acc.match.push(glob);
-      return acc;
-    },
-    {
-      match: [],
-      ignore: [],
-    }
-  );
-
-  return function isServicePatchMatch(path: string) {
-    return micromatch.isMatch(path, servicePathGlobs.match, {
-      ignore: servicePathGlobs.ignore,
-    });
-  };
 };
 
 export const supportedMethod = (

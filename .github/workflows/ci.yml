@@ -33,8 +33,7 @@ jobs:
 
       - name: Generate
         run: |
-          yarn workspace @openapi-qraft/react run generate-types
-          yarn workspace @openapi-qraft/react run generate-qraft
+          yarn workspace @openapi-qraft/react run generate-api
 
       - name: Unit Testing
         run: yarn test

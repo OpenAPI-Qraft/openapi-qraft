@@ -9,24 +9,27 @@ export const plugin: QraftCommandPlugin = {
     command
       .description('Generate TanStack Query React client from OpenAPI Schema')
       .requiredOption(
-        '--openapi-types-import-path <path>', // todo::specify better param name to avoid confusion with real path
-        'Path to schema types file (.d.ts), eg: "../openapi.d.ts"'
-      )
-      .option(
-        '--file-header <string>',
-        'Header to be added to the generated file (eg: /* eslint-disable */)'
+        '--openapi-types-import-path <path>',
+        'Path to schema types file (.d.ts), eg: "../schema.d.ts"'
       )
       .option(
         '--explicit-import-extensions',
         'All import statements will include explicit `.js` extensions. Ideal for projects using ECMAScript modules.'
       )
       .option(
+        '--export-openapi-types [bool]',
+        'Export the OpenAPI schema types from the generated `./index.ts` file',
+        (arg) => {
+          return arg?.toLowerCase() !== 'false';
+        }
+      )
+      .option(
         '--operation-generics-import-path <path>',
         'Path to operation generics file',
         '@openapi-qraft/react'
       )
-      .action(({ spinner, output, args, services }, resolve) => {
-        return void generateCode({
+      .action(async ({ spinner, output, args, services }, resolve) => {
+        return void (await generateCode({
           spinner,
           services,
           serviceImports: {
@@ -38,8 +41,9 @@ export const plugin: QraftCommandPlugin = {
             fileHeader: args.fileHeader ?? fileHeader,
             explicitImportExtensions: args.explicitImportExtensions,
             servicesDirName: 'services',
+            exportSchemaTypes: args.exportOpenapiTypes,
           },
-        }).then(resolve);
+        }).then(resolve));
       });
   },
 };

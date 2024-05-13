@@ -28,15 +28,18 @@ describe('bin', () => {
       });
     });
 
-    it('throws if multiple plugins specified', () => {
-      expect(() =>
+    it('extracts multiple plugins if specified', () => {
+      expect(
         extractArgvPluginOptions([
           '--plugin',
           'tanstack-query-react',
           '--plugin',
           'tanstack-query-react-2',
         ])
-      ).toThrowError();
+      ).toEqual({
+        argv: [],
+        plugins: ['tanstack-query-react', 'tanstack-query-react-2'],
+      });
     });
   });
 });

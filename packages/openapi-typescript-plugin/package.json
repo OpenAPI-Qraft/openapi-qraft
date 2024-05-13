@@ -1,6 +1,6 @@
 {
-  "name": "@openapi-qraft/tanstack-query-react-plugin",
-  "version": "1.8.0",
+  "name": "@openapi-qraft/openapi-typescript-plugin",
+  "version": "1.0.0",
   "type": "module",
   "scripts": {
     "build": "rimraf dist/ && tsc --project tsconfig.build.json",
@@ -26,11 +26,13 @@
   },
   "dependencies": {
     "@openapi-qraft/plugin": "workspace:^",
+    "openapi-typescript": "7.0.0-next.11",
     "typescript": "^5.3.3"
   },
   "devDependencies": {
     "@openapi-qraft/eslint-config": "workspace:~",
     "@openapi-qraft/test-fixtures": "workspace:~",
+    "@types/node": "^18.19.4",
     "eslint": "^9.0.0",
     "memfs": "^4.9.2",
     "rimraf": "^5.0.5",
