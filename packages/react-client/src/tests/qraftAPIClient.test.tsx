@@ -17,9 +17,7 @@ import {
   requestFn,
   urlSerializer,
 } from '../index.js';
-import type { OperationSchema } from '../lib/requestFn.js';
-import { QraftAuthProvider } from '../QraftAuthProvider.js';
-import { createTestJwt } from './createTestJwt.js';
+import type { OperationSchema, RequestFn } from '../lib/requestFn.js';
 import { createAPIClient } from './fixtures/api/index.js';
 
 const qraft = createAPIClient();
@@ -3217,9 +3215,11 @@ describe('Qraft is type-safe on Query Filters', () => {
 function Providers({
   children,
   queryClient,
+  requestFn: requestFnProp = requestFn,
 }: {
   children: ReactNode;
   queryClient?: QueryClient;
+  requestFn?: RequestFn<any>;
 }) {
   queryClient = React.useState(() => queryClient ?? new QueryClient())[0];
 
@@ -3231,7 +3231,7 @@ function Providers({
       <QraftContextDist.Provider
         value={{
           baseUrl: 'https://api.sandbox.monite.com/v1',
-          requestFn: requestFn,
+          requestFn: requestFnProp,
         }}
       >
         {children}
