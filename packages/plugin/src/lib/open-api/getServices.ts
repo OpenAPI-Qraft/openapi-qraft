@@ -44,7 +44,7 @@ export type ServiceOperation = {
   errors: Record<string, string | undefined>;
   success: Record<string, string | undefined>;
   parameters: Record<string, any> | undefined;
-  security: Array<Record<string, string[]>> | undefined;
+  security: Array<Record<string, string[] | undefined>> | undefined;
 };
 
 export interface ServiceOutputOptions {

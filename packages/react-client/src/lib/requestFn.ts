@@ -300,6 +300,8 @@ export interface OperationSchema {
    * @example application/json
    */
   readonly mediaType?: string;
+
+  readonly security?: string[];
 }
 
 export interface RequestFnPayload {
