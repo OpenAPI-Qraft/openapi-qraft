@@ -141,7 +141,7 @@ function getQueryString(params: Record<string, any>): string {
   return '';
 }
 
-function mergeHeaders(...allHeaders: (HeadersOptions | undefined)[]) {
+export function mergeHeaders(...allHeaders: (HeadersOptions | undefined)[]) {
   const headers = new Headers();
 
   for (const headerSet of allHeaders) {
@@ -339,7 +339,7 @@ export interface RequestFnPayload {
   signal?: AbortSignal | null;
 }
 
-interface RequestFnInfo
+export interface RequestFnInfo
   extends RequestFnPayload,
     Omit<RequestInit, 'headers' | 'method' | 'body' | 'signal'> {
   /**
