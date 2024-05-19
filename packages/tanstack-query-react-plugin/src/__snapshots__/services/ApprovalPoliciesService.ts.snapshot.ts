@@ -13,6 +13,9 @@ export interface ApprovalPoliciesService {
     getApprovalPoliciesId: ServiceOperationQuery<{
         method: "get";
         url: "/approval_policies/{approval_policy_id}";
+        security: [
+            "partnerToken"
+        ];
     }, paths["/approval_policies/{approval_policy_id}"]["get"]["responses"]["200"]["content"]["application/json"], paths["/approval_policies/{approval_policy_id}"]["get"]["parameters"], paths["/approval_policies/{approval_policy_id}"]["get"]["responses"]["401"]["content"]["application/json"] | paths["/approval_policies/{approval_policy_id}"]["get"]["responses"]["422"]["content"]["application/json"] | paths["/approval_policies/{approval_policy_id}"]["get"]["responses"]["default"]["content"]["application/json"]>;
     /**
      * @summary Delete an approval policy
@@ -21,6 +24,9 @@ export interface ApprovalPoliciesService {
     deleteApprovalPoliciesId: ServiceOperationMutation<{
         method: "delete";
         url: "/approval_policies/{approval_policy_id}";
+        security: [
+            "HTTPBearer"
+        ];
     }, undefined, paths["/approval_policies/{approval_policy_id}"]["delete"]["responses"]["200"]["content"]["application/json"], paths["/approval_policies/{approval_policy_id}"]["delete"]["parameters"], paths["/approval_policies/{approval_policy_id}"]["delete"]["responses"]["401"]["content"]["application/json"] | paths["/approval_policies/{approval_policy_id}"]["delete"]["responses"]["422"]["content"]["application/json"] | paths["/approval_policies/{approval_policy_id}"]["delete"]["responses"]["default"]["content"]["application/json"]>;
     /**
      * @summary Update an approval policy
@@ -30,6 +36,9 @@ export interface ApprovalPoliciesService {
         method: "patch";
         url: "/approval_policies/{approval_policy_id}";
         mediaType: "application/json";
+        security: [
+            "HTTPBearer"
+        ];
     }, NonNullable<paths["/approval_policies/{approval_policy_id}"]["patch"]["requestBody"]>["content"]["application/json"], paths["/approval_policies/{approval_policy_id}"]["patch"]["responses"]["200"]["content"]["application/json"], paths["/approval_policies/{approval_policy_id}"]["patch"]["parameters"], paths["/approval_policies/{approval_policy_id}"]["patch"]["responses"]["401"]["content"]["application/json"] | paths["/approval_policies/{approval_policy_id}"]["patch"]["responses"]["422"]["content"]["application/json"] | paths["/approval_policies/{approval_policy_id}"]["patch"]["responses"]["default"]["content"]["application/json"]>;
 }
 export const approvalPoliciesService: {
@@ -38,20 +47,23 @@ export const approvalPoliciesService: {
     getApprovalPoliciesId: {
         schema: {
             method: "get",
-            url: "/approval_policies/{approval_policy_id}"
+            url: "/approval_policies/{approval_policy_id}",
+            security: ["partnerToken"]
         }
     },
     deleteApprovalPoliciesId: {
         schema: {
             method: "delete",
-            url: "/approval_policies/{approval_policy_id}"
+            url: "/approval_policies/{approval_policy_id}",
+            security: ["HTTPBearer"]
         }
     },
     patchApprovalPoliciesId: {
         schema: {
             method: "patch",
             url: "/approval_policies/{approval_policy_id}",
-            mediaType: "application/json"
+            mediaType: "application/json",
+            security: ["HTTPBearer"]
         }
     }
 } as const;

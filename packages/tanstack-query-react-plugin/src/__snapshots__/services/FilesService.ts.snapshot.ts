@@ -10,6 +10,9 @@ export interface FilesService {
     getFiles: ServiceOperationQuery<{
         method: "get";
         url: "/files";
+        security: [
+            "HTTPBearer"
+        ];
     }, paths["/files"]["get"]["responses"]["200"]["content"]["application/json"], paths["/files"]["get"]["parameters"], paths["/files"]["get"]["responses"]["405"]["content"]["application/json"] | paths["/files"]["get"]["responses"]["422"]["content"]["application/json"] | paths["/files"]["get"]["responses"]["default"]["content"]["application/json"]>;
     /** @summary Upload a files by ID */
     postFiles: ServiceOperationMutation<{
@@ -24,6 +27,9 @@ export interface FilesService {
     getFileList: ServiceOperationQuery<{
         method: "get";
         url: "/files/list";
+        security: [
+            "HTTPBearer"
+        ];
     }, paths["/files/list"]["get"]["responses"]["200"]["content"]["application/json"], paths["/files/list"]["get"]["parameters"], paths["/files/list"]["get"]["responses"]["default"]["content"]["application/json"]>;
 }
 export const filesService: {
@@ -32,7 +38,8 @@ export const filesService: {
     getFiles: {
         schema: {
             method: "get",
-            url: "/files"
+            url: "/files",
+            security: ["HTTPBearer"]
         }
     },
     postFiles: {
@@ -45,7 +52,8 @@ export const filesService: {
     getFileList: {
         schema: {
             method: "get",
-            url: "/files/list"
+            url: "/files/list",
+            security: ["HTTPBearer"]
         }
     }
 } as const;
