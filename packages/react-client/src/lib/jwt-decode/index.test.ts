@@ -1,6 +1,11 @@
 import { describe, expect, it } from 'vitest';
 
-import { jwtDecode, InvalidTokenError, JwtPayload } from './index.js';
+import {
+  jwtDecode,
+  InvalidTokenError,
+  JwtPayload,
+  b64DecodeUnicode,
+} from './index.js';
 
 const token =
   'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJmb28iOiJiYXIiLCJleHAiOjEzOTMyODY4OTMsImlhdCI6MTM5MzI2ODg5M30.4-iaDojEVl0pJQMjrbM1EzUIfAZgsbK_kgnVyVxFSVo';
@@ -112,5 +117,15 @@ describe('jwt-decode', () => {
     expect(() => {
       jwtDecode(badToken);
     }).toThrow(/Invalid token specified: invalid json for part #2/);
+  });
+});
+
+describe('decodeBase64', () => {
+  it('decodes base64', () => {
+    expect(b64DecodeUnicode('aGVsbG8=')).toEqual('hello');
+  });
+
+  it('decodes base64 non latin characters', () => {
+    expect(b64DecodeUnicode('5L2g5aW9')).toEqual('你好');
   });
 });

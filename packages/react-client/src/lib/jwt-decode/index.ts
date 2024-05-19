@@ -22,16 +22,15 @@ export class InvalidTokenError extends Error {}
 
 InvalidTokenError.prototype.name = 'InvalidTokenError';
 
-function b64DecodeUnicode(str: string) {
-  return decodeURIComponent(
-    atob(str).replace(/(.)/g, (m, p) => {
-      let code = (p as string).charCodeAt(0).toString(16).toUpperCase();
-      if (code.length < 2) {
-        code = '0' + code;
-      }
-      return '%' + code;
-    })
-  );
+/**
+ * Decode a base64 string to a UTF-8 string.
+ * Could be used in Node.js or in the browser.
+ */
+export function b64DecodeUnicode(data: string): string {
+  if (typeof atob === 'function')
+    return decodeURIComponent(Array.from(atob(data), byteToPercent).join(''));
+
+  return Buffer.from(data, 'base64').toString('utf-8');
 }
 
 function base64UrlDecode(str: string) {
@@ -99,4 +98,8 @@ export function jwtDecode<T = JwtHeader | JwtPayload>(
       `Invalid token specified: invalid json for part #${pos + 1} (${(e as Error).message})`
     );
   }
+}
+
+function byteToPercent(b: string) {
+  return `%${`00${b.charCodeAt(0).toString(16)}`.slice(-2)}`;
 }
