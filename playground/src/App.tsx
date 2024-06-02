@@ -1,6 +1,7 @@
 import { ComponentProps, ReactNode, useState } from 'react';
 
 import { QraftContext, requestFn } from '@openapi-qraft/react';
+import { QraftSecureRequestFn } from '@openapi-qraft/react/Unstable_QraftSecureRequestFn';
 import {
   QueryClient,
   QueryClientProvider,
@@ -391,16 +392,32 @@ export const QraftProviders = ({ children }: { children: ReactNode }) => {
   const [queryClient] = useState(() => new QueryClient());
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <QraftContext.Provider
-        value={{
-          baseUrl: 'https://petstore3.swagger.io/api/v3',
-          requestFn,
-        }}
-      >
-        {children}
-      </QraftContext.Provider>
-    </QueryClientProvider>
+    <QraftSecureRequestFn
+      requestFn={requestFn}
+      securitySchemes={{
+        // Can be sync or async
+        api_key() {
+          return {
+            in: 'header',
+            name: 'api_key',
+            value: 'special-key',
+          };
+        },
+      }}
+    >
+      {(secureRequestFn) => (
+        <QueryClientProvider client={queryClient}>
+          <QraftContext.Provider
+            value={{
+              baseUrl: 'https://petstore3.swagger.io/api/v3',
+              requestFn: secureRequestFn,
+            }}
+          >
+            {children}
+          </QraftContext.Provider>
+        </QueryClientProvider>
+      )}
+    </QraftSecureRequestFn>
   );
 };
 
