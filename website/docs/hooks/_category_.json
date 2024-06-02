@@ -1,7 +1,7 @@
 {
   "label": "React",
   "position": 50,
-  "collapsible": false,
-  "collapsed": false,
+  "collapsible": true,
+  "collapsed": true,
   "link": null
 }

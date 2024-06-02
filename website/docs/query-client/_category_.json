@@ -1,7 +1,7 @@
 {
   "label": "QueryClient",
   "position": 60,
-  "collapsible": false,
-  "collapsed": false,
+  "collapsible": true,
+  "collapsed": true,
   "link": null
 }
