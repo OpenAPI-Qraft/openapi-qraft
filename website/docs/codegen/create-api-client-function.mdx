@@ -1,6 +1,6 @@
 ---
 sidebar_position: 2
-sidebar_label: 'createAPIClient'
+sidebar_label: 'createAPIClient(...)'
 ---
 
 import Tabs from '@theme/Tabs';
@@ -66,8 +66,8 @@ const qraft = createAPIClient({
   </TabItem>
   <TabItem value="custom-provider" label={<span style={{verticalAlign: 'middle'}}>Custom <code>context</code></span>}>
     With the `options.context`, you can specify a custom _Context_ to be used by the Qraft API client.
-    It's useful if you want to publish your **API client as an NPM library**. In this case, you **must provide
-    a custom _Context_ instead of `QraftContext`, to prevent conflicts with other API clients in the same application.
+    It's useful if you want to publish your **API client as an NPM library**. In this case, you must **provide
+    a custom _Context_** instead of `QraftContext`, to prevent conflicts with other API clients in the same application.
     The client can use the standard `QueryClient` from the `<QueryClientProvider/>` of TanStack,
     or even `<QraftContext/>` from client's application. That's why the `queryClient` must be also provided
     to the custom Qraft _Context_ `value`.
