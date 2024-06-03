@@ -1,5 +1,13 @@
 # @openapi-qraft/react
 
+## 1.10.0
+
+### Minor Changes
+
+- 67c1432: Added the `<QraftSecureRequestFn />` component to enhance secure request handling. This component supports
+  multiple authentication methods including API Key, Basic, Bearer, and Cookie authentication. Integrates seamlessly with
+  QraftContext for secure API requests.
+
 ## 1.9.0
 
 ## 1.8.0
