@@ -134,7 +134,7 @@
             }
           }
         },
-        "security": [{ "HTTPBearer": [] }]
+        "security": [{ "userToken": [] }, { "partnerToken": [] }]
       }
     },
     "/approval_policies/{approval_policy_id}": {
@@ -236,7 +236,7 @@
             }
           }
         },
-        "security": [{ "HTTPBearer": [] }]
+        "security": [{ "partnerToken": [] }]
       },
       "delete": {
         "tags": ["Approval policies"],
@@ -596,6 +596,18 @@
     }
   },
   "components": {
+    "securitySchemes": {
+      "client_credentials": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      },
+      "entity_user": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    },
     "schemas": {
       "EntityOnboardingDocuments": {
         "required": ["verification_document_front"],

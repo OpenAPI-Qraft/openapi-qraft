@@ -44,6 +44,7 @@ export type ServiceOperation = {
   errors: Record<string, string | undefined>;
   success: Record<string, string | undefined>;
   parameters: Record<string, any> | undefined;
+  security: Array<Record<string, string[] | undefined>> | undefined;
 };
 
 export interface ServiceOutputOptions {
@@ -148,6 +149,7 @@ export const getServices = (
             ? getContentMediaType(methodOperation.requestBody.content)
             : undefined,
           success: success,
+          security: methodOperation.security,
         });
       }
     }

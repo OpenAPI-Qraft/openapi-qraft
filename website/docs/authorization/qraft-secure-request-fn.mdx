@@ -1,0 +1,160 @@
+---
+sidebar_position: 10
+sidebar_label: <QraftSecureRequestFn />
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# `QraftSecureRequestFn`
+
+The `<QraftSecureRequestFn />` component is used to provide `SecurityScheme` handlers.
+These handlers extend the `requestFn` function,
+which can then be used with [`QraftContext`](/hooks/qraft-context.mdx) to make secure requests.
+
+See the [OpenAPI Authentication 🔗](https://swagger.io/docs/specification/authentication/) specification for more information.
+
+:::warning
+This feature is still in the experimental stage 🧪 and may change in the future.
+:::
+
+```tsx
+import { requestFn } from '@openapi-qraft/react';
+import { QraftSecureRequestFn } from '@openapi-qraft/react/Unstable_QraftSecureRequestFn';
+
+<QraftSecureRequestFn
+  requestFn={requestFn}
+  securitySchemes={securitySchemes}
+  queryClient={queryClient}
+>
+  {(secureRequestFn) => (
+    <QraftContext.Provider
+      value={{
+        requestFn: secureRequestFn,
+        ...qraftContextValue,
+      }}
+    >
+      {children}
+    </QraftContext.Provider>
+  )}
+</QraftSecureRequestFn>
+```
+
+### Properties
+- `requestFn: requestFn(requestScheme, requestInfo) => Promise<T>` - **Required** requests function to be secured.
+- `securitySchemes: { [key: string]: SecuritySchemeHandler }` - **Required**. Handlers for security schemes used in secure requests.
+  - **Key**: The name of the [`SecurityScheme`](https://swagger.io/docs/specification/authentication/).
+  - **Value**: The corresponding `SecuritySchemeHandler`.
+  - _Note_: You can specify multiple security scheme handlers. If an operation specifies multiple security schemes, **the first defined handler will be used**.
+- `queryClient?: QueryClient` - **Optional** [_QueryClient 🌴_](https://tanstack.com/query/latest/docs/reference/QueryClient)
+  to be used for security scheme handlers.
+  This query client will not be used for usual requests, only for security scheme handlers.
+
+:::tip
+Under the hood, the `QraftSecureRequestFn` component handles initial auth request and updates the token if necessary.
+It automatically detects the JWT expiration, or you can specify the refresh using the `refreshInterval` property.
+:::
+
+## Security Scheme Handler
+
+A `SecuritySchemeHandler` is a function that returns a `SecurityScheme` object or a promise that resolves to it.
+Each handler must return specific data based on the security scheme type, which is used to authenticate requests.
+
+```ts
+function securitySchemeHandler(props: {
+  isRefreshing: boolean;
+  signal: AbortSignal;
+}) : SecurityScheme | Promise<SecurityScheme>
+```
+
+### Properties
+- `isRefreshing: boolean` - A flag indicating whether the security scheme is being refreshed.
+- `signal: AbortSignal` - An optional `AbortSignal` to cancel the request. Usually, it is used to cancel the refresh request.
+
+### Returns
+
+The handler must return a `SecurityScheme` object or a promise that resolves to it.
+The `SecurityScheme` is a union of the following types:
+
+```ts
+type SecurityScheme =
+  | SecuritySchemeBearer
+  | SecuritySchemeBasic
+  | SecuritySchemeAPIKey
+  | SecuritySchemeCookie;
+```
+
+## Supported Security Schemes
+
+- [x] [Bearer](/authorization/bearer-authentication.mdx)
+- [x] [API Key](/authorization/api-key-authentication.mdx)
+- [x] [Basic](/authorization/basic-authentication.mdx)
+- [x] [Cookie](/authorization/cookie-authentication.mdx)
+- [ ] OAuth2 (_[create an issue](https://github.com/OpenAPI-Qraft/openapi-qraft/issues/new)_)
+
+## Example
+
+In this example, the `mySecurityScheme` security scheme handler is used to obtain and refresh the JWT Bearer token:
+
+<Tabs>
+  <TabItem value="1. Open API Document">
+    ```yaml
+    openapi: 3.1.0
+    securitySchemes:
+      mySecurityScheme: # ⬅︎ Define security scheme
+        type: http
+        scheme: bearer
+        bearerFormat: JWT
+    paths:
+      /pet:
+        post:
+          security:
+            - mySecurityScheme: [] # ⬅︎ Use specified security scheme for this operation
+          responses:
+            200:
+              content:
+                application/json:
+                  schema:
+                    $ref: '#/components/schemas/Pet'
+          requestBody:
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Pet'
+    # ...
+    ```
+  </TabItem>
+  <TabItem value="2. React" default>
+    ```tsx
+    import { ReactNode } from 'react';
+    import { requestFn, QraftContext } from '@openapi-qraft/react';
+    import { QraftSecureRequestFn } from '@openapi-qraft/react/Unstable_QraftSecureRequestFn';
+
+    const App = ({ children }: { children: ReactNode }) => {
+      return (
+        <QraftSecureRequestFn
+          requestFn={requestFn}
+          securitySchemes={{
+            async mySecurityScheme({isRefreshing}) {
+              return isRefreshing ? 'TEST_UNSECURE.NEW_BEARER.TOKEN' : 'TEST_UNSECURE.BEARER.TOKEN';
+            }
+          }}
+        >
+          {(secureRequestFn) => (
+            // When using `secureRequestFn`, all requests that require the specified security scheme
+            // will automatically include the appropriate authentication mechanism.
+            //
+            // For the `mySecurityScheme` security scheme, the initial request will use the provided token.
+            // If the token needs refreshing (`isRefreshing` is true), a new token will be used.
+            <QraftContext.Provider value={{ requestFn: secureRequestFn }}>
+              {children}
+            </QraftContext.Provider>
+          )}
+        </QraftSecureRequestFn>
+      );
+    };
+
+    export default App;
+    ```
+  </TabItem>
+</Tabs>

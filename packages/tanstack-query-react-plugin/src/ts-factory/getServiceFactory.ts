@@ -182,6 +182,22 @@ const getOperationSchemaFactory = (operation: ServiceOperation) => {
             )
           )
         : null,
+
+      operation.security
+        ? factory.createPropertySignature(
+            undefined,
+            factory.createIdentifier('security'),
+            undefined,
+            factory.createTupleTypeNode(
+              getOperationSecuritySchemas(operation.security).map(
+                (securitySchemaName) =>
+                  factory.createLiteralTypeNode(
+                    factory.createStringLiteral(securitySchemaName)
+                  )
+              )
+            )
+          )
+        : null,
     ].filter((node): node is NonNullable<typeof node> => Boolean(node))
   );
 };
@@ -382,6 +398,18 @@ const getServiceVariablePropertyFactory = (operation: ServiceOperation) => {
                     factory.createStringLiteral(operation.mediaType)
                   )
                 : null,
+
+              operation.security
+                ? factory.createPropertyAssignment(
+                    factory.createIdentifier('security'),
+                    factory.createArrayLiteralExpression(
+                      getOperationSecuritySchemas(operation.security).map(
+                        (securitySchemaName) =>
+                          factory.createStringLiteral(securitySchemaName)
+                      )
+                    )
+                  )
+                : null,
             ].filter((node): node is NonNullable<typeof node> => Boolean(node)),
             true
           )
@@ -408,3 +436,10 @@ const createMultilineComment = (comment: string[]) => {
 
   return '';
 };
+
+const getOperationSecuritySchemas = (
+  security: NonNullable<ServiceOperation['security']>
+) =>
+  security.flatMap((security) =>
+    Object.keys(security).map((securitySchemaName) => securitySchemaName)
+  );

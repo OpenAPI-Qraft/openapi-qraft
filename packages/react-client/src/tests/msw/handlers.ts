@@ -24,7 +24,7 @@ export const handlers = [
 
       const header = getHeaders<
         Services['approvalPolicies']['getApprovalPoliciesId']
-      >(request.headers, 'x-');
+      >(request.headers, ['x-', 'Authorization']);
 
       return HttpResponse.json({
         path,
@@ -49,7 +49,7 @@ export const handlers = [
 
       const header = getHeaders<
         Services['entities']['postEntitiesIdDocuments']
-      >(request.headers, 'x-');
+      >(request.headers, ['x-', 'Authorization']);
 
       const body = await request.json();
 
@@ -106,7 +106,7 @@ export const handlers = [
 
       const header = getHeaders<Services['files']['getFiles']>(
         request.headers,
-        'x-'
+        ['x-', 'Authorization']
       );
 
       return HttpResponse.json({
@@ -173,11 +173,18 @@ function getHeaders<
     | {
         getMutationKey: (arg: never) => unknown;
       },
->(headers: Headers, prefix: string): ServiceHeaderParameters<T> {
+>(headers: Headers, prefixes: string[]): ServiceHeaderParameters<T> {
   return Array.from(headers.entries()).reduce(
     (acc, [headerKey, headerValue]) => {
-      if (!headerKey.toLowerCase().startsWith(prefix.toLowerCase())) return acc;
+      if (
+        !prefixes.some((prefix) =>
+          headerKey.toLowerCase().startsWith(prefix.toLowerCase())
+        )
+      )
+        return acc;
+
       if (typeof headerValue !== 'string') return acc;
+
       return {
         ...acc,
         [headerKey]: headerValue,

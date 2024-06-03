@@ -30,6 +30,7 @@ export type OpenAPISchemaType = {
             };
           };
         };
+        security?: Array<Record<string, string[] | undefined>>;
       };
     };
   };

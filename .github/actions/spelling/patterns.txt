@@ -14,3 +14,10 @@
 # Algolia App ID and API key
 \b(?:B42903JOPT)
 \b(?:8893cd4cd8803573114bf5d2eaa1c651)
+
+# hit-count: 10 file-count: 1
+\b(?:typ|alg|kid|iss|sub|aud|exp|nbf|iat|jti)\b
+
+\b(?:ey)[0-9A-Za-z_\-]+\.[0-9A-Za-z_\-]+\.[0-9A-Za-z_\-]+
+
+\b(?:aGVsbG8)

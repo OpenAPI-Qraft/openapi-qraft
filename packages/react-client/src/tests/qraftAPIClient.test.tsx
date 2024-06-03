@@ -17,7 +17,7 @@ import {
   requestFn,
   urlSerializer,
 } from '../index.js';
-import type { OperationSchema } from '../lib/requestFn.js';
+import type { OperationSchema, RequestFn } from '../lib/requestFn.js';
 import { createAPIClient } from './fixtures/api/index.js';
 
 const qraft = createAPIClient();
@@ -1137,6 +1137,7 @@ describe('Qraft uses Query Function', () => {
           {
             url: '/approval_policies/{approval_policy_id}',
             method: 'get',
+            security: ['partnerToken'],
             infinite: false,
           },
           parameters,
@@ -1491,6 +1492,7 @@ describe('Proxy call manipulations', () => {
   it('reads the schema', () => {
     expect(qraft.files.getFiles.schema).toEqual({
       url: '/files',
+      security: ['HTTPBearer'],
       method: 'get',
     });
   });
@@ -2952,6 +2954,7 @@ describe('Qraft uses getQueryKey', () => {
         url: qraft.approvalPolicies.getApprovalPoliciesId.schema.url,
         method: qraft.approvalPolicies.getApprovalPoliciesId.schema.method,
         infinite: false,
+        security: qraft.approvalPolicies.getApprovalPoliciesId.schema.security,
       },
       {
         header: {
@@ -2972,6 +2975,7 @@ describe('Qraft uses getQueryKey', () => {
       {
         url: qraft.approvalPolicies.getApprovalPoliciesId.schema.url,
         method: qraft.approvalPolicies.getApprovalPoliciesId.schema.method,
+        security: qraft.approvalPolicies.getApprovalPoliciesId.schema.security,
         infinite: false,
       },
       {},
@@ -3211,9 +3215,11 @@ describe('Qraft is type-safe on Query Filters', () => {
 function Providers({
   children,
   queryClient,
+  requestFn: requestFnProp = requestFn,
 }: {
   children: ReactNode;
   queryClient?: QueryClient;
+  requestFn?: RequestFn<any>;
 }) {
   queryClient = React.useState(() => queryClient ?? new QueryClient())[0];
 
@@ -3225,7 +3231,7 @@ function Providers({
       <QraftContextDist.Provider
         value={{
           baseUrl: 'https://api.sandbox.monite.com/v1',
-          requestFn: requestFn,
+          requestFn: requestFnProp,
         }}
       >
         {children}
