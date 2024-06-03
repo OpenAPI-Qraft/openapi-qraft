@@ -1,5 +1,17 @@
 # @openapi-qraft/tanstack-query-react-plugin
 
+## 1.10.0
+
+### Minor Changes
+
+- 4d8bd3c: Added `security` output for service operations. The schema object for each operation now includes a list of supported
+  security schemes, detailing the authentication methods applicable to that operation.
+
+### Patch Changes
+
+- Updated dependencies [b04f28d]
+  - @openapi-qraft/plugin@1.10.0
+
 ## 1.9.0
 
 ### Patch Changes

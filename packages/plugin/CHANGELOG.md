@@ -1,5 +1,11 @@
 # @openapi-qraft/plugin
 
+## 1.10.0
+
+### Minor Changes
+
+- b04f28d: Added `security` output for service operations.
+
 ## 1.9.0
 
 ### Minor Changes
