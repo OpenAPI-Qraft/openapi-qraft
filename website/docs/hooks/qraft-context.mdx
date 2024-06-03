@@ -1,5 +1,6 @@
 ---
 sidebar_position: 1
+sidebar_label: <QraftContext />
 ---
 
 import Tabs from '@theme/Tabs';
@@ -21,7 +22,7 @@ import TabItem from '@theme/TabItem';
 ```
 
 ### Context Value
-- `requestFn: requestFn(requestSchema, requestInfo): Promise<T>` - **Required** function used to make requests
+- `requestFn: requestFn(requestSchema, requestInfo) => Promise<T>` - **Required** function used to make requests
 - `baseUrl: string` - **Required** base URL of the API to be used by `requestFn`
 - `queryClient?: QueryClient` - **Optional** [_QueryClient 🌴_](https://tanstack.com/query/latest/docs/reference/QueryClient) to be used in Qraft Hooks.
   If not provided, [_useQueryClient() 🌴_](https://tanstack.com/query/latest/docs/framework/react/reference/useQueryClient)
