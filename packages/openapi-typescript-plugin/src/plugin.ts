@@ -94,10 +94,24 @@ export const plugin: QraftCommandPlugin = {
     command.hook('preAction', (thisCommand) => {
       // Do not override if a custom value already exists
       if (!command.getOptionValue('openapiTypesImportPath')) {
+        let openapiTypesFileName = thisCommand.getOptionValue(
+          'openapiTypesFileName'
+        );
+
+        if (
+          thisCommand.getOptionValueSource('openapiTypesFileName') === 'default'
+        ) {
+          openapiTypesFileName = openapiTypesFileName.slice(
+            0,
+            openapiTypesFileName.indexOf('.')
+          );
+        }
+
+        // Set value to `--openapi-types-import-path` option
         thisCommand.setOptionValue(
           'openapiTypesImportPath',
           createOpenapiTypesImportPath(
-            thisCommand.getOptionValue('openapiTypesFileName'),
+            openapiTypesFileName,
             thisCommand.getOptionValue('explicitImportExtensions')
           )
         );
