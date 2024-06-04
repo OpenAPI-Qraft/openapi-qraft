@@ -56,4 +56,4 @@ export const filesService: {
             security: ["HTTPBearer"]
         }
     }
-} as const;
+};
