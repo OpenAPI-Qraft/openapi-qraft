@@ -430,7 +430,7 @@ qraft.pet.getPetById.setQueryData(
 );
 ```
 
-#### [invalidateQueries(...) 🔗](https://openapi-qraft.github.io/openapi-qraft/docs/query-client/invalidateQueries)
+### [invalidateQueries(...) 🔗](https://openapi-qraft.github.io/openapi-qraft/docs/query-client/invalidateQueries)
 
 [Queries Invalidation 🔗](https://tanstack.com/query/latest/docs/framework/react/guides/query-invalidation) is possible
 using `<operation>.invalidateQueries(...)` method.
@@ -462,7 +462,7 @@ qraft.entities.getEntities.invalidateQueries(
 );
 ```
 
-##### Invalidation without _parameters_:
+#### Invalidation without _parameters_:
 
 To invalidate all queries for a specific endpoint, you can call `invalidateQueries` without any parameters:
 
@@ -479,7 +479,7 @@ To invalidate all queries for a specific endpoint, you can call `invalidateQueri
 qraft.entities.getEntities.invalidateQueries(queryClient);
 ```
 
-##### Invalidation with _queryKey_:
+#### Invalidation with _queryKey_:
 
 It could be useful to invalidate queries using `queryKey` directly:
 
@@ -506,7 +506,7 @@ qraft.entities.getEntities.invalidateQueries(
 );
 ```
 
-##### [Invalidation with predicate: 🔗](https://tanstack.com/query/latest/docs/framework/react/guides/filters#query-filters)
+#### [Invalidation with predicate: 🔗](https://tanstack.com/query/latest/docs/framework/react/guides/filters#query-filters)
 
 The `predicate(...)` function will be used as a final filter on all matching queries.
 
@@ -534,7 +534,7 @@ qraft.entities.getEntities.invalidateQueries(
 );
 ```
 
-#### [fetchQuery(...) 🔗](https://openapi-qraft.github.io/openapi-qraft/docs/query-client/fetchQuery)
+### [fetchQuery(...) 🔗](https://openapi-qraft.github.io/openapi-qraft/docs/query-client/fetchQuery)
 
 ```ts
 /**
@@ -562,7 +562,7 @@ const posts = qraft.posts.getPosts.fetchQuery(
 );
 ```
 
-#### [fetchInfiniteQuery(...) 🔗](https://openapi-qraft.github.io/openapi-qraft/docs/query-client/fetchInfiniteQuery)
+### [fetchInfiniteQuery(...) 🔗](https://openapi-qraft.github.io/openapi-qraft/docs/query-client/fetchInfiniteQuery)
 
 ```ts
 /**
