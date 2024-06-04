@@ -313,7 +313,7 @@ const getOperationParametersFactory = (operation: ServiceOperation) => {
 };
 
 const getServiceVariableFactory = (
-  { typeName, variableName }: { typeName: string; variableName: string },
+  { variableName }: { variableName: string },
   operations: ServiceOperation[]
 ) => {
   return factory.createVariableStatement(
@@ -323,7 +323,9 @@ const getServiceVariableFactory = (
         factory.createVariableDeclaration(
           factory.createIdentifier(variableName),
           undefined,
-          getServiceVariableTypeFactory({ typeName }),
+          factory.createTypeLiteralNode(
+            operations.map(getServiceVariableTypeFactory)
+          ),
           factory.createObjectLiteralExpression(
             operations.map(getServiceVariablePropertyFactory),
             true
@@ -335,37 +337,19 @@ const getServiceVariableFactory = (
   );
 };
 
-const getServiceVariableTypeFactory = ({ typeName }: { typeName: string }) => {
-  return factory.createMappedTypeNode(
+const getServiceVariableTypeFactory = (operation: ServiceOperation) => {
+  return factory.createPropertySignature(
     undefined,
-    factory.createTypeParameterDeclaration(
-      undefined,
-      factory.createIdentifier('key'),
-      factory.createTypeOperatorNode(
-        ts.SyntaxKind.KeyOfKeyword,
-        factory.createTypeReferenceNode(
-          factory.createIdentifier(typeName),
-          undefined
-        )
+    factory.createIdentifier(operation.name),
+    undefined,
+    factory.createTypeLiteralNode([
+      factory.createPropertySignature(
+        undefined,
+        factory.createIdentifier('schema'),
+        undefined,
+        getOperationSchemaFactory(operation)
       ),
-      undefined
-    ),
-    undefined,
-    undefined,
-    factory.createTypeReferenceNode(factory.createIdentifier('Pick'), [
-      factory.createIndexedAccessTypeNode(
-        factory.createTypeReferenceNode(
-          factory.createIdentifier(typeName),
-          undefined
-        ),
-        factory.createTypeReferenceNode(
-          factory.createIdentifier('key'),
-          undefined
-        )
-      ),
-      factory.createLiteralTypeNode(factory.createStringLiteral('schema')),
-    ]),
-    undefined
+    ])
   );
 };
 
