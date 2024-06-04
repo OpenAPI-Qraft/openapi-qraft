@@ -5,6 +5,8 @@ applications,
 leveraging the power of **TanStack Query v5**. It utilizes a Proxy-based architecture to dynamically generate
 hooks with typed parameters, ensuring that your API requests are both type-safe and efficient.
 
+Read the full documentation at [openapi-qraft.github.io/openapi-qraft](https://openapi-qraft.github.io/openapi-qraft/).
+
 ## Features
 
 - **Type-safe API Requests:** Utilize TypeScript for type-safe API requests, reducing runtime errors and improving
@@ -37,36 +39,19 @@ To get started with `@openapi-qraft/react`, you'll need to set up your client by
 of
 callbacks to handle various React Query functionalities.
 
-### 1. Generate API Types
+### 1. Generate OpenAPI Types & Services
 
 Before utilizing `@openapi-qraft/react` to make typed requests, you need to define your API services by generating types
-and
-schemas from your OpenAPI specification. This ensures that your requests are type-safe and that your development
-experience benefits from TypeScript's power. Follow the steps below to generate your API services:
+and schemas from your OpenAPI Document.
 
-#### Generating TypeScript Definitions
-
-First, generate TypeScript definitions from your OpenAPI schema
-using [`openapi-typescript`](https://www.npmjs.com/package/openapi-typescript). This will provide you with
-the necessary types for your API requests and responses.
+To generate both TypeScript definitions and services using `openapi-qraft`, run the following command in the root directory of your project:
 
 ```bash
-npx openapi-typescript https://api.dev.monite.com/openapi.json?version=2023-09-01 --output src/api/openapi.d.ts
+npx @openapi-qraft/cli --plugin tanstack-query-react --plugin openapi-typescript https://api.dev.monite.com/openapi.json?version=2023-09-01 --output-dir src/api
 ```
 
-#### Generating Qraft Services
-
-Next, use `@openapi-qraft/cli` to generate the services and typed TanStack Query React Hooks. Ensure to specify the path
-to the TypeScript definitions generated in the previous step.
-
-```bash
-npx @openapi-qraft/cli https://api.dev.monite.com/openapi.json?version=2023-09-01 --output-dir src/api --openapi-types-import-path '../openapi.d.ts'
-```
-
-By completing these steps, you will generate `openapi.d.ts`, which serves as a TypeScript representation of the
-specified OpenAPI, _along with a set of services_ in `src/api/services`. These elements are key to enhancing your
-development workflow with type
-safety and auto-completion features.
+By completing this step, you will generate `src/api/schema.d.ts`, which serves as a TypeScript representation of the specified OpenAPI,
+along with a set of services in `src/api/services/`.
 
 ### 2. Create API Client
 
@@ -418,34 +403,6 @@ qraft.entities.getEntities.useQueries({
 });
 ```
 
-### [useIsFetching(...) 🔗](https://openapi-qraft.github.io/openapi-qraft/docs/hooks/useIsFetching)
-
-```tsx
-function FetchStatus() {
-  // Checks all queries `GET /entities`
-  const fetchingTotal = qraft.entities.getEntities.useIsFetching();
-
-  // Checks all queries `GET /entities/3e3e-3e3e-3e3e` and `x-monite-version: 2023-09-01` header
-  const specificQueryKeyTotal = qraft.entities.getEntities.useIsFetching({
-    parameters: {
-      header: {
-        'x-monite-version': '2023-09-01',
-      },
-      path: {
-        entity_id: '3e3e-3e3e-3e3e',
-      },
-    },
-  });
-
-  return (
-    <>
-      {!!fetchingTotal && <div>Number of queries: {fetchingTotal}...</div>}
-      {!!specificQueryKeyTotal && <div>Loading specific query...</div>}
-    </>
-  );
-}
-```
-
 ## [`QueryClient`](https://tanstack.com/query/latest/docs/reference/QueryClient) Methods
 
 #### [setQueryData(...) 🔗](https://openapi-qraft.github.io/openapi-qraft/docs/query-client/setQueryData)
@@ -458,7 +415,7 @@ qraft.pet.getPetById.setQueryData(
 );
 ```
 
-#### [invalidateQueries(...) 🔗](https://openapi-qraft.github.io/openapi-qraft/docs/query-client/invalidateQueries)
+### [invalidateQueries(...) 🔗](https://openapi-qraft.github.io/openapi-qraft/docs/query-client/invalidateQueries)
 
 [Queries Invalidation 🔗](https://tanstack.com/query/latest/docs/framework/react/guides/query-invalidation) is possible
 using `<operation>.invalidateQueries(...)` method.
@@ -490,7 +447,7 @@ qraft.entities.getEntities.invalidateQueries(
 );
 ```
 
-##### Invalidation without _parameters_:
+#### Invalidation without _parameters_:
 
 To invalidate all queries for a specific endpoint, you can call `invalidateQueries` without any parameters:
 
@@ -507,7 +464,7 @@ To invalidate all queries for a specific endpoint, you can call `invalidateQueri
 qraft.entities.getEntities.invalidateQueries(queryClient);
 ```
 
-##### Invalidation with _queryKey_:
+#### Invalidation with _queryKey_:
 
 It could be useful to invalidate queries using `queryKey` directly:
 
@@ -534,7 +491,7 @@ qraft.entities.getEntities.invalidateQueries(
 );
 ```
 
-##### [Invalidation with predicate: 🔗](https://tanstack.com/query/latest/docs/framework/react/guides/filters#query-filters)
+#### [Invalidation with predicate: 🔗](https://tanstack.com/query/latest/docs/framework/react/guides/filters#query-filters)
 
 The `predicate(...)` function will be used as a final filter on all matching queries.
 
@@ -562,7 +519,7 @@ qraft.entities.getEntities.invalidateQueries(
 );
 ```
 
-#### [fetchQuery(...) 🔗](https://openapi-qraft.github.io/openapi-qraft/docs/query-client/fetchQuery)
+### [fetchQuery(...) 🔗](https://openapi-qraft.github.io/openapi-qraft/docs/query-client/fetchQuery)
 
 ```ts
 /**
@@ -590,7 +547,7 @@ const posts = qraft.posts.getPosts.fetchQuery(
 );
 ```
 
-#### [fetchInfiniteQuery(...) 🔗](https://openapi-qraft.github.io/openapi-qraft/docs/query-client/fetchInfiniteQuery)
+### [fetchInfiniteQuery(...) 🔗](https://openapi-qraft.github.io/openapi-qraft/docs/query-client/fetchInfiniteQuery)
 
 ```ts
 /**
