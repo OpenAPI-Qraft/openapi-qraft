@@ -66,4 +66,4 @@ export const approvalPoliciesService: {
             security: ["HTTPBearer"]
         }
     }
-} as const;
+};

@@ -324,15 +324,9 @@ const getServiceVariableFactory = (
           factory.createIdentifier(variableName),
           undefined,
           getServiceVariableTypeFactory({ typeName }),
-          factory.createAsExpression(
-            factory.createObjectLiteralExpression(
-              operations.map(getServiceVariablePropertyFactory),
-              true
-            ),
-            factory.createTypeReferenceNode(
-              factory.createIdentifier('const'),
-              undefined
-            )
+          factory.createObjectLiteralExpression(
+            operations.map(getServiceVariablePropertyFactory),
+            true
           )
         ),
       ],
