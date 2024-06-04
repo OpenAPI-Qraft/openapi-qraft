@@ -418,34 +418,6 @@ qraft.entities.getEntities.useQueries({
 });
 ```
 
-### [useIsFetching(...) 🔗](https://openapi-qraft.github.io/openapi-qraft/docs/hooks/useIsFetching)
-
-```tsx
-function FetchStatus() {
-  // Checks all queries `GET /entities`
-  const fetchingTotal = qraft.entities.getEntities.useIsFetching();
-
-  // Checks all queries `GET /entities/3e3e-3e3e-3e3e` and `x-monite-version: 2023-09-01` header
-  const specificQueryKeyTotal = qraft.entities.getEntities.useIsFetching({
-    parameters: {
-      header: {
-        'x-monite-version': '2023-09-01',
-      },
-      path: {
-        entity_id: '3e3e-3e3e-3e3e',
-      },
-    },
-  });
-
-  return (
-    <>
-      {!!fetchingTotal && <div>Number of queries: {fetchingTotal}...</div>}
-      {!!specificQueryKeyTotal && <div>Loading specific query...</div>}
-    </>
-  );
-}
-```
-
 ## [`QueryClient`](https://tanstack.com/query/latest/docs/reference/QueryClient) Methods
 
 #### [setQueryData(...) 🔗](https://openapi-qraft.github.io/openapi-qraft/docs/query-client/setQueryData)
