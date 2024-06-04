@@ -1,5 +1,12 @@
 # @openapi-qraft/tanstack-query-react-plugin
 
+## 1.10.1-beta.1
+
+### Patch Changes
+
+- cbabbba: Removed `as const` from Services variable for compatibility with older TypeScript versions.
+  - @openapi-qraft/plugin@1.10.1-beta.1
+
 ## 1.10.1-beta.0
 
 ### Patch Changes
