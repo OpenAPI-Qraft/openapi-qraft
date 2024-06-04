@@ -1,5 +1,12 @@
 # @openapi-qraft/openapi-typescript
 
+## 1.0.3-beta.0
+
+### Patch Changes
+
+- 1ed521e: Default behavior now removes `.ts` extension from import paths. This behavior can be overridden for the `@openapi-qraft/tanstack-query-react-plugin` using the `--openapi-types-import-path <path>` option, which allows specifying the full import path, including the `.ts` extension.
+  - @openapi-qraft/plugin@1.10.1-beta.0
+
 ## 1.0.2
 
 ### Patch Changes
