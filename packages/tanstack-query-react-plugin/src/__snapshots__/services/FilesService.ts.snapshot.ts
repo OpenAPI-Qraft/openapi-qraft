@@ -33,7 +33,31 @@ export interface FilesService {
     }, paths["/files/list"]["get"]["responses"]["200"]["content"]["application/json"], paths["/files/list"]["get"]["parameters"], paths["/files/list"]["get"]["responses"]["default"]["content"]["application/json"]>;
 }
 export const filesService: {
-    [key in keyof FilesService]: Pick<FilesService[key], "schema">;
+    getFiles: {
+        schema: {
+            method: "get";
+            url: "/files";
+            security: [
+                "HTTPBearer"
+            ];
+        };
+    };
+    postFiles: {
+        schema: {
+            method: "post";
+            url: "/files";
+            mediaType: "multipart/form-data";
+        };
+    };
+    getFileList: {
+        schema: {
+            method: "get";
+            url: "/files/list";
+            security: [
+                "HTTPBearer"
+            ];
+        };
+    };
 } = {
     getFiles: {
         schema: {
