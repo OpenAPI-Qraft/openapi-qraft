@@ -13,5 +13,9 @@
     "playground": "0.0.14",
     "openapi-qraft-website": "0.0.0"
   },
-  "changesets": []
+  "changesets": [
+    "lovely-berries-invite",
+    "tricky-beans-search",
+    "twenty-starfishes-rhyme"
+  ]
 }

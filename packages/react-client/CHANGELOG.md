@@ -1,5 +1,12 @@
 # @openapi-qraft/react
 
+## 1.11.0-beta.0
+
+### Minor Changes
+
+- 84fb5e9: Added CommonJS distribution support.
+- de7ba93: `<QraftSecureRequestFn />` is now exported from the index.
+
 ## 1.10.1
 
 ## 1.10.1-beta.2
