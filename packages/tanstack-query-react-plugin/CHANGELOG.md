@@ -1,5 +1,15 @@
 # @openapi-qraft/tanstack-query-react-plugin
 
+## 1.11.0-beta.0
+
+### Minor Changes
+
+- 1a4eaf8: Exported callbacks from the package index file.
+
+### Patch Changes
+
+- @openapi-qraft/plugin@1.11.0-beta.0
+
 ## 1.10.1
 
 ### Patch Changes
