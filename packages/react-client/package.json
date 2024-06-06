@@ -3,8 +3,8 @@
   "version": "1.10.1",
   "description": "API client for React, providing type-safe requests and dynamic Tanstack Query React Hooks via a modular, Proxy-based architecture.",
   "scripts": {
-    "build": "rimraf dist/ && tsc --project tsconfig.build.json",
-    "dev": "rimraf dist/ && tsc --project tsconfig.build.json --watch",
+    "build": "rimraf dist/ && tsup --config tsup.config.ts",
+    "dev": "rimraf dist/ && tsc --project tsconfig.build.json --watch --outDir ./dist/esm",
     "test": "vitest run",
     "test:coverage": "vitest run --coverage",
     "typecheck": "tsc --noEmit",
@@ -12,7 +12,6 @@
     "generate-api": "openapi-qraft --plugin tanstack-query-react --plugin openapi-typescript ../test-fixtures/openapi.json -rm -o src/tests/fixtures/api --openapi-types-file-name openapi.ts --explicit-import-extensions --filter-services '/approval_policies/**,/entities/**,/files/**,!/internal/**' && yarn _prettify-api",
     "_prettify-api": "prettier --write src/tests/fixtures/api/**/*.ts"
   },
-  "type": "module",
   "sideEffects": false,
   "devDependencies": {
     "@openapi-qraft/cli": "workspace:~",
@@ -26,6 +25,7 @@
     "@types/react": "^18.2.47",
     "@vitejs/plugin-react": "latest",
     "@vitest/coverage-v8": "^1.1.3",
+    "esbuild-plugin-file-path-extensions": "^2.1.1",
     "eslint": "^9.0.0",
     "globals": "^15.0.0",
     "jsdom": "latest",
@@ -34,6 +34,7 @@
     "query-string": "^8.1.0",
     "react": "^18.2.0",
     "rimraf": "^5.0.5",
+    "tsup": "^8.1.0",
     "vitest": "^1.4.0"
   },
   "peerDependencies": {
@@ -47,17 +48,21 @@
     "!dist/tests/**",
     "!src/tests/**"
   ],
+  "type": "module",
+  "types": "dist/cjs/index.d.cts",
+  "main": "dist/cjs/index.cjs",
   "exports": {
-    "./package.json": "./package.json",
-    ".": "./dist/index.js",
-    "./*": "./dist/*.js"
-  },
-  "typesVersions": {
-    "*": {
-      "*": [
-        "dist/*"
-      ]
-    }
+    ".": {
+      "import": {
+        "types": "./dist/esm/index.d.ts",
+        "default": "./dist/esm/index.js"
+      },
+      "require": {
+        "types": "./dist/cjs/index.d.cts",
+        "default": "./dist/cjs/index.cjs"
+      }
+    },
+    "./package.json": "./package.json"
   },
   "repository": {
     "type": "git",
