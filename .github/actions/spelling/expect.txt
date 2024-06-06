@@ -79,7 +79,6 @@ TInfinite
 qraftio
 typecheck
 tseslint
-devDepencencies
 memfs
 OpenAPITSOptions
 tsup
