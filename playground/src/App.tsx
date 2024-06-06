@@ -1,7 +1,10 @@
 import { ComponentProps, ReactNode, useState } from 'react';
 
-import { QraftContext, requestFn } from '@openapi-qraft/react';
-import { QraftSecureRequestFn } from '@openapi-qraft/react/Unstable_QraftSecureRequestFn';
+import {
+  QraftContext,
+  requestFn,
+  Unstable_QraftSecureRequestFn as QraftSecureRequestFn,
+} from '@openapi-qraft/react';
 import {
   QueryClient,
   QueryClientProvider,
