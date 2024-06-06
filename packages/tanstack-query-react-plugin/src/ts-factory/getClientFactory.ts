@@ -36,30 +36,17 @@ const getClientImportsFactory = ({
             undefined,
             factory.createIdentifier('QraftClientOptions')
           ),
-        ])
-      ),
-      factory.createStringLiteral('@openapi-qraft/react'),
-      undefined
-    ),
-    ...serviceCallbacks.map((propertyName) =>
-      factory.createImportDeclaration(
-        undefined,
-        factory.createImportClause(
-          false,
-          undefined,
-          factory.createNamedImports([
+          ...serviceCallbacks.map((propertyName) =>
             factory.createImportSpecifier(
               false,
               undefined,
               factory.createIdentifier(propertyName)
-            ),
-          ])
-        ),
-        factory.createStringLiteral(
-          `@openapi-qraft/react/callbacks/${propertyName}`
-        ),
-        undefined
-      )
+            )
+          ),
+        ])
+      ),
+      factory.createStringLiteral('@openapi-qraft/react'),
+      undefined
     ),
     factory.createImportDeclaration(
       undefined,

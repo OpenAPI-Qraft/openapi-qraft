@@ -11,3 +11,4 @@ export {
   type HeadersOptions,
 } from './lib/requestFn.js';
 export * from './service-operation/index.js';
+export * from './callbacks/index.js';
