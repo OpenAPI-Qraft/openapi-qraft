@@ -12,7 +12,7 @@ csr
 dracula
 emoji
 fddbf
-Firefox
+firefox
 gitlab
 groupnames
 htpasswd
@@ -79,6 +79,8 @@ TInfinite
 qraftio
 typecheck
 tseslint
-devDepencencies
 memfs
 OpenAPITSOptions
+tsup
+dts
+
