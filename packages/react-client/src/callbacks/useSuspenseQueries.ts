@@ -1,21 +1,17 @@
 'use client';
 
-import { useContext } from 'react';
-
 import {
-  SuspenseQueriesResults,
+  type SuspenseQueriesResults,
   useSuspenseQueries as useSuspenseQueriesTanstack,
 } from '@tanstack/react-query';
 
 import { composeQueryKey } from '../lib/composeQueryKey.js';
 import type { OperationSchema } from '../lib/requestFn.js';
-import { useQueryClient } from '../lib/useQueryClient.js';
 import type { QraftClientOptions } from '../qraftAPIClient.js';
-import { QraftContext } from '../QraftContext.js';
-import { ServiceOperationQuery } from '../service-operation/ServiceOperation.js';
+import type { ServiceOperationQuery } from '../service-operation/ServiceOperation.js';
 
 export const useSuspenseQueries: (
-  qraftOptions: QraftClientOptions | undefined,
+  qraftOptions: QraftClientOptions,
   schema: OperationSchema,
   args: Parameters<
     ServiceOperationQuery<
@@ -26,10 +22,6 @@ export const useSuspenseQueries: (
   >
 ) => SuspenseQueriesResults<never> = (qraftOptions, schema, args) => {
   const [options, queryClientByArg] = args;
-
-  const contextValue = useContext(qraftOptions?.context ?? QraftContext);
-  if (!contextValue?.requestFn)
-    throw new Error(`QraftContext.requestFn not found`);
 
   return useSuspenseQueriesTanstack(
     {
@@ -55,9 +47,9 @@ export const useSuspenseQueries: (
           queryFn:
             optionsWithQueryKey.queryFn ??
             function ({ queryKey: [, queryParams], signal, meta }) {
-              return contextValue.requestFn(schema, {
+              return qraftOptions.requestFn(schema, {
                 parameters: queryParams as never,
-                baseUrl: contextValue.baseUrl,
+                baseUrl: qraftOptions.baseUrl,
                 signal,
                 meta,
               });
@@ -65,6 +57,6 @@ export const useSuspenseQueries: (
         };
       }),
     },
-    useQueryClient(qraftOptions, queryClientByArg)
+    qraftOptions.queryClient
   ) as never;
 };

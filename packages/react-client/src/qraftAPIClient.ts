@@ -1,12 +1,13 @@
-import type { Context } from 'react';
+import { type QueryClient } from '@tanstack/query-core';
 
 import type * as operationInvokeModule from './callbacks/operationInvokeFn.js';
 import { createRecursiveProxy } from './lib/createRecursiveProxy.js';
-import type { OperationSchema } from './lib/requestFn.js';
-import type { QraftContextValue } from './QraftContext.js';
+import type { OperationSchema, RequestFnInfo } from './lib/requestFn.js';
 
 export interface QraftClientOptions {
-  context?: Context<QraftContextValue>;
+  requestFn<T>(schema: OperationSchema, requestInfo: RequestFnInfo): Promise<T>;
+  baseUrl: string;
+  queryClient: QueryClient;
 }
 
 export const qraftAPIClient = <
@@ -15,7 +16,7 @@ export const qraftAPIClient = <
 >(
   services: ServicesDeclaration<Services>,
   callbacks: Callbacks,
-  options?: QraftClientOptions
+  options: QraftClientOptions
 ): Services => {
   return createRecursiveProxy(
     function getCallback(getPath, key) {

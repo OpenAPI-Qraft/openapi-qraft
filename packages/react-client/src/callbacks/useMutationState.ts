@@ -8,9 +8,8 @@ import {
 
 import { composeMutationFilters } from '../lib/composeMutationFilters.js';
 import type { OperationSchema } from '../lib/requestFn.js';
-import { useQueryClient } from '../lib/useQueryClient.js';
 import type { QraftClientOptions } from '../qraftAPIClient.js';
-import { ServiceOperationMutation } from '../service-operation/ServiceOperation.js';
+import type { ServiceOperationMutation } from '../service-operation/ServiceOperation.js';
 
 export const useMutationState: <
   TData = unknown,
@@ -18,7 +17,7 @@ export const useMutationState: <
   TVariables = unknown,
   TContext = unknown,
 >(
-  qraftOptions: QraftClientOptions | undefined,
+  qraftOptions: QraftClientOptions,
   schema: OperationSchema,
   args: Parameters<
     ServiceOperationMutation<
@@ -40,6 +39,6 @@ export const useMutationState: <
       ...options,
       filters: composeMutationFilters(schema, options?.filters),
     } as never,
-    useQueryClient(qraftOptions, queryClientByArg)
+    qraftOptions.queryClient
   ) as never;
 };
