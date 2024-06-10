@@ -1,5 +1,11 @@
 # @openapi-qraft/react
 
+## 1.11.0-beta.1
+
+### Patch Changes
+
+- 3d2dd60: Added initial implementation of `--operation-predefined-parameter` option
+
 ## 1.11.0-beta.0
 
 ### Minor Changes
