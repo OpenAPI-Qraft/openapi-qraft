@@ -10,14 +10,17 @@ import { act, renderHook, waitFor } from '@testing-library/react';
 
 import { vi } from 'vitest';
 
-import type { RequestFnPayload } from '../index.js';
 import {
   bodySerializer,
   QraftContextValue,
   requestFn,
   urlSerializer,
 } from '../index.js';
-import type { OperationSchema, RequestFn } from '../lib/requestFn.js';
+import type {
+  OperationSchema,
+  RequestFn,
+  RequestFnInfo,
+} from '../lib/requestFn.js';
 import { createAPIClient } from './fixtures/api/index.js';
 
 const qraft = createAPIClient();
@@ -26,7 +29,7 @@ const baseUrl = 'https://api.sandbox.monite.com/v1';
 
 const requestClient = async <T,>(
   requestSchema: OperationSchema,
-  requestInfo: Omit<RequestFnPayload, 'baseUrl'>
+  requestInfo: Omit<RequestFnInfo, 'baseUrl'>
 ): Promise<T> =>
   requestFn(requestSchema, {
     ...requestInfo,
@@ -174,7 +177,28 @@ describe('Qraft uses singular Query', () => {
     });
 
     await waitFor(() => {
-      expect(result.current.data).toEqual(undefined);
+      expect(result.current.data).toEqual({
+        data: [
+          {
+            file_type: 'pdf',
+            id: '1',
+            name: 'file1',
+            url: 'http://localhost:3000/1',
+          },
+          {
+            file_type: 'pdf',
+            id: '2',
+            name: 'file2',
+            url: 'http://localhost:3000/2',
+          },
+          {
+            file_type: 'pdf',
+            id: '3',
+            name: 'file3',
+            url: 'http://localhost:3000/3',
+          },
+        ],
+      });
     });
   });
 });
@@ -617,6 +641,72 @@ describe('Qraft uses Suspense Infinite Queries', () => {
           },
         },
       ],
+    });
+  });
+});
+
+describe('Qraft uses predefined parameters (--operation-predefined-parameters)', () => {
+  it('supports useMutation without predefined parameters', async () => {
+    const { result } = renderHook(
+      () => qraft.entities.postEntitiesIdDocuments.useMutation(),
+      {
+        wrapper: ({ children }) => (
+          <Providers
+            requestFn={(schema, requestInfo) => {
+              if (
+                schema.url === qraft.entities.postEntitiesIdDocuments.schema.url
+              )
+                return requestClient(schema, {
+                  ...requestInfo,
+                  headers: {
+                    'x-monite-version': '3.3.3',
+                  },
+                });
+              return requestClient(schema, requestInfo);
+            }}
+            children={children}
+          />
+        ),
+      }
+    );
+
+    act(() => {
+      result.current.mutate({
+        /**
+         * Should be passed, normally ⬇︎
+         * header: {
+         *   'x-monite-version': '1.0.0',
+         * }
+         */
+        path: {
+          entity_id: '1',
+        },
+        query: {
+          referer: 'https://example.com',
+        },
+        body: {
+          verification_document_back: 'back',
+          verification_document_front: 'front',
+        },
+      });
+    });
+
+    await waitFor(() => {
+      expect(result.current.data).toEqual({
+        header: {
+          'x-monite-version': '3.3.3',
+        },
+        path: {
+          entity_id: '1',
+        },
+        query: {
+          referer: 'https://example.com',
+        },
+        body: {
+          verification_document_back: 'back',
+          verification_document_front: 'front',
+        },
+      });
     });
   });
 });

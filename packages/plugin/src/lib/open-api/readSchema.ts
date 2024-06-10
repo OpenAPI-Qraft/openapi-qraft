@@ -4,8 +4,6 @@ import type { Readable } from 'node:stream';
 import type { OpenAPI3 } from 'openapi-typescript';
 import { validateAndBundle } from 'openapi-typescript/dist/lib/redoc.js';
 
-import { OpenAPISchemaType } from './OpenAPISchemaType.js';
-
 export const readSchema = async (
   source: string | URL | OpenAPI3 | Readable | Buffer
 ) => {
@@ -23,5 +21,5 @@ export const readSchema = async (
     silent: false,
   });
 
-  return parsed as OpenAPISchemaType;
+  return parsed as OpenAPI3;
 };

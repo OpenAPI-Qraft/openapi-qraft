@@ -16,6 +16,7 @@ describe('getServices', () => {
 
   it('matches snapshot with custom `servicesGlob`', () => {
     expect(
+      // @ts-expect-error - JSON OpenAPI schema does not match to OpenAPI3
       getServices(filterDocumentPaths(openAPI, ['/files/**']), {
         serviceNameBase: 'endpoint[0]',
         postfixServices: 'Service',

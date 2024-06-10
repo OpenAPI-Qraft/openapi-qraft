@@ -94,6 +94,15 @@ exports[`getServices > matches snapshot with "serviceNameBase: endpoint" 1`] = `
             },
           },
           {
+            "in": "header",
+            "name": "x-monite-entity-id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string",
+            },
+          },
+          {
             "in": "path",
             "name": "approval_policy_id",
             "required": true,
@@ -151,6 +160,15 @@ exports[`getServices > matches snapshot with "serviceNameBase: endpoint" 1`] = `
             },
           },
           {
+            "in": "header",
+            "name": "x-monite-entity-id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string",
+            },
+          },
+          {
             "in": "path",
             "name": "approval_policy_id",
             "required": true,
@@ -200,6 +218,15 @@ exports[`getServices > matches snapshot with "serviceNameBase: endpoint" 1`] = `
             "required": true,
             "schema": {
               "format": "date",
+              "type": "string",
+            },
+          },
+          {
+            "in": "header",
+            "name": "x-monite-entity-id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
               "type": "string",
             },
           },
@@ -462,6 +489,15 @@ exports[`getServices > matches snapshot with "serviceNameBase: tags" 1`] = `
             },
           },
           {
+            "in": "header",
+            "name": "x-monite-entity-id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string",
+            },
+          },
+          {
             "in": "path",
             "name": "approval_policy_id",
             "required": true,
@@ -519,6 +555,15 @@ exports[`getServices > matches snapshot with "serviceNameBase: tags" 1`] = `
             },
           },
           {
+            "in": "header",
+            "name": "x-monite-entity-id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string",
+            },
+          },
+          {
             "in": "path",
             "name": "approval_policy_id",
             "required": true,
@@ -568,6 +613,15 @@ exports[`getServices > matches snapshot with "serviceNameBase: tags" 1`] = `
             "required": true,
             "schema": {
               "format": "date",
+              "type": "string",
+            },
+          },
+          {
+            "in": "header",
+            "name": "x-monite-entity-id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
               "type": "string",
             },
           },
@@ -830,6 +884,15 @@ exports[`getServices > matches snapshot with custom \`postfixServices\` 1`] = `
             },
           },
           {
+            "in": "header",
+            "name": "x-monite-entity-id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string",
+            },
+          },
+          {
             "in": "path",
             "name": "approval_policy_id",
             "required": true,
@@ -887,6 +950,15 @@ exports[`getServices > matches snapshot with custom \`postfixServices\` 1`] = `
             },
           },
           {
+            "in": "header",
+            "name": "x-monite-entity-id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string",
+            },
+          },
+          {
             "in": "path",
             "name": "approval_policy_id",
             "required": true,
@@ -936,6 +1008,15 @@ exports[`getServices > matches snapshot with custom \`postfixServices\` 1`] = `
             "required": true,
             "schema": {
               "format": "date",
+              "type": "string",
+            },
+          },
+          {
+            "in": "header",
+            "name": "x-monite-entity-id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
               "type": "string",
             },
           },
@@ -1330,6 +1411,15 @@ exports[`getServices > matches snapshot with default options 1`] = `
             },
           },
           {
+            "in": "header",
+            "name": "x-monite-entity-id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string",
+            },
+          },
+          {
             "in": "path",
             "name": "approval_policy_id",
             "required": true,
@@ -1387,6 +1477,15 @@ exports[`getServices > matches snapshot with default options 1`] = `
             },
           },
           {
+            "in": "header",
+            "name": "x-monite-entity-id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string",
+            },
+          },
+          {
             "in": "path",
             "name": "approval_policy_id",
             "required": true,
@@ -1436,6 +1535,15 @@ exports[`getServices > matches snapshot with default options 1`] = `
             "required": true,
             "schema": {
               "format": "date",
+              "type": "string",
+            },
+          },
+          {
+            "in": "header",
+            "name": "x-monite-entity-id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
               "type": "string",
             },
           },

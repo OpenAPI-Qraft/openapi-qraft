@@ -11,7 +11,7 @@ export type OpenAPISchemaType = {
         description?: string;
         summary?: string;
         operationId?: string;
-        parameters?: Record<string, any>;
+        parameters?: Array<any>;
         deprecated?: boolean;
         requestBody?: {
           content: {

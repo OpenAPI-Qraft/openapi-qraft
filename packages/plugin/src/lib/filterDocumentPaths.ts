@@ -1,6 +1,6 @@
-import micromatch from 'micromatch';
+import { type OpenAPI3 } from 'openapi-typescript/src/types.js';
 
-import type { OpenAPISchemaType } from './open-api/OpenAPISchemaType.js';
+import { createServicePathMatch } from './createServicePathMatch.js';
 
 /**
  * Filter the schema to only include paths that match the servicesGlob
@@ -13,9 +13,9 @@ import type { OpenAPISchemaType } from './open-api/OpenAPISchemaType.js';
  * ```
  */
 export const filterDocumentPaths = (
-  schema: OpenAPISchemaType,
+  schema: OpenAPI3,
   servicesGlob: string[] | undefined
-) => {
+): OpenAPI3 => {
   if (!servicesGlob) return schema;
 
   const isPathMatch = createServicePathMatch(servicesGlob);
@@ -28,31 +28,4 @@ export const filterDocumentPaths = (
   }
 
   return { ...schema, paths };
-};
-
-/**
- * Create a function to match service paths
- * @param servicesGlob
- */
-export const createServicePathMatch = (servicesGlob: string[]) => {
-  const servicePathGlobs = servicesGlob.reduce<
-    Record<'match' | 'ignore', string[]>
-  >(
-    (acc, glob) => {
-      glob.startsWith('!')
-        ? acc.ignore.push(glob.slice(1))
-        : acc.match.push(glob);
-      return acc;
-    },
-    {
-      match: [],
-      ignore: [],
-    }
-  );
-
-  return function isServicePatchMatch(path: string) {
-    return micromatch.isMatch(path, servicePathGlobs.match, {
-      ignore: servicePathGlobs.ignore,
-    });
-  };
 };
