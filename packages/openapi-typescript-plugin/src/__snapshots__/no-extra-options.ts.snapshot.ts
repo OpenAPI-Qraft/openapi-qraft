@@ -258,6 +258,7 @@ export interface operations {
             header: {
                 /** @example 2023-06-04 */
                 "x-monite-version": string;
+                "x-monite-entity-id": string;
             };
             path: {
                 approval_policy_id: string;
@@ -326,6 +327,7 @@ export interface operations {
             header: {
                 /** @example 2023-06-04 */
                 "x-monite-version": string;
+                "x-monite-entity-id": string;
             };
             path: {
                 approval_policy_id: string;
@@ -384,6 +386,7 @@ export interface operations {
             header: {
                 /** @example 2023-06-04 */
                 "x-monite-version": string;
+                "x-monite-entity-id": string;
             };
             path: {
                 approval_policy_id: string;

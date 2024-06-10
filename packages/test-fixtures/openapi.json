@@ -154,6 +154,12 @@
           {
             "required": true,
             "schema": { "type": "string", "format": "uuid" },
+            "name": "x-monite-entity-id",
+            "in": "header"
+          },
+          {
+            "required": true,
+            "schema": { "type": "string", "format": "uuid" },
             "name": "approval_policy_id",
             "in": "path"
           },
@@ -254,6 +260,12 @@
           {
             "required": true,
             "schema": { "type": "string", "format": "uuid" },
+            "name": "x-monite-entity-id",
+            "in": "header"
+          },
+          {
+            "required": true,
+            "schema": { "type": "string", "format": "uuid" },
             "name": "approval_policy_id",
             "in": "path"
           },
@@ -326,6 +338,12 @@
             "schema": { "type": "string", "format": "date" },
             "example": "2023-06-04",
             "name": "x-monite-version",
+            "in": "header"
+          },
+          {
+            "required": true,
+            "schema": { "type": "string", "format": "uuid" },
+            "name": "x-monite-entity-id",
             "in": "header"
           },
           {
