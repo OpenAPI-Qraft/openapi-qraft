@@ -5,6 +5,7 @@ export {
   baseRequestFn,
   urlSerializer,
   bodySerializer,
+  mergeHeaders,
   type RequestFnPayload,
   type OperationSchema,
   type RequestFnOptions,
