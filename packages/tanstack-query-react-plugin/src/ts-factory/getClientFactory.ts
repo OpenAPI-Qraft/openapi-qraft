@@ -114,7 +114,7 @@ const getCreateClientFunctionFactory = () => {
         undefined,
         undefined,
         factory.createIdentifier('options'),
-        factory.createToken(ts.SyntaxKind.QuestionToken),
+        undefined,
         factory.createTypeReferenceNode(
           factory.createIdentifier('QraftClientOptions'),
           undefined
