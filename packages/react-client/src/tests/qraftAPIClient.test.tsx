@@ -1,6 +1,6 @@
-import React, { createContext, ReactNode, useEffect } from 'react';
+import React, { ReactNode } from 'react';
 
-import { QraftContext as QraftContextDist } from '@openapi-qraft/react';
+import { type QueryClientConfig } from '@tanstack/query-core';
 import {
   QueryClient,
   QueryClientProvider,
@@ -10,24 +10,13 @@ import { act, renderHook, waitFor } from '@testing-library/react';
 
 import { vi } from 'vitest';
 
-import {
-  bodySerializer,
-  QraftContextValue,
-  requestFn,
-  urlSerializer,
-} from '../index.js';
-import type {
-  OperationSchema,
-  RequestFn,
-  RequestFnInfo,
-} from '../lib/requestFn.js';
-import { createAPIClient } from './fixtures/api/index.js';
-
-const qraft = createAPIClient();
+import { type QraftClientOptions, requestFn } from '../index.js';
+import type { OperationSchema, RequestFnInfo } from '../lib/requestFn.js';
+import { createAPIClient, Services } from './fixtures/api/index.js';
 
 const baseUrl = 'https://api.sandbox.monite.com/v1';
 
-const requestClient = async <T,>(
+const requestFnWithBaseUrl = async <T,>(
   requestSchema: OperationSchema,
   requestInfo: Omit<RequestFnInfo, 'baseUrl'>
 ): Promise<T> =>
@@ -36,8 +25,27 @@ const requestClient = async <T,>(
     baseUrl,
   });
 
+const createClient = ({
+  requestFn: requestFnProp = requestFn,
+  queryClientConfig,
+}: { queryClientConfig?: QueryClientConfig } & Partial<
+  Pick<QraftClientOptions, 'requestFn'>
+> = {}) => {
+  const queryClient = new QueryClient(queryClientConfig);
+  return {
+    qraft: createAPIClient({
+      requestFn: requestFnProp,
+      queryClient,
+      baseUrl,
+    }),
+    queryClient,
+  };
+};
+
 describe('Qraft uses singular Query', () => {
   it('supports useQuery', async () => {
+    const { qraft, queryClient } = createClient();
+
     const { result } = renderHook(
       () =>
         qraft.approvalPolicies.getApprovalPoliciesId.useQuery({
@@ -52,7 +60,7 @@ describe('Qraft uses singular Query', () => {
           },
         }),
       {
-        wrapper: Providers,
+        wrapper: (props) => <Providers queryClient={queryClient} {...props} />,
       }
     );
 
@@ -86,6 +94,8 @@ describe('Qraft uses singular Query', () => {
   });
 
   it('supports useQuery with QueryKey', async () => {
+    const { qraft, queryClient } = createClient();
+
     const getApprovalPoliciesIdQueryKey =
       qraft.approvalPolicies.getApprovalPoliciesId.getQueryKey({
         header: {
@@ -105,7 +115,7 @@ describe('Qraft uses singular Query', () => {
           getApprovalPoliciesIdQueryKey
         ),
       {
-        wrapper: Providers,
+        wrapper: (props) => <Providers queryClient={queryClient} {...props} />,
       }
     );
 
@@ -115,6 +125,8 @@ describe('Qraft uses singular Query', () => {
   });
 
   it('supports useQuery with select()', async () => {
+    const { qraft, queryClient } = createClient();
+
     const { result } = renderHook(
       () =>
         qraft.approvalPolicies.getApprovalPoliciesId.useQuery(
@@ -136,7 +148,7 @@ describe('Qraft uses singular Query', () => {
           }
         ),
       {
-        wrapper: Providers,
+        wrapper: (props) => <Providers queryClient={queryClient} {...props} />,
       }
     );
 
@@ -145,78 +157,9 @@ describe('Qraft uses singular Query', () => {
     });
   });
 
-  it('supports custom context', async () => {
-    const QraftCustomContext = createContext<QraftContextValue>(undefined);
-
-    const customQraft = createAPIClient({ context: QraftCustomContext });
-
-    const queryClient = new QueryClient();
-
-    const { result } = renderHook(
-      () =>
-        customQraft.approvalPolicies.getApprovalPoliciesId.useQuery({
-          header: {
-            'x-monite-version': '1.0.0',
-          },
-          path: {
-            approval_policy_id: '1',
-          },
-          query: {
-            items_order: ['asc', 'desc'],
-          },
-        }),
-      {
-        wrapper: ({ children }) => {
-          useEffect(() => {
-            queryClient.mount();
-            return () => {
-              queryClient.unmount();
-            };
-          }, [queryClient]);
-
-          return (
-            <QraftCustomContext.Provider
-              value={{
-                queryClient,
-                baseUrl: 'https://api.sandbox.monite.com/v1',
-                requestFn(schema, info) {
-                  return requestFn(
-                    schema,
-                    {
-                      ...info,
-                      headers: { 'x-custom-provider': 'true' },
-                    },
-                    { urlSerializer, bodySerializer }
-                  );
-                },
-              }}
-            >
-              {children}
-            </QraftCustomContext.Provider>
-          );
-        },
-      }
-    );
-
-    expect(result.current.status).toEqual('pending');
-
-    await waitFor(() => {
-      expect(result.current.data).toEqual({
-        header: {
-          'x-monite-version': '1.0.0',
-          'x-custom-provider': 'true',
-        },
-        path: {
-          approval_policy_id: '1',
-        },
-        query: {
-          items_order: ['asc', 'desc'],
-        },
-      });
-    });
-  });
-
   it('supports useQuery with optional params', async () => {
+    const { qraft, queryClient } = createClient();
+
     const { result } = renderHook(
       () => ({
         queryNoArgsWithVoidParameters: qraft.files.getFileList.useQuery(),
@@ -224,7 +167,7 @@ describe('Qraft uses singular Query', () => {
       }),
 
       {
-        wrapper: Providers,
+        wrapper: (props) => <Providers queryClient={queryClient} {...props} />,
       }
     );
 
@@ -259,6 +202,8 @@ describe('Qraft uses singular Query', () => {
 
 describe('Qraft uses Suspense Query', () => {
   it('supports useSuspenseQuery', async () => {
+    const { qraft, queryClient } = createClient();
+
     const hook = () => {
       try {
         return qraft.approvalPolicies.getApprovalPoliciesId.useSuspenseQuery({
@@ -276,8 +221,6 @@ describe('Qraft uses Suspense Query', () => {
         return error as Promise<unknown>;
       }
     };
-
-    const queryClient = new QueryClient();
 
     const { result: resultWithErrorPromise } = renderHook(hook, {
       wrapper: (props) => <Providers {...props} queryClient={queryClient} />,
@@ -313,6 +256,8 @@ describe('Qraft uses Suspense Query', () => {
 });
 
 describe('Qraft uses Queries', () => {
+  const { qraft, queryClient } = createClient();
+
   const parameters: typeof qraft.approvalPolicies.getApprovalPoliciesId.types.parameters =
     {
       header: {
@@ -344,7 +289,7 @@ describe('Qraft uses Queries', () => {
           combine: (results) => results.map((result) => result.data),
         }),
       {
-        wrapper: Providers,
+        wrapper: (props) => <Providers queryClient={queryClient} {...props} />,
       }
     );
 
@@ -354,13 +299,15 @@ describe('Qraft uses Queries', () => {
   });
 
   it('supports useQueries with unified parameters', async () => {
+    const { qraft, queryClient } = createClient();
+
     const { result } = renderHook(
       () =>
         qraft.approvalPolicies.getApprovalPoliciesId.useQueries({
           queries: [{ parameters }, { parameters }],
         }),
       {
-        wrapper: Providers,
+        wrapper: (props) => <Providers queryClient={queryClient} {...props} />,
       }
     );
 
@@ -375,6 +322,8 @@ describe('Qraft uses Queries', () => {
   });
 
   it('supports useQueries with unified parameters and combine(...)', async () => {
+    const { qraft, queryClient } = createClient();
+
     const { result } = renderHook(
       () =>
         qraft.approvalPolicies.getApprovalPoliciesId.useQueries({
@@ -383,7 +332,7 @@ describe('Qraft uses Queries', () => {
             results.map((result) => result.data?.path?.approval_policy_id),
         }),
       {
-        wrapper: Providers,
+        wrapper: (props) => <Providers queryClient={queryClient} {...props} />,
       }
     );
 
@@ -397,6 +346,8 @@ describe('Qraft uses Queries', () => {
 });
 
 describe('Qraft uses Suspense Queries', () => {
+  const { qraft, queryClient } = createClient();
+
   const parameters: typeof qraft.approvalPolicies.getApprovalPoliciesId.types.parameters =
     {
       header: {
@@ -430,8 +381,6 @@ describe('Qraft uses Suspense Queries', () => {
         return error as Promise<void>;
       }
     };
-
-    const queryClient = new QueryClient();
 
     const { result: resultWithErrorPromise } = renderHook(hook, {
       wrapper: (props) => <Providers {...props} queryClient={queryClient} />,
@@ -506,7 +455,7 @@ describe('Qraft uses Suspense Queries', () => {
 });
 
 describe('Qraft uses Infinite Queries', () => {
-  const parameters: typeof qraft.files.getFiles.types.parameters = {
+  const parameters: Services['files']['getFiles']['types']['parameters'] = {
     header: {
       'x-monite-version': '1.0.0',
     },
@@ -516,6 +465,8 @@ describe('Qraft uses Infinite Queries', () => {
   };
 
   it('supports useInfiniteQuery with parameters', async () => {
+    const { qraft, queryClient } = createClient();
+
     const { result } = renderHook(
       () =>
         qraft.files.getFiles.useInfiniteQuery(parameters, {
@@ -535,7 +486,7 @@ describe('Qraft uses Infinite Queries', () => {
           },
         }),
       {
-        wrapper: Providers,
+        wrapper: (props) => <Providers queryClient={queryClient} {...props} />,
       }
     );
 
@@ -564,6 +515,8 @@ describe('Qraft uses Infinite Queries', () => {
   });
 
   it('supports useInfiniteQuery with select', async () => {
+    const { qraft, queryClient } = createClient();
+
     const { result } = renderHook(
       () =>
         qraft.files.getFiles.useInfiniteQuery(
@@ -597,7 +550,7 @@ describe('Qraft uses Infinite Queries', () => {
           }
         ),
       {
-        wrapper: Providers,
+        wrapper: (props) => <Providers queryClient={queryClient} {...props} />,
       }
     );
 
@@ -630,6 +583,8 @@ describe('Qraft uses Infinite Queries', () => {
   });
 
   it('supports useInfiniteQuery with queryKey', async () => {
+    const { qraft, queryClient } = createClient();
+
     const { result } = renderHook(
       () =>
         qraft.files.getFiles.useInfiniteQuery(
@@ -652,7 +607,7 @@ describe('Qraft uses Infinite Queries', () => {
           }
         ),
       {
-        wrapper: Providers,
+        wrapper: (props) => <Providers queryClient={queryClient} {...props} />,
       }
     );
 
@@ -681,7 +636,7 @@ describe('Qraft uses Infinite Queries', () => {
   });
 
   it('supports useInfiniteQuery with next page', async () => {
-    const queryClient = new QueryClient();
+    const { qraft, queryClient } = createClient();
 
     const { result } = renderHook(
       () =>
@@ -785,6 +740,8 @@ describe('Qraft uses Infinite Queries', () => {
 
 describe('Qraft uses Suspense Infinite Queries', () => {
   it('supports useSuspenseInfiniteQuery', async () => {
+    const { qraft, queryClient } = createClient();
+
     const hook = () => {
       try {
         return qraft.files.getFiles.useSuspenseInfiniteQuery(
@@ -817,8 +774,6 @@ describe('Qraft uses Suspense Infinite Queries', () => {
         return error as Promise<unknown>;
       }
     };
-
-    const queryClient = new QueryClient();
 
     const { result: resultWithErrorPromise } = renderHook(hook, {
       wrapper: (props) => <Providers {...props} queryClient={queryClient} />,
@@ -861,26 +816,23 @@ describe('Qraft uses Suspense Infinite Queries', () => {
 
 describe('Qraft uses predefined parameters (--operation-predefined-parameters)', () => {
   it('supports useMutation without predefined parameters', async () => {
+    const { qraft, queryClient } = createClient({
+      requestFn(schema, requestInfo) {
+        if (schema.url === qraft.entities.postEntitiesIdDocuments.schema.url)
+          return requestFnWithBaseUrl(schema, {
+            ...requestInfo,
+            headers: {
+              'x-monite-version': '3.3.3',
+            },
+          });
+        return requestFnWithBaseUrl(schema, requestInfo);
+      },
+    });
+
     const { result } = renderHook(
       () => qraft.entities.postEntitiesIdDocuments.useMutation(),
       {
-        wrapper: ({ children }) => (
-          <Providers
-            requestFn={(schema, requestInfo) => {
-              if (
-                schema.url === qraft.entities.postEntitiesIdDocuments.schema.url
-              )
-                return requestClient(schema, {
-                  ...requestInfo,
-                  headers: {
-                    'x-monite-version': '3.3.3',
-                  },
-                });
-              return requestClient(schema, requestInfo);
-            }}
-            children={children}
-          />
-        ),
+        wrapper: (props) => <Providers {...props} queryClient={queryClient} />,
       }
     );
 
@@ -927,10 +879,12 @@ describe('Qraft uses predefined parameters (--operation-predefined-parameters)',
 
 describe('Qraft uses Mutations', () => {
   it('supports useMutation without predefined parameters', async () => {
+    const { qraft, queryClient } = createClient();
+
     const { result } = renderHook(
       () => qraft.entities.postEntitiesIdDocuments.useMutation(),
       {
-        wrapper: Providers,
+        wrapper: (props) => <Providers {...props} queryClient={queryClient} />,
       }
     );
 
@@ -1036,6 +990,8 @@ describe('Qraft uses Mutations', () => {
   });
 
   it('supports useMutation with predefined parameters', async () => {
+    const { qraft, queryClient } = createClient();
+
     const { result } = renderHook(
       () =>
         qraft.entities.postEntitiesIdDocuments.useMutation({
@@ -1050,7 +1006,7 @@ describe('Qraft uses Mutations', () => {
           },
         }),
       {
-        wrapper: Providers,
+        wrapper: (props) => <Providers {...props} queryClient={queryClient} />,
       }
     );
 
@@ -1081,8 +1037,10 @@ describe('Qraft uses Mutations', () => {
   });
 
   it('supports useMutation with form data', async () => {
+    const { qraft, queryClient } = createClient();
+
     const { result } = renderHook(() => qraft.files.postFiles.useMutation(), {
-      wrapper: Providers,
+      wrapper: (props) => <Providers {...props} queryClient={queryClient} />,
     });
 
     act(() => {
@@ -1106,7 +1064,7 @@ describe('Qraft uses Mutations', () => {
 });
 
 describe('Qraft uses useIsMutating', () => {
-  const parameters: typeof qraft.entities.postEntitiesIdDocuments.types.parameters =
+  const parameters: Services['entities']['postEntitiesIdDocuments']['types']['parameters'] =
     {
       header: {
         'x-monite-version': '1.0.0',
@@ -1120,8 +1078,7 @@ describe('Qraft uses useIsMutating', () => {
     };
 
   it('supports useIsMutating with filters', async () => {
-    const queryClient = new QueryClient();
-
+    const { qraft, queryClient } = createClient();
     const { result: mutationResult } = renderHook(
       () => qraft.entities.postEntitiesIdDocuments.useMutation(parameters),
       {
@@ -1150,8 +1107,7 @@ describe('Qraft uses useIsMutating', () => {
   });
 
   it('supports useIsMutating without filters', async () => {
-    const queryClient = new QueryClient();
-
+    const { qraft, queryClient } = createClient();
     const { result: mutationResult } = renderHook(
       () => {
         return {
@@ -1214,7 +1170,7 @@ describe('Qraft uses Mutation State', () => {
   } as const;
 
   it('supports useMutationState with filter', async () => {
-    const queryClient = new QueryClient();
+    const { qraft, queryClient } = createClient();
 
     const { result: mutationResult } = renderHook(
       () => qraft.entities.postEntitiesIdDocuments.useMutation(parameters),
@@ -1256,7 +1212,7 @@ describe('Qraft uses Mutation State', () => {
   });
 
   it('supports useMutationState with filter and select', async () => {
-    const queryClient = new QueryClient();
+    const { qraft, queryClient } = createClient();
 
     const { result: mutationResult } = renderHook(
       () => qraft.entities.postEntitiesIdDocuments.useMutation(parameters),
@@ -1298,7 +1254,7 @@ describe('Qraft uses Mutation State', () => {
   });
 
   it('supports useMutationState with without filter', async () => {
-    const queryClient = new QueryClient();
+    const { qraft, queryClient } = createClient();
 
     const { result: mutationResult } = renderHook(
       () => qraft.entities.postEntitiesIdDocuments.useMutation(parameters),
@@ -1335,7 +1291,7 @@ describe('Qraft uses Mutation State', () => {
   });
 
   it('supports useMutationState with mutationKey and select', async () => {
-    const queryClient = new QueryClient();
+    const { qraft, queryClient } = createClient();
 
     const { result: mutationHookResultToMatch } = renderHook(
       () => qraft.entities.postEntitiesIdDocuments.useMutation(parameters),
@@ -1379,7 +1335,7 @@ describe('Qraft uses Mutation State', () => {
   });
 
   it('supports useMutationState with not partial parameters', async () => {
-    const queryClient = new QueryClient();
+    const { qraft, queryClient } = createClient();
 
     const { result: mutationHookResultToMatch } = renderHook(
       () => qraft.entities.postEntitiesIdDocuments.useMutation(parameters),
@@ -1425,7 +1381,7 @@ describe('Qraft uses Mutation State', () => {
 });
 
 describe('Qraft uses Query Function', () => {
-  const parameters: typeof qraft.approvalPolicies.getApprovalPoliciesId.types.parameters =
+  const parameters: Services['approvalPolicies']['getApprovalPoliciesId']['types']['parameters'] =
     {
       header: {
         'x-monite-version': '1.0.0',
@@ -1442,9 +1398,11 @@ describe('Qraft uses Query Function', () => {
    * @deprecated
    */
   it('uses queryFn with `parameters`', async () => {
+    const { qraft } = createClient();
+
     const result = await qraft.approvalPolicies.getApprovalPoliciesId.queryFn(
       { parameters },
-      requestClient
+      requestFnWithBaseUrl
     );
 
     expect(result).toEqual({
@@ -1461,9 +1419,11 @@ describe('Qraft uses Query Function', () => {
   });
 
   it('uses Operation Query with `parameters` and without `baseUrl`', async () => {
+    const { qraft } = createClient();
+
     const result = await qraft.approvalPolicies.getApprovalPoliciesId(
       { parameters },
-      requestClient
+      requestFnWithBaseUrl
     );
 
     expect(result).toEqual({
@@ -1480,6 +1440,8 @@ describe('Qraft uses Query Function', () => {
   });
 
   it('uses Operation Query with `baseUrl`', async () => {
+    const { qraft } = createClient();
+
     const result = await qraft.approvalPolicies.getApprovalPoliciesId(
       { parameters, baseUrl },
       requestFn
@@ -1499,6 +1461,8 @@ describe('Qraft uses Query Function', () => {
   });
 
   it('uses Operation Query with `queryKey`', async () => {
+    const { qraft } = createClient();
+
     const result = await qraft.approvalPolicies.getApprovalPoliciesId(
       {
         queryKey: [
@@ -1511,14 +1475,14 @@ describe('Qraft uses Query Function', () => {
           parameters,
         ],
       },
-      requestClient
+      requestFnWithBaseUrl
     );
 
     expect(result).toEqual(parameters);
   });
 
   it('uses fetchQuery with `parameters`', async () => {
-    const queryClient = new QueryClient();
+    const { qraft, queryClient } = createClient();
 
     const result = qraft.approvalPolicies.getApprovalPoliciesId.fetchQuery(
       {
@@ -1533,7 +1497,7 @@ describe('Qraft uses Query Function', () => {
   });
 
   it('uses fetchQuery with `queryKey`', async () => {
-    const queryClient = new QueryClient();
+    const { qraft, queryClient } = createClient();
 
     const result = qraft.approvalPolicies.getApprovalPoliciesId.fetchQuery(
       {
@@ -1549,7 +1513,7 @@ describe('Qraft uses Query Function', () => {
   });
 
   it('uses fetchQuery with queryFn', async () => {
-    const queryClient = new QueryClient();
+    const { qraft, queryClient } = createClient();
 
     const customResult: typeof qraft.approvalPolicies.getApprovalPoliciesId.types.parameters =
       {
@@ -1570,7 +1534,7 @@ describe('Qraft uses Query Function', () => {
   });
 
   it('uses fetchQuery with default requestFn set by specific "QueryKey"', async () => {
-    const queryClient = new QueryClient();
+    const { qraft, queryClient } = createClient();
 
     queryClient.setQueryDefaults(
       qraft.approvalPolicies.getApprovalPoliciesId.getQueryKey(parameters),
@@ -1586,7 +1550,7 @@ describe('Qraft uses Query Function', () => {
   });
 
   it('uses fetchQuery with default requestFn set by base "QueryKey"', async () => {
-    const queryClient = new QueryClient();
+    const { qraft, queryClient } = createClient();
 
     queryClient.setQueryDefaults(
       qraft.approvalPolicies.getApprovalPoliciesId.getQueryKey(),
@@ -1602,7 +1566,7 @@ describe('Qraft uses Query Function', () => {
   });
 
   it('uses prefetchQuery with `parameters`', async () => {
-    const queryClient = new QueryClient();
+    const { qraft, queryClient } = createClient();
 
     const result = qraft.approvalPolicies.getApprovalPoliciesId.prefetchQuery(
       {
@@ -1624,7 +1588,7 @@ describe('Qraft uses Query Function', () => {
   });
 
   it('uses fetchInfiniteQuery with multiple pages', async () => {
-    const queryClient = new QueryClient();
+    const { qraft, queryClient } = createClient();
 
     const result =
       qraft.approvalPolicies.getApprovalPoliciesId.fetchInfiniteQuery(
@@ -1682,7 +1646,7 @@ describe('Qraft uses Query Function', () => {
   });
 
   it('uses prefetchInfiniteQuery', async () => {
-    const queryClient = new QueryClient();
+    const { qraft, queryClient } = createClient();
 
     const result =
       qraft.approvalPolicies.getApprovalPoliciesId.prefetchInfiniteQuery(
@@ -1732,8 +1696,10 @@ describe('Qraft uses mutationFn', () => {
    * @deprecated
    */
   it('supports mutationFn', async () => {
+    const { qraft } = createClient();
+
     const result = await qraft.entities.postEntitiesIdDocuments.mutationFn(
-      requestClient,
+      requestFnWithBaseUrl,
       {
         parameters: {
           header: {
@@ -1773,6 +1739,8 @@ describe('Qraft uses mutationFn', () => {
   });
 
   it('supports Operation Mutation without `baseUrl`', async () => {
+    const { qraft } = createClient();
+
     const result = await qraft.entities.postEntitiesIdDocuments(
       {
         parameters: {
@@ -1791,7 +1759,7 @@ describe('Qraft uses mutationFn', () => {
           verification_document_front: 'front',
         },
       },
-      requestClient
+      requestFnWithBaseUrl
     );
 
     await waitFor(() => {
@@ -1814,6 +1782,8 @@ describe('Qraft uses mutationFn', () => {
   });
 
   it('supports Operation Mutation with `baseUrl`', async () => {
+    const { qraft } = createClient();
+
     const result = await qraft.entities.postEntitiesIdDocuments(
       {
         baseUrl,
@@ -1857,6 +1827,8 @@ describe('Qraft uses mutationFn', () => {
 });
 
 describe('Proxy call manipulations', () => {
+  const { qraft } = createClient();
+
   it('reads the schema', () => {
     expect(qraft.files.getFiles.schema).toEqual({
       url: '/files',
@@ -1886,6 +1858,8 @@ describe('Proxy call manipulations', () => {
 });
 
 describe('Qraft uses utils', () => {
+  const { qraft } = createClient();
+
   it('throws an error when calling an unsupported service ', () => {
     expect(() =>
       // @ts-expect-error - Invalid usage
@@ -1910,7 +1884,7 @@ describe('Qraft uses utils', () => {
 
 describe('Qraft uses setQueryData', () => {
   it('uses setQueryData & getQueryData', async () => {
-    const queryClient = new QueryClient();
+    const { qraft, queryClient } = createClient();
 
     qraft.files.getFiles.setQueryData(
       {
@@ -1955,7 +1929,7 @@ describe('Qraft uses setQueryData', () => {
   });
 
   it('uses setQueryData & getQueryData with QueryKey', async () => {
-    const queryClient = new QueryClient();
+    const { qraft, queryClient } = createClient();
 
     const getFilesQueryKey = qraft.files.getFiles.getQueryKey({
       header: {
@@ -1992,7 +1966,7 @@ describe('Qraft uses setQueryData', () => {
   });
 
   it('does not return getQueryData() from Infinite query', async () => {
-    const queryClient = new QueryClient();
+    const { qraft, queryClient } = createClient();
 
     const parameters = {
       header: {
@@ -2020,7 +1994,7 @@ describe('Qraft uses setQueryData', () => {
 
 describe('Qraft uses setQueriesData', () => {
   it('uses setQueriesData with parameters', async () => {
-    const queryClient = new QueryClient();
+    const { qraft, queryClient } = createClient();
 
     const parameters: typeof qraft.files.getFiles.types.parameters = {
       header: {
@@ -2047,7 +2021,7 @@ describe('Qraft uses setQueriesData', () => {
 });
 
 describe('Qraft uses getQueriesData', () => {
-  const parameters: typeof qraft.files.getFiles.types.parameters = {
+  const parameters: Services['files']['getFiles']['types']['parameters'] = {
     header: {
       'x-monite-version': '1.0.0',
     },
@@ -2057,7 +2031,7 @@ describe('Qraft uses getQueriesData', () => {
   };
 
   it('uses getQueriesData with parameters', async () => {
-    const queryClient = new QueryClient();
+    const { qraft, queryClient } = createClient();
 
     qraft.files.getFiles.setQueryData(parameters, parameters, queryClient);
 
@@ -2070,7 +2044,7 @@ describe('Qraft uses getQueriesData', () => {
   });
 
   it('uses getQueriesData Infinite Queries', async () => {
-    const queryClient = new QueryClient();
+    const { qraft, queryClient } = createClient();
 
     qraft.files.getFiles.setInfiniteQueryData(
       parameters,
@@ -2105,7 +2079,7 @@ describe('Qraft uses getQueriesData', () => {
 
 describe('Qraft uses setInfiniteQueryData', () => {
   it('uses setInfiniteQueryData & getInfiniteQueryData with parameters', async () => {
-    const queryClient = new QueryClient();
+    const { qraft, queryClient } = createClient();
 
     const parameters: typeof qraft.files.getFiles.types.parameters = {
       header: {
@@ -2143,7 +2117,7 @@ describe('Qraft uses setInfiniteQueryData', () => {
   });
 
   it('uses setInfiniteQueryData & getInfiniteQueryData with queryKey', async () => {
-    const queryClient = new QueryClient();
+    const { qraft, queryClient } = createClient();
 
     const parameters: typeof qraft.files.getFiles.types.parameters = {
       header: {
@@ -2181,7 +2155,7 @@ describe('Qraft uses setInfiniteQueryData', () => {
   });
 
   it('does not return getInfiniteQueryData() from non Infinite query', async () => {
-    const queryClient = new QueryClient();
+    const { qraft, queryClient } = createClient();
 
     const parameters: typeof qraft.files.getFiles.types.parameters = {
       header: {
@@ -2212,7 +2186,7 @@ describe('Qraft uses setInfiniteQueryData', () => {
 });
 
 describe('Qraft uses Queries Invalidation', () => {
-  const parameters: typeof qraft.approvalPolicies.getApprovalPoliciesId.types.parameters =
+  const parameters: Services['approvalPolicies']['getApprovalPoliciesId']['types']['parameters'] =
     {
       header: {
         'x-monite-version': '1.0.0',
@@ -2225,26 +2199,23 @@ describe('Qraft uses Queries Invalidation', () => {
       },
     };
 
-  const hook = () =>
-    qraft.approvalPolicies.getApprovalPoliciesId.useQuery(parameters);
-
-  const wrapper = (
-    queryClient: QueryClient,
-    props: { children: ReactNode }
-  ) => <Providers {...props} queryClient={queryClient} />;
-
   it('supports invalidateQueries by parameters', async () => {
-    const queryClient = new QueryClient({
-      defaultOptions: {
-        queries: {
-          refetchOnMount: false,
+    const { qraft, queryClient } = createClient({
+      queryClientConfig: {
+        defaultOptions: {
+          queries: {
+            refetchOnMount: false,
+          },
         },
       },
     });
 
-    const { result: result_01 } = renderHook(hook, {
-      wrapper: wrapper.bind(null, queryClient),
-    });
+    const { result: result_01 } = renderHook(
+      () => qraft.approvalPolicies.getApprovalPoliciesId.useQuery(parameters),
+      {
+        wrapper: (props) => <Providers {...props} queryClient={queryClient} />,
+      }
+    );
 
     await waitFor(() => {
       expect(result_01.current.isSuccess).toBeTruthy();
@@ -2258,25 +2229,33 @@ describe('Qraft uses Queries Invalidation', () => {
       )
     ).toBeInstanceOf(Promise);
 
-    const { result: result_02 } = renderHook(hook, {
-      wrapper: wrapper.bind(null, queryClient),
-    });
+    const { result: result_02 } = renderHook(
+      () => qraft.approvalPolicies.getApprovalPoliciesId.useQuery(parameters),
+      {
+        wrapper: (props) => <Providers {...props} queryClient={queryClient} />,
+      }
+    );
 
     expect(result_02.current.isFetching).toBeTruthy();
   });
 
   it('supports invalidateQueries by queryKey', async () => {
-    const queryClient = new QueryClient({
-      defaultOptions: {
-        queries: {
-          refetchOnMount: false,
+    const { qraft, queryClient } = createClient({
+      queryClientConfig: {
+        defaultOptions: {
+          queries: {
+            refetchOnMount: false,
+          },
         },
       },
     });
 
-    const { result: result_01 } = renderHook(hook, {
-      wrapper: wrapper.bind(null, queryClient),
-    });
+    const { result: result_01 } = renderHook(
+      () => qraft.approvalPolicies.getApprovalPoliciesId.useQuery(parameters),
+      {
+        wrapper: (props) => <Providers {...props} queryClient={queryClient} />,
+      }
+    );
 
     await waitFor(() => {
       expect(result_01.current.isSuccess).toBeTruthy();
@@ -2295,19 +2274,24 @@ describe('Qraft uses Queries Invalidation', () => {
       )
     ).toBeInstanceOf(Promise);
 
-    const { result: result_02 } = renderHook(hook, {
-      wrapper: wrapper.bind(null, queryClient),
-    });
+    const { result: result_02 } = renderHook(
+      () => qraft.approvalPolicies.getApprovalPoliciesId.useQuery(parameters),
+      {
+        wrapper: (props) => <Providers {...props} queryClient={queryClient} />,
+      }
+    );
 
     expect(result_02.current.isFetching).toBeTruthy();
   });
 
   describe('Qraft uses getQueryState', () => {
     it('supports getQueryState by parameters', async () => {
-      const queryClient = new QueryClient({
-        defaultOptions: {
-          queries: {
-            refetchOnMount: false,
+      const { qraft, queryClient } = createClient({
+        queryClientConfig: {
+          defaultOptions: {
+            queries: {
+              refetchOnMount: false,
+            },
           },
         },
       });
@@ -2315,7 +2299,9 @@ describe('Qraft uses Queries Invalidation', () => {
       renderHook(
         () => qraft.approvalPolicies.getApprovalPoliciesId.useQuery(parameters),
         {
-          wrapper: wrapper.bind(null, queryClient),
+          wrapper: (props) => (
+            <Providers {...props} queryClient={queryClient} />
+          ),
         }
       );
 
@@ -2330,10 +2316,12 @@ describe('Qraft uses Queries Invalidation', () => {
     });
 
     it('supports getQueryState by parameters and infinite query', async () => {
-      const queryClient = new QueryClient({
-        defaultOptions: {
-          queries: {
-            refetchOnMount: false,
+      const { qraft, queryClient } = createClient({
+        queryClientConfig: {
+          defaultOptions: {
+            queries: {
+              refetchOnMount: false,
+            },
           },
         },
       });
@@ -2350,7 +2338,9 @@ describe('Qraft uses Queries Invalidation', () => {
             }
           ),
         {
-          wrapper: wrapper.bind(null, queryClient),
+          wrapper: (props) => (
+            <Providers {...props} queryClient={queryClient} />
+          ),
         }
       );
 
@@ -2366,10 +2356,12 @@ describe('Qraft uses Queries Invalidation', () => {
   });
 
   it('supports invalidateQueries with options', async () => {
-    const queryClient = new QueryClient({
-      defaultOptions: {
-        queries: {
-          refetchOnMount: false,
+    const { qraft, queryClient } = createClient({
+      queryClientConfig: {
+        defaultOptions: {
+          queries: {
+            refetchOnMount: false,
+          },
         },
       },
     });
@@ -2387,7 +2379,7 @@ describe('Qraft uses Queries Invalidation', () => {
     };
 
     const { result: result_01 } = renderHook(useMockHook, {
-      wrapper: wrapper.bind(null, queryClient),
+      wrapper: (props) => <Providers {...props} queryClient={queryClient} />,
     });
 
     await waitFor(() => {
@@ -2412,6 +2404,8 @@ describe('Qraft uses Queries Invalidation', () => {
   });
 
   it('check invalidateQueries queryClient instance', async () => {
+    const { qraft } = createClient();
+
     expect(() =>
       qraft.approvalPolicies.getApprovalPoliciesId.invalidateQueries(
         {} as never
@@ -2420,45 +2414,44 @@ describe('Qraft uses Queries Invalidation', () => {
   });
 
   it('supports invalidateQueries without filters and not effect other queries', async () => {
-    const queryClient = new QueryClient({
-      defaultOptions: {
-        queries: {
-          refetchOnMount: false,
+    const { qraft, queryClient } = createClient({
+      queryClientConfig: {
+        defaultOptions: {
+          queries: {
+            refetchOnMount: false,
+          },
         },
       },
     });
 
-    const { result: result_01 } = renderHook(
-      () => {
-        return [
-          qraft.approvalPolicies.getApprovalPoliciesId.useInfiniteQuery(
-            parameters,
-            {
-              initialPageParam: {},
-              getNextPageParam: () => {
-                return {};
-              },
-            }
-          ),
-          qraft.approvalPolicies.getApprovalPoliciesId.useQuery(parameters),
-        ] as const;
-      },
-      {
-        wrapper: wrapper.bind(null, queryClient),
-      }
-    );
+    const useQueryHooks = () => ({
+      getApprovalPoliciesIdQuery:
+        qraft.approvalPolicies.getApprovalPoliciesId.useQuery(parameters),
+      getApprovalPoliciesIdInfiniteQuery:
+        qraft.approvalPolicies.getApprovalPoliciesId.useInfiniteQuery(
+          parameters,
+          {
+            initialPageParam: {},
+            getNextPageParam: () => {
+              return {};
+            },
+          }
+        ),
+      getFileListQuery: qraft.files.getFileList.useQuery({}),
+    });
 
-    const { result: getFilesResult_01 } = renderHook(
-      () => qraft.files.getFileList.useQuery({}),
-      {
-        wrapper: wrapper.bind(null, queryClient),
-      }
-    );
+    const { result: hookResult_01 } = renderHook(useQueryHooks, {
+      wrapper: (props) => <Providers {...props} queryClient={queryClient} />,
+    });
 
     await waitFor(() => {
-      expect(result_01.current[0].isSuccess).toBeTruthy();
-      expect(result_01.current[0].isFetching).toBeFalsy();
-      expect(getFilesResult_01.current.isSuccess).toBeTruthy();
+      expect(
+        hookResult_01.current.getApprovalPoliciesIdQuery.isSuccess
+      ).toBeTruthy();
+      expect(
+        hookResult_01.current.getApprovalPoliciesIdInfiniteQuery.isSuccess
+      ).toBeTruthy();
+      expect(hookResult_01.current.getFileListQuery.isSuccess).toBeTruthy();
     });
 
     act(() => {
@@ -2469,53 +2462,31 @@ describe('Qraft uses Queries Invalidation', () => {
       ).toBeInstanceOf(Promise);
     });
 
-    const { result: getFilesResult_02 } = renderHook(
-      () => qraft.files.getFileList.useQuery({}),
-      {
-        wrapper: wrapper.bind(null, queryClient),
-      }
-    );
+    const { result: hookResult_02 } = renderHook(useQueryHooks, {
+      wrapper: (props) => <Providers {...props} queryClient={queryClient} />,
+    });
 
     expect(
-      renderHook(
-        () =>
-          qraft.approvalPolicies.getApprovalPoliciesId.useInfiniteQuery(
-            parameters,
-            {
-              initialPageParam: {},
-              getNextPageParam: () => {
-                return {};
-              },
-            }
-          ),
-        {
-          wrapper: wrapper.bind(null, queryClient),
-        }
-      ).result.current.isFetching
+      hookResult_02.current.getApprovalPoliciesIdQuery.isFetching
     ).toBeTruthy();
-
     expect(
-      renderHook(
-        () => qraft.approvalPolicies.getApprovalPoliciesId.useQuery(parameters),
-        {
-          wrapper: wrapper.bind(null, queryClient),
-        }
-      ).result.current.isFetching
+      hookResult_02.current.getApprovalPoliciesIdInfiniteQuery.isFetching
     ).toBeTruthy();
-
-    expect(getFilesResult_02.current.isFetching).toBeFalsy();
+    expect(hookResult_02.current.getFileListQuery.isFetching).toBeFalsy();
   });
 
   it('supports invalidateQueries for Infinite Query', async () => {
-    const queryClient = new QueryClient({
-      defaultOptions: {
-        queries: {
-          refetchOnMount: false,
+    const { qraft, queryClient } = createClient({
+      queryClientConfig: {
+        defaultOptions: {
+          queries: {
+            refetchOnMount: false,
+          },
         },
       },
     });
 
-    const useInfiniteHook = () =>
+    const useInfiniteQueryHook = () =>
       qraft.approvalPolicies.getApprovalPoliciesId.useInfiniteQuery(
         parameters,
         {
@@ -2526,8 +2497,8 @@ describe('Qraft uses Queries Invalidation', () => {
         }
       );
 
-    const { result: result_01 } = renderHook(useInfiniteHook, {
-      wrapper: wrapper.bind(null, queryClient),
+    const { result: result_01 } = renderHook(useInfiniteQueryHook, {
+      wrapper: (props) => <Providers {...props} queryClient={queryClient} />,
     });
 
     await waitFor(() => {
@@ -2556,8 +2527,8 @@ describe('Qraft uses Queries Invalidation', () => {
       )
     ).toBeInstanceOf(Promise);
 
-    const { result: result_02 } = renderHook(useInfiniteHook, {
-      wrapper: wrapper.bind(null, queryClient),
+    const { result: result_02 } = renderHook(useInfiniteQueryHook, {
+      wrapper: (props) => <Providers {...props} queryClient={queryClient} />,
     });
 
     expect(result_02.current.isFetching).toBeTruthy();
@@ -2568,17 +2539,22 @@ describe('Qraft uses Queries Invalidation', () => {
   });
 
   it('does not invalidateQueries by not matching queryKey', async () => {
-    const queryClient = new QueryClient({
-      defaultOptions: {
-        queries: {
-          refetchOnMount: false,
+    const { qraft, queryClient } = createClient({
+      queryClientConfig: {
+        defaultOptions: {
+          queries: {
+            refetchOnMount: false,
+          },
         },
       },
     });
 
-    const { result: result_01 } = renderHook(hook, {
-      wrapper: wrapper.bind(null, queryClient),
-    });
+    const { result: result_01 } = renderHook(
+      () => qraft.approvalPolicies.getApprovalPoliciesId.useQuery(parameters),
+      {
+        wrapper: (props) => <Providers {...props} queryClient={queryClient} />,
+      }
+    );
 
     await waitFor(() => {
       expect(result_01.current.isSuccess).toBeTruthy();
@@ -2599,18 +2575,23 @@ describe('Qraft uses Queries Invalidation', () => {
       )
     ).toBeInstanceOf(Promise);
 
-    const { result: result_02 } = renderHook(hook, {
-      wrapper: wrapper.bind(null, queryClient),
-    });
+    const { result: result_02 } = renderHook(
+      () => qraft.approvalPolicies.getApprovalPoliciesId.useQuery(parameters),
+      {
+        wrapper: (props) => <Providers {...props} queryClient={queryClient} />,
+      }
+    );
 
     expect(result_02.current.isFetching).toBeFalsy();
   });
 
   it('supports invalidateQueries with predicate', async () => {
-    const queryClient = new QueryClient({
-      defaultOptions: {
-        queries: {
-          refetchOnMount: false,
+    const { qraft, queryClient } = createClient({
+      queryClientConfig: {
+        defaultOptions: {
+          queries: {
+            refetchOnMount: false,
+          },
         },
       },
     });
@@ -2628,12 +2609,15 @@ describe('Qraft uses Queries Invalidation', () => {
     await queryClient.fetchQuery({
       queryKey: filesQueryKey,
       queryFn: () =>
-        qraft.files.getFiles({ queryKey: filesQueryKey }, requestClient),
+        qraft.files.getFiles({ queryKey: filesQueryKey, baseUrl }, requestFn),
     });
 
-    const { result: result_01 } = renderHook(hook, {
-      wrapper: wrapper.bind(null, queryClient),
-    });
+    const { result: result_01 } = renderHook(
+      () => qraft.approvalPolicies.getApprovalPoliciesId.useQuery(parameters),
+      {
+        wrapper: (props) => <Providers {...props} queryClient={queryClient} />,
+      }
+    );
 
     await waitFor(() => {
       expect(result_01.current.isSuccess).toBeTruthy();
@@ -2671,10 +2655,12 @@ describe('Qraft uses Queries Invalidation', () => {
   });
 
   it('supports invalidateQueries with predicate and no queryKey', async () => {
-    const queryClient = new QueryClient({
-      defaultOptions: {
-        queries: {
-          refetchOnMount: false,
+    const { qraft, queryClient } = createClient({
+      queryClientConfig: {
+        defaultOptions: {
+          queries: {
+            refetchOnMount: false,
+          },
         },
       },
     });
@@ -2692,12 +2678,15 @@ describe('Qraft uses Queries Invalidation', () => {
     await queryClient.fetchQuery({
       queryKey: filesQueryKey,
       queryFn: () =>
-        qraft.files.getFiles({ queryKey: filesQueryKey }, requestClient),
+        qraft.files.getFiles({ queryKey: filesQueryKey, baseUrl }, requestFn),
     });
 
-    const { result: result_01 } = renderHook(hook, {
-      wrapper: wrapper.bind(null, queryClient),
-    });
+    const { result: result_01 } = renderHook(
+      () => qraft.approvalPolicies.getApprovalPoliciesId.useQuery(parameters),
+      {
+        wrapper: (props) => <Providers {...props} queryClient={queryClient} />,
+      }
+    );
 
     await waitFor(() => {
       expect(result_01.current.isSuccess).toBeTruthy();
@@ -2729,7 +2718,7 @@ describe('Qraft uses Queries Invalidation', () => {
 });
 
 describe('Qraft uses Queries Removal', () => {
-  const parameters_1: typeof qraft.approvalPolicies.getApprovalPoliciesId.types.parameters =
+  const parameters_1: Services['approvalPolicies']['getApprovalPoliciesId']['types']['parameters'] =
     {
       header: {
         'x-monite-version': '1.0.0',
@@ -2742,7 +2731,7 @@ describe('Qraft uses Queries Removal', () => {
       },
     };
 
-  const parameters_2: typeof qraft.approvalPolicies.getApprovalPoliciesId.types.parameters =
+  const parameters_2: Services['approvalPolicies']['getApprovalPoliciesId']['types']['parameters'] =
     {
       header: {
         'x-monite-version': '1.0.0',
@@ -2756,7 +2745,7 @@ describe('Qraft uses Queries Removal', () => {
     };
 
   it('supports removeQueries by parameters', async () => {
-    const queryClient = new QueryClient();
+    const { qraft, queryClient } = createClient();
 
     const { result: result_01 } = renderHook(
       () => {
@@ -2812,7 +2801,7 @@ describe('Qraft uses Queries Removal', () => {
   });
 
   it('supports removeQueries without parameters', async () => {
-    const queryClient = new QueryClient();
+    const { qraft, queryClient } = createClient();
 
     const { result: result_01 } = renderHook(
       () => {
@@ -2866,7 +2855,7 @@ describe('Qraft uses Queries Removal', () => {
 });
 
 describe('Qraft uses Queries Cancellation', () => {
-  const parameters: typeof qraft.approvalPolicies.getApprovalPoliciesId.types.parameters =
+  const parameters: Services['approvalPolicies']['getApprovalPoliciesId']['types']['parameters'] =
     {
       header: {
         'x-monite-version': '1.0.0',
@@ -2880,7 +2869,7 @@ describe('Qraft uses Queries Cancellation', () => {
     };
 
   it('supports cancelQueries by parameters', async () => {
-    const queryClient = new QueryClient();
+    const { qraft, queryClient } = createClient();
 
     const counterFn = vi.fn();
 
@@ -2916,7 +2905,7 @@ describe('Qraft uses Queries Cancellation', () => {
   });
 
   it('supports cancelQueries without parameters', async () => {
-    const queryClient = new QueryClient();
+    const { qraft, queryClient } = createClient();
 
     const counterFn = vi.fn();
 
@@ -2950,7 +2939,7 @@ describe('Qraft uses Queries Cancellation', () => {
 });
 
 describe('Qraft uses Queries Refetch', () => {
-  const parameters: typeof qraft.approvalPolicies.getApprovalPoliciesId.types.parameters =
+  const parameters: Services['approvalPolicies']['getApprovalPoliciesId']['types']['parameters'] =
     {
       header: {
         'x-monite-version': '1.0.0',
@@ -2964,7 +2953,7 @@ describe('Qraft uses Queries Refetch', () => {
     };
 
   it('supports refetchQueries by parameters', async () => {
-    const queryClient = new QueryClient();
+    const { qraft, queryClient } = createClient();
 
     const counterFn = vi.fn();
 
@@ -3005,7 +2994,7 @@ describe('Qraft uses Queries Refetch', () => {
 });
 
 describe('Qraft uses Queries Reset', () => {
-  const parameters: typeof qraft.approvalPolicies.getApprovalPoliciesId.types.parameters =
+  const parameters: Services['approvalPolicies']['getApprovalPoliciesId']['types']['parameters'] =
     {
       header: {
         'x-monite-version': '1.0.0',
@@ -3019,7 +3008,8 @@ describe('Qraft uses Queries Reset', () => {
     };
 
   it('supports resetQueries by parameters', async () => {
-    const queryClient = new QueryClient();
+    const { qraft, queryClient } = createClient();
+
     const initialData = {
       ...parameters,
       header: {
@@ -3067,7 +3057,7 @@ describe('Qraft uses Queries Reset', () => {
 });
 
 describe('Qraft uses IsFetching Query', () => {
-  const parameters: typeof qraft.approvalPolicies.getApprovalPoliciesId.types.parameters =
+  const parameters: Services['approvalPolicies']['getApprovalPoliciesId']['types']['parameters'] =
     {
       header: {
         'x-monite-version': '1.0.0',
@@ -3081,7 +3071,7 @@ describe('Qraft uses IsFetching Query', () => {
     };
 
   it('supports isFetching with specific parameters', async () => {
-    const queryClient = new QueryClient();
+    const { qraft, queryClient } = createClient();
 
     renderHook(
       () => {
@@ -3110,7 +3100,7 @@ describe('Qraft uses IsFetching Query', () => {
   });
 
   it('supports isFetching without specific parameters', async () => {
-    const queryClient = new QueryClient();
+    const { qraft, queryClient } = createClient();
 
     renderHook(
       () => {
@@ -3137,7 +3127,7 @@ describe('Qraft uses IsFetching Query', () => {
 });
 
 describe('Qraft uses IsMutating Query', () => {
-  const parameters: typeof qraft.entities.postEntitiesIdDocuments.types.parameters =
+  const parameters: Services['entities']['postEntitiesIdDocuments']['types']['parameters'] =
     {
       header: {
         'x-monite-version': '1.0.0',
@@ -3151,7 +3141,7 @@ describe('Qraft uses IsMutating Query', () => {
     };
 
   it('supports isMutating with specific parameters', async () => {
-    const queryClient = new QueryClient();
+    const { qraft, queryClient } = createClient();
 
     const { result } = renderHook(
       () => {
@@ -3185,7 +3175,7 @@ describe('Qraft uses IsMutating Query', () => {
   });
 
   it('supports isMutating without specific parameters', async () => {
-    const queryClient = new QueryClient();
+    const { qraft, queryClient } = createClient();
 
     const { result: mutationResult } = renderHook(
       () => {
@@ -3223,7 +3213,7 @@ describe('Qraft uses IsMutating Query', () => {
 });
 
 describe('Qraft uses useIsFetching Query', () => {
-  const parameters: typeof qraft.approvalPolicies.getApprovalPoliciesId.types.parameters =
+  const parameters: Services['approvalPolicies']['getApprovalPoliciesId']['types']['parameters'] =
     {
       header: {
         'x-monite-version': '1.0.0',
@@ -3237,7 +3227,7 @@ describe('Qraft uses useIsFetching Query', () => {
     };
 
   it('supports useIsFetching with specific parameters', async () => {
-    const queryClient = new QueryClient();
+    const { qraft, queryClient } = createClient();
 
     renderHook(
       () => {
@@ -3272,7 +3262,7 @@ describe('Qraft uses useIsFetching Query', () => {
   });
 
   it('supports useIsFetching without specific parameters', async () => {
-    const queryClient = new QueryClient();
+    const { qraft, queryClient } = createClient();
 
     renderHook(
       () => {
@@ -3305,6 +3295,8 @@ describe('Qraft uses useIsFetching Query', () => {
 
 describe('Qraft uses getQueryKey', () => {
   it('returns query key with parameters', async () => {
+    const { qraft } = createClient();
+
     expect(
       qraft.approvalPolicies.getApprovalPoliciesId.getQueryKey({
         header: {
@@ -3339,6 +3331,8 @@ describe('Qraft uses getQueryKey', () => {
   });
 
   it('returns query key without parameters', async () => {
+    const { qraft } = createClient();
+
     expect(qraft.approvalPolicies.getApprovalPoliciesId.getQueryKey()).toEqual([
       {
         url: qraft.approvalPolicies.getApprovalPoliciesId.schema.url,
@@ -3353,6 +3347,8 @@ describe('Qraft uses getQueryKey', () => {
 
 describe('Qraft uses getMutationKey', () => {
   it('returns mutation key with parameters', async () => {
+    const { qraft } = createClient();
+
     expect(
       qraft.entities.postEntitiesIdDocuments.getMutationKey({
         header: {
@@ -3389,6 +3385,8 @@ describe('Qraft uses getMutationKey', () => {
   });
 
   it('returns mutation key without parameters', async () => {
+    const { qraft } = createClient();
+
     expect(qraft.entities.postEntitiesIdDocuments.getMutationKey()).toEqual([
       {
         url: qraft.entities.postEntitiesIdDocuments.schema.url,
@@ -3400,7 +3398,7 @@ describe('Qraft uses getMutationKey', () => {
 });
 
 describe('Qraft respects Types', () => {
-  const parameters: typeof qraft.approvalPolicies.getApprovalPoliciesId.types.parameters =
+  const parameters: Services['approvalPolicies']['getApprovalPoliciesId']['types']['parameters'] =
     {
       header: {
         'x-monite-version': '1.0.0',
@@ -3413,9 +3411,9 @@ describe('Qraft respects Types', () => {
       },
     };
 
-  const queryClient = new QueryClient();
-
   it('supports infinite QueryKey predicate query filter strict types', () => {
+    const { qraft, queryClient } = createClient();
+
     qraft.approvalPolicies.getApprovalPoliciesId.getQueriesData(
       {
         queryKey: [
@@ -3440,6 +3438,8 @@ describe('Qraft respects Types', () => {
   });
 
   it('supports regular QueryKey predicate query filter strict types', () => {
+    const { qraft, queryClient } = createClient();
+
     qraft.approvalPolicies.getApprovalPoliciesId.getQueriesData(
       {
         queryKey: [
@@ -3463,6 +3463,8 @@ describe('Qraft respects Types', () => {
   });
 
   it('supports regular parameters predicate query filter strict types', () => {
+    const { qraft, queryClient } = createClient();
+
     qraft.approvalPolicies.getApprovalPoliciesId.getQueriesData(
       {
         parameters,
@@ -3481,6 +3483,8 @@ describe('Qraft respects Types', () => {
   });
 
   it('does not supports  predicate without ', () => {
+    const { qraft, queryClient } = createClient();
+
     qraft.approvalPolicies.getApprovalPoliciesId.getQueriesData(
       {
         // @ts-expect-error - `query` should be infinite or regular query, todo::improve type checking
@@ -3501,7 +3505,7 @@ describe('Qraft respects Types', () => {
 
 describe('Qraft is type-safe on Query Filters', () => {
   it('does not emit an error on the `exact` key', () => {
-    const queryClient = new QueryClient();
+    const { qraft, queryClient } = createClient();
 
     qraft.approvalPolicies.getApprovalPoliciesId.invalidateQueries(
       {
@@ -3523,7 +3527,7 @@ describe('Qraft is type-safe on Query Filters', () => {
   });
 
   it('emits an error on the `exact` key and partial parameters', () => {
-    const queryClient = new QueryClient();
+    const { qraft, queryClient } = createClient();
 
     // Header is required, must emit an error
     qraft.approvalPolicies.getApprovalPoliciesId.invalidateQueries(
@@ -3547,7 +3551,7 @@ describe('Qraft is type-safe on Query Filters', () => {
   });
 
   it('does not emit an error when `exact` is not specified', () => {
-    const queryClient = new QueryClient();
+    const { qraft, queryClient } = createClient();
 
     qraft.approvalPolicies.getApprovalPoliciesId.invalidateQueries(
       {
@@ -3563,7 +3567,7 @@ describe('Qraft is type-safe on Query Filters', () => {
   });
 
   it('does not emit an error when `exact` is `false`', () => {
-    const queryClient = new QueryClient();
+    const { qraft, queryClient } = createClient();
 
     qraft.approvalPolicies.getApprovalPoliciesId.invalidateQueries(
       {
@@ -3583,27 +3587,11 @@ describe('Qraft is type-safe on Query Filters', () => {
 function Providers({
   children,
   queryClient,
-  requestFn: requestFnProp = requestFn,
 }: {
   children: ReactNode;
-  queryClient?: QueryClient;
-  requestFn?: RequestFn<any>;
+  queryClient: QueryClient;
 }) {
-  queryClient = React.useState(() => queryClient ?? new QueryClient())[0];
-
   return (
-    <QueryClientProvider client={queryClient}>
-      {/* We should use precompiled `QraftContextDist`,
-       * because callbacks are imported from `@openapi-qraft` package `/dist` folder
-       */}
-      <QraftContextDist.Provider
-        value={{
-          baseUrl: 'https://api.sandbox.monite.com/v1',
-          requestFn: requestFnProp,
-        }}
-      >
-        {children}
-      </QraftContextDist.Provider>
-    </QueryClientProvider>
+    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
   );
 }

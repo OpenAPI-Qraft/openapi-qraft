@@ -1,18 +1,14 @@
 'use client';
 
-import { useContext } from 'react';
-
 import type { DefaultError } from '@tanstack/query-core';
 import {
   useMutation as useMutationBase,
-  UseMutationResult,
+  type UseMutationResult,
 } from '@tanstack/react-query';
 
 import { composeMutationKey } from '../lib/composeMutationKey.js';
 import type { OperationSchema } from '../lib/requestFn.js';
-import { useQueryClient } from '../lib/useQueryClient.js';
 import type { QraftClientOptions } from '../qraftAPIClient.js';
-import { QraftContext } from '../QraftContext.js';
 import type { ServiceOperationMutation } from '../service-operation/ServiceOperation.js';
 import type { ServiceOperationMutationKey } from '../service-operation/ServiceOperationKey.js';
 
@@ -22,7 +18,7 @@ export const useMutation: <
   TVariables = void,
   TContext = unknown,
 >(
-  qraftOptions: QraftClientOptions | undefined,
+  qraftOptions: QraftClientOptions,
   schema: OperationSchema,
   args: Parameters<
     ServiceOperationMutation<
@@ -49,8 +45,6 @@ export const useMutation: <
       `'useMutation': parameters and 'options.mutationKey' cannot be used together`
     );
 
-  const contextValue = useContext(qraftOptions?.context ?? QraftContext);
-
   const mutationKey =
     options && 'mutationKey' in options
       ? (options.mutationKey as ServiceOperationMutationKey<
@@ -67,30 +61,24 @@ export const useMutation: <
         options?.mutationFn ??
         (parameters
           ? function (bodyPayload) {
-              if (!contextValue?.requestFn)
-                throw new Error(`QraftContext.requestFn not found`);
-
-              return contextValue.requestFn(schema, {
+              return qraftOptions.requestFn(schema, {
                 parameters,
-                baseUrl: contextValue.baseUrl,
+                baseUrl: qraftOptions.baseUrl,
                 body: bodyPayload as never,
               });
             }
           : function (parametersAndBodyPayload) {
-              if (!contextValue?.requestFn)
-                throw new Error(`QraftContext.requestFn not found`);
-
               const { body, ...parameters } = parametersAndBodyPayload as {
                 body: unknown;
               };
 
-              return contextValue.requestFn(schema, {
+              return qraftOptions.requestFn(schema, {
                 parameters,
-                baseUrl: contextValue.baseUrl,
+                baseUrl: qraftOptions.baseUrl,
                 body,
               } as never);
             }),
     },
-    useQueryClient(qraftOptions, queryClientByArg)
+    qraftOptions.queryClient
   ) as never;
 };

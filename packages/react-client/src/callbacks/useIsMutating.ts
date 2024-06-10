@@ -2,15 +2,14 @@
 
 import type { DefaultError } from '@tanstack/query-core';
 import {
-  UseMutationResult,
   useIsMutating as useIsMutatingStateTanstack,
+  type UseMutationResult,
 } from '@tanstack/react-query';
 
 import { composeMutationFilters } from '../lib/composeMutationFilters.js';
 import type { OperationSchema } from '../lib/requestFn.js';
-import { useQueryClient } from '../lib/useQueryClient.js';
 import type { QraftClientOptions } from '../qraftAPIClient.js';
-import { ServiceOperationMutation } from '../service-operation/ServiceOperation.js';
+import type { ServiceOperationMutation } from '../service-operation/ServiceOperation.js';
 
 export const useIsMutating: <
   TData = unknown,
@@ -18,7 +17,7 @@ export const useIsMutating: <
   TVariables = unknown,
   TContext = unknown,
 >(
-  _: QraftClientOptions | undefined,
+  qraftOptions: QraftClientOptions,
   schema: OperationSchema,
   args: Parameters<
     ServiceOperationMutation<
@@ -37,6 +36,6 @@ export const useIsMutating: <
 
   return useIsMutatingStateTanstack(
     composeMutationFilters(schema, filters) as never,
-    useQueryClient(qraftOptions, queryClientByArg)
+    qraftOptions.queryClient
   ) as never;
 };
