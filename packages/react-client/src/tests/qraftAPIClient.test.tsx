@@ -1577,13 +1577,11 @@ describe('Qraft uses Query Function', () => {
       queryClient
     );
 
+    // Prefetching doesn't return the data
     await expect(result).resolves.toEqual(undefined);
 
     expect(
-      qraft.approvalPolicies.getApprovalPoliciesId.getQueryData(
-        parameters,
-        queryClient
-      )
+      qraft.approvalPolicies.getApprovalPoliciesId.getQueryData(parameters)
     ).toEqual(parameters);
   });
 
@@ -1667,8 +1665,7 @@ describe('Qraft uses Query Function', () => {
 
     expect(
       qraft.approvalPolicies.getApprovalPoliciesId.getInfiniteQueryData(
-        parameters,
-        queryClient
+        parameters
       )
     ).toEqual({
       pageParams: [
@@ -1902,22 +1899,18 @@ describe('Qraft uses setQueryData', () => {
         query: {
           id__in: ['1', '2'],
         },
-      },
-      queryClient
+      }
     );
 
     expect(
-      qraft.files.getFiles.getQueryData(
-        {
-          header: {
-            'x-monite-version': '1.0.0',
-          },
-          query: {
-            id__in: ['1', '2'],
-          },
+      qraft.files.getFiles.getQueryData({
+        header: {
+          'x-monite-version': '1.0.0',
         },
-        queryClient
-      )
+        query: {
+          id__in: ['1', '2'],
+        },
+      })
     ).toEqual({
       header: {
         'x-monite-version': '1.0.0',
@@ -1949,20 +1942,17 @@ describe('Qraft uses setQueryData', () => {
       },
     };
 
-    qraft.files.getFiles.setQueryData(
-      getFilesQueryKey,
-      getFilesSetQueryData,
-      { updatedAt: Date.now() },
-      queryClient
+    qraft.files.getFiles.setQueryData(getFilesQueryKey, getFilesSetQueryData, {
+      updatedAt: Date.now(),
+    });
+
+    expect(qraft.files.getFiles.getQueryData(getFilesQueryKey)).toEqual(
+      getFilesSetQueryData
     );
 
-    expect(
-      qraft.files.getFiles.getQueryData(getFilesQueryKey, queryClient)
-    ).toEqual(getFilesSetQueryData);
-
-    expect(
-      qraft.files.getFiles.getQueryData(getFilesQueryKey[1], queryClient)
-    ).toEqual(getFilesSetQueryData);
+    expect(qraft.files.getFiles.getQueryData(getFilesQueryKey[1])).toEqual(
+      getFilesSetQueryData
+    );
   });
 
   it('does not return getQueryData() from Infinite query', async () => {
@@ -1977,18 +1967,12 @@ describe('Qraft uses setQueryData', () => {
       },
     };
 
-    qraft.files.getFiles.setInfiniteQueryData(
-      parameters,
-      {
-        pages: [parameters],
-        pageParams: [parameters],
-      },
-      queryClient
-    );
+    qraft.files.getFiles.setInfiniteQueryData(parameters, {
+      pages: [parameters],
+      pageParams: [parameters],
+    });
 
-    expect(
-      qraft.files.getFiles.getQueryData(parameters, queryClient)
-    ).not.toBeDefined();
+    expect(qraft.files.getFiles.getQueryData(parameters)).not.toBeDefined();
   });
 });
 
@@ -2005,7 +1989,7 @@ describe('Qraft uses setQueriesData', () => {
       },
     };
 
-    qraft.files.getFiles.setQueryData(parameters, parameters, queryClient);
+    qraft.files.getFiles.setQueryData(parameters, parameters);
 
     qraft.files.getFiles.setQueriesData(
       { parameters, infinite: false },
@@ -2013,7 +1997,7 @@ describe('Qraft uses setQueriesData', () => {
       queryClient
     );
 
-    expect(qraft.files.getFiles.getQueryData(parameters, queryClient)).toEqual({
+    expect(qraft.files.getFiles.getQueryData(parameters)).toEqual({
       ...parameters,
       header: { 'x-monite-version': '2.0.0' },
     });
@@ -2033,7 +2017,7 @@ describe('Qraft uses getQueriesData', () => {
   it('uses getQueriesData with parameters', async () => {
     const { qraft, queryClient } = createClient();
 
-    qraft.files.getFiles.setQueryData(parameters, parameters, queryClient);
+    qraft.files.getFiles.setQueryData(parameters, parameters);
 
     expect(
       qraft.files.getFiles.getQueriesData(
@@ -2046,14 +2030,10 @@ describe('Qraft uses getQueriesData', () => {
   it('uses getQueriesData Infinite Queries', async () => {
     const { qraft, queryClient } = createClient();
 
-    qraft.files.getFiles.setInfiniteQueryData(
-      parameters,
-      {
-        pages: [parameters],
-        pageParams: [parameters],
-      },
-      queryClient
-    );
+    qraft.files.getFiles.setInfiniteQueryData(parameters, {
+      pages: [parameters],
+      pageParams: [parameters],
+    });
 
     const queries = qraft.files.getFiles.getQueriesData(
       { parameters, infinite: true },
@@ -2090,28 +2070,23 @@ describe('Qraft uses setInfiniteQueryData', () => {
       },
     };
 
-    qraft.files.getFiles.setInfiniteQueryData(
-      parameters,
-      {
-        pages: [parameters],
-        pageParams: [parameters],
-      },
-      queryClient
-    );
+    qraft.files.getFiles.setInfiniteQueryData(parameters, {
+      pages: [parameters],
+      pageParams: [parameters],
+    });
 
     const expectedResult = {
       pages: [parameters],
       pageParams: [parameters],
     };
 
-    expect(
-      qraft.files.getFiles.getInfiniteQueryData(parameters, queryClient)
-    ).toEqual(expectedResult);
+    expect(qraft.files.getFiles.getInfiniteQueryData(parameters)).toEqual(
+      expectedResult
+    );
 
     expect(
       qraft.files.getFiles.getInfiniteQueryData(
-        qraft.files.getFiles.getInfiniteQueryKey(parameters),
-        queryClient
+        qraft.files.getFiles.getInfiniteQueryKey(parameters)
       )
     ).toEqual(expectedResult);
   });
@@ -2133,8 +2108,7 @@ describe('Qraft uses setInfiniteQueryData', () => {
       {
         pages: [parameters],
         pageParams: [parameters],
-      },
-      queryClient
+      }
     );
 
     const expectedResult = {
@@ -2142,14 +2116,13 @@ describe('Qraft uses setInfiniteQueryData', () => {
       pageParams: [parameters],
     };
 
-    expect(
-      qraft.files.getFiles.getInfiniteQueryData(parameters, queryClient)
-    ).toEqual(expectedResult);
+    expect(qraft.files.getFiles.getInfiniteQueryData(parameters)).toEqual(
+      expectedResult
+    );
 
     expect(
       qraft.files.getFiles.getInfiniteQueryData(
-        qraft.files.getFiles.getInfiniteQueryKey(parameters),
-        queryClient
+        qraft.files.getFiles.getInfiniteQueryKey(parameters)
       )
     ).toEqual(expectedResult);
   });
@@ -2166,21 +2139,17 @@ describe('Qraft uses setInfiniteQueryData', () => {
       },
     };
 
-    qraft.files.getFiles.setQueryData(
-      parameters,
-      {
-        header: {
-          'x-monite-version': '1.0.0',
-        },
-        query: {
-          id__in: ['1', '2'],
-        },
+    qraft.files.getFiles.setQueryData(parameters, {
+      header: {
+        'x-monite-version': '1.0.0',
       },
-      queryClient
-    );
+      query: {
+        id__in: ['1', '2'],
+      },
+    });
 
     expect(
-      qraft.files.getFiles.getInfiniteQueryData(parameters, queryClient)
+      qraft.files.getFiles.getInfiniteQueryData(parameters)
     ).not.toBeDefined();
   });
 });
@@ -2307,10 +2276,8 @@ describe('Qraft uses Queries Invalidation', () => {
 
       await waitFor(() => {
         expect(
-          qraft.approvalPolicies.getApprovalPoliciesId.getQueryState(
-            parameters,
-            queryClient
-          )?.status
+          qraft.approvalPolicies.getApprovalPoliciesId.getQueryState(parameters)
+            ?.status
         ).toEqual('success');
       });
     });
@@ -2347,8 +2314,7 @@ describe('Qraft uses Queries Invalidation', () => {
       await waitFor(() => {
         expect(
           qraft.approvalPolicies.getApprovalPoliciesId.getInfiniteQueryState(
-            parameters,
-            queryClient
+            parameters
           )?.status
         ).toEqual('success');
       });
@@ -2767,17 +2733,11 @@ describe('Qraft uses Queries Removal', () => {
     });
 
     expect(
-      qraft.approvalPolicies.getApprovalPoliciesId.getQueryData(
-        parameters_1,
-        queryClient
-      )
+      qraft.approvalPolicies.getApprovalPoliciesId.getQueryData(parameters_1)
     ).toBeDefined();
 
     expect(
-      qraft.approvalPolicies.getApprovalPoliciesId.getQueryData(
-        parameters_2,
-        queryClient
-      )
+      qraft.approvalPolicies.getApprovalPoliciesId.getQueryData(parameters_2)
     ).toBeDefined();
 
     qraft.approvalPolicies.getApprovalPoliciesId.removeQueries(
@@ -2786,17 +2746,11 @@ describe('Qraft uses Queries Removal', () => {
     );
 
     expect(
-      qraft.approvalPolicies.getApprovalPoliciesId.getQueryData(
-        parameters_1,
-        queryClient
-      )
+      qraft.approvalPolicies.getApprovalPoliciesId.getQueryData(parameters_1)
     ).not.toBeDefined();
 
     expect(
-      qraft.approvalPolicies.getApprovalPoliciesId.getQueryData(
-        parameters_2,
-        queryClient
-      )
+      qraft.approvalPolicies.getApprovalPoliciesId.getQueryData(parameters_2)
     ).toBeDefined();
   });
 
@@ -2823,33 +2777,21 @@ describe('Qraft uses Queries Removal', () => {
     });
 
     expect(
-      qraft.approvalPolicies.getApprovalPoliciesId.getQueryData(
-        parameters_1,
-        queryClient
-      )
+      qraft.approvalPolicies.getApprovalPoliciesId.getQueryData(parameters_1)
     ).toBeDefined();
 
     expect(
-      qraft.approvalPolicies.getApprovalPoliciesId.getQueryData(
-        parameters_2,
-        queryClient
-      )
+      qraft.approvalPolicies.getApprovalPoliciesId.getQueryData(parameters_2)
     ).toBeDefined();
 
     qraft.approvalPolicies.getApprovalPoliciesId.removeQueries(queryClient);
 
     expect(
-      qraft.approvalPolicies.getApprovalPoliciesId.getQueryData(
-        parameters_1,
-        queryClient
-      )
+      qraft.approvalPolicies.getApprovalPoliciesId.getQueryData(parameters_1)
     ).not.toBeDefined();
 
     expect(
-      qraft.approvalPolicies.getApprovalPoliciesId.getQueryData(
-        parameters_2,
-        queryClient
-      )
+      qraft.approvalPolicies.getApprovalPoliciesId.getQueryData(parameters_2)
     ).not.toBeDefined();
   });
 });
@@ -3030,10 +2972,7 @@ describe('Qraft uses Queries Reset', () => {
     );
 
     expect(
-      qraft.approvalPolicies.getApprovalPoliciesId.getQueryData(
-        parameters,
-        queryClient
-      )
+      qraft.approvalPolicies.getApprovalPoliciesId.getQueryData(parameters)
     ).toEqual(initialData);
 
     await waitFor(() => {
@@ -3048,10 +2987,7 @@ describe('Qraft uses Queries Reset', () => {
     });
 
     expect(
-      qraft.approvalPolicies.getApprovalPoliciesId.getQueryData(
-        parameters,
-        queryClient
-      )
+      qraft.approvalPolicies.getApprovalPoliciesId.getQueryData(parameters)
     ).toEqual(initialData);
   });
 });
