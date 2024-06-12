@@ -1,8 +1,4 @@
-import type {
-  DefaultError,
-  QueryClient,
-  QueryState,
-} from '@tanstack/query-core';
+import type { DefaultError, QueryState } from '@tanstack/query-core';
 
 import type { OperationInfiniteData } from './OperationInfiniteData.js';
 import type {
@@ -17,12 +13,10 @@ export interface ServiceOperationGetQueryState<
   TError = DefaultError,
 > {
   getQueryState(
-    parameters: TParams | ServiceOperationQueryKey<TSchema, TParams>,
-    queryClient: QueryClient
+    parameters: TParams | ServiceOperationQueryKey<TSchema, TParams>
   ): QueryState<TData, TError> | undefined;
 
   getInfiniteQueryState(
-    parameters: TParams | ServiceOperationInfiniteQueryKey<TSchema, TParams>,
-    queryClient: QueryClient
+    parameters: TParams | ServiceOperationInfiniteQueryKey<TSchema, TParams>
   ): QueryState<OperationInfiniteData<TData, TParams>, TError> | undefined;
 }

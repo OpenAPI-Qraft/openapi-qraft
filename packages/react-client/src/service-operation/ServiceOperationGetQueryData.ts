@@ -1,5 +1,3 @@
-import type { QueryClient } from '@tanstack/query-core';
-
 import type { ServiceOperationQueryKey } from './ServiceOperationKey.js';
 
 export interface ServiceOperationGetQueryData<
@@ -8,7 +6,6 @@ export interface ServiceOperationGetQueryData<
   TParams = {},
 > {
   getQueryData(
-    parameters: TParams | ServiceOperationQueryKey<TSchema, TParams>,
-    queryClient: QueryClient
+    parameters: TParams | ServiceOperationQueryKey<TSchema, TParams>
   ): TData | undefined;
 }
