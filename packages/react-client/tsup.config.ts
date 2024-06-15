@@ -7,7 +7,7 @@ const tsupBaseOptions: Options = {
   entry: ['src/index.ts'],
   target: ['chrome91', 'firefox90', 'edge91', 'safari15', 'ios15', 'opera77'],
   tsconfig: 'tsconfig.build.json',
-  dts: true,
+  dts: false,
   sourcemap: true,
   clean: true,
   banner: {

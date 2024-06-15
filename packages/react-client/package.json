@@ -3,7 +3,7 @@
   "version": "1.11.0-beta.1",
   "description": "API client for React, providing type-safe requests and dynamic Tanstack Query React Hooks via a modular, Proxy-based architecture.",
   "scripts": {
-    "build": "rimraf dist/ && tsup --config tsup.config.ts",
+    "build": "rimraf dist/ && tsup --config tsup.config.ts && tsc --project tsconfig.build.json --emitDeclarationOnly",
     "dev": "rimraf dist/ && tsc --project tsconfig.build.json --watch --outDir ./dist/esm",
     "test": "vitest run",
     "test:coverage": "vitest run --coverage",
@@ -49,16 +49,16 @@
     "!src/tests/**"
   ],
   "type": "module",
-  "types": "dist/cjs/index.d.cts",
+  "types": "dist/types/index.d.ts",
   "main": "dist/cjs/index.cjs",
   "exports": {
     ".": {
       "import": {
-        "types": "./dist/esm/index.d.ts",
+        "types": "./dist/types/index.d.ts",
         "default": "./dist/esm/index.js"
       },
       "require": {
-        "types": "./dist/cjs/index.d.cts",
+        "types": "./dist/types/index.d.ts",
         "default": "./dist/cjs/index.cjs"
       }
     },
