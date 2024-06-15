@@ -21,8 +21,7 @@ import {
 
 import constate from 'constate';
 
-import { createAPIClient, Services } from './api';
-import { components } from './api/schema';
+import { createAPIClient, Services, components } from './api';
 
 function AppComponent() {
   const { petIdToEdit } = usePetToEdit();
@@ -150,14 +149,9 @@ function PetUpdateForm({ petId }: { petId: number }) {
     error: petQueryError,
   } = qraft.pet.getPetById.useQuery(petParameters, { enabled: !!petId });
 
-  const queryClient = useQueryClient();
-
   const { isPending, mutate } = qraft.pet.updatePet.useMutation(undefined, {
     async onMutate(variables) {
-      await qraft.pet.getPetById.cancelQueries(
-        { parameters: petParameters },
-        queryClient
-      );
+      await qraft.pet.getPetById.cancelQueries({ parameters: petParameters });
 
       const prevPet = qraft.pet.getPetById.getQueryData(petParameters);
 
@@ -175,7 +169,7 @@ function PetUpdateForm({ petId }: { petId: number }) {
     },
     async onSuccess(updatedPet) {
       qraft.pet.getPetById.setQueryData(petParameters, updatedPet);
-      await qraft.pet.findPetsByStatus.invalidateQueries(queryClient);
+      await qraft.pet.findPetsByStatus.invalidateQueries();
       setPetIdToEditToEdit(undefined);
     },
   });
@@ -245,12 +239,11 @@ function PetCreateForm({
   const { setPetIdToEditToEdit } = usePetToEdit();
   const { setPetStatusToCreate } = usePetStatusToCreate();
 
-  const queryClient = useQueryClient();
   const qraft = useCreateAPIClient();
 
   const { isPending, mutate, error } = qraft.pet.addPet.useMutation(undefined, {
     async onSuccess(createdPet) {
-      await qraft.pet.findPetsByStatus.invalidateQueries(queryClient);
+      await qraft.pet.findPetsByStatus.invalidateQueries();
       if (!createdPet)
         throw new Error('createdPet not found in addPet.onSuccess');
       setPetIdToEditToEdit(createdPet.id);
