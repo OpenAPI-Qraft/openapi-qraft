@@ -2780,10 +2780,7 @@ describe('Qraft uses IsMutating Query', () => {
     });
 
     expect(
-      qraft.entities.postEntitiesIdDocuments.isMutating(
-        { parameters },
-        queryClient
-      )
+      qraft.entities.postEntitiesIdDocuments.isMutating({ parameters })
     ).toEqual(1);
   });
 
@@ -2819,9 +2816,7 @@ describe('Qraft uses IsMutating Query', () => {
       });
     });
 
-    expect(
-      qraft.entities.postEntitiesIdDocuments.isMutating(queryClient)
-    ).toEqual(2);
+    expect(qraft.entities.postEntitiesIdDocuments.isMutating()).toEqual(2);
   });
 });
 
