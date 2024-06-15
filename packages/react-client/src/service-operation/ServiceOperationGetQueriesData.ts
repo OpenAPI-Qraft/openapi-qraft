@@ -1,4 +1,4 @@
-import type { DefaultError, NoInfer, QueryClient } from '@tanstack/query-core';
+import type { DefaultError, NoInfer } from '@tanstack/query-core';
 
 import type { OperationInfiniteData } from './OperationInfiniteData.js';
 import type {
@@ -17,10 +17,9 @@ export interface ServiceOperationGetQueriesData<
   TError = DefaultError,
 > {
   getQueriesData<TInfinite extends boolean>(
-    filters:
+    filters?:
       | QueryFiltersByParameters<TSchema, TData, TInfinite, TParams, TError>
-      | QueryFiltersByQueryKey<TSchema, TData, TInfinite, TParams, TError>,
-    queryClient: QueryClient
+      | QueryFiltersByQueryKey<TSchema, TData, TInfinite, TParams, TError>
   ): TInfinite extends true
     ? Array<
         [
