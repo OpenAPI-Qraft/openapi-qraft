@@ -1,19 +1,24 @@
 import { callQueryClientMethodWithQueryKey } from '../lib/callQueryClientFetchMethod.js';
 import type { QraftClientOptions } from '../qraftAPIClient.js';
-import { ServiceOperationQuery } from '../service-operation/ServiceOperation.js';
+import { ServiceOperationFetchInfiniteQuery } from '../service-operation/ServiceOperationFetchInfiniteQuery.js';
 
 export const prefetchInfiniteQuery: <
   TSchema extends { url: string; method: 'get' | 'head' | 'options' },
   TData,
   TParams,
 >(
-  _: QraftClientOptions | undefined,
+  qraftOptions: QraftClientOptions,
   schema: TSchema,
   args: Parameters<
-    ServiceOperationQuery<TSchema, TData, TParams>['prefetchInfiniteQuery']
+    ServiceOperationFetchInfiniteQuery<
+      TSchema,
+      TData,
+      TParams
+    >['prefetchInfiniteQuery']
   >
-) => Promise<TData> = (_, schema, args) => {
+) => Promise<TData> = (qraftOptions, schema, args) => {
   return callQueryClientMethodWithQueryKey(
+    qraftOptions,
     'prefetchInfiniteQuery',
     schema,
     true,

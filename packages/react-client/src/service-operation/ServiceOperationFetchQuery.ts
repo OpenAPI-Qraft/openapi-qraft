@@ -1,7 +1,6 @@
 import type {
   DefaultError,
   FetchQueryOptions,
-  QueryClient,
   QueryFunction,
 } from '@tanstack/query-core';
 
@@ -19,8 +18,7 @@ export interface ServiceOperationFetchQuery<
       | (FetchQueryOptionsByQueryKey<TSchema, TData, TParams, TError> &
           FetchQueryOptionsQueryFn<TSchema, TData, TParams>)
       | (FetchQueryOptionsByParameters<TSchema, TData, TParams, TError> &
-          FetchQueryOptionsQueryFn<TSchema, TData, TParams>),
-    queryClient: QueryClient
+          FetchQueryOptionsQueryFn<TSchema, TData, TParams>)
   ): Promise<TData>;
 
   prefetchQuery(
@@ -28,8 +26,7 @@ export interface ServiceOperationFetchQuery<
       | (FetchQueryOptionsByQueryKey<TSchema, TData, TParams, TError> &
           FetchQueryOptionsQueryFn<TSchema, TData, TParams>)
       | (FetchQueryOptionsByParameters<TSchema, TData, TParams, TError> &
-          FetchQueryOptionsQueryFn<TSchema, TData, TParams>),
-    queryClient: QueryClient
+          FetchQueryOptionsQueryFn<TSchema, TData, TParams>)
   ): Promise<void>;
 }
 
@@ -79,17 +76,17 @@ type FetchQueryOptionsQueryFn<
   TParams = {},
 > =
   | {
-      queryFn?: QueryFunction<
-        TData,
-        ServiceOperationQueryKey<TSchema, TParams>
-      >;
+      queryFn: QueryFunction<TData, ServiceOperationQueryKey<TSchema, TParams>>;
     }
   | {
-      requestFn: RequestFn<TData>;
+      /**
+       * Custom request function to use for the query
+       */
+      requestFn?: RequestFn<TData>;
       /**
        * Base URL to use for the request (used in the `queryFn`)
        * @example 'https://api.example.com'
        */
-      baseUrl: string | undefined;
+      baseUrl?: string | undefined;
       queryFn?: never; // Workaround to fix union type error
     };

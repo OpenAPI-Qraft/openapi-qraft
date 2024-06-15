@@ -3,7 +3,6 @@ import type {
   FetchQueryOptions,
   GetNextPageParamFunction,
   InitialPageParam,
-  QueryClient,
   QueryFunction,
 } from '@tanstack/query-core';
 
@@ -38,8 +37,7 @@ export interface ServiceOperationFetchInfiniteQuery<
           TPageParam,
           TError
         > &
-          FetchInfiniteQueryOptionsQueryFn<TSchema, TData, TParams>),
-    queryClient: QueryClient
+          FetchInfiniteQueryOptionsQueryFn<TSchema, TData, TParams>)
   ): Promise<OperationInfiniteData<TData, TParams>>;
 
   prefetchInfiniteQuery<TPageParam extends TParams>(
@@ -59,8 +57,7 @@ export interface ServiceOperationFetchInfiniteQuery<
           TPageParam,
           TError
         > &
-          FetchInfiniteQueryOptionsQueryFn<TSchema, TData, TParams>),
-    queryClient: QueryClient
+          FetchInfiniteQueryOptionsQueryFn<TSchema, TData, TParams>)
   ): Promise<void>;
 }
 
@@ -140,17 +137,20 @@ type FetchInfiniteQueryOptionsQueryFn<
   TParams = {},
 > =
   | {
-      queryFn?: QueryFunction<
+      queryFn: QueryFunction<
         TData,
         ServiceOperationInfiniteQueryKey<TSchema, TParams>
       >;
     }
   | {
-      requestFn: RequestFn<TData>;
+      /**
+       * Custom request function to use for the query
+       */
+      requestFn?: RequestFn<TData>;
       /**
        * Base URL to use for the request (used in the `queryFn`)
        * @example 'https://api.example.com'
        */
-      baseUrl: string | undefined;
+      baseUrl?: string | undefined;
       queryFn?: never; // Workaround to fix union type error
     };
