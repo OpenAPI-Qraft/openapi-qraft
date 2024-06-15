@@ -1,7 +1,6 @@
 import type {
   DefaultError,
   NoInfer,
-  QueryClient,
   SetDataOptions,
   Updater,
 } from '@tanstack/query-core';
@@ -22,34 +21,6 @@ export interface ServiceOperationSetQueriesData<
       | QueryFiltersByParameters<TSchema, TData, TInfinite, TParams, TError>
       | QueryFiltersByQueryKey<TSchema, TData, TInfinite, TParams, TError>,
     updater: Updater<NoInfer<TData> | undefined, NoInfer<TData> | undefined>,
-    options: SetDataOptions,
-    queryClient: QueryClient
-  ): Array<TData | undefined>;
-
-  setQueriesData<TInfinite extends boolean>(
-    filters:
-      | QueryFiltersByParameters<TSchema, TData, TInfinite, TParams, TError>
-      | QueryFiltersByQueryKey<TSchema, TData, TInfinite, TParams, TError>,
-    updater: Updater<NoInfer<TData> | undefined, NoInfer<TData> | undefined>,
-    queryClient: QueryClient
-  ): Array<TData | undefined>;
-}
-
-/**
- * @internal
- */
-export interface ServiceOperationSetQueriesDataCallback<
-  TSchema extends { url: string; method: string },
-  TData,
-  TParams = {},
-  TError = DefaultError,
-> extends ServiceOperationSetQueriesData<TSchema, TData, TParams, TError> {
-  setQueriesData<TInfinite extends boolean>(
-    filters:
-      | QueryFiltersByParameters<TSchema, TData, TInfinite, TParams, TError>
-      | QueryFiltersByQueryKey<TSchema, TData, TInfinite, TParams, TError>,
-    updater: Updater<NoInfer<TData> | undefined, NoInfer<TData> | undefined>,
-    options: SetDataOptions | QueryClient,
-    queryClient?: QueryClient
+    options?: SetDataOptions
   ): Array<TData | undefined>;
 }

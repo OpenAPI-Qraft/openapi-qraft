@@ -4,13 +4,14 @@ import type { QraftClientOptions } from '../qraftAPIClient.js';
 import { ServiceOperationQuery } from '../service-operation/ServiceOperation.js';
 
 export function getQueriesData<TData>(
-  _: QraftClientOptions | undefined,
+  qraftOptions: QraftClientOptions,
   schema: OperationSchema,
   args: Parameters<
     ServiceOperationQuery<OperationSchema, unknown, TData>['getQueriesData']
   >
 ): TData | undefined {
   return callQueryClientMethodWithQueryFilters(
+    qraftOptions,
     'getQueriesData',
     schema,
     args as never

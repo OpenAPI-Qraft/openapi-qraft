@@ -1,13 +1,13 @@
 import { callQueryClientMethodWithQueryFilters } from '../lib/callQueryClientMethodWithQueryFilters.js';
 import type { OperationSchema } from '../lib/requestFn.js';
 import type { QraftClientOptions } from '../qraftAPIClient.js';
-import type { ServiceOperationInvalidateQueriesCallback } from '../service-operation/ServiceOperationInvalidateQueries.js';
+import type { ServiceOperationInvalidateQueries } from '../service-operation/ServiceOperationInvalidateQueries.js';
 
 export function invalidateQueries<TData>(
-  qraftOptions: QraftClientOptions | undefined,
+  qraftOptions: QraftClientOptions,
   schema: OperationSchema,
   args: Parameters<
-    ServiceOperationInvalidateQueriesCallback<
+    ServiceOperationInvalidateQueries<
       OperationSchema,
       unknown,
       TData
@@ -15,6 +15,7 @@ export function invalidateQueries<TData>(
   >
 ): Promise<void> {
   return callQueryClientMethodWithQueryFilters(
+    qraftOptions,
     'invalidateQueries',
     schema,
     args as never
