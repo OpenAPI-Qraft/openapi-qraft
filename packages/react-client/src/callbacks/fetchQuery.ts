@@ -1,17 +1,20 @@
 import { callQueryClientMethodWithQueryKey } from '../lib/callQueryClientFetchMethod.js';
 import type { QraftClientOptions } from '../qraftAPIClient.js';
-import { ServiceOperationQuery } from '../service-operation/ServiceOperation.js';
+import { ServiceOperationFetchQuery } from '../service-operation/ServiceOperationFetchQuery.js';
 
 export const fetchQuery: <
   TSchema extends { url: string; method: 'get' | 'head' | 'options' },
   TData,
   TParams,
 >(
-  _: QraftClientOptions | undefined,
+  qraftOptions: QraftClientOptions,
   schema: TSchema,
-  args: Parameters<ServiceOperationQuery<TSchema, TData, TParams>['fetchQuery']>
-) => Promise<TData> = (_, schema, args) => {
+  args: Parameters<
+    ServiceOperationFetchQuery<TSchema, TData, TParams>['fetchQuery']
+  >
+) => Promise<TData> = (qraftOptions, schema, args) => {
   return callQueryClientMethodWithQueryKey(
+    qraftOptions,
     'fetchQuery',
     schema,
     false,
