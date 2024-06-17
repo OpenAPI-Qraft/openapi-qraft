@@ -1,5 +1,7 @@
 # @openapi-qraft/plugin
 
+## 1.11.0-beta.2
+
 ## 1.11.0-beta.1
 
 ### Patch Changes
