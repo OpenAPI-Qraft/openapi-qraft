@@ -1,5 +1,11 @@
 # @openapi-qraft/react
 
+## 1.11.0-beta.2
+
+### Patch Changes
+
+- d77f53b: Use a single source `d.ts` file for all module formats
+
 ## 1.11.0-beta.1
 
 ### Patch Changes

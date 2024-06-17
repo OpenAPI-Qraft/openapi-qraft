@@ -14,6 +14,7 @@
     "openapi-qraft-website": "0.0.0"
   },
   "changesets": [
+    "friendly-schools-learn",
     "khaki-carrots-impress",
     "lovely-berries-invite",
     "tricky-beans-search",
