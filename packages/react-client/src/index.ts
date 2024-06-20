@@ -13,7 +13,7 @@ export {
   type HeadersOptions,
 } from './lib/requestFn.js';
 export type * from './service-operation/index.js';
-export * from './callbacks/index.js';
+export * as callbacks from './callbacks/index.js';
 export {
   QraftSecureRequestFn as Unstable_QraftSecureRequestFn,
   type QraftSecureRequestFnProps,
