@@ -3,45 +3,8 @@
  * Do not make direct changes to the file.
  */
 
-import { qraftAPIClient, QraftClientOptions, getInfiniteQueryData, getInfiniteQueryKey, getMutationKey, getQueryData, getQueriesData, getQueryKey, mutationFn, queryFn, setInfiniteQueryData, setQueryData, setQueriesData, useInfiniteQuery, useMutation, useQuery, useSuspenseQuery, useSuspenseInfiniteQuery, useMutationState, useIsMutating, useQueries, useSuspenseQueries, invalidateQueries, cancelQueries, resetQueries, removeQueries, refetchQueries, isFetching, isMutating, useIsFetching, fetchQuery, prefetchQuery, fetchInfiniteQuery, prefetchInfiniteQuery, getQueryState, getInfiniteQueryState, operationInvokeFn } from "@openapi-qraft/react";
+import { qraftAPIClient, QraftClientOptions, callbacks } from "@openapi-qraft/react";
 import { services, Services } from "./services/index.js";
-const callbacks = {
-    getInfiniteQueryData,
-    getInfiniteQueryKey,
-    getMutationKey,
-    getQueryData,
-    getQueriesData,
-    getQueryKey,
-    mutationFn,
-    queryFn,
-    setInfiniteQueryData,
-    setQueryData,
-    setQueriesData,
-    useInfiniteQuery,
-    useMutation,
-    useQuery,
-    useSuspenseQuery,
-    useSuspenseInfiniteQuery,
-    useMutationState,
-    useIsMutating,
-    useQueries,
-    useSuspenseQueries,
-    invalidateQueries,
-    cancelQueries,
-    resetQueries,
-    removeQueries,
-    refetchQueries,
-    isFetching,
-    isMutating,
-    useIsFetching,
-    fetchQuery,
-    prefetchQuery,
-    fetchInfiniteQuery,
-    prefetchInfiniteQuery,
-    getQueryState,
-    getInfiniteQueryState,
-    operationInvokeFn
-};
 export function createAPIClient(options?: QraftClientOptions): Services {
     return qraftAPIClient<Services, typeof callbacks>(services, callbacks, options);
 }
