@@ -1,6 +1,6 @@
 import fs from 'node:fs';
 import { dirname, extname } from 'node:path';
-import { OutputOptions, RollupOptions } from 'rollup';
+import { OutputOptions, RollupLog, RollupOptions, Plugin } from 'rollup';
 import { swc } from 'rollup-plugin-swc3';
 import preserveDirectives from 'rollup-preserve-directives';
 
@@ -57,6 +57,7 @@ export const rollupConfig = (
               }
         ),
         preserveDirectives(),
+        errorOnCyclicCrossChunkReexport(),
       ],
       onwarn(warning, warn) {
         if (!warning.message.includes('"/*#__PURE__*/"')) {
@@ -78,3 +79,34 @@ export const rollupConfig = (
     } satisfies RollupOptions,
   ];
 };
+
+function errorOnCyclicCrossChunkReexport(): Plugin {
+  const warnLog: RollupLog[] = [];
+
+  return {
+    name: 'error-on-cyclic-cross-chunk-reexport',
+    onLog: {
+      order: 'post',
+      handler(level, log) {
+        if (
+          log.code === 'CYCLIC_CROSS_CHUNK_REEXPORT' &&
+          log.message.includes('output.preserveModules')
+        ) {
+          warnLog.push(log);
+        }
+      },
+    },
+    writeBundle: {
+      order: 'post',
+      sequential: true,
+      handler() {
+        if (!warnLog.length || this.meta.watchMode) return;
+
+        this.error(
+          "Fatal: detected cyclic cross-chunk reexport with 'output.preserveModules'. " +
+            'Check the logs and fix the dependencies.'
+        );
+      },
+    },
+  };
+}
