@@ -3,7 +3,7 @@
   "version": "1.11.0-beta.3",
   "description": "API client for React, providing type-safe requests and dynamic Tanstack Query React Hooks via a modular, Proxy-based architecture.",
   "scripts": {
-    "build": "rimraf dist/ && tsup --config tsup.config.ts && tsc --project tsconfig.build.json --emitDeclarationOnly",
+    "build": "rimraf dist/ && NODE_ENV=production rollup --config rollup.config.mjs && tsc --project tsconfig.build.json --emitDeclarationOnly",
     "dev": "rimraf dist/ && tsc --project tsconfig.build.json --watch --outDir ./dist/esm",
     "test": "vitest run",
     "test:coverage": "vitest run --coverage",
@@ -17,6 +17,7 @@
     "@openapi-qraft/cli": "workspace:~",
     "@openapi-qraft/eslint-config": "workspace:~",
     "@openapi-qraft/openapi-typescript-plugin": "workspace:^",
+    "@openapi-qraft/rollup-config": "workspace:~",
     "@openapi-qraft/test-fixtures": "workspace:~",
     "@tanstack/react-query": "^5.17.3",
     "@testing-library/jest-dom": "^5.17.0",
@@ -33,7 +34,7 @@
     "query-string": "^8.1.0",
     "react": "^18.2.0",
     "rimraf": "^5.0.5",
-    "tsup": "^8.1.0",
+    "rollup": "~4.18.0",
     "vitest": "^1.4.0"
   },
   "peerDependencies": {
@@ -48,13 +49,10 @@
     "!src/tests/**"
   ],
   "type": "module",
-  "main": "dist/cjs/index.js",
-  "module": "dist/esm/index.js",
-  "types": "dist/types/index.d.ts",
   "exports": {
     ".": {
       "import": "./dist/esm/index.js",
-      "require": "./dist/cjs/index.js",
+      "require": "./dist/cjs/index.cjs",
       "types": "./dist/types/index.d.ts"
     },
     "./package.json": "./package.json"
