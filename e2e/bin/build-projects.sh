@@ -10,4 +10,5 @@ for project in $PROJECTS; do
   echo "Building $project..."
   (cd "$project" && npm run e2e:pre-build)
   (cd "$project" && npm run build)
+  (cd "$project" && npm run e2e:post-build)
 done
