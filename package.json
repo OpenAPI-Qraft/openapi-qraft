@@ -3,16 +3,17 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "yarn workspaces foreach --verbose --recursive --topological --from '@openapi-qraft/*' run build",
-    "dev": "yarn workspaces foreach -i --jobs unlimited --verbose --worktree --parallel --from '@openapi-qraft/*' run dev",
-    "test": "yarn workspaces foreach --verbose --recursive --topological --no-private --from '@openapi-qraft/*' run test",
-    "lint": "yarn workspaces foreach --verbose --recursive --topological --from '@openapi-qraft/*' --from 'playground' run lint",
-    "typecheck": "yarn workspaces foreach --verbose --recursive --topological --from '@openapi-qraft/*' run typecheck"
+    "build": "turbo run build",
+    "dev": "turbo run dev",
+    "test": "turbo run test --continue --output-logs=new-only",
+    "lint": "turbo run lint --continue --output-logs=new-only",
+    "typecheck": "turbo run typecheck --output-logs=new-only"
   },
   "devDependencies": {
     "@changesets/cli": "^2.27.1",
     "@trivago/prettier-plugin-sort-imports": "^4.3.0",
     "prettier": "^3.1.1",
+    "turbo": "^2.0.4",
     "typescript": "^5.3.3"
   },
   "workspaces": [

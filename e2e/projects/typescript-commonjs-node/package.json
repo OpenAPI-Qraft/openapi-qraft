@@ -7,14 +7,15 @@
   "type": "commonjs",
   "scripts": {
     "build": "tsc",
-    "generate-qraft": "openapi-qraft --plugin tanstack-query-react --plugin openapi-typescript https://raw.githubusercontent.com/swagger-api/swagger-petstore/7767363b841961221a38c0be9c6b1066a5120051/src/main/resources/openapi.yaml --clean -o src/api --openapi-types-import-path '../schema.d.ts' --openapi-types-file-name schema.d.ts",
-    "e2e:pre-build": "npm run generate-qraft",
+    "codegen": "openapi-qraft --plugin tanstack-query-react --plugin openapi-typescript https://raw.githubusercontent.com/swagger-api/swagger-petstore/7767363b841961221a38c0be9c6b1066a5120051/src/main/resources/openapi.yaml --clean -o src/api --openapi-types-import-path '../schema.d.ts' --openapi-types-file-name schema.d.ts",
+    "e2e:pre-build": "npm run codegen",
     "e2e:post-build": " node ./dist/index.js"
   },
   "dependencies": {
     "typescript": "latest",
-    "@openapi-qraft/cli": "1.11.0-beta.2",
-    "@openapi-qraft/react": "1.11.0-beta.2"
+    "@openapi-qraft/cli": "latest",
+    "@openapi-qraft/react": "latest",
+    "@types/node": "latest"
   },
   "repository": {
     "type": "git",

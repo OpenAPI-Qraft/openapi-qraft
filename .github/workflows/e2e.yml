@@ -36,8 +36,11 @@ jobs:
 
       - name: Copy Playground for E2E Tests
         run: |
-          mkdir -p ${{ runner.temp }}/projects
-          cp -r playground ${{ runner.temp }}/projects
+          mkdir -p "$TEST_PROJECTS_DIR"
+          cp -r playground "$TEST_PROJECTS_DIR"
+          cp -a e2e/projects/. "$TEST_PROJECTS_DIR/"
+        env:
+          TEST_PROJECTS_DIR: "${{ runner.temp }}/projects"
 
       - name: Remove Verdaccio Storage
         run: rm -rf e2e/verdaccio-storage

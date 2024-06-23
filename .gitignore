@@ -21,6 +21,7 @@ coverage
 !.yarn/versions
 
 .swc/
+.turbo/
 
 # Used as dummy placeholder during CI/CD
 /.npmrc

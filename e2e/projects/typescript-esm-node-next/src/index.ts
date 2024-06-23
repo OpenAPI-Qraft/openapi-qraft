@@ -1,6 +1,6 @@
-import { esmClient } from './esm-client.mjs';
+import { createAPIClient as createAPIClientMjs } from './api/index.js';
 
-if (esmClient) {
+if (typeof createAPIClientMjs !== 'undefined') {
   console.log('Client is imported successfully from esm project.');
 } else {
   console.error('Client is not imported from esm project.');
