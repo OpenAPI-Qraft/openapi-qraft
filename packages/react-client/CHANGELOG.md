@@ -1,5 +1,11 @@
 # @openapi-qraft/react
 
+## 1.11.0-beta.4
+
+### Minor Changes
+
+- 3d4f489: Improved compatibility with CommonJS and enhanced type support across various IDEs.
+
 ## 1.11.0-beta.3
 
 ### Patch Changes

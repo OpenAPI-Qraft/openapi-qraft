@@ -11,12 +11,14 @@
     "@openapi-qraft/tanstack-query-react-plugin": "1.10.1",
     "@openapi-qraft/test-fixtures": "1.0.0",
     "playground": "0.0.14",
-    "openapi-qraft-website": "0.0.0"
+    "openapi-qraft-website": "0.0.0",
+    "@openapi-qraft/rollup-config": "1.0.0"
   },
   "changesets": [
     "friendly-schools-learn",
     "khaki-carrots-impress",
     "lovely-berries-invite",
+    "mean-pianos-laugh",
     "seven-buttons-chew",
     "tricky-beans-search",
     "twenty-starfishes-rhyme"
