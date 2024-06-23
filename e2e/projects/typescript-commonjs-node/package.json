@@ -13,8 +13,8 @@
   },
   "dependencies": {
     "typescript": "latest",
-    "@openapi-qraft/cli": "1.11.0-beta.2",
-    "@openapi-qraft/react": "1.11.0-beta.2"
+    "@openapi-qraft/cli": "latest",
+    "@openapi-qraft/react": "latest"
   },
   "repository": {
     "type": "git",
