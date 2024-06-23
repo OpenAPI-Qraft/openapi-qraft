@@ -8,7 +8,6 @@ type Options = {
 export const getClientFactory = (options: Options) => {
   return [
     ...getClientImportsFactory(options),
-    getCallbacksVariableFactory(),
     getCreateClientFunctionFactory(),
   ];
 };
@@ -36,12 +35,10 @@ const getClientImportsFactory = ({
             undefined,
             factory.createIdentifier('QraftClientOptions')
           ),
-          ...serviceCallbacks.map((propertyName) =>
-            factory.createImportSpecifier(
-              false,
-              undefined,
-              factory.createIdentifier(propertyName)
-            )
+          factory.createImportSpecifier(
+            false,
+            undefined,
+            factory.createIdentifier('callbacks')
           ),
         ])
       ),
@@ -72,33 +69,6 @@ const getClientImportsFactory = ({
       undefined
     ),
   ];
-};
-
-const getCallbacksVariableFactory = () => {
-  const factory = ts.factory;
-
-  return factory.createVariableStatement(
-    undefined,
-    factory.createVariableDeclarationList(
-      [
-        factory.createVariableDeclaration(
-          factory.createIdentifier('callbacks'),
-          undefined,
-          undefined,
-          factory.createObjectLiteralExpression(
-            serviceCallbacks.map((propertyName) =>
-              factory.createShorthandPropertyAssignment(
-                factory.createIdentifier(propertyName),
-                undefined
-              )
-            ),
-            true
-          )
-        ),
-      ],
-      ts.NodeFlags.Const
-    )
-  );
 };
 
 const getCreateClientFunctionFactory = () => {
@@ -153,42 +123,3 @@ const getCreateClientFunctionFactory = () => {
     )
   );
 };
-
-// todo::make callbacks type-safe
-const serviceCallbacks = [
-  'getInfiniteQueryData',
-  'getInfiniteQueryKey',
-  'getMutationKey',
-  'getQueryData',
-  'getQueriesData',
-  'getQueryKey',
-  'mutationFn',
-  'queryFn',
-  'setInfiniteQueryData',
-  'setQueryData',
-  'setQueriesData',
-  'useInfiniteQuery',
-  'useMutation',
-  'useQuery',
-  'useSuspenseQuery',
-  'useSuspenseInfiniteQuery',
-  'useMutationState',
-  'useIsMutating',
-  'useQueries',
-  'useSuspenseQueries',
-  'invalidateQueries',
-  'cancelQueries',
-  'resetQueries',
-  'removeQueries',
-  'refetchQueries',
-  'isFetching',
-  'isMutating',
-  'useIsFetching',
-  'fetchQuery',
-  'prefetchQuery',
-  'fetchInfiniteQuery',
-  'prefetchInfiniteQuery',
-  'getQueryState',
-  'getInfiniteQueryState',
-  'operationInvokeFn',
-] as const;
