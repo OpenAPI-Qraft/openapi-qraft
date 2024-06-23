@@ -31,10 +31,6 @@ jobs:
       - name: Build
         run: yarn build
 
-      - name: Generate
-        run: |
-          yarn workspace @openapi-qraft/react run generate-api
-
       - name: Unit Testing
         run: yarn test
 

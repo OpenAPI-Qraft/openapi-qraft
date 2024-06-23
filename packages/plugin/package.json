@@ -4,11 +4,12 @@
   "packageManager": "yarn@4.0.2",
   "type": "module",
   "scripts": {
-    "build": "rimraf dist/ && tsc --project tsconfig.build.json",
+    "build": "tsc --project tsconfig.build.json",
     "dev": "yarn build --watch",
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
-    "lint": "eslint"
+    "lint": "eslint",
+    "clean": "rimraf dist/"
   },
   "exports": {
     "./package.json": "./package.json",

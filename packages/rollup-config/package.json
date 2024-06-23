@@ -6,7 +6,8 @@
     "build": "tsc",
     "dev": "tsc -w",
     "lint": "echo 'No linting configured'",
-    "typecheck": "tsc --noEmit --emitDeclarationOnly false"
+    "typecheck": "tsc --noEmit --emitDeclarationOnly false",
+    "clean": "rimraf dist/"
   },
   "dependencies": {
     "@swc/core": "1.4.17",
@@ -14,6 +15,7 @@
     "rollup-preserve-directives": "~1.1.1"
   },
   "devDependencies": {
+    "rimraf": "^5.0.5",
     "typescript": "^5.3.3"
   },
   "peerDependencies": {

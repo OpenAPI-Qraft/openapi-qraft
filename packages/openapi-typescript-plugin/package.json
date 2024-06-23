@@ -3,11 +3,12 @@
   "version": "1.0.4-beta.3",
   "type": "module",
   "scripts": {
-    "build": "rimraf dist/ && tsc --project tsconfig.build.json",
+    "build": "tsc --project tsconfig.build.json",
     "dev": "yarn build --watch",
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
-    "lint": "eslint"
+    "lint": "eslint",
+    "clean": "rimraf dist/"
   },
   "publishConfig": {
     "access": "public"

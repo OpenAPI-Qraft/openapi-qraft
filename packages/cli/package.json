@@ -3,11 +3,12 @@
   "version": "1.11.0-beta.3",
   "description": "CLI for generating typed Tanstack Query React Hooks and services from OpenAPI Schemas, improving type safety in React apps",
   "scripts": {
-    "build": "rimraf dist/ && tsc --project tsconfig.build.json",
+    "build": "tsc --project tsconfig.build.json",
     "dev": "yarn build --watch",
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
-    "lint": "eslint"
+    "lint": "eslint",
+    "clean": "rimraf dist/"
   },
   "type": "module",
   "bin": {
