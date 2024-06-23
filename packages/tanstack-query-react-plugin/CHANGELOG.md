@@ -1,5 +1,11 @@
 # @openapi-qraft/tanstack-query-react-plugin
 
+## 1.11.0-beta.3
+
+### Patch Changes
+
+- @openapi-qraft/plugin@1.11.0-beta.3
+
 ## 1.11.0-beta.2
 
 ### Patch Changes

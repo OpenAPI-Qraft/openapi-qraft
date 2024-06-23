@@ -1,5 +1,11 @@
 # @openapi-qraft/react
 
+## 1.11.0-beta.3
+
+### Patch Changes
+
+- 5a103b2: Do not bundle dist to maintain compatibility with Next.js Server Actions.
+
 ## 1.11.0-beta.2
 
 ### Patch Changes
