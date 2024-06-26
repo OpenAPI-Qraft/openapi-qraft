@@ -1,5 +1,11 @@
 # @openapi-qraft/react
 
+## 1.11.0-beta.5
+
+### Patch Changes
+
+- 7cf6ae1: revert: Export callbacks from the index
+
 ## 1.11.0-beta.4
 
 ### Minor Changes
