@@ -25,3 +25,6 @@ export {
   type SecuritySchemeBearer,
   type SecuritySchemeAPIKey,
 } from './Unstable_QraftSecureRequestFn.js';
+
+// temporary beta version backward compatibility
+export * from './callbacks/index.js';
