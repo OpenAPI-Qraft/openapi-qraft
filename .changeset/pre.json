@@ -15,6 +15,7 @@
     "@openapi-qraft/rollup-config": "1.0.0"
   },
   "changesets": [
+    "early-peas-allow",
     "friendly-schools-learn",
     "khaki-carrots-impress",
     "lovely-berries-invite",
