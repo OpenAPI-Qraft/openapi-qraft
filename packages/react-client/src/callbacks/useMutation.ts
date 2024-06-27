@@ -50,8 +50,6 @@ export const useMutation: <
     );
 
   const contextValue = useContext(qraftOptions?.context ?? QraftContext);
-  if (!contextValue?.requestFn)
-    throw new Error(`QraftContext.request not found`);
 
   const mutationKey =
     options && 'mutationKey' in options
@@ -69,6 +67,9 @@ export const useMutation: <
         options?.mutationFn ??
         (parameters
           ? function (bodyPayload) {
+              if (!contextValue?.requestFn)
+                throw new Error(`QraftContext.requestFn not found`);
+
               return contextValue.requestFn(schema, {
                 parameters,
                 baseUrl: contextValue.baseUrl,
@@ -76,6 +77,9 @@ export const useMutation: <
               });
             }
           : function (parametersAndBodyPayload) {
+              if (!contextValue?.requestFn)
+                throw new Error(`QraftContext.requestFn not found`);
+
               const { body, ...parameters } = parametersAndBodyPayload as {
                 body: unknown;
               };
