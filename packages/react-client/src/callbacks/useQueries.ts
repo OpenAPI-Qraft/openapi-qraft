@@ -24,8 +24,6 @@ export const useQueries: (
   const [options, queryClientByArg] = args;
 
   const contextValue = useContext(qraftOptions?.context ?? QraftContext);
-  if (!contextValue?.requestFn)
-    throw new Error(`QraftContext.requestFn not found`);
 
   return useQueriesTanstack(
     {
@@ -51,6 +49,9 @@ export const useQueries: (
           queryFn:
             optionsWithQueryKey.queryFn ??
             function ({ queryKey: [, queryParams], signal, meta }) {
+              if (!contextValue?.requestFn)
+                throw new Error(`QraftContext.requestFn not found`);
+
               return contextValue.requestFn(schema, {
                 parameters: queryParams as never,
                 baseUrl: contextValue.baseUrl,
