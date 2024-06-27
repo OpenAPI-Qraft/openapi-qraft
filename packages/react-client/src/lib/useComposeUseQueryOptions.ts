@@ -27,13 +27,14 @@ export function useComposeUseQueryOptions(
   const [parameters, options, queryClient] = args;
 
   const contextValue = useContext(qraftOptions?.context ?? QraftContext);
-  if (!contextValue?.requestFn)
-    throw new Error(`QraftContext.requestFn not found`);
 
   const queryFn =
     options?.queryFn ??
     // @ts-expect-error - Too complex to type
     function ({ queryKey: [, queryParams], signal, meta, pageParam }) {
+      if (!contextValue?.requestFn)
+        throw new Error(`QraftContext.requestFn not found`);
+
       return contextValue.requestFn(schema, {
         // @ts-expect-error - Too complex to type
         parameters: infinite
