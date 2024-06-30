@@ -6,10 +6,14 @@ export {
   urlSerializer,
   bodySerializer,
   mergeHeaders,
-  type RequestFn,
-  type RequestFnPayload,
-  type OperationSchema,
-  type RequestFnOptions,
-  type HeadersOptions,
 } from './lib/requestFn.js';
+
+export type {
+  RequestFnPayload,
+  RequestFnOptions,
+  HeadersOptions,
+  OperationSchema,
+  RequestFn,
+} from './lib/requestFn.js';
+
 export type * from './service-operation/index.js';
