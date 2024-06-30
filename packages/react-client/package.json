@@ -53,11 +53,18 @@
   "exports": {
     ".": {
       "import": "./dist/esm/index.js",
-      "require": "./dist/cjs/index.cjs"
+      "require": "./dist/cjs/index.cjs",
+      "types": "./dist/types/index.d.ts"
     },
     "./callbacks/*": {
       "import": "./dist/esm/callbacks/*.js",
-      "require": "./dist/cjs/callbacks/*.cjs"
+      "require": "./dist/cjs/callbacks/*.cjs",
+      "types": "./dist/types/callbacks/*.d.ts"
+    },
+    "./Unstable_QraftSecureRequestFn": {
+      "import": "./dist/esm/Unstable_QraftSecureRequestFn.js",
+      "require": "./dist/cjs/Unstable_QraftSecureRequestFn.cjs",
+      "types": "./dist/types/Unstable_QraftSecureRequestFn.d.ts"
     },
     "./package.json": "./package.json"
   },
