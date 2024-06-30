@@ -13,14 +13,3 @@ export {
   type HeadersOptions,
 } from './lib/requestFn.js';
 export type * from './service-operation/index.js';
-export {
-  QraftSecureRequestFn as Unstable_QraftSecureRequestFn,
-  type QraftSecureRequestFnProps,
-  useSecuritySchemeAuth,
-  createSecureRequestFn,
-  type SecuritySchemeHandlers,
-  type SecuritySchemeCookie,
-  type SecuritySchemeBasic,
-  type SecuritySchemeBearer,
-  type SecuritySchemeAPIKey,
-} from './Unstable_QraftSecureRequestFn.js';
