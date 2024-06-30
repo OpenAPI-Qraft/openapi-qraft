@@ -1,5 +1,5 @@
 {
-  "name": "typescript-esm-node-next",
+  "name": "typescript-nodenext-nodenext",
   "private": true,
   "version": "1.0.0",
   "description": "",
@@ -12,10 +12,10 @@
     "e2e:post-build": "node ./dist/index.js"
   },
   "dependencies": {
-    "typescript": "latest",
     "@openapi-qraft/cli": "latest",
     "@openapi-qraft/react": "latest",
-    "@types/node": "latest"
+    "@types/node": "latest",
+    "typescript": "latest"
   },
   "repository": {
     "type": "git",
