@@ -42,6 +42,7 @@
     "src",
     "!dist/**/*.test.*",
     "!dist/**/*.spec.*",
+    "!src/**/__snapshots__/**",
     "!src/**/*.test.*",
     "!src/**/*.spec.*"
   ],

@@ -45,6 +45,7 @@
     "!dist/**/*.test.*",
     "!dist/**/*.spec.*",
     "!src/**/*.test.*",
+    "!src/**/__snapshots__/**",
     "!src/**/*.spec.*"
   ],
   "packageManager": "yarn@4.0.2"
