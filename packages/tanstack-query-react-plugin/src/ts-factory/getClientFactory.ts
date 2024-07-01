@@ -35,14 +35,19 @@ const getClientImportsFactory = ({
             undefined,
             factory.createIdentifier('QraftClientOptions')
           ),
-          factory.createImportSpecifier(
-            false,
-            undefined,
-            factory.createIdentifier('callbacks')
-          ),
         ])
       ),
       factory.createStringLiteral('@openapi-qraft/react'),
+      undefined
+    ),
+    factory.createImportDeclaration(
+      undefined,
+      factory.createImportClause(
+        false,
+        undefined,
+        factory.createNamespaceImport(factory.createIdentifier('callbacks'))
+      ),
+      factory.createStringLiteral('@openapi-qraft/react/callbacks/index'),
       undefined
     ),
     factory.createImportDeclaration(
