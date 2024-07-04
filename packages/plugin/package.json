@@ -33,7 +33,7 @@
     "yaml": "^2.3.4"
   },
   "devDependencies": {
-    "@openapi-qraft/test-fixtures": "workspace:~",
+    "@openapi-qraft/test-fixtures": "workspace:*",
     "@types/micromatch": "^4",
     "@types/node": "^18.19.4",
     "commander": "^11.1.0",

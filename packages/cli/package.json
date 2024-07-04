@@ -15,13 +15,13 @@
     "openapi-qraft": "./bin.mjs"
   },
   "dependencies": {
-    "@openapi-qraft/openapi-typescript-plugin": "workspace:~",
-    "@openapi-qraft/plugin": "workspace:~",
-    "@openapi-qraft/tanstack-query-react-plugin": "workspace:~",
+    "@openapi-qraft/openapi-typescript-plugin": "workspace:*",
+    "@openapi-qraft/plugin": "workspace:*",
+    "@openapi-qraft/tanstack-query-react-plugin": "workspace:*",
     "commander": "^11.1.0"
   },
   "devDependencies": {
-    "@openapi-qraft/eslint-config": "workspace:~",
+    "@openapi-qraft/eslint-config": "workspace:*",
     "@types/node": "^18.19.4",
     "eslint": "^9.0.0",
     "globals": "^15.0.0",

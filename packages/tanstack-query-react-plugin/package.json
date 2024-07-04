@@ -30,8 +30,8 @@
     "typescript": "^5.3.3"
   },
   "devDependencies": {
-    "@openapi-qraft/eslint-config": "workspace:~",
-    "@openapi-qraft/test-fixtures": "workspace:~",
+    "@openapi-qraft/eslint-config": "workspace:*",
+    "@openapi-qraft/test-fixtures": "workspace:*",
     "eslint": "^9.0.0",
     "memfs": "^4.9.2",
     "rimraf": "^5.0.5",
