@@ -14,5 +14,9 @@
     "playground": "0.0.14",
     "openapi-qraft-website": "0.0.0"
   },
-  "changesets": []
+  "changesets": [
+    "cool-cheetahs-lie",
+    "khaki-carrots-impress",
+    "warm-singers-divide"
+  ]
 }

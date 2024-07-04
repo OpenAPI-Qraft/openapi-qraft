@@ -1,5 +1,15 @@
 # @openapi-qraft/react
 
+## 1.12.0-beta.0
+
+### Minor Changes
+
+- 9cd9909: Added CommonJS distribution support and various module resolution types.
+
+### Patch Changes
+
+- 3d2dd60: Added initial implementation of `--operation-predefined-parameter` option
+
 ## 1.11.0-beta.5
 
 ### Patch Changes
