@@ -49,7 +49,7 @@ export class QraftCommand extends Command {
       )
       .option(
         '--operation-predefined-parameters <patterns...>',
-        'Predefined parameters for services. The specified services parameters will be optional. Eg: "/**:header.x-monite-version,query.x-api-key.;/user/**,/post/**:header.x-monite-entity-id"'
+        'Predefined parameters for services. The specified services parameters will be optional. Eg: "/**:header.x-monite-version,query.x-api-key;/user/**,/post/**:header.x-monite-entity-id"'
       )
       .option(
         '--postfix-services <string>',
