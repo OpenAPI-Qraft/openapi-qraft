@@ -6,25 +6,14 @@ export {
   urlSerializer,
   bodySerializer,
   mergeHeaders,
-  type RequestFn,
-  type RequestFnPayload,
-  type OperationSchema,
-  type RequestFnOptions,
-  type HeadersOptions,
 } from './lib/requestFn.js';
-export type * from './service-operation/index.js';
-export * as callbacks from './callbacks/index.js';
-export {
-  QraftSecureRequestFn as Unstable_QraftSecureRequestFn,
-  type QraftSecureRequestFnProps,
-  useSecuritySchemeAuth,
-  createSecureRequestFn,
-  type SecuritySchemeHandlers,
-  type SecuritySchemeCookie,
-  type SecuritySchemeBasic,
-  type SecuritySchemeBearer,
-  type SecuritySchemeAPIKey,
-} from './Unstable_QraftSecureRequestFn.js';
 
-// temporary beta version backward compatibility
-export * from './callbacks/index.js';
+export type {
+  RequestFnPayload,
+  RequestFnOptions,
+  HeadersOptions,
+  OperationSchema,
+  RequestFn,
+} from './lib/requestFn.js';
+
+export type * from './service-operation/index.js';

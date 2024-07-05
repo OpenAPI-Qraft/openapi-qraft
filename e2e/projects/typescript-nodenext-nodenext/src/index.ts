@@ -6,7 +6,7 @@ import {
   createSecureRequestFn,
 } from '@openapi-qraft/react/Unstable_QraftSecureRequestFn';
 
-import { createAPIClient as createAPIClientMjs } from './api';
+import { createAPIClient as createAPIClientMjs } from './api/index.js';
 
 if (typeof createAPIClientMjs !== 'undefined') {
   console.log('Client is imported successfully from esm project.');

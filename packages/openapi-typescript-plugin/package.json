@@ -1,6 +1,6 @@
 {
   "name": "@openapi-qraft/openapi-typescript-plugin",
-  "version": "1.0.4-beta.5",
+  "version": "1.0.5-beta.0",
   "type": "module",
   "scripts": {
     "build": "tsc --project tsconfig.build.json",
@@ -31,8 +31,8 @@
     "typescript": "^5.3.3"
   },
   "devDependencies": {
-    "@openapi-qraft/eslint-config": "workspace:~",
-    "@openapi-qraft/test-fixtures": "workspace:~",
+    "@openapi-qraft/eslint-config": "workspace:*",
+    "@openapi-qraft/test-fixtures": "workspace:*",
     "@types/node": "^18.19.4",
     "eslint": "^9.0.0",
     "memfs": "^4.9.2",
@@ -45,6 +45,7 @@
     "!dist/**/*.test.*",
     "!dist/**/*.spec.*",
     "!src/**/*.test.*",
+    "!src/**/__snapshots__/**",
     "!src/**/*.spec.*"
   ],
   "packageManager": "yarn@4.0.2"

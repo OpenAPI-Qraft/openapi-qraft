@@ -1,6 +1,6 @@
 {
   "name": "@openapi-qraft/cli",
-  "version": "1.11.0-beta.5",
+  "version": "1.12.0-beta.0",
   "description": "CLI for generating typed Tanstack Query React Hooks and services from OpenAPI Schemas, improving type safety in React apps",
   "scripts": {
     "build": "tsc --project tsconfig.build.json",
@@ -15,13 +15,13 @@
     "openapi-qraft": "./bin.mjs"
   },
   "dependencies": {
-    "@openapi-qraft/openapi-typescript-plugin": "workspace:~",
-    "@openapi-qraft/plugin": "workspace:~",
-    "@openapi-qraft/tanstack-query-react-plugin": "workspace:~",
+    "@openapi-qraft/openapi-typescript-plugin": "workspace:*",
+    "@openapi-qraft/plugin": "workspace:*",
+    "@openapi-qraft/tanstack-query-react-plugin": "workspace:*",
     "commander": "^11.1.0"
   },
   "devDependencies": {
-    "@openapi-qraft/eslint-config": "workspace:~",
+    "@openapi-qraft/eslint-config": "workspace:*",
     "@types/node": "^18.19.4",
     "eslint": "^9.0.0",
     "globals": "^15.0.0",

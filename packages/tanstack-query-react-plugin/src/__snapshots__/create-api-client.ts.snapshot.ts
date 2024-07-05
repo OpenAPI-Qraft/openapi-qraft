@@ -3,7 +3,8 @@
  * Do not make direct changes to the file.
  */
 
-import { qraftAPIClient, QraftClientOptions, callbacks } from "@openapi-qraft/react";
+import { qraftAPIClient, QraftClientOptions } from "@openapi-qraft/react";
+import * as callbacks from "@openapi-qraft/react/callbacks/index";
 import { services, Services } from "./services/index.js";
 export function createAPIClient(options?: QraftClientOptions): Services {
     return qraftAPIClient<Services, typeof callbacks>(services, callbacks, options);

@@ -1,6 +1,6 @@
 {
   "name": "@openapi-qraft/tanstack-query-react-plugin",
-  "version": "1.11.0-beta.5",
+  "version": "1.12.0-beta.0",
   "type": "module",
   "scripts": {
     "build": "tsc --project tsconfig.build.json",
@@ -30,8 +30,8 @@
     "typescript": "^5.3.3"
   },
   "devDependencies": {
-    "@openapi-qraft/eslint-config": "workspace:~",
-    "@openapi-qraft/test-fixtures": "workspace:~",
+    "@openapi-qraft/eslint-config": "workspace:*",
+    "@openapi-qraft/test-fixtures": "workspace:*",
     "eslint": "^9.0.0",
     "memfs": "^4.9.2",
     "rimraf": "^5.0.5",
@@ -42,6 +42,7 @@
     "src",
     "!dist/**/*.test.*",
     "!dist/**/*.spec.*",
+    "!src/**/__snapshots__/**",
     "!src/**/*.test.*",
     "!src/**/*.spec.*"
   ],
