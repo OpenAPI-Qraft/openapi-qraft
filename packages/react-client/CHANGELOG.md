@@ -1,5 +1,11 @@
 # @openapi-qraft/react
 
+## 1.12.0-beta.1
+
+### Minor Changes
+
+- 225f7f4: feat: make `requestFn` optional if `queryFn` or `mutationFn` is specified in hooks.
+
 ## 1.12.0-beta.0
 
 ### Minor Changes

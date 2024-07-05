@@ -1,5 +1,11 @@
 # @openapi-qraft/openapi-typescript
 
+## 1.0.5-beta.1
+
+### Patch Changes
+
+- @openapi-qraft/plugin@1.12.0-beta.1
+
 ## 1.0.5-beta.0
 
 ### Patch Changes

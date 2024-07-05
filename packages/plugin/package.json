@@ -1,6 +1,6 @@
 {
   "name": "@openapi-qraft/plugin",
-  "version": "1.12.0-beta.0",
+  "version": "1.12.0-beta.1",
   "packageManager": "yarn@4.0.2",
   "type": "module",
   "scripts": {
