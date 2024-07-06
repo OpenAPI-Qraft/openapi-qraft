@@ -304,20 +304,20 @@ describe('Qraft uses Suspense Query', () => {
 });
 
 describe('Qraft uses Queries', () => {
-  it('supports useQueries with parameters and queryKey', async () => {
-    const parameters: typeof qraft.approvalPolicies.getApprovalPoliciesId.types.parameters =
-      {
-        header: {
-          'x-monite-version': '1.0.0',
-        },
-        path: {
-          approval_policy_id: '1',
-        },
-        query: {
-          items_order: ['asc', 'desc'],
-        },
-      };
+  const parameters: typeof qraft.approvalPolicies.getApprovalPoliciesId.types.parameters =
+    {
+      header: {
+        'x-monite-version': '1.0.0',
+      },
+      path: {
+        approval_policy_id: '1',
+      },
+      query: {
+        items_order: ['asc', 'desc'],
+      },
+    };
 
+  it('supports useQueries with parameters and queryKey', async () => {
     const { result } = renderHook(
       () =>
         qraft.approvalPolicies.getApprovalPoliciesId.useQueries({
@@ -341,6 +341,48 @@ describe('Qraft uses Queries', () => {
 
     await waitFor(() => {
       expect(result.current).toEqual([parameters, parameters]);
+    });
+  });
+
+  it('supports useQueries with unified parameters', async () => {
+    const { result } = renderHook(
+      () =>
+        qraft.approvalPolicies.getApprovalPoliciesId.useQueries({
+          queries: [{ parameters }, { parameters }],
+        }),
+      {
+        wrapper: Providers,
+      }
+    );
+
+    await waitFor(() => {
+      expect(result.current[0]?.data?.path?.approval_policy_id).toEqual(
+        parameters.path.approval_policy_id
+      );
+      expect(result.current[1]?.data?.query?.items_order).toEqual(
+        parameters.query?.items_order
+      );
+    });
+  });
+
+  it('supports useQueries with unified parameters and combine(...)', async () => {
+    const { result } = renderHook(
+      () =>
+        qraft.approvalPolicies.getApprovalPoliciesId.useQueries({
+          queries: [{ parameters }, { parameters }],
+          combine: (results) =>
+            results.map((result) => result.data?.path?.approval_policy_id),
+        }),
+      {
+        wrapper: Providers,
+      }
+    );
+
+    await waitFor(() => {
+      expect(result.current satisfies Array<string | undefined>).toEqual([
+        parameters.path.approval_policy_id,
+        parameters.path.approval_policy_id,
+      ]);
     });
   });
 });

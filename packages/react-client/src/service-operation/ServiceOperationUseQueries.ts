@@ -1,4 +1,4 @@
-import type {
+import {
   DefaultError,
   QueriesPlaceholderDataFunction,
   QueryClient,
@@ -7,32 +7,54 @@ import type { UseQueryOptions, UseQueryResult } from '@tanstack/react-query';
 
 import type { ServiceOperationQueryKey } from './ServiceOperationKey.js';
 
+type UseQueryOptionsForUseQueries<
+  TSchema extends { url: string; method: string },
+  TParams,
+  TQueryFnData,
+  TError,
+  TData = TQueryFnData,
+> = Omit<
+  UseQueryOptions<
+    TQueryFnData,
+    TError,
+    TData,
+    ServiceOperationQueryKey<TSchema, TParams>
+  >,
+  'placeholderData' | 'suspense' | 'queryKey'
+> &
+  (
+    | {
+        parameters: TParams;
+        placeholderData?:
+          | TQueryFnData
+          | QueriesPlaceholderDataFunction<TQueryFnData>;
+        queryKey?: never;
+      }
+    | {
+        queryKey: ServiceOperationQueryKey<TSchema, TParams>;
+        placeholderData?:
+          | TQueryFnData
+          | QueriesPlaceholderDataFunction<TQueryFnData>;
+        parameters?: never;
+      }
+  );
+
 export interface ServiceOperationUseQueries<
   TSchema extends { url: string; method: string },
-  TData,
+  TQueryFnData,
   TParams = {},
   TError = DefaultError,
 > {
-  useQueries<TCombinedResult = Array<UseQueryResult<TData, TError>>>(
+  useQueries<
+    T extends Array<
+      UseQueryOptionsForUseQueries<TSchema, TParams, TQueryFnData, TError>
+    >,
+    TCombinedResult = Array<UseQueryResult<TQueryFnData, TError>>,
+  >(
     options: {
-      queries: ReadonlyArray<
-        Omit<
-          UseQueryOptions<
-            TData,
-            TError,
-            TData,
-            ServiceOperationQueryKey<TSchema, TParams>
-          >,
-          'placeholderData' | 'suspense' | 'queryKey'
-        > & {
-          placeholderData?: TData | QueriesPlaceholderDataFunction<TData>;
-        } & (
-            | { parameters: TParams; queryKey?: never }
-            | { queryKey: ServiceOperationQueryKey<TSchema, TParams> }
-          )
-      >;
+      queries: T;
       combine?: (
-        results: Array<UseQueryResult<TData, TError>>
+        results: Array<UseQueryResult<TQueryFnData, TError>>
       ) => TCombinedResult;
     },
     queryClient?: QueryClient
