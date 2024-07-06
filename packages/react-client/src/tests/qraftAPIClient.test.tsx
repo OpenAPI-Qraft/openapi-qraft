@@ -57,7 +57,21 @@ describe('Qraft uses singular Query', () => {
     );
 
     await waitFor(() => {
-      expect(result.current.data).toEqual({
+      expect(
+        result.current.data satisfies
+          | {
+              header?: {
+                'x-monite-version'?: string;
+              };
+              path?: {
+                approval_policy_id?: string;
+              };
+              query?: {
+                items_order?: ('asc' | 'desc')[];
+              };
+            }
+          | undefined
+      ).toEqual({
         header: {
           'x-monite-version': '1.0.0',
         },
@@ -97,6 +111,37 @@ describe('Qraft uses singular Query', () => {
 
     await waitFor(() => {
       expect(result.current.data).toEqual(getApprovalPoliciesIdQueryKey[1]);
+    });
+  });
+
+  it('supports useQuery with select()', async () => {
+    const { result } = renderHook(
+      () =>
+        qraft.approvalPolicies.getApprovalPoliciesId.useQuery(
+          {
+            header: {
+              'x-monite-version': '1.0.0',
+            },
+            path: {
+              approval_policy_id: '1',
+            },
+            query: {
+              items_order: ['asc', 'desc'],
+            },
+          },
+          {
+            select(data) {
+              return String(data.path?.approval_policy_id);
+            },
+          }
+        ),
+      {
+        wrapper: Providers,
+      }
+    );
+
+    await waitFor(() => {
+      expect(result.current.data satisfies string | undefined).toEqual('1');
     });
   });
 
