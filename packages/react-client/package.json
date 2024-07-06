@@ -4,7 +4,7 @@
   "description": "API client for React, providing type-safe requests and dynamic Tanstack Query React Hooks via a modular, Proxy-based architecture.",
   "scripts": {
     "build": "NODE_ENV=production rollup --config rollup.config.mjs && tsc --project tsconfig.build.json --emitDeclarationOnly",
-    "dev": "rimraf dist/ && tsc --project tsconfig.build.json --watch --outDir ./dist/esm",
+    "dev": "rimraf dist/ && tsc --project tsconfig.build.json --watch --outDir ./dist/esm --noEmitOnError false",
     "test": "vitest run",
     "test:coverage": "vitest run --coverage",
     "typecheck": "tsc --noEmit",
