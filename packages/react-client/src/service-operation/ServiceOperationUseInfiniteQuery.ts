@@ -16,7 +16,7 @@ import type { ServiceOperationInfiniteQueryKey } from './ServiceOperationKey.js'
 
 export interface ServiceOperationUseInfiniteQuery<
   TSchema extends { url: string; method: string },
-  TData,
+  TQueryFnData,
   TParams = {},
   TError = DefaultError,
 > {
@@ -24,11 +24,11 @@ export interface ServiceOperationUseInfiniteQuery<
     parameters: TQueryKeyParams
   ): ServiceOperationInfiniteQueryKey<TSchema, TQueryKeyParams>;
 
-  useInfiniteQuery<TPageParam extends TParams>(
+  useInfiniteQuery<TPageParam extends TParams, TData = TQueryFnData>(
     parameters: TParams | ServiceOperationInfiniteQueryKey<TSchema, TParams>,
     options: Omit<
       UndefinedInitialDataInfiniteOptions<
-        TData,
+        TQueryFnData,
         TError,
         OperationInfiniteData<TData, TParams>,
         ServiceOperationInfiniteQueryKey<TSchema, TParams>,
@@ -39,18 +39,21 @@ export interface ServiceOperationUseInfiniteQuery<
       | 'getNextPageParam'
       | 'initialPageParam'
     > &
-      InfiniteQueryPageParamsOptions<TData, PartialParameters<TPageParam>>,
+      InfiniteQueryPageParamsOptions<
+        TQueryFnData,
+        PartialParameters<TPageParam>
+      >,
     queryClient?: QueryClient
   ): UseInfiniteQueryResult<
     OperationInfiniteData<TData, TParams>,
     TError | Error
   >;
 
-  useInfiniteQuery<TPageParam extends TParams>(
+  useInfiniteQuery<TPageParam extends TParams, TData = TQueryFnData>(
     parameters: TParams | ServiceOperationInfiniteQueryKey<TSchema, TParams>,
     options: Omit<
       DefinedInitialDataInfiniteOptions<
-        TData,
+        TQueryFnData,
         TError,
         OperationInfiniteData<TData, TParams>,
         ServiceOperationInfiniteQueryKey<TSchema, TParams>,
@@ -61,7 +64,10 @@ export interface ServiceOperationUseInfiniteQuery<
       | 'getNextPageParam'
       | 'initialPageParam'
     > &
-      InfiniteQueryPageParamsOptions<TData, PartialParameters<TPageParam>>,
+      InfiniteQueryPageParamsOptions<
+        TQueryFnData,
+        PartialParameters<TPageParam>
+      >,
     queryClient?: QueryClient
   ): DefinedUseInfiniteQueryResult<
     OperationInfiniteData<TData, TParams>,
