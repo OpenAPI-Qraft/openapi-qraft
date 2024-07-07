@@ -286,7 +286,10 @@ describe('Qraft uses Suspense Query', () => {
       throw new Error('Promise should be resolved');
     }
 
-    expect(resultWithData.current.data).toEqual({
+    expect(
+      resultWithData.current
+        .data satisfies typeof qraft.approvalPolicies.getApprovalPoliciesId.types.data
+    ).toEqual({
       header: {
         'x-monite-version': '1.0.0',
       },
