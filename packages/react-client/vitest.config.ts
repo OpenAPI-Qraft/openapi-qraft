@@ -19,6 +19,12 @@ export default defineConfig({
         find: '@openapi-qraft/react',
         replacement: fileURLToPath(new URL('./src', import.meta.url)),
       },
+      {
+        find: '@openapi-qraft/react/Unstable_QraftSecureRequestFn',
+        replacement: fileURLToPath(
+          new URL('./src/Unstable_QraftSecureRequestFn', import.meta.url)
+        ),
+      },
     ],
     coverage: {
       exclude: [
