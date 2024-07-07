@@ -57,7 +57,21 @@ describe('Qraft uses singular Query', () => {
     );
 
     await waitFor(() => {
-      expect(result.current.data).toEqual({
+      expect(
+        result.current.data satisfies
+          | {
+              header?: {
+                'x-monite-version'?: string;
+              };
+              path?: {
+                approval_policy_id?: string;
+              };
+              query?: {
+                items_order?: ('asc' | 'desc')[];
+              };
+            }
+          | undefined
+      ).toEqual({
         header: {
           'x-monite-version': '1.0.0',
         },
@@ -97,6 +111,37 @@ describe('Qraft uses singular Query', () => {
 
     await waitFor(() => {
       expect(result.current.data).toEqual(getApprovalPoliciesIdQueryKey[1]);
+    });
+  });
+
+  it('supports useQuery with select()', async () => {
+    const { result } = renderHook(
+      () =>
+        qraft.approvalPolicies.getApprovalPoliciesId.useQuery(
+          {
+            header: {
+              'x-monite-version': '1.0.0',
+            },
+            path: {
+              approval_policy_id: '1',
+            },
+            query: {
+              items_order: ['asc', 'desc'],
+            },
+          },
+          {
+            select(data) {
+              return String(data.path?.approval_policy_id);
+            },
+          }
+        ),
+      {
+        wrapper: Providers,
+      }
+    );
+
+    await waitFor(() => {
+      expect(result.current.data satisfies string | undefined).toEqual('1');
     });
   });
 
@@ -241,7 +286,10 @@ describe('Qraft uses Suspense Query', () => {
       throw new Error('Promise should be resolved');
     }
 
-    expect(resultWithData.current.data).toEqual({
+    expect(
+      resultWithData.current
+        .data satisfies typeof qraft.approvalPolicies.getApprovalPoliciesId.types.data
+    ).toEqual({
       header: {
         'x-monite-version': '1.0.0',
       },
@@ -256,20 +304,20 @@ describe('Qraft uses Suspense Query', () => {
 });
 
 describe('Qraft uses Queries', () => {
-  it('supports useQueries with parameters and queryKey', async () => {
-    const parameters: typeof qraft.approvalPolicies.getApprovalPoliciesId.types.parameters =
-      {
-        header: {
-          'x-monite-version': '1.0.0',
-        },
-        path: {
-          approval_policy_id: '1',
-        },
-        query: {
-          items_order: ['asc', 'desc'],
-        },
-      };
+  const parameters: typeof qraft.approvalPolicies.getApprovalPoliciesId.types.parameters =
+    {
+      header: {
+        'x-monite-version': '1.0.0',
+      },
+      path: {
+        approval_policy_id: '1',
+      },
+      query: {
+        items_order: ['asc', 'desc'],
+      },
+    };
 
+  it('supports useQueries with parameters and queryKey', async () => {
     const { result } = renderHook(
       () =>
         qraft.approvalPolicies.getApprovalPoliciesId.useQueries({
@@ -295,23 +343,65 @@ describe('Qraft uses Queries', () => {
       expect(result.current).toEqual([parameters, parameters]);
     });
   });
+
+  it('supports useQueries with unified parameters', async () => {
+    const { result } = renderHook(
+      () =>
+        qraft.approvalPolicies.getApprovalPoliciesId.useQueries({
+          queries: [{ parameters }, { parameters }],
+        }),
+      {
+        wrapper: Providers,
+      }
+    );
+
+    await waitFor(() => {
+      expect(result.current[0]?.data?.path?.approval_policy_id).toEqual(
+        parameters.path.approval_policy_id
+      );
+      expect(result.current[1]?.data?.query?.items_order).toEqual(
+        parameters.query?.items_order
+      );
+    });
+  });
+
+  it('supports useQueries with unified parameters and combine(...)', async () => {
+    const { result } = renderHook(
+      () =>
+        qraft.approvalPolicies.getApprovalPoliciesId.useQueries({
+          queries: [{ parameters }, { parameters }],
+          combine: (results) =>
+            results.map((result) => result.data?.path?.approval_policy_id),
+        }),
+      {
+        wrapper: Providers,
+      }
+    );
+
+    await waitFor(() => {
+      expect(result.current satisfies Array<string | undefined>).toEqual([
+        parameters.path.approval_policy_id,
+        parameters.path.approval_policy_id,
+      ]);
+    });
+  });
 });
 
 describe('Qraft uses Suspense Queries', () => {
-  it('supports useSuspenseQueries', async () => {
-    const parameters: typeof qraft.approvalPolicies.getApprovalPoliciesId.types.parameters =
-      {
-        header: {
-          'x-monite-version': '1.0.0',
-        },
-        path: {
-          approval_policy_id: '1',
-        },
-        query: {
-          items_order: ['asc', 'desc'],
-        },
-      };
+  const parameters: typeof qraft.approvalPolicies.getApprovalPoliciesId.types.parameters =
+    {
+      header: {
+        'x-monite-version': '1.0.0',
+      },
+      path: {
+        approval_policy_id: '1',
+      },
+      query: {
+        items_order: ['asc', 'desc'],
+      },
+    };
 
+  it('supports useSuspenseQueries', async () => {
     const hook = () => {
       try {
         return qraft.approvalPolicies.getApprovalPoliciesId.useSuspenseQueries({
@@ -326,10 +416,9 @@ describe('Qraft uses Suspense Queries', () => {
                 ),
             },
           ],
-          combine: (results) => results.map((result) => result.data),
         });
       } catch (error) {
-        return error as Promise<unknown>;
+        return error as Promise<void>;
       }
     };
 
@@ -351,8 +440,58 @@ describe('Qraft uses Suspense Queries', () => {
       throw new Error('Promise should be resolved');
     }
 
-    await waitFor(() => {
-      expect(resultWithData.current).toEqual([parameters, parameters]);
+    expect(
+      resultWithData.current[0]
+        .data satisfies typeof qraft.approvalPolicies.getApprovalPoliciesId.types.data
+    ).toEqual(parameters);
+    expect(
+      resultWithData.current[1]
+        .data satisfies typeof qraft.approvalPolicies.getApprovalPoliciesId.types.data
+    ).toEqual(parameters);
+  });
+
+  it('supports useSuspenseQueries with combine()', async () => {
+    const hook = () => {
+      try {
+        return qraft.approvalPolicies.getApprovalPoliciesId.useSuspenseQueries({
+          queries: [
+            {
+              parameters,
+            },
+            {
+              queryKey:
+                qraft.approvalPolicies.getApprovalPoliciesId.getQueryKey(
+                  parameters
+                ),
+            },
+          ],
+          combine: (results) =>
+            results.map((result) => result.data?.query?.items_order),
+        });
+      } catch (error) {
+        return error as Promise<void>;
+      }
+    };
+
+    const queryClient = new QueryClient({
+      defaultOptions: { queries: { staleTime: Infinity } },
+    });
+
+    const { result: resultWithErrorPromise } = renderHook(hook, {
+      wrapper: (props) => <Providers {...props} queryClient={queryClient} />,
+    });
+
+    expect(resultWithErrorPromise.current).toBeInstanceOf(Promise); // Suspense throws a promise
+
+    await waitFor(async () => {
+      expect(
+        (await resultWithErrorPromise.current) satisfies
+          | void
+          | (('asc' | 'desc')[] | undefined)[]
+      ).toEqual([
+        ['asc', 'desc'],
+        ['asc', 'desc'],
+      ]);
     });
   });
 });
@@ -407,6 +546,72 @@ describe('Qraft uses Infinite Queries', () => {
             },
             query: {
               id__in: ['1', '2'],
+              page: '1',
+            },
+          },
+        ],
+      });
+    });
+  });
+
+  it('supports useInfiniteQuery with select', async () => {
+    const { result } = renderHook(
+      () =>
+        qraft.files.getFiles.useInfiniteQuery(
+          {
+            header: {
+              'x-monite-version': '1.0.0',
+            },
+            query: {
+              id__in: ['1', '2'],
+            },
+          },
+          {
+            getNextPageParam: (lastPage, allPages, params) => {
+              return {
+                query: {
+                  page: params.query?.page
+                    ? String(Number(params.query.page) + 1)
+                    : undefined,
+                },
+              };
+            },
+            initialPageParam: {
+              query: {
+                page: '1',
+              },
+            },
+            select: (data) => ({
+              pages: data.pages.map((page) => page.query?.id__in),
+              pageParams: data.pageParams,
+            }),
+          }
+        ),
+      {
+        wrapper: Providers,
+      }
+    );
+
+    await waitFor(() => {
+      result.current.data?.pages.map((page) => page);
+      result.current.data?.pageParams.map((pageParam) => pageParam);
+
+      expect(
+        result.current.data satisfies
+          | {
+              pages: Array<string[] | undefined>;
+              pageParams: {
+                query?: {
+                  page?: string;
+                };
+              }[];
+            }
+          | undefined
+      ).toEqual({
+        pages: [['1', '2']],
+        pageParams: [
+          {
+            query: {
               page: '1',
             },
           },

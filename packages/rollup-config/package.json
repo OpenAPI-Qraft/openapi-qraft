@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "build": "tsc",
-    "dev": "tsc -w",
+    "dev": "tsc --watch --noEmitOnError false",
     "lint": "echo 'No linting configured'",
     "typecheck": "tsc --noEmit --emitDeclarationOnly false",
     "clean": "rimraf dist/"

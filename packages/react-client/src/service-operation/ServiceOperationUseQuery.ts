@@ -10,7 +10,7 @@ import type { ServiceOperationQueryKey } from './ServiceOperationKey.js';
 
 export interface ServiceOperationUseQuery<
   TSchema extends { url: string; method: string },
-  TData,
+  TQueryFnData,
   TParams = {},
   TError = DefaultError,
 > {
@@ -18,11 +18,11 @@ export interface ServiceOperationUseQuery<
     parameters?: QueryKeyParams
   ): ServiceOperationQueryKey<TSchema, QueryKeyParams>;
 
-  useQuery(
+  useQuery<TData = TQueryFnData>(
     parameters: TParams | ServiceOperationQueryKey<TSchema, TParams>,
     options?: Omit<
       UndefinedInitialDataOptions<
-        TData,
+        TQueryFnData,
         TError,
         TData,
         ServiceOperationQueryKey<TSchema, TParams>
@@ -32,11 +32,11 @@ export interface ServiceOperationUseQuery<
     queryClient?: QueryClient
   ): UseQueryResult<TData, TError | Error>;
 
-  useQuery(
+  useQuery<TData = TQueryFnData>(
     parameters: TParams | ServiceOperationQueryKey<TSchema, TParams>,
     options: Omit<
       DefinedInitialDataOptions<
-        TData,
+        TQueryFnData,
         TError,
         TData,
         ServiceOperationQueryKey<TSchema, TParams>

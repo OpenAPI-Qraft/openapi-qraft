@@ -27,7 +27,7 @@ import type { ServiceOperationUseQueries } from './ServiceOperationUseQueries.js
 import type { ServiceOperationUseQuery } from './ServiceOperationUseQuery.js';
 import type { ServiceOperationUseSuspenseInfiniteQuery } from './ServiceOperationUseSuspenseInfiniteQuery.js';
 import type { ServiceOperationUseSuspenseQueries } from './ServiceOperationUseSuspenseQueries.js';
-import type { ServiceOperationUseSuspenseQueryQuery } from './ServiceOperationUseSuspenseQueryQuery.js';
+import type { ServiceOperationUseSuspenseQuery } from './ServiceOperationUseSuspenseQuery.js';
 
 export interface ServiceOperationQuery<
   TSchema extends { url: string; method: string },
@@ -38,7 +38,7 @@ export interface ServiceOperationQuery<
     ServiceOperationUseQueries<TSchema, TData, TParams, TError>,
     ServiceOperationUseSuspenseQueries<TSchema, TData, TParams, TError>,
     ServiceOperationUseInfiniteQuery<TSchema, TData, TParams, TError>,
-    ServiceOperationUseSuspenseQueryQuery<TSchema, TData, TParams, TError>,
+    ServiceOperationUseSuspenseQuery<TSchema, TData, TParams, TError>,
     ServiceOperationUseSuspenseInfiniteQuery<TSchema, TData, TParams, TError>,
     ServiceOperationUseIsFetchingQueries<TSchema, TData, TParams, TError>,
     ServiceOperationQueryFn<TSchema, TData, TParams>,

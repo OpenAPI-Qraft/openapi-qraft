@@ -6,17 +6,17 @@ import type {
 
 import type { ServiceOperationQueryKey } from './ServiceOperationKey.js';
 
-export interface ServiceOperationUseSuspenseQueryQuery<
+export interface ServiceOperationUseSuspenseQuery<
   TSchema extends { url: string; method: string },
-  TData,
+  TQueryFnData,
   TParams = {},
   TError = DefaultError,
 > {
-  useSuspenseQuery(
+  useSuspenseQuery<TData = TQueryFnData>(
     parameters: TParams | ServiceOperationQueryKey<TSchema, TParams>,
     options?: Omit<
       UseSuspenseQueryOptions<
-        TData,
+        TQueryFnData,
         TError,
         TData,
         ServiceOperationQueryKey<TSchema, TParams>

@@ -42,7 +42,6 @@ export const useSuspenseQueries: (
                   },
                   queryOptions
                 );
-                // @ts-expect-error - `parameters` is not inferred as a property of `queryOptionsCopy`
                 delete queryOptionsCopy.parameters;
                 return queryOptionsCopy;
               })()
