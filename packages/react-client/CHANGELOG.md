@@ -1,5 +1,13 @@
 # @openapi-qraft/react
 
+## 1.12.0-beta.2
+
+### Patch Changes
+
+- 8531e42: Fixed output type for `useQueries(...)` and `useSuspenseQueries(...)`.
+- 7a50463: Fixed typing for `select(...)` in `useQuery(...)` and `useSuspenseQuery`.
+- 7dff8fa: Fixed typing for `select(...)` in `useInfiniteQuery(...)` and `useSuspenseInfiniteQuery(...)`.
+
 ## 1.12.0-beta.1
 
 ### Minor Changes
