@@ -1,5 +1,11 @@
 # @openapi-qraft/plugin
 
+## 1.12.0
+
+### Minor Changes
+
+- d4bc3af: Added new CLI option `--operation-predefined-parameters` to allow setting default parameters across multiple endpoints.
+
 ## 1.12.0-beta.2
 
 ## 1.12.0-beta.1

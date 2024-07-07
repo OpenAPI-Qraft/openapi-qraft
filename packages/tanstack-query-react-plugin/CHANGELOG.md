@@ -1,5 +1,16 @@
 # @openapi-qraft/tanstack-query-react-plugin
 
+## 1.12.0
+
+### Minor Changes
+
+- 9cd9909: Added CommonJS distribution support and various module resolution types.
+
+### Patch Changes
+
+- Updated dependencies [d4bc3af]
+  - @openapi-qraft/plugin@1.12.0
+
 ## 1.12.0-beta.2
 
 ### Patch Changes
