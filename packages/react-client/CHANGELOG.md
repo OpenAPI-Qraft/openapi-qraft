@@ -1,5 +1,18 @@
 # @openapi-qraft/react
 
+## 1.12.0
+
+### Minor Changes
+
+- 225f7f4: feat: make `requestFn` optional if `queryFn` or `mutationFn` is specified in hooks.
+- 9cd9909: Added CommonJS distribution support and various module resolution types.
+
+### Patch Changes
+
+- 8531e42: Fixed output type for `useQueries(...)` and `useSuspenseQueries(...)`.
+- 7a50463: Fixed typing for `select(...)` in `useQuery(...)` and `useSuspenseQuery`.
+- 7dff8fa: Fixed typing for `select(...)` in `useInfiniteQuery(...)` and `useSuspenseInfiniteQuery(...)`.
+
 ## 1.12.0-beta.2
 
 ### Patch Changes
