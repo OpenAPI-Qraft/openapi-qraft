@@ -14,18 +14,18 @@ import type { ServiceOperationInfiniteQueryKey } from './ServiceOperationKey.js'
 
 export interface ServiceOperationUseSuspenseInfiniteQuery<
   TSchema extends { url: string; method: string },
-  TData,
+  TQueryFnData,
   TParams = {},
   TError = DefaultError,
 > {
-  useSuspenseInfiniteQuery<TPageParam extends TParams>(
+  useSuspenseInfiniteQuery<TPageParam extends TParams, TData = TQueryFnData>(
     parameters: TParams | ServiceOperationInfiniteQueryKey<TSchema, TParams>,
     options: Omit<
       UseSuspenseInfiniteQueryOptions<
-        TData,
+        TQueryFnData,
         TError,
         OperationInfiniteData<TData, TParams>,
-        TData,
+        TQueryFnData,
         ServiceOperationInfiniteQueryKey<TSchema, TParams>,
         PartialParameters<TPageParam>
       >,
@@ -34,7 +34,10 @@ export interface ServiceOperationUseSuspenseInfiniteQuery<
       | 'getNextPageParam'
       | 'initialPageParam'
     > &
-      InfiniteQueryPageParamsOptions<TData, PartialParameters<TPageParam>>,
+      InfiniteQueryPageParamsOptions<
+        TQueryFnData,
+        PartialParameters<TPageParam>
+      >,
     queryClient?: QueryClient
   ): UseSuspenseInfiniteQueryResult<
     OperationInfiniteData<TData, TParams>,
