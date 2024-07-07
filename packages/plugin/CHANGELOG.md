@@ -1,5 +1,7 @@
 # @openapi-qraft/plugin
 
+## 1.12.0-beta.2
+
 ## 1.12.0-beta.1
 
 ## 1.12.0-beta.0
