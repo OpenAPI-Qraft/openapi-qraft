@@ -6,7 +6,7 @@ import type {
 
 import type { ServiceOperationQueryKey } from './ServiceOperationKey.js';
 
-export interface ServiceOperationUseSuspenseQueryQuery<
+export interface ServiceOperationUseSuspenseQuery<
   TSchema extends { url: string; method: string },
   TQueryFnData,
   TParams = {},
