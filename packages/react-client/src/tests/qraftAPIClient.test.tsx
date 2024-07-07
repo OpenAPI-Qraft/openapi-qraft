@@ -388,20 +388,20 @@ describe('Qraft uses Queries', () => {
 });
 
 describe('Qraft uses Suspense Queries', () => {
-  it('supports useSuspenseQueries', async () => {
-    const parameters: typeof qraft.approvalPolicies.getApprovalPoliciesId.types.parameters =
-      {
-        header: {
-          'x-monite-version': '1.0.0',
-        },
-        path: {
-          approval_policy_id: '1',
-        },
-        query: {
-          items_order: ['asc', 'desc'],
-        },
-      };
+  const parameters: typeof qraft.approvalPolicies.getApprovalPoliciesId.types.parameters =
+    {
+      header: {
+        'x-monite-version': '1.0.0',
+      },
+      path: {
+        approval_policy_id: '1',
+      },
+      query: {
+        items_order: ['asc', 'desc'],
+      },
+    };
 
+  it('supports useSuspenseQueries', async () => {
     const hook = () => {
       try {
         return qraft.approvalPolicies.getApprovalPoliciesId.useSuspenseQueries({
@@ -416,10 +416,9 @@ describe('Qraft uses Suspense Queries', () => {
                 ),
             },
           ],
-          combine: (results) => results.map((result) => result.data),
         });
       } catch (error) {
-        return error as Promise<unknown>;
+        return error as Promise<void>;
       }
     };
 
@@ -441,8 +440,58 @@ describe('Qraft uses Suspense Queries', () => {
       throw new Error('Promise should be resolved');
     }
 
-    await waitFor(() => {
-      expect(resultWithData.current).toEqual([parameters, parameters]);
+    expect(
+      resultWithData.current[0]
+        .data satisfies typeof qraft.approvalPolicies.getApprovalPoliciesId.types.data
+    ).toEqual(parameters);
+    expect(
+      resultWithData.current[1]
+        .data satisfies typeof qraft.approvalPolicies.getApprovalPoliciesId.types.data
+    ).toEqual(parameters);
+  });
+
+  it('supports useSuspenseQueries with combine()', async () => {
+    const hook = () => {
+      try {
+        return qraft.approvalPolicies.getApprovalPoliciesId.useSuspenseQueries({
+          queries: [
+            {
+              parameters,
+            },
+            {
+              queryKey:
+                qraft.approvalPolicies.getApprovalPoliciesId.getQueryKey(
+                  parameters
+                ),
+            },
+          ],
+          combine: (results) =>
+            results.map((result) => result.data?.query?.items_order),
+        });
+      } catch (error) {
+        return error as Promise<void>;
+      }
+    };
+
+    const queryClient = new QueryClient({
+      defaultOptions: { queries: { staleTime: Infinity } },
+    });
+
+    const { result: resultWithErrorPromise } = renderHook(hook, {
+      wrapper: (props) => <Providers {...props} queryClient={queryClient} />,
+    });
+
+    expect(resultWithErrorPromise.current).toBeInstanceOf(Promise); // Suspense throws a promise
+
+    await waitFor(async () => {
+      expect(
+        (await resultWithErrorPromise.current) satisfies
+          | void
+          | (('asc' | 'desc')[] | undefined)[]
+      ).toEqual([
+        ['asc', 'desc'],
+        ['asc', 'desc'],
+      ]);
     });
   });
 });
