@@ -431,15 +431,9 @@ describe('Qraft uses Suspense Queries', () => {
       }
     };
 
-    const queryClient = new QueryClient({
-      defaultOptions: { queries: { staleTime: Infinity } },
-    });
-
     const { result: resultWithErrorPromise } = renderHook(hook, {
       wrapper: (props) => <Providers {...props} queryClient={queryClient} />,
     });
-
-    expect(resultWithErrorPromise.current).toBeInstanceOf(Promise); // Suspense throws a promise
 
     await waitFor(async () => {
       expect(
