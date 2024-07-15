@@ -117,6 +117,26 @@ export const plugin: QraftCommandPlugin = {
         );
       }
 
+      const openapiTypesImportPath = thisCommand.getOptionValue(
+        'openapiTypesImportPath'
+      );
+
+      // Validate if `--openapi-types-file-name` has a wrong file extension
+      if (
+        thisCommand.getOptionValue('explicitImportExtensions') &&
+        thisCommand
+          .getOptionValue('openapiTypesFileName')
+          ?.endsWith?.('.d.ts') &&
+        openapiTypesImportPath &&
+        !openapiTypesImportPath?.endsWith?.('.d.ts')
+      ) {
+        throw new CommanderError(
+          1,
+          'ERR_INVALID_OPENAPI_TYPES_FILE_NAME',
+          "When '--explicit-import-extensions' is set, the '--openapi-types-file-name' must end with '.ts', or set '--openapi-types-import-path' to '.d.ts'"
+        );
+      }
+
       // If the option is not set, set it to true
       if (command.getOptionValue('exportOpenapiTypes') === undefined) {
         thisCommand.setOptionValue('exportOpenapiTypes', true);
