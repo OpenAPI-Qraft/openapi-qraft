@@ -1,5 +1,12 @@
 # @openapi-qraft/tanstack-query-react-plugin
 
+## 1.12.1-beta.0
+
+### Patch Changes
+
+- eea0b30: Fixes the issue where enums were exported only as types, preventing their use as values.
+  - @openapi-qraft/plugin@1.12.1-beta.0
+
 ## 1.12.0
 
 ### Minor Changes
