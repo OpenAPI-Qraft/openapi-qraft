@@ -18,7 +18,7 @@ export const getIndexFactory = ({
       ? [
           factory.createExportDeclaration(
             undefined,
-            true,
+            openapiTypesImportPath.endsWith('.d.ts'),
             undefined,
             factory.createStringLiteral(
               maybeResolveImport({ openapiTypesImportPath, servicesDirName })
@@ -74,8 +74,8 @@ export const getIndexFactory = ({
 };
 
 /**
- * Resolve the import path if it's a relative path.
- * Normally,`openapiTypesImportPath` is a relative path to services directory.
+ * Prepend the import path if it's a relative path.
+ * Normally,`openapiTypesImportPath` is a relative path to the services' directory.
  */
 export function maybeResolveImport<T extends string | undefined>({
   openapiTypesImportPath,
