@@ -72,4 +72,120 @@ describe('TanStack Query React Client Generation', () => {
       );
     });
   });
+
+  describe('no "--export-openapi-types"', () => {
+    beforeAll(async () => {
+      const { QraftCommand } = await import(
+        '@openapi-qraft/plugin/lib/QraftCommand'
+      );
+      const { plugin } = await import('./plugin.js');
+      const command = new QraftCommand();
+      plugin.setupCommand(command);
+
+      await command.parseAsync([
+        'dummy-node',
+        'dummy-qraft-bin',
+        openAPIDocumentFixturePath,
+        '--clean',
+        '-o',
+        '/mock-fs',
+        '--openapi-types-import-path',
+        '../../openapi.d.ts',
+      ]);
+    });
+
+    test('index.ts', async () => {
+      expect(fs.readFileSync('/mock-fs/index.ts', 'utf-8')).toMatchFileSnapshot(
+        './__snapshots__/no-export-openapi-types/index.ts.snapshot.ts'
+      );
+    });
+  });
+
+  describe('--openapi-types-import-path *.d.ts', () => {
+    beforeAll(async () => {
+      const { QraftCommand } = await import(
+        '@openapi-qraft/plugin/lib/QraftCommand'
+      );
+      const { plugin } = await import('./plugin.js');
+      const command = new QraftCommand();
+      plugin.setupCommand(command);
+
+      await command.parseAsync([
+        'dummy-node',
+        'dummy-qraft-bin',
+        openAPIDocumentFixturePath,
+        '--clean',
+        '-o',
+        '/mock-fs',
+        '--export-openapi-types',
+        '--openapi-types-import-path',
+        '../../openapi.d.ts',
+      ]);
+    });
+
+    test('index.ts', async () => {
+      expect(fs.readFileSync('/mock-fs/index.ts', 'utf-8')).toMatchFileSnapshot(
+        './__snapshots__/openapi-types-import-path-d-ts/index.ts.snapshot.ts'
+      );
+    });
+  });
+
+  describe('--openapi-types-import-path *.ts', () => {
+    beforeAll(async () => {
+      const { QraftCommand } = await import(
+        '@openapi-qraft/plugin/lib/QraftCommand'
+      );
+      const { plugin } = await import('./plugin.js');
+      const command = new QraftCommand();
+      plugin.setupCommand(command);
+
+      await command.parseAsync([
+        'dummy-node',
+        'dummy-qraft-bin',
+        openAPIDocumentFixturePath,
+        '--clean',
+        '-o',
+        '/mock-fs',
+        '--export-openapi-types',
+        '--openapi-types-import-path',
+        '../../openapi.ts',
+      ]);
+    });
+
+    test('index.ts', async () => {
+      expect(fs.readFileSync('/mock-fs/index.ts', 'utf-8')).toMatchFileSnapshot(
+        './__snapshots__/openapi-types-import-path-ts/index.ts.snapshot.ts'
+      );
+    });
+  });
+
+  describe('--explicit-import-extensions --openapi-types-import-path ./openapi.d.ts', () => {
+    beforeAll(async () => {
+      const { QraftCommand } = await import(
+        '@openapi-qraft/plugin/lib/QraftCommand'
+      );
+      const { plugin } = await import('./plugin.js');
+      const command = new QraftCommand();
+      plugin.setupCommand(command);
+
+      await command.parseAsync([
+        'dummy-node',
+        'dummy-qraft-bin',
+        openAPIDocumentFixturePath,
+        '--clean',
+        '-o',
+        '/mock-fs',
+        '--export-openapi-types',
+        '--explicit-import-extensions',
+        '--openapi-types-import-path',
+        '../../openapi.d.ts',
+      ]);
+    });
+
+    test('index.ts', async () => {
+      expect(fs.readFileSync('/mock-fs/index.ts', 'utf-8')).toMatchFileSnapshot(
+        './__snapshots__/explicit-import-extensions-d-ts-imports/index.ts.snapshot.ts'
+      );
+    });
+  });
 });
