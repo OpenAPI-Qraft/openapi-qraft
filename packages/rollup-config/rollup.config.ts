@@ -67,6 +67,7 @@ export const rollupConfig = (
       errorOnCyclicCrossChunkReexport(),
     ],
     onwarn(warning, warn) {
+      // Ignore SWC's comments
       if (!warning.message.includes('"/*#__PURE__*/"')) {
         warn(warning);
       }
@@ -86,6 +87,10 @@ export const rollupConfig = (
   };
 };
 
+/**
+ * Prevents cyclic cross-chunk reexport errors.
+ * Fails on build but warns on watch mode.
+ */
 function errorOnCyclicCrossChunkReexport(): Plugin {
   const warnLog: RollupLog[] = [];
 
