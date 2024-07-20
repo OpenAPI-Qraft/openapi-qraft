@@ -6,6 +6,7 @@ import type {
   UseQueryResult,
 } from '@tanstack/react-query';
 
+import { AreAllOptional } from '../lib/AreAllOptional.js';
 import type { ServiceOperationQueryKey } from './ServiceOperationKey.js';
 
 export interface ServiceOperationUseQuery<
@@ -19,7 +20,9 @@ export interface ServiceOperationUseQuery<
   ): ServiceOperationQueryKey<TSchema, QueryKeyParams>;
 
   useQuery<TData = TQueryFnData>(
-    parameters: TParams | ServiceOperationQueryKey<TSchema, TParams>,
+    parameters:
+      | ServiceOperationQueryKey<TSchema, TParams>
+      | (AreAllOptional<TParams> extends true ? TParams | void : TParams),
     options?: Omit<
       UndefinedInitialDataOptions<
         TQueryFnData,
@@ -33,7 +36,9 @@ export interface ServiceOperationUseQuery<
   ): UseQueryResult<TData, TError | Error>;
 
   useQuery<TData = TQueryFnData>(
-    parameters: TParams | ServiceOperationQueryKey<TSchema, TParams>,
+    parameters:
+      | ServiceOperationQueryKey<TSchema, TParams>
+      | (AreAllOptional<TParams> extends true ? TParams | void : TParams),
     options: Omit<
       DefinedInitialDataOptions<
         TQueryFnData,

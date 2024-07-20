@@ -217,12 +217,19 @@ describe('Qraft uses singular Query', () => {
   });
 
   it('supports useQuery with optional params', async () => {
-    const { result } = renderHook(() => qraft.files.getFileList.useQuery({}), {
-      wrapper: Providers,
-    });
+    const { result } = renderHook(
+      () => ({
+        queryNoArgsWithVoidParameters: qraft.files.getFileList.useQuery(),
+        queryWithEmptyParameters: qraft.files.getFileList.useQuery({}),
+      }),
+
+      {
+        wrapper: Providers,
+      }
+    );
 
     await waitFor(() => {
-      expect(result.current.data).toEqual({
+      const data = {
         data: [
           {
             file_type: 'pdf',
@@ -243,7 +250,9 @@ describe('Qraft uses singular Query', () => {
             url: 'http://localhost:3000/3',
           },
         ],
-      });
+      };
+      expect(result.current.queryNoArgsWithVoidParameters.data).toEqual(data);
+      expect(result.current.queryWithEmptyParameters.data).toEqual(data);
     });
   });
 });
@@ -1875,7 +1884,7 @@ describe('Qraft uses utils', () => {
   it('throws an error when calling an unsupported service ', () => {
     expect(() =>
       // @ts-expect-error - Invalid usage
-      qraft.counterparts.postCounterpartsIdAddresses.useQuery()
+      qraft.counterparts.postCounterpartsIdAddresses.useQuery({})
     ).toThrowError(/Service operation not found/i);
   });
 
