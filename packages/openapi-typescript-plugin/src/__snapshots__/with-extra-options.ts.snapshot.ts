@@ -16,7 +16,8 @@ export interface paths {
         put?: never;
         /** Upload a files by ID */
         post: operations["post_files"];
-        delete?: never;
+        /** Delete all files */
+        delete: operations["delete_files"];
         options?: never;
         head?: never;
         patch?: never;
@@ -207,6 +208,41 @@ export interface operations {
                         body?: {
                             file?: string;
                             file_description?: string;
+                        };
+                    };
+                };
+            };
+            /** @description Internal Server Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorSchemaResponse"];
+                };
+            };
+        };
+    };
+    delete_files: {
+        parameters: {
+            query?: {
+                all?: boolean;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        query?: {
+                            all?: boolean;
                         };
                     };
                 };

@@ -564,6 +564,51 @@
             }
           }
         }
+      },
+      "delete": {
+        "tags": ["Files"],
+        "summary": "Delete all files",
+        "operationId": "delete_files",
+        "parameters": [
+          {
+            "required": false,
+            "schema": {
+              "type": "boolean"
+            },
+            "name": "all",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "query": {
+                      "type": "object",
+                      "properties": {
+                        "all": {
+                          "type": "boolean"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorSchemaResponse" }
+              }
+            }
+          }
+        }
       }
     },
     "/files/list": {

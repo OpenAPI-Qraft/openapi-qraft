@@ -92,6 +92,20 @@ export const handlers = [
     }
   ),
 
+  http.delete<
+    ServicePathParameters<Services['files']['deleteFiles']>,
+    ServiceRequestBodyParameters<Services['files']['deleteFiles']>,
+    ServiceResponseParameters<Services['files']['deleteFiles']>
+  >(
+    openApiToMswPath(services.files.postFiles.schema.url),
+    async ({ request }) => {
+      const query = getQueryParameters<Services['files']['deleteFiles']>(
+        request.url
+      );
+      return HttpResponse.json({ query });
+    }
+  ),
+
   http.get<
     ServicePathParameters<Services['files']['getFiles']>,
     undefined,

@@ -217,12 +217,19 @@ describe('Qraft uses singular Query', () => {
   });
 
   it('supports useQuery with optional params', async () => {
-    const { result } = renderHook(() => qraft.files.getFileList.useQuery({}), {
-      wrapper: Providers,
-    });
+    const { result } = renderHook(
+      () => ({
+        queryNoArgsWithVoidParameters: qraft.files.getFileList.useQuery(),
+        queryWithEmptyParameters: qraft.files.getFileList.useQuery({}),
+      }),
+
+      {
+        wrapper: Providers,
+      }
+    );
 
     await waitFor(() => {
-      expect(result.current.data).toEqual({
+      const data = {
         data: [
           {
             file_type: 'pdf',
@@ -243,7 +250,9 @@ describe('Qraft uses singular Query', () => {
             url: 'http://localhost:3000/3',
           },
         ],
-      });
+      };
+      expect(result.current.queryNoArgsWithVoidParameters.data).toEqual(data);
+      expect(result.current.queryWithEmptyParameters.data).toEqual(data);
     });
   });
 });
@@ -958,6 +967,65 @@ describe('Qraft uses Mutations', () => {
           verification_document_back: 'back',
           verification_document_front: 'front',
         },
+      });
+    });
+  });
+
+  it('emits an error if useMutation() mutate() requires variables', async () => {
+    expect(() =>
+      // @ts-expect-error - useMutation() requires variables
+      qraft.entities.postEntitiesIdDocuments.useMutation().mutate()
+    ).toThrow(Error);
+  });
+
+  it('handles useMutation.mutate without body or parameters when optional or undefined', async () => {
+    const { result } = renderHook(
+      () => ({
+        mutateNoArgsWithVoidParameters: qraft.files.deleteFiles.useMutation(),
+        mutateNoArgsWithEmptyParameters: qraft.files.deleteFiles.useMutation(
+          {}
+        ),
+        mutateWithPredefinedParameters: qraft.files.deleteFiles.useMutation({
+          query: { all: true },
+        }),
+        mutateWithParameters: qraft.files.deleteFiles.useMutation(),
+      }),
+      {
+        wrapper: Providers,
+      }
+    );
+
+    act(() => {
+      const {
+        mutateNoArgsWithVoidParameters,
+        mutateNoArgsWithEmptyParameters,
+        mutateWithPredefinedParameters,
+        mutateWithParameters,
+      } = result.current;
+
+      mutateNoArgsWithVoidParameters.mutate();
+      mutateNoArgsWithEmptyParameters.mutate();
+      mutateWithPredefinedParameters.mutate();
+      mutateWithParameters.mutate({ query: { all: true } });
+    });
+
+    await waitFor(() => {
+      const {
+        mutateNoArgsWithVoidParameters,
+        mutateNoArgsWithEmptyParameters,
+        mutateWithPredefinedParameters,
+        mutateWithParameters,
+      } = result.current;
+
+      expect(mutateNoArgsWithVoidParameters.data).toBeUndefined();
+      expect(mutateNoArgsWithEmptyParameters.data).toEqual({
+        query: {},
+      });
+      expect(mutateWithPredefinedParameters.data).toEqual({
+        query: { all: 'true' },
+      });
+      expect(mutateWithParameters.data).toEqual({
+        query: { all: 'true' },
       });
     });
   });
@@ -1816,7 +1884,7 @@ describe('Qraft uses utils', () => {
   it('throws an error when calling an unsupported service ', () => {
     expect(() =>
       // @ts-expect-error - Invalid usage
-      qraft.counterparts.postCounterpartsIdAddresses.useQuery()
+      qraft.counterparts.postCounterpartsIdAddresses.useQuery({})
     ).toThrowError(/Service operation not found/i);
   });
 
