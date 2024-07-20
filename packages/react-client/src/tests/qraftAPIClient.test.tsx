@@ -920,6 +920,8 @@ describe('Qraft uses Mutations', () => {
   });
 
   it('emits an error if useMutation() mutate() requires variables', async () => {
+    const { qraft } = createClient();
+
     expect(() =>
       // @ts-expect-error - useMutation() requires variables
       qraft.entities.postEntitiesIdDocuments.useMutation().mutate()
@@ -927,6 +929,8 @@ describe('Qraft uses Mutations', () => {
   });
 
   it('handles useMutation.mutate without body or parameters when optional or undefined', async () => {
+    const { qraft, queryClient } = createClient();
+
     const { result } = renderHook(
       () => ({
         mutateNoArgsWithVoidParameters: qraft.files.deleteFiles.useMutation(),
@@ -940,7 +944,7 @@ describe('Qraft uses Mutations', () => {
         mutateWithEmptyBody: qraft.files.deleteFiles.useMutation(),
       }),
       {
-        wrapper: Providers,
+        wrapper: (props) => <Providers {...props} queryClient={queryClient} />,
       }
     );
 
