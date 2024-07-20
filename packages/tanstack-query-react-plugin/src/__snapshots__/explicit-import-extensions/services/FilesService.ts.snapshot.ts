@@ -20,6 +20,11 @@ export interface FilesService {
         url: "/files";
         mediaType: "multipart/form-data";
     }, NonNullable<paths["/files"]["post"]["requestBody"]>["content"]["multipart/form-data"], paths["/files"]["post"]["responses"]["200"]["content"]["application/json"], undefined, paths["/files"]["post"]["responses"]["default"]["content"]["application/json"]>;
+    /** @summary Delete all files */
+    deleteFiles: ServiceOperationMutation<{
+        method: "delete";
+        url: "/files";
+    }, undefined, paths["/files"]["delete"]["responses"]["200"]["content"]["application/json"], paths["/files"]["delete"]["parameters"], paths["/files"]["delete"]["responses"]["default"]["content"]["application/json"]>;
     /**
      * @deprecated
      * @summary Get a file list
@@ -49,6 +54,12 @@ export const filesService: {
             mediaType: "multipart/form-data";
         };
     };
+    deleteFiles: {
+        schema: {
+            method: "delete";
+            url: "/files";
+        };
+    };
     getFileList: {
         schema: {
             method: "get";
@@ -71,6 +82,12 @@ export const filesService: {
             method: "post",
             url: "/files",
             mediaType: "multipart/form-data"
+        }
+    },
+    deleteFiles: {
+        schema: {
+            method: "delete",
+            url: "/files"
         }
     },
     getFileList: {

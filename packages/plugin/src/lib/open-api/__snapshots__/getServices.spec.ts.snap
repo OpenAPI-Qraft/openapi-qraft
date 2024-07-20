@@ -344,6 +344,32 @@ exports[`getServices > matches snapshot with "serviceNameBase: endpoint" 1`] = `
         "summary": "Upload a files by ID",
       },
       {
+        "deprecated": undefined,
+        "description": undefined,
+        "errors": {
+          "default": "application/json",
+        },
+        "mediaType": undefined,
+        "method": "delete",
+        "name": "deleteFiles",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "all",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+            },
+          },
+        ],
+        "path": "/files",
+        "security": undefined,
+        "success": {
+          "200": "application/json",
+        },
+        "summary": "Delete all files",
+      },
+      {
         "deprecated": true,
         "description": undefined,
         "errors": {
@@ -737,6 +763,32 @@ exports[`getServices > matches snapshot with "serviceNameBase: tags" 1`] = `
           "200": "application/json",
         },
         "summary": "Upload a files by ID",
+      },
+      {
+        "deprecated": undefined,
+        "description": undefined,
+        "errors": {
+          "default": "application/json",
+        },
+        "mediaType": undefined,
+        "method": "delete",
+        "name": "deleteFiles",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "all",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+            },
+          },
+        ],
+        "path": "/files",
+        "security": undefined,
+        "success": {
+          "200": "application/json",
+        },
+        "summary": "Delete all files",
       },
       {
         "deprecated": true,
@@ -1134,6 +1186,32 @@ exports[`getServices > matches snapshot with custom \`postfixServices\` 1`] = `
         "summary": "Upload a files by ID",
       },
       {
+        "deprecated": undefined,
+        "description": undefined,
+        "errors": {
+          "default": "application/json",
+        },
+        "mediaType": undefined,
+        "method": "delete",
+        "name": "deleteFiles",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "all",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+            },
+          },
+        ],
+        "path": "/files",
+        "security": undefined,
+        "success": {
+          "200": "application/json",
+        },
+        "summary": "Delete all files",
+      },
+      {
         "deprecated": true,
         "description": undefined,
         "errors": {
@@ -1264,6 +1342,32 @@ exports[`getServices > matches snapshot with custom \`servicesGlob\` 1`] = `
           "200": "application/json",
         },
         "summary": "Upload a files by ID",
+      },
+      {
+        "deprecated": undefined,
+        "description": undefined,
+        "errors": {
+          "default": "application/json",
+        },
+        "mediaType": undefined,
+        "method": "delete",
+        "name": "deleteFiles",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "all",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+            },
+          },
+        ],
+        "path": "/files",
+        "security": undefined,
+        "success": {
+          "200": "application/json",
+        },
+        "summary": "Delete all files",
       },
       {
         "deprecated": true,
@@ -1659,6 +1763,32 @@ exports[`getServices > matches snapshot with default options 1`] = `
           "200": "application/json",
         },
         "summary": "Upload a files by ID",
+      },
+      {
+        "deprecated": undefined,
+        "description": undefined,
+        "errors": {
+          "default": "application/json",
+        },
+        "mediaType": undefined,
+        "method": "delete",
+        "name": "deleteFiles",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "all",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+            },
+          },
+        ],
+        "path": "/files",
+        "security": undefined,
+        "success": {
+          "200": "application/json",
+        },
+        "summary": "Delete all files",
       },
       {
         "deprecated": true,

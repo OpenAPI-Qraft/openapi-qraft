@@ -962,6 +962,65 @@ describe('Qraft uses Mutations', () => {
     });
   });
 
+  it('emits an error if useMutation() mutate() requires variables', async () => {
+    expect(() =>
+      // @ts-expect-error - useMutation() requires variables
+      qraft.entities.postEntitiesIdDocuments.useMutation().mutate()
+    ).toThrow(Error);
+  });
+
+  it('handles useMutation.mutate without body or parameters when optional or undefined', async () => {
+    const { result } = renderHook(
+      () => ({
+        mutateNoArgsWithVoidParameters: qraft.files.deleteFiles.useMutation(),
+        mutateNoArgsWithEmptyParameters: qraft.files.deleteFiles.useMutation(
+          {}
+        ),
+        mutateWithPredefinedParameters: qraft.files.deleteFiles.useMutation({
+          query: { all: true },
+        }),
+        mutateWithParameters: qraft.files.deleteFiles.useMutation(),
+      }),
+      {
+        wrapper: Providers,
+      }
+    );
+
+    act(() => {
+      const {
+        mutateNoArgsWithVoidParameters,
+        mutateNoArgsWithEmptyParameters,
+        mutateWithPredefinedParameters,
+        mutateWithParameters,
+      } = result.current;
+
+      mutateNoArgsWithVoidParameters.mutate();
+      mutateNoArgsWithEmptyParameters.mutate();
+      mutateWithPredefinedParameters.mutate();
+      mutateWithParameters.mutate({ query: { all: true } });
+    });
+
+    await waitFor(() => {
+      const {
+        mutateNoArgsWithVoidParameters,
+        mutateNoArgsWithEmptyParameters,
+        mutateWithPredefinedParameters,
+        mutateWithParameters,
+      } = result.current;
+
+      expect(mutateNoArgsWithVoidParameters.data).toBeUndefined();
+      expect(mutateNoArgsWithEmptyParameters.data).toEqual({
+        query: {},
+      });
+      expect(mutateWithPredefinedParameters.data).toEqual({
+        query: { all: 'true' },
+      });
+      expect(mutateWithParameters.data).toEqual({
+        query: { all: 'true' },
+      });
+    });
+  });
+
   it('supports useMutation with predefined parameters', async () => {
     const { result } = renderHook(
       () =>
