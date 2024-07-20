@@ -1392,30 +1392,6 @@ describe('Qraft uses Query Function', () => {
       },
     };
 
-  /**
-   * @deprecated
-   */
-  it('uses queryFn with `parameters`', async () => {
-    const { qraft } = createClient();
-
-    const result = await qraft.approvalPolicies.getApprovalPoliciesId.queryFn(
-      { parameters },
-      requestFnWithBaseUrl
-    );
-
-    expect(result).toEqual({
-      header: {
-        'x-monite-version': '1.0.0',
-      },
-      path: {
-        approval_policy_id: '1',
-      },
-      query: {
-        items_order: ['asc', 'desc'],
-      },
-    });
-  });
-
   it('uses Operation Query with `parameters` and without `baseUrl`', async () => {
     const { qraft } = createClient();
 
@@ -1727,52 +1703,6 @@ describe('Qraft uses Query Function', () => {
 });
 
 describe('Qraft uses mutationFn', () => {
-  /**
-   * @deprecated
-   */
-  it('supports mutationFn', async () => {
-    const { qraft } = createClient();
-
-    const result = await qraft.entities.postEntitiesIdDocuments.mutationFn(
-      requestFnWithBaseUrl,
-      {
-        parameters: {
-          header: {
-            'x-monite-version': '1.0.0',
-          },
-          path: {
-            entity_id: '1',
-          },
-          query: {
-            referer: 'https://example.com',
-          },
-        },
-        body: {
-          verification_document_back: 'back',
-          verification_document_front: 'front',
-        },
-      }
-    );
-
-    await waitFor(() => {
-      expect(result).toEqual({
-        header: {
-          'x-monite-version': '1.0.0',
-        },
-        path: {
-          entity_id: '1',
-        },
-        query: {
-          referer: 'https://example.com',
-        },
-        body: {
-          verification_document_back: 'back',
-          verification_document_front: 'front',
-        },
-      });
-    });
-  });
-
   it('supports Operation Mutation without `baseUrl`', async () => {
     const { qraft } = createClient();
 
