@@ -1,5 +1,11 @@
 # @openapi-qraft/react
 
+## 1.13.0-beta.1
+
+### Patch Changes
+
+- 4e4a571: Add backward compatibility for `undefined` body mutations, allowing `useMutation` to support `mutate()` and `mutateAsync()` without arguments when the body is `undefined`.
+
 ## 1.13.0-beta.0
 
 ### Minor Changes
