@@ -1,5 +1,4 @@
 export { qraftAPIClient, type QraftClientOptions } from './qraftAPIClient.js';
-export { QraftContext, type QraftContextValue } from './QraftContext.js';
 export {
   requestFn,
   baseRequestFn,

@@ -6,7 +6,7 @@ import type { QraftClientOptions } from '../qraftAPIClient.js';
 import type { ServiceOperationQuery } from '../service-operation/ServiceOperation.js';
 
 export function getInfiniteQueryData<TData>(
-  _: QraftClientOptions | undefined,
+  qraftOptions: QraftClientOptions,
   schema: OperationSchema,
   args: Parameters<
     ServiceOperationQuery<
@@ -17,9 +17,11 @@ export function getInfiniteQueryData<TData>(
   >
 ): InfiniteData<TData> | undefined {
   return callQueryClientMethodWithQueryKey(
+    qraftOptions,
     'getQueryData',
     schema,
     true,
-    args as never
+    // @ts-expect-error - Too complex to type
+    args
   ) as never;
 }

@@ -5,7 +5,12 @@
     "outDir": "dist",
     "baseUrl": ".",
     "lib": ["ES2019", "DOM", "DOM.Iterable"],
-    "jsx": "react"
+    "jsx": "react",
+    "paths": {
+      "@openapi-qraft/react": ["./src/index.ts"],
+      "@openapi-qraft/react/callbacks/index": ["./src/callbacks/index.ts"],
+      "@openapi-qraft/react/Unstable_QraftSecureRequestFn": ["./src/Unstable_QraftSecureRequestFn.ts"]
+    }
   },
   "include": ["src/**/*"],
   "exclude": [
