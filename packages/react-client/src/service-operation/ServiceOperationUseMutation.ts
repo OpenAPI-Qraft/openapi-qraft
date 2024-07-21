@@ -54,23 +54,13 @@ export interface ServiceOperationUseMutation<
 }
 
 export type MutationVariables<TBody, TParams> =
-  NonNullable<TBody> extends never
-    ? NonNullable<TParams> extends never
-      ? void
-      : AreAllOptional<TParams> extends true
-        ? TParams | void
-        : TParams
-    : NonNullable<TParams> extends never
-      ? AreAllOptional<TBody> extends true
-        ? { body?: TBody } | void
-        : { body: TBody }
-      : AreAllOptional<TBody> extends true
-        ? AreAllOptional<TParams> extends true
-          ? ({ body?: TBody } & TParams) | void
-          : { body?: TBody } & TParams
-        : {
-            body: TBody;
-          } & TParams;
+  AreAllOptional<TBody> extends true
+    ? AreAllOptional<TParams> extends true
+      ? ({ body?: TBody } & NonNullableObject<TParams>) | void
+      : { body?: TBody } & TParams
+    : { body: TBody } & NonNullableObject<TParams>;
+
+type NonNullableObject<T> = NonNullable<T> extends never ? {} : T;
 
 type ServiceOperationUseMutationOptions<
   TSchema extends { url: string; method: string },

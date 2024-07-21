@@ -989,6 +989,7 @@ describe('Qraft uses Mutations', () => {
           query: { all: true },
         }),
         mutateWithParameters: qraft.files.deleteFiles.useMutation(),
+        mutateWithEmptyBody: qraft.files.deleteFiles.useMutation(),
       }),
       {
         wrapper: Providers,
@@ -1001,12 +1002,14 @@ describe('Qraft uses Mutations', () => {
         mutateNoArgsWithEmptyParameters,
         mutateWithPredefinedParameters,
         mutateWithParameters,
+        mutateWithEmptyBody,
       } = result.current;
 
       mutateNoArgsWithVoidParameters.mutate();
       mutateNoArgsWithEmptyParameters.mutate();
       mutateWithPredefinedParameters.mutate();
       mutateWithParameters.mutate({ query: { all: true } });
+      mutateWithEmptyBody.mutate({ body: undefined });
     });
 
     await waitFor(() => {
@@ -1015,6 +1018,7 @@ describe('Qraft uses Mutations', () => {
         mutateNoArgsWithEmptyParameters,
         mutateWithPredefinedParameters,
         mutateWithParameters,
+        mutateWithEmptyBody,
       } = result.current;
 
       expect(mutateNoArgsWithVoidParameters.data).toBeUndefined();
@@ -1027,6 +1031,7 @@ describe('Qraft uses Mutations', () => {
       expect(mutateWithParameters.data).toEqual({
         query: { all: 'true' },
       });
+      expect(mutateWithEmptyBody.data).toEqual({ query: {} });
     });
   });
 
