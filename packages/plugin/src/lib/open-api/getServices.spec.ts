@@ -1,4 +1,4 @@
-import openAPI from '@openapi-qraft/test-fixtures/openapi.json' assert { type: 'json' };
+import openAPI from '@openapi-qraft/test-fixtures/openapi.json' with { type: 'json' };
 
 import { describe, expect, it } from 'vitest';
 

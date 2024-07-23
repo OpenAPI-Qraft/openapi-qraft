@@ -75,7 +75,7 @@ export class QraftCommand extends Command {
     const { version: packageVersion } = await import(
       '@openapi-qraft/plugin/package.json',
       {
-        assert: { type: 'json' },
+        with: { type: 'json' },
       }
     ).then(({ default: packageJSON }) => packageJSON);
 
