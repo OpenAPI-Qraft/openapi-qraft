@@ -6,7 +6,6 @@ import process from 'node:process';
 import { pathToFileURL, URL } from 'node:url';
 import ora, { Ora } from 'ora';
 
-import { parsePathGlobs } from './createServicePathMatch.js';
 import { filterDocumentPaths } from './filterDocumentPaths.js';
 import { GeneratorFile } from './GeneratorFile.js';
 import { handleSchemaInput } from './handleSchemaInput.js';
@@ -15,10 +14,15 @@ import { OpenAPISchemaType } from './open-api/OpenAPISchemaType.js';
 import { readSchema } from './open-api/readSchema.js';
 import { OutputOptions } from './OutputOptions.js';
 import {
-  parseOperationPredefinedParametersOption,
   createPredefinedParametersGlobMap,
+  parseOperationPredefinedParametersOption,
   predefineSchemaParameters,
 } from './predefineSchemaParameters.js';
+import {
+  parseOperationNameModifier,
+  processOperationNameModifierOption,
+} from './processOperationNameModifierOption.js';
+import { splitCommaSeparatedGlobs } from './splitCommaSeparatedGlobs.js';
 import { writeGeneratorFiles } from './writeGeneratorFiles.js';
 
 export class QraftCommand extends Command {
@@ -50,6 +54,10 @@ export class QraftCommand extends Command {
       .option(
         '--operation-predefined-parameters <patterns...>',
         'Predefined parameters for services. The specified services parameters will be optional. Eg: "/**:header.x-monite-version,query.x-api-key;/user/**,/post/**:header.x-monite-entity-id"'
+      )
+      .option(
+        '--operation-name-modifier <patterns...>',
+        'Modifies operation names using a pattern. Use the `==>` operator to separate the regular expression (left) and the substitution string (right). For example: "post /**:[A-Za-z]+Id ==> createOne"'
       )
       .option(
         '--postfix-services <string>',
@@ -102,7 +110,7 @@ export class QraftCommand extends Command {
     spinner.text = 'Reading OpenAPI Schema';
     let schema = filterDocumentPaths(
       await readSchema(input),
-      parsePathGlobs(args.filterServices)
+      splitCommaSeparatedGlobs(args.filterServices)
     );
 
     if (args.operationPredefinedParameters) {
@@ -129,10 +137,51 @@ export class QraftCommand extends Command {
     }
 
     spinner.text = 'Getting OpenAPI Services';
-    const services = getServices(schema as OpenAPISchemaType, {
+    let services = getServices(schema as OpenAPISchemaType, {
       postfixServices: args.postfixServices,
       serviceNameBase: args.serviceNameBase,
     });
+
+    if (args.operationNameModifier) {
+      const {
+        services: modifiedServicesOperationNames,
+        errors: operationNameModifierErrors,
+      } = processOperationNameModifierOption(
+        parseOperationNameModifier(
+          ...(Array.isArray(args.operationNameModifier)
+            ? args.operationNameModifier
+            : [args.operationNameModifier])
+        ),
+        services
+      );
+
+      if (operationNameModifierErrors.length) {
+        operationNameModifierErrors.forEach((error) => {
+          spinner.fail(
+            [
+              c.red.bold(
+                `Error occurred during operation name modifier setup: '${error.serviceName}.${error.originalOperationName}' to '${error.replacedOperationName}'`
+              ),
+              c.yellow(
+                error.modifiers
+                  .map(
+                    ({
+                      pathGlobs,
+                      operationNameModifierRegex,
+                      operationNameModifierReplace,
+                    }) =>
+                      `Conflicting operation name modifier: '${pathGlobs}': '${operationNameModifierRegex}' => '${operationNameModifierReplace}'`
+                  )
+                  .join('\n')
+              ),
+            ].join('\n')
+          );
+        });
+        process.exit(1);
+      }
+
+      services = modifiedServicesOperationNames;
+    }
 
     spinner.text = 'Generating code';
 

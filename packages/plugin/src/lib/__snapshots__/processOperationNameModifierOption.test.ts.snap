@@ -1,0 +1,151 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`# processOperationNameModifierOption > processOperationNameModifierOption(...) > generates errors for modifiers with overlapping patterns 1`] = `
+[
+  {
+    "modifiers": [
+      {
+        "methods": undefined,
+        "operationNameModifierRegex": "get[A-Za-z]+Id",
+        "operationNameModifierReplace": "deleteOne",
+        "pathGlobs": "/approval_policies/{approval_policy_id}",
+      },
+    ],
+    "originalOperationName": "getApprovalPoliciesId",
+    "replacedOperationName": "deleteOne",
+    "serviceName": "approvalPolicies",
+  },
+  {
+    "modifiers": [
+      {
+        "methods": undefined,
+        "operationNameModifierRegex": "delete[A-Za-z]+sId",
+        "operationNameModifierReplace": "deleteOne",
+        "pathGlobs": "/approval_policies/{approval_policy_id}",
+      },
+    ],
+    "originalOperationName": "deleteApprovalPoliciesId",
+    "replacedOperationName": "deleteOne",
+    "serviceName": "approvalPolicies",
+  },
+]
+`;
+
+exports[`# processOperationNameModifierOption > processOperationNameModifierOption(...) > generates errors for multiple modifiers for the same operation 1`] = `
+[
+  {
+    "modifiers": [
+      {
+        "methods": undefined,
+        "operationNameModifierRegex": "post[A-Z][A-Za-z]+sId[A-Z][A-Za-z]+",
+        "operationNameModifierReplace": "createOne",
+        "pathGlobs": "/entities/{entity_id}/documents",
+      },
+      {
+        "methods": undefined,
+        "operationNameModifierRegex": "post[A-Z][A-Za-z]+sId[A-Z][A-Za-z]+",
+        "operationNameModifierReplace": "createSingle",
+        "pathGlobs": "/**",
+      },
+    ],
+    "originalOperationName": "postEntitiesIdDocuments",
+    "replacedOperationName": "createOne",
+    "serviceName": "entities",
+  },
+]
+`;
+
+exports[`# processOperationNameModifierOption > processOperationNameModifierOption(...) > processes operation name modifier with multiple modifiers 1`] = `
+[
+  {
+    "name": "findOne",
+  },
+  {
+    "name": "deleteOne",
+  },
+  {
+    "name": "patchApprovalPoliciesId",
+  },
+]
+`;
+
+exports[`# processOperationNameModifierOption > processOperationNameModifierOption(...) > processes operation name modifier with single modifier 1`] = `
+[
+  {
+    "name": "createOne",
+  },
+]
+`;
+
+exports[`# processOperationNameModifierOption > processOperationNameModifierOption(...) > should generate errors for modifiers with overlapping patterns 1`] = `
+[
+  {
+    "modifiers": [
+      {
+        "operationNameModifierRegex": "get[A-Za-z]+Id",
+        "operationNameModifierReplace": "deleteOne",
+        "pathGlobs": "/approval_policies/{approval_policy_id}",
+      },
+    ],
+    "originalOperationName": "getApprovalPoliciesId",
+    "replacedOperationName": "deleteOne",
+    "serviceName": "approvalPolicies",
+  },
+  {
+    "modifiers": [
+      {
+        "operationNameModifierRegex": "delete[A-Za-z]+sId",
+        "operationNameModifierReplace": "deleteOne",
+        "pathGlobs": "/approval_policies/{approval_policy_id}",
+      },
+    ],
+    "originalOperationName": "deleteApprovalPoliciesId",
+    "replacedOperationName": "deleteOne",
+    "serviceName": "approvalPolicies",
+  },
+]
+`;
+
+exports[`# processOperationNameModifierOption > processOperationNameModifierOption(...) > should generate errors for multiple modifiers for the same operation 1`] = `
+[
+  {
+    "modifiers": [
+      {
+        "operationNameModifierRegex": "post[A-Z][A-Za-z]+sId[A-Z][A-Za-z]+",
+        "operationNameModifierReplace": "createOne",
+        "pathGlobs": "/entities/{entity_id}/documents",
+      },
+      {
+        "operationNameModifierRegex": "post[A-Z][A-Za-z]+sId[A-Z][A-Za-z]+",
+        "operationNameModifierReplace": "createSingle",
+        "pathGlobs": "/**",
+      },
+    ],
+    "originalOperationName": "postEntitiesIdDocuments",
+    "replacedOperationName": "createOne",
+    "serviceName": "entities",
+  },
+]
+`;
+
+exports[`# processOperationNameModifierOption > processOperationNameModifierOption(...) > should process operation name modifier with multiple modifiers 1`] = `
+[
+  {
+    "name": "findOne",
+  },
+  {
+    "name": "deleteOne",
+  },
+  {
+    "name": "patchApprovalPoliciesId",
+  },
+]
+`;
+
+exports[`# processOperationNameModifierOption > processOperationNameModifierOption(...) > should process operation name modifier with single modifier 1`] = `
+[
+  {
+    "name": "createOne",
+  },
+]
+`;
