@@ -216,8 +216,8 @@ describe('Qraft uses singular Query', () => {
   it('supports useQuery with optional params', async () => {
     const { result } = renderHook(
       () => ({
-        queryNoArgsWithVoidParameters: qraft.files.getFileList.useQuery(),
-        queryWithEmptyParameters: qraft.files.getFileList.useQuery({}),
+        queryNoArgsWithVoidParameters: qraft.files.findAll.useQuery(),
+        queryWithEmptyParameters: qraft.files.findAll.useQuery({}),
       }),
 
       {
@@ -2446,7 +2446,7 @@ describe('Qraft uses Queries Invalidation', () => {
     );
 
     const { result: getFilesResult_01 } = renderHook(
-      () => qraft.files.getFileList.useQuery({}),
+      () => qraft.files.findAll.useQuery(),
       {
         wrapper: wrapper.bind(null, queryClient),
       }
@@ -2467,7 +2467,7 @@ describe('Qraft uses Queries Invalidation', () => {
     });
 
     const { result: getFilesResult_02 } = renderHook(
-      () => qraft.files.getFileList.useQuery({}),
+      () => qraft.files.findAll.useQuery(),
       {
         wrapper: wrapper.bind(null, queryClient),
       }

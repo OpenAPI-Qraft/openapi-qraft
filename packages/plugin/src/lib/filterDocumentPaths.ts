@@ -13,9 +13,9 @@ import { createServicePathMatch } from './createServicePathMatch.js';
  */
 export const filterDocumentPaths = (
   schema: OpenAPI3,
-  servicesGlob: string[] | undefined
+  servicesGlob: string[]
 ): OpenAPI3 => {
-  if (!servicesGlob) return schema;
+  if (!servicesGlob.length) return schema;
 
   const isPathMatch = createServicePathMatch(servicesGlob);
   const paths: typeof schema.paths = {};

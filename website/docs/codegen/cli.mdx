@@ -72,6 +72,15 @@ npx openapi-qraft --plugin tanstack-query-react --plugin openapi-typescript http
   > **Note:** In future versions of the library, this feature will be expanded. Not only will it make parameters optional,
   > but it will also offer typed suggestions for these predefined parameters when creating a client. This enhancement will
   > further improve type safety and developer experience.
+
+- **`--operation-name-modifier <patterns...>`:** Modifies operation names using a pattern.
+
+  - Examples:
+    - `--operation-name-modifier 'get /**:[A-Za-z]+Id ==> findOne'` - will change all `GET` operations with `Id` suffix to `findOne`.
+    - `--operation-name-modifier 'put,patch /**:[A-Za-z]+Id ==> updateOne'` - will change all `PUT` and `PATCH` operations with `Id` suffix to `updateOne`.
+    - `--operation-name-modifier '/posts,/files:create[a-zA-Z]+ ==> createOne'` - will change all operations under `/posts` and `/files` to `createOne` if the operation name starts with `create`.
+    - `--operation-name-modifier 'post /files ==> createOne' 'put /posts ==> updateOne'` - will change all `POST` operations under `/files` to `createOne` and all `PUT` operations under `/posts` to `updateOne`.
+
 - **`--service-name-base <endpoint[<index>] | tags>`:** Use OpenAPI Operation `endpoint[<index>]` path part (e.g.: `/0/1/2`) or `tags` as the base name of the service. _(optional, default: `endpoint[0]`)_.
   - Examples:
     - `--service-name-base endpoint[0]` generates `services/FooService.ts` for the endpoint `/foo/bar/baz`

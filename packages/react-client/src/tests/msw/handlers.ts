@@ -130,10 +130,10 @@ export const handlers = [
   ),
 
   http.get<
-    ServicePathParameters<Services['files']['getFileList']>,
+    ServicePathParameters<Services['files']['findAll']>,
     undefined,
-    ServiceResponseParameters<Services['files']['getFileList']>
-  >(openApiToMswPath(services.files.getFileList.schema.url), () => {
+    ServiceResponseParameters<Services['files']['findAll']>
+  >(openApiToMswPath(services.files.findAll.schema.url), () => {
     return HttpResponse.json({
       data: [
         {

@@ -4,10 +4,8 @@ import {
   PathItemObject,
   ReferenceObject,
 } from 'openapi-typescript/src/types.js';
-import {
-  createServicePathMatch,
-  parsePathGlobs,
-} from './createServicePathMatch.js';
+import { createServicePathMatch } from './createServicePathMatch.js';
+import { splitCommaSeparatedGlobs } from './splitCommaSeparatedGlobs.js';
 
 export function predefineSchemaParameters(
   schema: OpenAPI3,
@@ -104,35 +102,38 @@ function parseOperationPredefinedParametersOption(
   const globParametersMap: PredefinedParametersOptionMap = {};
 
   for (const optionItem of optionItems) {
-    const [pathGlob, options] = optionItem.split(':').map((s) => s.trim());
+    const pathGlobsRaw = optionItem.slice(
+      0,
+      Math.max(0, optionItem.indexOf(':')) || optionItem.length
+    );
+    const parameterGlobs = optionItem.slice(pathGlobsRaw.length + 1);
+
     const parameters: Record<'header' | 'query' | 'cookie', string[]> = {
       header: [],
       query: [],
       cookie: [],
     };
 
-    if (options) {
-      options
-        .split(',')
-        .map((option) => option.trim())
-        .filter(Boolean)
-        .forEach((option) => {
-          const [type, key] = option.split('.').map((s) => s.trim());
+    if (parameterGlobs) {
+      splitCommaSeparatedGlobs(parameterGlobs).forEach((option) => {
+        const [type, key] = option.split('.').map((s) => s.trim());
 
-          if (type !== 'header' && type !== 'query' && type !== 'cookie')
-            throw new Error(
-              `Invalid option type: ${type} in ${option}. Must be one of 'header', 'query', or 'cookie'`
-            );
+        if (type !== 'header' && type !== 'query' && type !== 'cookie')
+          throw new Error(
+            `Invalid option type: ${type} in ${option}. Must be one of 'header', 'query', or 'cookie'`
+          );
 
-          if (!parameters[type].includes(key)) parameters[type].push(key);
-        });
+        if (!parameters[type].includes(key)) parameters[type].push(key);
+      });
     }
 
-    if (pathGlob in globParametersMap) {
-      throw new Error(`Duplicate path: ${pathGlob} in config string.`);
+    const pathGlobs = splitCommaSeparatedGlobs(pathGlobsRaw).join(',');
+
+    if (pathGlobs in globParametersMap) {
+      throw new Error(`Duplicate path: ${pathGlobs} in config string.`);
     }
 
-    globParametersMap[pathGlob] = Object.entries(parameters).flatMap(
+    globParametersMap[pathGlobs] = Object.entries(parameters).flatMap(
       ([inLocation, names]) =>
         names.map((name) => ({ in: inLocation as ParameterObject['in'], name }))
     );
@@ -158,8 +159,8 @@ export function createPredefinedParametersGlobMap(
   const servicePredefinedParametersList = Object.entries(
     predefinedParameters
   ).map(([pathGlobs, parameters]) => {
-    const globs = parsePathGlobs(pathGlobs);
-    if (!globs)
+    const globs = splitCommaSeparatedGlobs(pathGlobs);
+    if (!globs.length)
       throw new Error(
         `Invalid path glob: ${pathGlobs}. Must be a comma-separated list of globs.`
       );
