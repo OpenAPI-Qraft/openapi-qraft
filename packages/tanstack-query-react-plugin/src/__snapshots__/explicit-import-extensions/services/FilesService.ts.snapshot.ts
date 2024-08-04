@@ -38,6 +38,7 @@ export interface FilesService {
     }, paths["/files/list"]["get"]["responses"]["200"]["content"]["application/json"], paths["/files/list"]["get"]["parameters"], paths["/files/list"]["get"]["responses"]["default"]["content"]["application/json"]>;
 }
 export const filesService: {
+    /** @summary Get a files by ID */
     getFiles: {
         schema: {
             method: "get";
@@ -47,6 +48,7 @@ export const filesService: {
             ];
         };
     };
+    /** @summary Upload a files by ID */
     postFiles: {
         schema: {
             method: "post";
@@ -54,12 +56,17 @@ export const filesService: {
             mediaType: "multipart/form-data";
         };
     };
+    /** @summary Delete all files */
     deleteFiles: {
         schema: {
             method: "delete";
             url: "/files";
         };
     };
+    /**
+     * @deprecated
+     * @summary Get a file list
+     */
     getFileList: {
         schema: {
             method: "get";
