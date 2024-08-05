@@ -15,7 +15,7 @@ import { OpenAPISchemaType } from './open-api/OpenAPISchemaType.js';
 import { readSchema } from './open-api/readSchema.js';
 import { OutputOptions } from './OutputOptions.js';
 import {
-  createPredefinedParametersGlobMap,
+  createPredefinedParametersGlobs,
   parseOperationPredefinedParametersOption,
   predefineSchemaParameters,
 } from './predefineSchemaParameters.js';
@@ -54,7 +54,7 @@ export class QraftCommand extends Command {
       )
       .option(
         '--operation-predefined-parameters <patterns...>',
-        'Predefined parameters for services. The specified services parameters will be optional. Eg: "/**:header.x-monite-version,query.x-api-key;/user/**,/post/**:header.x-monite-entity-id"'
+        'Predefined parameters for services. The specified services parameters will be optional. Eg: "/**:header.x-monite-version,query.x-api-key" or "get /**:header.x-monite-entity-id"'
       )
       .option(
         '--operation-name-modifier <patterns...>',
@@ -115,16 +115,16 @@ export class QraftCommand extends Command {
     );
 
     if (args.operationPredefinedParameters) {
-      const predefinedParametersGlobMap = createPredefinedParametersGlobMap(
+      const predefinedParametersGlobs = createPredefinedParametersGlobs(
         schema,
         parseOperationPredefinedParametersOption(
           ...args.operationPredefinedParameters
         )
       );
 
-      const predefinedParametersErrors = Object.values(
-        predefinedParametersGlobMap
-      ).flatMap(({ errors }) => errors);
+      const predefinedParametersErrors = predefinedParametersGlobs.flatMap(
+        ({ errors }) => errors
+      );
 
       if (predefinedParametersErrors.length) {
         predefinedParametersErrors.forEach((error) => spinner.warn(error));
@@ -134,7 +134,7 @@ export class QraftCommand extends Command {
         process.exit(1);
       }
 
-      schema = predefineSchemaParameters(schema, predefinedParametersGlobMap);
+      schema = predefineSchemaParameters(schema, predefinedParametersGlobs);
     }
 
     spinner.text = 'Getting OpenAPI Services';

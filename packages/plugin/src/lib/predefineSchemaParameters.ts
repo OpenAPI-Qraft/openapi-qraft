@@ -5,11 +5,15 @@ import {
   ReferenceObject,
 } from 'openapi-typescript/src/types.js';
 import { createServicePathMatch } from './createServicePathMatch.js';
+import {
+  OperationGlobMethods,
+  parseOperationGlobs,
+} from './parseOperationGlobs.js';
 import { splitCommaSeparatedGlobs } from './splitCommaSeparatedGlobs.js';
 
 export function predefineSchemaParameters(
   schema: OpenAPI3,
-  predefinedParametersGlobMap: PredefinedParametersGlobMap
+  predefinedParametersGlobs: PredefinedParametersGlob[]
 ): OpenAPI3 {
   const predefinedSchemaPaths: typeof schema.paths = {};
 
@@ -29,9 +33,7 @@ export function predefineSchemaParameters(
       const operation = service[method];
       assertIsOperationObject(operation);
 
-      for (const predefinedParametersGlob of Object.values(
-        predefinedParametersGlobMap
-      )) {
+      for (const predefinedParametersGlob of predefinedParametersGlobs) {
         if (!predefinedParametersGlob.paths.includes(path)) {
           continue;
         }
@@ -80,11 +82,6 @@ export function predefineSchemaParameters(
   };
 }
 
-type PredefinedParametersOptionMap = Record<
-  string,
-  Pick<ParameterObject, 'in' | 'name'>[]
->;
-
 /**
  * Parses the given configuration string into a structured format.
  *
@@ -98,15 +95,15 @@ type PredefinedParametersOptionMap = Record<
  */
 function parseOperationPredefinedParametersOption(
   ...optionItems: string[]
-): PredefinedParametersOptionMap {
-  const globParametersMap: PredefinedParametersOptionMap = {};
+): ParsedPredefinedParametersOption[] {
+  const globParametersMap = new Map<string, ParsedPredefinedParametersOption>();
 
   for (const optionItem of optionItems) {
-    const pathGlobsRaw = optionItem.slice(
+    const operationGlobsRaw = optionItem.slice(
       0,
-      Math.max(0, optionItem.indexOf(':')) || optionItem.length
+      Math.max(0, optionItem.indexOf(':')) || optionItem.length // the second part after the `:` is optional for the predefined parameters option
     );
-    const parameterGlobs = optionItem.slice(pathGlobsRaw.length + 1);
+    const parameterGlobs = optionItem.slice(operationGlobsRaw.length + 1);
 
     const parameters: Record<'header' | 'query' | 'cookie', string[]> = {
       header: [],
@@ -127,54 +124,61 @@ function parseOperationPredefinedParametersOption(
       });
     }
 
-    const pathGlobs = splitCommaSeparatedGlobs(pathGlobsRaw).join(',');
+    const { pathGlobs, methods: methodList } =
+      parseOperationGlobs(operationGlobsRaw);
 
-    if (pathGlobs in globParametersMap) {
-      throw new Error(`Duplicate path: ${pathGlobs} in config string.`);
+    const methods = methodList ? methodList.join(',') : '';
+
+    const globKey = `${methods}${pathGlobs}`;
+
+    if (globParametersMap.has(globKey)) {
+      throw new Error(
+        `Duplicate path: ${methods ? methods + ' ' : ''}${pathGlobs} in config string.`
+      );
     }
 
-    globParametersMap[pathGlobs] = Object.entries(parameters).flatMap(
-      ([inLocation, names]) =>
+    globParametersMap.set(globKey, {
+      parameters: Object.entries(parameters).flatMap(([inLocation, names]) =>
         names.map((name) => ({ in: inLocation as ParameterObject['in'], name }))
-    );
+      ),
+      methods: methodList,
+      pathGlobs,
+    });
   }
 
-  return globParametersMap;
+  return Array.from(globParametersMap.values());
 }
 
-type PredefinedParametersGlobMap = {
-  [glob: string]: {
-    paths: string[];
-    parameters: ParameterObject[];
-    errors: string[];
-  };
-};
-
-export function createPredefinedParametersGlobMap(
+export function createPredefinedParametersGlobs(
   schema: OpenAPI3,
-  predefinedParameters: PredefinedParametersOptionMap
-): PredefinedParametersGlobMap {
-  const predefinedParametersGlobMap: PredefinedParametersGlobMap = {};
+  predefinedParameters: ParsedPredefinedParametersOption[]
+): Array<PredefinedParametersGlob> {
+  const predefinedParametersGlobMap = new Map<
+    string,
+    PredefinedParametersGlob
+  >();
 
-  const servicePredefinedParametersList = Object.entries(
-    predefinedParameters
-  ).map(([pathGlobs, parameters]) => {
-    const globs = splitCommaSeparatedGlobs(pathGlobs);
-    if (!globs.length)
-      throw new Error(
-        `Invalid path glob: ${pathGlobs}. Must be a comma-separated list of globs.`
-      );
+  const servicePredefinedParametersList = predefinedParameters.map(
+    ({ pathGlobs, parameters, methods }) => {
+      const globs = splitCommaSeparatedGlobs(pathGlobs);
+      if (!globs.length)
+        throw new Error(
+          `Invalid path glob: ${pathGlobs}. Must be a comma-separated list of globs.`
+        );
 
-    return {
-      pathGlobs,
-      parameters,
-      isPathMatch: createServicePathMatch(globs),
-    };
-  });
+      return {
+        methods,
+        pathGlobs,
+        parameters,
+        isPathMatch: createServicePathMatch(globs),
+      };
+    }
+  );
 
   for (const path in schema.paths) {
     if (!Object.prototype.hasOwnProperty.call(schema.paths, path)) continue;
     for (const {
+      methods,
       pathGlobs,
       parameters: parametersToPredefine,
       isPathMatch,
@@ -188,6 +192,11 @@ export function createPredefinedParametersGlobMap(
       for (const _method in service) {
         const method = _method as keyof typeof service;
         if (!Object.prototype.hasOwnProperty.call(service, method)) continue;
+        if (
+          methods !== undefined &&
+          !methods.includes(method as OperationGlobMethods)
+        )
+          continue;
 
         const operation = service[method];
         assertIsOperationObject(operation);
@@ -195,20 +204,33 @@ export function createPredefinedParametersGlobMap(
         const operationParameters = operation.parameters ?? [];
         assertIsParameterObjects(operationParameters);
 
-        if (!(pathGlobs in predefinedParametersGlobMap))
-          predefinedParametersGlobMap[pathGlobs] = {
+        if (!predefinedParametersGlobMap.has(pathGlobs))
+          predefinedParametersGlobMap.set(pathGlobs, {
+            methods: [],
             paths: [],
             parameters: [],
             errors: [],
-          };
+          });
 
-        const predefinedPathGlob = predefinedParametersGlobMap[pathGlobs];
+        const predefinedPathGlob = predefinedParametersGlobMap.get(pathGlobs);
+
+        if (!predefinedPathGlob)
+          throw new Error('predefinedPathGlob not found');
 
         for (const parameterSchemaToPredefine of parametersToPredefine) {
           const parameterToPredefine = findPredefinedOperationParameter(
             parameterSchemaToPredefine,
             operationParameters
           );
+
+          if (
+            !predefinedPathGlob.methods?.includes(
+              method as OperationGlobMethods
+            )
+          ) {
+            if (!predefinedPathGlob.methods) predefinedPathGlob.methods = [];
+            predefinedPathGlob.methods.push(method as OperationGlobMethods);
+          }
 
           if (!parameterToPredefine) {
             predefinedPathGlob.errors.push(
@@ -247,17 +269,18 @@ export function createPredefinedParametersGlobMap(
     }
   }
 
-  Object.entries(predefinedParameters).forEach(([pathGlobs]) => {
-    if (!predefinedParametersGlobMap[pathGlobs]) {
-      predefinedParametersGlobMap[pathGlobs] = {
+  predefinedParameters.forEach(({ pathGlobs, methods }) => {
+    if (!predefinedParametersGlobMap.has(pathGlobs)) {
+      predefinedParametersGlobMap.set(pathGlobs, {
+        methods,
         paths: [],
         parameters: [],
         errors: [`No matching paths found for '${pathGlobs}'`],
-      };
+      });
     }
   });
 
-  return predefinedParametersGlobMap;
+  return Array.from(predefinedParametersGlobMap.values());
 }
 
 function findPredefinedOperationParameter(
@@ -307,5 +330,18 @@ export function assertIsParameterObjects(
     }
   });
 }
+
+type ParsedPredefinedParametersOption = {
+  methods: OperationGlobMethods[] | undefined;
+  pathGlobs: string;
+  parameters: Pick<ParameterObject, 'in' | 'name'>[];
+};
+
+type PredefinedParametersGlob = {
+  methods: OperationGlobMethods[] | undefined;
+  paths: string[];
+  parameters: Pick<ParameterObject, 'in' | 'name'>[];
+  errors: string[];
+};
 
 export { parseOperationPredefinedParametersOption };

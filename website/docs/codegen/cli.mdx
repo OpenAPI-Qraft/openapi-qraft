@@ -51,7 +51,8 @@ npx openapi-qraft --plugin tanstack-query-react --plugin openapi-typescript http
     - `--filter-services '**,!/internal/**'` - include _all_ API endpoints _except_ those that start with `/internal/`
 - **`--operation-predefined-parameters <patterns...> `:** Predefined parameters for services. The specified services parameters will be optional. _(optional)_
 
-  This most wanted option 💎 allows you to **set default parameters** across multiple endpoints. However, if an endpoint doesn't contain a parameter specified in this option, an error will be displayed. For example:
+  This option 💎 is arguably one of the most awesome features, allowing you to **set default parameters** across multiple endpoints.
+  However, if an endpoint doesn't contain a parameter specified in this option, an error will be displayed. For example:
 
   ```text
   ⚠ Missing predefined parameter 'header' 'x-monite-version' in 'post /files' in '/**'
@@ -69,8 +70,9 @@ npx openapi-qraft --plugin tanstack-query-react --plugin openapi-typescript http
     - `--operation-predefined-parameters '/**,!/auth/token:header.x-entity-id'` - set `header.x-entity-id` as optional parameters for all services except `/auth/token`.
     - `--operation-predefined-parameters '/**:header.x-monite-version,query.x-api-key' '/user/**,/post/**:header.x-monite-entity-id'` -
       set `header.x-monite-version` and `query.x-api-key` as optional parameters for all services, and `header.x-monite-entity-id` for the `/user/**` and `/post/**` services.
-  > **Note:** In future versions of the library, this feature will be expanded. Not only will it make parameters optional,
-  > but it will also offer typed suggestions for these predefined parameters when creating a client. This enhancement will
+    - `--operation-predefined-parameters 'post,put /**:header.x-entity-id'` - set the `Header` record `x-entity-id` as an optional parameter for the `POST` and `PUT` methods.
+  > **Note:** In future versions of the library, this feature will be expanded. Not only will it make parameters
+  > optional, but it will also offer typed suggestions for these predefined parameters when creating a client. This enhancement will
   > further improve type safety and developer experience.
 
 - **`--operation-name-modifier <patterns...>`:** Modifies operation names using a pattern.
