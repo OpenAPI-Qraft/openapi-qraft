@@ -130,23 +130,7 @@ const getServiceInterfaceOperationFactory = (operation: ServiceOperation) => {
     )
   );
 
-  const comment = createMultilineComment(
-    [
-      operation.deprecated ? '@deprecated' : null,
-      operation.summary ? `@summary ${operation.summary}` : null,
-      operation.description ? `@description ${operation.description}` : null,
-    ].filter((comment): comment is NonNullable<typeof comment> =>
-      Boolean(comment)
-    )
-  );
-
-  if (comment)
-    ts.addSyntheticLeadingComment(
-      node,
-      ts.SyntaxKind.MultiLineCommentTrivia,
-      comment,
-      true
-    );
+  addSyntheticLeadingOperationComment(node, operation);
 
   return node;
 };
@@ -338,7 +322,7 @@ const getServiceVariableFactory = (
 };
 
 const getServiceVariableTypeFactory = (operation: ServiceOperation) => {
-  return factory.createPropertySignature(
+  const node = factory.createPropertySignature(
     undefined,
     factory.createIdentifier(operation.name),
     undefined,
@@ -351,6 +335,10 @@ const getServiceVariableTypeFactory = (operation: ServiceOperation) => {
       ),
     ])
   );
+
+  addSyntheticLeadingOperationComment(node, operation);
+
+  return node;
 };
 
 const getServiceVariablePropertyFactory = (operation: ServiceOperation) => {
@@ -413,6 +401,33 @@ const createMultilineComment = (comment: string[]) => {
   }
 
   return '';
+};
+
+const createOperationComment = (operation: ServiceOperation) => {
+  return createMultilineComment(
+    [
+      operation.deprecated ? '@deprecated' : null,
+      operation.summary ? `@summary ${operation.summary}` : null,
+      operation.description ? `@description ${operation.description}` : null,
+    ].filter((comment): comment is NonNullable<typeof comment> =>
+      Boolean(comment)
+    )
+  );
+};
+
+const addSyntheticLeadingOperationComment = (
+  node: ts.Node,
+  operation: ServiceOperation
+) => {
+  const comment = createOperationComment(operation);
+
+  if (comment)
+    ts.addSyntheticLeadingComment(
+      node,
+      ts.SyntaxKind.MultiLineCommentTrivia,
+      comment,
+      true
+    );
 };
 
 const getOperationSecuritySchemas = (

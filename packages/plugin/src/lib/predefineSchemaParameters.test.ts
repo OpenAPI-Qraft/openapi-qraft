@@ -1,68 +1,91 @@
 import openAPI from '@openapi-qraft/test-fixtures/openapi.json' assert { type: 'json' };
 
-import { describe, it, expect } from 'vitest';
+import { describe, expect, it } from 'vitest';
 
 import {
   assertIsOperationObject,
   assertIsParameterObjects,
-  createPredefinedParametersGlobMap,
+  createPredefinedParametersGlobs,
   parseOperationPredefinedParametersOption,
   predefineSchemaParameters,
 } from './predefineSchemaParameters.js';
 
 describe('predefineSchemaParameters utils', () => {
   describe('parseOperationPredefinedParametersOption', () => {
-    it('should correctly parse a simple config string', () => {
+    it('parses a simple config string', () => {
       const configString = '/**:header.x-monite-version,query.x-api-key';
 
       const parsedConfig =
         parseOperationPredefinedParametersOption(configString);
-      expect(parsedConfig).toEqual({
-        '/**': [
-          { in: 'header', name: 'x-monite-version' },
-          { in: 'query', name: 'x-api-key' },
-        ],
-      });
+      expect(parsedConfig).toEqual([
+        {
+          pathGlobs: '/**',
+          parameters: [
+            { in: 'header', name: 'x-monite-version' },
+            { in: 'query', name: 'x-api-key' },
+          ],
+        },
+      ]);
+    });
+
+    it('parses a config with methods', () => {
+      const parsedConfig = parseOperationPredefinedParametersOption(
+        'get /**:header.x-monite-version,query.x-api-key'
+      );
+      expect(parsedConfig).toEqual([
+        {
+          methods: ['get'],
+          pathGlobs: '/**',
+          parameters: [
+            { in: 'header', name: 'x-monite-version' },
+            { in: 'query', name: 'x-api-key' },
+          ],
+        },
+      ]);
     });
 
     it('should handle config strings with no options', () => {
-      const configString = '/user/**,/post/**';
-      const expectedOutput = {
-        '/user/**,/post/**': [],
-      };
-
       const parsedConfig =
-        parseOperationPredefinedParametersOption(configString);
-      expect(parsedConfig).toEqual(expectedOutput);
+        parseOperationPredefinedParametersOption('/user/**,/post/**');
+      expect(parsedConfig).toEqual([
+        {
+          pathGlobs: '/user/**,/post/**',
+          parameters: [],
+        },
+      ]);
     });
 
     it('should handle config strings with multiple headers and queries', () => {
       const configString =
         '/**:query.x-session-id,header.x-monite-version,header.x-monite-entity-id,query.x-api-key,cookie.jwt';
-      const expectedOutput = {
-        '/**': [
-          { in: 'header', name: 'x-monite-version' },
-          { in: 'header', name: 'x-monite-entity-id' },
-          { in: 'query', name: 'x-session-id' },
-          { in: 'query', name: 'x-api-key' },
-          { in: 'cookie', name: 'jwt' },
-        ],
-      };
 
       const parsedConfig =
         parseOperationPredefinedParametersOption(configString);
-      expect(parsedConfig).toEqual(expectedOutput);
+      expect(parsedConfig).toEqual([
+        {
+          pathGlobs: '/**',
+          parameters: [
+            { in: 'header', name: 'x-monite-version' },
+            { in: 'header', name: 'x-monite-entity-id' },
+            { in: 'query', name: 'x-session-id' },
+            { in: 'query', name: 'x-api-key' },
+            { in: 'cookie', name: 'jwt' },
+          ],
+        },
+      ]);
     });
 
     it('should handle config strings with multiple paths and no options', () => {
       const configString = '/foo,/bar';
-      const expectedOutput = {
-        '/foo,/bar': [],
-      };
 
       const parsedConfig =
         parseOperationPredefinedParametersOption(configString);
-      expect(parsedConfig).toEqual(expectedOutput);
+      expect(parsedConfig).toEqual([
+        {
+          pathGlobs: '/foo,/bar',
+          parameters: [],
+        },
+      ]);
     });
 
     it('should handle config strings with multiple paths and options', () => {
@@ -70,18 +93,23 @@ describe('predefineSchemaParameters utils', () => {
         '/foo,/bar:header.x-monite-version,query.x-api-key',
         '/baz:header.x-monite-entity-id',
       ];
-      const expectedOutput = {
-        '/foo,/bar': [
-          { in: 'header', name: 'x-monite-version' },
-          { in: 'query', name: 'x-api-key' },
-        ],
-        '/baz': [{ in: 'header', name: 'x-monite-entity-id' }],
-      };
 
       const parsedConfig = parseOperationPredefinedParametersOption(
         ...configString
       );
-      expect(parsedConfig).toEqual(expectedOutput);
+      expect(parsedConfig).toEqual([
+        {
+          pathGlobs: '/foo,/bar',
+          parameters: [
+            { in: 'header', name: 'x-monite-version' },
+            { in: 'query', name: 'x-api-key' },
+          ],
+        },
+        {
+          pathGlobs: '/baz',
+          parameters: [{ in: 'header', name: 'x-monite-entity-id' }],
+        },
+      ]);
     });
 
     it('should throw an error for duplicate paths', () => {
@@ -107,14 +135,17 @@ describe('predefineSchemaParameters utils', () => {
   describe('createPredefinedParametersGlobMap', () => {
     it('should correctly create a map of predefined parameters', () => {
       expect(
-        createPredefinedParametersGlobMap(openAPI as never, {
-          '/entities/**,/approval_policies/**': [
-            { in: 'header', name: 'x-monite-version' },
-          ],
-        })
-      ).toEqual({
-        '/entities/**,/approval_policies/**': {
+        createPredefinedParametersGlobs(openAPI as never, [
+          {
+            methods: undefined,
+            pathGlobs: '/entities/**,/approval_policies/**',
+            parameters: [{ in: 'header', name: 'x-monite-version' }],
+          },
+        ])
+      ).toEqual([
+        {
           errors: [],
+          methods: ['post', 'get', 'delete', 'patch'],
           parameters: [
             {
               example: '2023-06-04',
@@ -132,20 +163,25 @@ describe('predefineSchemaParameters utils', () => {
             '/approval_policies/{approval_policy_id}',
           ],
         },
-      });
+      ]);
     });
 
     it('should correctly create a map of predefined parameters with different type', () => {
       expect(
-        createPredefinedParametersGlobMap(openAPI as never, {
-          '/files/list': [
-            { in: 'header', name: 'x-monite-version' },
-            { in: 'query', name: 'id__in' },
-          ],
-        })
-      ).toEqual({
-        '/files/list': {
+        createPredefinedParametersGlobs(openAPI as never, [
+          {
+            methods: undefined,
+            pathGlobs: '/files/list',
+            parameters: [
+              { in: 'header', name: 'x-monite-version' },
+              { in: 'query', name: 'id__in' },
+            ],
+          },
+        ])
+      ).toEqual([
+        {
           errors: [],
+          methods: ['get'],
           parameters: [
             {
               example: '2023-06-04',
@@ -173,19 +209,24 @@ describe('predefineSchemaParameters utils', () => {
           ],
           paths: ['/files/list'],
         },
-      });
+      ]);
     });
 
     it('creates errors for paths with non existing parameters', () => {
       expect(
-        createPredefinedParametersGlobMap(openAPI as never, {
-          '/approval_policies/**': [
-            { in: 'header', name: 'x-non-existing-parameter' },
-            { in: 'header', name: 'x-monite-version' },
-          ],
-        })
-      ).toEqual({
-        '/approval_policies/**': {
+        createPredefinedParametersGlobs(openAPI as never, [
+          {
+            methods: undefined,
+            pathGlobs: '/approval_policies/**',
+            parameters: [
+              { in: 'header', name: 'x-non-existing-parameter' },
+              { in: 'header', name: 'x-monite-version' },
+            ],
+          },
+        ])
+      ).toEqual([
+        {
+          methods: ['get', 'delete', 'patch'],
           errors: [
             "Missing predefined parameter 'header' 'x-non-existing-parameter' in 'get /approval_policies/{approval_policy_id}' in '/approval_policies/**'",
             "Missing predefined parameter 'header' 'x-non-existing-parameter' in 'delete /approval_policies/{approval_policy_id}' in '/approval_policies/**'",
@@ -205,22 +246,27 @@ describe('predefineSchemaParameters utils', () => {
           ],
           paths: ['/approval_policies/{approval_policy_id}'],
         },
-      });
+      ]);
     });
 
     it('creates multiple predefined parameters for different paths', () => {
       expect(
-        createPredefinedParametersGlobMap(openAPI as never, {
-          '/approval_policies/**': [
-            { in: 'header', name: 'x-monite-entity-id' },
-          ],
-          '/approval_policies/{approval_policy_id}': [
-            { in: 'header', name: 'x-monite-version' },
-          ],
-        })
-      ).toEqual({
-        '/approval_policies/**': {
+        createPredefinedParametersGlobs(openAPI as never, [
+          {
+            methods: undefined,
+            pathGlobs: '/approval_policies/**',
+            parameters: [{ in: 'header', name: 'x-monite-entity-id' }],
+          },
+          {
+            methods: undefined,
+            pathGlobs: '/approval_policies/{approval_policy_id}',
+            parameters: [{ in: 'header', name: 'x-monite-version' }],
+          },
+        ])
+      ).toEqual([
+        {
           errors: [],
+          methods: ['get', 'delete', 'patch'],
           parameters: [
             {
               in: 'header',
@@ -234,13 +280,14 @@ describe('predefineSchemaParameters utils', () => {
           ],
           paths: ['/approval_policies/{approval_policy_id}'],
         },
-        '/approval_policies/{approval_policy_id}': {
+        {
           errors: [],
+          methods: ['get', 'delete', 'patch'],
           parameters: [
             {
+              example: '2023-06-04',
               in: 'header',
               name: 'x-monite-version',
-              example: '2023-06-04',
               required: true,
               schema: {
                 format: 'date',
@@ -250,12 +297,12 @@ describe('predefineSchemaParameters utils', () => {
           ],
           paths: ['/approval_policies/{approval_policy_id}'],
         },
-      });
+      ]);
     });
 
     it('creates errors for paths with conflicting types', () => {
       expect(
-        createPredefinedParametersGlobMap(
+        createPredefinedParametersGlobs(
           {
             ...openAPI,
             paths: {
@@ -279,14 +326,17 @@ describe('predefineSchemaParameters utils', () => {
               },
             },
           } as never,
-          {
-            '/approval_policies/**': [
-              { in: 'header', name: 'x-monite-version' },
-            ],
-          }
+          [
+            {
+              parameters: [{ in: 'header', name: 'x-monite-version' }],
+              pathGlobs: '/approval_policies/**',
+              methods: undefined,
+            },
+          ]
         )
-      ).toEqual({
-        '/approval_policies/**': {
+      ).toEqual([
+        {
+          methods: ['get', 'delete', 'patch'],
           errors: [
             "Parameter 'header' 'x-monite-version' in 'delete /approval_policies/{approval_policy_id}' has conflicting types with predefined parameter 'x-monite-version' in '/approval_policies/**'",
             "Parameter 'header' 'x-monite-version' in 'patch /approval_policies/{approval_policy_id}' has conflicting types with predefined parameter 'x-monite-version' in '/approval_policies/**'",
@@ -303,21 +353,25 @@ describe('predefineSchemaParameters utils', () => {
           ],
           paths: ['/approval_policies/{approval_policy_id}'],
         },
-      });
+      ]);
     });
 
     it('creates an error for not matching paths', () => {
       expect(
-        createPredefinedParametersGlobMap(openAPI as never, {
-          '/non-existing-path/**': [{ in: 'header', name: 'x-monite-version' }],
-        })
-      ).toEqual({
-        '/non-existing-path/**': {
+        createPredefinedParametersGlobs(openAPI as never, [
+          {
+            methods: undefined,
+            pathGlobs: '/non-existing-path/**',
+            parameters: [{ in: 'header', name: 'x-monite-version' }],
+          },
+        ])
+      ).toEqual([
+        {
           errors: ["No matching paths found for '/non-existing-path/**'"],
           parameters: [],
           paths: [],
         },
-      });
+      ]);
     });
   });
 
@@ -325,9 +379,13 @@ describe('predefineSchemaParameters utils', () => {
     it('should correctly predefine parameters in the schema', () => {
       const predefinedSchema = predefineSchemaParameters(
         openAPI as never,
-        createPredefinedParametersGlobMap(openAPI as never, {
-          '/approval_policies/**': [{ in: 'header', name: 'x-monite-version' }],
-        })
+        createPredefinedParametersGlobs(openAPI as never, [
+          {
+            methods: undefined,
+            pathGlobs: '/approval_policies/**',
+            parameters: [{ in: 'header', name: 'x-monite-version' }],
+          },
+        ])
       );
 
       const pathsItem =
@@ -360,14 +418,18 @@ describe('predefineSchemaParameters utils', () => {
     it('should keep already predefine parameters in the schema', () => {
       const predefinedSchema = predefineSchemaParameters(
         openAPI as never,
-        createPredefinedParametersGlobMap(openAPI as never, {
-          '/approval_policies/**': [
-            { in: 'header', name: 'x-monite-entity-id' },
-          ],
-          '/approval_policies/{approval_policy_id}': [
-            { in: 'header', name: 'x-monite-version' },
-          ],
-        })
+        createPredefinedParametersGlobs(openAPI as never, [
+          {
+            methods: undefined,
+            pathGlobs: '/approval_policies/**',
+            parameters: [{ in: 'header', name: 'x-monite-entity-id' }],
+          },
+          {
+            methods: undefined,
+            pathGlobs: '/approval_policies/{approval_policy_id}',
+            parameters: [{ in: 'header', name: 'x-monite-version' }],
+          },
+        ])
       );
 
       const pathsItem =
@@ -410,7 +472,7 @@ describe('predefineSchemaParameters utils', () => {
     });
 
     it('should skip predefining parameters in the schema if not needed', () => {
-      const predefinedSchema = predefineSchemaParameters(openAPI as never, {});
+      const predefinedSchema = predefineSchemaParameters(openAPI as never, []);
 
       const pathsItem =
         predefinedSchema.paths?.['/approval_policies/{approval_policy_id}'];

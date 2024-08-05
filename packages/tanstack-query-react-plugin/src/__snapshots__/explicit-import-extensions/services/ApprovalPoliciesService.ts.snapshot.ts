@@ -42,6 +42,10 @@ export interface ApprovalPoliciesService {
     }, NonNullable<paths["/approval_policies/{approval_policy_id}"]["patch"]["requestBody"]>["content"]["application/json"], paths["/approval_policies/{approval_policy_id}"]["patch"]["responses"]["200"]["content"]["application/json"], paths["/approval_policies/{approval_policy_id}"]["patch"]["parameters"], paths["/approval_policies/{approval_policy_id}"]["patch"]["responses"]["401"]["content"]["application/json"] | paths["/approval_policies/{approval_policy_id}"]["patch"]["responses"]["422"]["content"]["application/json"] | paths["/approval_policies/{approval_policy_id}"]["patch"]["responses"]["default"]["content"]["application/json"]>;
 }
 export const approvalPoliciesService: {
+    /**
+     * @summary Get an approval policy by ID
+     * @description Retrieve a specific approval policy.
+     */
     getApprovalPoliciesId: {
         schema: {
             method: "get";
@@ -51,6 +55,10 @@ export const approvalPoliciesService: {
             ];
         };
     };
+    /**
+     * @summary Delete an approval policy
+     * @description Delete an existing approval policy.
+     */
     deleteApprovalPoliciesId: {
         schema: {
             method: "delete";
@@ -60,6 +68,10 @@ export const approvalPoliciesService: {
             ];
         };
     };
+    /**
+     * @summary Update an approval policy
+     * @description Update an existing approval policy.
+     */
     patchApprovalPoliciesId: {
         schema: {
             method: "patch";
