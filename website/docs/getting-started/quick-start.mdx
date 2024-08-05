@@ -9,20 +9,18 @@ import TabItem from '@theme/TabItem';
 
 To get started with OpenAPI Qraft, you first need to generate types from your OpenAPI Document,
 and also generate services that will use these types to interact with your API.
-Assumed that you already [installed](installation.mdx) Qraft packages.
 
 ### 1. Generate OpenAPI Types & Services
 
-To generate services from OpenAPI Document, you must first [install](/getting-started/installation.mdx)
-the `@openapi-qraft/cli` package. Then, you can use the `openapi-qraft` command to generate services and types.
+**Assumed that you already [installed](installation.mdx) `@openapi-qraft/react` package ✅**
 
 <Tabs>
   <TabItem value="cli" label={<span style={{verticalAlign: "middle"}}>Instant <code>CLI</code></span>} default>
-    Run the following command in the root directory of your project using your package manager:
+    Run the following command in the root directory of your project using your package manager.
 
-    ```bash npm2yarn
-    npx openapi-qraft --plugin tanstack-query-react --plugin openapi-typescript https://raw.githubusercontent.com/swagger-api/swagger-petstore/master/src/main/resources/openapi.yaml \
-      --output-dir src/api
+    ```bash
+    npx @openapi-qraft/cli --plugin tanstack-query-react --plugin openapi-typescript \
+      --output-dir src/api https://raw.githubusercontent.com/swagger-api/swagger-petstore/master/src/main/resources/openapi.yaml
     ```
   </TabItem>
   <TabItem value="package-json" label={<span style={{verticalAlign: "middle"}}><code>package.json</code> setup</span>}>
@@ -35,6 +33,9 @@ the `@openapi-qraft/cli` package. Then, you can use the `openapi-qraft` command 
       },
       "devDependencies": {
         "@openapi-qraft/cli": "latest"
+      },
+      "dependencies": {
+        "@openapi-qraft/react": "latest"
       }
     }
     ```
