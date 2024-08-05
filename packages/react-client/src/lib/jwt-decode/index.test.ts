@@ -1,10 +1,9 @@
 import { describe, expect, it } from 'vitest';
-
 import {
-  jwtDecode,
-  InvalidTokenError,
-  JwtPayload,
   b64DecodeUnicode,
+  InvalidTokenError,
+  jwtDecode,
+  JwtPayload,
 } from './index.js';
 
 const token =

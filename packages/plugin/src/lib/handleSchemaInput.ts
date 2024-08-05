@@ -1,6 +1,6 @@
+import type { Ora } from 'ora';
 import process from 'node:process';
 import { URL } from 'node:url';
-import type { Ora } from 'ora';
 
 /**
  * Validates Schema's `input` and return `Readable` stream or `URL`

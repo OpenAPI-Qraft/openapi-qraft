@@ -1,5 +1,4 @@
 import type { DefaultError, FetchStatus, Query } from '@tanstack/query-core';
-
 import type { PartialParameters } from '../lib/PartialParameters.type.js';
 import type { OperationInfiniteData } from './OperationInfiniteData.js';
 import type {

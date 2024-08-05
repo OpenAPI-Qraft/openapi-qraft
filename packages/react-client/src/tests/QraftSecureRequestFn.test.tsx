@@ -1,12 +1,10 @@
-import React, { ReactNode } from 'react';
-
+import type { RequestFn } from '../lib/requestFn.js';
 import { QraftContext as QraftContextDist } from '@openapi-qraft/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { act, renderHook, waitFor } from '@testing-library/react';
-
+import React, { ReactNode } from 'react';
 import { vi } from 'vitest';
-
-import { type RequestFn, requestFn } from '../lib/requestFn.js';
+import { requestFn } from '../lib/requestFn.js';
 import { QraftSecureRequestFn } from '../Unstable_QraftSecureRequestFn.js';
 import { createTestJwt } from './createTestJwt.js';
 import { createAPIClient } from './fixtures/api/index.js';

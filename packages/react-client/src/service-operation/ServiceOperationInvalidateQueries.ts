@@ -3,7 +3,6 @@ import type {
   InvalidateOptions,
   QueryClient,
 } from '@tanstack/query-core';
-
 import type {
   QueryFiltersByParameters,
   QueryFiltersByQueryKey,

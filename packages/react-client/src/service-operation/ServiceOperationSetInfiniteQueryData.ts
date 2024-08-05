@@ -4,7 +4,6 @@ import type {
   SetDataOptions,
   Updater,
 } from '@tanstack/query-core';
-
 import type { OperationInfiniteData } from './OperationInfiniteData.js';
 import type { ServiceOperationInfiniteQueryKey } from './ServiceOperationKey.js';
 

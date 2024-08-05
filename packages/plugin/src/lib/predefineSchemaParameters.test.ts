@@ -1,7 +1,5 @@
 import openAPI from '@openapi-qraft/test-fixtures/openapi.json' with { type: 'json' };
-
-import { describe, it, expect } from 'vitest';
-
+import { describe, expect, it } from 'vitest';
 import {
   assertIsOperationObject,
   assertIsParameterObjects,

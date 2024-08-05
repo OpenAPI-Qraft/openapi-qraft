@@ -1,5 +1,5 @@
+import type { OpenAPISchemaType } from './OpenAPISchemaType.js';
 import camelCase from 'camelcase';
-
 import { getContentMediaType } from './getContent.js';
 import { getOperationName } from './getOperationName.js';
 import {
@@ -7,7 +7,6 @@ import {
   ServiceBaseNameByEndpointOption,
 } from './getServiceNamesByOperationEndpoint.js';
 import { getServiceNamesByOperationTags } from './getServiceNamesByOperationTags.js';
-import type { OpenAPISchemaType } from './OpenAPISchemaType.js';
 
 export type ServiceBaseName = ServiceBaseNameByEndpointOption | 'tags';
 

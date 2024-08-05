@@ -1,5 +1,5 @@
-import { composeMutationKey } from './composeMutationKey.js';
 import type { OperationSchema } from './requestFn.js';
+import { composeMutationKey } from './composeMutationKey.js';
 
 /**
  * Replaces the `parameters` field in the filters with a `mutationKey` field based on the schema.

@@ -1,12 +1,7 @@
-import { createConfig } from '@redocly/openapi-core';
-
 import type { Readable } from 'node:stream';
-import openapiTS, {
-  astToString,
-  type OpenAPI3,
-  type OpenAPITSOptions,
-  SchemaObject,
-} from 'openapi-typescript';
+import type { OpenAPI3, OpenAPITSOptions } from 'openapi-typescript';
+import { createConfig } from '@redocly/openapi-core';
+import openapiTS, { astToString, SchemaObject } from 'openapi-typescript';
 import ts from 'typescript';
 
 export async function generateSchemaTypes(

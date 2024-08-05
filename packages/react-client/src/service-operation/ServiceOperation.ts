@@ -1,5 +1,4 @@
 import type { DefaultError } from '@tanstack/query-core';
-
 import type { ServiceOperationCancelQueries } from './ServiceOperationCancelQueries.js';
 import type { ServiceOperationFetchInfiniteQuery } from './ServiceOperationFetchInfiniteQuery.js';
 import type { ServiceOperationFetchQuery } from './ServiceOperationFetchQuery.js';
