@@ -4,7 +4,14 @@
   "trailingComma": "es5",
   "importOrderCaseInsensitive": true,
   "importOrderSeparation": true,
-  "importOrder": ["^react(.*)$","^@(.*)$", "<THIRD_PARTY_MODULES>", "^[./]"],
+  "importOrder": [
+    "<TYPES>^(node:)",
+    "<TYPES>",
+    "<TYPES>^[.]",
+    "<BUILTIN_MODULES>",
+    "<THIRD_PARTY_MODULES>",
+    "^[.]"
+  ],
   "importOrderParserPlugins": ["importAssertions", "typescript", "jsx"],
-  "plugins": ["@trivago/prettier-plugin-sort-imports"]
+  "plugins": ["@ianvs/prettier-plugin-sort-imports"]
 }
