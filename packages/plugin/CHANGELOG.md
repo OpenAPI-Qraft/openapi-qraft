@@ -1,5 +1,11 @@
 # @openapi-qraft/plugin
 
+## 1.13.0-beta.2
+
+### Patch Changes
+
+- 6eec6d9: Update import attributes syntax to use `with` instead of `assert`.
+
 ## 1.13.0-beta.1
 
 ## 1.13.0-beta.0
