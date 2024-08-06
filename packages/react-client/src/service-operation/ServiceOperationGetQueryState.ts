@@ -3,7 +3,6 @@ import type {
   QueryClient,
   QueryState,
 } from '@tanstack/query-core';
-
 import type { OperationInfiniteData } from './OperationInfiniteData.js';
 import type {
   ServiceOperationInfiniteQueryKey,

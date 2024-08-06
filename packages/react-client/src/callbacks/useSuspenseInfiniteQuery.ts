@@ -1,15 +1,12 @@
 'use client';
 
 import type { DefaultError, InfiniteData } from '@tanstack/query-core';
-import {
-  useSuspenseInfiniteQuery as useSuspenseInfiniteQueryTanstack,
-  type UseSuspenseInfiniteQueryResult,
-} from '@tanstack/react-query';
-
+import type { UseSuspenseInfiniteQueryResult } from '@tanstack/react-query';
 import type { OperationSchema } from '../lib/requestFn.js';
-import { useComposeUseQueryOptions } from '../lib/useComposeUseQueryOptions.js';
 import type { QraftClientOptions } from '../qraftAPIClient.js';
 import type { ServiceOperationQuery } from '../service-operation/ServiceOperation.js';
+import { useSuspenseInfiniteQuery as useSuspenseInfiniteQueryTanstack } from '@tanstack/react-query';
+import { useComposeUseQueryOptions } from '../lib/useComposeUseQueryOptions.js';
 
 export const useSuspenseInfiniteQuery: <
   TQueryFnData,

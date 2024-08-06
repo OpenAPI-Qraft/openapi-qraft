@@ -1,13 +1,11 @@
 'use client';
 
-import { useContext } from 'react';
-
+import type { QraftClientOptions } from '../qraftAPIClient.js';
 import {
   QueryClient,
   useQueryClient as useQueryClientTanstack,
 } from '@tanstack/react-query';
-
-import type { QraftClientOptions } from '../qraftAPIClient.js';
+import { useContext } from 'react';
 import { QraftContext } from '../QraftContext.js';
 
 /**

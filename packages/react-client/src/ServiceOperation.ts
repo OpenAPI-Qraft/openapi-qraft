@@ -1,8 +1,7 @@
 import type { DefaultError } from '@tanstack/query-core';
-
 import type {
-  ServiceOperationQuery as ServiceOperationQueryBase,
   ServiceOperationMutation as ServiceOperationMutationBase,
+  ServiceOperationQuery as ServiceOperationQueryBase,
 } from './service-operation/ServiceOperation.js';
 import type {
   ServiceOperationInfiniteQueryKey as ServiceOperationInfiniteQueryKeyBase,

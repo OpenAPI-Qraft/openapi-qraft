@@ -1,7 +1,6 @@
-import { createConfig } from '@redocly/openapi-core';
-
 import type { Readable } from 'node:stream';
 import type { OpenAPI3 } from 'openapi-typescript';
+import { createConfig } from '@redocly/openapi-core';
 import { validateAndBundle } from 'openapi-typescript/dist/lib/redoc.js';
 
 export const readSchema = async (

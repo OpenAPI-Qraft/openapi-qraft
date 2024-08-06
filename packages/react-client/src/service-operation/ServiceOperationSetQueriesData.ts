@@ -5,7 +5,6 @@ import type {
   SetDataOptions,
   Updater,
 } from '@tanstack/query-core';
-
 import type {
   QueryFiltersByParameters,
   QueryFiltersByQueryKey,

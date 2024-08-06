@@ -1,9 +1,7 @@
 import { fileHeader } from '@openapi-qraft/plugin/lib/fileHeader';
 import { formatFileHeader } from '@openapi-qraft/plugin/lib/formatFileHeader';
 import { QraftCommandPlugin } from '@openapi-qraft/plugin/lib/QraftCommandPlugin';
-
 import { CommanderError } from 'commander';
-
 import { generateSchemaTypes } from './generateSchemaTypes.js';
 import {
   createOpenapiTypesImportPath,

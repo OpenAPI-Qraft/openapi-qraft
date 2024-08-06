@@ -3,7 +3,6 @@ import type {
   DefaultError,
   QueryClient,
 } from '@tanstack/query-core';
-
 import type {
   QueryFiltersByParameters,
   QueryFiltersByQueryKey,

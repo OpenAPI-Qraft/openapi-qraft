@@ -3,7 +3,6 @@ import type {
   UseMutationOptions,
   UseMutationResult,
 } from '@tanstack/react-query';
-
 import type { AreAllOptional } from '../lib/AreAllOptional.js';
 import type { ServiceOperationMutationKey } from './ServiceOperationKey.js';
 

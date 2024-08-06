@@ -1,5 +1,4 @@
 import type { DefaultError, QueryClient } from '@tanstack/query-core';
-
 import type {
   MutationFiltersByMutationKey,
   MutationFiltersByParameters,

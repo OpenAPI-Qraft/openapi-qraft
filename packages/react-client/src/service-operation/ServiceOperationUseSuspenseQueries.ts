@@ -3,7 +3,6 @@ import type {
   UseQueryOptions,
   UseSuspenseQueryResult,
 } from '@tanstack/react-query';
-
 import type { ServiceOperationQueryKey } from './ServiceOperationKey.js';
 
 type UseQueryOptionsForUseSuspenseQuery<

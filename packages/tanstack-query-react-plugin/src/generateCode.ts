@@ -1,12 +1,10 @@
+import { URL } from 'node:url';
 import { formatFileHeader } from '@openapi-qraft/plugin/lib/formatFileHeader';
 import { GeneratorFile } from '@openapi-qraft/plugin/lib/GeneratorFile';
 import { Service } from '@openapi-qraft/plugin/lib/open-api/getServices';
 import { OutputOptions as OutputOptionsBase } from '@openapi-qraft/plugin/lib/OutputOptions';
-
 import c from 'ansi-colors';
-import { URL } from 'node:url';
 import { Ora } from 'ora';
-
 import { astToString } from './ts-factory/astToString.js';
 import { getClientFactory } from './ts-factory/getClientFactory.js';
 import { getIndexFactory } from './ts-factory/getIndexFactory.js';

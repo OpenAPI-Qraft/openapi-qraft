@@ -1,7 +1,6 @@
 import type { QueryClient } from '@tanstack/query-core';
-
-import { composeMutationFilters } from './composeMutationFilters.js';
 import type { OperationSchema } from './requestFn.js';
+import { composeMutationFilters } from './composeMutationFilters.js';
 
 /**
  * Calls a query client method with mutation filters and options,

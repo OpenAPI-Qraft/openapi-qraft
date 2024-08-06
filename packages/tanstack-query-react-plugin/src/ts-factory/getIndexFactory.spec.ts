@@ -1,5 +1,4 @@
 import { describe, expect, test } from 'vitest';
-
 import { maybeResolveImport } from './getIndexFactory.js';
 
 describe('maybeResolveImport', () => {

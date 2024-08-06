@@ -3,7 +3,6 @@ import type {
   QueryClient,
   ResetOptions,
 } from '@tanstack/query-core';
-
 import type {
   QueryFiltersByParameters,
   QueryFiltersByQueryKey,

@@ -1,6 +1,5 @@
 import { http, HttpResponse } from 'msw';
 import queryString from 'query-string';
-
 import { Services, services } from '../fixtures/api/index.js';
 
 export const handlers = [

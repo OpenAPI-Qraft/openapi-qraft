@@ -1,22 +1,23 @@
-import c from 'ansi-colors';
-import { Command, type Option } from 'commander';
+import type { Option } from 'commander';
+import type { Service } from './open-api/getServices.js';
 import * as console from 'node:console';
 import { sep } from 'node:path';
 import process from 'node:process';
 import { pathToFileURL, URL } from 'node:url';
+import c from 'ansi-colors';
+import { Command } from 'commander';
 import ora, { Ora } from 'ora';
-
 import { parsePathGlobs } from './createServicePathMatch.js';
 import { filterDocumentPaths } from './filterDocumentPaths.js';
 import { GeneratorFile } from './GeneratorFile.js';
 import { handleSchemaInput } from './handleSchemaInput.js';
-import { getServices, type Service } from './open-api/getServices.js';
+import { getServices } from './open-api/getServices.js';
 import { OpenAPISchemaType } from './open-api/OpenAPISchemaType.js';
 import { readSchema } from './open-api/readSchema.js';
 import { OutputOptions } from './OutputOptions.js';
 import {
-  parseOperationPredefinedParametersOption,
   createPredefinedParametersGlobMap,
+  parseOperationPredefinedParametersOption,
   predefineSchemaParameters,
 } from './predefineSchemaParameters.js';
 import { writeGeneratorFiles } from './writeGeneratorFiles.js';
@@ -75,7 +76,7 @@ export class QraftCommand extends Command {
     const { version: packageVersion } = await import(
       '@openapi-qraft/plugin/package.json',
       {
-        assert: { type: 'json' },
+        with: { type: 'json' },
       }
     ).then(({ default: packageJSON }) => packageJSON);
 

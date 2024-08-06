@@ -5,7 +5,6 @@ import type {
   MutationStatus,
   QueryClient,
 } from '@tanstack/query-core';
-
 import type { PartialParameters } from '../lib/PartialParameters.type.js';
 import type { ServiceOperationMutationKey } from './ServiceOperationKey.js';
 import type { MutationVariables } from './ServiceOperationUseMutation.js';

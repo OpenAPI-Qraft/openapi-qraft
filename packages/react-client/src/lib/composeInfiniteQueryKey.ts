@@ -1,6 +1,6 @@
 import type { ServiceOperationInfiniteQueryKey } from '../service-operation/ServiceOperationKey.js';
-import { composeBaseQueryKey } from './composeBaseQueryKey.js';
 import type { OperationSchema } from './requestFn.js';
+import { composeBaseQueryKey } from './composeBaseQueryKey.js';
 
 export function composeInfiniteQueryKey<
   TSchema extends OperationSchema,

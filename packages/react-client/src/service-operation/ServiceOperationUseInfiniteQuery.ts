@@ -9,7 +9,6 @@ import type {
   UndefinedInitialDataInfiniteOptions,
   UseInfiniteQueryResult,
 } from '@tanstack/react-query';
-
 import type { PartialParameters } from '../lib/PartialParameters.type.js';
 import type { OperationInfiniteData } from './OperationInfiniteData.js';
 import type { ServiceOperationInfiniteQueryKey } from './ServiceOperationKey.js';

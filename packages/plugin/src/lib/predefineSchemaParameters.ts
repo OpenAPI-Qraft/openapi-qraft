@@ -1,10 +1,9 @@
+import type { OpenAPI3 } from 'openapi-typescript/src/types.js';
 import { OperationObject, ParameterObject } from 'openapi-typescript';
 import {
-  type OpenAPI3,
   PathItemObject,
   ReferenceObject,
 } from 'openapi-typescript/src/types.js';
-
 import {
   createServicePathMatch,
   parsePathGlobs,

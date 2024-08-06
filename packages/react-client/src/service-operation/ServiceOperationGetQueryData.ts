@@ -1,5 +1,4 @@
 import type { QueryClient } from '@tanstack/query-core';
-
 import type { ServiceOperationQueryKey } from './ServiceOperationKey.js';
 
 export interface ServiceOperationGetQueryData<

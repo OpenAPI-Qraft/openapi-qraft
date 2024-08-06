@@ -4,7 +4,6 @@ import type {
   RefetchOptions,
   ResetOptions,
 } from '@tanstack/query-core';
-
 import type {
   QueryFiltersByParameters,
   QueryFiltersByQueryKey,
