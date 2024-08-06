@@ -4175,13 +4175,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@fastify/busboy@npm:^2.0.0":
-  version: 2.1.1
-  resolution: "@fastify/busboy@npm:2.1.1"
-  checksum: 10c0/6f8027a8cba7f8f7b736718b013f5a38c0476eea67034c94a0d3c375e2b114366ad4419e6a6fa7ffc2ef9c6d3e0435d76dd584a7a1cbac23962fda7650b579e3
-  languageName: node
-  linkType: hard
-
 "@fastify/deepmerge@npm:^1.3.0":
   version: 1.3.0
   resolution: "@fastify/deepmerge@npm:1.3.0"
@@ -4654,7 +4647,7 @@ __metadata:
     "@types/node": "npm:^18.19.4"
     eslint: "npm:^9.0.0"
     memfs: "npm:^4.9.2"
-    openapi-typescript: "npm:7.0.0-next.11"
+    openapi-typescript: "npm:^7.3.0"
     rimraf: "npm:^5.0.5"
     typescript: "npm:^5.3.3"
     vitest: "npm:^1.4.0"
@@ -4673,7 +4666,7 @@ __metadata:
     commander: "npm:^11.1.0"
     eslint: "npm:^9.0.0"
     micromatch: "npm:^4.0.5"
-    openapi-typescript: "npm:7.0.0-next.11"
+    openapi-typescript: "npm:^7.3.0"
     ora: "npm:^8.0.1"
     rimraf: "npm:^5.0.5"
     typescript: "npm:^5.3.3"
@@ -4813,20 +4806,21 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@redocly/config@npm:^0.5.0":
-  version: 0.5.0
-  resolution: "@redocly/config@npm:0.5.0"
-  checksum: 10c0/c6804f4591bea0d0c7854df0fd80af881ffa463bbec1c8ef8e1c0bb4846cccf4910603761e11eca7be175ed41d639dee975204995b5cf8875d60365fd7e470f2
+"@redocly/config@npm:^0.7.0":
+  version: 0.7.0
+  resolution: "@redocly/config@npm:0.7.0"
+  checksum: 10c0/ca5ae4dc4b031ada8b22a8c1ec49bedc4d3643779dbf5558e3dcd5f90dab7f962796b5c191897a3989656682dee0c833636cba551052d5f52ec8120f6e63b516
   languageName: node
   linkType: hard
 
-"@redocly/openapi-core@npm:^1.12.0":
-  version: 1.12.2
-  resolution: "@redocly/openapi-core@npm:1.12.2"
+"@redocly/openapi-core@npm:^1.16.0":
+  version: 1.19.0
+  resolution: "@redocly/openapi-core@npm:1.19.0"
   dependencies:
     "@redocly/ajv": "npm:^8.11.0"
-    "@redocly/config": "npm:^0.5.0"
+    "@redocly/config": "npm:^0.7.0"
     colorette: "npm:^1.2.0"
+    https-proxy-agent: "npm:^7.0.4"
     js-levenshtein: "npm:^1.1.6"
     js-yaml: "npm:^4.1.0"
     lodash.isequal: "npm:^4.5.0"
@@ -4834,7 +4828,7 @@ __metadata:
     node-fetch: "npm:^2.6.1"
     pluralize: "npm:^8.0.0"
     yaml-ast-parser: "npm:0.0.43"
-  checksum: 10c0/c24498694c5ca07ac0c9c3fa1450e7e0366ef746a9dd6c32c02f6cfef402fa313d072a9469685a9ff1b89f4cbe82e48e0bbd66f5171e81f62554801ed3d38c78
+  checksum: 10c0/f36340ea1c2a4f69d7653b4c08e494664a939e8087036f8dd57d93fb8fd0f0a0864eb499146aa614af9504d9f89f87eb8ea814d56f402baa1d0485faf269422c
   languageName: node
   linkType: hard
 
@@ -10532,7 +10526,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"fast-glob@npm:^3.2.11, fast-glob@npm:^3.2.9, fast-glob@npm:^3.3.0, fast-glob@npm:^3.3.2":
+"fast-glob@npm:^3.2.11, fast-glob@npm:^3.2.9, fast-glob@npm:^3.3.0":
   version: 3.3.2
   resolution: "fast-glob@npm:3.3.2"
   dependencies:
@@ -11939,6 +11933,16 @@ __metadata:
     agent-base: "npm:^7.0.2"
     debug: "npm:4"
   checksum: 10c0/7735eb90073db087e7e79312e3d97c8c04baf7ea7ca7b013382b6a45abbaa61b281041a98f4e13c8c80d88f843785bcc84ba189165b4b4087b1e3496ba656d77
+  languageName: node
+  linkType: hard
+
+"https-proxy-agent@npm:^7.0.4":
+  version: 7.0.5
+  resolution: "https-proxy-agent@npm:7.0.5"
+  dependencies:
+    agent-base: "npm:^7.0.2"
+    debug: "npm:4"
+  checksum: 10c0/2490e3acec397abeb88807db52cac59102d5ed758feee6df6112ab3ccd8325e8a1ce8bce6f4b66e5470eca102d31e425ace904242e4fa28dbe0c59c4bafa7b2c
   languageName: node
   linkType: hard
 
@@ -15702,11 +15706,11 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"openapi-typescript@npm:7.0.0-next.11":
-  version: 7.0.0-next.11
-  resolution: "openapi-typescript@npm:7.0.0-next.11"
+"openapi-typescript@npm:^7.3.0":
+  version: 7.3.0
+  resolution: "openapi-typescript@npm:7.3.0"
   dependencies:
-    "@redocly/openapi-core": "npm:^1.12.0"
+    "@redocly/openapi-core": "npm:^1.16.0"
     ansi-colors: "npm:^4.1.3"
     parse-json: "npm:^8.1.0"
     supports-color: "npm:^9.4.0"
@@ -15715,23 +15719,7 @@ __metadata:
     typescript: ^5.x
   bin:
     openapi-typescript: bin/cli.js
-  checksum: 10c0/1adce3af1a96c27affdc7b7ccf8810f7fc1ee5b4691382a39df8b6b50612c1db442cd7de184fd299b79675470e0f09076062850f3ba89e2df73044d2af324f69
-  languageName: node
-  linkType: hard
-
-"openapi-typescript@npm:latest":
-  version: 6.7.4
-  resolution: "openapi-typescript@npm:6.7.4"
-  dependencies:
-    ansi-colors: "npm:^4.1.3"
-    fast-glob: "npm:^3.3.2"
-    js-yaml: "npm:^4.1.0"
-    supports-color: "npm:^9.4.0"
-    undici: "npm:^5.28.2"
-    yargs-parser: "npm:^21.1.1"
-  bin:
-    openapi-typescript: bin/cli.js
-  checksum: 10c0/d87ac3b2ce5f615bbada8da7489d480441241fdcb2abcc3068847e5935bdaf038aba6caeedd8cf10745c533e94ad0debe3b88536c439534a58172e532ec004e1
+  checksum: 10c0/432d7a549aa4a224ae51e6236e01bd2ac50934d2ed3a283c1c7a3342b86d64f29cf5d5576881704f095be1d2d6cb718ec918747f4e941ef7bfb101520f85f4fb
   languageName: node
   linkType: hard
 
@@ -16367,7 +16355,6 @@ __metadata:
     eslint: "npm:^8.55.0"
     eslint-plugin-react-hooks: "npm:^4.6.0"
     eslint-plugin-react-refresh: "npm:^0.4.5"
-    openapi-typescript: "npm:latest"
     react: "npm:^18.2.0"
     react-dom: "npm:^18.2.0"
     rimraf: "npm:^5.0.5"
@@ -20920,15 +20907,6 @@ __metadata:
   version: 5.26.5
   resolution: "undici-types@npm:5.26.5"
   checksum: 10c0/bb673d7876c2d411b6eb6c560e0c571eef4a01c1c19925175d16e3a30c4c428181fb8d7ae802a261f283e4166a0ac435e2f505743aa9e45d893f9a3df017b501
-  languageName: node
-  linkType: hard
-
-"undici@npm:^5.28.2":
-  version: 5.28.4
-  resolution: "undici@npm:5.28.4"
-  dependencies:
-    "@fastify/busboy": "npm:^2.0.0"
-  checksum: 10c0/08d0f2596553aa0a54ca6e8e9c7f45aef7d042c60918564e3a142d449eda165a80196f6ef19ea2ef2e6446959e293095d8e40af1236f0d67223b06afac5ecad7
   languageName: node
   linkType: hard
 

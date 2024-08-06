@@ -28,7 +28,7 @@
     "camelcase": "^8.0.0",
     "commander": "^11.1.0",
     "micromatch": "^4.0.5",
-    "openapi-typescript": "7.0.0-next.11",
+    "openapi-typescript": "^7.3.0",
     "ora": "^8.0.1",
     "yaml": "^2.3.4"
   },
