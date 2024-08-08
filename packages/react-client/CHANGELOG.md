@@ -1,5 +1,17 @@
 # @openapi-qraft/react
 
+## 1.13.0
+
+### Minor Changes
+
+- 6d35890: Improve `userQuery()` to support calling without `{}` as the first argument if all parameters are optional or no parameters are required.
+- 39a159c: Improve `useMutation` to support calling `mutate()` or `mutateAsync()` without arguments if body or parameters are optional or `undefined`.
+
+### Patch Changes
+
+- 6eec6d9: Update import attributes syntax to use `with` instead of `assert`.
+- 4e4a571: Add backward compatibility for `undefined` body mutations, allowing `useMutation` to support `mutate()` and `mutateAsync()` without arguments when the body is `undefined`.
+
 ## 1.13.0-beta.2
 
 ### Patch Changes
