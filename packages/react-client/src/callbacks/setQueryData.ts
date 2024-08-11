@@ -1,7 +1,7 @@
-import { callQueryClientMethodWithQueryKey } from '../lib/callQueryClientMethodWithQueryKey.js';
 import type { OperationSchema } from '../lib/requestFn.js';
 import type { QraftClientOptions } from '../qraftAPIClient.js';
 import type { ServiceOperationSetQueryData } from '../service-operation/ServiceOperationSetQueryData.js';
+import { callQueryClientMethodWithQueryKey } from '../lib/callQueryClientMethodWithQueryKey.js';
 
 export function setQueryData<TData>(
   qraftOptions: QraftClientOptions,

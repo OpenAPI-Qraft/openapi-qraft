@@ -3,7 +3,6 @@ import type {
   FetchQueryOptions,
   QueryFunction,
 } from '@tanstack/query-core';
-
 import type { RequestFn } from '../lib/requestFn.js';
 import type { ServiceOperationQueryKey } from './ServiceOperationKey.js';
 

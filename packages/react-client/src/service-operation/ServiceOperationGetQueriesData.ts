@@ -1,5 +1,4 @@
 import type { DefaultError, NoInfer } from '@tanstack/query-core';
-
 import type { OperationInfiniteData } from './OperationInfiniteData.js';
 import type {
   QueryFiltersByParameters,

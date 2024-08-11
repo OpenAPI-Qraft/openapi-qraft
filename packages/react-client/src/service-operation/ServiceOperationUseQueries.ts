@@ -1,11 +1,10 @@
+import type { UseQueryOptions, UseQueryResult } from '@tanstack/react-query';
+import type { ServiceOperationQueryKey } from './ServiceOperationKey.js';
 import {
   DefaultError,
   QueriesPlaceholderDataFunction,
   QueryClient,
 } from '@tanstack/query-core';
-import type { UseQueryOptions, UseQueryResult } from '@tanstack/react-query';
-
-import type { ServiceOperationQueryKey } from './ServiceOperationKey.js';
 
 type UseQueryOptionsForUseQueries<
   TSchema extends { url: string; method: string },

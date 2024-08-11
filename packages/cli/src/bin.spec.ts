@@ -1,5 +1,4 @@
 import { describe, expect, it } from 'vitest';
-
 import { extractArgvPluginOptions } from './bin.js';
 
 describe('bin', () => {

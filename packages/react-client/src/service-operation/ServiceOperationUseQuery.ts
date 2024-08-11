@@ -5,9 +5,8 @@ import type {
   UndefinedInitialDataOptions,
   UseQueryResult,
 } from '@tanstack/react-query';
-
-import { AreAllOptional } from '../lib/AreAllOptional.js';
 import type { ServiceOperationQueryKey } from './ServiceOperationKey.js';
+import { AreAllOptional } from '../lib/AreAllOptional.js';
 
 export interface ServiceOperationUseQuery<
   TSchema extends { url: string; method: string },

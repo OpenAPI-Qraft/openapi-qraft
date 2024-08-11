@@ -1,5 +1,4 @@
 import type { NoInfer, SetDataOptions, Updater } from '@tanstack/query-core';
-
 import type { ServiceOperationQueryKey } from './ServiceOperationKey.js';
 
 export interface ServiceOperationSetQueryData<

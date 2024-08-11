@@ -1,5 +1,4 @@
 import type { CancelOptions, DefaultError } from '@tanstack/query-core';
-
 import type {
   QueryFiltersByParameters,
   QueryFiltersByQueryKey,

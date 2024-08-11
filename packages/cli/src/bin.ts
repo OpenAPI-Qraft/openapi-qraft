@@ -1,10 +1,8 @@
 #!/usr/bin/env node
-import { QraftCommand } from '@openapi-qraft/plugin/lib/QraftCommand';
 import type { QraftCommandPlugin } from '@openapi-qraft/plugin/lib/QraftCommandPlugin';
-
-import { Option } from 'commander';
 import process from 'node:process';
-
+import { QraftCommand } from '@openapi-qraft/plugin/lib/QraftCommand';
+import { Option } from 'commander';
 import { builtInPlugins } from './builtInPlugins.js';
 
 export async function main() {

@@ -1,16 +1,13 @@
 'use client';
 
 import type { DefaultError } from '@tanstack/query-core';
-import {
-  useMutation as useMutationBase,
-  type UseMutationResult,
-} from '@tanstack/react-query';
-
-import { composeMutationKey } from '../lib/composeMutationKey.js';
+import type { UseMutationResult } from '@tanstack/react-query';
 import type { OperationSchema } from '../lib/requestFn.js';
 import type { QraftClientOptions } from '../qraftAPIClient.js';
 import type { ServiceOperationMutation } from '../service-operation/ServiceOperation.js';
 import type { ServiceOperationMutationKey } from '../service-operation/ServiceOperationKey.js';
+import { useMutation as useMutationBase } from '@tanstack/react-query';
+import { composeMutationKey } from '../lib/composeMutationKey.js';
 
 export const useMutation: <
   TData = unknown,

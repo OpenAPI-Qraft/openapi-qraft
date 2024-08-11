@@ -1,15 +1,12 @@
 'use client';
 
 import type { DefaultError } from '@tanstack/query-core';
-import {
-  useIsMutating as useIsMutatingStateTanstack,
-  type UseMutationResult,
-} from '@tanstack/react-query';
-
-import { composeMutationFilters } from '../lib/composeMutationFilters.js';
+import type { UseMutationResult } from '@tanstack/react-query';
 import type { OperationSchema } from '../lib/requestFn.js';
 import type { QraftClientOptions } from '../qraftAPIClient.js';
 import type { ServiceOperationMutation } from '../service-operation/ServiceOperation.js';
+import { useIsMutating as useIsMutatingStateTanstack } from '@tanstack/react-query';
+import { composeMutationFilters } from '../lib/composeMutationFilters.js';
 
 export const useIsMutating: <
   TData = unknown,

@@ -1,7 +1,6 @@
 import { fileHeader } from '@openapi-qraft/plugin/lib/fileHeader';
 import { QraftCommand } from '@openapi-qraft/plugin/lib/QraftCommand';
 import { QraftCommandPlugin } from '@openapi-qraft/plugin/lib/QraftCommandPlugin';
-
 import { generateCode } from './generateCode.js';
 
 export const plugin: QraftCommandPlugin = {

@@ -1,5 +1,4 @@
 import { type OpenAPI3 } from 'openapi-typescript/src/types.js';
-
 import { createServicePathMatch } from './createServicePathMatch.js';
 
 /**

@@ -1,5 +1,4 @@
 import type { DefaultError, ResetOptions } from '@tanstack/query-core';
-
 import type {
   QueryFiltersByParameters,
   QueryFiltersByQueryKey,

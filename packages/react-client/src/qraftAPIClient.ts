@@ -1,8 +1,7 @@
-import { type QueryClient } from '@tanstack/query-core';
-
 import type * as operationInvokeModule from './callbacks/operationInvokeFn.js';
-import { createRecursiveProxy } from './lib/createRecursiveProxy.js';
 import type { OperationSchema, RequestFnInfo } from './lib/requestFn.js';
+import { type QueryClient } from '@tanstack/query-core';
+import { createRecursiveProxy } from './lib/createRecursiveProxy.js';
 
 export interface QraftClientOptions {
   requestFn<T>(schema: OperationSchema, requestInfo: RequestFnInfo): Promise<T>;

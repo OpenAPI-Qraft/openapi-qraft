@@ -1,5 +1,4 @@
 import { expect } from 'vitest';
-
 import { jwtDecode } from '../lib/jwt-decode/index.js';
 import { createTestJwt } from './createTestJwt.js';
 

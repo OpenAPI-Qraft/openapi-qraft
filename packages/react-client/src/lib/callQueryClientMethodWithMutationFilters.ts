@@ -1,8 +1,7 @@
-import { QraftClientOptions } from '@openapi-qraft/react';
 import type { QueryClient } from '@tanstack/query-core';
-
-import { composeMutationFilters } from './composeMutationFilters.js';
 import type { OperationSchema } from './requestFn.js';
+import { QraftClientOptions } from '@openapi-qraft/react';
+import { composeMutationFilters } from './composeMutationFilters.js';
 
 /**
  * Calls a query client method with mutation filters and options,

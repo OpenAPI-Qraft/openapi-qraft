@@ -1,7 +1,7 @@
+import type { OperationSchema } from './requestFn.js';
 import { composeBaseQueryKey } from './composeBaseQueryKey.js';
 import { composeInfiniteQueryKey } from './composeInfiniteQueryKey.js';
 import { composeQueryKey } from './composeQueryKey.js';
-import type { OperationSchema } from './requestFn.js';
 
 /**
  * Replaces the `parameters` field in the filters with a `queryKey` field based on the schema.

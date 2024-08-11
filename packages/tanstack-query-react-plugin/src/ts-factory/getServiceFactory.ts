@@ -1,5 +1,4 @@
 import { ServiceOperation } from '@openapi-qraft/plugin/lib/open-api/getServices';
-
 import ts from 'typescript';
 
 const SERVICE_OPERATION_QUERY = 'ServiceOperationQuery';

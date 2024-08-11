@@ -1,20 +1,14 @@
 'use client';
 
-import { createElement, Fragment, ReactNode, useEffect, useMemo } from 'react';
-
-import {
-  QueryClient,
-  type QueryFunctionContext,
-  type QueryKey,
-  useQueries,
-} from '@tanstack/react-query';
-
-import { jwtDecode } from './lib/jwt-decode/index.js';
+import type { QueryFunctionContext, QueryKey } from '@tanstack/react-query';
 import type {
   OperationSchema,
   RequestFnInfo,
   RequestFnOptions,
 } from './lib/requestFn.js';
+import { QueryClient, useQueries } from '@tanstack/react-query';
+import { createElement, Fragment, ReactNode, useEffect, useMemo } from 'react';
+import { jwtDecode } from './lib/jwt-decode/index.js';
 
 interface QraftSecureRequestFnBaseProps {
   requestFn<T>(

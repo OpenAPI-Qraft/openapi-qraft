@@ -1,5 +1,5 @@
-import { callQueryClientMethodWithQueryKey } from '../lib/callQueryClientFetchMethod.js';
 import type { QraftClientOptions } from '../qraftAPIClient.js';
+import { callQueryClientMethodWithQueryKey } from '../lib/callQueryClientFetchMethod.js';
 import { ServiceOperationFetchQuery } from '../service-operation/ServiceOperationFetchQuery.js';
 
 export const fetchQuery: <

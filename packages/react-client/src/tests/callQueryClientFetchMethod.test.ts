@@ -1,5 +1,4 @@
 import { QueryClient } from '@tanstack/react-query';
-
 import { callQueryClientMethodWithQueryKey } from '../lib/callQueryClientFetchMethod.js';
 
 describe('callQueryClientFetchMethod', () => {

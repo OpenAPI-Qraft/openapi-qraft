@@ -1,7 +1,6 @@
-import c from 'ansi-colors';
 import fs from 'node:fs';
+import c from 'ansi-colors';
 import { Ora } from 'ora';
-
 import { GeneratorFile } from './GeneratorFile.js';
 
 export const writeGeneratorFiles = async ({

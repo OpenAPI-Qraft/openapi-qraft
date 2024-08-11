@@ -1,6 +1,5 @@
 import { rollupConfig } from '@openapi-qraft/rollup-config';
-
-import packageJson from './package.json' assert { type: 'json' };
+import packageJson from './package.json' with { type: 'json' };
 
 const moduleDist = {
   import: packageJson['exports']['.']['import'],

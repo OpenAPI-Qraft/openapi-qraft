@@ -1,6 +1,5 @@
-import ts from 'typescript';
-
 import type { ServiceImportsFactoryOptions } from './getServiceFactory.js';
+import ts from 'typescript';
 
 export const getIndexFactory = ({
   openapiTypesImportPath,

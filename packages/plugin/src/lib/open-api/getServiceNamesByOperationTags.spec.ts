@@ -1,5 +1,4 @@
 import { describe, expect, it } from 'vitest';
-
 import { getServiceNamesByOperationTags } from './getServiceNamesByOperationTags.js';
 
 describe('getServiceNamesByOperationTags(...)', () => {
