@@ -19,6 +19,8 @@ export async function generateSchemaTypes(
       | 'defaultNonNullable'
       | 'emptyObjectsUnknown'
       | 'enum'
+      | 'enumValues'
+      | 'dedupeEnums'
       | 'excludeDeprecated'
       | 'exportType'
       | 'immutable'

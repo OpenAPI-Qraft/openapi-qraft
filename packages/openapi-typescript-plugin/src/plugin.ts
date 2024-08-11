@@ -21,6 +21,8 @@ export const plugin: QraftCommandPlugin = {
         'schema.ts'
       )
       .option('--enum', 'Export true TS enums instead of unions')
+      .option('--enum-values', 'Export enum values as arrays.')
+      .option('--dedupe-enums', 'Dedupe enum types when `--enum` is set')
       .option(
         '-t, --export-type',
         'Export top-level `type` instead of `interface`'

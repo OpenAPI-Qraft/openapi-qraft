@@ -1,5 +1,6 @@
 import type { QraftClientOptions } from '../qraftAPIClient.js';
 import { callQueryClientMethodWithQueryKey } from '../lib/callQueryClientFetchMethod.js';
+import { callQueryClientMethodWithQueryKey } from '../lib/callQueryClientFetchMethod.js';
 import { ServiceOperationFetchInfiniteQuery } from '../service-operation/ServiceOperationFetchInfiniteQuery.js';
 
 export const fetchInfiniteQuery: <
