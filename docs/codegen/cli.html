@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="generator" content="Docusaurus v3.4.0">
 <title data-rh="true">OpenAPI Qraft CLI | OpenAPI Qraft</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:url" content="https://openapi-qraft.github.io/openapi-qraft/docs/codegen/cli"><meta data-rh="true" property="og:locale" content="en"><meta data-rh="true" name="docusaurus_locale" content="en"><meta data-rh="true" name="docsearch:language" content="en"><meta data-rh="true" name="docusaurus_version" content="current"><meta data-rh="true" name="docusaurus_tag" content="docs-default-current"><meta data-rh="true" name="docsearch:version" content="current"><meta data-rh="true" name="docsearch:docusaurus_tag" content="docs-default-current"><meta data-rh="true" property="og:title" content="OpenAPI Qraft CLI | OpenAPI Qraft"><meta data-rh="true" name="description" content="OpenAPI Qraft CLI is a command-line utility that generates API schemas and interfaces for the @openapi-qraft/react."><meta data-rh="true" property="og:description" content="OpenAPI Qraft CLI is a command-line utility that generates API schemas and interfaces for the @openapi-qraft/react."><link data-rh="true" rel="canonical" href="https://openapi-qraft.github.io/openapi-qraft/docs/codegen/cli"><link data-rh="true" rel="alternate" href="https://openapi-qraft.github.io/openapi-qraft/docs/codegen/cli" hreflang="en"><link data-rh="true" rel="alternate" href="https://openapi-qraft.github.io/openapi-qraft/docs/codegen/cli" hreflang="x-default"><link data-rh="true" rel="preconnect" href="https://B42903JOPT-dsn.algolia.net" crossorigin="anonymous"><link rel="search" type="application/opensearchdescription+xml" title="OpenAPI Qraft" href="/openapi-qraft/opensearch.xml"><link rel="stylesheet" href="/openapi-qraft/assets/css/styles.f84b3a44.css">
-<script src="/openapi-qraft/assets/js/runtime~main.9b8ca1f1.js" defer="defer"></script>
+<script src="/openapi-qraft/assets/js/runtime~main.d6d86a8b.js" defer="defer"></script>
 <script src="/openapi-qraft/assets/js/main.855f9321.js" defer="defer"></script>
 </head>
 <body class="navigation-with-keyboard">
@@ -46,7 +46,8 @@ package for more details.</p>
 </li>
 <li>
 <p><strong><code>--operation-predefined-parameters &lt;patterns...&gt; </code>:</strong> Predefined parameters for services. The specified services parameters will be optional. <em>(optional)</em></p>
-<p>This most wanted option 💎 allows you to <strong>set default parameters</strong> across multiple endpoints. However, if an endpoint doesn&#x27;t contain a parameter specified in this option, an error will be displayed. For example:</p>
+<p>This option 💎 is arguably one of the most awesome features, allowing you to <strong>set default parameters</strong> across multiple endpoints.
+However, if an endpoint doesn&#x27;t contain a parameter specified in this option, an error will be displayed. For example:</p>
 <div class="language-text codeBlockContainer_mQmQ theme-code-block" style="--prism-color:#393A34;--prism-background-color:#f6f8fa"><div class="codeBlockContent_D5yF"><pre tabindex="0" class="prism-code language-text codeBlock_RMoD thin-scrollbar" style="color:#393A34;background-color:#f6f8fa"><code class="codeBlockLines_AclH"><span class="token-line" style="color:#393A34"><span class="token plain">⚠ Missing predefined parameter &#x27;header&#x27; &#x27;x-monite-version&#x27; in &#x27;post /files&#x27; in &#x27;/**&#x27;</span><br></span></code></pre><div class="buttonGroup_aaMX"><button type="button" aria-label="Copy code to clipboard" title="Copy" class="clean-btn"><span class="copyButtonIcons_z5j7" aria-hidden="true"><svg viewBox="0 0 24 24" class="copyButtonIcon_FoOz"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"></path></svg><svg viewBox="0 0 24 24" class="copyButtonSuccessIcon_L0B6"><path fill="currentColor" d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z"></path></svg></span></button></div></div></div>
 <p>To resolve such errors, you can exclude specific endpoints from the predefined parameters using the negation syntax in the glob pattern, like:</p>
 <div class="codeBlockContainer_mQmQ theme-code-block" style="--prism-color:#393A34;--prism-background-color:#f6f8fa"><div class="codeBlockContent_D5yF"><pre tabindex="0" class="prism-code language-text codeBlock_RMoD thin-scrollbar" style="color:#393A34;background-color:#f6f8fa"><code class="codeBlockLines_AclH"><span class="token-line" style="color:#393A34"><span class="token plain">--operation-predefined-parameters &#x27;/**,!/files:header.x-monite-version&#x27;</span><br></span></code></pre><div class="buttonGroup_aaMX"><button type="button" aria-label="Copy code to clipboard" title="Copy" class="clean-btn"><span class="copyButtonIcons_z5j7" aria-hidden="true"><svg viewBox="0 0 24 24" class="copyButtonIcon_FoOz"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"></path></svg><svg viewBox="0 0 24 24" class="copyButtonSuccessIcon_L0B6"><path fill="currentColor" d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z"></path></svg></span></button></div></div></div>
@@ -58,14 +59,28 @@ as optional parameters for all services.</li>
 <li><code>--operation-predefined-parameters &#x27;/**,!/auth/token:header.x-entity-id&#x27;</code> - set <code>header.x-entity-id</code> as optional parameters for all services except <code>/auth/token</code>.</li>
 <li><code>--operation-predefined-parameters &#x27;/**:header.x-monite-version,query.x-api-key&#x27; &#x27;/user/**,/post/**:header.x-monite-entity-id&#x27;</code> -
 set <code>header.x-monite-version</code> and <code>query.x-api-key</code> as optional parameters for all services, and <code>header.x-monite-entity-id</code> for the <code>/user/**</code> and <code>/post/**</code> services.</li>
+<li><code>--operation-predefined-parameters &#x27;post,put /**:header.x-entity-id&#x27;</code> - set the <code>Header</code> record <code>x-entity-id</code> as an optional parameter for the <code>POST</code> and <code>PUT</code> methods.</li>
 </ul>
 </li>
 </ul>
 <blockquote>
-<p><strong>Note:</strong> In future versions of the library, this feature will be expanded. Not only will it make parameters optional,
-but it will also offer typed suggestions for these predefined parameters when creating a client. This enhancement will
+<p><strong>Note:</strong> In future versions of the library, this feature will be expanded. Not only will it make parameters
+optional, but it will also offer typed suggestions for these predefined parameters when creating a client. This enhancement will
 further improve type safety and developer experience.</p>
 </blockquote>
+</li>
+<li>
+<p><strong><code>--operation-name-modifier &lt;patterns...&gt;</code>:</strong> Modifies operation names using a pattern.</p>
+<ul>
+<li>Examples:<!-- -->
+<ul>
+<li><code>--operation-name-modifier &#x27;get /**:[A-Za-z]+Id ==&gt; findOne&#x27;</code> - will change all <code>GET</code> operations with <code>Id</code> suffix to <code>findOne</code>.</li>
+<li><code>--operation-name-modifier &#x27;put,patch /**:[A-Za-z]+Id ==&gt; updateOne&#x27;</code> - will change all <code>PUT</code> and <code>PATCH</code> operations with <code>Id</code> suffix to <code>updateOne</code>.</li>
+<li><code>--operation-name-modifier &#x27;/posts,/files:create[a-zA-Z]+ ==&gt; createOne&#x27;</code> - will change all operations under <code>/posts</code> and <code>/files</code> to <code>createOne</code> if the operation name starts with <code>create</code>.</li>
+<li><code>--operation-name-modifier &#x27;post /files ==&gt; createOne&#x27; &#x27;put /posts ==&gt; updateOne&#x27;</code> - will change all <code>POST</code> operations under <code>/files</code> to <code>createOne</code> and all <code>PUT</code> operations under <code>/posts</code> to <code>updateOne</code>.</li>
+</ul>
+</li>
+</ul>
 </li>
 <li>
 <p><strong><code>--service-name-base &lt;endpoint[&lt;index&gt;] | tags&gt;</code>:</strong> Use OpenAPI Operation <code>endpoint[&lt;index&gt;]</code> path part (e.g.: <code>/0/1/2</code>) or <code>tags</code> as the base name of the service. <em>(optional, default: <code>endpoint[0]</code>)</em>.</p>
@@ -153,6 +168,8 @@ operation handling <em>(optional, default: <code>@openapi-qraft/react</code>)</e
 <ul>
 <li><strong><code>--openapi-types-file-name &lt;path&gt;</code></strong>: OpenAPI Schema types file name, e.g., <code>schema.d.ts</code> (default: <code>schema.ts</code>).</li>
 <li><strong><code>--enum</code></strong>: Export true TypeScript enums instead of unions.</li>
+<li><strong><code>--enum-values</code></strong>: Export enum values as arrays.</li>
+<li><strong><code>--dedupe-enums</code></strong>: Dedupe enum types when <code>--enum</code> is set.</li>
 <li><strong><code>-t, --export-type</code></strong>: Export top-level <code>type</code> instead of <code>interface</code>.</li>
 <li><strong><code>--immutable</code></strong>: Generate readonly types.</li>
 <li><strong><code>--additional-properties</code></strong>: Treat schema objects as if <code>additionalProperties: true</code> is set.</li>
