@@ -14,5 +14,9 @@
     "playground": "0.0.14",
     "openapi-qraft-website": "0.0.0"
   },
-  "changesets": []
+  "changesets": [
+    "eleven-crews-switch",
+    "rude-sheep-yell",
+    "wet-melons-tickle"
+  ]
 }

@@ -1,5 +1,12 @@
 # @openapi-qraft/plugin
 
+## 1.14.0-beta.0
+
+### Minor Changes
+
+- 77f0812: Added support for the `--operation-predefined-parameters` option to allow changing operation names.
+- 787f568: Updated `openapi-typescript` to `^7.3.0`.
+
 ## 1.13.0
 
 ### Patch Changes
