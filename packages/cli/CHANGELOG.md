@@ -1,5 +1,14 @@
 # @openapi-qraft/cli
 
+## 1.13.1
+
+### Patch Changes
+
+- Updated dependencies [63ba3ff]
+  - @openapi-qraft/plugin@1.13.1
+  - @openapi-qraft/openapi-typescript-plugin@1.0.8
+  - @openapi-qraft/tanstack-query-react-plugin@1.13.1
+
 ## 1.13.0
 
 ### Patch Changes

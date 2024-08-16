@@ -1,5 +1,12 @@
 # @openapi-qraft/plugin
 
+## 1.13.1
+
+### Patch Changes
+
+- 63ba3ff: Simplified the method for retrieving the package version by implementing a more straightforward approach. This change
+  improves maintainability and ensures better compatibility across different Node.js versions (18, 20, and 22).
+
 ## 1.13.0
 
 ### Patch Changes
