@@ -12,6 +12,13 @@
 - Updated dependencies [787f568]
   - @openapi-qraft/plugin@1.14.0-beta.0
 
+## 1.0.8
+
+### Patch Changes
+
+- Updated dependencies [63ba3ff]
+  - @openapi-qraft/plugin@1.13.1
+
 ## 1.0.7
 
 ### Patch Changes

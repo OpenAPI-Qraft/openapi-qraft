@@ -7,6 +7,13 @@
 - 77f0812: Added support for the `--operation-predefined-parameters` option to allow changing operation names.
 - 787f568: Updated `openapi-typescript` to `^7.3.0`.
 
+## 1.13.1
+
+### Patch Changes
+
+- 63ba3ff: Simplified the method for retrieving the package version by implementing a more straightforward approach. This change
+  improves maintainability and ensures better compatibility across different Node.js versions (18, 20, and 22).
+
 ## 1.13.0
 
 ### Patch Changes
