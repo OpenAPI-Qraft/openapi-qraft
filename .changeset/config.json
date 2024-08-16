@@ -12,7 +12,7 @@
   ],
   "linked": [],
   "access": "public",
-  "baseBranch": "origin/versions/1.13.x",
+  "baseBranch": "origin/main",
   "updateInternalDependencies": "patch",
   "ignore": ["@openapi-qraft/e2e", "playground", "openapi-qraft-website"]
 }
