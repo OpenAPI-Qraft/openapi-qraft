@@ -84,6 +84,22 @@ describe('# processOperationNameModifierOption', () => {
       ).toMatchSnapshot();
     });
 
+    it('processes operation name modifier with regex capture group', () => {
+      const { errors, services } = processOperationNameModifierOption(
+        parseOperationNameModifier(
+          '/entities/{entity_id}/documents:post([A-Z][A-Za-z]+sId[A-Z][A-Za-z]+) ==> $1'
+        ),
+        getServices(openAPI)
+      );
+
+      expect(errors).toEqual([]);
+      expect(
+        services
+          .find(({ name }) => name === 'entities')
+          ?.operations.map(({ name }) => ({ name }))
+      ).toMatchSnapshot();
+    });
+
     it('generates errors for multiple modifiers for the same operation', () => {
       const { errors } = processOperationNameModifierOption(
         parseOperationNameModifier(
