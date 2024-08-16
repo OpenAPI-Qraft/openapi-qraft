@@ -1,5 +1,11 @@
 # @openapi-qraft/plugin
 
+## 1.14.0-beta.2
+
+### Patch Changes
+
+- 7430754: Added compatibility with Node.js v18.18.0
+
 ## 1.14.0-beta.0
 
 ### Minor Changes
