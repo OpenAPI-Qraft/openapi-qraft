@@ -1,5 +1,12 @@
 # @openapi-qraft/openapi-typescript
 
+## 1.0.8
+
+### Patch Changes
+
+- Updated dependencies [63ba3ff]
+  - @openapi-qraft/plugin@1.13.1
+
 ## 1.0.7
 
 ### Patch Changes
