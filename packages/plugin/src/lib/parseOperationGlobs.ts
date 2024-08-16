@@ -20,8 +20,9 @@ export const parseOperationGlobs = (operationFullGlobs: string) => {
   const methods = methodsGlobsRaw
     .split(',')
     .map((method) => method.trim().toLowerCase())
-    .filter(isSupportedOperationMethod)
-    .toSorted(sortSupportedMethods);
+    .filter(isSupportedOperationMethod);
+
+  methods.sort(sortSupportedMethods);
 
   return {
     methods: methods.length ? methods : undefined,
