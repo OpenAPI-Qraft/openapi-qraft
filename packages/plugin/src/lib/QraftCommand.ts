@@ -1,12 +1,12 @@
 import type { Option } from 'commander';
 import type { Service } from './open-api/getServices.js';
-import * as console from 'node:console';
 import { sep } from 'node:path';
 import process from 'node:process';
 import { pathToFileURL, URL } from 'node:url';
 import c from 'ansi-colors';
 import { Command } from 'commander';
 import ora, { Ora } from 'ora';
+import { packageVersion } from '../packageVersion.js';
 import { parsePathGlobs } from './createServicePathMatch.js';
 import { filterDocumentPaths } from './filterDocumentPaths.js';
 import { GeneratorFile } from './GeneratorFile.js';
@@ -73,13 +73,6 @@ export class QraftCommand extends Command {
   }
 
   async actionCallback(...actionArgs: any[]) {
-    const { version: packageVersion } = await import(
-      '@openapi-qraft/plugin/package.json',
-      {
-        with: { type: 'json' },
-      }
-    ).then(({ default: packageJSON }) => packageJSON);
-
     const inputs = actionArgs.filter(
       (arg) => typeof arg === 'string'
     ) as string[];
