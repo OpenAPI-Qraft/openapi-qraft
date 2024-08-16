@@ -9,7 +9,8 @@
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
     "lint": "eslint",
-    "clean": "rimraf dist/"
+    "clean": "rimraf dist/",
+    "write-package-version-file": "yarn exec ../../write-package-version-file.sh"
   },
   "exports": {
     "./package.json": "./package.json",
