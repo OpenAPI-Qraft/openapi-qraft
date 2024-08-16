@@ -69,6 +69,14 @@ exports[`# processOperationNameModifierOption > processOperationNameModifierOpti
 ]
 `;
 
+exports[`# processOperationNameModifierOption > processOperationNameModifierOption(...) > processes operation name modifier with regex capture group 1`] = `
+[
+  {
+    "name": "EntitiesIdDocuments",
+  },
+]
+`;
+
 exports[`# processOperationNameModifierOption > processOperationNameModifierOption(...) > processes operation name modifier with single modifier 1`] = `
 [
   {
