@@ -45,7 +45,7 @@ jobs:
         uses: changesets/action@v1
         with:
           publish: yarn exec .changeset/publish.sh --create-git-tags
-          version: yarn exec .changeset/version.sh
+          version: exit 1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}

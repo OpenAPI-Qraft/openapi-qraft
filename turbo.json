@@ -3,32 +3,26 @@
   "tasks": {
     "build": {
       "cache": true,
-      "dependsOn": ["codegen", "^build"],
+      "dependsOn": ["write-package-version-file", "codegen", "^build"],
       "outputs": ["dist/**"]
     },
     "test": {
       "cache": true,
-      "dependsOn": ["^build"],
+      "dependsOn": ["write-package-version-file", "^build"],
       "outputs": ["coverage/**"]
     },
     "typecheck": {
       "cache": true,
-      "dependsOn": [
-        "^build"
-      ]
+      "dependsOn": ["write-package-version-file", "^build"]
     },
     "dev": {
       "cache": false,
       "persistent": true,
-      "dependsOn": [
-        "^build"
-      ]
+      "dependsOn": ["write-package-version-file", "^build"]
     },
     "lint": {
       "cache": true,
-      "dependsOn": [
-        "^build"
-      ]
+      "dependsOn": ["write-package-version-file", "^build"]
     },
     "clean": {
       "cache": false
@@ -41,6 +35,11 @@
         "src/api/**/*.ts"
       ],
       "inputs": []
+    },
+    "write-package-version-file": {
+      "cache": true,
+      "outputs": ["src/packageVersion.ts"],
+      "inputs": ["package.json"]
     }
   }
 }
