@@ -60,7 +60,7 @@ export const plugin: QraftCommandPlugin = {
       )
       .option(
         '--explicit-component-exports',
-        'Enabling this option will export API components as standalone types, alongside `components` interface'
+        'Enabling this option will export API components as separate type aliases, alongside `components` interface'
       )
       .action(async ({ output, args, spinner, schema }, resolve) => {
         spinner.text = 'Generating OpenAPI Document Types';
