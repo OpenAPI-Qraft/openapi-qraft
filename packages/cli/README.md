@@ -56,6 +56,7 @@ Options:
   --alphabetize                                    Sort object keys alphabetically
   --exclude-deprecated                             Exclude deprecated types
   --no-blob-from-binary                            If this option is enabled, binary format fields will not be converted to Blob types, preserving the native representation
+  --explicit-component-exports                     Enabling this option will export API components as separate type aliases, alongside `components` interface
   -h, --help                                       display help for command
 ```
 
