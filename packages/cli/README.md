@@ -56,6 +56,7 @@ Options:
   --alphabetize                                    Sort object keys alphabetically
   --exclude-deprecated                             Exclude deprecated types
   --no-blob-from-binary                            If this option is enabled, binary format fields will not be converted to Blob types, preserving the native representation
+  --explicit-component-exports                     Enabling this option will export API components as separate type aliases, alongside `components` interface
   -h, --help                                       display help for command
 ```
 
@@ -135,6 +136,8 @@ npx openapi-qraft --plugin tanstack-query-react --plugin openapi-typescript http
     - `--operation-name-modifier 'put,patch /**:[A-Za-z]+Id ==> updateOne'` - will change all `PUT` and `PATCH` operations with `Id` suffix to `updateOne`.
     - `--operation-name-modifier '/posts,/files:create[a-zA-Z]+ ==> createOne'` - will change all operations under `/posts` and `/files` to `createOne` if the operation name starts with `create`.
     - `--operation-name-modifier 'post /files ==> createOne' 'put /posts ==> updateOne'` - will change all `POST` operations under `/files` to `createOne` and all `PUT` operations under `/posts` to `updateOne`.
+
+- **`--explicit-component-exports`:** Enabling this option will export API components as separate type aliases, alongside `components` interface.
 
 - **`--service-name-base <endpoint[<index>] | tags>`:** Use OpenAPI Operation `endpoint[<index>]` path part (e.g.: `/0/1/2`) or `tags` as the base name of the service. _(optional, default: `endpoint[0]`)_.
   - Examples:

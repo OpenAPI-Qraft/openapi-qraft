@@ -3,7 +3,8 @@
   "compilerOptions": {
     "noEmit": false,
     "declaration": true,
-    "declarationMap": true
+    "declarationMap": true,
+    "resolveJsonModule": false
   },
   "exclude": ["src/**/*.spec.ts", "src/**/*.test.ts", "src/tmp/**", "src/__snapshots__/**/*"]
 }
