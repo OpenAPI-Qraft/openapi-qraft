@@ -17,6 +17,20 @@ describe('splitCommaSeparatedGlobs', () => {
     expect(splitCommaSeparatedGlobs(undefined)).toEqual([]);
   });
 
+  it('accepts multiple inputs', () => {
+    expect(
+      splitCommaSeparatedGlobs(['foo,bar', 'baz,foobar', undefined])
+    ).toEqual(['foo', 'bar', 'baz', 'foobar']);
+  });
+
+  it('removes redundant inputs', () => {
+    expect(splitCommaSeparatedGlobs(['foo,bar', 'bar,baz'])).toEqual([
+      'foo',
+      'bar',
+      'baz',
+    ]);
+  });
+
   it('should throw an error on invalid input', () => {
     // @ts-expect-error - invalid input
     expect(() => splitCommaSeparatedGlobs(null)).toThrowError();
@@ -24,8 +38,6 @@ describe('splitCommaSeparatedGlobs', () => {
     expect(() => splitCommaSeparatedGlobs(false)).toThrowError();
     // @ts-expect-error - invalid input
     expect(() => splitCommaSeparatedGlobs(0)).toThrowError();
-    // @ts-expect-error - invalid input
-    expect(() => splitCommaSeparatedGlobs([])).toThrowError();
     // @ts-expect-error - invalid input
     expect(() => splitCommaSeparatedGlobs({})).toThrowError();
     // @ts-expect-error - invalid input
