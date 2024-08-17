@@ -81,6 +81,21 @@ export async function baseRequestFn<T>(
   return (await getResponseBody(clonedResponse)) as T;
 }
 
+/**
+ * Serializes the given schema and request payload into a URL string.
+ *
+ * This function is implemented according to the URI Template standard
+ * defined in RFC 6570. It supports the expansion of path and query parameters,
+ * correctly handling empty arrays, `null`, and `undefined` values by ignoring
+ * them during the expansion process, as specified by the standard.
+ *
+ * For more information, refer to the official documentation:
+ * https://datatracker.ietf.org/doc/html/rfc6570
+ *
+ * @param schema - The operation schema containing the URL template and method.
+ * @param info - The request payload including baseUrl, path parameters, and query parameters.
+ * @returns The fully constructed URL string.
+ */
 export function urlSerializer(
   schema: OperationSchema,
   info: RequestFnPayload

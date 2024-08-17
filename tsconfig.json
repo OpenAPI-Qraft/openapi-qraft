@@ -2,7 +2,7 @@
   "compilerOptions": {
     "target": "ESNext",
     "module": "NodeNext",
-    "lib": ["ES2019"],
+    "lib": ["ES2019", "ESNext.Array"],
     "moduleResolution": "NodeNext",
     "sourceMap": true,
     "esModuleInterop": true,

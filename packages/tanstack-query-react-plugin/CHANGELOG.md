@@ -1,5 +1,42 @@
 # @openapi-qraft/tanstack-query-react-plugin
 
+## 1.14.0-beta.4
+
+### Patch Changes
+
+- Updated dependencies [346a408]
+  - @openapi-qraft/plugin@1.14.0-beta.4
+
+## 1.14.0-beta.3
+
+### Patch Changes
+
+- Updated dependencies [c5c4426]
+  - @openapi-qraft/plugin@1.14.0-beta.3
+
+## 1.14.0-beta.2
+
+### Patch Changes
+
+- Updated dependencies [7430754]
+  - @openapi-qraft/plugin@1.14.0-beta.2
+
+## 1.14.0-beta.0
+
+### Patch Changes
+
+- 49dc44f: Added Operation comments to service variable declarations.
+- Updated dependencies [77f0812]
+- Updated dependencies [787f568]
+  - @openapi-qraft/plugin@1.14.0-beta.0
+
+## 1.13.1
+
+### Patch Changes
+
+- Updated dependencies [63ba3ff]
+  - @openapi-qraft/plugin@1.13.1
+
 ## 1.13.0
 
 ### Patch Changes

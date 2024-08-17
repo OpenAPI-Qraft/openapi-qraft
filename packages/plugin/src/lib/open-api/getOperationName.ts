@@ -8,16 +8,9 @@ import camelCase from 'camelcase';
 export const getOperationName = (
   url: string,
   method: string,
-  operationId?: string
+  operationId: string | undefined
 ): string => {
-  if (operationId) {
-    return camelCase(
-      operationId
-        .replace(/^[^a-zA-Z]+/g, '')
-        .replace(/[^\w-]+/g, '-')
-        .trim()
-    );
-  }
+  if (operationId) return getOperationIdName(operationId);
 
   const urlWithoutPlaceholders = url
     .replace(/[^/]*?{api-version}.*?\//g, '')
@@ -25,4 +18,13 @@ export const getOperationName = (
     .replace(/\//g, '-');
 
   return camelCase(`${method}-${urlWithoutPlaceholders}`);
+};
+
+export const getOperationIdName = (operationId: string): string => {
+  return camelCase(
+    operationId
+      .replace(/^[^a-zA-Z]+/g, '')
+      .replace(/[^\w-]+/g, '-')
+      .trim()
+  );
 };

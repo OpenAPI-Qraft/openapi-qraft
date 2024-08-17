@@ -26,21 +26,3 @@ export const createServicePathMatch = (servicesGlob: string[]) => {
     });
   };
 };
-
-/**
- * Parse services filter option to array
- * @example
- * ```ts
- * parsePathGlobs('/user/**,/post/**')
- * ```
- * @param endpointGlobs
- */
-export function parsePathGlobs(endpointGlobs: string): string[] | undefined {
-  return endpointGlobs
-    ? endpointGlobs
-        .split(',')
-        .filter((item: unknown): item is string =>
-          Boolean(typeof item === 'string' && item.trim())
-        )
-    : undefined;
-}

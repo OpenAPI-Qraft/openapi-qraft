@@ -160,8 +160,8 @@ describe('Qraft uses singular Query', () => {
 
     const { result } = renderHook(
       () => ({
-        queryNoArgsWithVoidParameters: qraft.files.getFileList.useQuery(),
-        queryWithEmptyParameters: qraft.files.getFileList.useQuery({}),
+        queryNoArgsWithVoidParameters: qraft.files.findAll.useQuery(),
+        queryWithEmptyParameters: qraft.files.findAll.useQuery({}),
       }),
 
       {
@@ -2349,7 +2349,7 @@ describe('Qraft uses Queries Invalidation', () => {
             },
           }
         ),
-      getFileListQuery: qraft.files.getFileList.useQuery({}),
+      getFileListQuery: qraft.files.findAll.useQuery({}),
     });
 
     const { result: hookResult_01 } = renderHook(useQueryHooks, {

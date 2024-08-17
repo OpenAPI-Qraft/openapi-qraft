@@ -1,6 +1,6 @@
 import type { QraftClientOptions } from '../qraftAPIClient.js';
 import type { OperationSchema } from './requestFn.js';
-import { QueryClient } from '@tanstack/query-core';import type { OperationSchema } from './requestFn.js';
+import { QueryClient } from '@tanstack/query-core';
 import { composeInfiniteQueryKey } from './composeInfiniteQueryKey.js';
 import { composeQueryKey } from './composeQueryKey.js';
 
