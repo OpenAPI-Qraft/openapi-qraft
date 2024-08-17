@@ -2349,7 +2349,7 @@ describe('Qraft uses Queries Invalidation', () => {
             },
           }
         ),
-      getFileListQuery: qraft.files.findAll.useQuery({}),
+      getFileListQuery: qraft.files.findAll.useQuery(),
     });
 
     const { result: hookResult_01 } = renderHook(useQueryHooks, {
