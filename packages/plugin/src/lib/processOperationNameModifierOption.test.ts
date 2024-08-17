@@ -81,7 +81,13 @@ describe('# processOperationNameModifierOption', () => {
         services
           .find(({ name }) => name === 'entities')
           ?.operations.map(({ name }) => ({ name }))
-      ).toMatchSnapshot();
+      ).toMatchInlineSnapshot(`
+        [
+          {
+            "name": "createOne",
+          },
+        ]
+      `);
     });
 
     it('processes operation name modifier with regex capture group', () => {
@@ -97,7 +103,13 @@ describe('# processOperationNameModifierOption', () => {
         services
           .find(({ name }) => name === 'entities')
           ?.operations.map(({ name }) => ({ name }))
-      ).toMatchSnapshot();
+      ).toMatchInlineSnapshot(`
+        [
+          {
+            "name": "entitiesIdDocuments",
+          },
+        ]
+      `);
     });
 
     it('generates errors for multiple modifiers for the same operation', () => {
@@ -109,7 +121,29 @@ describe('# processOperationNameModifierOption', () => {
         getServices(openAPI)
       );
 
-      expect(errors).toMatchSnapshot();
+      expect(errors).toMatchInlineSnapshot(`
+        [
+          {
+            "modifiers": [
+              {
+                "methods": undefined,
+                "operationNameModifierRegex": "post[A-Z][A-Za-z]+sId[A-Z][A-Za-z]+",
+                "operationNameModifierReplace": "createOne",
+                "pathGlobs": "/entities/{entity_id}/documents",
+              },
+              {
+                "methods": undefined,
+                "operationNameModifierRegex": "post[A-Z][A-Za-z]+sId[A-Z][A-Za-z]+",
+                "operationNameModifierReplace": "createSingle",
+                "pathGlobs": "/**",
+              },
+            ],
+            "originalOperationName": "postEntitiesIdDocuments",
+            "replacedOperationName": "createOne",
+            "serviceName": "entities",
+          },
+        ]
+      `);
     });
 
     it('generates errors for modifiers with overlapping patterns', () => {
@@ -121,7 +155,36 @@ describe('# processOperationNameModifierOption', () => {
         getServices(openAPI)
       );
 
-      expect(errors).toMatchSnapshot();
+      expect(errors).toMatchInlineSnapshot(`
+        [
+          {
+            "modifiers": [
+              {
+                "methods": undefined,
+                "operationNameModifierRegex": "get[A-Za-z]+Id",
+                "operationNameModifierReplace": "deleteOne",
+                "pathGlobs": "/approval_policies/{approval_policy_id}",
+              },
+            ],
+            "originalOperationName": "getApprovalPoliciesId",
+            "replacedOperationName": "deleteOne",
+            "serviceName": "approvalPolicies",
+          },
+          {
+            "modifiers": [
+              {
+                "methods": undefined,
+                "operationNameModifierRegex": "delete[A-Za-z]+sId",
+                "operationNameModifierReplace": "deleteOne",
+                "pathGlobs": "/approval_policies/{approval_policy_id}",
+              },
+            ],
+            "originalOperationName": "deleteApprovalPoliciesId",
+            "replacedOperationName": "deleteOne",
+            "serviceName": "approvalPolicies",
+          },
+        ]
+      `);
     });
 
     it('processes operation name modifier with multiple modifiers', () => {
@@ -138,7 +201,19 @@ describe('# processOperationNameModifierOption', () => {
         services
           .find(({ name }) => name === 'approvalPolicies')
           ?.operations.map(({ name }) => ({ name }))
-      ).toMatchSnapshot();
+      ).toMatchInlineSnapshot(`
+        [
+          {
+            "name": "findOne",
+          },
+          {
+            "name": "deleteOne",
+          },
+          {
+            "name": "patchApprovalPoliciesId",
+          },
+        ]
+      `);
     });
 
     it('not processes services if no modifiers', () => {
