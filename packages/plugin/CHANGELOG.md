@@ -1,5 +1,7 @@
 # @openapi-qraft/plugin
 
+## 1.14.0-beta.5
+
 ## 1.14.0-beta.4
 
 ### Minor Changes

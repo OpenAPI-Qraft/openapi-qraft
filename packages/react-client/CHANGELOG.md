@@ -1,5 +1,7 @@
 # @openapi-qraft/react
 
+## 1.14.0-beta.5
+
 ## 1.14.0-beta.4
 
 ## 1.14.0-beta.3
