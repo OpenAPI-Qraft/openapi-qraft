@@ -230,10 +230,6 @@ type ServiceHeaderParameters<
       : unknown
     : never;
 
-type D = ServicePathParameters<
-  Services['approvalPolicies']['getApprovalPoliciesId']
->;
-
 type ServicePathParameters<
   T extends
     | {
