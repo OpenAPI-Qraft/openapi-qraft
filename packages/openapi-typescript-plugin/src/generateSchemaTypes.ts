@@ -51,9 +51,8 @@ export async function generateSchemaTypes(
     silent,
   });
 
-  const componentSchemasExportNodes = createExportsForComponentSchemas(ast);
   if (args.explicitComponentExports)
-    return astToString(ast.concat(componentSchemasExportNodes));
+    return astToString(ast.concat(createExportsForComponentSchemas(ast)));
 
   return astToString(ast);
 }
