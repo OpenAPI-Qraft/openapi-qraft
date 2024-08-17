@@ -1454,7 +1454,7 @@ describe('Qraft uses Query Function', () => {
   });
 
   it('uses fetchQuery with `parameters`', async () => {
-    const { qraft, queryClient } = createClient();
+    const { qraft } = createClient();
 
     const result = qraft.approvalPolicies.getApprovalPoliciesId.fetchQuery({
       requestFn: requestFn,
@@ -1473,7 +1473,7 @@ describe('Qraft uses Query Function', () => {
       requestFn: requestFnSpy,
     });
 
-    const result = qraft.approvalPolicies.getApprovalPoliciesId.fetchQuery({
+    await qraft.approvalPolicies.getApprovalPoliciesId.fetchQuery({
       baseUrl: 'https://api.sandbox.monite.com/v222',
       parameters,
     });
@@ -1502,7 +1502,7 @@ describe('Qraft uses Query Function', () => {
       requestFn: requestFnClientSpy,
     });
 
-    const result = qraft.approvalPolicies.getApprovalPoliciesId.fetchQuery({
+    await qraft.approvalPolicies.getApprovalPoliciesId.fetchQuery({
       baseUrl: 'https://api.sandbox.monite.com/v333',
       // @ts-expect-error - vi.fn types are not correct
       requestFn: requestFnCustomSpy,
@@ -1526,7 +1526,7 @@ describe('Qraft uses Query Function', () => {
   });
 
   it('uses fetchQuery with `queryKey`', async () => {
-    const { qraft, queryClient } = createClient();
+    const { qraft } = createClient();
 
     const result = qraft.approvalPolicies.getApprovalPoliciesId.fetchQuery({
       requestFn: requestFn,
@@ -1539,7 +1539,7 @@ describe('Qraft uses Query Function', () => {
   });
 
   it('uses fetchQuery with queryFn', async () => {
-    const { qraft, queryClient } = createClient();
+    const { qraft } = createClient();
 
     const customResult: typeof qraft.approvalPolicies.getApprovalPoliciesId.types.parameters =
       {
@@ -1587,7 +1587,7 @@ describe('Qraft uses Query Function', () => {
   });
 
   it('uses prefetchQuery with `parameters`', async () => {
-    const { qraft, queryClient } = createClient();
+    const { qraft } = createClient();
 
     const result = qraft.approvalPolicies.getApprovalPoliciesId.prefetchQuery({
       requestFn: requestFn,
@@ -1604,7 +1604,7 @@ describe('Qraft uses Query Function', () => {
   });
 
   it('uses fetchInfiniteQuery with multiple pages', async () => {
-    const { qraft, queryClient } = createClient();
+    const { qraft } = createClient();
 
     const result =
       qraft.approvalPolicies.getApprovalPoliciesId.fetchInfiniteQuery({
@@ -1659,7 +1659,7 @@ describe('Qraft uses Query Function', () => {
   });
 
   it('uses prefetchInfiniteQuery', async () => {
-    const { qraft, queryClient } = createClient();
+    const { qraft } = createClient();
 
     const result =
       qraft.approvalPolicies.getApprovalPoliciesId.prefetchInfiniteQuery({
@@ -1847,7 +1847,7 @@ describe('Qraft uses utils', () => {
 
 describe('Qraft uses setQueryData', () => {
   it('uses setQueryData & getQueryData', async () => {
-    const { qraft, queryClient } = createClient();
+    const { qraft } = createClient();
 
     qraft.files.getFiles.setQueryData(
       {
@@ -1888,7 +1888,7 @@ describe('Qraft uses setQueryData', () => {
   });
 
   it('uses setQueryData & getQueryData with QueryKey', async () => {
-    const { qraft, queryClient } = createClient();
+    const { qraft } = createClient();
 
     const getFilesQueryKey = qraft.files.getFiles.getQueryKey({
       header: {
@@ -1922,7 +1922,7 @@ describe('Qraft uses setQueryData', () => {
   });
 
   it('does not return getQueryData() from Infinite query', async () => {
-    const { qraft, queryClient } = createClient();
+    const { qraft } = createClient();
 
     const parameters = {
       header: {
@@ -1944,7 +1944,7 @@ describe('Qraft uses setQueryData', () => {
 
 describe('Qraft uses setQueriesData', () => {
   it('uses setQueriesData with parameters', async () => {
-    const { qraft, queryClient } = createClient();
+    const { qraft } = createClient();
 
     const parameters: typeof qraft.files.getFiles.types.parameters = {
       header: {
@@ -1980,7 +1980,7 @@ describe('Qraft uses getQueriesData', () => {
   };
 
   it('uses getQueriesData with parameters', async () => {
-    const { qraft, queryClient } = createClient();
+    const { qraft } = createClient();
 
     qraft.files.getFiles.setQueryData(parameters, parameters);
 
@@ -1990,7 +1990,7 @@ describe('Qraft uses getQueriesData', () => {
   });
 
   it('uses getQueriesData Infinite Queries', async () => {
-    const { qraft, queryClient } = createClient();
+    const { qraft } = createClient();
 
     qraft.files.getFiles.setInfiniteQueryData(parameters, {
       pages: [parameters],
@@ -2021,7 +2021,7 @@ describe('Qraft uses getQueriesData', () => {
 
 describe('Qraft uses setInfiniteQueryData', () => {
   it('uses setInfiniteQueryData & getInfiniteQueryData with parameters', async () => {
-    const { qraft, queryClient } = createClient();
+    const { qraft } = createClient();
 
     const parameters: typeof qraft.files.getFiles.types.parameters = {
       header: {
@@ -2054,7 +2054,7 @@ describe('Qraft uses setInfiniteQueryData', () => {
   });
 
   it('uses setInfiniteQueryData & getInfiniteQueryData with queryKey', async () => {
-    const { qraft, queryClient } = createClient();
+    const { qraft } = createClient();
 
     const parameters: typeof qraft.files.getFiles.types.parameters = {
       header: {
@@ -2090,7 +2090,7 @@ describe('Qraft uses setInfiniteQueryData', () => {
   });
 
   it('does not return getInfiniteQueryData() from non Infinite query', async () => {
-    const { qraft, queryClient } = createClient();
+    const { qraft } = createClient();
 
     const parameters: typeof qraft.files.getFiles.types.parameters = {
       header: {
@@ -3272,7 +3272,7 @@ describe('Qraft respects Types', () => {
     };
 
   it('supports infinite QueryKey predicate query filter strict types', () => {
-    const { qraft, queryClient } = createClient();
+    const { qraft } = createClient();
 
     qraft.approvalPolicies.getApprovalPoliciesId.getQueriesData({
       queryKey: [
@@ -3317,7 +3317,7 @@ describe('Qraft respects Types', () => {
   });
 
   it('supports regular parameters predicate query filter strict types', () => {
-    const { qraft, queryClient } = createClient();
+    const { qraft } = createClient();
 
     qraft.approvalPolicies.getApprovalPoliciesId.getQueriesData({
       parameters,
@@ -3334,7 +3334,7 @@ describe('Qraft respects Types', () => {
   });
 
   it('does not supports  predicate without ', () => {
-    const { qraft, queryClient } = createClient();
+    const { qraft } = createClient();
 
     qraft.approvalPolicies.getApprovalPoliciesId.getQueriesData({
       // @ts-expect-error - `query` should be infinite or regular query, todo::improve type checking
@@ -3353,7 +3353,7 @@ describe('Qraft respects Types', () => {
 
 describe('Qraft is type-safe on Query Filters', () => {
   it('does not emit an error on the `exact` key', () => {
-    const { qraft, queryClient } = createClient();
+    const { qraft } = createClient();
 
     qraft.approvalPolicies.getApprovalPoliciesId.invalidateQueries({
       exact: true,
@@ -3372,7 +3372,7 @@ describe('Qraft is type-safe on Query Filters', () => {
   });
 
   it('emits an error on the `exact` key and partial parameters', () => {
-    const { qraft, queryClient } = createClient();
+    const { qraft } = createClient();
 
     // Header is required, must emit an error
     qraft.approvalPolicies.getApprovalPoliciesId.invalidateQueries({
@@ -3393,7 +3393,7 @@ describe('Qraft is type-safe on Query Filters', () => {
   });
 
   it('does not emit an error when `exact` is not specified', () => {
-    const { qraft, queryClient } = createClient();
+    const { qraft } = createClient();
 
     qraft.approvalPolicies.getApprovalPoliciesId.invalidateQueries({
       // Partial parameters
@@ -3406,7 +3406,7 @@ describe('Qraft is type-safe on Query Filters', () => {
   });
 
   it('does not emit an error when `exact` is `false`', () => {
-    const { qraft, queryClient } = createClient();
+    const { qraft } = createClient();
 
     qraft.approvalPolicies.getApprovalPoliciesId.invalidateQueries({
       // Partial parameters

@@ -19,7 +19,7 @@ export function useComposeUseQueryOptions(
   args: UseQueryOptionsArgs,
   infinite: boolean
 ): never {
-  const [parameters, options, queryClient] = args;
+  const [parameters, options] = args;
 
   const queryFn =
     options?.queryFn ??
