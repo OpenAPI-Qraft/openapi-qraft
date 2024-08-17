@@ -52,9 +52,10 @@ export async function generateSchemaTypes(
   });
 
   const componentSchemasExportNodes = createExportsForComponentSchemas(ast);
-  if (!args.explicitComponentExports) return astToString(ast);
+  if (args.explicitComponentExports)
+    return astToString(ast.concat(componentSchemasExportNodes));
 
-  return astToString(ast.concat(componentSchemasExportNodes));
+  return astToString(ast);
 }
 
 function transformFormatBinary(schemaObject: SchemaObject) {
