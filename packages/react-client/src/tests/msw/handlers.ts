@@ -79,6 +79,7 @@ export const handlers = [
         if (
           !value ||
           typeof value === 'string' ||
+          // @ts-expect-error - todo::fixme
           value.type !== 'application/octet-stream'
         ) {
           body[key] = value;
@@ -229,6 +230,10 @@ type ServiceHeaderParameters<
       : unknown
     : never;
 
+type D = ServicePathParameters<
+  Services['approvalPolicies']['getApprovalPoliciesId']
+>;
+
 type ServicePathParameters<
   T extends
     | {
@@ -241,14 +246,18 @@ type ServicePathParameters<
   getQueryKey: (arg: infer QueryKey) => unknown;
 }
   ? QueryKey extends { path?: infer Parameters }
-    ? Parameters & { 0: string }
-    : {}
+    ? NonNullable<Parameters> extends never
+      ? { '0': string }
+      : { '0': string } & Parameters
+    : {
+        '0': never;
+      }
   : T extends {
         getMutationKey: (arg: infer MutationKey) => unknown;
       }
     ? NonNullable<MutationKey> extends { path?: infer Parameters }
-      ? Parameters & { 0: string }
-      : {}
+      ? Parameters & { '0': string }
+      : { '0': never }
     : never;
 
 type ServiceQueryParameters<
@@ -275,12 +284,13 @@ type ServiceQueryParameters<
 
 type ServiceRequestBodyParameters<
   T extends {
-    mutationFn: (...args: never[]) => unknown;
+    useMutation: (...args: never[]) => unknown;
   },
 > = T extends {
-  mutationFn: (...args: never[]) => unknown;
+  useMutation: (...args: never[]) => unknown;
+  (...args: never[]): unknown;
 }
-  ? Parameters<T['mutationFn']>[1] extends infer Options
+  ? Parameters<T>[1] extends infer Options
     ? Options extends { body: infer Body }
       ? Body
       : never
@@ -290,17 +300,19 @@ type ServiceRequestBodyParameters<
 type ServiceResponseParameters<
   T extends
     | {
-        queryFn: (...args: never[]) => unknown;
+        useQuery: (...args: never[]) => unknown;
       }
     | {
-        mutationFn: (...args: never[]) => unknown;
+        useMutation: (...args: never[]) => unknown;
       },
 > = T extends {
-  queryFn: (...args: never[]) => unknown;
+  useQuery: (...args: never[]) => unknown;
+  (...args: never[]): unknown;
 }
-  ? Awaited<ReturnType<T['queryFn']>>
+  ? Awaited<ReturnType<T>>
   : T extends {
-        mutationFn: (...args: never[]) => unknown;
+        useMutation: (...args: never[]) => unknown;
+        (...args: never[]): unknown;
       }
-    ? Awaited<ReturnType<T['mutationFn']>>
+    ? Awaited<ReturnType<T>>
     : never;
