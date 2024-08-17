@@ -58,6 +58,10 @@ export const plugin: QraftCommandPlugin = {
         '--no-blob-from-binary',
         'If this option is enabled, binary format fields will not be converted to Blob types, preserving the native representation'
       )
+      .option(
+        '--explicit-component-exports',
+        'Enabling this option will export API components as separate type aliases, alongside `components` interface'
+      )
       .action(async ({ output, args, spinner, schema }, resolve) => {
         spinner.text = 'Generating OpenAPI Document Types';
 
