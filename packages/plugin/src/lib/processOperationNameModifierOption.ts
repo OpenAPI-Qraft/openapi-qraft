@@ -35,59 +35,69 @@ export const processOperationNameModifierOption = (
     >
   >();
 
-  const replacedOperationNamesServices = services.map((service) => {
+  for (const service of services) {
     serviceOperationReplacements.set(service.name, new Map());
 
-    return {
-      ...service,
-      operations: service.operations.map((operation) => {
-        const operationReplacements = serviceOperationReplacements.get(
-          service.name
-        );
+    for (const operation of service.operations) {
+      const operationReplacements = serviceOperationReplacements.get(
+        service.name
+      );
 
-        if (!operationReplacements)
-          throw new Error('operationReplacements not found');
+      if (!operationReplacements)
+        throw new Error('operationReplacements not found');
 
-        const operationModifiers = operationNameModifiers.filter(
-          (modifier) =>
-            modifier.isPathMatch(operation.path) &&
-            (modifier.methods === undefined ||
-              modifier.methods.includes(operation.method)) &&
+      const operationModifiers = operationNameModifiers.filter(
+        (modifier) =>
+          modifier.isPathMatch(operation.path) &&
+          (modifier.methods === undefined ||
+            modifier.methods.includes(operation.method)) &&
+          normalizeOperationNameModifierRegex(
+            modifier.operationNameModifierRegex
+          ).test(operation.name)
+      );
+
+      const replacedOperationName = operationModifiers.reduce<string>(
+        (operationName, modifier) =>
+          operationName.replace(
             normalizeOperationNameModifierRegex(
               modifier.operationNameModifierRegex
-            ).test(operation.name)
-        );
-
-        const replacedOperationName = operationModifiers.reduce<string>(
-          (operationName, modifier) =>
-            operationName.replace(
-              normalizeOperationNameModifierRegex(
-                modifier.operationNameModifierRegex
-              ),
-              modifier.operationNameModifierReplace
             ),
-          operation.name
+            modifier.operationNameModifierReplace
+          ),
+        operation.name
+      );
+
+      if (replacedOperationName !== operation.name) {
+        if (!operationReplacements.has(replacedOperationName))
+          operationReplacements.set(replacedOperationName, new Map());
+        operationReplacements.get(replacedOperationName)?.set(
+          operation.name,
+          operationModifiers.map(
+            ({ isPathMatch: _, ...operationModifiersRest }) =>
+              operationModifiersRest
+          )
         );
+      }
+    }
+  }
 
-        if (replacedOperationName !== operation.name) {
-          if (!operationReplacements.has(replacedOperationName))
-            operationReplacements.set(replacedOperationName, new Map());
-          operationReplacements.get(replacedOperationName)?.set(
-            operation.name,
-            operationModifiers.map(
-              ({ isPathMatch: _, ...operationModifiersRest }) =>
-                operationModifiersRest
-            )
-          );
+  const replacedOperationNamesServices = services.map((service) => ({
+    ...service,
+    operations: service.operations.map((operation) => {
+      const operationReplacements = serviceOperationReplacements.get(
+        service.name
+      );
+      if (!operationReplacements) return operation;
+
+      for (const [replacedName, originalMap] of operationReplacements) {
+        if (originalMap.has(operation.name)) {
+          return { ...operation, name: replacedName };
         }
+      }
 
-        return {
-          ...operation,
-          name: replacedOperationName,
-        };
-      }),
-    };
-  });
+      return operation;
+    }),
+  }));
 
   const errors = Array.from(serviceOperationReplacements).flatMap(
     ([serviceName, modifiedOperations]) =>
