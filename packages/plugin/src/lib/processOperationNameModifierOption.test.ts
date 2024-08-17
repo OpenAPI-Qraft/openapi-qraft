@@ -112,6 +112,28 @@ describe('# processOperationNameModifierOption', () => {
       `);
     });
 
+    it('processes operation name modifier with regex capture group with prefix and suffix', () => {
+      const { errors, services } = processOperationNameModifierOption(
+        parseOperationNameModifier(
+          '/**:postEntities(.+) ==> create-$1-insecure'
+        ),
+        getServices(openAPI)
+      );
+
+      expect(errors).toEqual([]);
+      expect(
+        services
+          .find(({ name }) => name === 'entities')
+          ?.operations.map(({ name }) => ({ name }))
+      ).toMatchInlineSnapshot(`
+        [
+          {
+            "name": "createIdDocumentsInsecure",
+          },
+        ]
+      `);
+    });
+
     it('generates errors for multiple modifiers for the same operation', () => {
       const { errors } = processOperationNameModifierOption(
         parseOperationNameModifier(

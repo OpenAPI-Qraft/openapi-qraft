@@ -1,4 +1,5 @@
 import { createServicePathMatch } from './createServicePathMatch.js';
+import { getOperationIdName } from './open-api/getOperationName.js';
 import { Service } from './open-api/getServices.js';
 import {
   OperationGlobMethods,
@@ -56,15 +57,17 @@ export const processOperationNameModifierOption = (
           ).test(operation.name)
       );
 
-      const replacedOperationName = operationModifiers.reduce<string>(
-        (operationName, modifier) =>
-          operationName.replace(
-            normalizeOperationNameModifierRegex(
-              modifier.operationNameModifierRegex
+      const replacedOperationName = getOperationIdName(
+        operationModifiers.reduce(
+          (operationName, modifier) =>
+            operationName.replace(
+              normalizeOperationNameModifierRegex(
+                modifier.operationNameModifierRegex
+              ),
+              modifier.operationNameModifierReplace
             ),
-            modifier.operationNameModifierReplace
-          ),
-        operation.name
+          operation.name
+        )
       );
 
       if (replacedOperationName !== operation.name) {
