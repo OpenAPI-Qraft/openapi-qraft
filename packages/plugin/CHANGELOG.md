@@ -1,5 +1,11 @@
 # @openapi-qraft/plugin
 
+## 1.14.0-beta.3
+
+### Patch Changes
+
+- c5c4426: Corrected the generation of operation names modified by `--operation-name-modifier` to ensure they follow the CamelCase style.
+
 ## 1.14.0-beta.2
 
 ### Patch Changes
