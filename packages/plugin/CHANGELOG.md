@@ -1,5 +1,11 @@
 # @openapi-qraft/plugin
 
+## 1.14.0-beta.4
+
+### Minor Changes
+
+- 346a408: Added multiple patterns support to `--filter-services <patterns...>` option.
+
 ## 1.14.0-beta.3
 
 ### Patch Changes
