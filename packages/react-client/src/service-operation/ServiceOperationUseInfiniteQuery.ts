@@ -1,7 +1,6 @@
 import type {
   DefaultError,
   InfiniteQueryPageParamsOptions,
-  QueryClient,
 } from '@tanstack/query-core';
 import type {
   DefinedInitialDataInfiniteOptions,
@@ -41,8 +40,7 @@ export interface ServiceOperationUseInfiniteQuery<
       InfiniteQueryPageParamsOptions<
         TQueryFnData,
         PartialParameters<TPageParam>
-      >,
-    queryClient?: QueryClient
+      >
   ): UseInfiniteQueryResult<
     OperationInfiniteData<TData, TParams>,
     TError | Error
@@ -66,8 +64,7 @@ export interface ServiceOperationUseInfiniteQuery<
       InfiniteQueryPageParamsOptions<
         TQueryFnData,
         PartialParameters<TPageParam>
-      >,
-    queryClient?: QueryClient
+      >
   ): DefinedUseInfiniteQueryResult<
     OperationInfiniteData<TData, TParams>,
     TError | Error

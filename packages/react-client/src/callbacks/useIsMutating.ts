@@ -29,7 +29,7 @@ export const useIsMutating: <
   schema,
   args
 ) => {
-  const [filters, queryClientByArg] = args;
+  const [filters] = args;
 
   return useIsMutatingStateTanstack(
     composeMutationFilters(schema, filters) as never,

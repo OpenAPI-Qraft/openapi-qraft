@@ -1,4 +1,4 @@
-import type { DefaultError, QueryClient } from '@tanstack/query-core';
+import type { DefaultError } from '@tanstack/query-core';
 import type {
   UseQueryOptions,
   UseSuspenseQueryResult,
@@ -42,17 +42,14 @@ export interface ServiceOperationUseSuspenseQueries<
       UseQueryOptionsForUseSuspenseQuery<TSchema, TParams, TQueryFnData, TError>
     >,
     TCombinedResult = Array<UseSuspenseQueryResult<TQueryFnData, TError>>,
-  >(
-    options: {
-      queries: T;
-      combine?: (
-        results: Array<
-          WithOptional<UseSuspenseQueryResult<TQueryFnData, TError>, 'data'>
-        >
-      ) => TCombinedResult;
-    },
-    queryClient?: QueryClient
-  ): TCombinedResult;
+  >(options: {
+    queries: T;
+    combine?: (
+      results: Array<
+        WithOptional<UseSuspenseQueryResult<TQueryFnData, TError>, 'data'>
+      >
+    ) => TCombinedResult;
+  }): TCombinedResult;
 }
 
 type WithOptional<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;

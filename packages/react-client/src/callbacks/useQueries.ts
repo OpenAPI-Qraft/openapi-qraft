@@ -14,7 +14,7 @@ export const useQueries: (
     ServiceOperationQuery<OperationSchema, unknown, unknown>['useQueries']
   >
 ) => QueriesResults<never> = (qraftOptions, schema, args) => {
-  const [options, queryClientByArg] = args;
+  const [options] = args;
 
   return useQueriesTanstack(
     {

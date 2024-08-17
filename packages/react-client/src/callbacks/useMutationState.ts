@@ -31,7 +31,7 @@ export const useMutationState: <
   schema,
   args
 ) => {
-  const [options, queryClientByArg] = args;
+  const [options] = args;
 
   return useMutationStateTanstack(
     {

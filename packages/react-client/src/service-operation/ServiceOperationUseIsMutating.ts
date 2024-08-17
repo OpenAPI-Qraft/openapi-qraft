@@ -1,4 +1,4 @@
-import type { DefaultError, QueryClient } from '@tanstack/query-core';
+import type { DefaultError } from '@tanstack/query-core';
 import type {
   MutationFiltersByMutationKey,
   MutationFiltersByParameters,
@@ -21,7 +21,6 @@ export interface ServiceOperationUseIsMutating<
           TParams,
           TError,
           TContext
-        >,
-    queryClient?: QueryClient
+        >
   ): number;
 }

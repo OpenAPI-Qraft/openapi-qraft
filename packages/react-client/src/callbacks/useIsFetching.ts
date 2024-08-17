@@ -18,7 +18,7 @@ export const useIsFetching: <TVariables = unknown>(
     >['useIsFetching']
   >
 ) => number = (qraftOptions, schema, args) => {
-  const [filters, queryClientByArg] = args;
+  const [filters] = args;
 
   return useIsFetchingTanstack(
     composeQueryFilters(schema, filters as never) as never,

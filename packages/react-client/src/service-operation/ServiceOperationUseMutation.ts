@@ -1,4 +1,4 @@
-import type { DefaultError, QueryClient } from '@tanstack/query-core';
+import type { DefaultError } from '@tanstack/query-core';
 import type {
   UseMutationOptions,
   UseMutationResult,
@@ -29,8 +29,7 @@ export interface ServiceOperationUseMutation<
       TVariables,
       TError,
       TContext
-    >,
-    queryClient?: QueryClient
+    >
   ): UseMutationResult<TData, TError | Error, TVariables, TContext>;
 
   useMutation<TVariables extends TBody, TContext = unknown>(
@@ -42,8 +41,7 @@ export interface ServiceOperationUseMutation<
       TVariables,
       TError,
       TContext
-    >,
-    queryClient?: QueryClient
+    >
   ): UseMutationResult<
     TData,
     TError | Error,

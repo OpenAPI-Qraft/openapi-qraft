@@ -30,7 +30,7 @@ export const useMutation: <
   schema,
   args
 ) => {
-  const [parameters, options, queryClientByArg] = args;
+  const [parameters, options] = args;
 
   if (
     parameters &&

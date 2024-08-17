@@ -1,4 +1,4 @@
-import type { DefaultError, QueryClient } from '@tanstack/query-core';
+import type { DefaultError } from '@tanstack/query-core';
 import type {
   DefinedInitialDataOptions,
   DefinedUseQueryResult,
@@ -30,8 +30,7 @@ export interface ServiceOperationUseQuery<
         ServiceOperationQueryKey<TSchema, TParams>
       >,
       'queryKey'
-    >,
-    queryClient?: QueryClient
+    >
   ): UseQueryResult<TData, TError | Error>;
 
   useQuery<TData = TQueryFnData>(
@@ -46,7 +45,6 @@ export interface ServiceOperationUseQuery<
         ServiceOperationQueryKey<TSchema, TParams>
       >,
       'queryKey'
-    >,
-    queryClient?: QueryClient
+    >
   ): DefinedUseQueryResult<TData, TError | Error>;
 }

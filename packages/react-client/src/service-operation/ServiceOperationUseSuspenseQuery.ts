@@ -1,4 +1,4 @@
-import type { DefaultError, QueryClient } from '@tanstack/query-core';
+import type { DefaultError } from '@tanstack/query-core';
 import type {
   UseSuspenseQueryOptions,
   UseSuspenseQueryResult,
@@ -21,7 +21,6 @@ export interface ServiceOperationUseSuspenseQuery<
         ServiceOperationQueryKey<TSchema, TParams>
       >,
       'queryKey'
-    >,
-    queryClient?: QueryClient
+    >
   ): UseSuspenseQueryResult<TData, TError | Error>;
 }

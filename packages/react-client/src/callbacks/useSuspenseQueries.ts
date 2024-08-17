@@ -18,7 +18,7 @@ export const useSuspenseQueries: (
     >['useSuspenseQueries']
   >
 ) => SuspenseQueriesResults<never> = (qraftOptions, schema, args) => {
-  const [options, queryClientByArg] = args;
+  const [options] = args;
 
   return useSuspenseQueriesTanstack(
     {
