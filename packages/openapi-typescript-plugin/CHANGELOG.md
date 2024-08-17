@@ -1,5 +1,15 @@
 # @openapi-qraft/openapi-typescript
 
+## 1.1.0-beta.5
+
+### Minor Changes
+
+- 0df334b: Added `--explicit-component-exports` option to export API components as separate type aliases alongside `components` interface by [@EcksDy](https://github.com/EcksDy)
+
+### Patch Changes
+
+- @openapi-qraft/plugin@1.14.0-beta.5
+
 ## 1.1.0-beta.4
 
 ### Patch Changes
