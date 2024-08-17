@@ -47,7 +47,7 @@ export function createExportsForComponentSchemas(ast: ts.Node[]) {
   return exportStatements;
 }
 
-function getExportedNames(ast: ts.Node[]) {
+export function getExportedNames(ast: ts.Node[]) {
   return ast.reduce<string[]>((acc, node) => {
     if (
       ts.isInterfaceDeclaration(node) &&
