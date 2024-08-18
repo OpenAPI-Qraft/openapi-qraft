@@ -9,25 +9,26 @@ import TabItem from '@theme/TabItem';
 # createAPIClient(...)
 
 Qraft CLI generates a helper function `createAPIClient(...)`, which creates a Qraft API client with
-the necessary context for React Hooks.
+the necessary `requestFn`, `queryClient`, and `baseUrl` for React Hooks.
 
 ```tsx
 import { createAPIClient } from './api'
 
-const qraft = createAPIClient({
-  context,
+const api = createAPIClient({
+  requestFn,
+  queryClient,
+  baseUrl,
 })
 ```
 
 ### Arguments
 1. `options?: QraftClientOptions` - **Optional** options to be used by the Qraft API client
-   - `options.context?: Context<QraftContextValue>` - **Optional** custom Context to be used by Qraft Hooks.
-     If not provided, a _default_ `QraftContext` will be used. The custom Context must be used
-     when multiple Qraft API clients for the multiple OpenAPIs are used in the same application.
-     In case if you are going to publish your API client as a library, it's _highly_ recommended to use a custom Context.
+   - `options.requestFn` - **Required** `requestFn` function to be used by Qraft Hooks.
+   - `options.queryClient` - **Required** `QueryClient` instance to be used by Qraft Hooks.
+   - `options.baseUrl` - **Required** base URL for the `requestFn` function.
 
 ### Returns
-- `qraft` - The Qraft API client with the necessary context for Qraft Hooks.
+- Qraft API client with the necessary context for Qraft Hooks.
   It contains all the methods to interact with the API grouped in services.
 
 ### Examples
@@ -43,20 +44,15 @@ const qraft = createAPIClient({
     const queryClient = new QueryClient();
 
     // ⬇︎ Create a Qraft API client
-    const qraft = createAPIClient()
-
-    const parameters = {
-      path: { petId: 1 },
-    };
+    const api = createAPIClient({
+      requestFn,
+      queryClient,
+      baseUrl: 'https://api.sandbox.monite.com/v1',
+    });
 
     // ⬇︎ Fetch the `getPetById` query with the `queryClient`
     const pet = await qraft.pet.getPetById.fetchQuery(
-      {
-        parameters,
-        requestFn: requestFn,
-        baseUrl: 'https://api.sandbox.monite.com/v1',
-      },
-      queryClient
+      { parameters: { path: { petId: 1 } } }
     );
 
     console.log(pet.name); // `pet` is the result of the `getPetById` request
