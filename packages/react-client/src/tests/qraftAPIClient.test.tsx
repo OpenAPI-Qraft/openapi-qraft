@@ -1390,12 +1390,14 @@ describe('Qraft uses Query Function', () => {
       },
     };
 
-  it('uses Operation Query with `parameters` and without `baseUrl`', async () => {
+  it('uses Operation Query with `parameters`', async () => {
     const { qraft } = createClient();
+
+    const requestFnSpy = vi.fn(requestFn) as typeof requestFn;
 
     const result = await qraft.approvalPolicies.getApprovalPoliciesId(
       { parameters },
-      requestFnWithBaseUrl
+      requestFnSpy
     );
 
     expect(result).toEqual({
@@ -1409,26 +1411,52 @@ describe('Qraft uses Query Function', () => {
         items_order: ['asc', 'desc'],
       },
     });
+
+    expect(requestFnSpy).toHaveBeenCalled();
   });
 
-  it('uses Operation Query with `baseUrl`', async () => {
+  it('uses Operation Query with `parameters` and with `baseUrl`', async () => {
     const { qraft } = createClient();
 
-    const result = await qraft.approvalPolicies.getApprovalPoliciesId(
-      { parameters, baseUrl },
-      requestFn
+    const requestFnSpy = vi.fn(requestFn) as typeof requestFn;
+
+    await qraft.approvalPolicies.getApprovalPoliciesId(
+      { parameters, baseUrl: 'https://foo.bar.baz/v1' },
+      requestFnSpy
     );
 
+    expect(requestFnSpy).toHaveBeenCalledWith(
+      qraft.approvalPolicies.getApprovalPoliciesId.schema,
+      { parameters, baseUrl: 'https://foo.bar.baz/v1' }
+    );
+  });
+
+  it('uses Operation Query without arguments', async () => {
+    const { qraft } = createClient();
+
+    const result = await qraft.files.findAll();
+
     expect(result).toEqual({
-      header: {
-        'x-monite-version': '1.0.0',
-      },
-      path: {
-        approval_policy_id: '1',
-      },
-      query: {
-        items_order: ['asc', 'desc'],
-      },
+      data: [
+        {
+          file_type: 'pdf',
+          id: '1',
+          name: 'file1',
+          url: 'http://localhost:3000/1',
+        },
+        {
+          file_type: 'pdf',
+          id: '2',
+          name: 'file2',
+          url: 'http://localhost:3000/2',
+        },
+        {
+          file_type: 'pdf',
+          id: '3',
+          name: 'file3',
+          url: 'http://localhost:3000/3',
+        },
+      ],
     });
   });
 

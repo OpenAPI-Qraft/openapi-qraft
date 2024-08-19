@@ -12,34 +12,37 @@ export const operationInvokeFn: <
   TData,
   TParams,
 >(
-  qraftOptions: QraftClientOptions | undefined,
+  qraftOptions: QraftClientOptions,
   schema: TSchema,
   args:
     | Parameters<ServiceOperationQueryFn<TSchema, TData, TParams>>
     | Parameters<ServiceOperationMutationFn<TSchema, TBody, TData, TParams>>
-) => Promise<TData> = (_, schema, args) => {
+) => Promise<TData> | TData = (qraftOptions, schema, args) => {
   const queryOperationMethods = ['get', 'head', 'options'] as const; // todo::make it shared
 
   const isQueryOperationType = queryOperationMethods.includes(
     schema.method as (typeof queryOperationMethods)[number]
   );
 
-  const [options, client] = args;
+  const [options, requestFn = qraftOptions.requestFn] = args;
 
   const invokeSchema =
-    isQueryOperationType && 'queryKey' in options
+    options && isQueryOperationType && 'queryKey' in options
       ? options.queryKey![0]
       : schema;
 
   const invokeParameters =
-    isQueryOperationType && 'queryKey' in options
+    options && isQueryOperationType && 'queryKey' in options
       ? options.queryKey![1]
-      : 'parameters' in options
+      : options && 'parameters' in options
         ? options.parameters
         : undefined;
 
-  return client(invokeSchema, {
+  const baseUrl = options && 'baseUrl' in options ? options.baseUrl : undefined;
+
+  return requestFn(invokeSchema, {
     ...options,
+    baseUrl: baseUrl ?? qraftOptions.baseUrl,
     parameters: invokeParameters,
   } as never);
 };
