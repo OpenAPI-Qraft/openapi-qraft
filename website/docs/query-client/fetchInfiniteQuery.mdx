@@ -8,6 +8,13 @@ The method facilitates the fetching of paginated data.
 See TanStack [_queryClient.fetchInfiniteQuery 🌴_](https://tanstack.com/query/latest/docs/reference/QueryClient#queryclientfetchinfinitequery)
 documentation for more details.
 
+:::tip
+`fetchInfiniteQuery` is particularly useful for server-side data fetching (SSR). When used on the server, it automatically
+provides all the retry logic and caching capabilities inherent to TanStack Query.
+This makes it an excellent choice for efficient and robust server-side data retrieval, ensuring your application benefits
+from built-in error handling and performance optimizations.
+:::
+
 ```ts
 const result = qraft.<service>.<operation>.fetchInfiniteQuery(
   {
