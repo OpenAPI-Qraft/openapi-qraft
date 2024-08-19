@@ -11,6 +11,13 @@ The method allows you to execute a _Queries_ without React Hooks with the full p
 To understand how `fetchQuery` handles data and cache management,
 refer to the TanStack [_queryClient.fetchQuery 🌴_](https://tanstack.com/query/latest/docs/reference/QueryClient#queryclientfetchquery) documentation.
 
+:::tip
+`fetchQuery` is particularly useful for server-side data fetching (SSR). When used on the server, it automatically
+provides all the retry logic and caching capabilities inherent to TanStack Query.
+This makes it an excellent choice for efficient and robust server-side data retrieval, ensuring your application benefits
+from built-in error handling and performance optimizations.
+:::
+
 ```ts
 const result = qraft.<service>.<operation>.fetchQuery(
   {
