@@ -91,7 +91,7 @@ The method allows you to execute a _Queries_ without TanStack's ~~_QueryClient_~
     const posts = await qraft.posts.getPosts(
       {
         queryKey: qraft.posts.getPosts.getQueryKey({ query: { limit: 10 } }),
-        baseUrl: 'https://custom-api.sandbox.monite.com/v1',
+        baseUrl: 'https://custom-api.sandbox.monite.com/v1', // optionally, you can specify the base URL
       }
     );
     ```
