@@ -18,8 +18,9 @@ const query = api.<service>.<operation>.useSuspenseInfiniteQuery(
 
 ### Arguments
 
-1. `parameters: { path, query, header } | QueryKey | {}`
-   - **Required** and strictly-typed ✨ parameters for the query
+1. `parameters: { path, query, header } | QueryKey | undefined`
+   - **Required only if OpenAPI specification defines required parameters**
+   - If the operation has no required parameters according to OpenAPI, you can omit this argument
    - `parameters` will be used to generate the `QueryKey`
    - Instead of an object with `{path, query, header}`, you can pass a `QueryKey` as an array
      which is also strictly-typed ✨
@@ -30,7 +31,6 @@ const query = api.<service>.<operation>.useSuspenseInfiniteQuery(
      [_useSuspenseInfiniteQuery(...) 🌴_](https://tanstack.com/query/latest/docs/framework/react/reference/useSuspenseInfiniteQuery)
      Hook
      - `queryOptions.queryFn` could be provided to override the default `queryFn` used by Qraft
-     - ~~`queryOptions.queryKey`~~ is not allowed, as it will be generated from `parameters`
 
 ### Examples
 
