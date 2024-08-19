@@ -1772,30 +1772,26 @@ describe('Qraft uses mutationFn', () => {
     });
   });
 
-  it('supports Operation Mutation with `baseUrl`', async () => {
+  it('supports Operation Mutation', async () => {
     const { qraft } = createClient();
 
-    const result = await qraft.entities.postEntitiesIdDocuments(
-      {
-        baseUrl,
-        parameters: {
-          header: {
-            'x-monite-version': '1.0.0',
-          },
-          path: {
-            entity_id: '1',
-          },
-          query: {
-            referer: 'https://example.com',
-          },
+    const result = await qraft.entities.postEntitiesIdDocuments({
+      parameters: {
+        header: {
+          'x-monite-version': '1.0.0',
         },
-        body: {
-          verification_document_back: 'back',
-          verification_document_front: 'front',
+        path: {
+          entity_id: '1',
+        },
+        query: {
+          referer: 'https://example.com',
         },
       },
-      requestFn
-    );
+      body: {
+        verification_document_back: 'back',
+        verification_document_front: 'front',
+      },
+    });
 
     await waitFor(() => {
       expect(result).toEqual({
@@ -1814,6 +1810,56 @@ describe('Qraft uses mutationFn', () => {
         },
       });
     });
+  });
+
+  it('supports Operation Mutation with `requestFn` and `baseUrl`', async () => {
+    const { qraft } = createClient();
+
+    const requestFnSpy = vi.fn(requestFn) as typeof requestFn;
+
+    await qraft.entities.postEntitiesIdDocuments(
+      {
+        baseUrl: 'https://foo.bar.baz/v1',
+        parameters: {
+          header: {
+            'x-monite-version': '1.0.0',
+          },
+          path: {
+            entity_id: '1',
+          },
+          query: {
+            referer: 'https://example.com',
+          },
+        },
+        body: {
+          verification_document_back: 'back',
+          verification_document_front: 'front',
+        },
+      },
+      requestFnSpy
+    );
+
+    expect(requestFnSpy).toHaveBeenCalledWith(
+      qraft.entities.postEntitiesIdDocuments.schema,
+      {
+        baseUrl: 'https://foo.bar.baz/v1',
+        parameters: {
+          header: {
+            'x-monite-version': '1.0.0',
+          },
+          path: {
+            entity_id: '1',
+          },
+          query: {
+            referer: 'https://example.com',
+          },
+        },
+        body: {
+          verification_document_back: 'back',
+          verification_document_front: 'front',
+        },
+      }
+    );
   });
 });
 
