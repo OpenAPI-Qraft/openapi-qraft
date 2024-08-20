@@ -1,5 +1,17 @@
 # @openapi-qraft/plugin
 
+## 1.14.0
+
+### Minor Changes
+
+- 77f0812: Added support for the `--operation-predefined-parameters` option to allow changing operation names.
+- 346a408: Added multiple patterns support to `--filter-services <patterns...>` option.
+- 787f568: Updated `openapi-typescript` to `^7.3.0`.
+
+### Patch Changes
+
+- 7430754: Added compatibility with Node.js v18.18.0
+
 ## 1.14.0-beta.5
 
 ## 1.14.0-beta.4
