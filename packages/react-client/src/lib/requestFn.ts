@@ -272,11 +272,6 @@ async function getResponseBody<T>(response: Response): Promise<T | undefined> {
     const errorFallbackResponse = response.clone(); // clone to allow multiple reads
 
     return response.json().catch(() => {
-      if (process.env.NODE_ENV === 'development') {
-        console.warn(
-          'Failed to parse response body as JSON. Falling back to .text()'
-        );
-      }
       // falling back to .text() when necessary for error messages
       return errorFallbackResponse.text();
     });
