@@ -3,9 +3,12 @@
  * Do not make direct changes to the file.
  */
 
-import { qraftAPIClient, QraftClientOptions } from "@openapi-qraft/react";
+import { qraftAPIClient, type APIBasicClientServices, type CreateAPIBasicClientOptions, type CreateAPIClientOptions, type CreateAPIQueryClientOptions } from "@openapi-qraft/react";
 import * as callbacks from "@openapi-qraft/react/callbacks/index";
-import { services, Services } from "./services/index.js";
-export function createAPIClient(options: QraftClientOptions): Services {
-    return qraftAPIClient<Services, typeof callbacks>(services, callbacks, options);
+import { services, type Services } from "./services/index.js";
+export function createAPIClient(options: CreateAPIQueryClientOptions): Services;
+export function createAPIClient(options: CreateAPIBasicClientOptions): APIBasicClientServices<Services, Callbacks>;
+export function createAPIClient(options: CreateAPIClientOptions): Services | APIBasicClientServices<Services, Callbacks> {
+    return qraftAPIClient<Services, Callbacks>(services, callbacks, options);
 }
+type Callbacks = typeof callbacks;

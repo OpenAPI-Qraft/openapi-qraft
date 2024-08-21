@@ -1,10 +1,10 @@
 import type { OperationSchema } from '../lib/requestFn.js';
-import type { QraftClientOptions } from '../qraftAPIClient.js';
+import type { CreateAPIQueryClientOptions } from '../qraftAPIClient.js';
 import type { ServiceOperationIsFetchingQueries } from '../service-operation/ServiceOperationIsFetchingQueries.js';
 import { callQueryClientMethodWithQueryFilters } from '../lib/callQueryClientMethodWithQueryFilters.js';
 
 export function isFetching<TData>(
-  qraftOptions: QraftClientOptions,
+  qraftOptions: CreateAPIQueryClientOptions,
   schema: OperationSchema,
   args: Parameters<
     ServiceOperationIsFetchingQueries<

@@ -1,13 +1,13 @@
-import type { QraftClientOptions } from '../qraftAPIClient.js';
+import type { CreateAPIQueryClientOptions } from '../qraftAPIClient.js';
+import type { ServiceOperationFetchQuery } from '../service-operation/ServiceOperationFetchQuery.js';
 import { callQueryClientMethodWithQueryKey } from '../lib/callQueryClientFetchMethod.js';
-import { ServiceOperationFetchQuery } from '../service-operation/ServiceOperationFetchQuery.js';
 
 export const prefetchQuery: <
   TSchema extends { url: string; method: 'get' | 'head' | 'options' },
   TData,
   TParams,
 >(
-  qraftOptions: QraftClientOptions,
+  qraftOptions: CreateAPIQueryClientOptions,
   schema: TSchema,
   args: Parameters<
     ServiceOperationFetchQuery<TSchema, TData, TParams>['prefetchQuery']

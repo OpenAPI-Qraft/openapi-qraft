@@ -2,13 +2,13 @@
 
 import type { QueriesResults } from '@tanstack/react-query';
 import type { OperationSchema } from '../lib/requestFn.js';
-import type { QraftClientOptions } from '../qraftAPIClient.js';
+import type { CreateAPIQueryClientOptions } from '../qraftAPIClient.js';
 import type { ServiceOperationQuery } from '../service-operation/ServiceOperation.js';
 import { useQueries as useQueriesTanstack } from '@tanstack/react-query';
 import { composeQueryKey } from '../lib/composeQueryKey.js';
 
 export const useQueries: (
-  qraftOptions: QraftClientOptions,
+  qraftOptions: CreateAPIQueryClientOptions,
   schema: OperationSchema,
   args: Parameters<
     ServiceOperationQuery<OperationSchema, unknown, unknown>['useQueries']

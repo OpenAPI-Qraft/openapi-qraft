@@ -1,7 +1,7 @@
 import type { OperationSchema } from '../lib/requestFn.js';
-import type { QraftClientOptions } from '../qraftAPIClient.js';
-import { ServiceOperationMutationFn } from '../service-operation/ServiceOperationMutationFn.js';
-import { ServiceOperationQueryFn } from '../service-operation/ServiceOperationQueryFn.js';
+import type { CreateAPIBasicClientOptions } from '../qraftAPIClient.js';
+import type { ServiceOperationMutationFn } from '../service-operation/ServiceOperationMutationFn.js';
+import type { ServiceOperationQueryFn } from '../service-operation/ServiceOperationQueryFn.js';
 
 /**
  * Called when <service>.<operation>(...) is invoked.
@@ -12,7 +12,7 @@ export const operationInvokeFn: <
   TData,
   TParams,
 >(
-  qraftOptions: QraftClientOptions,
+  qraftOptions: CreateAPIBasicClientOptions,
   schema: TSchema,
   args:
     | Parameters<ServiceOperationQueryFn<TSchema, TData, TParams>>

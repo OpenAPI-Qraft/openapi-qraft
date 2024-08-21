@@ -2,7 +2,7 @@
 
 import type { QueryClient } from '@tanstack/query-core';
 import type { UseQueryOptions } from '@tanstack/react-query';
-import type { QraftClientOptions } from '../qraftAPIClient.js';
+import type { CreateAPIQueryClientOptions } from '../qraftAPIClient.js';
 import type { ServiceOperationQueryKey } from '../service-operation/ServiceOperationKey.js';
 import type { OperationSchema } from './requestFn.js';
 import { composeInfiniteQueryKey } from './composeInfiniteQueryKey.js';
@@ -14,7 +14,7 @@ import { shelfMerge } from './shelfMerge.js';
  * @internal
  */
 export function useComposeUseQueryOptions(
-  qraftOptions: QraftClientOptions,
+  qraftOptions: CreateAPIQueryClientOptions,
   schema: OperationSchema,
   args: UseQueryOptionsArgs,
   infinite: boolean

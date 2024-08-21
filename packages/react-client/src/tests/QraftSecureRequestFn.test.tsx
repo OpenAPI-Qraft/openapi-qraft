@@ -1,10 +1,10 @@
+import type { CreateAPIBasicClientOptions } from '../qraftAPIClient.js';
 import type { Services } from './fixtures/api/index.js';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { act, renderHook, waitFor } from '@testing-library/react';
 import React, { createContext, ReactNode, useContext, useMemo } from 'react';
 import { vi } from 'vitest';
 import { requestFn } from '../lib/requestFn.js';
-import { type QraftClientOptions } from '../qraftAPIClient.js';
 import { QraftSecureRequestFn } from '../Unstable_QraftSecureRequestFn.js';
 import { createTestJwt } from './createTestJwt.js';
 import { createAPIClient } from './fixtures/api/index.js';
@@ -342,7 +342,7 @@ function Providers({
   requestFn: requestFnProp,
 }: {
   children: ReactNode;
-  requestFn: QraftClientOptions['requestFn'];
+  requestFn: CreateAPIBasicClientOptions['requestFn'];
 }) {
   const { qraft, queryClient } = useMemo(() => {
     const queryClient = new QueryClient();

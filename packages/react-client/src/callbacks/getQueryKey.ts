@@ -1,10 +1,10 @@
 import type { OperationSchema } from '../lib/requestFn.js';
-import type { QraftClientOptions } from '../qraftAPIClient.js';
+import type { CreateAPIBasicClientOptions } from '../qraftAPIClient.js';
+import type { ServiceOperationQuery } from '../service-operation/ServiceOperation.js';
 import { composeQueryKey } from '../lib/composeQueryKey.js';
-import { ServiceOperationQuery } from '../service-operation/ServiceOperation.js';
 
 export const getQueryKey = (
-  qraftOptions: QraftClientOptions | undefined,
+  _qraftOptions: CreateAPIBasicClientOptions,
   schema: OperationSchema,
   args: Parameters<
     ServiceOperationQuery<OperationSchema, unknown, unknown>['getQueryKey']

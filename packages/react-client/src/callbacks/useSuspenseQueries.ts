@@ -2,13 +2,13 @@
 
 import type { SuspenseQueriesResults } from '@tanstack/react-query';
 import type { OperationSchema } from '../lib/requestFn.js';
-import type { QraftClientOptions } from '../qraftAPIClient.js';
+import type { CreateAPIQueryClientOptions } from '../qraftAPIClient.js';
 import type { ServiceOperationQuery } from '../service-operation/ServiceOperation.js';
 import { useSuspenseQueries as useSuspenseQueriesTanstack } from '@tanstack/react-query';
 import { composeQueryKey } from '../lib/composeQueryKey.js';
 
 export const useSuspenseQueries: (
-  qraftOptions: QraftClientOptions,
+  qraftOptions: CreateAPIQueryClientOptions,
   schema: OperationSchema,
   args: Parameters<
     ServiceOperationQuery<

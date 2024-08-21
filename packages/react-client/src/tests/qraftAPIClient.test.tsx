@@ -1,5 +1,9 @@
-import type { QraftClientOptions } from '../index.js';
 import type { OperationSchema, RequestFnInfo } from '../lib/requestFn.js';
+import {
+  getQueryKey,
+  operationInvokeFn,
+  useQuery,
+} from '@openapi-qraft/react/callbacks/index';
 import { type QueryClientConfig } from '@tanstack/query-core';
 import {
   QueryClient,
@@ -9,8 +13,8 @@ import {
 import { act, renderHook, waitFor } from '@testing-library/react';
 import React, { ReactNode } from 'react';
 import { vi } from 'vitest';
-import { requestFn } from '../index.js';
-import { createAPIClient, Services } from './fixtures/api/index.js';
+import { CreateAPIClientOptions, qraftAPIClient, requestFn } from '../index.js';
+import { createAPIClient, services, Services } from './fixtures/api/index.js';
 
 const baseUrl = 'https://api.sandbox.monite.com/v1';
 
@@ -27,7 +31,7 @@ const createClient = ({
   requestFn: requestFnProp = requestFn,
   queryClientConfig,
 }: { queryClientConfig?: QueryClientConfig } & Partial<
-  Pick<QraftClientOptions, 'requestFn'>
+  Pick<CreateAPIClientOptions, 'requestFn'>
 > = {}) => {
   const queryClient = new QueryClient(queryClientConfig);
   return {
@@ -1894,6 +1898,242 @@ describe('Proxy call manipulations', () => {
   });
 });
 
+describe('Custom Callbacks support', () => {
+  const parameters: Services['approvalPolicies']['getApprovalPoliciesId']['types']['parameters'] =
+    {
+      header: {
+        'x-monite-version': '1.0.0',
+      },
+      path: {
+        approval_policy_id: '1',
+      },
+      query: {
+        items_order: ['asc', 'desc'],
+      },
+    };
+
+  describe('with QueryClient in options', () => {
+    it('supports "useQuery" if callback provided', async () => {
+      const customCallbacks = {
+        useQuery,
+      } as const;
+
+      const queryClient = new QueryClient();
+      const qraft = qraftAPIClient<Services, typeof customCallbacks>(
+        services,
+        customCallbacks,
+        {
+          requestFn,
+          baseUrl,
+          queryClient,
+        }
+      );
+
+      const { result } = renderHook(
+        () => qraft.approvalPolicies.getApprovalPoliciesId.useQuery(parameters),
+        {
+          wrapper: (props) => (
+            <Providers queryClient={queryClient} {...props} />
+          ),
+        }
+      );
+
+      await waitFor(() => {
+        expect(
+          result.current.data satisfies
+            | Services['approvalPolicies']['getApprovalPoliciesId']['types']['data']
+            | undefined
+        ).toEqual(parameters);
+      });
+    });
+
+    it('throws errors callbacks not provided', async () => {
+      const noCallbacks = {} as const;
+      const qraft = qraftAPIClient<Services, typeof noCallbacks>(
+        services,
+        noCallbacks,
+        {
+          requestFn,
+          baseUrl,
+          queryClient: new QueryClient(),
+        }
+      );
+
+      expect(() =>
+        // @ts-expect-error - `getQueryKey()` callback is not specified
+        qraft.approvalPolicies.getApprovalPoliciesId.getQueryKey(parameters)
+      ).toThrow(
+        new Error(
+          "Callback for 'qraft.<service>.<operation>.getQueryKey()' is not provided in the 'callbacks' object."
+        )
+      );
+
+      expect(() =>
+        // @ts-expect-error - `useQuery()` callback is not specified
+        qraft.approvalPolicies.getApprovalPoliciesId.useQuery(parameters)
+      ).toThrow(
+        new Error(
+          "Callback for 'qraft.<service>.<operation>.useQuery()' is not provided in the 'callbacks' object."
+        )
+      );
+    });
+  });
+
+  describe('no QueryClient in options', () => {
+    it('supports GET "operationInvokeFn" if callback provided', async () => {
+      const customCallbacks = {
+        operationInvokeFn,
+      } as const;
+      const qraft = qraftAPIClient<Services, typeof customCallbacks>(
+        services,
+        customCallbacks,
+        {
+          requestFn,
+          baseUrl,
+        }
+      );
+
+      const result = await qraft.approvalPolicies.getApprovalPoliciesId({
+        parameters,
+      });
+
+      expect(
+        result satisfies Services['approvalPolicies']['getApprovalPoliciesId']['types']['data']
+      ).toEqual(parameters);
+    });
+
+    it('supports POST "operationInvokeFn" if callback provided', async () => {
+      const customCallbacks = { operationInvokeFn };
+      const qraft = qraftAPIClient<Services, typeof customCallbacks>(
+        services,
+        customCallbacks,
+        {
+          requestFn,
+          baseUrl,
+        }
+      );
+
+      const result = await qraft.entities.postEntitiesIdDocuments({
+        parameters: {
+          header: {
+            'x-monite-version': '1.0.0',
+          },
+          path: {
+            entity_id: '1',
+          },
+          query: {
+            referer: 'https://example.com',
+          },
+        },
+        body: {
+          verification_document_back: 'back',
+          verification_document_front: 'front',
+        },
+      });
+
+      await waitFor(() => {
+        expect(
+          result satisfies Services['entities']['postEntitiesIdDocuments']['types']['data']
+        ).toEqual({
+          header: {
+            'x-monite-version': '1.0.0',
+          },
+          path: {
+            entity_id: '1',
+          },
+          query: {
+            referer: 'https://example.com',
+          },
+          body: {
+            verification_document_back: 'back',
+            verification_document_front: 'front',
+          },
+        });
+      });
+    });
+
+    it('supports "getQueryKey" if callback provided', async () => {
+      const customCallbacks = {
+        getQueryKey,
+      } as const;
+
+      const qraft = qraftAPIClient<Services, typeof customCallbacks>(
+        services,
+        customCallbacks,
+        {
+          requestFn,
+          baseUrl,
+        }
+      );
+
+      const queryKey =
+        qraft.approvalPolicies.getApprovalPoliciesId.getQueryKey(parameters);
+
+      expect(
+        queryKey satisfies [
+          Services['approvalPolicies']['getApprovalPoliciesId']['schema'],
+          Services['approvalPolicies']['getApprovalPoliciesId']['types']['parameters'],
+        ]
+      ).toEqual([
+        {
+          infinite: false,
+          ...(qraft.approvalPolicies.getApprovalPoliciesId
+            .schema satisfies Services['approvalPolicies']['getApprovalPoliciesId']['schema']),
+        },
+        parameters,
+      ]);
+    });
+
+    it('throws errors callbacks not provided', async () => {
+      const noCallbacks = {} as const;
+      const qraft = qraftAPIClient<Services, typeof noCallbacks>(
+        services,
+        noCallbacks,
+        {
+          requestFn,
+          baseUrl,
+        }
+      );
+
+      expect(() =>
+        // @ts-expect-error - `getQueryKey()` callback is not specified
+        qraft.approvalPolicies.getApprovalPoliciesId.getQueryKey(parameters)
+      ).toThrow(
+        new Error(
+          "Callback for 'qraft.<service>.<operation>.getQueryKey()' is not provided in the 'callbacks' object."
+        )
+      );
+
+      expect(() =>
+        // @ts-expect-error - `getMutationKey()` callback is not specified
+        qraft.approvalPolicies.getApprovalPoliciesId.getMutationKey(parameters)
+      ).toThrow(
+        new Error(
+          "Callback for 'qraft.<service>.<operation>.getMutationKey()' is not provided in the 'callbacks' object."
+        )
+      );
+
+      expect(
+        // @ts-expect-error - `operationInvokeFn()` callback is not specified
+        () => qraft.approvalPolicies.getApprovalPoliciesId()
+      ).toThrow(
+        new Error(
+          "Callback 'operationInvokeFn' is required for executing 'qraft.<service>.<operation>()', but it is not provided in the 'callbacks' object."
+        )
+      );
+
+      expect(() =>
+        // @ts-expect-error - `useQuery()` callback is not specified
+        qraft.approvalPolicies.getApprovalPoliciesId.useQuery(parameters)
+      ).toThrow(
+        new Error(
+          "Callback for 'qraft.<service>.<operation>.useQuery()' is not provided in the 'callbacks' object."
+        )
+      );
+    });
+  });
+});
+
 describe('Qraft uses utils', () => {
   const { qraft } = createClient();
 
@@ -1908,7 +2148,11 @@ describe('Qraft uses utils', () => {
     expect(() =>
       // @ts-expect-error - Invalid usage of method
       qraft.files.getFileList.unsupportedMethod()
-    ).toThrowError(/Function unsupportedMethod is not supported/i);
+    ).toThrow(
+      new Error(
+        "Callback for 'qraft.<service>.<operation>.unsupportedMethod()' is not provided in the 'callbacks' object."
+      )
+    );
   });
 
   it('resolves original proxy in promises ', async () => {

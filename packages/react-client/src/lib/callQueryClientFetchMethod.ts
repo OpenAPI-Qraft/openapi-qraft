@@ -1,5 +1,5 @@
 import type { QueryClient } from '@tanstack/query-core';
-import type { QraftClientOptions } from '../qraftAPIClient.js';
+import type { CreateAPIQueryClientOptions } from '../qraftAPIClient.js';
 import type { OperationSchema, RequestFn } from './requestFn.js';
 import { composeInfiniteQueryKey } from './composeInfiniteQueryKey.js';
 import { composeQueryKey } from './composeQueryKey.js';
@@ -12,7 +12,7 @@ import { shelfMerge } from './shelfMerge.js';
 export function callQueryClientMethodWithQueryKey<
   QFMethod extends QueryKeyMethods,
 >(
-  qraftOptions: QraftClientOptions,
+  qraftOptions: CreateAPIQueryClientOptions,
   queryFilterMethod: QFMethod,
   schema: OperationSchema,
   infinite: boolean,
