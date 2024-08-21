@@ -16,6 +16,8 @@ export async function requestFn<T>(
   requestInfo: RequestFnInfo,
   options?: RequestFnOptions
 ): Promise<T> {
+  // todo::refactor according to https://github.com/openapi-ts/openapi-typescript/blob/2a4b067f43f7e0b75aecbf5c2fb3013a4e96e591/packages/openapi-fetch/src/index.js#L158-L178
+  // todo::return full response and error, not throw! add invoke method typed errors
   return baseRequestFn(schema, requestInfo, {
     urlSerializer,
     bodySerializer,
