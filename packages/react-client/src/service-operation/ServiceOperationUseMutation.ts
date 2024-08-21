@@ -13,8 +13,8 @@ export interface ServiceOperationUseMutation<
   TParams,
   TError = DefaultError,
 > {
-  getMutationKey<TMutationKeyParams extends TParams | undefined = undefined>(
-    parameters?: TMutationKeyParams
+  getMutationKey<TMutationKeyParams extends TParams>(
+    parameters: TMutationKeyParams | void
   ): ServiceOperationMutationKey<TSchema, TMutationKeyParams>;
 
   useMutation<
