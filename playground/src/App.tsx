@@ -1,12 +1,4 @@
 import {
-  ComponentProps,
-  createContext,
-  ReactNode,
-  useContext,
-  useState,
-} from 'react';
-
-import {
   OperationSchema,
   QraftClientOptions,
   requestFn,
@@ -18,10 +10,15 @@ import {
   QueryClientProvider,
   useQueryClient,
 } from '@tanstack/react-query';
-
 import constate from 'constate';
-
-import { createAPIClient, Services, components } from './api';
+import {
+  ComponentProps,
+  createContext,
+  ReactNode,
+  useContext,
+  useState,
+} from 'react';
+import { components, createAPIClient, Services } from './api';
 
 function AppComponent() {
   const { petIdToEdit } = usePetToEdit();
@@ -415,12 +412,14 @@ export const QraftProviders = ({ children }: { children: ReactNode }) => {
   );
 };
 
-export function useCreateAPIClient(options?: Partial<QraftClientOptions>) {
+function useCreateAPIClient(options?: Partial<QraftClientOptions>) {
   const apiContextValue = useContext(APIContext);
 
   const requestFn = options?.requestFn ?? apiContextValue?.requestFn;
   const baseUrl = options?.baseUrl ?? apiContextValue?.baseUrl;
-  const queryClient = useQueryClient(options?.queryClient);
+  const queryClient = useQueryClient(
+    options && 'queryClient' in options ? options?.queryClient : undefined
+  );
 
   if (!requestFn)
     throw new Error('requestFn not found in APIContext or options');

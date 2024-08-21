@@ -8,7 +8,7 @@ type Options = {
 export const getClientFactory = (options: Options) => {
   return [
     ...getClientImportsFactory(options),
-    getCreateClientFunctionFactory(),
+    ...getCreateClientFunctionFactory(),
   ];
 };
 
@@ -30,10 +30,17 @@ const getClientImportsFactory = ({
             undefined,
             factory.createIdentifier('qraftAPIClient')
           ),
-          factory.createImportSpecifier(
-            false,
-            undefined,
-            factory.createIdentifier('QraftClientOptions')
+          ...[
+            'APIBasicClientServices',
+            'CreateAPIBasicClientOptions',
+            'CreateAPIClientOptions',
+            'CreateAPIQueryClientOptions',
+          ].map((name) =>
+            factory.createImportSpecifier(
+              true,
+              undefined,
+              factory.createIdentifier(name)
+            )
           ),
         ])
       ),
@@ -62,7 +69,7 @@ const getClientImportsFactory = ({
             factory.createIdentifier('services')
           ),
           factory.createImportSpecifier(
-            false,
+            true,
             undefined,
             factory.createIdentifier('Services')
           ),
@@ -79,52 +86,135 @@ const getClientImportsFactory = ({
 const getCreateClientFunctionFactory = () => {
   const factory = ts.factory;
 
-  return factory.createFunctionDeclaration(
-    [factory.createToken(ts.SyntaxKind.ExportKeyword)],
-    undefined,
-    factory.createIdentifier('createAPIClient'),
-    undefined,
-    [
-      factory.createParameterDeclaration(
-        undefined,
-        undefined,
-        factory.createIdentifier('options'),
-        undefined,
-        factory.createTypeReferenceNode(
-          factory.createIdentifier('QraftClientOptions'),
+  return [
+    factory.createFunctionDeclaration(
+      [factory.createToken(ts.SyntaxKind.ExportKeyword)],
+      undefined,
+      factory.createIdentifier('createAPIClient'),
+      undefined,
+      [
+        factory.createParameterDeclaration(
+          undefined,
+          undefined,
+          factory.createIdentifier('options'),
+          undefined,
+          factory.createTypeReferenceNode(
+            factory.createIdentifier('CreateAPIQueryClientOptions'),
+            undefined
+          ),
           undefined
         ),
+      ],
+      factory.createTypeReferenceNode(
+        factory.createIdentifier('Services'),
         undefined
       ),
-    ],
-    factory.createTypeReferenceNode(
-      factory.createIdentifier('Services'),
       undefined
     ),
-    factory.createBlock(
+    factory.createFunctionDeclaration(
+      [factory.createToken(ts.SyntaxKind.ExportKeyword)],
+      undefined,
+      factory.createIdentifier('createAPIClient'),
+      undefined,
       [
-        factory.createReturnStatement(
-          factory.createCallExpression(
-            factory.createIdentifier('qraftAPIClient'),
-            [
-              factory.createTypeReferenceNode(
-                factory.createIdentifier('Services'),
-                undefined
-              ),
-              factory.createTypeQueryNode(
-                factory.createIdentifier('callbacks'),
-                undefined
-              ),
-            ],
-            [
-              factory.createIdentifier('services'),
-              factory.createIdentifier('callbacks'),
-              factory.createIdentifier('options'),
-            ]
-          )
+        factory.createParameterDeclaration(
+          undefined,
+          undefined,
+          factory.createIdentifier('options'),
+          undefined,
+          factory.createTypeReferenceNode(
+            factory.createIdentifier('CreateAPIBasicClientOptions'),
+            undefined
+          ),
+          undefined
         ),
       ],
-      true
-    )
-  );
+      factory.createTypeReferenceNode(
+        factory.createIdentifier('APIBasicClientServices'),
+        [
+          factory.createTypeReferenceNode(
+            factory.createIdentifier('Services'),
+            undefined
+          ),
+          factory.createTypeReferenceNode(
+            factory.createIdentifier('Callbacks'),
+            undefined
+          ),
+        ]
+      ),
+      undefined
+    ),
+    factory.createFunctionDeclaration(
+      [factory.createToken(ts.SyntaxKind.ExportKeyword)],
+      undefined,
+      factory.createIdentifier('createAPIClient'),
+      undefined,
+      [
+        factory.createParameterDeclaration(
+          undefined,
+          undefined,
+          factory.createIdentifier('options'),
+          undefined,
+          factory.createTypeReferenceNode(
+            factory.createIdentifier('CreateAPIClientOptions'),
+            undefined
+          ),
+          undefined
+        ),
+      ],
+      factory.createUnionTypeNode([
+        factory.createTypeReferenceNode(
+          factory.createIdentifier('Services'),
+          undefined
+        ),
+        factory.createTypeReferenceNode(
+          factory.createIdentifier('APIBasicClientServices'),
+          [
+            factory.createTypeReferenceNode(
+              factory.createIdentifier('Services'),
+              undefined
+            ),
+            factory.createTypeReferenceNode(
+              factory.createIdentifier('Callbacks'),
+              undefined
+            ),
+          ]
+        ),
+      ]),
+      factory.createBlock(
+        [
+          factory.createReturnStatement(
+            factory.createCallExpression(
+              factory.createIdentifier('qraftAPIClient'),
+              [
+                factory.createTypeReferenceNode(
+                  factory.createIdentifier('Services'),
+                  undefined
+                ),
+                factory.createTypeReferenceNode(
+                  factory.createIdentifier('Callbacks'),
+                  undefined
+                ),
+              ],
+              [
+                factory.createIdentifier('services'),
+                factory.createIdentifier('callbacks'),
+                factory.createIdentifier('options'),
+              ]
+            )
+          ),
+        ],
+        true
+      )
+    ),
+    factory.createTypeAliasDeclaration(
+      undefined,
+      factory.createIdentifier('Callbacks'),
+      undefined,
+      factory.createTypeQueryNode(
+        factory.createIdentifier('callbacks'),
+        undefined
+      )
+    ),
+  ];
 };

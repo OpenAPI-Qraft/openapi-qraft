@@ -1,10 +1,10 @@
 import type { OperationSchema } from '../lib/requestFn.js';
-import type { QraftClientOptions } from '../qraftAPIClient.js';
+import type { CreateAPIQueryClientOptions } from '../qraftAPIClient.js';
 import type { ServiceOperationRemoveQueries } from '../service-operation/ServiceOperationRemoveQueries.js';
 import { callQueryClientMethodWithQueryFilters } from '../lib/callQueryClientMethodWithQueryFilters.js';
 
 export function removeQueries<TData>(
-  qraftOptions: QraftClientOptions,
+  qraftOptions: CreateAPIQueryClientOptions,
   schema: OperationSchema,
   args: Parameters<
     ServiceOperationRemoveQueries<

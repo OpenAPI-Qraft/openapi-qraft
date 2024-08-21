@@ -1,6 +1,6 @@
 import type { QueryClient } from '@tanstack/query-core';
+import type { CreateAPIQueryClientOptions } from '../qraftAPIClient.js';
 import type { OperationSchema } from './requestFn.js';
-import { QraftClientOptions } from '@openapi-qraft/react';
 import { composeMutationFilters } from './composeMutationFilters.js';
 
 /**
@@ -10,7 +10,7 @@ import { composeMutationFilters } from './composeMutationFilters.js';
 export function callQueryClientMethodWithMutationFilters<
   QFMethod extends QueryFilterMethods,
 >(
-  qraftOptions: QraftClientOptions,
+  qraftOptions: CreateAPIQueryClientOptions,
   queryFilterMethod: QFMethod,
   schema: OperationSchema,
   args: [...Parameters<(typeof QueryClient.prototype)[QFMethod]>, QueryClient]

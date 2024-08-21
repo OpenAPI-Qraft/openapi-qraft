@@ -1,5 +1,5 @@
 import type { QueryClient } from '@tanstack/query-core';
-import type { QraftClientOptions } from '../qraftAPIClient.js';
+import type { CreateAPIQueryClientOptions } from '../qraftAPIClient.js';
 import type { OperationSchema } from './requestFn.js';
 import { composeQueryFilters } from './composeQueryFilters.js';
 
@@ -10,7 +10,7 @@ import { composeQueryFilters } from './composeQueryFilters.js';
 export function callQueryClientMethodWithQueryFilters<
   QFMethod extends QueryFilterMethods,
 >(
-  qraftOptions: QraftClientOptions,
+  qraftOptions: CreateAPIQueryClientOptions,
   queryFilterMethod: QFMethod,
   schema: OperationSchema,
   args: [...Parameters<(typeof QueryClient.prototype)[QFMethod]>, QueryClient]
