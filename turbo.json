@@ -27,7 +27,7 @@
     },
     "lint": {
       "cache": true,
-      "dependsOn": ["write-package-version-file", "^build"]
+      "dependsOn": ["write-package-version-file", "codegen", "^build"]
     },
     "clean": {
       "cache": false
