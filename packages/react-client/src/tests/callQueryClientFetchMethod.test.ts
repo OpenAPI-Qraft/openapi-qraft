@@ -19,7 +19,11 @@ describe('callQueryClientFetchMethod', () => {
           {
             parameters: { key: 'value' },
             queryKey: ['key'],
-            requestFn: () => Promise.resolve({}),
+            requestFn: () =>
+              Promise.resolve({
+                data: {},
+                response: new Response(),
+              }),
             baseUrl: 'https://example.com',
           },
           queryClient,
@@ -46,7 +50,11 @@ describe('callQueryClientFetchMethod', () => {
         [
           {
             queryKey: ['key'],
-            requestFn: () => Promise.resolve({}),
+            requestFn: () =>
+              Promise.resolve({
+                data: {},
+                response: new Response(),
+              }),
             queryFn: () => Promise.resolve({}),
           },
           queryClient,

@@ -6,6 +6,7 @@ import type { CreateAPIQueryClientOptions } from '../qraftAPIClient.js';
 import type { ServiceOperationQuery } from '../service-operation/ServiceOperation.js';
 import { useSuspenseQueries as useSuspenseQueriesTanstack } from '@tanstack/react-query';
 import { composeQueryKey } from '../lib/composeQueryKey.js';
+import { requestFnResponseResolver } from '../lib/requestFnResponseResolver.js';
 
 export const useSuspenseQueries: (
   qraftOptions: CreateAPIQueryClientOptions,
@@ -43,12 +44,14 @@ export const useSuspenseQueries: (
           queryFn:
             optionsWithQueryKey.queryFn ??
             function ({ queryKey: [, queryParams], signal, meta }) {
-              return qraftOptions.requestFn(schema, {
-                parameters: queryParams as never,
-                baseUrl: qraftOptions.baseUrl,
-                signal,
-                meta,
-              });
+              return qraftOptions
+                .requestFn(schema, {
+                  parameters: queryParams as never,
+                  baseUrl: qraftOptions.baseUrl,
+                  signal,
+                  meta,
+                })
+                .then(requestFnResponseResolver);
             },
         };
       }),

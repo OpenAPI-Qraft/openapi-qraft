@@ -1,5 +1,6 @@
 import type { ServiceOperationQueryKey } from './ServiceOperationKey.js';
 import { AreAllOptional } from '../lib/AreAllOptional.js';
+import { RequestFnResponse } from '../lib/requestFn.js';
 
 interface QueryFnOptionsBase<
   TMeta extends Record<string, any>,
@@ -44,6 +45,7 @@ export interface ServiceOperationQueryFn<
   TSchema extends { url: string; method: string },
   TData,
   TParams,
+  TError,
 > {
   <
     TMeta extends Record<string, any>,
@@ -64,23 +66,6 @@ export interface ServiceOperationQueryFn<
         signal?: TSignal;
         meta?: TMeta;
       }
-    ) => Promise<TData>
-  ): Promise<TData>;
-
-  <
-    TMeta extends Record<string, any>,
-    TSignal extends AbortSignal = AbortSignal,
-  >(
-    options:
-      | QueryFnOptionsByParameters<TParams, TMeta, TSignal>
-      | QueryFnOptionsByQueryKey<TSchema, TParams, TMeta, TSignal>,
-    client: (
-      schema: TSchema,
-      options: {
-        parameters: TParams;
-        signal?: TSignal;
-        meta?: TMeta;
-      }
-    ) => TData
-  ): TData;
+    ) => Promise<RequestFnResponse<TData, TError>>
+  ): Promise<RequestFnResponse<TData, TError>>;
 }

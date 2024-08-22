@@ -1,7 +1,7 @@
-import type { OperationSchema } from '../lib/requestFn.js';
 import type { CreateAPIBasicClientOptions } from '../qraftAPIClient.js';
 import type { ServiceOperationMutationFn } from '../service-operation/ServiceOperationMutationFn.js';
 import type { ServiceOperationQueryFn } from '../service-operation/ServiceOperationQueryFn.js';
+import { OperationSchema, RequestFnResponse } from '../lib/requestFn.js';
 
 /**
  * Called when <service>.<operation>(...) is invoked.
@@ -11,13 +11,20 @@ export const operationInvokeFn: <
   TBody,
   TData,
   TParams,
+  TError,
 >(
   qraftOptions: CreateAPIBasicClientOptions,
   schema: TSchema,
   args:
-    | Parameters<ServiceOperationQueryFn<TSchema, TData, TParams>>
-    | Parameters<ServiceOperationMutationFn<TSchema, TBody, TData, TParams>>
-) => Promise<TData> | TData = (qraftOptions, schema, args) => {
+    | Parameters<ServiceOperationQueryFn<TSchema, TData, TParams, TError>>
+    | Parameters<
+        ServiceOperationMutationFn<TSchema, TBody, TData, TParams, TError>
+      >
+) => Promise<RequestFnResponse<TData, TError>> = (
+  qraftOptions,
+  schema,
+  args
+) => {
   const queryOperationMethods = ['get', 'head', 'options'] as const; // todo::make it shared
 
   const isQueryOperationType = queryOperationMethods.includes(

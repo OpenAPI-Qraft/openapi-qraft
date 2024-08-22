@@ -7,6 +7,7 @@ import type { ServiceOperationQueryKey } from '../service-operation/ServiceOpera
 import type { OperationSchema } from './requestFn.js';
 import { composeInfiniteQueryKey } from './composeInfiniteQueryKey.js';
 import { composeQueryKey } from './composeQueryKey.js';
+import { requestFnResponseResolver } from './requestFnResponseResolver.js';
 import { shelfMerge } from './shelfMerge.js';
 
 /**
@@ -25,15 +26,17 @@ export function useComposeUseQueryOptions(
     options?.queryFn ??
     // @ts-expect-error - Too complex to type
     function ({ queryKey: [, queryParams], signal, meta, pageParam }) {
-      return qraftOptions.requestFn(schema, {
-        // @ts-expect-error - Too complex to type
-        parameters: infinite
-          ? (shelfMerge(2, queryParams, pageParam) as never)
-          : queryParams,
-        baseUrl: qraftOptions.baseUrl,
-        signal,
-        meta,
-      });
+      return qraftOptions
+        .requestFn(schema, {
+          // @ts-expect-error - Too complex to type
+          parameters: infinite
+            ? (shelfMerge(2, queryParams, pageParam) as never)
+            : queryParams,
+          baseUrl: qraftOptions.baseUrl,
+          signal,
+          meta,
+        })
+        .then(requestFnResponseResolver);
     };
 
   const queryKey = Array.isArray(parameters)

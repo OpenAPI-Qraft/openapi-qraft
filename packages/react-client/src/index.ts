@@ -13,6 +13,7 @@ export {
   urlSerializer,
   bodySerializer,
   mergeHeaders,
+  type RequestFnResponse,
 } from './lib/requestFn.js';
 
 export type {

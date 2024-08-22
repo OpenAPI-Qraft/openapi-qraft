@@ -59,7 +59,6 @@ type SecuritySchemeBearer =
             securitySchemes={{
               clientToken: async ({ isRefreshing }) => {
                 const api = createAPIClient({
-                  queryClient,
                   requestFn,
                   baseUrl: 'https://petstore3.swagger.io/api/v3',
                 });

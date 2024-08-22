@@ -47,12 +47,11 @@ const App = ({ children }: { children: ReactNode }) => {
         securitySchemes={{
           apiClientSecret: async () => {
             const api = createAPIClient({
-              queryClient,
               requestFn,
               baseUrl: 'https://petstore3.swagger.io/api/v3',
             });
 
-            const { secret } = await api.auth.getAPISecret({parameters: undefined}, requestFn);
+            const { secret } = await api.auth.getAPISecret({ parameters: undefined }, requestFn);
             return {
               in: 'header', // specify the location of the secret, either 'header' or 'query'
               name: 'X-API-Secret',

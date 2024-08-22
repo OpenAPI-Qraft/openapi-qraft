@@ -8,6 +8,7 @@ import type { ServiceOperationMutation } from '../service-operation/ServiceOpera
 import type { ServiceOperationMutationKey } from '../service-operation/ServiceOperationKey.js';
 import { useMutation as useMutationBase } from '@tanstack/react-query';
 import { composeMutationKey } from '../lib/composeMutationKey.js';
+import { requestFnResponseResolver } from '../lib/requestFnResponseResolver.js';
 
 export const useMutation: <
   TData = unknown,
@@ -54,26 +55,31 @@ export const useMutation: <
     {
       ...options,
       mutationKey,
+      // @ts-expect-error - Too complex to type
       mutationFn:
         options?.mutationFn ??
         (parameters
           ? function (bodyPayload) {
-              return qraftOptions.requestFn(schema, {
-                parameters,
-                baseUrl: qraftOptions.baseUrl,
-                body: bodyPayload as never,
-              });
+              return qraftOptions
+                .requestFn(schema, {
+                  parameters,
+                  baseUrl: qraftOptions.baseUrl,
+                  body: bodyPayload as never,
+                })
+                .then(requestFnResponseResolver);
             }
           : function (parametersAndBodyPayload) {
               const { body, ...parameters } = parametersAndBodyPayload as {
                 body: unknown;
               };
 
-              return qraftOptions.requestFn(schema, {
-                parameters,
-                baseUrl: qraftOptions.baseUrl,
-                body,
-              } as never);
+              return qraftOptions
+                .requestFn(schema, {
+                  parameters,
+                  baseUrl: qraftOptions.baseUrl,
+                  body,
+                } as never)
+                .then(requestFnResponseResolver);
             }),
     },
     qraftOptions.queryClient

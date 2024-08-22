@@ -9,27 +9,50 @@ import TabItem from '@theme/TabItem';
 # createAPIClient(...)
 
 Qraft CLI generates a helper function `createAPIClient(...)`, which creates a Qraft API client with
-the necessary `requestFn`, `queryClient`, and `baseUrl` for React Hooks.
+the necessary `requestFn`, `baseUrl` and `queryClient` for React Hooks.
 
-```tsx
-import { createAPIClient } from './api'
+<Tabs>
+  <TabItem value="with-query-client" label={<span style={{verticalAlign: 'middle'}}>With <code>QueryClient</code></span>} default>
+    ```tsx
+    import { createAPIClient } from './api'
 
-const api = createAPIClient({
-  requestFn,
-  queryClient,
-  baseUrl,
-})
-```
+    const api = createAPIClient({
+      requestFn,
+      queryClient,
+      baseUrl,
+    })
+    ```
 
-### Arguments
-1. `options?: QraftClientOptions` - **Optional** options to be used by the Qraft API client
-   - `options.requestFn` - **Required** `requestFn` function to be used by Qraft Hooks.
-   - `options.queryClient` - **Required** `QueryClient` instance to be used by Qraft Hooks.
-   - `options.baseUrl` - **Required** base URL for the `requestFn` function.
+    ### Arguments
+    1. `options: QraftClientOptions` - **Required** options to be used by the Qraft API client
+       - `options.queryClient` - **Required** `QueryClient` instance to be used by Qraft Hooks.
+       - `options.requestFn` - **Required** `requestFn` function to be used by Qraft Hooks.
+       - `options.baseUrl` - **Required** base URL for the `requestFn` function.
 
-### Returns
-- Qraft API client with the necessary context for Qraft Hooks.
-  It contains all the methods to interact with the API grouped in services.
+    ### Returns
+    - Qraft API client with the necessary React Hooks for operations.
+      It contains all the methods to interact with the API grouped in services.
+  </TabItem>
+  <TabItem value="without-query-client" label={<span style={{verticalAlign: 'middle'}}>Without <code>QueryClient</code></span>}>
+    ```tsx
+    import { createAPIClient } from './api'
+
+    const api = createAPIClient({
+      requestFn,
+      baseUrl,
+    })
+    ```
+
+    ### Arguments
+    1. `options: QraftClientOptions` - **Required** options to be used by the Qraft API client
+       - `options.requestFn` - **Required** `requestFn` function to be used by Qraft requests.
+       - `options.baseUrl` - **Required** base URL for the `requestFn` function.
+
+    ### Returns
+    - Qraft API client with the necessary operations.
+      It contains all the methods to interact with the API grouped in services.
+  </TabItem>
+</Tabs>
 
 ### Examples
 

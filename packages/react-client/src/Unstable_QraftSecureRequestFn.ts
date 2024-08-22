@@ -5,17 +5,18 @@ import type {
   OperationSchema,
   RequestFnInfo,
   RequestFnOptions,
+  RequestFnResponse,
 } from './lib/requestFn.js';
 import { QueryClient, useQueries } from '@tanstack/react-query';
 import { createElement, Fragment, ReactNode, useEffect, useMemo } from 'react';
 import { jwtDecode } from './lib/jwt-decode/index.js';
 
 interface QraftSecureRequestFnBaseProps {
-  requestFn<T>(
+  requestFn<TData, TError>(
     schema: OperationSchema,
     requestInfo: RequestFnInfo,
     options?: RequestFnOptions
-  ): Promise<T>;
+  ): Promise<RequestFnResponse<TData, TError>>;
   securitySchemes: SecuritySchemeHandlers<string>;
 }
 

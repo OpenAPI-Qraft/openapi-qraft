@@ -1,4 +1,8 @@
-import type { OperationSchema, RequestFnInfo } from '../lib/requestFn.js';
+import type {
+  OperationSchema,
+  RequestFnInfo,
+  RequestFnResponse,
+} from '../lib/requestFn.js';
 import {
   getQueryKey,
   operationInvokeFn,
@@ -18,11 +22,11 @@ import { createAPIClient, services, Services } from './fixtures/api/index.js';
 
 const baseUrl = 'https://api.sandbox.monite.com/v1';
 
-const requestFnWithBaseUrl = async <T,>(
+const requestFnWithBaseUrl = async <TData, TError>(
   requestSchema: OperationSchema,
   requestInfo: Omit<RequestFnInfo, 'baseUrl'>
-): Promise<T> =>
-  requestFn(requestSchema, {
+): Promise<RequestFnResponse<TData, TError>> =>
+  requestFn<TData, TError>(requestSchema, {
     ...requestInfo,
     baseUrl,
   });
@@ -1399,12 +1403,23 @@ describe('Qraft uses Query Function', () => {
 
     const requestFnSpy = vi.fn(requestFn) as typeof requestFn;
 
-    const result = await qraft.approvalPolicies.getApprovalPoliciesId(
+    const { data, error } = await qraft.approvalPolicies.getApprovalPoliciesId(
       { parameters },
       requestFnSpy
     );
 
-    expect(result).toEqual({
+    expect(
+      error satisfies
+        | Services['approvalPolicies']['getApprovalPoliciesId']['types']['error']
+        | Error
+        | undefined
+    ).toBeUndefined();
+
+    expect(
+      data satisfies
+        | Services['approvalPolicies']['getApprovalPoliciesId']['types']['data']
+        | undefined
+    ).toEqual({
       header: {
         'x-monite-version': '1.0.0',
       },
@@ -1438,9 +1453,18 @@ describe('Qraft uses Query Function', () => {
   it('uses Operation Query without arguments', async () => {
     const { qraft } = createClient();
 
-    const result = await qraft.files.findAll();
+    const { data, error } = await qraft.files.findAll();
 
-    expect(result).toEqual({
+    expect(
+      error satisfies
+        | Services['files']['findAll']['types']['error']
+        | Error
+        | undefined
+    ).toBeUndefined();
+
+    expect(
+      data satisfies Services['files']['findAll']['types']['data'] | undefined
+    ).toEqual({
       data: [
         {
           file_type: 'pdf',
@@ -1467,7 +1491,7 @@ describe('Qraft uses Query Function', () => {
   it('uses Operation Query with `queryKey`', async () => {
     const { qraft } = createClient();
 
-    const result = await qraft.approvalPolicies.getApprovalPoliciesId(
+    const { data, error } = await qraft.approvalPolicies.getApprovalPoliciesId(
       {
         queryKey: [
           {
@@ -1482,7 +1506,18 @@ describe('Qraft uses Query Function', () => {
       requestFnWithBaseUrl
     );
 
-    expect(result).toEqual(parameters);
+    expect(
+      error satisfies
+        | Services['approvalPolicies']['getApprovalPoliciesId']['types']['error']
+        | Error
+        | undefined
+    ).toBeUndefined();
+
+    expect(
+      data satisfies
+        | Services['approvalPolicies']['getApprovalPoliciesId']['types']['data']
+        | undefined
+    ).toEqual(parameters);
   });
 
   it('uses fetchQuery with `parameters`', async () => {
@@ -1736,50 +1771,7 @@ describe('Qraft uses mutationFn', () => {
   it('supports Operation Mutation without `baseUrl`', async () => {
     const { qraft } = createClient();
 
-    const result = await qraft.entities.postEntitiesIdDocuments(
-      {
-        parameters: {
-          header: {
-            'x-monite-version': '1.0.0',
-          },
-          path: {
-            entity_id: '1',
-          },
-          query: {
-            referer: 'https://example.com',
-          },
-        },
-        body: {
-          verification_document_back: 'back',
-          verification_document_front: 'front',
-        },
-      },
-      requestFnWithBaseUrl
-    );
-
-    await waitFor(() => {
-      expect(result).toEqual({
-        header: {
-          'x-monite-version': '1.0.0',
-        },
-        path: {
-          entity_id: '1',
-        },
-        query: {
-          referer: 'https://example.com',
-        },
-        body: {
-          verification_document_back: 'back',
-          verification_document_front: 'front',
-        },
-      });
-    });
-  });
-
-  it('supports Operation Mutation', async () => {
-    const { qraft } = createClient();
-
-    const result = await qraft.entities.postEntitiesIdDocuments({
+    const { data, error } = await qraft.entities.postEntitiesIdDocuments({
       parameters: {
         header: {
           'x-monite-version': '1.0.0',
@@ -1797,8 +1789,39 @@ describe('Qraft uses mutationFn', () => {
       },
     });
 
-    await waitFor(() => {
-      expect(result).toEqual({
+    expect(
+      error satisfies
+        | Services['entities']['postEntitiesIdDocuments']['types']['error']
+        | Error
+        | undefined
+    ).toBeUndefined();
+
+    expect(
+      data satisfies
+        | Services['entities']['postEntitiesIdDocuments']['types']['data']
+        | undefined
+    ).toEqual({
+      header: {
+        'x-monite-version': '1.0.0',
+      },
+      path: {
+        entity_id: '1',
+      },
+      query: {
+        referer: 'https://example.com',
+      },
+      body: {
+        verification_document_back: 'back',
+        verification_document_front: 'front',
+      },
+    });
+  });
+
+  it('supports Operation Mutation', async () => {
+    const { qraft } = createClient();
+
+    const { data, error } = await qraft.entities.postEntitiesIdDocuments({
+      parameters: {
         header: {
           'x-monite-version': '1.0.0',
         },
@@ -1808,11 +1831,38 @@ describe('Qraft uses mutationFn', () => {
         query: {
           referer: 'https://example.com',
         },
-        body: {
-          verification_document_back: 'back',
-          verification_document_front: 'front',
-        },
-      });
+      },
+      body: {
+        verification_document_back: 'back',
+        verification_document_front: 'front',
+      },
+    });
+
+    expect(
+      error satisfies
+        | Services['entities']['postEntitiesIdDocuments']['types']['error']
+        | Error
+        | undefined
+    ).toBeUndefined();
+
+    expect(
+      data satisfies
+        | Services['entities']['postEntitiesIdDocuments']['types']['data']
+        | undefined
+    ).toEqual({
+      header: {
+        'x-monite-version': '1.0.0',
+      },
+      path: {
+        entity_id: '1',
+      },
+      query: {
+        referer: 'https://example.com',
+      },
+      body: {
+        verification_document_back: 'back',
+        verification_document_front: 'front',
+      },
     });
   });
 
@@ -1993,12 +2043,22 @@ describe('Custom Callbacks support', () => {
         }
       );
 
-      const result = await qraft.approvalPolicies.getApprovalPoliciesId({
-        parameters,
-      });
+      const { data, error } =
+        await qraft.approvalPolicies.getApprovalPoliciesId({
+          parameters,
+        });
 
       expect(
-        result satisfies Services['approvalPolicies']['getApprovalPoliciesId']['types']['data']
+        error satisfies
+          | Services['approvalPolicies']['getApprovalPoliciesId']['types']['error']
+          | Error
+          | undefined
+      ).toBeUndefined();
+
+      expect(
+        data satisfies
+          | Services['approvalPolicies']['getApprovalPoliciesId']['types']['data']
+          | undefined
       ).toEqual(parameters);
     });
 
@@ -2013,7 +2073,7 @@ describe('Custom Callbacks support', () => {
         }
       );
 
-      const result = await qraft.entities.postEntitiesIdDocuments({
+      const { data, error } = await qraft.entities.postEntitiesIdDocuments({
         parameters: {
           header: {
             'x-monite-version': '1.0.0',
@@ -2031,24 +2091,31 @@ describe('Custom Callbacks support', () => {
         },
       });
 
-      await waitFor(() => {
-        expect(
-          result satisfies Services['entities']['postEntitiesIdDocuments']['types']['data']
-        ).toEqual({
-          header: {
-            'x-monite-version': '1.0.0',
-          },
-          path: {
-            entity_id: '1',
-          },
-          query: {
-            referer: 'https://example.com',
-          },
-          body: {
-            verification_document_back: 'back',
-            verification_document_front: 'front',
-          },
-        });
+      expect(
+        error satisfies
+          | Services['entities']['postEntitiesIdDocuments']['types']['error']
+          | Error
+          | undefined
+      ).toBeUndefined();
+
+      expect(
+        data satisfies
+          | Services['entities']['postEntitiesIdDocuments']['types']['data']
+          | undefined
+      ).toEqual({
+        header: {
+          'x-monite-version': '1.0.0',
+        },
+        path: {
+          entity_id: '1',
+        },
+        query: {
+          referer: 'https://example.com',
+        },
+        body: {
+          verification_document_back: 'back',
+          verification_document_front: 'front',
+        },
       });
     });
 

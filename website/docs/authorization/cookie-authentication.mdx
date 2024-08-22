@@ -41,7 +41,6 @@ const App = ({ children }: { children: ReactNode }) => {
         securitySchemes={{
           cookieAuth: async ({isRefreshing}) => {
             const api = createAPIClient({
-              queryClient,
               requestFn,
               baseUrl: 'https://petstore3.swagger.io/api/v3',
             });

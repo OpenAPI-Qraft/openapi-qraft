@@ -3,6 +3,7 @@ import type { CreateAPIQueryClientOptions } from '../qraftAPIClient.js';
 import type { OperationSchema, RequestFn } from './requestFn.js';
 import { composeInfiniteQueryKey } from './composeInfiniteQueryKey.js';
 import { composeQueryKey } from './composeQueryKey.js';
+import { requestFnResponseResolver } from './requestFnResponseResolver.js';
 import { shelfMerge } from './shelfMerge.js';
 
 /**
@@ -54,7 +55,7 @@ export function callQueryClientMethodWithQueryKey<
         baseUrl,
         signal,
         meta,
-      });
+      }).then(requestFnResponseResolver);
     };
 
   if (parameters) {
@@ -76,7 +77,7 @@ type QueryClientMethodArgs<QMethod extends keyof QueryClientPrototype> = [
   options: Parameters<QueryClientPrototype[QMethod]>[0] & {
     parameters?: unknown;
     baseUrl?: string;
-    requestFn?: RequestFn<unknown>;
+    requestFn?: RequestFn<unknown, unknown>;
   },
   queryClient: QueryClient,
 ];

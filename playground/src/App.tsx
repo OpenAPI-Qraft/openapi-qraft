@@ -3,6 +3,7 @@ import {
   QraftClientOptions,
   requestFn,
   RequestFnPayload,
+  RequestFnResponse,
 } from '@openapi-qraft/react';
 import { QraftSecureRequestFn } from '@openapi-qraft/react/Unstable_QraftSecureRequestFn';
 import {
@@ -442,10 +443,10 @@ export interface APIContextValue {
   /**
    * The `requestFn` will be invoked with every request.
    */
-  requestFn<T>(
+  requestFn<TData, TError>(
     requestSchema: OperationSchema,
     requestInfo: RequestFnPayload
-  ): Promise<T>;
+  ): Promise<RequestFnResponse<TData, TError>>;
 
   /** The QueryClient to use in Hooks */
   queryClient?: QueryClient;

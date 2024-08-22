@@ -1,4 +1,5 @@
 import { AreAllOptional } from '../lib/AreAllOptional.js';
+import { RequestFnResponse } from '../lib/requestFn.js';
 
 interface QueryFnBaseUrlOptions {
   /**
@@ -12,7 +13,7 @@ type ServiceOperationMutationFnOptions<TBody, TParams> =
   AreAllOptional<TBody> extends true
     ? AreAllOptional<TParams> extends true
       ?
-          | void
+          | void // todo::try to move void to arguments
           | ({
               parameters?: TParams;
               body?: TBody;
@@ -36,14 +37,13 @@ export interface ServiceOperationMutationFn<
   TBody,
   TData,
   TParams,
+  TError,
 > {
   <TOptions extends ServiceOperationMutationFnOptions<TBody, TParams>>(
     options: TOptions,
-    client?: (schema: TSchema, options: TOptions) => Promise<TData>
-  ): Promise<TData>;
-
-  <TOptions extends ServiceOperationMutationFnOptions<TBody, TParams>>(
-    options: TOptions,
-    client?: (schema: TSchema, options: TOptions) => TData
-  ): TData;
+    client?: (
+      schema: TSchema,
+      options: TOptions
+    ) => Promise<RequestFnResponse<TData, TError>>
+  ): Promise<RequestFnResponse<TData, TError>>;
 }
