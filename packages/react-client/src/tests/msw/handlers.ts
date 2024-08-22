@@ -4,18 +4,15 @@ import { Services, services } from '../fixtures/api/index.js';
 
 export const handlers = [
   http.get<
-    ServicePathParameters<
-      Services['approvalPolicies']['getApprovalPoliciesId']
-    >,
+    ServiceOperationPath<Services['approvalPolicies']['getApprovalPoliciesId']>,
     undefined,
-    ServiceResponseParameters<
+    ServiceOperationResponseData<
       Services['approvalPolicies']['getApprovalPoliciesId']
     >
   >(
-    openApiToMswPath(
+    convertPathToMSW(
       services.approvalPolicies.getApprovalPoliciesId.schema.url
     ),
-    // @ts-expect-error // todo::fixme
     ({ params: { '0': _, ...path }, request }) => {
       const query = getQueryParameters<
         Services['approvalPolicies']['getApprovalPoliciesId']
@@ -34,13 +31,15 @@ export const handlers = [
   ),
 
   http.post<
-    ServicePathParameters<Services['entities']['postEntitiesIdDocuments']>,
-    ServiceRequestBodyParameters<
+    ServiceOperationPath<Services['entities']['postEntitiesIdDocuments']>,
+    ServiceOperationRequestBody<
       Services['entities']['postEntitiesIdDocuments']
     >,
-    ServiceResponseParameters<Services['entities']['postEntitiesIdDocuments']>
+    ServiceOperationResponseData<
+      Services['entities']['postEntitiesIdDocuments']
+    >
   >(
-    openApiToMswPath(services.entities.postEntitiesIdDocuments.schema.url),
+    convertPathToMSW(services.entities.postEntitiesIdDocuments.schema.url),
     async ({ params: { '0': _, ...path }, request }) => {
       const query = getQueryParameters<
         Services['entities']['postEntitiesIdDocuments']
@@ -62,11 +61,11 @@ export const handlers = [
   ),
 
   http.post<
-    ServicePathParameters<Services['files']['postFiles']>,
-    ServiceRequestBodyParameters<Services['files']['postFiles']>,
-    ServiceResponseParameters<Services['files']['postFiles']>
+    ServiceOperationPath<Services['files']['postFiles']>,
+    ServiceOperationRequestBody<Services['files']['postFiles']>,
+    ServiceOperationResponseData<Services['files']['postFiles']>
   >(
-    openApiToMswPath(services.files.postFiles.schema.url),
+    convertPathToMSW(services.files.postFiles.schema.url),
     async ({ request }) => {
       const formData = Object.fromEntries(await request.formData()) as Awaited<
         ReturnType<typeof request.json>
@@ -79,7 +78,6 @@ export const handlers = [
         if (
           !value ||
           typeof value === 'string' ||
-          // @ts-expect-error - todo::fixme
           value.type !== 'application/octet-stream'
         ) {
           body[key] = value;
@@ -93,11 +91,11 @@ export const handlers = [
   ),
 
   http.delete<
-    ServicePathParameters<Services['files']['deleteFiles']>,
-    ServiceRequestBodyParameters<Services['files']['deleteFiles']>,
-    ServiceResponseParameters<Services['files']['deleteFiles']>
+    ServiceOperationPath<Services['files']['deleteFiles']>,
+    ServiceOperationRequestBody<Services['files']['deleteFiles']>,
+    ServiceOperationResponseData<Services['files']['deleteFiles']>
   >(
-    openApiToMswPath(services.files.postFiles.schema.url),
+    convertPathToMSW(services.files.postFiles.schema.url),
     async ({ request }) => {
       const query = getQueryParameters<Services['files']['deleteFiles']>(
         request.url
@@ -107,34 +105,30 @@ export const handlers = [
   ),
 
   http.get<
-    ServicePathParameters<Services['files']['getFiles']>,
+    ServiceOperationPath<Services['files']['getFiles']>,
     undefined,
-    ServiceResponseParameters<Services['files']['getFiles']>
-  >(
-    openApiToMswPath(services.files.getFiles.schema.url),
-    // @ts-expect-error // todo::fixme
-    ({ request }) => {
-      const query = getQueryParameters<Services['files']['getFiles']>(
-        request.url
-      );
+    ServiceOperationResponseData<Services['files']['getFiles']>
+  >(convertPathToMSW(services.files.getFiles.schema.url), ({ request }) => {
+    const query = getQueryParameters<Services['files']['getFiles']>(
+      request.url
+    );
 
-      const header = getHeaders<Services['files']['getFiles']>(
-        request.headers,
-        ['x-', 'Authorization']
-      );
+    const header = getHeaders<Services['files']['getFiles']>(request.headers, [
+      'x-',
+      'Authorization',
+    ]);
 
-      return HttpResponse.json({
-        query,
-        header,
-      });
-    }
-  ),
+    return HttpResponse.json({
+      query,
+      header,
+    });
+  }),
 
   http.get<
-    ServicePathParameters<Services['files']['findAll']>,
+    ServiceOperationPath<Services['files']['findAll']>,
     undefined,
-    ServiceResponseParameters<Services['files']['findAll']>
-  >(openApiToMswPath(services.files.findAll.schema.url), () => {
+    ServiceOperationResponseData<Services['files']['findAll']>
+  >(convertPathToMSW(services.files.findAll.schema.url), () => {
     return HttpResponse.json({
       data: [
         {
@@ -160,7 +154,7 @@ export const handlers = [
   }),
 ];
 
-function openApiToMswPath(url: string) {
+function convertPathToMSW(url: string) {
   return `*${url.replace(
     /{(.*?)}/g,
     (substring: string, group: string) => `:${group}`
@@ -168,26 +162,24 @@ function openApiToMswPath(url: string) {
 }
 
 function getQueryParameters<
-  T extends
-    | {
-        getQueryKey: (arg: never) => unknown;
-      }
-    | {
-        getMutationKey: (arg: never) => unknown;
-      },
->(url: string): ServiceQueryParameters<T> {
-  return queryString.parse(url.split('?')[1]) as ServiceQueryParameters<T>;
+  TService extends {
+    schema: {
+      method: string;
+    };
+  },
+>(url: string): ServiceOperationQuery<TService> {
+  return queryString.parse(
+    url.split('?')[1]
+  ) as ServiceOperationQuery<TService>;
 }
 
 function getHeaders<
-  T extends
-    | {
-        getQueryKey: (arg: never) => unknown;
-      }
-    | {
-        getMutationKey: (arg: never) => unknown;
-      },
->(headers: Headers, prefixes: string[]): ServiceHeaderParameters<T> {
+  TService extends {
+    schema: {
+      method: string;
+    };
+  },
+>(headers: Headers, prefixes: string[]): ServiceOperationHeaders<TService> {
   return Array.from(headers.entries()).reduce(
     (acc, [headerKey, headerValue]) => {
       if (
@@ -205,110 +197,141 @@ function getHeaders<
       };
     },
     {} as Record<string, string>
-  ) as ServiceHeaderParameters<T>;
+  ) as ServiceOperationHeaders<TService>;
 }
 
-type ServiceHeaderParameters<
-  T extends
-    | {
-        getQueryKey: (arg: never) => unknown;
-      }
-    | {
-        getMutationKey: (arg: never) => unknown;
-      },
-> = T extends {
-  getQueryKey: (arg: infer QueryKey) => unknown;
-}
-  ? QueryKey extends { header?: infer Parameters }
-    ? Parameters
-    : unknown
-  : T extends {
-        getMutationKey: (arg: infer MutationKey) => unknown;
-      }
-    ? NonNullable<MutationKey> extends { header?: infer Parameters }
-      ? Parameters
-      : unknown
-    : never;
-
-type ServicePathParameters<
-  T extends
-    | {
-        getQueryKey: (arg: never) => unknown;
-      }
-    | {
-        getMutationKey: (arg: never) => unknown;
-      },
-> = T extends {
-  getQueryKey: (arg: infer QueryKey) => unknown;
-}
-  ? QueryKey extends { path?: infer Parameters }
-    ? NonNullable<Parameters> extends never
-      ? { '0': string }
-      : { '0': string } & Parameters
-    : {
-        '0': never;
-      }
-  : T extends {
-        getMutationKey: (arg: infer MutationKey) => unknown;
-      }
-    ? NonNullable<MutationKey> extends { path?: infer Parameters }
-      ? Parameters & { '0': string }
-      : { '0': never }
-    : never;
-
-type ServiceQueryParameters<
-  T extends
-    | {
-        getQueryKey: (arg: never) => unknown;
-      }
-    | {
-        getMutationKey: (arg: never) => unknown;
-      },
-> = T extends {
-  getQueryKey: (arg: infer QueryKey) => unknown;
-}
-  ? QueryKey extends { query?: infer Parameters }
-    ? Parameters
-    : unknown
-  : T extends {
-        getMutationKey: (arg: infer MutationKey) => unknown;
-      }
-    ? NonNullable<MutationKey> extends { query?: infer Parameters }
-      ? Parameters
-      : unknown
-    : never;
-
-type ServiceRequestBodyParameters<
-  T extends {
-    useMutation: (...args: never[]) => unknown;
+type ServiceOperationHeaders<
+  TService extends {
+    schema: {
+      method: string;
+    };
   },
-> = T extends {
-  useMutation: (...args: never[]) => unknown;
-  (...args: never[]): unknown;
+> = TService extends {
+  schema: {
+    method: 'get' | 'head' | 'options';
+  };
+  types: {
+    parameters?: {
+      header?: infer Header;
+    };
+  };
 }
-  ? Parameters<T>[1] extends infer Options
-    ? Options extends { body: infer Body }
-      ? Body
-      : never
-    : never
-  : never;
+  ? NonNullable<Header> extends never
+    ? unknown
+    : Header
+  : TService extends {
+        types: {
+          parameters?: {
+            header?: infer Header;
+          };
+        };
+      }
+    ? NonNullable<Header> extends never
+      ? unknown
+      : Header
+    : never;
 
-type ServiceResponseParameters<
-  T extends
-    | {
-        useQuery: (...args: never[]) => unknown;
-      }
-    | {
-        useMutation: (...args: never[]) => unknown;
-      },
-> = T extends {
-  useQuery: (...args: never[]) => unknown;
-  (...args: never[]): unknown;
+type ServiceOperationPath<
+  TServices extends {
+    schema: {
+      method: string;
+    };
+  },
+> = TServices extends {
+  schema: {
+    method: 'get' | 'head' | 'options';
+  };
+  types: {
+    parameters?: {
+      path?: infer Path;
+    };
+  };
 }
-  ? Awaited<ReturnType<T>>
-  : T extends {
-        useMutation: (...args: never[]) => unknown;
-        (...args: never[]): unknown;
+  ? NonNullable<Path> extends never
+    ? { '0': string }
+    : { '0': string } & Path
+  : TServices extends {
+        types: {
+          parameters?: {
+            path?: infer Path;
+          };
+        };
       }
-    ? Awaited<ReturnType<T>>
+    ? NonNullable<Path> extends never
+      ? { '0': string }
+      : { '0': string } & Path
+    : never;
+
+type ServiceOperationQuery<
+  TService extends {
+    schema: {
+      method: string;
+    };
+  },
+> = TService extends {
+  schema: {
+    method: 'get' | 'head' | 'options';
+  };
+  types: {
+    parameters?: {
+      query?: infer Parameters;
+    };
+  };
+}
+  ? NonNullable<Parameters> extends never
+    ? unknown
+    : Parameters
+  : TService extends {
+        types: {
+          parameters?: {
+            query?: infer Parameters;
+          };
+        };
+      }
+    ? NonNullable<Parameters> extends never
+      ? unknown
+      : Parameters
+    : never;
+
+type ServiceOperationRequestBody<
+  TService extends {
+    schema: {
+      method: string;
+    };
+  },
+> = TService extends {
+  schema: {
+    method: 'get' | 'head' | 'options';
+  };
+}
+  ? never
+  : TService extends {
+        types: {
+          body?: infer Body;
+        };
+      }
+    ? Body
+    : never;
+
+type ServiceOperationResponseData<
+  TService extends {
+    schema: {
+      method: string;
+    };
+  },
+> = TService extends {
+  schema: {
+    method: 'get' | 'head' | 'options';
+  };
+  types: {
+    data?: infer Data;
+  };
+}
+  ? Data
+  : TService extends {
+        types: {
+          data?: infer Data;
+        };
+      }
+    ? Data
     : never;

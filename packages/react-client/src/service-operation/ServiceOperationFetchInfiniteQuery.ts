@@ -28,7 +28,7 @@ export interface ServiceOperationFetchInfiniteQuery<
           TPageParam,
           TError
         > &
-          FetchInfiniteQueryOptionsQueryFn<TSchema, TData, TParams>)
+          FetchInfiniteQueryOptionsQueryFn<TSchema, TData, TParams, TError>)
       | (FetchInfiniteQueryOptionsByParameters<
           TSchema,
           TData,
@@ -36,7 +36,7 @@ export interface ServiceOperationFetchInfiniteQuery<
           TPageParam,
           TError
         > &
-          FetchInfiniteQueryOptionsQueryFn<TSchema, TData, TParams>)
+          FetchInfiniteQueryOptionsQueryFn<TSchema, TData, TParams, TError>)
   ): Promise<OperationInfiniteData<TData, TParams>>;
 
   prefetchInfiniteQuery<TPageParam extends TParams>(
@@ -48,7 +48,7 @@ export interface ServiceOperationFetchInfiniteQuery<
           TPageParam,
           TError
         > &
-          FetchInfiniteQueryOptionsQueryFn<TSchema, TData, TParams>)
+          FetchInfiniteQueryOptionsQueryFn<TSchema, TData, TParams, TError>)
       | (FetchInfiniteQueryOptionsByParameters<
           TSchema,
           TData,
@@ -56,7 +56,7 @@ export interface ServiceOperationFetchInfiniteQuery<
           TPageParam,
           TError
         > &
-          FetchInfiniteQueryOptionsQueryFn<TSchema, TData, TParams>)
+          FetchInfiniteQueryOptionsQueryFn<TSchema, TData, TParams, TError>)
   ): Promise<void>;
 }
 
@@ -133,7 +133,8 @@ type FetchInfiniteQueryOptionsByParameters<
 type FetchInfiniteQueryOptionsQueryFn<
   TSchema extends { url: string; method: string },
   TData,
-  TParams = {},
+  TParams,
+  TError,
 > =
   | {
       queryFn: QueryFunction<
@@ -145,7 +146,7 @@ type FetchInfiniteQueryOptionsQueryFn<
       /**
        * Custom request function to use for the query
        */
-      requestFn?: RequestFn<TData>;
+      requestFn?: RequestFn<TData, TError>;
       /**
        * Base URL to use for the request (used in the `queryFn`)
        * @example 'https://api.example.com'

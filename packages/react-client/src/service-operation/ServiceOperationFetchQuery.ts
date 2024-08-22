@@ -15,17 +15,17 @@ export interface ServiceOperationFetchQuery<
   fetchQuery(
     options:
       | (FetchQueryOptionsByQueryKey<TSchema, TData, TParams, TError> &
-          FetchQueryOptionsQueryFn<TSchema, TData, TParams>)
+          FetchQueryOptionsQueryFn<TSchema, TData, TParams, TError>)
       | (FetchQueryOptionsByParameters<TSchema, TData, TParams, TError> &
-          FetchQueryOptionsQueryFn<TSchema, TData, TParams>)
+          FetchQueryOptionsQueryFn<TSchema, TData, TParams, TError>)
   ): Promise<TData>;
 
   prefetchQuery(
     options:
       | (FetchQueryOptionsByQueryKey<TSchema, TData, TParams, TError> &
-          FetchQueryOptionsQueryFn<TSchema, TData, TParams>)
+          FetchQueryOptionsQueryFn<TSchema, TData, TParams, TError>)
       | (FetchQueryOptionsByParameters<TSchema, TData, TParams, TError> &
-          FetchQueryOptionsQueryFn<TSchema, TData, TParams>)
+          FetchQueryOptionsQueryFn<TSchema, TData, TParams, TError>)
   ): Promise<void>;
 }
 
@@ -72,7 +72,8 @@ interface FetchQueryOptionsByParameters<
 type FetchQueryOptionsQueryFn<
   TSchema extends { url: string; method: string },
   TData,
-  TParams = {},
+  TParams,
+  TError,
 > =
   | {
       queryFn: QueryFunction<TData, ServiceOperationQueryKey<TSchema, TParams>>;
@@ -81,7 +82,7 @@ type FetchQueryOptionsQueryFn<
       /**
        * Custom request function to use for the query
        */
-      requestFn?: RequestFn<TData>;
+      requestFn?: RequestFn<TData, TError>;
       /**
        * Base URL to use for the request (used in the `queryFn`)
        * @example 'https://api.example.com'

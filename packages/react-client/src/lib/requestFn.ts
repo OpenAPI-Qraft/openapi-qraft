@@ -11,14 +11,12 @@
  *
  * @throws {error: object|string, response: Response} Throws an error if the request fails. The error includes the error message and the response from the server.
  */
-export async function requestFn<T>(
+export async function requestFn<TData, TError>(
   schema: OperationSchema,
   requestInfo: RequestFnInfo,
   options?: RequestFnOptions
-): Promise<T> {
-  // todo::refactor according to https://github.com/openapi-ts/openapi-typescript/blob/2a4b067f43f7e0b75aecbf5c2fb3013a4e96e591/packages/openapi-fetch/src/index.js#L158-L178
-  // todo::return full response and error, not throw! add invoke method typed errors
-  return baseRequestFn(schema, requestInfo, {
+): Promise<RequestFnResponse<TData, TError>> {
+  return baseRequestFn<TData, TError>(schema, requestInfo, {
     urlSerializer,
     bodySerializer,
     ...options,
@@ -41,11 +39,11 @@ export async function requestFn<T>(
  *
  * @throws {error: object|string, response: Response} Throws an error if the request fails. The error includes the error message and the response from the server.
  */
-export async function baseRequestFn<T>(
+export async function baseRequestFn<TData, TError>(
   requestSchema: OperationSchema,
   requestInfo: RequestFnInfo,
   options: WithRequired<RequestFnOptions, 'urlSerializer' | 'bodySerializer'>
-): Promise<T> {
+): Promise<RequestFnResponse<TData, TError>> {
   const { parameters, headers, body, ...requestInfoRest } = requestInfo;
 
   const requestBody = options.bodySerializer(requestSchema, requestInfo);
@@ -65,7 +63,7 @@ export async function baseRequestFn<T>(
         headers,
         parameters?.header,
         requestBody instanceof FormData
-          ? // remove `Content-Type` if serialized body is FormData; browser will correctly set Content-Type & boundary expression
+          ? // remove `Content-Type` if the serialized body is FormData; the browser will correctly set Content-Type & boundary expression
             { 'Content-Type': null }
           : undefined
       ),
@@ -73,14 +71,7 @@ export async function baseRequestFn<T>(
     }
   );
 
-  // clone response to allow multiple reads
-  const clonedResponse = response.clone();
-
-  if (!response.ok) {
-    throw await getResponseBody(clonedResponse);
-  }
-
-  return (await getResponseBody(clonedResponse)) as T;
+  return processResponse<TData, TError>(response);
 }
 
 /**
@@ -259,27 +250,64 @@ function getBodyContentType(body: RequestFnPayload['body']) {
   if (!(body instanceof FormData)) return 'application/json';
 }
 
-async function getResponseBody<T>(response: Response): Promise<T | undefined> {
+async function processResponse<TData, TError>(
+  response: Response
+): Promise<RequestFnResponse<TData, TError>> {
   if (response.status === 204 || response.headers.get('Content-Length') === '0')
-    return undefined;
+    return (
+      response.ok ? { data: {}, response } : { error: {}, response }
+    ) as RequestFnResponse<TData, TError>;
 
-  const contentType = response.headers.get('Content-Type')?.toLowerCase();
-  const isJSON =
-    contentType?.includes('/json') || contentType?.includes('+json');
+  const isJSON = isJsonResponse(response);
 
-  if (isJSON) {
-    // attempt to parse JSON for successful responses, otherwise fail
-    if (response.ok) return response.json();
+  if (response.ok) {
+    if (isJSON) {
+      return resolveResponse(
+        response,
+        // clone response before parsing every time to allow multiple reads
+        response.clone().json()
+      );
+    }
 
-    const errorFallbackResponse = response.clone(); // clone to allow multiple reads
-
-    return response.json().catch(() => {
-      // falling back to .text() when necessary for error messages
-      return errorFallbackResponse.text();
-    });
+    return resolveResponse(
+      response,
+      new Promise((resolve, reject) =>
+        // attempt to parse JSON for successful responses, otherwise fail
+        response.clone().text().then(JSON.parse).then(resolve, reject)
+      )
+    );
   }
 
-  return response.text() as Promise<T>;
+  if (isJSON)
+    return resolveResponse(response, Promise.reject(response.clone().json()));
+
+  return resolveResponse(response, Promise.reject(response.clone().text()));
+}
+
+function isJsonResponse(response: Response) {
+  const contentType = response.headers.get('Content-Type')?.toLowerCase();
+  return contentType?.includes('/json') || contentType?.includes('+json');
+}
+
+function resolveResponse<TData, TError>(
+  responseToReturn: Response,
+  responsePromise: Promise<TData>
+): Promise<RequestFnResponse<TData, TError>> {
+  return responsePromise
+    .then(
+      (data) =>
+        ({ data, response: responseToReturn }) as RequestFnResponse<
+          TData,
+          TError
+        >
+    )
+    .catch(
+      (error) =>
+        ({ error, response: responseToReturn }) as RequestFnResponse<
+          TData,
+          TError
+        >
+    );
 }
 
 // To have definitely typed headers without a conversion to stings
@@ -367,7 +395,13 @@ export interface RequestFnOptions {
   fetch?: typeof fetch;
 }
 
-export type RequestFn<T> = typeof requestFn<T>;
+export type RequestFn<TData, TError> = typeof requestFn<TData, TError>;
+
+export type RequestFnResponse<TData, TError> = {
+  data?: TData;
+  error?: TError | Error;
+  response: Response;
+};
 
 type WithRequired<T, K extends keyof T> = T & {
   [_ in K]: {};

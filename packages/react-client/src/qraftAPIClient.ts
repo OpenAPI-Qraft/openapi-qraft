@@ -1,7 +1,11 @@
 import type { QueryClient } from '@tanstack/query-core';
 import type * as callbacks from './callbacks/index.js';
 import type * as operationInvokeModule from './callbacks/operationInvokeFn.js';
-import type { OperationSchema, RequestFnInfo } from './lib/requestFn.js';
+import type {
+  OperationSchema,
+  RequestFnInfo,
+  RequestFnResponse,
+} from './lib/requestFn.js';
 import type {
   ServiceOperationMutation,
   ServiceOperationQuery,
@@ -11,7 +15,10 @@ import type { ServiceOperationQueryFn } from './service-operation/ServiceOperati
 import { createRecursiveProxy } from './lib/createRecursiveProxy.js';
 
 export interface CreateAPIBasicClientOptions {
-  requestFn<T>(schema: OperationSchema, requestInfo: RequestFnInfo): Promise<T>;
+  requestFn<TData, TError>(
+    schema: OperationSchema,
+    requestInfo: RequestFnInfo
+  ): Promise<RequestFnResponse<TData, TError>>;
   baseUrl: string;
 }
 
@@ -264,7 +271,8 @@ type ServicesFilteredByCallbacks<
             ? ServiceOperationQueryFn<
                 TServices[serviceName][method]['schema'],
                 TServices[serviceName][method]['types']['data'],
-                TServices[serviceName][method]['types']['parameters']
+                TServices[serviceName][method]['types']['parameters'],
+                TServices[serviceName][method]['types']['error']
               >
             : {})
       : Pick<
@@ -284,7 +292,8 @@ type ServicesFilteredByCallbacks<
                 TServices[serviceName][method]['schema'],
                 TServices[serviceName][method]['types']['body'],
                 TServices[serviceName][method]['types']['data'],
-                TServices[serviceName][method]['types']['parameters']
+                TServices[serviceName][method]['types']['parameters'],
+                TServices[serviceName][method]['types']['error']
               >
             : {});
   };

@@ -40,7 +40,7 @@ export interface ServiceOperationQuery<
     ServiceOperationUseSuspenseQuery<TSchema, TData, TParams, TError>,
     ServiceOperationUseSuspenseInfiniteQuery<TSchema, TData, TParams, TError>,
     ServiceOperationUseIsFetchingQueries<TSchema, TData, TParams, TError>,
-    ServiceOperationQueryFn<TSchema, TData, TParams>,
+    ServiceOperationQueryFn<TSchema, TData, TParams, TError>,
     ServiceOperationFetchQuery<TSchema, TData, TParams, TError>,
     ServiceOperationFetchInfiniteQuery<TSchema, TData, TParams, TError>,
     ServiceOperationGetQueryData<TSchema, TData, TParams>,
@@ -74,7 +74,7 @@ export interface ServiceOperationMutation<
     ServiceOperationUseIsMutating<TSchema, TBody, TData, TParams, TError>,
     ServiceOperationUseMutationState<TSchema, TBody, TData, TParams, TError>,
     ServiceOperationIsMutatingQueries<TSchema, TBody, TData, TParams, TError>,
-    ServiceOperationMutationFn<TSchema, TBody, TData, TParams> {
+    ServiceOperationMutationFn<TSchema, TBody, TData, TParams, TError> {
   schema: TSchema;
   types: {
     parameters: TParams;
