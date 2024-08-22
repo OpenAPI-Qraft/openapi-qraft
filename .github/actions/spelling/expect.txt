@@ -70,7 +70,7 @@ treeshake
 TResult
 TSchema
 TCallbacks
-TServices
+tservice
 tseslint
 TSignal
 TVariables
