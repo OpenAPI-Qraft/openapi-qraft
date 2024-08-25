@@ -41,7 +41,14 @@ const config = {
       /** @type {import('@docusaurus/preset-classic').Options} */
       ({
         docs: {
+          path: 'docs',
           sidebarPath: './sidebars.js',
+          lastVersion: 'current',
+          versions: {
+            current: {
+              label: '2.x',
+            },
+          },
           // Please change this to your repo.
           // Remove this to remove the "edit this page" links.
           editUrl: 'https://github.com/OpenAPI-Qraft/openapi-qraft/edit/main/website/',
@@ -87,6 +94,10 @@ const config = {
         title: 'OpenAPI Qraft',
         items: [
           {
+            type: 'docsVersionDropdown',
+            position: 'right',
+          },
+          {
             type: 'docSidebar',
             sidebarId: 'mainDocsSidebar',
             position: 'left',
@@ -111,6 +122,10 @@ const config = {
         appId: 'B42903JOPT',
         apiKey: '68a397ed6b627ba01e722c54228bd79f',
         indexName: 'openapi-qraftio',
+      },
+      announcementBar: {
+        id: `announcementBar-v2.x`, // used in `localStorage`
+        content: `🎉️ <b>OpenAPI Qraft 2.x is out!</b> 🥳️`,
       },
     }),
 };
