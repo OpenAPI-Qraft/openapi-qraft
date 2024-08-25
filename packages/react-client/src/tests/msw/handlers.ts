@@ -22,6 +22,23 @@ export const handlers = [
         Services['approvalPolicies']['getApprovalPoliciesId']
       >(request.headers, ['x-', 'Authorization']);
 
+      // @ts-expect-error - test invalid parameter
+      if (query.not_existing_approval_policy_query_parameter)
+        throw HttpResponse.error();
+
+      if (
+        !path.approval_policy_id ||
+        path.approval_policy_id === '{approval_policy_id}'
+      )
+        return HttpResponse.json(
+          { error: { message: 'approval_policy_id is required' } },
+          {
+            status: 404,
+            type: 'basic',
+            headers: { 'Content-Type': 'application/json' },
+          }
+        );
+
       return HttpResponse.json({
         path,
         query,
@@ -327,13 +344,15 @@ type ServiceOperationResponseData<
   };
   types: {
     data?: infer Data;
+    error?: infer Error;
   };
 }
-  ? Data
+  ? Data | Error
   : TService extends {
         types: {
           data?: infer Data;
+          error?: infer Error;
         };
       }
-    ? Data
+    ? Data | Error
     : never;

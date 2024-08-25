@@ -36,7 +36,7 @@ export function useComposeUseQueryOptions(
           signal,
           meta,
         })
-        .then(requestFnResponseResolver);
+        .then(requestFnResponseResolver, requestFnResponseResolver);
     };
 
   const queryKey = Array.isArray(parameters)

@@ -66,7 +66,7 @@ export const useMutation: <
                   baseUrl: qraftOptions.baseUrl,
                   body: bodyPayload as never,
                 })
-                .then(requestFnResponseResolver);
+                .then(requestFnResponseResolver, requestFnResponseResolver);
             }
           : function (parametersAndBodyPayload) {
               const { body, ...parameters } = parametersAndBodyPayload as {
@@ -79,7 +79,7 @@ export const useMutation: <
                   baseUrl: qraftOptions.baseUrl,
                   body,
                 } as never)
-                .then(requestFnResponseResolver);
+                .then(requestFnResponseResolver, requestFnResponseResolver);
             }),
     },
     qraftOptions.queryClient

@@ -55,7 +55,7 @@ export function callQueryClientMethodWithQueryKey<
         baseUrl,
         signal,
         meta,
-      }).then(requestFnResponseResolver);
+      }).then(requestFnResponseResolver, requestFnResponseResolver);
     };
 
   if (parameters) {

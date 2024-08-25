@@ -51,7 +51,7 @@ export const useSuspenseQueries: (
                   signal,
                   meta,
                 })
-                .then(requestFnResponseResolver);
+                .then(requestFnResponseResolver, requestFnResponseResolver);
             },
         };
       }),

@@ -1516,6 +1516,39 @@ describe('Qraft uses Query Function', () => {
     await expect(result).resolves.toEqual(parameters);
   });
 
+  it('uses fetchQuery without arguments', async () => {
+    const { qraft } = createClient();
+
+    const result = qraft.files.findAll.fetchQuery();
+
+    await expect(result).resolves.toEqual(filesFindAllResponsePayloadFixtures);
+  });
+
+  it('emits type and response error required `parameters` are omitted', async () => {
+    const { qraft } = createClient();
+
+    await expect(
+      // @ts-expect-error - `parameters` is required for the operation
+      qraft.approvalPolicies.getApprovalPoliciesId.fetchQuery()
+    ).rejects.toEqual({ error: { message: 'approval_policy_id is required' } });
+  });
+
+  it('emits type and response network error extra `parameters` are provided', async () => {
+    const { qraft } = createClient();
+
+    await expect(
+      qraft.approvalPolicies.getApprovalPoliciesId.fetchQuery({
+        parameters: {
+          path: { approval_policy_id: '1' },
+          query: {
+            // @ts-expect-error - `parameters` is required for the operation
+            not_existing_approval_policy_query_parameter: '1',
+          },
+        },
+      })
+    ).rejects.toThrow(new Error('Failed to fetch'));
+  });
+
   it('uses fetchQuery with custom `baseUrl`', async () => {
     const requestFnSpy = vi.fn(requestFn);
 

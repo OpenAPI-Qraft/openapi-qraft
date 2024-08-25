@@ -47,7 +47,7 @@ export const useQueries: (
                   signal,
                   meta,
                 })
-                .then(requestFnResponseResolver);
+                .then(requestFnResponseResolver, requestFnResponseResolver);
             },
         };
       }),

@@ -50,28 +50,25 @@ export async function baseRequestFn<TData, TError>(
 
   const baseFetch = options.fetch ?? fetch;
 
-  const response = await baseFetch(
-    options.urlSerializer(requestSchema, requestInfo),
-    {
-      method: requestSchema.method.toUpperCase(),
-      body: requestBody,
-      headers: mergeHeaders(
-        {
-          Accept: 'application/json',
-          'Content-Type': requestSchema.mediaType ?? getBodyContentType(body),
-        },
-        headers,
-        parameters?.header,
-        requestBody instanceof FormData
-          ? // remove `Content-Type` if the serialized body is FormData; the browser will correctly set Content-Type & boundary expression
-            { 'Content-Type': null }
-          : undefined
-      ),
-      ...requestInfoRest,
-    }
-  );
-
-  return processResponse<TData, TError>(response);
+  return baseFetch(options.urlSerializer(requestSchema, requestInfo), {
+    method: requestSchema.method.toUpperCase(),
+    body: requestBody,
+    headers: mergeHeaders(
+      {
+        Accept: 'application/json',
+        'Content-Type': requestSchema.mediaType ?? getBodyContentType(body),
+      },
+      headers,
+      parameters?.header,
+      requestBody instanceof FormData
+        ? // remove `Content-Type` if the serialized body is FormData; the browser will correctly set Content-Type & boundary expression
+          { 'Content-Type': null }
+        : undefined
+    ),
+    ...requestInfoRest,
+  })
+    .then(processResponse as typeof processResponse<TData, TError>)
+    .catch(resolveResponse as typeof resolveResponse<TData, TError>);
 }
 
 /**
@@ -258,30 +255,24 @@ async function processResponse<TData, TError>(
       response.ok ? { data: {}, response } : { error: {}, response }
     ) as RequestFnResponse<TData, TError>;
 
-  const isJSON = isJsonResponse(response);
-
-  if (response.ok) {
-    if (isJSON) {
-      return resolveResponse(
-        response,
-        // clone response before parsing every time to allow multiple reads
-        response.clone().json()
-      );
-    }
-
+  if (isJsonResponse(response)) {
+    // clone response before parsing every time to allow multiple reads
+    const jsonResponse = response.clone().json();
     return resolveResponse(
       response,
-      new Promise((resolve, reject) =>
-        // attempt to parse JSON for successful responses, otherwise fail
-        response.clone().text().then(JSON.parse).then(resolve, reject)
-      )
+      response.ok ? jsonResponse : Promise.reject(await jsonResponse)
     );
   }
 
-  if (isJSON)
-    return resolveResponse(response, Promise.reject(response.clone().json()));
+  const jsonResponse = new Promise<TData>((resolve, reject) =>
+    // attempt to parse JSON for successful responses, otherwise fail
+    response.clone().text().then(JSON.parse).then(resolve, reject)
+  );
 
-  return resolveResponse(response, Promise.reject(response.clone().text()));
+  return resolveResponse(
+    response,
+    response.ok ? jsonResponse : Promise.reject(await jsonResponse)
+  );
 }
 
 function isJsonResponse(response: Response) {
@@ -290,9 +281,23 @@ function isJsonResponse(response: Response) {
 }
 
 function resolveResponse<TData, TError>(
+  error: Error
+): Promise<RequestFnResponse<TData, TError>>;
+function resolveResponse<TData, TError>(
   responseToReturn: Response,
   responsePromise: Promise<TData>
+): Promise<RequestFnResponse<TData, TError>>;
+function resolveResponse<TData, TError>(
+  responseToReturn: Response | Error,
+  responsePromise?: Promise<TData>
 ): Promise<RequestFnResponse<TData, TError>> {
+  if (!responsePromise)
+    return Promise.reject({
+      error: responseToReturn,
+      response: undefined,
+      data: undefined,
+    });
+
   return responsePromise
     .then(
       (data) =>
@@ -397,11 +402,24 @@ export interface RequestFnOptions {
 
 export type RequestFn<TData, TError> = typeof requestFn<TData, TError>;
 
-export type RequestFnResponse<TData, TError> = {
-  data?: TData;
-  error?: TError | Error;
-  response: Response;
-};
+export type RequestFnResponse<TData, TError> =
+  | {
+      data?: TData;
+      response: Response;
+      error?: never;
+    }
+  | {
+      // server error
+      error?: TError | Error;
+      response: Response;
+      data?: never;
+    }
+  | {
+      // network error
+      error?: Error;
+      data?: never;
+      response?: never;
+    };
 
 type WithRequired<T, K extends keyof T> = T & {
   [_ in K]: {};
