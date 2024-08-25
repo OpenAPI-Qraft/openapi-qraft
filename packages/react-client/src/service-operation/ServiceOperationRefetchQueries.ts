@@ -10,7 +10,7 @@ export interface ServiceOperationRefetchQueries<
   TParams = {},
   TError = DefaultError,
 > {
-  refetchQueries<TInfinite extends boolean>(
+  refetchQueries<TInfinite extends boolean = false>(
     filters?:
       | QueryFiltersByParameters<TSchema, TData, TInfinite, TParams, TError>
       | QueryFiltersByQueryKey<TSchema, TData, TInfinite, TParams, TError>,

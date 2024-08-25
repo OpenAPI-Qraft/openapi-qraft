@@ -10,7 +10,7 @@ export interface ServiceOperationRemoveQueries<
   TParams = {},
   TError = DefaultError,
 > {
-  removeQueries<TInfinite extends boolean>(
+  removeQueries<TInfinite extends boolean = false>(
     filters?:
       | QueryFiltersByParameters<TSchema, TData, TInfinite, TParams, TError>
       | QueryFiltersByQueryKey<TSchema, TData, TInfinite, TParams, TError>

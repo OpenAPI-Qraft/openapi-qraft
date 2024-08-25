@@ -12,10 +12,10 @@ import type {
 export interface ServiceOperationSetQueriesData<
   TSchema extends { url: string; method: string },
   TData,
-  TParams = {}, // todo::try to replace `TParams = {}` with `TParams = undefined`
+  TParams,
   TError = DefaultError,
 > {
-  setQueriesData<TInfinite extends boolean>(
+  setQueriesData<TInfinite extends boolean = false>(
     filters:
       | QueryFiltersByParameters<TSchema, TData, TInfinite, TParams, TError>
       | QueryFiltersByQueryKey<TSchema, TData, TInfinite, TParams, TError>,

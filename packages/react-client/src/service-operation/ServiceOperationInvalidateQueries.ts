@@ -24,7 +24,7 @@ export interface ServiceOperationInvalidateQueries<
   TParams = {},
   TError = DefaultError,
 > {
-  invalidateQueries<TInfinite extends boolean>(
+  invalidateQueries<TInfinite extends boolean = false>(
     filters?: InvalidateQueryFilters<
       TSchema,
       TData,

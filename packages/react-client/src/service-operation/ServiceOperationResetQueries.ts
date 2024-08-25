@@ -10,7 +10,7 @@ export interface ServiceOperationResetQueries<
   TParams = {},
   TError = DefaultError,
 > {
-  resetQueries<TInfinite extends boolean>(
+  resetQueries<TInfinite extends boolean = false>(
     filters?:
       | QueryFiltersByParameters<TSchema, TData, TInfinite, TParams, TError>
       | QueryFiltersByQueryKey<TSchema, TData, TInfinite, TParams, TError>,

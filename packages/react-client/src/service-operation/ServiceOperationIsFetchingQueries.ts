@@ -10,7 +10,7 @@ export interface ServiceOperationIsFetchingQueries<
   TParams = {},
   TError = DefaultError,
 > {
-  isFetching<TInfinite extends boolean>(
+  isFetching<TInfinite extends boolean = false>(
     filters?:
       | QueryFiltersByParameters<TSchema, TData, TInfinite, TParams, TError>
       | QueryFiltersByQueryKey<TSchema, TData, TInfinite, TParams, TError>
