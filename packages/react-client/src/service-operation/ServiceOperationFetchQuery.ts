@@ -5,29 +5,47 @@ import type {
 } from '@tanstack/query-core';
 import type { RequestFn } from '../lib/requestFn.js';
 import type { ServiceOperationQueryKey } from './ServiceOperationKey.js';
+import { AreAllOptional } from '../lib/AreAllOptional.js';
 
 export interface ServiceOperationFetchQuery<
   TSchema extends { url: string; method: string },
   TData,
-  TParams = {},
+  TParams,
   TError = DefaultError,
 > {
   fetchQuery(
-    options:
-      | (FetchQueryOptionsByQueryKey<TSchema, TData, TParams, TError> &
-          FetchQueryOptionsQueryFn<TSchema, TData, TParams, TError>)
-      | (FetchQueryOptionsByParameters<TSchema, TData, TParams, TError> &
-          FetchQueryOptionsQueryFn<TSchema, TData, TParams, TError>)
+    options: AreAllOptional<TParams> extends true
+      ? ServiceOperationFetchQueryOptions<
+          TSchema,
+          TData,
+          TParams,
+          TError
+        > | void
+      : ServiceOperationFetchQueryOptions<TSchema, TData, TParams, TError>
   ): Promise<TData>;
 
   prefetchQuery(
-    options:
-      | (FetchQueryOptionsByQueryKey<TSchema, TData, TParams, TError> &
-          FetchQueryOptionsQueryFn<TSchema, TData, TParams, TError>)
-      | (FetchQueryOptionsByParameters<TSchema, TData, TParams, TError> &
-          FetchQueryOptionsQueryFn<TSchema, TData, TParams, TError>)
+    options: AreAllOptional<TParams> extends true
+      ? ServiceOperationFetchQueryOptions<
+          TSchema,
+          TData,
+          TParams,
+          TError
+        > | void
+      : ServiceOperationFetchQueryOptions<TSchema, TData, TParams, TError>
   ): Promise<void>;
 }
+
+type ServiceOperationFetchQueryOptions<
+  TSchema extends { url: string; method: string },
+  TData,
+  TParams,
+  TError,
+> =
+  | (FetchQueryOptionsByQueryKey<TSchema, TData, TParams, TError> &
+      FetchQueryOptionsQueryFn<TSchema, TData, TParams, TError>)
+  | (FetchQueryOptionsByParameters<TSchema, TData, TParams, TError> &
+      FetchQueryOptionsQueryFn<TSchema, TData, TParams, TError>);
 
 type FetchQueryOptionsBase<
   TSchema extends { url: string; method: string },
@@ -53,7 +71,8 @@ interface FetchQueryOptionsByQueryKey<
   /**
    * Fetch Queries by query key
    */
-  queryKey?: ServiceOperationQueryKey<TSchema, TParams>;
+  queryKey: ServiceOperationQueryKey<TSchema, TParams>;
+  parameters?: never;
 }
 
 interface FetchQueryOptionsByParameters<
@@ -65,7 +84,7 @@ interface FetchQueryOptionsByParameters<
   /**
    * Fetch Queries by parameters
    */
-  parameters?: TParams;
+  parameters: TParams;
   queryKey?: never;
 }
 

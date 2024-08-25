@@ -1389,7 +1389,7 @@ describe('Qraft uses Mutation State', () => {
   });
 });
 
-describe('Qraft uses Query Function', () => {
+describe('Qraft uses Operation Query Function', () => {
   const parameters: Services['approvalPolicies']['getApprovalPoliciesId']['types']['parameters'] =
     {
       header: {
@@ -1503,6 +1503,21 @@ describe('Qraft uses Query Function', () => {
         | undefined
     ).toEqual(parameters);
   });
+});
+
+describe('Qraft uses "fetchQuery(...) & "prefetchQuery(...)"', () => {
+  const parameters: Services['approvalPolicies']['getApprovalPoliciesId']['types']['parameters'] =
+    {
+      header: {
+        'x-monite-version': '1.0.0',
+      },
+      path: {
+        approval_policy_id: '1',
+      },
+      query: {
+        items_order: ['asc', 'desc'],
+      },
+    };
 
   it('uses fetchQuery with `parameters`', async () => {
     const { qraft } = createClient();
@@ -1578,17 +1593,15 @@ describe('Qraft uses Query Function', () => {
   });
 
   it('uses fetchQuery with custom `baseUrl` and `requestFn`', async () => {
-    const requestFnClientSpy = vi.fn(requestFn);
-    const requestFnCustomSpy = vi.fn(requestFn);
+    const requestFnClientSpy = vi.fn(requestFn) as typeof requestFn;
+    const requestFnCustomSpy = vi.fn(requestFn) as typeof requestFn;
 
     const { qraft } = createClient({
-      // @ts-expect-error - vi.fn types are not correct
       requestFn: requestFnClientSpy,
     });
 
     await qraft.approvalPolicies.getApprovalPoliciesId.fetchQuery({
       baseUrl: 'https://api.sandbox.monite.com/v333',
-      // @ts-expect-error - vi.fn types are not correct
       requestFn: requestFnCustomSpy,
       parameters,
     });
@@ -1658,6 +1671,21 @@ describe('Qraft uses Query Function', () => {
       qraft.approvalPolicies.getApprovalPoliciesId.getQueryData(parameters)
     ).toEqual(parameters);
   });
+});
+
+describe('Qraft uses "fetchInfiniteQuery(...) & "prefetchInfiniteQuery(...)"', () => {
+  const parameters: Services['approvalPolicies']['getApprovalPoliciesId']['types']['parameters'] =
+    {
+      header: {
+        'x-monite-version': '1.0.0',
+      },
+      path: {
+        approval_policy_id: '1',
+      },
+      query: {
+        items_order: ['asc', 'desc'],
+      },
+    };
 
   it('uses fetchInfiniteQuery with multiple pages', async () => {
     const { qraft } = createClient();
@@ -1756,7 +1784,7 @@ describe('Qraft uses Query Function', () => {
   });
 });
 
-describe('Qraft uses mutationFn', () => {
+describe('Qraft uses Operation Mutation Function', () => {
   it('supports Operation Mutation without `baseUrl`', async () => {
     const { qraft } = createClient();
 

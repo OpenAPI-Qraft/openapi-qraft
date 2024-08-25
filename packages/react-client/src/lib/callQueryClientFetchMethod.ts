@@ -25,7 +25,7 @@ export function callQueryClientMethodWithQueryKey<
     queryFn: queryFnOption,
     parameters,
     ...options
-  } = args[0];
+  } = args[0] ?? {};
 
   const queryClient = qraftOptions.queryClient;
   const baseUrl = baseUrlOption ?? qraftOptions.baseUrl;
@@ -58,19 +58,16 @@ export function callQueryClientMethodWithQueryKey<
       }).then(requestFnResponseResolver, requestFnResponseResolver);
     };
 
-  if (parameters) {
-    // @ts-expect-error - Too complex union to type
-    return queryClient[queryFilterMethod]({
-      ...options,
-      queryFn,
-      queryKey: infinite
-        ? composeInfiniteQueryKey(schema, parameters)
-        : composeQueryKey(schema, parameters),
-    });
-  }
-
   // @ts-expect-error - Too complex union to type
-  return queryClient[queryFilterMethod]({ ...options, queryFn });
+  return queryClient[queryFilterMethod]({
+    ...options,
+    queryFn,
+    queryKey:
+      options.queryKey ??
+      (infinite
+        ? composeInfiniteQueryKey(schema, parameters)
+        : composeQueryKey(schema, parameters)),
+  });
 }
 
 type QueryClientMethodArgs<QMethod extends keyof QueryClientPrototype> = [
