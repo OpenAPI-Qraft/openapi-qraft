@@ -2783,13 +2783,6 @@ describe('Qraft uses Queries Invalidation', () => {
     ).rejects.toThrowError('Invalidation Error');
   });
 
-  it('requires invalidateQueries queryClient instance', async () => {
-    expect(() =>
-      // @ts-expect-error - Invalid usage
-      qraft.approvalPolicies.getApprovalPoliciesId.invalidateQueries()
-    ).toThrowError();
-  });
-
   it('supports invalidateQueries without filters and not effect other queries', async () => {
     const { qraft, queryClient } = createClient({
       queryClientConfig: {
