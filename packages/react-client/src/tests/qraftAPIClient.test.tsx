@@ -19,6 +19,7 @@ import React, { ReactNode } from 'react';
 import { vi } from 'vitest';
 import { CreateAPIClientOptions, qraftAPIClient, requestFn } from '../index.js';
 import { createAPIClient, services, Services } from './fixtures/api/index.js';
+import { filesFindAllResponsePayloadFixtures } from './msw/handlers.js';
 
 const baseUrl = 'https://api.sandbox.monite.com/v1';
 
@@ -178,30 +179,12 @@ describe('Qraft uses singular Query', () => {
     );
 
     await waitFor(() => {
-      const data = {
-        data: [
-          {
-            file_type: 'pdf',
-            id: '1',
-            name: 'file1',
-            url: 'http://localhost:3000/1',
-          },
-          {
-            file_type: 'pdf',
-            id: '2',
-            name: 'file2',
-            url: 'http://localhost:3000/2',
-          },
-          {
-            file_type: 'pdf',
-            id: '3',
-            name: 'file3',
-            url: 'http://localhost:3000/3',
-          },
-        ],
-      };
-      expect(result.current.queryNoArgsWithVoidParameters.data).toEqual(data);
-      expect(result.current.queryWithEmptyParameters.data).toEqual(data);
+      expect(result.current.queryNoArgsWithVoidParameters.data).toEqual(
+        filesFindAllResponsePayloadFixtures
+      );
+      expect(result.current.queryWithEmptyParameters.data).toEqual(
+        filesFindAllResponsePayloadFixtures
+      );
     });
   });
 });
@@ -1464,28 +1447,7 @@ describe('Qraft uses Query Function', () => {
 
     expect(
       data satisfies Services['files']['findAll']['types']['data'] | undefined
-    ).toEqual({
-      data: [
-        {
-          file_type: 'pdf',
-          id: '1',
-          name: 'file1',
-          url: 'http://localhost:3000/1',
-        },
-        {
-          file_type: 'pdf',
-          id: '2',
-          name: 'file2',
-          url: 'http://localhost:3000/2',
-        },
-        {
-          file_type: 'pdf',
-          id: '3',
-          name: 'file3',
-          url: 'http://localhost:3000/3',
-        },
-      ],
-    });
+    ).toEqual(filesFindAllResponsePayloadFixtures);
   });
 
   it('uses Operation Query with `queryKey`', async () => {

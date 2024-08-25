@@ -129,30 +129,32 @@ export const handlers = [
     undefined,
     ServiceOperationResponseData<Services['files']['findAll']>
   >(convertPathToMSW(services.files.findAll.schema.url), () => {
-    return HttpResponse.json({
-      data: [
-        {
-          id: '1',
-          url: 'http://localhost:3000/1',
-          name: 'file1',
-          file_type: 'pdf',
-        },
-        {
-          id: '2',
-          url: 'http://localhost:3000/2',
-          name: 'file2',
-          file_type: 'pdf',
-        },
-        {
-          id: '3',
-          url: 'http://localhost:3000/3',
-          name: 'file3',
-          file_type: 'pdf',
-        },
-      ],
-    });
+    return HttpResponse.json(filesFindAllResponsePayloadFixtures);
   }),
 ];
+
+export const filesFindAllResponsePayloadFixtures = {
+  data: [
+    {
+      id: '1',
+      url: 'http://localhost:3000/1',
+      name: 'file1',
+      file_type: 'pdf',
+    },
+    {
+      id: '2',
+      url: 'http://localhost:3000/2',
+      name: 'file2',
+      file_type: 'pdf',
+    },
+    {
+      id: '3',
+      url: 'http://localhost:3000/3',
+      name: 'file3',
+      file_type: 'pdf',
+    },
+  ],
+};
 
 function convertPathToMSW(url: string) {
   return `*${url.replace(
