@@ -41,7 +41,9 @@ const config = {
       /** @type {import('@docusaurus/preset-classic').Options} */
       ({
         docs: {
+          path: 'docs',
           sidebarPath: './sidebars.js',
+          lastVersion: '1.x',
           // Please change this to your repo.
           // Remove this to remove the "edit this page" links.
           editUrl: 'https://github.com/OpenAPI-Qraft/openapi-qraft/edit/main/website/',

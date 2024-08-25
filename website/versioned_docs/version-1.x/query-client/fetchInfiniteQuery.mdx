@@ -1,0 +1,98 @@
+---
+sidebar_label: fetchInfiniteQuery()
+---
+
+# fetchInfiniteQuery(...)
+
+The method facilitates the fetching of paginated data.
+See TanStack [_queryClient.fetchInfiniteQuery 🌴_](https://tanstack.com/query/latest/docs/reference/QueryClient#queryclientfetchinfinitequery)
+documentation for more details.
+
+:::tip
+`fetchInfiniteQuery` is particularly useful for server-side data fetching (SSR). When used on the server, it automatically
+provides all the retry logic and caching capabilities inherent to TanStack Query.
+This makes it an excellent choice for efficient and robust server-side data retrieval, ensuring your application benefits
+from built-in error handling and performance optimizations.
+:::
+
+```ts
+const result = qraft.<service>.<operation>.fetchInfiniteQuery(
+  {
+    parameters,
+    requestFn,
+    baseUrl,
+    ...fetchInfiniteQueryOptions,
+  },
+  queryClient
+);
+```
+
+### Arguments
+
+1. - `parameters: { path, query, header } | QueryKey | {}`
+     - **Required**, OpenAPI request parameters for the query, strictly-typed ✨
+     - `parameters` will be used to generate the `QueryKey`
+     - If operation does not require parameters, you must pass an empty object `{}` for strictness
+   - `requestFn: RequestFn`
+     - **Optional**, a function that will be used to execute the request
+     - The function should be provided, otherwise it will throw an error if default `queryFn` is not set previously using `QueryClient.setDefaultOptions(...)` method
+   - `baseUrl: string`
+     - **Required if `requestFn` is set**, the base URL of the API
+   - `fetchInfiniteQueryOptions?: FetchInfiniteQueryOptions`
+     - **Optional**, represents the rest options of the [_fetchInfiniteQuery(...) 🌴_](https://tanstack.com/query/latest/docs/reference/QueryClient#queryclientfetchinfinitequery) method
+       - `queryOptions.queryFn` could be provided instead of ~~`requestFn`~~
+       - `queryOptions.queryKey` could be provided instead of ~~`parameters`~~
+
+2. `queryClient: QueryClient`
+   - **Required** [_QueryClient 🌴_](https://tanstack.com/query/latest/docs/reference/QueryClient) to be used
+   - _If not provided_
+     - `QraftContext.queryClient` will be used if available
+     - [_useQueryClient() 🌴_](https://tanstack.com/query/latest/docs/framework/react/reference/useQueryClient)
+       result will be used as a fallback
+
+### Returns
+
+`Promise<InfiniteData<T>>` - A promise of the paginated data and page parameters
+
+### Example
+
+```ts
+/**
+ * Will execute the initial request:
+ * ###
+ * GET /posts?limit=10&page=1
+ * ###
+ * And then will execute the next page request:
+ * GET /posts?limit=10&page=2
+ **/
+import { requestFn } from '@openapi-qraft/react';
+import { QueryClient } from '@tanstack/react-query';
+
+const queryClient = new QueryClient();
+
+const posts = qraft.posts.getPosts.fetchInfiniteQuery(
+  {
+    parameters: { query: { limit: 10 } },
+    pages: 2, // How many pages to fetch
+    initialPageParam: {
+      query: { pagination_token: undefined }, // will be used in initial request
+    },
+    getNextPageParam: (lastPage, allPages, lastPageParam) => ({
+      query: { pagination_token: lastPage.next_pagination_token },
+    }),
+    /**
+     * Request function should be provided, otherwise it will throw an error
+     * if default `queryFn` is not set previously using
+     * `QueryClient.setDefaultOptions(...)` method
+     */
+    requestFn: requestFn,
+    baseUrl: 'https://api.sandbox.monite.com/v1', // must be provided if `requestFn` is set
+  },
+  queryClient
+);
+
+console.log(
+  posts.pages, // all fetched pages
+  posts.pageParams // all page parameters
+);
+```
