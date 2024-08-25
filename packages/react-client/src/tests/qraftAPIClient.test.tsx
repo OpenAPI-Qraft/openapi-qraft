@@ -3742,7 +3742,7 @@ describe('Qraft uses "getMutationKey(...)"', () => {
   });
 });
 
-describe('Qraft respects Types', () => {
+describe('Qraft supports "getQueriesData(...) & setQueriesData(...)"', () => {
   const parameters: Services['approvalPolicies']['getApprovalPoliciesId']['types']['parameters'] =
     {
       header: {
@@ -3768,9 +3768,6 @@ describe('Qraft respects Types', () => {
         parameters,
       ],
       predicate: (query) => {
-        // Will report TS error if 'false'
-        const _isTrue = query.queryKey?.[0]?.infinite === true; // todo::improve type checking
-
         return Boolean(
           // Check if queryKey has a correct type
           query.queryKey?.[1]?.query?.items_order?.includes('asc')
@@ -3801,16 +3798,13 @@ describe('Qraft respects Types', () => {
     });
   });
 
-  it('supports regular parameters predicate query filter strict types', () => {
+  it('not emits type error when using parameters and predicate and infinite is false', () => {
     const { qraft } = createClient();
 
     qraft.approvalPolicies.getApprovalPoliciesId.getQueriesData({
       parameters,
       infinite: false,
       predicate: (query) => {
-        // Will report TS error if 'true'
-        const _isTrue = query.queryKey?.[0]?.infinite === false; // todo::improve type checking
-
         return Boolean(
           query.queryKey?.[1]?.query?.items_order?.includes('asc')
         );
@@ -3818,21 +3812,90 @@ describe('Qraft respects Types', () => {
     });
   });
 
-  it('does not supports  predicate without ', () => {
+  it('supports without parameters and predicate only', () => {
     const { qraft } = createClient();
 
-    qraft.approvalPolicies.getApprovalPoliciesId.getQueriesData({
-      // @ts-expect-error - `query` should be infinite or regular query, todo::improve type checking
-      predicate: (query) => {
-        // Will report TS error if 'true'
-        const _isInfinite =
-          query.queryKey?.[0] && 'infinite' in query.queryKey[0];
+    qraft.approvalPolicies.getApprovalPoliciesId.setQueryData(
+      parameters,
+      parameters
+    );
 
-        return Boolean(
-          query.queryKey?.[1]?.query?.items_order?.includes('asc')
-        );
-      },
-    });
+    expect(
+      qraft.approvalPolicies.getApprovalPoliciesId.getQueriesData({
+        predicate: (query) => {
+          return Boolean(
+            query.queryKey?.[1]?.query?.items_order?.includes('asc')
+          );
+        },
+      })
+    ).toEqual([
+      [
+        [
+          {
+            ...qraft.approvalPolicies.getApprovalPoliciesId.schema,
+            infinite: false,
+          },
+          parameters,
+        ],
+        parameters,
+      ],
+    ]);
+  });
+
+  it('supports getQueriesData without filters on normal queries', () => {
+    const { qraft } = createClient();
+
+    qraft.approvalPolicies.getApprovalPoliciesId.setQueryData(
+      parameters,
+      parameters
+    );
+
+    expect(
+      qraft.approvalPolicies.getApprovalPoliciesId.getQueriesData()
+    ).toEqual([
+      [
+        [
+          {
+            ...qraft.approvalPolicies.getApprovalPoliciesId.schema,
+            infinite: false,
+          },
+          parameters,
+        ],
+        parameters,
+      ],
+    ]);
+  });
+
+  it('supports getQueriesData without filters on infinite queries', () => {
+    const { qraft } = createClient();
+
+    qraft.approvalPolicies.getApprovalPoliciesId.setInfiniteQueryData(
+      parameters,
+      {
+        pages: [parameters],
+        pageParams: [parameters],
+      }
+    );
+
+    expect(
+      qraft.approvalPolicies.getApprovalPoliciesId.getQueriesData({
+        infinite: true,
+      })
+    ).toEqual([
+      [
+        [
+          {
+            ...qraft.approvalPolicies.getApprovalPoliciesId.schema,
+            infinite: true,
+          },
+          parameters,
+        ],
+        {
+          pages: [parameters],
+          pageParams: [parameters],
+        },
+      ],
+    ]);
   });
 });
 
