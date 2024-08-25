@@ -11,10 +11,7 @@ The method can be used to remove queries. Refer to the TanStack
 [_queryClient.removeQueries 🌴_](https://tanstack.com/query/latest/docs/reference/QueryClient#queryclientremovequeries) documentation.
 
 ```ts
-qraft.<service>.<operation>.removeQueries(
-  filters,
-  queryClient,
-)
+qraft.<service>.<operation>.removeQueries(filters)
 ```
 
 ### Arguments
@@ -29,8 +26,6 @@ qraft.<service>.<operation>.removeQueries(
    - `filters.predicate?: (query: Query) => boolean` will be used for filtering queries by custom predicate
    - _If not provided_
      - All queries for the specified endpoint will be removed
-2. `queryClient: QueryClient`
-   - **Required** [_QueryClient 🌴_](https://tanstack.com/query/latest/docs/reference/QueryClient) to be used
 
 ### Returns
 
@@ -60,8 +55,7 @@ qraft.<service>.<operation>.removeQueries(
             entity_id: '3e3e-3e3e-3e3e',
           },
         },
-      },
-      queryClient
+      }
     );
     ```
   </TabItem>
@@ -80,7 +74,7 @@ qraft.<service>.<operation>.removeQueries(
      * ###
      * ⬇︎ All queries for the specified endpoint will be removed
      **/
-    qraft.entities.getEntities.removeQueries(queryClient);
+    qraft.entities.getEntities.removeQueries();
     ```
   </TabItem>
   <TabItem value="with-predicate" label={<span style={{verticalAlign: "middle"}}><code>predicate</code></span>}>
@@ -106,8 +100,7 @@ qraft.<service>.<operation>.removeQueries(
 
           return true;
         },
-      },
-      queryClient
+      }
     );
     ```
   </TabItem>
@@ -132,8 +125,7 @@ qraft.<service>.<operation>.removeQueries(
             entity_id: '3e3e-3e3e-3e3e',
           },
         }),
-      },
-      queryClient
+      }
     );
     ```
   </TabItem>

@@ -15,8 +15,7 @@ See also the TanStack [_queryClient.refetchQueries(...) 🌴_](https://tanstack.
 
     ```ts
     qraft.<service>.<operation>.refetchQueries(
-      filters,
-      queryClient,
+      filters
     )
     ```
 
@@ -32,8 +31,6 @@ See also the TanStack [_queryClient.refetchQueries(...) 🌴_](https://tanstack.
        - `filters.predicate?: (query: Query) => boolean` will be used for filtering queries by custom predicate
        - _If not provided_
          - All queries for the specified endpoint will be refetched
-    2. `queryClient: QueryClient`
-       - **Required** [_QueryClient 🌴_](https://tanstack.com/query/latest/docs/reference/QueryClient) to be used
   </TabItem>
   <TabItem value="with-filter-and-options" label={<span style={{verticalAlign: "middle"}}>With <code>filters</code>, <code>options</code></span>}>
     Refetches queries for the specified endpoint using the provided filters with the specified options.
@@ -41,8 +38,7 @@ See also the TanStack [_queryClient.refetchQueries(...) 🌴_](https://tanstack.
     ```ts
     qraft.<service>.<operation>.refetchQueries(
       filters,
-      options,
-      queryClient,
+      options
     )
     ```
 
@@ -61,22 +57,13 @@ See also the TanStack [_queryClient.refetchQueries(...) 🌴_](https://tanstack.
     2. `options: RefetchOptions`
        - **Required**, see [_queryClient.refetchQueries(...) 🌴_](https://tanstack.com/query/latest/docs/reference/QueryClient#queryclientrefetchqueries) for more details
         to be used
-    2. `queryClient: QueryClient`
-       - **Required** [_QueryClient 🌴_](https://tanstack.com/query/latest/docs/reference/QueryClient) to be used
   </TabItem>
   <TabItem value="without-filters" label={<span style={{verticalAlign: "middle"}}>No <code style={{textDecoration: "line-through"}}>filters</code>, <code style={{textDecoration: "line-through"}}>options</code></span>}>
     Refetches _all_ normal and _Infinite_ queries for the specified endpoint.
 
     ```ts
-    qraft.<service>.<operation>.refetchQueries(
-      queryClient,
-    )
+    qraft.<service>.<operation>.refetchQueries()
     ```
-
-    ### Arguments
-
-    1. `queryClient: QueryClient`
-       - **Required** [_QueryClient 🌴_](https://tanstack.com/query/latest/docs/reference/QueryClient) to be used
   </TabItem>
 </Tabs>
 
@@ -108,8 +95,7 @@ See also the TanStack [_queryClient.refetchQueries(...) 🌴_](https://tanstack.
             entity_id: '3e3e-3e3e-3e3e',
           },
         },
-      },
-      queryClient
+      }
     );
     ```
   </TabItem>
@@ -128,7 +114,7 @@ See also the TanStack [_queryClient.refetchQueries(...) 🌴_](https://tanstack.
      * ###
      * ⬇︎ All queries for the specified endpoint will be refetched
      **/
-    qraft.entities.getEntities.refetchQueries(queryClient);
+    qraft.entities.getEntities.refetchQueries();
     ```
   </TabItem>
   <TabItem value="with-predicate" label={<span style={{verticalAlign: "middle"}}><code>predicate</code></span>}>
@@ -154,8 +140,7 @@ See also the TanStack [_queryClient.refetchQueries(...) 🌴_](https://tanstack.
 
           return true;
         },
-      },
-      queryClient
+      }
     );
     ```
   </TabItem>
@@ -180,8 +165,7 @@ See also the TanStack [_queryClient.refetchQueries(...) 🌴_](https://tanstack.
             entity_id: '3e3e-3e3e-3e3e',
           },
         }),
-      },
-      queryClient
+      }
     );
     ```
   </TabItem>

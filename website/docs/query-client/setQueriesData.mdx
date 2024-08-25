@@ -16,8 +16,7 @@ See the TanStack [_queryClient.setQueriesData 🌴_](https://tanstack.com/query/
     ```ts
     const data = qraft.<service>.<operation>.setQueriesData(
       filters,
-      updater,
-      queryClient
+      updater
     );
     ```
 
@@ -33,16 +32,13 @@ See the TanStack [_queryClient.setQueriesData 🌴_](https://tanstack.com/query/
        - `filters.predicate?: (query: Query) => boolean` will be used for filtering queries by custom predicate
     2. `updater: TData | (oldData: TData | undefined) => TData | undefined`
          - **Required** updater to be used to set the data in the _Query Cache_
-    3. `queryClient: QueryClient`
-         - **Required** `QueryClient` instance to use
   </TabItem>
   <TabItem value="with-options" label={<span style={{verticalAlign: 'middle'}}>With <code>options</code></span>}>
     ```ts
     const data = qraft.<service>.<operation>.setQueriesData(
       filters,
       updater,
-      options,
-      queryClient
+      options
     );
     ```
 
@@ -61,8 +57,6 @@ See the TanStack [_queryClient.setQueriesData 🌴_](https://tanstack.com/query/
     3. `options: SetQueryDataOptions`
          - **Required** options to set the data in the cache
          - See the TanStack [_queryClient.setQueriesData 🌴_](https://tanstack.com/query/latest/docs/reference/QueryClient#queryclientsetquerydata) documentation.
-    4. `queryClient: QueryClient`
-         - **Required** `QueryClient` instance to use
   </TabItem>
 </Tabs>
 
@@ -79,14 +73,10 @@ See the TanStack [_queryClient.setQueriesData 🌴_](https://tanstack.com/query/
 
     qraft.pet.getPetById.setQueriesData(
       { parameters, infinite: false },
-      { id: 123, name: 'Rex' },
-      queryClient
+      { id: 123, name: 'Rex' }
     );
 
-    const pet = qraft.pet.getPetById.getQueryData(
-      parameters,
-      queryClient
-    );
+    const pet = qraft.pet.getPetById.getQueryData(parameters);
 
     expect(pet).toEqual({
       id: 123,
@@ -99,8 +89,7 @@ See the TanStack [_queryClient.setQueriesData 🌴_](https://tanstack.com/query/
     const pets = qraft.pet.getPetById.setQueriesData(
       { parameters: { path: { petId: 123 } }, infinite: false },
       { id: 123, name: 'Rex' },
-      { updatedAt: Date.now() - 60_000 },
-      queryClient
+      { updatedAt: Date.now() - 60_000 }
     );
     ```
   </TabItem>
@@ -115,8 +104,7 @@ See the TanStack [_queryClient.setQueriesData 🌴_](https://tanstack.com/query/
           { petId: 123 },
         ],
       },
-      { id: 123, name: 'Rex' },
-      queryClient
+      { id: 123, name: 'Rex' }
     );
     ```
   </TabItem>

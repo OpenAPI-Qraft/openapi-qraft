@@ -17,8 +17,7 @@ guide for more information.
 
     ```ts
     const mutationNumber = qraft.<service>.<operation>.isMutating(
-      filters,
-      queryClient,
+      filters
     )
     ```
 
@@ -31,12 +30,6 @@ guide for more information.
        - `filters.mutationKey: MutationKey` will be used for filtering mutations by _MutationKey_ instead of parameters
          - `filters.mutationKey` and `filters.parameters` are mutually exclusive
        - `filters.predicate?: (mutation: Mutation) => boolean` will be used for filtering mutations by custom predicate
-    2. `queryClient?: QueryClient`
-       - **Optional** [_QueryClient 🌴_](https://tanstack.com/query/latest/docs/reference/QueryClient) to be used
-       - _If not provided_
-         - `QraftContext.queryClient` will be used if available
-         - [_useQueryClient() 🌴_](https://tanstack.com/query/latest/docs/framework/react/reference/useQueryClient)
-           result will be used as a fallback
 
     ### Returns
 
@@ -47,19 +40,8 @@ guide for more information.
     Check _all_ mutations for the specified endpoint.
 
     ```ts
-    const mutationNumber = qraft.<service>.<operation>.isMutating(
-      queryClient,
-    )
+    const mutationNumber = qraft.<service>.<operation>.isMutating()
     ```
-
-    ### Arguments
-
-    1. `queryClient?: QueryClient`
-       - **Optional** [_QueryClient 🌴_](https://tanstack.com/query/latest/docs/reference/QueryClient) to be used
-       - _If not provided_
-         - `QraftContext.queryClient` will be used if available
-         - [_useQueryClient() 🌴_](https://tanstack.com/query/latest/docs/framework/react/reference/useQueryClient)
-           result will be used as a fallback
 
     ### Returns
 
@@ -88,8 +70,7 @@ guide for more information.
         path: {
           entity_id: '3e3e-3e3e-3e3e',
         },
-      },
-      queryClient
+      }
     );
 
     expect(numberOfFetchingEntities).toEqual(1);
@@ -110,7 +91,7 @@ guide for more information.
      * ###
      * ⬇︎ All mutations for the specified endpoint will be used
      **/
-    const numberOfFetchingEntities = qraft.entities.postEntities.isMutating(queryClient);
+    const numberOfFetchingEntities = qraft.entities.postEntities.isMutating();
 
     expect(numberOfFetchingEntities).toEqual(2);
     ```
