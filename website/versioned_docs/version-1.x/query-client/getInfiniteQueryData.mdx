@@ -1,0 +1,45 @@
+---
+sidebar_label: getInfiniteQueryData()
+---
+
+# getInfiniteQueryData(...)
+
+The method enables direct access to the `QueryClient` cache to retrieve the data for a specific _InfiniteQuery_.
+See the TanStack [_queryClient.getQueryData 🌴_](https://tanstack.com/query/latest/docs/reference/QueryClient#queryclientgetquerydata) documentation.
+
+```ts
+const data = qraft.<service>.<operation>.getInfiniteQueryData(
+  parameters,
+  queryClient
+);
+```
+
+### Arguments
+
+1. `parameters: { path, query, header } | {} | QueryKey`
+   - **Required** parameters to retrieve the data from the cache.
+   - Instead of an object with `{path, query, header}`, you can pass a `QueryKey` as an array
+     which is also strictly-typed ✨
+2. `queryClient: QueryClient`
+   - **Required** `QueryClient` instance to use
+
+### Returns
+
+The data from the _Query Cache_ for the specific query, strictly-typed ✨
+
+### Example
+
+```tsx
+const fileListPages = qraft.files.getFiles.getInfiniteQueryData({}, queryClient);
+
+expect(fileListPages).toEqual({
+  pageParams: [
+    { page: 1 },
+    { page: 2 },
+  ],
+  pages: [
+    [file1, file2],
+    [file3, file4]
+  ],
+});
+```

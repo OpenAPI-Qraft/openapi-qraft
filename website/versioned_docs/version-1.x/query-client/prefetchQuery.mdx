@@ -1,0 +1,29 @@
+---
+sidebar_label: prefetchQuery()
+---
+
+# prefetchQuery(...)
+
+The method allows you to fetch data and cache it before it's needed.
+To understand how `prefetchQuery` handles data and cache management,
+refer to the TanStack [_queryClient.prefetchQuery 🌴_](https://tanstack.com/query/latest/docs/reference/QueryClient#queryclientprefetchquery) documentation.
+
+```ts
+const result = qraft.<service>.<operation>.prefetchQuery(
+  {
+    parameters,
+    requestFn,
+    baseUrl,
+    ...prefetchQueryOptions,
+  },
+  queryClient
+);
+```
+
+### Arguments
+
+See [_fetchQuery(...)_](fetchQuery.mdx) for the full list of arguments.
+
+### Returns
+
+`Promise<void>` - a promise that resolves when the query is successfully cached
