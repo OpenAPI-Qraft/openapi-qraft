@@ -437,7 +437,7 @@ describe('Qraft uses Suspense Queries', () => {
   });
 });
 
-describe('Qraft uses Infinite Queries', () => {
+describe('Qraft uses "useInfiniteQuery(...)"', () => {
   const parameters: Services['files']['getFiles']['types']['parameters'] = {
     header: {
       'x-monite-version': '1.0.0',
@@ -493,6 +493,28 @@ describe('Qraft uses Infinite Queries', () => {
             },
           },
         ],
+      });
+    });
+  });
+
+  it('supports useInfiniteQuery without parameters', async () => {
+    const { qraft, queryClient } = createClient();
+
+    const { result } = renderHook(
+      () =>
+        qraft.files.findAll.useInfiniteQuery(undefined, {
+          getNextPageParam: () => ({}),
+          initialPageParam: {},
+        }),
+      {
+        wrapper: (props) => <Providers queryClient={queryClient} {...props} />,
+      }
+    );
+
+    await waitFor(() => {
+      expect(result.current.data).toEqual({
+        pageParams: [{}],
+        pages: [filesFindAllResponsePayloadFixtures],
       });
     });
   });
@@ -1576,43 +1598,15 @@ describe('Qraft uses Query Function', () => {
         header: { 'x-monite-version': '2.0.0' },
       };
 
+    const queryFnSpy = vi.fn(() => Promise.resolve(customResult));
     const result = qraft.approvalPolicies.getApprovalPoliciesId.fetchQuery({
-      queryFn: () => Promise.resolve(customResult),
+      queryFn: queryFnSpy,
       queryKey:
         qraft.approvalPolicies.getApprovalPoliciesId.getQueryKey(parameters),
     });
 
     await expect(result).resolves.toEqual(customResult);
-  });
-
-  it('uses fetchQuery with default requestFn set by specific "QueryKey"', async () => {
-    const { qraft, queryClient } = createClient();
-
-    queryClient.setQueryDefaults(
-      qraft.approvalPolicies.getApprovalPoliciesId.getQueryKey(parameters),
-      { queryFn: () => Promise.resolve(parameters) }
-    );
-
-    const result = qraft.approvalPolicies.getApprovalPoliciesId.fetchQuery({
-      parameters,
-    });
-
-    await expect(result).resolves.toEqual(parameters);
-  });
-
-  it('uses fetchQuery with default requestFn set by base "QueryKey"', async () => {
-    const { qraft, queryClient } = createClient();
-
-    queryClient.setQueryDefaults(
-      qraft.approvalPolicies.getApprovalPoliciesId.getQueryKey(),
-      { queryFn: () => Promise.resolve(parameters) }
-    );
-
-    const result = qraft.approvalPolicies.getApprovalPoliciesId.fetchQuery({
-      parameters,
-    });
-
-    await expect(result).resolves.toEqual(parameters);
+    expect(queryFnSpy).toHaveBeenCalled();
   });
 
   it('uses prefetchQuery with `parameters`', async () => {
@@ -2192,8 +2186,8 @@ describe('Qraft uses utils', () => {
   });
 });
 
-describe('Qraft uses setQueryData', () => {
-  it('uses setQueryData & getQueryData', async () => {
+describe('Qraft uses "setQueryData(...)"', () => {
+  it('uses setQueryData & getQueryData with parameters', async () => {
     const { qraft } = createClient();
 
     qraft.files.getFiles.setQueryData(
@@ -2232,6 +2226,19 @@ describe('Qraft uses setQueryData', () => {
         id__in: ['1', '2'],
       },
     });
+  });
+
+  it('emits type error if parameters is not provided', async () => {
+    const { qraft } = createClient();
+
+    expect(
+      // @ts-expect-error - `parameters` is required for the operation
+      qraft.files.getFiles.getQueryData({})
+    ).toBeUndefined();
+    expect(
+      // @ts-expect-error - `parameters` is required for the operation
+      qraft.files.getFiles.getQueryData()
+    ).toBeUndefined();
   });
 
   it('uses setQueryData & getQueryData with QueryKey', async () => {
@@ -2366,7 +2373,7 @@ describe('Qraft uses getQueriesData', () => {
   });
 });
 
-describe('Qraft uses setInfiniteQueryData', () => {
+describe('Qraft uses "setInfiniteQueryData(...)"', () => {
   it('uses setInfiniteQueryData & getInfiniteQueryData with parameters', async () => {
     const { qraft } = createClient();
 
@@ -2434,6 +2441,17 @@ describe('Qraft uses setInfiniteQueryData', () => {
         qraft.files.getFiles.getInfiniteQueryKey(parameters)
       )
     ).toEqual(expectedResult);
+  });
+
+  it('supports getInfiniteQueryData without parameters', async () => {
+    const { qraft } = createClient();
+
+    expect(qraft.files.findAll.getInfiniteQueryData()).toBeUndefined();
+
+    expect(
+      // @ts-expect-error - `parameters` is required for the operation
+      qraft.approvalPolicies.getApprovalPoliciesId.getInfiniteQueryData()
+    ).toBeUndefined();
   });
 
   it('does not return getInfiniteQueryData() from non Infinite query', async () => {
@@ -3500,7 +3518,7 @@ describe('Qraft uses useIsFetching Query', () => {
   });
 });
 
-describe('Qraft uses getQueryKey', () => {
+describe('Qraft uses "getQueryKey(...)"', () => {
   it('returns query key with parameters', async () => {
     const { qraft } = createClient();
 
@@ -3515,7 +3533,10 @@ describe('Qraft uses getQueryKey', () => {
         query: {
           items_order: ['asc', 'desc'],
         },
-      })
+      }) satisfies [
+        typeof qraft.approvalPolicies.getApprovalPoliciesId.schema,
+        typeof qraft.approvalPolicies.getApprovalPoliciesId.types.parameters,
+      ]
     ).toEqual([
       {
         url: qraft.approvalPolicies.getApprovalPoliciesId.schema.url,
@@ -3540,7 +3561,29 @@ describe('Qraft uses getQueryKey', () => {
   it('returns query key without parameters', async () => {
     const { qraft } = createClient();
 
-    expect(qraft.approvalPolicies.getApprovalPoliciesId.getQueryKey()).toEqual([
+    expect(
+      qraft.files.findAll.getQueryKey() satisfies [
+        typeof qraft.files.findAll.schema,
+        typeof qraft.files.findAll.types.parameters,
+      ]
+    ).toEqual([
+      {
+        url: qraft.files.findAll.schema.url,
+        method: qraft.files.findAll.schema.method,
+        security: qraft.files.findAll.schema.security,
+        infinite: false,
+      },
+      {},
+    ]);
+  });
+
+  it('emits type error parameters are required but returns a correct result', async () => {
+    const { qraft } = createClient();
+
+    expect(
+      // @ts-expect-error - `parameters` is required
+      qraft.approvalPolicies.getApprovalPoliciesId.getQueryKey()
+    ).toEqual([
       {
         url: qraft.approvalPolicies.getApprovalPoliciesId.schema.url,
         method: qraft.approvalPolicies.getApprovalPoliciesId.schema.method,
@@ -3552,7 +3595,45 @@ describe('Qraft uses getQueryKey', () => {
   });
 });
 
-describe('Qraft uses getMutationKey', () => {
+describe('Qraft uses "getInfiniteQueryKey(...)"', () => {
+  it('returns infinite query key without parameters', async () => {
+    const { qraft } = createClient();
+
+    expect(
+      qraft.files.findAll.getInfiniteQueryKey() satisfies [
+        typeof qraft.files.findAll.schema,
+        typeof qraft.files.findAll.types.parameters,
+      ]
+    ).toEqual([
+      {
+        url: qraft.files.findAll.schema.url,
+        method: qraft.files.findAll.schema.method,
+        security: qraft.files.findAll.schema.security,
+        infinite: true,
+      },
+      {},
+    ]);
+  });
+
+  it('emits type error parameters are required but returns a correct result', async () => {
+    const { qraft } = createClient();
+
+    expect(
+      // @ts-expect-error - `parameters` is required
+      qraft.approvalPolicies.getApprovalPoliciesId.getInfiniteQueryKey()
+    ).toEqual([
+      {
+        url: qraft.approvalPolicies.getApprovalPoliciesId.schema.url,
+        method: qraft.approvalPolicies.getApprovalPoliciesId.schema.method,
+        security: qraft.approvalPolicies.getApprovalPoliciesId.schema.security,
+        infinite: true,
+      },
+      {},
+    ]);
+  });
+});
+
+describe('Qraft uses "getMutationKey(...)"', () => {
   it('returns mutation key with parameters', async () => {
     const { qraft } = createClient();
 
@@ -3566,10 +3647,6 @@ describe('Qraft uses getMutationKey', () => {
         },
         query: {
           referer: 'https://example.com',
-        },
-        body: {
-          verification_document_back: 'back',
-          verification_document_front: 'front',
         },
       })
     ).toEqual([

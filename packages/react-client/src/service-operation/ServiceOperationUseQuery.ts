@@ -14,9 +14,9 @@ export interface ServiceOperationUseQuery<
   TParams,
   TError = DefaultError,
 > {
-  getQueryKey<QueryKeyParams extends TParams>(
-    parameters: QueryKeyParams | void
-  ): ServiceOperationQueryKey<TSchema, QueryKeyParams>;
+  getQueryKey(
+    parameters: AreAllOptional<TParams> extends true ? TParams | void : TParams
+  ): ServiceOperationQueryKey<TSchema, TParams>;
 
   useQuery<TData = TQueryFnData>(
     parameters:

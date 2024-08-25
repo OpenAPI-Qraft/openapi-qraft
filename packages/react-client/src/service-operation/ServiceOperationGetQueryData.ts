@@ -1,11 +1,14 @@
+import type { AreAllOptional } from '../lib/AreAllOptional.js';
 import type { ServiceOperationQueryKey } from './ServiceOperationKey.js';
 
 export interface ServiceOperationGetQueryData<
   TSchema extends { url: string; method: string },
   TData,
-  TParams = {},
+  TParams,
 > {
   getQueryData(
-    parameters: TParams | ServiceOperationQueryKey<TSchema, TParams>
+    parameters: AreAllOptional<TParams> extends true
+      ? TParams | ServiceOperationQueryKey<TSchema, TParams> | void
+      : TParams | ServiceOperationQueryKey<TSchema, TParams>
   ): TData | undefined;
 }
