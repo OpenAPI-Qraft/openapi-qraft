@@ -1,0 +1,156 @@
+---
+sidebar_position: 2
+sidebar_label: createAPIClient()
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# createAPIClient(...)
+
+Qraft CLI generates a helper function `createAPIClient(...)`, which creates a Qraft API client with
+the necessary context for React Hooks.
+
+```tsx
+import { createAPIClient } from './api'
+
+const qraft = createAPIClient({
+  context,
+})
+```
+
+### Arguments
+1. `options?: QraftClientOptions` - **Optional** options to be used by the Qraft API client
+   - `options.context?: Context<QraftContextValue>` - **Optional** custom Context to be used by Qraft Hooks.
+     If not provided, a _default_ `QraftContext` will be used. The custom Context must be used
+     when multiple Qraft API clients for the multiple OpenAPIs are used in the same application.
+     In case if you are going to publish your API client as a library, it's _highly_ recommended to use a custom Context.
+
+### Returns
+- `qraft` - The Qraft API client with the necessary context for Qraft Hooks.
+  It contains all the methods to interact with the API grouped in services.
+
+### Examples
+
+<Tabs>
+  <TabItem value="basic" label="Basic" default>
+    ```tsx title="src/fetch-queries.ts"
+    import { requestFn } from '@openapi-qraft/react';
+    import { createAPIClient } from './api';
+
+    import { QueryClient, dehydrate } from '@tanstack/react-query';
+
+    const queryClient = new QueryClient();
+
+    // ⬇︎ Create a Qraft API client
+    const qraft = createAPIClient()
+
+    const parameters = {
+      path: { petId: 1 },
+    };
+
+    // ⬇︎ Fetch the `getPetById` query with the `queryClient`
+    const pet = await qraft.pet.getPetById.fetchQuery(
+      {
+        parameters,
+        requestFn: requestFn,
+        baseUrl: 'https://api.sandbox.monite.com/v1',
+      },
+      queryClient
+    );
+
+    console.log(pet.name); // `pet` is the result of the `getPetById` request
+
+    dehydrate(queryClient); // Dehydrate the `queryClient` to be used for SSR
+    ```
+  </TabItem>
+  <TabItem value="custom-provider" label={<span style={{verticalAlign: 'middle'}}>Custom <code>context</code></span>}>
+    With the `options.context`, you can specify a custom _Context_ to be used by the Qraft API client.
+    It's useful if you want to publish your **API client as an NPM library**. In this case, you must **provide
+    a custom _Context_** instead of `QraftContext`, to prevent conflicts with other API clients in the same application.
+    The client can use the standard `QueryClient` from the `<QueryClientProvider/>` of TanStack,
+    or even `<QraftContext/>` from client's application. That's why the `queryClient` must be also provided
+    to the custom Qraft _Context_ `value`.
+
+    <Tabs>
+      <TabItem value="custom-api-provider" label={<code>src/CustomAPIProvider.ts</code>} default>
+        ```tsx title="src/CustomAPIProvider.ts"
+        import { QraftContextValue, requestFn } from '@openapi-qraft/react';
+        import { createAPIClient } from './api';
+
+        import React, { createContext, useMemo, useEffect, useContext } from "react";
+        import { QueryClient } from '@tanstack/react-query'
+
+        // ⬇︎ Create a custom Context with the `QraftContextValue` type
+        const CustomQraftContext = createContext<QraftContextValue>(undefined);
+
+        export function createCustomAPIClient() {
+          // ⬇︎ Create a Qraft API client with the custom Context
+          return createAPIClient({ context: CustomQraftContext });
+        }
+
+        export function CustomAPIProvider({ children }: { children: React.ReactNode }) {
+          const queryClient = useMemo(() => new QueryClient(), []);
+
+          useEffect(() => {
+            // ⬇︎ Mount and unmount the `queryClient`,
+            //   so you will NOT be needed to use `<QueryClientProvider/>` from TanStack
+            queryClient.mount();
+            return () => {
+              queryClient.unmount();
+            };
+          }, [queryClient]);
+
+          return (
+            <CustomQraftContext.Provider
+              value={{
+                queryClient, // ⬅︎ specify the `queryClient` to be used by the Hooks
+                requestFn,
+                baseUrl: 'https://api.sandbox.monite.com/v1',
+              }}
+            >
+              {children}
+            </CustomQraftContext.Provider>
+          );
+        }
+        ```
+      </TabItem>
+
+      <TabItem value="custom-api-provider-app" label={<code>src/App.tsx</code>}>
+        ```tsx title="src/App.tsx"
+        import { createCustomAPIClient, CustomAPIProvider } from './CustomAPIProvider'
+
+        const qraft = createCustomAPIClient()
+
+        export default function App() {
+          // ⬇︎ with the `CustomAPIProvider` you don't need to use`<QueryClientProvider />` from TanStack
+          // because the `queryClient` is already provided by the `<CustomAPIProvider/>`
+          return (
+            <CustomAPIProvider>
+              <ExampleComponent />
+            </CustomAPIProvider>
+          )
+        }
+
+        function ExampleComponent() {
+          const { data: pet } = qraft.pet.getPetById.useQuery({ parameters: { petId: 1 } })
+
+          return (
+            <div>
+              {pet && <h2>{pet.name}</h2>}
+            </div>
+          )
+        }
+        ```
+      </TabItem>
+    </Tabs>
+  </TabItem>
+</Tabs>
+
+:::tip
+
+You can call the `createAPIClient(...)` function multiple times, inside the _Components_,
+server side code, or create an external file to _export_ the `qraft` object. All methods are valid ✔︎
+as long as you provide the same `options`.
+
+:::

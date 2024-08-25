@@ -1,0 +1,59 @@
+---
+sidebar_label: getQueryKey()
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# getQueryKey(...)
+
+The method provides a standardized way to generate `QueryKey` for _Queries_.
+See TanStack [_Query Keys 🌴_](https://tanstack.com/query/latest/docs/framework/react/guides/query-keys) guide for more information.
+
+```ts
+const queryKey = qraft.<service>.<operation>.getQueryKey(parameters);
+```
+
+### Arguments
+
+1. - `parameters: { path, query, header } | undefined`
+     - **Optional**, OpenAPI request parameters for the query, strictly-typed ✨
+     - `parameters` will be used to generate the `QueryKey`
+     - If not specified, returns a `QueryKey` with `{}` as a _Query_ parameters
+
+### Returns
+
+`QueryKey` - a query key for the _operation_ _parameters_
+
+### Example
+
+<Tabs>
+  <TabItem value="with-parameters" label={<span style={{verticalAlign: 'middle'}}>With <code style={{display: 'inline-block'}}>parameters</code></span>} default>
+    ```tsx
+    const queryKey = qraft.files.getFiles.getQueryKey({
+      header: { 'x-monite-version': '1.0.0' },
+      query: { id__in: ['1', '2'] },
+    });
+
+    // `queryKey` will be an array of objects
+    expect(queryKey).toEqual([
+      { method: 'get', url: '/files' },
+      {
+        header: { 'x-monite-version': '1.0.0' },
+        query: { id__in: ['1', '2'] }
+      }
+    ]);
+    ```
+  </TabItem>
+  <TabItem value="without-parameters" label={<span style={{verticalAlign: 'middle'}}>Without <code style={{display: 'inline-block', textDecoration: 'line-through'}}>parameters</code></span>} default>
+    ```tsx
+    const queryKey = qraft.files.getFiles.getQueryKey();
+
+    // `queryKey` will be an array of objects
+    expect(queryKey).toEqual([
+      { method: 'get', url: '/files' },
+      {}
+    ]);
+    ```
+  </TabItem>
+</Tabs>
