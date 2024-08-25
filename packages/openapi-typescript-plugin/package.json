@@ -36,7 +36,7 @@
     "@types/node": "^18.19.4",
     "eslint": "^9.0.0",
     "memfs": "^4.9.2",
-    "rimraf": "^5.0.5",
+    "rimraf": "^5.0.10",
     "vitest": "^1.4.0"
   },
   "files": [
