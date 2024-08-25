@@ -2357,23 +2357,62 @@ describe('Qraft uses "setQueryData(...)"', () => {
   });
 });
 
-describe('Qraft uses setQueriesData', () => {
+describe('Qraft uses "setQueriesData(...)"', () => {
+  const parameters: Services['files']['getFiles']['types']['parameters'] = {
+    header: {
+      'x-monite-version': '1.0.0',
+    },
+    query: {
+      id__in: ['1', '2'],
+    },
+  };
+
   it('uses setQueriesData with parameters', async () => {
     const { qraft } = createClient();
 
-    const parameters: typeof qraft.files.getFiles.types.parameters = {
-      header: {
-        'x-monite-version': '1.0.0',
-      },
-      query: {
-        id__in: ['1', '2'],
-      },
-    };
-
+    // set `setQueriesData` does not create a new query, only updates the data
     qraft.files.getFiles.setQueryData(parameters, parameters);
 
     qraft.files.getFiles.setQueriesData(
-      { parameters, infinite: false },
+      { parameters },
+      { ...parameters, header: { 'x-monite-version': '2.0.0' } }
+    );
+
+    expect(qraft.files.getFiles.getQueryData(parameters)).toEqual({
+      ...parameters,
+      header: { 'x-monite-version': '2.0.0' },
+    });
+  });
+
+  it('uses setQueriesData with predicate', async () => {
+    const { qraft } = createClient();
+
+    // set `setQueriesData` does not create a new query, only updates the data
+    qraft.files.getFiles.setQueryData(parameters, parameters);
+
+    qraft.files.getFiles.setQueriesData(
+      {
+        predicate: (query) => {
+          return query.queryKey[1].query?.id__in?.includes('1');
+        },
+      },
+      { ...parameters, header: { 'x-monite-version': '2.0.0' } }
+    );
+
+    expect(qraft.files.getFiles.getQueryData(parameters)).toEqual({
+      ...parameters,
+      header: { 'x-monite-version': '2.0.0' },
+    });
+  });
+
+  it('uses setQueriesData without filters', async () => {
+    const { qraft } = createClient();
+
+    // set `setQueriesData` does not create a new query, only updates the data
+    qraft.files.getFiles.setQueryData(parameters, parameters);
+
+    qraft.files.getFiles.setQueriesData(
+      {},
       { ...parameters, header: { 'x-monite-version': '2.0.0' } }
     );
 
@@ -3742,7 +3781,7 @@ describe('Qraft uses "getMutationKey(...)"', () => {
   });
 });
 
-describe('Qraft supports "getQueriesData(...) & setQueriesData(...)"', () => {
+describe('Qraft supports "getQueriesData(...) & setQueryData(...)"', () => {
   const parameters: Services['approvalPolicies']['getApprovalPoliciesId']['types']['parameters'] =
     {
       header: {
