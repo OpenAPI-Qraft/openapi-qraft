@@ -11,7 +11,7 @@ on:
 jobs:
   update_algolia:
     runs-on: ubuntu-latest
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
     environment: github-pages
     steps:
       - name: Update Algolia index
