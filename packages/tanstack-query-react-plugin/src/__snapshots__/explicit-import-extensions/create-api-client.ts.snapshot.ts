@@ -7,8 +7,8 @@ import { qraftAPIClient, type APIBasicClientServices, type CreateAPIBasicClientO
 import * as callbacks from "@openapi-qraft/react/callbacks/index";
 import { services, type Services } from "./services/index.js";
 export function createAPIClient(options: CreateAPIQueryClientOptions): Services;
-export function createAPIClient(options: CreateAPIBasicClientOptions): APIBasicClientServices<Services, Callbacks>;
-export function createAPIClient(options: CreateAPIClientOptions): Services | APIBasicClientServices<Services, Callbacks> {
-    return qraftAPIClient<Services, Callbacks>(services, callbacks, options);
+export function createAPIClient(options: CreateAPIBasicClientOptions): APIBasicClientServices<Services, ServiceMethods>;
+export function createAPIClient(options: CreateAPIClientOptions): Services | APIBasicClientServices<Services, ServiceMethods> {
+    return qraftAPIClient<Services, ServiceMethods>(services, callbacks, options);
 }
-type Callbacks = typeof callbacks;
+type ServiceMethods = typeof callbacks;

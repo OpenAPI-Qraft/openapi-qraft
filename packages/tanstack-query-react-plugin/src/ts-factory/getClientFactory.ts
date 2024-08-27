@@ -137,7 +137,7 @@ const getCreateClientFunctionFactory = () => {
             undefined
           ),
           factory.createTypeReferenceNode(
-            factory.createIdentifier('Callbacks'),
+            factory.createIdentifier('ServiceMethods'),
             undefined
           ),
         ]
@@ -175,7 +175,7 @@ const getCreateClientFunctionFactory = () => {
               undefined
             ),
             factory.createTypeReferenceNode(
-              factory.createIdentifier('Callbacks'),
+              factory.createIdentifier('ServiceMethods'),
               undefined
             ),
           ]
@@ -192,7 +192,7 @@ const getCreateClientFunctionFactory = () => {
                   undefined
                 ),
                 factory.createTypeReferenceNode(
-                  factory.createIdentifier('Callbacks'),
+                  factory.createIdentifier('ServiceMethods'),
                   undefined
                 ),
               ],
@@ -209,7 +209,7 @@ const getCreateClientFunctionFactory = () => {
     ),
     factory.createTypeAliasDeclaration(
       undefined,
-      factory.createIdentifier('Callbacks'),
+      factory.createIdentifier('ServiceMethods'),
       undefined,
       factory.createTypeQueryNode(
         factory.createIdentifier('callbacks'),
