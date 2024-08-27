@@ -1,5 +1,5 @@
 ---
-"@openapi-qraft/react": patch
+'@openapi-qraft/react': patch
 ---
 
-remove deprecated `mutationFn` and `queryFn` methods
+Removed deprecated `mutationFn` and `queryFn` methods.
