@@ -1,14 +1,17 @@
-import { requestFn } from '@openapi-qraft/react';
+import {
+  APIBasicClientServices,
+  CreateAPIBasicClientOptions,
+  qraftAPIClient,
+  requestFn,
+} from '@openapi-qraft/react';
 import { operationInvokeFn } from '@openapi-qraft/react/callbacks/operationInvokeFn';
 import {
-  QraftSecureRequestFn,
   createSecureRequestFn,
+  QraftSecureRequestFn,
 } from '@openapi-qraft/react/Unstable_QraftSecureRequestFn';
 import { QueryClient } from '@tanstack/query-core';
-import { qraftAPIClient, QraftClientOptions } from "@openapi-qraft/react";
-import { services, Services } from "./api/services/index";
-
-import { createAPIClient  } from './api/index';
+import { createAPIClient } from './api/index';
+import { services, Services } from './api/services/index';
 
 QraftSecureRequestFn({
   requestFn: createSecureRequestFn({}, requestFn, new QueryClient()),
@@ -17,12 +20,22 @@ QraftSecureRequestFn({
   children: (securedRequestFn) => null,
 });
 
-createAPIClient({})
+createAPIClient({
+  baseUrl: 'https://petstore3.swagger.io/api/v3',
+  requestFn,
+  queryClient: new QueryClient(),
+});
 
 const nodeCallbacks = {
-  operationInvokeFn: operationInvokeFn
-}
+  operationInvokeFn: operationInvokeFn,
+};
 
-export function createNodeAPIClient(options?: QraftClientOptions): Services {
-  return qraftAPIClient<Services, typeof nodeCallbacks>(services, nodeCallbacks, options);
+export function createNodeAPIClient(
+  options: CreateAPIBasicClientOptions
+): APIBasicClientServices<Services, typeof nodeCallbacks> {
+  return qraftAPIClient<Services, typeof nodeCallbacks>(
+    services,
+    nodeCallbacks,
+    options
+  );
 }
