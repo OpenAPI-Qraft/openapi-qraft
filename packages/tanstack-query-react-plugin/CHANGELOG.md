@@ -1,5 +1,19 @@
 # @openapi-qraft/tanstack-query-react-plugin
 
+## 2.0.0-next.0
+
+### Major Changes
+
+- 266611a: Enhance `createAPIClient` to accept `requestFn`, `baseUrl`, and optionally `queryClient`.
+
+### Minor Changes
+
+- 0b3cda1: Updated the `qraftAPIClient(...)` to return only the set of services corresponding to the methods for which callbacks were passed.
+
+### Patch Changes
+
+- @openapi-qraft/plugin@2.0.0-next.0
+
 ## 1.14.0
 
 ### Patch Changes
