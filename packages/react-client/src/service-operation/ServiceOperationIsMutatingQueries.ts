@@ -1,4 +1,4 @@
-import type { DefaultError, QueryClient } from '@tanstack/query-core';
+import type { DefaultError } from '@tanstack/query-core';
 import type {
   MutationFiltersByMutationKey,
   MutationFiltersByParameters,
@@ -12,40 +12,7 @@ export interface ServiceOperationIsMutatingQueries<
   TError = DefaultError,
 > {
   isMutating<TContext>(
-    filters:
-      | MutationFiltersByParameters<TBody, TData, TParams, TError, TContext>
-      | MutationFiltersByMutationKey<
-          TSchema,
-          TBody,
-          TData,
-          TParams,
-          TError,
-          TContext
-        >,
-    queryClient: QueryClient
-  ): number;
-
-  isMutating(queryClient: QueryClient): number;
-}
-
-/**
- * @internal
- */
-export interface ServiceOperationIsMutatingQueriesCallback<
-  TSchema extends { url: string; method: string },
-  TBody,
-  TData,
-  TParams = {},
-  TError = DefaultError,
-> extends ServiceOperationIsMutatingQueries<
-    TSchema,
-    TBody,
-    TData,
-    TParams,
-    TError
-  > {
-  isMutating<TContext>(
-    filters:
+    filters?:
       | MutationFiltersByParameters<TBody, TData, TParams, TError, TContext>
       | MutationFiltersByMutationKey<
           TSchema,
@@ -55,7 +22,5 @@ export interface ServiceOperationIsMutatingQueriesCallback<
           TError,
           TContext
         >
-      | QueryClient,
-    queryClient?: QueryClient
   ): number;
 }

@@ -1,4 +1,4 @@
-import type { DefaultError, QueryClient } from '@tanstack/query-core';
+import type { DefaultError } from '@tanstack/query-core';
 import type {
   QueryFiltersByParameters,
   QueryFiltersByQueryKey,
@@ -10,10 +10,9 @@ export interface ServiceOperationUseIsFetchingQueries<
   TParams = {},
   TError = DefaultError,
 > {
-  useIsFetching<TInfinite extends boolean>(
+  useIsFetching<TInfinite extends boolean = false>(
     filters?:
       | QueryFiltersByParameters<TSchema, TData, TInfinite, TParams, TError>
-      | QueryFiltersByQueryKey<TSchema, TData, TInfinite, TParams, TError>,
-    queryClient?: QueryClient
+      | QueryFiltersByQueryKey<TSchema, TData, TInfinite, TParams, TError>
   ): number;
 }

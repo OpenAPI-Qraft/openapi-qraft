@@ -3,7 +3,6 @@ import type {
   Mutation,
   MutationState,
   MutationStatus,
-  QueryClient,
 } from '@tanstack/query-core';
 import type { PartialParameters } from '../lib/PartialParameters.type.js';
 import type { ServiceOperationMutationKey } from './ServiceOperationKey.js';
@@ -85,27 +84,24 @@ export interface ServiceOperationUseMutationState<
       MutationVariables<TBody, TParams>,
       TContext
     >,
-  >(
-    options?: {
-      filters?:
-        | MutationFiltersByParameters<TBody, TData, TParams, TError, TContext>
-        | MutationFiltersByMutationKey<
-            TSchema,
-            TBody,
-            TData,
-            TParams,
-            TError,
-            TContext
-          >;
-      select?: (
-        mutation: Mutation<
+  >(options?: {
+    filters?:
+      | MutationFiltersByParameters<TBody, TData, TParams, TError, TContext>
+      | MutationFiltersByMutationKey<
+          TSchema,
+          TBody,
           TData,
+          TParams,
           TError,
-          MutationVariables<TBody, TParams>,
           TContext
-        >
-      ) => TResult;
-    },
-    queryClient?: QueryClient
-  ): Array<TResult>;
+        >;
+    select?: (
+      mutation: Mutation<
+        TData,
+        TError,
+        MutationVariables<TBody, TParams>,
+        TContext
+      >
+    ) => TResult;
+  }): Array<TResult>;
 }

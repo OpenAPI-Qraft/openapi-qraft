@@ -1,15 +1,23 @@
-import type { RequestFn } from '../lib/requestFn.js';
-import { QraftContext as QraftContextDist } from '@openapi-qraft/react';
+import type { CreateAPIBasicClientOptions } from '../qraftAPIClient.js';
+import type { Services } from './fixtures/api/index.js';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { act, renderHook, waitFor } from '@testing-library/react';
-import React, { ReactNode } from 'react';
+import React, { createContext, ReactNode, useContext, useMemo } from 'react';
 import { vi } from 'vitest';
 import { requestFn } from '../lib/requestFn.js';
 import { QraftSecureRequestFn } from '../Unstable_QraftSecureRequestFn.js';
 import { createTestJwt } from './createTestJwt.js';
 import { createAPIClient } from './fixtures/api/index.js';
 
-const qraft = createAPIClient();
+const QraftContext = createContext<Services | null>(null);
+
+const useQraft = () => {
+  const value = useContext(QraftContext);
+  if (!value) {
+    throw new Error('useQraft must be used within a QraftProvider');
+  }
+  return value;
+};
 
 describe('QraftSecureRequestFn', () => {
   beforeEach(() => {
@@ -20,10 +28,10 @@ describe('QraftSecureRequestFn', () => {
   });
 
   const mutationParams: Pick<
-    typeof qraft.entities.postEntitiesIdDocuments.types,
+    Services['entities']['postEntitiesIdDocuments']['types'],
     'body'
   > &
-    typeof qraft.entities.postEntitiesIdDocuments.types.parameters = {
+    Services['entities']['postEntitiesIdDocuments']['types']['parameters'] = {
     header: {
       'x-monite-version': '1.0.0',
     },
@@ -45,7 +53,7 @@ describe('QraftSecureRequestFn', () => {
     const fetchPartnerToken = vi.fn().mockImplementation(() => token);
 
     const { result } = renderHook(
-      () => qraft.entities.postEntitiesIdDocuments.useMutation(),
+      () => useQraft().entities.postEntitiesIdDocuments.useMutation(),
       {
         wrapper: (props) => (
           <QraftSecureRequestFn
@@ -101,7 +109,7 @@ describe('QraftSecureRequestFn', () => {
     const fetchPartnerToken = vi.fn().mockImplementation(() => token);
 
     const { result } = renderHook(
-      () => qraft.entities.postEntitiesIdDocuments.useMutation(),
+      () => useQraft().entities.postEntitiesIdDocuments.useMutation(),
       {
         wrapper: (props) => (
           <QraftSecureRequestFn
@@ -170,7 +178,7 @@ describe('QraftSecureRequestFn', () => {
     const queryClient = new QueryClient();
 
     const { result } = renderHook(
-      () => qraft.entities.postEntitiesIdDocuments.useMutation(),
+      () => useQraft().entities.postEntitiesIdDocuments.useMutation(),
       {
         wrapper: (props) => (
           <QraftSecureRequestFn
@@ -272,7 +280,7 @@ describe('QraftSecureRequestFn', () => {
     const fetchPartnerToken = vi.fn().mockImplementation(() => token);
 
     const { result } = renderHook(
-      () => qraft.entities.postEntitiesIdDocuments.useMutation(),
+      () => useQraft().entities.postEntitiesIdDocuments.useMutation(),
       {
         wrapper: (props) => (
           <QraftSecureRequestFn
@@ -331,28 +339,26 @@ describe('QraftSecureRequestFn', () => {
 
 function Providers({
   children,
-  queryClient,
-  requestFn: requestFnProp = requestFn,
+  requestFn: requestFnProp,
 }: {
   children: ReactNode;
-  queryClient?: QueryClient;
-  requestFn?: RequestFn<any>;
+  requestFn: CreateAPIBasicClientOptions['requestFn'];
 }) {
-  queryClient = React.useState(() => queryClient ?? new QueryClient())[0];
+  const { qraft, queryClient } = useMemo(() => {
+    const queryClient = new QueryClient();
+    return {
+      queryClient,
+      qraft: createAPIClient({
+        requestFn: requestFnProp,
+        queryClient,
+        baseUrl: 'https://api.sandbox.monite.com/v1',
+      }),
+    };
+  }, [requestFnProp]);
 
   return (
     <QueryClientProvider client={queryClient}>
-      {/* We should use precompiled `QraftContextDist`,
-       * because callbacks are imported from `@openapi-qraft` package `/dist` folder
-       */}
-      <QraftContextDist.Provider
-        value={{
-          baseUrl: 'https://api.sandbox.monite.com/v1',
-          requestFn: requestFnProp,
-        }}
-      >
-        {children}
-      </QraftContextDist.Provider>
+      <QraftContext.Provider value={qraft}>{children}</QraftContext.Provider>
     </QueryClientProvider>
   );
 }

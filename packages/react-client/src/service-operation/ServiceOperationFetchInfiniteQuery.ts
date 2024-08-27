@@ -3,7 +3,6 @@ import type {
   FetchQueryOptions,
   GetNextPageParamFunction,
   InitialPageParam,
-  QueryClient,
   QueryFunction,
 } from '@tanstack/query-core';
 import type { PartialParameters } from '../lib/PartialParameters.type.js';
@@ -29,7 +28,7 @@ export interface ServiceOperationFetchInfiniteQuery<
           TPageParam,
           TError
         > &
-          FetchInfiniteQueryOptionsQueryFn<TSchema, TData, TParams>)
+          FetchInfiniteQueryOptionsQueryFn<TSchema, TData, TParams, TError>)
       | (FetchInfiniteQueryOptionsByParameters<
           TSchema,
           TData,
@@ -37,8 +36,7 @@ export interface ServiceOperationFetchInfiniteQuery<
           TPageParam,
           TError
         > &
-          FetchInfiniteQueryOptionsQueryFn<TSchema, TData, TParams>),
-    queryClient: QueryClient
+          FetchInfiniteQueryOptionsQueryFn<TSchema, TData, TParams, TError>)
   ): Promise<OperationInfiniteData<TData, TParams>>;
 
   prefetchInfiniteQuery<TPageParam extends TParams>(
@@ -50,7 +48,7 @@ export interface ServiceOperationFetchInfiniteQuery<
           TPageParam,
           TError
         > &
-          FetchInfiniteQueryOptionsQueryFn<TSchema, TData, TParams>)
+          FetchInfiniteQueryOptionsQueryFn<TSchema, TData, TParams, TError>)
       | (FetchInfiniteQueryOptionsByParameters<
           TSchema,
           TData,
@@ -58,8 +56,7 @@ export interface ServiceOperationFetchInfiniteQuery<
           TPageParam,
           TError
         > &
-          FetchInfiniteQueryOptionsQueryFn<TSchema, TData, TParams>),
-    queryClient: QueryClient
+          FetchInfiniteQueryOptionsQueryFn<TSchema, TData, TParams, TError>)
   ): Promise<void>;
 }
 
@@ -136,20 +133,24 @@ type FetchInfiniteQueryOptionsByParameters<
 type FetchInfiniteQueryOptionsQueryFn<
   TSchema extends { url: string; method: string },
   TData,
-  TParams = {},
+  TParams,
+  TError,
 > =
   | {
-      queryFn?: QueryFunction<
+      queryFn: QueryFunction<
         TData,
         ServiceOperationInfiniteQueryKey<TSchema, TParams>
       >;
     }
   | {
-      requestFn: RequestFn<TData>;
+      /**
+       * Custom request function to use for the query
+       */
+      requestFn?: RequestFn<TData, TError>;
       /**
        * Base URL to use for the request (used in the `queryFn`)
        * @example 'https://api.example.com'
        */
-      baseUrl: string | undefined;
+      baseUrl?: string | undefined;
       queryFn?: never; // Workaround to fix union type error
     };

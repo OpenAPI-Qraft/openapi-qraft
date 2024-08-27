@@ -1,9 +1,4 @@
-import type {
-  NoInfer,
-  QueryClient,
-  SetDataOptions,
-  Updater,
-} from '@tanstack/query-core';
+import type { NoInfer, SetDataOptions, Updater } from '@tanstack/query-core';
 import type { OperationInfiniteData } from './OperationInfiniteData.js';
 import type { ServiceOperationInfiniteQueryKey } from './ServiceOperationKey.js';
 
@@ -18,7 +13,6 @@ export interface ServiceOperationSetInfiniteQueryData<
       NoInfer<OperationInfiniteData<TData, TParams>> | undefined,
       NoInfer<OperationInfiniteData<TData, TParams>> | undefined
     >,
-    queryClient: QueryClient,
     options?: SetDataOptions
   ): OperationInfiniteData<TData, TParams> | undefined;
 }

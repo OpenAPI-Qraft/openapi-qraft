@@ -1,7 +1,9 @@
 import type { QueryClient } from '@tanstack/query-core';
+import type { CreateAPIQueryClientOptions } from '../qraftAPIClient.js';
 import type { OperationSchema, RequestFn } from './requestFn.js';
 import { composeInfiniteQueryKey } from './composeInfiniteQueryKey.js';
 import { composeQueryKey } from './composeQueryKey.js';
+import { requestFnResponseResolver } from './requestFnResponseResolver.js';
 import { shelfMerge } from './shelfMerge.js';
 
 /**
@@ -11,18 +13,30 @@ import { shelfMerge } from './shelfMerge.js';
 export function callQueryClientMethodWithQueryKey<
   QFMethod extends QueryKeyMethods,
 >(
+  qraftOptions: CreateAPIQueryClientOptions,
   queryFilterMethod: QFMethod,
   schema: OperationSchema,
   infinite: boolean,
   args: QueryClientMethodArgs<QFMethod>
 ): ReturnType<(typeof QueryClient.prototype)[QFMethod]> {
-  const [{ requestFn, baseUrl, parameters, ...options }, queryClient] = args;
+  const {
+    requestFn: requestFnOption,
+    baseUrl: baseUrlOption,
+    queryFn: queryFnOption,
+    parameters,
+    ...options
+  } = args[0] ?? {};
 
-  if (!queryClient) throw new Error('queryClient is required');
-  if (!queryClient[queryFilterMethod])
+  const queryClient = qraftOptions.queryClient;
+  const baseUrl = baseUrlOption ?? qraftOptions.baseUrl;
+
+  if (queryFnOption && requestFnOption) {
     throw new Error(
-      `queryClient is invalid, ${queryFilterMethod} method does not exist`
+      'callQueryClientMethodWithQueryKey: options.queryFn and options.requestFn are mutually exclusive'
     );
+  }
+
+  const requestFn = requestFnOption ?? qraftOptions.requestFn;
 
   if (options.queryKey && parameters) {
     throw new Error(
@@ -30,49 +44,37 @@ export function callQueryClientMethodWithQueryKey<
     );
   }
 
-  if (options.queryFn && requestFn) {
-    throw new Error(
-      'callQueryClientMethodWithQueryKey: options.queryFn and requestFn are mutually exclusive'
-    );
-  }
-
   const queryFn =
-    options.queryFn ??
-    (requestFn
-      ? // @ts-expect-error - Not inferring the correct type for `queryFn`
-        function ({ queryKey: [, queryParams], signal, meta, pageParam }) {
-          return requestFn(schema, {
-            parameters: infinite
-              ? (shelfMerge(2, queryParams, pageParam) as never)
-              : queryParams,
-            baseUrl,
-            signal,
-            meta,
-          });
-        }
-      : undefined);
-
-  if (parameters) {
+    queryFnOption ??
     // @ts-expect-error - Too complex union to type
-    return queryClient[queryFilterMethod]({
-      ...options,
-      // Event if queryFn is undefined, it will override the default queryFn from `setQueryDefaults(...)`
-      ...(queryFn ? { queryFn } : {}),
-      queryKey: infinite
-        ? composeInfiniteQueryKey(schema, parameters)
-        : composeQueryKey(schema, parameters),
-    });
-  }
+    function ({ queryKey: [, queryParams], signal, meta, pageParam }) {
+      return requestFn(schema, {
+        parameters: infinite
+          ? (shelfMerge(2, queryParams, pageParam) as never)
+          : queryParams,
+        baseUrl,
+        signal,
+        meta,
+      }).then(requestFnResponseResolver, requestFnResponseResolver);
+    };
 
   // @ts-expect-error - Too complex union to type
-  return queryClient[queryFilterMethod]({ ...options, queryFn });
+  return queryClient[queryFilterMethod]({
+    ...options,
+    queryFn,
+    queryKey:
+      options.queryKey ??
+      (infinite
+        ? composeInfiniteQueryKey(schema, parameters)
+        : composeQueryKey(schema, parameters)),
+  });
 }
 
 type QueryClientMethodArgs<QMethod extends keyof QueryClientPrototype> = [
   options: Parameters<QueryClientPrototype[QMethod]>[0] & {
     parameters?: unknown;
     baseUrl?: string;
-    requestFn?: RequestFn<unknown>;
+    requestFn?: RequestFn<unknown, unknown>;
   },
   queryClient: QueryClient,
 ];

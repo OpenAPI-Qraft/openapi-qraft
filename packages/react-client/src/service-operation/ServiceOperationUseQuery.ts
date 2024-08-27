@@ -1,4 +1,4 @@
-import type { DefaultError, QueryClient } from '@tanstack/query-core';
+import type { DefaultError } from '@tanstack/query-core';
 import type {
   DefinedInitialDataOptions,
   DefinedUseQueryResult,
@@ -11,12 +11,12 @@ import { AreAllOptional } from '../lib/AreAllOptional.js';
 export interface ServiceOperationUseQuery<
   TSchema extends { url: string; method: string },
   TQueryFnData,
-  TParams = {},
+  TParams,
   TError = DefaultError,
 > {
-  getQueryKey<QueryKeyParams extends TParams | undefined = undefined>(
-    parameters?: QueryKeyParams
-  ): ServiceOperationQueryKey<TSchema, QueryKeyParams>;
+  getQueryKey(
+    parameters: AreAllOptional<TParams> extends true ? TParams | void : TParams
+  ): ServiceOperationQueryKey<TSchema, TParams>;
 
   useQuery<TData = TQueryFnData>(
     parameters:
@@ -30,8 +30,7 @@ export interface ServiceOperationUseQuery<
         ServiceOperationQueryKey<TSchema, TParams>
       >,
       'queryKey'
-    >,
-    queryClient?: QueryClient
+    >
   ): UseQueryResult<TData, TError | Error>;
 
   useQuery<TData = TQueryFnData>(
@@ -46,7 +45,6 @@ export interface ServiceOperationUseQuery<
         ServiceOperationQueryKey<TSchema, TParams>
       >,
       'queryKey'
-    >,
-    queryClient?: QueryClient
+    >
   ): DefinedUseQueryResult<TData, TError | Error>;
 }

@@ -5,6 +5,7 @@
     "declarationDir": "dist/types",
     "declaration": true,
     "declarationMap": true,
+    "paths": {}
   },
   "include": ["src/**/*"],
   "exclude": [

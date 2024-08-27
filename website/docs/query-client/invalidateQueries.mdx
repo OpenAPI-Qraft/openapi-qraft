@@ -17,8 +17,7 @@ guide for more information.
 
     ```ts
     qraft.<service>.<operation>.invalidateQueries(
-      filters,
-      queryClient,
+      filters
     )
     ```
 
@@ -34,22 +33,13 @@ guide for more information.
        - `filters.predicate?: (query: Query) => boolean` will be used for filtering queries by custom predicate
        - _If not provided_
          - All queries for the specified endpoint will be invalidated
-    2. `queryClient: QueryClient`
-       - **Required** [_QueryClient 🌴_](https://tanstack.com/query/latest/docs/reference/QueryClient) to be used
   </TabItem>
   <TabItem value="without-filters" label={<span style={{verticalAlign: "middle"}}>No <code style={{textDecoration: 'line-through'}}>filters</code></span>}>
     Invalidates _all_ normal and _Infinite_ queries for the specified endpoint.
 
     ```ts
-    qraft.<service>.<operation>.invalidateQueries(
-      queryClient,
-    )
+    qraft.<service>.<operation>.invalidateQueries()
     ```
-
-    ### Arguments
-
-    1. `queryClient: QueryClient`
-       - **Required** [_QueryClient 🌴_](https://tanstack.com/query/latest/docs/reference/QueryClient) to be used
   </TabItem>
 </Tabs>
 
@@ -81,8 +71,7 @@ guide for more information.
             entity_id: '3e3e-3e3e-3e3e',
           },
         },
-      },
-      queryClient
+      }
     );
     ```
   </TabItem>
@@ -101,7 +90,7 @@ guide for more information.
      * ###
      * ⬇︎ All queries for the specified endpoint will be invalidated
      **/
-    qraft.entities.getEntities.invalidateQueries(queryClient);
+    qraft.entities.getEntities.invalidateQueries();
     ```
   </TabItem>
   <TabItem value="with-predicate" label={<span style={{verticalAlign: "middle"}}><code>predicate</code></span>}>
@@ -127,8 +116,7 @@ guide for more information.
 
           return true;
         },
-      },
-      queryClient
+      }
     );
     ```
   </TabItem>
@@ -153,8 +141,7 @@ guide for more information.
             entity_id: '3e3e-3e3e-3e3e',
           },
         }),
-      },
-      queryClient
+      }
     );
     ```
   </TabItem>

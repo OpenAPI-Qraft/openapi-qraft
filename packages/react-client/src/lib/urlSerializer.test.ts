@@ -45,7 +45,6 @@ describe('urlSerializer', () => {
     expect(
       urlSerializer(
         { url: '/users/{userId}/posts', method: 'get' },
-        // @ts-expect-error - Missing baseUrl fallback
         {
           parameters: { path: { userId: '123' } },
         }

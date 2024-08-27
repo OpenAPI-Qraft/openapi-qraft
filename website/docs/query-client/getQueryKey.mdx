@@ -11,15 +11,14 @@ The method provides a standardized way to generate `QueryKey` for _Queries_.
 See TanStack [_Query Keys 🌴_](https://tanstack.com/query/latest/docs/framework/react/guides/query-keys) guide for more information.
 
 ```ts
-const queryKey = qraft.<service>.<operation>.getQueryKey(parameters);
+const queryKey = api.<service>.<operation>.getQueryKey(parameters);
 ```
 
 ### Arguments
 
-1. - `parameters: { path, query, header } | undefined`
+1. - `parameters: { path, query, header } | void`
      - **Optional**, OpenAPI request parameters for the query, strictly-typed ✨
      - `parameters` will be used to generate the `QueryKey`
-     - If not specified, returns a `QueryKey` with `{}` as a _Query_ parameters
 
 ### Returns
 
@@ -30,14 +29,14 @@ const queryKey = qraft.<service>.<operation>.getQueryKey(parameters);
 <Tabs>
   <TabItem value="with-parameters" label={<span style={{verticalAlign: 'middle'}}>With <code style={{display: 'inline-block'}}>parameters</code></span>} default>
     ```tsx
-    const queryKey = qraft.files.getFiles.getQueryKey({
+    const queryKey = api.files.getFiles.getQueryKey({
       header: { 'x-monite-version': '1.0.0' },
       query: { id__in: ['1', '2'] },
     });
 
     // `queryKey` will be an array of objects
     expect(queryKey).toEqual([
-      { method: 'get', url: '/files' },
+      { method: 'get', url: '/files', infinite: false, },
       {
         header: { 'x-monite-version': '1.0.0' },
         query: { id__in: ['1', '2'] }
@@ -46,12 +45,14 @@ const queryKey = qraft.<service>.<operation>.getQueryKey(parameters);
     ```
   </TabItem>
   <TabItem value="without-parameters" label={<span style={{verticalAlign: 'middle'}}>Without <code style={{display: 'inline-block', textDecoration: 'line-through'}}>parameters</code></span>} default>
+    In case all parameters are optional - you can pass nothing.
+
     ```tsx
-    const queryKey = qraft.files.getFiles.getQueryKey();
+    const queryKey = api.files.getFiles.getQueryKey();
 
     // `queryKey` will be an array of objects
     expect(queryKey).toEqual([
-      { method: 'get', url: '/files' },
+      { method: 'get', url: '/files', infinite: false, },
       {}
     ]);
     ```

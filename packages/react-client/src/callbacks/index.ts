@@ -4,8 +4,6 @@ export { getMutationKey } from './getMutationKey.js';
 export { getQueryData } from './getQueryData.js';
 export { getQueriesData } from './getQueriesData.js';
 export { getQueryKey } from './getQueryKey.js';
-export { mutationFn } from './mutationFn.js';
-export { queryFn } from './queryFn.js';
 export { setInfiniteQueryData } from './setInfiniteQueryData.js';
 export { setQueryData } from './setQueryData.js';
 export { setQueriesData } from './setQueriesData.js';

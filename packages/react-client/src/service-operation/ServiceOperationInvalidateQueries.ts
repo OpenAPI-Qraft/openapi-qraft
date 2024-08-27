@@ -1,8 +1,4 @@
-import type {
-  DefaultError,
-  InvalidateOptions,
-  QueryClient,
-} from '@tanstack/query-core';
+import type { DefaultError, InvalidateOptions } from '@tanstack/query-core';
 import type {
   QueryFiltersByParameters,
   QueryFiltersByQueryKey,
@@ -28,34 +24,14 @@ export interface ServiceOperationInvalidateQueries<
   TParams = {},
   TError = DefaultError,
 > {
-  invalidateQueries<TInfinite extends boolean>(
-    filters: InvalidateQueryFilters<TSchema, TData, TInfinite, TParams, TError>,
-    options: InvalidateOptions,
-    queryClient: QueryClient
-  ): Promise<void>;
-
-  invalidateQueries<TInfinite extends boolean>(
-    filters: InvalidateQueryFilters<TSchema, TData, TInfinite, TParams, TError>,
-    queryClient: QueryClient
-  ): Promise<void>;
-
-  invalidateQueries(queryClient: QueryClient): Promise<void>;
-}
-
-/**
- * @internal
- */
-export interface ServiceOperationInvalidateQueriesCallback<
-  TSchema extends { url: string; method: string },
-  TData,
-  TParams = {},
-  TError = DefaultError,
-> extends ServiceOperationInvalidateQueries<TSchema, TData, TParams, TError> {
-  invalidateQueries<TInfinite extends boolean>(
-    filters:
-      | InvalidateQueryFilters<TSchema, TData, TInfinite, TParams, TError>
-      | QueryClient,
-    options?: InvalidateOptions | QueryClient,
-    queryClient?: QueryClient
+  invalidateQueries<TInfinite extends boolean = false>(
+    filters?: InvalidateQueryFilters<
+      TSchema,
+      TData,
+      TInfinite,
+      TParams,
+      TError
+    >,
+    options?: InvalidateOptions
   ): Promise<void>;
 }

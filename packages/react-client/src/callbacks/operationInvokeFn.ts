@@ -1,7 +1,7 @@
-import type { OperationSchema } from '../lib/requestFn.js';
-import type { QraftClientOptions } from '../qraftAPIClient.js';
-import { ServiceOperationMutationFn } from '../service-operation/ServiceOperationMutationFn.js';
-import { ServiceOperationQueryFn } from '../service-operation/ServiceOperationQueryFn.js';
+import type { CreateAPIBasicClientOptions } from '../qraftAPIClient.js';
+import type { ServiceOperationMutationFn } from '../service-operation/ServiceOperationMutationFn.js';
+import type { ServiceOperationQueryFn } from '../service-operation/ServiceOperationQueryFn.js';
+import { OperationSchema, RequestFnResponse } from '../lib/requestFn.js';
 
 /**
  * Called when <service>.<operation>(...) is invoked.
@@ -11,35 +11,45 @@ export const operationInvokeFn: <
   TBody,
   TData,
   TParams,
+  TError,
 >(
-  qraftOptions: QraftClientOptions | undefined,
+  qraftOptions: CreateAPIBasicClientOptions,
   schema: TSchema,
   args:
-    | Parameters<ServiceOperationQueryFn<TSchema, TData, TParams>>
-    | Parameters<ServiceOperationMutationFn<TSchema, TBody, TData, TParams>>
-) => Promise<TData> = (_, schema, args) => {
+    | Parameters<ServiceOperationQueryFn<TSchema, TData, TParams, TError>>
+    | Parameters<
+        ServiceOperationMutationFn<TSchema, TBody, TData, TParams, TError>
+      >
+) => Promise<RequestFnResponse<TData, TError>> = (
+  qraftOptions,
+  schema,
+  args
+) => {
   const queryOperationMethods = ['get', 'head', 'options'] as const; // todo::make it shared
 
   const isQueryOperationType = queryOperationMethods.includes(
     schema.method as (typeof queryOperationMethods)[number]
   );
 
-  const [options, client] = args;
+  const [options, requestFn = qraftOptions.requestFn] = args;
 
   const invokeSchema =
-    isQueryOperationType && 'queryKey' in options
+    options && isQueryOperationType && 'queryKey' in options
       ? options.queryKey![0]
       : schema;
 
   const invokeParameters =
-    isQueryOperationType && 'queryKey' in options
+    options && isQueryOperationType && 'queryKey' in options
       ? options.queryKey![1]
-      : 'parameters' in options
+      : options && 'parameters' in options
         ? options.parameters
         : undefined;
 
-  return client(invokeSchema, {
+  const baseUrl = options && 'baseUrl' in options ? options.baseUrl : undefined;
+
+  return requestFn(invokeSchema, {
     ...options,
+    baseUrl: baseUrl ?? qraftOptions.baseUrl,
     parameters: invokeParameters,
   } as never);
 };

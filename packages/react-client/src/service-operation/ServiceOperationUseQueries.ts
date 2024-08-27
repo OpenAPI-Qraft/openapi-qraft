@@ -3,7 +3,6 @@ import type { ServiceOperationQueryKey } from './ServiceOperationKey.js';
 import {
   DefaultError,
   QueriesPlaceholderDataFunction,
-  QueryClient,
 } from '@tanstack/query-core';
 
 type UseQueryOptionsForUseQueries<
@@ -49,13 +48,10 @@ export interface ServiceOperationUseQueries<
       UseQueryOptionsForUseQueries<TSchema, TParams, TQueryFnData, TError>
     >,
     TCombinedResult = Array<UseQueryResult<TQueryFnData, TError>>,
-  >(
-    options: {
-      queries: T;
-      combine?: (
-        results: Array<UseQueryResult<TQueryFnData, TError>>
-      ) => TCombinedResult;
-    },
-    queryClient?: QueryClient
-  ): TCombinedResult;
+  >(options: {
+    queries: T;
+    combine?: (
+      results: Array<UseQueryResult<TQueryFnData, TError>>
+    ) => TCombinedResult;
+  }): TCombinedResult;
 }

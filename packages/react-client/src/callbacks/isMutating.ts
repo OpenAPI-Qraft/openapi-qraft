@@ -1,13 +1,13 @@
 import type { OperationSchema } from '../lib/requestFn.js';
-import type { QraftClientOptions } from '../qraftAPIClient.js';
-import type { ServiceOperationIsMutatingQueriesCallback } from '../service-operation/ServiceOperationIsMutatingQueries.js';
+import type { CreateAPIQueryClientOptions } from '../qraftAPIClient.js';
+import type { ServiceOperationIsMutatingQueries } from '../service-operation/ServiceOperationIsMutatingQueries.js';
 import { callQueryClientMethodWithMutationFilters } from '../lib/callQueryClientMethodWithMutationFilters.js';
 
 export function isMutating<TData>(
-  _: QraftClientOptions | undefined,
+  qraftOptions: CreateAPIQueryClientOptions,
   schema: OperationSchema,
   args: Parameters<
-    ServiceOperationIsMutatingQueriesCallback<
+    ServiceOperationIsMutatingQueries<
       OperationSchema,
       unknown,
       TData
@@ -15,6 +15,7 @@ export function isMutating<TData>(
   >
 ): Promise<void> {
   return callQueryClientMethodWithMutationFilters(
+    qraftOptions,
     'isMutating',
     schema,
     args as never

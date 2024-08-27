@@ -1,14 +1,14 @@
+import type { InfiniteData } from '@tanstack/query-core';
 import type { OperationSchema } from '../lib/requestFn.js';
-import type { QraftClientOptions } from '../qraftAPIClient.js';
-import type { ServiceOperationQuery } from '../service-operation/ServiceOperation.js';
-import { InfiniteData } from '@tanstack/query-core';
+import type { CreateAPIQueryClientOptions } from '../qraftAPIClient.js';
+import type { ServiceOperationSetInfiniteQueryData } from '../service-operation/ServiceOperationSetInfiniteQueryData.js';
 import { callQueryClientMethodWithQueryKey } from '../lib/callQueryClientMethodWithQueryKey.js';
 
 export function setInfiniteQueryData<TData>(
-  qraftOptions: QraftClientOptions | undefined,
+  qraftOptions: CreateAPIQueryClientOptions,
   schema: OperationSchema,
   args: Parameters<
-    ServiceOperationQuery<
+    ServiceOperationSetInfiniteQueryData<
       OperationSchema,
       unknown,
       TData
@@ -16,9 +16,11 @@ export function setInfiniteQueryData<TData>(
   >
 ): InfiniteData<TData> | undefined {
   return callQueryClientMethodWithQueryKey(
+    qraftOptions,
     'setQueryData',
     schema,
     true,
-    args as never
+    // @ts-expect-error - Too complex to type
+    args
   ) as never;
 }

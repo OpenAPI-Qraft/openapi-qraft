@@ -1,13 +1,13 @@
 import type { OperationSchema } from '../lib/requestFn.js';
-import type { QraftClientOptions } from '../qraftAPIClient.js';
-import type { ServiceOperationSetQueryDataCallback } from '../service-operation/ServiceOperationSetQueryData.js';
+import type { CreateAPIQueryClientOptions } from '../qraftAPIClient.js';
+import type { ServiceOperationSetQueryData } from '../service-operation/ServiceOperationSetQueryData.js';
 import { callQueryClientMethodWithQueryKey } from '../lib/callQueryClientMethodWithQueryKey.js';
 
 export function setQueryData<TData>(
-  _: QraftClientOptions | undefined,
+  qraftOptions: CreateAPIQueryClientOptions,
   schema: OperationSchema,
   args: Parameters<
-    ServiceOperationSetQueryDataCallback<
+    ServiceOperationSetQueryData<
       OperationSchema,
       unknown,
       TData
@@ -15,9 +15,11 @@ export function setQueryData<TData>(
   >
 ): TData | undefined {
   return callQueryClientMethodWithQueryKey(
+    qraftOptions,
     'setQueryData',
     schema,
     false,
-    args as never
+    // @ts-expect-error - Too complex to type
+    args
   ) as never;
 }

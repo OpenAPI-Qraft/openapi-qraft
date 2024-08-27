@@ -7,18 +7,17 @@ import TabItem from '@theme/TabItem';
 # getMutationKey(...)
 
 The method provides a standardized way to generate `MutationKey` for _Mutations_.
-It could be used to check mutation status, or to cancel a mutation.
+It could be used to check mutation status.
 
 ```ts
-qraft.<service>.<operation>.getMutationKey(parameters)
+api.<service>.<operation>.getMutationKey(parameters)
 ```
 
 ### Arguments
 
-1. - `parameters: { path, query, header } | undefined`
+1. - `parameters: { path, query, header } | void`
      - **Optional**, OpenAPI request parameters for the mutation, strictly-typed ✨
      - `parameters` will be used to generate the `MutationKey`
-     - If not specified, returns a `MutationKey` with `{}` as a _Mutation_ parameters
 
 ### Returns
 
@@ -30,7 +29,7 @@ qraft.<service>.<operation>.getMutationKey(parameters)
   <TabItem value="with-parameters" label={<span style={{verticalAlign: 'middle'}}>With <code style={{display: 'inline-block'}}>parameters</code></span>} default>
     ```tsx
     expect(
-      qraft.entities.postEntitiesIdDocuments.getMutationKey({
+      api.entities.postEntitiesIdDocuments.getMutationKey({
         header: {
           'x-monite-version': '1.0.0',
         },
@@ -43,8 +42,8 @@ qraft.<service>.<operation>.getMutationKey(parameters)
       })
     ).toEqual([
       {
-        url: qraft.entities.postEntitiesIdDocuments.schema.url,
-        method: qraft.entities.postEntitiesIdDocuments.schema.method,
+        url: api.entities.postEntitiesIdDocuments.schema.url,
+        method: api.entities.postEntitiesIdDocuments.schema.method,
       },
       {
         header: {
@@ -63,11 +62,11 @@ qraft.<service>.<operation>.getMutationKey(parameters)
   <TabItem value="without-parameters" label={<span style={{verticalAlign: 'middle'}}>Without <code style={{display: 'inline-block', textDecoration: 'line-through'}}>parameters</code></span>} default>
     ```tsx
     expect(
-      qraft.entities.postEntitiesIdDocuments.getMutationKey()
+      api.entities.postEntitiesIdDocuments.getMutationKey()
     ).toEqual([
       {
-        url: qraft.entities.postEntitiesIdDocuments.schema.url,
-        method: qraft.entities.postEntitiesIdDocuments.schema.method,
+        url: api.entities.postEntitiesIdDocuments.schema.url,
+        method: api.entities.postEntitiesIdDocuments.schema.method,
       },
       {},
     ]);

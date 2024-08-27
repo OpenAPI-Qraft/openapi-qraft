@@ -1,13 +1,13 @@
 import type { OperationSchema } from '../lib/requestFn.js';
-import type { QraftClientOptions } from '../qraftAPIClient.js';
-import type { ServiceOperationIsFetchingQueriesCallback } from '../service-operation/ServiceOperationIsFetchingQueries.js';
+import type { CreateAPIQueryClientOptions } from '../qraftAPIClient.js';
+import type { ServiceOperationIsFetchingQueries } from '../service-operation/ServiceOperationIsFetchingQueries.js';
 import { callQueryClientMethodWithQueryFilters } from '../lib/callQueryClientMethodWithQueryFilters.js';
 
 export function isFetching<TData>(
-  qraftOptions: QraftClientOptions | undefined,
+  qraftOptions: CreateAPIQueryClientOptions,
   schema: OperationSchema,
   args: Parameters<
-    ServiceOperationIsFetchingQueriesCallback<
+    ServiceOperationIsFetchingQueries<
       OperationSchema,
       unknown,
       TData
@@ -15,6 +15,7 @@ export function isFetching<TData>(
   >
 ): Promise<void> {
   return callQueryClientMethodWithQueryFilters(
+    qraftOptions,
     'isFetching',
     schema,
     args as never

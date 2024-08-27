@@ -1,19 +1,25 @@
-import { ComponentProps, ReactNode, useState } from 'react';
-
-import { QraftContext, requestFn } from '@openapi-qraft/react';
+import {
+  OperationSchema,
+  QraftClientOptions,
+  requestFn,
+  RequestFnPayload,
+  RequestFnResponse,
+} from '@openapi-qraft/react';
 import { QraftSecureRequestFn } from '@openapi-qraft/react/Unstable_QraftSecureRequestFn';
 import {
   QueryClient,
   QueryClientProvider,
   useQueryClient,
 } from '@tanstack/react-query';
-
 import constate from 'constate';
-
-import { createAPIClient } from './api';
-import { components } from './api/schema';
-
-const qraft = createAPIClient();
+import {
+  ComponentProps,
+  createContext,
+  ReactNode,
+  useContext,
+  useState,
+} from 'react';
+import { components, createAPIClient, Services } from './api';
 
 function AppComponent() {
   const { petIdToEdit } = usePetToEdit();
@@ -65,6 +71,7 @@ function PetListFilter() {
 }
 
 function PetList() {
+  const qraft = useCreateAPIClient();
   const { petsFilter } = usePetsFilter();
   const { data, error, isPending } = qraft.pet.findPetsByStatus.useQuery({
     query: { status: petsFilter.status },
@@ -128,6 +135,7 @@ function PetCard({ pet }: { pet: components['schemas']['Pet'] }) {
 
 function PetUpdateForm({ petId }: { petId: number }) {
   const { setPetIdToEditToEdit } = usePetToEdit();
+  const qraft = useCreateAPIClient();
 
   const petParameters: typeof qraft.pet.getPetById.types.parameters = {
     path: { petId },
@@ -139,43 +147,27 @@ function PetUpdateForm({ petId }: { petId: number }) {
     error: petQueryError,
   } = qraft.pet.getPetById.useQuery(petParameters, { enabled: !!petId });
 
-  const queryClient = useQueryClient();
-
   const { isPending, mutate } = qraft.pet.updatePet.useMutation(undefined, {
     async onMutate(variables) {
-      await qraft.pet.getPetById.cancelQueries(
-        { parameters: petParameters },
-        queryClient
-      );
+      await qraft.pet.getPetById.cancelQueries({ parameters: petParameters });
 
-      const prevPet = qraft.pet.getPetById.getQueryData(
-        petParameters,
-        queryClient
-      );
+      const prevPet = qraft.pet.getPetById.getQueryData(petParameters);
 
-      qraft.pet.getPetById.setQueryData(
-        petParameters,
-        (oldData) => ({
-          ...oldData,
-          ...variables.body,
-        }),
-        queryClient
-      );
+      qraft.pet.getPetById.setQueryData(petParameters, (oldData) => ({
+        ...oldData,
+        ...variables.body,
+      }));
 
       return { prevPet };
     },
     async onError(_error, _variables, context) {
       if (context?.prevPet) {
-        qraft.pet.getPetById.setQueryData(
-          petParameters,
-          context.prevPet,
-          queryClient
-        );
+        qraft.pet.getPetById.setQueryData(petParameters, context.prevPet);
       }
     },
     async onSuccess(updatedPet) {
-      qraft.pet.getPetById.setQueryData(petParameters, updatedPet, queryClient);
-      await qraft.pet.findPetsByStatus.invalidateQueries(queryClient);
+      qraft.pet.getPetById.setQueryData(petParameters, updatedPet);
+      await qraft.pet.findPetsByStatus.invalidateQueries();
       setPetIdToEditToEdit(undefined);
     },
   });
@@ -240,16 +232,16 @@ function PetUpdateForm({ petId }: { petId: number }) {
 function PetCreateForm({
   status,
 }: {
-  status: typeof qraft.pet.addPet.types.body.status;
+  status: Services['pet']['addPet']['types']['body']['status'];
 }) {
   const { setPetIdToEditToEdit } = usePetToEdit();
   const { setPetStatusToCreate } = usePetStatusToCreate();
 
-  const queryClient = useQueryClient();
+  const qraft = useCreateAPIClient();
 
   const { isPending, mutate, error } = qraft.pet.addPet.useMutation(undefined, {
     async onSuccess(createdPet) {
-      await qraft.pet.findPetsByStatus.invalidateQueries(queryClient);
+      await qraft.pet.findPetsByStatus.invalidateQueries();
       if (!createdPet)
         throw new Error('createdPet not found in addPet.onSuccess');
       setPetIdToEditToEdit(createdPet.id);
@@ -407,19 +399,60 @@ export const QraftProviders = ({ children }: { children: ReactNode }) => {
     >
       {(secureRequestFn) => (
         <QueryClientProvider client={queryClient}>
-          <QraftContext.Provider
+          <APIContext.Provider
             value={{
               baseUrl: 'https://petstore3.swagger.io/api/v3',
               requestFn: secureRequestFn,
             }}
           >
             {children}
-          </QraftContext.Provider>
+          </APIContext.Provider>
         </QueryClientProvider>
       )}
     </QraftSecureRequestFn>
   );
 };
+
+function useCreateAPIClient(options?: Partial<QraftClientOptions>) {
+  const apiContextValue = useContext(APIContext);
+
+  const requestFn = options?.requestFn ?? apiContextValue?.requestFn;
+  const baseUrl = options?.baseUrl ?? apiContextValue?.baseUrl;
+  const queryClient = useQueryClient(
+    options && 'queryClient' in options ? options?.queryClient : undefined
+  );
+
+  if (!requestFn)
+    throw new Error('requestFn not found in APIContext or options');
+  if (!baseUrl) throw new Error('baseUrl not found in APIContext or options');
+
+  return createAPIClient({
+    requestFn,
+    baseUrl,
+    queryClient,
+  });
+}
+
+export interface APIContextValue {
+  /**
+   * Base URL to use for the request
+   * @example 'https://api.example.com'
+   */
+  baseUrl?: string;
+
+  /**
+   * The `requestFn` will be invoked with every request.
+   */
+  requestFn<TData, TError>(
+    requestSchema: OperationSchema,
+    requestInfo: RequestFnPayload
+  ): Promise<RequestFnResponse<TData, TError>>;
+
+  /** The QueryClient to use in Hooks */
+  queryClient?: QueryClient;
+}
+
+export const APIContext = createContext<APIContextValue | undefined>(undefined);
 
 export default function App() {
   return (

@@ -1,4 +1,4 @@
-import type { DefaultError, NoInfer, QueryClient } from '@tanstack/query-core';
+import type { DefaultError, NoInfer } from '@tanstack/query-core';
 import type { OperationInfiniteData } from './OperationInfiniteData.js';
 import type {
   QueryFiltersByParameters,
@@ -12,14 +12,13 @@ import type {
 export interface ServiceOperationGetQueriesData<
   TSchema extends { url: string; method: string },
   TData,
-  TParams = {}, // todo::try to replace `TParams = {}` with `TParams = undefined`
+  TParams,
   TError = DefaultError,
 > {
-  getQueriesData<TInfinite extends boolean>(
-    filters:
+  getQueriesData<TInfinite extends boolean = false>(
+    filters?:
       | QueryFiltersByParameters<TSchema, TData, TInfinite, TParams, TError>
-      | QueryFiltersByQueryKey<TSchema, TData, TInfinite, TParams, TError>,
-    queryClient: QueryClient
+      | QueryFiltersByQueryKey<TSchema, TData, TInfinite, TParams, TError>
   ): TInfinite extends true
     ? Array<
         [

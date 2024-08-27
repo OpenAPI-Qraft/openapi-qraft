@@ -1,4 +1,4 @@
-import type { DefaultError, QueryClient } from '@tanstack/query-core';
+import type { DefaultError } from '@tanstack/query-core';
 import type {
   UseMutationOptions,
   UseMutationResult,
@@ -13,9 +13,9 @@ export interface ServiceOperationUseMutation<
   TParams,
   TError = DefaultError,
 > {
-  getMutationKey<TMutationKeyParams extends TParams | undefined = undefined>(
-    parameters?: TMutationKeyParams
-  ): ServiceOperationMutationKey<TSchema, TMutationKeyParams>;
+  getMutationKey(
+    parameters: TParams | void
+  ): ServiceOperationMutationKey<TSchema, TParams>;
 
   useMutation<
     TVariables extends MutationVariables<TBody, TParams>,
@@ -29,8 +29,7 @@ export interface ServiceOperationUseMutation<
       TVariables,
       TError,
       TContext
-    >,
-    queryClient?: QueryClient
+    >
   ): UseMutationResult<TData, TError | Error, TVariables, TContext>;
 
   useMutation<TVariables extends TBody, TContext = unknown>(
@@ -42,8 +41,7 @@ export interface ServiceOperationUseMutation<
       TVariables,
       TError,
       TContext
-    >,
-    queryClient?: QueryClient
+    >
   ): UseMutationResult<
     TData,
     TError | Error,

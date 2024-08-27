@@ -69,6 +69,8 @@ TQuery
 treeshake
 TResult
 TSchema
+TCallbacks
+tservice
 tseslint
 TSignal
 TVariables

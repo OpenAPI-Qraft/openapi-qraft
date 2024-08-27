@@ -1,7 +1,6 @@
 import type {
   DefaultError,
   InfiniteQueryPageParamsOptions,
-  QueryClient,
 } from '@tanstack/query-core';
 import type {
   DefinedInitialDataInfiniteOptions,
@@ -9,6 +8,7 @@ import type {
   UndefinedInitialDataInfiniteOptions,
   UseInfiniteQueryResult,
 } from '@tanstack/react-query';
+import type { AreAllOptional } from '../lib/AreAllOptional.js';
 import type { PartialParameters } from '../lib/PartialParameters.type.js';
 import type { OperationInfiniteData } from './OperationInfiniteData.js';
 import type { ServiceOperationInfiniteQueryKey } from './ServiceOperationKey.js';
@@ -16,15 +16,17 @@ import type { ServiceOperationInfiniteQueryKey } from './ServiceOperationKey.js'
 export interface ServiceOperationUseInfiniteQuery<
   TSchema extends { url: string; method: string },
   TQueryFnData,
-  TParams = {},
+  TParams,
   TError = DefaultError,
 > {
-  getInfiniteQueryKey<TQueryKeyParams extends TParams>(
-    parameters: TQueryKeyParams
-  ): ServiceOperationInfiniteQueryKey<TSchema, TQueryKeyParams>;
+  getInfiniteQueryKey(
+    parameters: AreAllOptional<TParams> extends true ? TParams | void : TParams
+  ): ServiceOperationInfiniteQueryKey<TSchema, TParams>;
 
   useInfiniteQuery<TPageParam extends TParams, TData = TQueryFnData>(
-    parameters: TParams | ServiceOperationInfiniteQueryKey<TSchema, TParams>,
+    parameters: AreAllOptional<TParams> extends true
+      ? TParams | ServiceOperationInfiniteQueryKey<TSchema, TParams> | void
+      : TParams | ServiceOperationInfiniteQueryKey<TSchema, TParams>,
     options: Omit<
       UndefinedInitialDataInfiniteOptions<
         TQueryFnData,
@@ -41,15 +43,16 @@ export interface ServiceOperationUseInfiniteQuery<
       InfiniteQueryPageParamsOptions<
         TQueryFnData,
         PartialParameters<TPageParam>
-      >,
-    queryClient?: QueryClient
+      >
   ): UseInfiniteQueryResult<
     OperationInfiniteData<TData, TParams>,
     TError | Error
   >;
 
   useInfiniteQuery<TPageParam extends TParams, TData = TQueryFnData>(
-    parameters: TParams | ServiceOperationInfiniteQueryKey<TSchema, TParams>,
+    parameters: AreAllOptional<TParams> extends true
+      ? TParams | ServiceOperationInfiniteQueryKey<TSchema, TParams> | void
+      : TParams | ServiceOperationInfiniteQueryKey<TSchema, TParams>,
     options: Omit<
       DefinedInitialDataInfiniteOptions<
         TQueryFnData,
@@ -66,8 +69,7 @@ export interface ServiceOperationUseInfiniteQuery<
       InfiniteQueryPageParamsOptions<
         TQueryFnData,
         PartialParameters<TPageParam>
-      >,
-    queryClient?: QueryClient
+      >
   ): DefinedUseInfiniteQueryResult<
     OperationInfiniteData<TData, TParams>,
     TError | Error

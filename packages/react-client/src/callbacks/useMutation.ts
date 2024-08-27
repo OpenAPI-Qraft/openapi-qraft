@@ -1,18 +1,14 @@
 'use client';
 
 import type { DefaultError } from '@tanstack/query-core';
+import type { UseMutationResult } from '@tanstack/react-query';
 import type { OperationSchema } from '../lib/requestFn.js';
-import type { QraftClientOptions } from '../qraftAPIClient.js';
+import type { CreateAPIQueryClientOptions } from '../qraftAPIClient.js';
 import type { ServiceOperationMutation } from '../service-operation/ServiceOperation.js';
 import type { ServiceOperationMutationKey } from '../service-operation/ServiceOperationKey.js';
-import {
-  useMutation as useMutationBase,
-  UseMutationResult,
-} from '@tanstack/react-query';
-import { useContext } from 'react';
+import { useMutation as useMutationBase } from '@tanstack/react-query';
 import { composeMutationKey } from '../lib/composeMutationKey.js';
-import { useQueryClient } from '../lib/useQueryClient.js';
-import { QraftContext } from '../QraftContext.js';
+import { requestFnResponseResolver } from '../lib/requestFnResponseResolver.js';
 
 export const useMutation: <
   TData = unknown,
@@ -20,7 +16,7 @@ export const useMutation: <
   TVariables = void,
   TContext = unknown,
 >(
-  qraftOptions: QraftClientOptions | undefined,
+  qraftOptions: CreateAPIQueryClientOptions,
   schema: OperationSchema,
   args: Parameters<
     ServiceOperationMutation<
@@ -35,7 +31,7 @@ export const useMutation: <
   schema,
   args
 ) => {
-  const [parameters, options, queryClientByArg] = args;
+  const [parameters, options] = args;
 
   if (
     parameters &&
@@ -46,8 +42,6 @@ export const useMutation: <
     throw new Error(
       `'useMutation': parameters and 'options.mutationKey' cannot be used together`
     );
-
-  const contextValue = useContext(qraftOptions?.context ?? QraftContext);
 
   const mutationKey =
     options && 'mutationKey' in options
@@ -61,34 +55,33 @@ export const useMutation: <
     {
       ...options,
       mutationKey,
+      // @ts-expect-error - Too complex to type
       mutationFn:
         options?.mutationFn ??
         (parameters
           ? function (bodyPayload) {
-              if (!contextValue?.requestFn)
-                throw new Error(`QraftContext.requestFn not found`);
-
-              return contextValue.requestFn(schema, {
-                parameters,
-                baseUrl: contextValue.baseUrl,
-                body: bodyPayload as never,
-              });
+              return qraftOptions
+                .requestFn(schema, {
+                  parameters,
+                  baseUrl: qraftOptions.baseUrl,
+                  body: bodyPayload as never,
+                })
+                .then(requestFnResponseResolver, requestFnResponseResolver);
             }
           : function (parametersAndBodyPayload) {
-              if (!contextValue?.requestFn)
-                throw new Error(`QraftContext.requestFn not found`);
-
               const { body, ...parameters } = parametersAndBodyPayload as {
                 body: unknown;
               };
 
-              return contextValue.requestFn(schema, {
-                parameters,
-                baseUrl: contextValue.baseUrl,
-                body,
-              } as never);
+              return qraftOptions
+                .requestFn(schema, {
+                  parameters,
+                  baseUrl: qraftOptions.baseUrl,
+                  body,
+                } as never)
+                .then(requestFnResponseResolver, requestFnResponseResolver);
             }),
     },
-    useQueryClient(qraftOptions, queryClientByArg)
+    qraftOptions.queryClient
   ) as never;
 };

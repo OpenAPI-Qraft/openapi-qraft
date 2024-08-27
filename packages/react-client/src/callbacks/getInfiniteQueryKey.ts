@@ -1,10 +1,10 @@
 import type { OperationSchema } from '../lib/requestFn.js';
-import type { QraftClientOptions } from '../qraftAPIClient.js';
 import { composeInfiniteQueryKey } from '../lib/composeInfiniteQueryKey.js';
+import { CreateAPIBasicClientOptions } from '../qraftAPIClient.js';
 import { ServiceOperationQuery } from '../service-operation/ServiceOperation.js';
 
 export const getInfiniteQueryKey = (
-  qraftOptions: QraftClientOptions | undefined,
+  _qraftOptions: CreateAPIBasicClientOptions,
   schema: OperationSchema,
   args: Parameters<
     ServiceOperationQuery<
