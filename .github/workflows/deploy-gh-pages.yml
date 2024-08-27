@@ -16,6 +16,7 @@ jobs:
     name: Deploy to GitHub Pages
     runs-on: ubuntu-latest
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    environment: github-pages
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v4
@@ -37,18 +38,8 @@ jobs:
       - name: Build website
         run: yarn workspace openapi-qraft-website run build
 
-      # Popular action to deploy to GitHub Pages:
-      # Docs: https://github.com/peaceiris/actions-gh-pages#%EF%B8%8F-docusaurus
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          # Build output to publish to the `gh-pages` branch:
           publish_dir: ./website/build
-
-      - name: Update Algolia index
-        uses: darrenjennings/algolia-docsearch-action@v0.2.0
-        with:
-          algolia_application_id: ${{ vars.ALGOLIA_APP_ID }}
-          algolia_api_key: ${{ secrets.ALGOLIA_WRITE_API_KEY }}
-          file: 'website/tools/algolia/config.json'

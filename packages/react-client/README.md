@@ -23,7 +23,7 @@ Read the full documentation at [openapi-qraft.github.io/openapi-qraft](https://o
 First, install the core package for your project:
 
 ```bash
-npm install @openapi-qraft/react
+npm install @openapi-qraft/react@next
 ```
 
 If your project doesn't already include `@tanstack/react-query`, you'll also need to install it. This package is
@@ -75,11 +75,9 @@ Finally, provide the request client to the `QraftContext` to enable the generate
 Every request will be handled by `request` function, which can be customized to fit your project's needs.
 
 ```tsx
-import { useMemo } from 'react';
-
 import { QraftContext, requestFn } from '@openapi-qraft/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-
+import { useMemo } from 'react';
 // where `./api` is the '--output-dir' path to the services you generated with `@openapi-qraft/cli`
 import { createAPIClient } from './api';
 
@@ -599,7 +597,6 @@ using a custom `fetchToken` async function.
 
 ```tsx
 import { QraftContext, requestFn } from '@openapi-qraft/react';
-
 import { fetchToken } from './auth';
 
 function QraftProvider({ children }: { children: React.ReactNode }) {

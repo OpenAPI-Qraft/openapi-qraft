@@ -1,0 +1,22 @@
+name: Update Algolia Index
+
+on:
+  workflow_dispatch:
+
+  workflow_run:
+    workflows: ["pages build and deployment"]
+    types:
+      - completed
+
+jobs:
+  update_algolia:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    environment: github-pages
+    steps:
+      - name: Update Algolia index
+        uses: darrenjennings/algolia-docsearch-action@v0.2.0
+        with:
+          algolia_application_id: ${{ vars.ALGOLIA_APP_ID }}
+          algolia_api_key: ${{ secrets.ALGOLIA_WRITE_API_KEY }}
+          file: 'website/tools/algolia/config.json'
