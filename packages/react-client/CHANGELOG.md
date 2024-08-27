@@ -1,5 +1,45 @@
 # @openapi-qraft/react
 
+## 2.0.0-next.0
+
+### Major Changes
+
+- caff377: Removed the option to pass a `QueryClient` for hooks or methods.
+
+  **Details**:
+  This decision was made to streamline the developer experience and to reduce the potential for errors.
+
+  - The `QueryClient` is no longer needed for methods like `qraft.<service>.<operation>.getQueryData(...)` and has been
+    removed entirely.
+    This change was made to simplify the API and avoid potential confusion.
+  - The ability to pass an optional `QueryClient` for hooks has been removed.
+  - Now, there is only one `QueryClient` instance associated with the `createAPIClient`.
+    This ensures consistent data management throughout the project.
+
+  **Impact**:
+
+  - All hooks or methods that previously accepted an optional/required `QueryClient` should now rely on the single,
+    consistent `QueryClient` associated with the `createAPIClient`.
+
+- 2b0fb30: Return `{ data, error, response }` from `requestFn` Instead of `Promise.reject(error)`
+
+  This change promotes stricter error handling within the application.
+
+- 266611a: Enhance `createAPIClient` to accept `requestFn`, `baseUrl`, and optionally `queryClient`.
+- 0aca269: Removed `QraftContext` in favor of enhanced functionality in `createAPIClient(...)`.
+
+### Minor Changes
+
+- 0b3cda1: Updated the `qraftAPIClient(...)` to return only the set of services corresponding to the methods for which callbacks were passed.
+- 2099907: Enhanced usage of `parameters`
+  in `getQueryData(...)`, `getInfiniteQueryData(...)`, `getMutationData(...)`, `getQueryKey(...)`,
+  and `getInfiniteQueryKey(...)`. Now, when not all query parameters are optional (according to OpenAPI), the parameters
+  can be omitted as the first argument.
+
+### Patch Changes
+
+- 057292f: Removed deprecated `mutationFn` and `queryFn` methods.
+
 ## 1.14.0
 
 ## 1.14.0-beta.5
