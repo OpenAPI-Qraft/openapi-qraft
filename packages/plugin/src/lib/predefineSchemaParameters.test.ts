@@ -156,6 +156,7 @@ describe('predefineSchemaParameters utils', () => {
               },
             },
           ],
+          pathGlobs: '/entities/**,/approval_policies/**',
           paths: [
             '/entities/{entity_id}/documents',
             '/approval_policies/{approval_policy_id}',
@@ -205,6 +206,7 @@ describe('predefineSchemaParameters utils', () => {
               },
             },
           ],
+          pathGlobs: '/files/list',
           paths: ['/files/list'],
         },
       ]);
@@ -242,6 +244,7 @@ describe('predefineSchemaParameters utils', () => {
               },
             },
           ],
+          pathGlobs: '/approval_policies/**',
           paths: ['/approval_policies/{approval_policy_id}'],
         },
       ]);
@@ -276,6 +279,7 @@ describe('predefineSchemaParameters utils', () => {
               },
             },
           ],
+          pathGlobs: '/approval_policies/**',
           paths: ['/approval_policies/{approval_policy_id}'],
         },
         {
@@ -293,6 +297,7 @@ describe('predefineSchemaParameters utils', () => {
               },
             },
           ],
+          pathGlobs: '/approval_policies/{approval_policy_id}',
           paths: ['/approval_policies/{approval_policy_id}'],
         },
       ]);
@@ -349,6 +354,7 @@ describe('predefineSchemaParameters utils', () => {
               },
             },
           ],
+          pathGlobs: '/approval_policies/**',
           paths: ['/approval_policies/{approval_policy_id}'],
         },
       ]);
@@ -366,6 +372,7 @@ describe('predefineSchemaParameters utils', () => {
       ).toEqual([
         {
           errors: ["No matching paths found for '/non-existing-path/**'"],
+          pathGlobs: '/non-existing-path/**',
           parameters: [],
           paths: [],
         },

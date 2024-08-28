@@ -210,6 +210,7 @@ export function createPredefinedParametersGlobs(
             paths: [],
             parameters: [],
             errors: [],
+            pathGlobs,
           });
 
         const predefinedPathGlob = predefinedParametersGlobMap.get(pathGlobs);
@@ -276,6 +277,7 @@ export function createPredefinedParametersGlobs(
         paths: [],
         parameters: [],
         errors: [`No matching paths found for '${pathGlobs}'`],
+        pathGlobs,
       });
     }
   });
@@ -342,6 +344,7 @@ type PredefinedParametersGlob = {
   paths: string[];
   parameters: Pick<ParameterObject, 'in' | 'name'>[];
   errors: string[];
+  pathGlobs: string;
 };
 
 export { parseOperationPredefinedParametersOption };
