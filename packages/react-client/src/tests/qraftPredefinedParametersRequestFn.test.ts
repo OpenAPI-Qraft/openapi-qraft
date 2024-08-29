@@ -10,7 +10,7 @@ describe('qraftPredefinedParametersRequestFn(...)', () => {
     const predefinedRequestFn = qraftPredefinedParametersRequestFn(
       [
         {
-          pathGlobs: '/**',
+          requestPattern: '/**',
           parameters: [
             {
               in: 'header',
@@ -22,7 +22,7 @@ describe('qraftPredefinedParametersRequestFn(...)', () => {
       ],
       [
         {
-          pathGlobs: '/**',
+          requestPattern: '/**',
           methods: ['patch'],
           paths: ['/approval_policies/{approval_policy_id}'],
         },
@@ -68,7 +68,7 @@ describe('qraftPredefinedParametersRequestFn(...)', () => {
     const predefinedRequestFn = qraftPredefinedParametersRequestFn(
       [
         {
-          pathGlobs: '/**',
+          requestPattern: '/**',
           parameters: [
             {
               in: 'header',
@@ -78,7 +78,7 @@ describe('qraftPredefinedParametersRequestFn(...)', () => {
           ],
         },
         {
-          pathGlobs: '/foo/**',
+          requestPattern: '/foo/**',
           parameters: [
             {
               in: 'header',
@@ -90,12 +90,12 @@ describe('qraftPredefinedParametersRequestFn(...)', () => {
       ],
       [
         {
-          pathGlobs: '/**',
+          requestPattern: '/**',
           methods: ['patch'],
           paths: ['/approval_policies/{approval_policy_id}'],
         },
         {
-          pathGlobs: '/foo/**',
+          requestPattern: '/foo/**',
           methods: ['patch'],
           paths: ['/approval_policies/{approval_policy_id}'],
         },
@@ -130,7 +130,7 @@ describe('qraftPredefinedParametersRequestFn(...)', () => {
     const predefinedRequestFn = qraftPredefinedParametersRequestFn(
       [
         {
-          pathGlobs: '/foo/bar',
+          requestPattern: '/foo/bar',
           parameters: [
             {
               in: 'header',
@@ -142,7 +142,7 @@ describe('qraftPredefinedParametersRequestFn(...)', () => {
       ],
       [
         {
-          pathGlobs: '/**',
+          requestPattern: '/**',
           methods: ['patch'],
           paths: ['/approval_policies/{approval_policy_id}'],
         },
@@ -166,7 +166,7 @@ describe('qraftPredefinedParametersRequestFn(...)', () => {
     const predefinedRequestFn = qraftPredefinedParametersRequestFn(
       [
         {
-          pathGlobs: '/**',
+          requestPattern: '/**',
           parameters: [
             {
               in: 'header',
@@ -176,7 +176,7 @@ describe('qraftPredefinedParametersRequestFn(...)', () => {
           ],
         },
         {
-          pathGlobs: '/entities/**',
+          requestPattern: '/entities/**',
           parameters: [
             {
               in: 'header',
@@ -193,7 +193,7 @@ describe('qraftPredefinedParametersRequestFn(...)', () => {
       ],
       [
         {
-          pathGlobs: '/**',
+          requestPattern: '/**',
           methods: ['patch', 'post'],
           paths: [
             '/approval_policies/{approval_policy_id}',
@@ -201,7 +201,7 @@ describe('qraftPredefinedParametersRequestFn(...)', () => {
           ],
         },
         {
-          pathGlobs: '/entities/**',
+          requestPattern: '/entities/**',
           methods: ['get', 'post'],
           paths: ['/entities/{entity_id}/documents'],
         },
