@@ -74,6 +74,9 @@ tservice
 tseslint
 TSignal
 TVariables
+TInput
+TRequest
+TValue
 typecheck
 typesafe
 Unpublishing
