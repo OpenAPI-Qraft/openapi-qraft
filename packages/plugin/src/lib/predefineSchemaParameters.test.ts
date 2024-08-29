@@ -375,6 +375,7 @@ describe('predefineSchemaParameters utils', () => {
           pathGlobs: '/non-existing-path/**',
           parameters: [],
           paths: [],
+          methods: [],
         },
       ]);
     });

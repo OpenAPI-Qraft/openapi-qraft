@@ -93,7 +93,7 @@ export function predefineSchemaParameters(
  * const parsedConfig = parseOperationPredefinedParametersOption("/foo,/bar/**:header.x-monite-version,query.x-api-key");
  * ```
  */
-function parseOperationPredefinedParametersOption(
+export function parseOperationPredefinedParametersOption(
   ...optionItems: string[]
 ): ParsedPredefinedParametersOption[] {
   const globParametersMap = new Map<string, ParsedPredefinedParametersOption>();
@@ -190,7 +190,7 @@ export function createPredefinedParametersGlobs(
       assertIsPathItemObject(service);
 
       for (const _method in service) {
-        const method = _method as keyof typeof service;
+        const method = _method as OperationGlobMethods;
         if (!Object.prototype.hasOwnProperty.call(service, method)) continue;
         if (
           methods !== undefined &&
@@ -199,13 +199,21 @@ export function createPredefinedParametersGlobs(
           continue;
 
         const operation = service[method];
+
+        if (!operation) continue;
+
         assertIsOperationObject(operation);
 
         const operationParameters = operation.parameters ?? [];
         assertIsParameterObjects(operationParameters);
 
-        if (!predefinedParametersGlobMap.has(pathGlobs))
-          predefinedParametersGlobMap.set(pathGlobs, {
+        const predefinedParametersGlobKey = createOperationGlobsKey(
+          pathGlobs,
+          methods
+        );
+
+        if (!predefinedParametersGlobMap.has(predefinedParametersGlobKey))
+          predefinedParametersGlobMap.set(predefinedParametersGlobKey, {
             methods: [],
             paths: [],
             parameters: [],
@@ -213,7 +221,9 @@ export function createPredefinedParametersGlobs(
             pathGlobs,
           });
 
-        const predefinedPathGlob = predefinedParametersGlobMap.get(pathGlobs);
+        const predefinedPathGlob = predefinedParametersGlobMap.get(
+          predefinedParametersGlobKey
+        );
 
         if (!predefinedPathGlob)
           throw new Error('predefinedPathGlob not found');
@@ -229,8 +239,7 @@ export function createPredefinedParametersGlobs(
               method as OperationGlobMethods
             )
           ) {
-            if (!predefinedPathGlob.methods) predefinedPathGlob.methods = [];
-            predefinedPathGlob.methods.push(method as OperationGlobMethods);
+            predefinedPathGlob.methods.push(method);
           }
 
           if (!parameterToPredefine) {
@@ -271,9 +280,13 @@ export function createPredefinedParametersGlobs(
   }
 
   predefinedParameters.forEach(({ pathGlobs, methods }) => {
-    if (!predefinedParametersGlobMap.has(pathGlobs)) {
-      predefinedParametersGlobMap.set(pathGlobs, {
-        methods,
+    const predefinedParametersGlobKey = createOperationGlobsKey(
+      pathGlobs,
+      methods
+    );
+    if (!predefinedParametersGlobMap.has(predefinedParametersGlobKey)) {
+      predefinedParametersGlobMap.set(predefinedParametersGlobKey, {
+        methods: methods ?? [],
         paths: [],
         parameters: [],
         errors: [`No matching paths found for '${pathGlobs}'`],
@@ -283,6 +296,13 @@ export function createPredefinedParametersGlobs(
   });
 
   return Array.from(predefinedParametersGlobMap.values());
+
+  function createOperationGlobsKey(
+    pathGlobs: string,
+    methods: OperationGlobMethods[] | undefined
+  ) {
+    return `${methods?.join(',')}${pathGlobs}`;
+  }
 }
 
 function findPredefinedOperationParameter(
@@ -339,12 +359,10 @@ type ParsedPredefinedParametersOption = {
   parameters: Pick<ParameterObject, 'in' | 'name'>[];
 };
 
-type PredefinedParametersGlob = {
-  methods: OperationGlobMethods[] | undefined;
+export type PredefinedParametersGlob = {
+  methods: OperationGlobMethods[];
   paths: string[];
   parameters: Pick<ParameterObject, 'in' | 'name'>[];
   errors: string[];
   pathGlobs: string;
 };
-
-export { parseOperationPredefinedParametersOption };

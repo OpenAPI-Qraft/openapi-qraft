@@ -18,6 +18,7 @@ import { act, renderHook, waitFor } from '@testing-library/react';
 import React, { ReactNode } from 'react';
 import { vi } from 'vitest';
 import { CreateAPIClientOptions, qraftAPIClient, requestFn } from '../index.js';
+import { createPredefinedParametersRequestFn } from './fixtures/api/create-predefined-parameters-request-fn.js';
 import { createAPIClient, services, Services } from './fixtures/api/index.js';
 import { filesFindAllResponsePayloadFixtures } from './msw/handlers.js';
 
@@ -877,6 +878,189 @@ describe('Qraft uses predefined parameters (--operation-predefined-parameters)',
           verification_document_back: 'back',
           verification_document_front: 'front',
         },
+      });
+    });
+  });
+
+  describe('createPredefinedParametersRequestFn(...)', () => {
+    const predefinedParametersRequestFn = createPredefinedParametersRequestFn(
+      [
+        {
+          requestPattern: 'post /entities/{entity_id}/documents',
+          parameters: [
+            { in: 'header', name: 'x-monite-version', value: '4.4.4' },
+          ],
+        },
+        {
+          requestPattern:
+            'get,delete,patch /approval_policies/{approval_policy_id}/**',
+          parameters: [
+            {
+              in: 'header',
+              name: 'x-monite-entity-id',
+              value: 'my-predefined-entity-id',
+            },
+          ],
+        },
+      ],
+      requestFn
+    );
+
+    it('supports useMutation without overridden parameters', async () => {
+      const { qraft, queryClient } = createClient({
+        requestFn: predefinedParametersRequestFn,
+      });
+
+      const { result } = renderHook(
+        () => ({
+          result1: qraft.entities.postEntitiesIdDocuments.useMutation(),
+          result2: qraft.approvalPolicies.getApprovalPoliciesId.useQuery({
+            header: {
+              'x-monite-version': '1.0.0',
+            },
+            path: {
+              approval_policy_id: '1',
+            },
+            query: {
+              items_order: ['asc', 'desc'],
+            },
+          }),
+        }),
+        {
+          wrapper: (props) => (
+            <Providers {...props} queryClient={queryClient} />
+          ),
+        }
+      );
+
+      act(() => {
+        result.current.result1.mutate({
+          /**
+           * Should be passed, normally ⬇︎
+           * header: {
+           *   'x-monite-version': '1.0.0',
+           * }
+           */
+          path: {
+            entity_id: '1',
+          },
+          query: {
+            referer: 'https://example.com',
+          },
+          body: {
+            verification_document_back: 'back',
+            verification_document_front: 'front',
+          },
+        });
+      });
+
+      await waitFor(() => {
+        expect(result.current.result1.data).toEqual({
+          header: {
+            'x-monite-version': '4.4.4',
+          },
+          path: {
+            entity_id: '1',
+          },
+          query: {
+            referer: 'https://example.com',
+          },
+          body: {
+            verification_document_back: 'back',
+            verification_document_front: 'front',
+          },
+        });
+
+        expect(result.current.result2.data).toEqual({
+          header: {
+            'x-monite-version': '1.0.0',
+            'x-monite-entity-id': 'my-predefined-entity-id',
+          },
+          path: {
+            approval_policy_id: '1',
+          },
+          query: {
+            items_order: ['asc', 'desc'],
+          },
+        });
+      });
+    });
+
+    it('supports useMutation with overridden parameters', async () => {
+      const { qraft, queryClient } = createClient({
+        requestFn: predefinedParametersRequestFn,
+      });
+
+      const { result } = renderHook(
+        () => ({
+          result1: qraft.entities.postEntitiesIdDocuments.useMutation(),
+          result2: qraft.approvalPolicies.getApprovalPoliciesId.useQuery({
+            header: {
+              'x-monite-version': '1.0.0',
+              'x-monite-entity-id': 'not-predefined-entity-id',
+            },
+            path: {
+              approval_policy_id: '1',
+            },
+            query: {
+              items_order: ['asc', 'desc'],
+            },
+          }),
+        }),
+        {
+          wrapper: (props) => (
+            <Providers {...props} queryClient={queryClient} />
+          ),
+        }
+      );
+
+      act(() => {
+        result.current.result1.mutate({
+          header: {
+            'x-monite-version': 'not-predefined-version',
+          },
+          path: {
+            entity_id: '1',
+          },
+          query: {
+            referer: 'https://example.com',
+          },
+          body: {
+            verification_document_back: 'back',
+            verification_document_front: 'front',
+          },
+        });
+      });
+
+      await waitFor(() => {
+        expect(result.current.result1.data).toEqual({
+          header: {
+            'x-monite-version': 'not-predefined-version',
+          },
+          path: {
+            entity_id: '1',
+          },
+          query: {
+            referer: 'https://example.com',
+          },
+          body: {
+            verification_document_back: 'back',
+            verification_document_front: 'front',
+          },
+        });
+
+        expect(result.current.result2.data).toEqual({
+          header: {
+            'x-monite-version': '1.0.0',
+            'x-monite-entity-id': 'not-predefined-entity-id',
+          },
+          path: {
+            approval_policy_id: '1',
+          },
+          query: {
+            items_order: ['asc', 'desc'],
+          },
+        });
       });
     });
   });

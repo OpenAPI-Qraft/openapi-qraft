@@ -1,4 +1,8 @@
 import { fileHeader } from '@openapi-qraft/plugin/lib/fileHeader';
+import {
+  createPredefinedParametersGlobs,
+  parseOperationPredefinedParametersOption,
+} from '@openapi-qraft/plugin/lib/predefineSchemaParameters';
 import { QraftCommand } from '@openapi-qraft/plugin/lib/QraftCommand';
 import { QraftCommandPlugin } from '@openapi-qraft/plugin/lib/QraftCommandPlugin';
 import { generateCode } from './generateCode.js';
@@ -27,7 +31,7 @@ export const plugin: QraftCommandPlugin = {
         'Path to operation generics file',
         '@openapi-qraft/react'
       )
-      .action(async ({ spinner, output, args, services }, resolve) => {
+      .action(async ({ spinner, output, args, services, schema }, resolve) => {
         return void (await generateCode({
           spinner,
           services,
@@ -41,6 +45,14 @@ export const plugin: QraftCommandPlugin = {
             explicitImportExtensions: args.explicitImportExtensions,
             servicesDirName: 'services',
             exportSchemaTypes: args.exportOpenapiTypes,
+            operationPredefinedParameters: args.operationPredefinedParameters
+              ? createPredefinedParametersGlobs(
+                  schema,
+                  parseOperationPredefinedParametersOption(
+                    ...args.operationPredefinedParameters
+                  )
+                )
+              : undefined, // inherited from `--operation-predefined-parameters` option
           },
         }).then(resolve));
       });
