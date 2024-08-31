@@ -1,5 +1,17 @@
 # @openapi-qraft/openapi-typescript
 
+## 1.2.0-next.1
+
+### Minor Changes
+
+- 2a53608: Updated TypeScript to version 5.5.4
+
+### Patch Changes
+
+- Updated dependencies [2a53608]
+- Updated dependencies [76634bf]
+  - @openapi-qraft/plugin@2.0.0-next.1
+
 ## 1.1.1-next.0
 
 ### Patch Changes
