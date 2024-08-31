@@ -66,6 +66,11 @@
       "require": "./dist/cjs/Unstable_QraftSecureRequestFn.cjs",
       "types": "./dist/types/Unstable_QraftSecureRequestFn.d.ts"
     },
+    "./qraftPredefinedParametersRequestFn": {
+      "import": "./dist/esm/qraftPredefinedParametersRequestFn.js",
+      "require": "./dist/cjs/qraftPredefinedParametersRequestFn.cjs",
+      "types": "./dist/types/qraftPredefinedParametersRequestFn.d.ts"
+    },
     "./package.json": "./package.json"
   },
   "typesVersions": {

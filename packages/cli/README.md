@@ -112,8 +112,6 @@ npx openapi-qraft --plugin tanstack-query-react --plugin openapi-typescript http
     - `--operation-predefined-parameters '/**:header.x-monite-version'` - set `header.x-monite-version`
       as optional parameters for all services.
     - `--operation-predefined-parameters '/**,!/auth/token:header.x-entity-id'` - set `header.x-entity-id` as optional parameters for all services except `/auth/token`.
-    - `--operation-predefined-parameters '/**:header.x-monite-version,query.x-api-key' '/user/**,/post/**:header.x-monite-entity-id'` -
-      set `header.x-monite-version` and `query.x-api-key` as optional parameters for all services, and `header.x-monite-entity-id` for the `/user/**` and `/post/**` services.
     - `--operation-predefined-parameters 'post,put /**:header.x-entity-id'` - set the `Header` record `x-entity-id` as an optional parameter for the `POST` and `PUT` methods.
 
   > **Note:** In future versions of the library, this feature will be expanded. Not only will it make parameters

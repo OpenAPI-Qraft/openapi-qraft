@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'vitest';
-import { maybeResolveImport } from './getIndexFactory.js';
+import { maybeResolveImport } from './maybeResolveImport.js';
 
 describe('maybeResolveImport', () => {
   test('should prepend services directory to services relative path', () => {

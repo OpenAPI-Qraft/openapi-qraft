@@ -187,4 +187,42 @@ describe('TanStack Query React Client Generation', () => {
       );
     });
   });
+
+  describe('--operation-predefined-parameters <...patterns> --explicit-import-extensions --openapi-types-import-path ./openapi.d.ts', () => {
+    beforeAll(async () => {
+      const { QraftCommand } = await import(
+        '@openapi-qraft/plugin/lib/QraftCommand'
+      );
+      const { plugin } = await import('./plugin.js');
+      const command = new QraftCommand();
+      plugin.setupCommand(command);
+
+      await command.parseAsync([
+        'dummy-node',
+        'dummy-qraft-bin',
+        openAPIDocumentFixturePath,
+        '--clean',
+        '-o',
+        '/mock-fs',
+        '--export-openapi-types',
+        '--explicit-import-extensions',
+        '--openapi-types-import-path',
+        '../../openapi.d.ts',
+        '--operation-predefined-parameters',
+        '/approval_policies/{approval_policy_id}/**:header.x-monite-entity-id',
+        '/entities/{entity_id}/documents:header.x-monite-version',
+      ]);
+    });
+
+    test('create-predefined-parameters-request-fn.ts', async () => {
+      expect(
+        fs.readFileSync(
+          '/mock-fs/create-predefined-parameters-request-fn.ts',
+          'utf-8'
+        )
+      ).toMatchFileSnapshot(
+        './__snapshots__/operation-predefined-parameters/create-predefined-parameters-request-fn.ts.snapshot.ts'
+      );
+    });
+  });
 });

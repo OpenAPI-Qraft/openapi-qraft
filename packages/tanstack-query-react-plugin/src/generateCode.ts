@@ -3,10 +3,12 @@ import { formatFileHeader } from '@openapi-qraft/plugin/lib/formatFileHeader';
 import { GeneratorFile } from '@openapi-qraft/plugin/lib/GeneratorFile';
 import { Service } from '@openapi-qraft/plugin/lib/open-api/getServices';
 import { OutputOptions as OutputOptionsBase } from '@openapi-qraft/plugin/lib/OutputOptions';
+import { PredefinedParametersGlob } from '@openapi-qraft/plugin/lib/predefineSchemaParameters';
 import c from 'ansi-colors';
 import { Ora } from 'ora';
 import { astToString } from './ts-factory/astToString.js';
 import { getClientFactory } from './ts-factory/getClientFactory.js';
+import { getCreatePredefinedParametersRequestFnFactory } from './ts-factory/getCreatePredefinedParametersRequestFnFactory.js';
 import { getIndexFactory } from './ts-factory/getIndexFactory.js';
 import {
   getServiceFactory,
@@ -19,6 +21,7 @@ interface OutputOptions extends OutputOptionsBase {
   servicesDirName: string;
   explicitImportExtensions: boolean;
   exportSchemaTypes: boolean | undefined;
+  operationPredefinedParameters: Array<PredefinedParametersGlob> | undefined;
 }
 
 export const generateCode = async ({
@@ -36,6 +39,13 @@ export const generateCode = async ({
     ...(await generateServices(spinner, services, serviceImports, output)),
     ...(await generateServiceIndex(spinner, services, output)),
     ...(await generateClient(spinner, output)),
+    ...(output.operationPredefinedParameters
+      ? await generateCreatePredefinedParametersRequestFn(
+          spinner,
+          serviceImports,
+          output
+        )
+      : []),
     ...(await generateIndex(spinner, serviceImports, output)),
   ];
 };
@@ -162,6 +172,45 @@ const generateClient = async (spinner: Ora, output: OutputOptions) => {
   }
 
   spinner.succeed(c.green('Client has been generated'));
+
+  return clientFiles;
+};
+
+const generateCreatePredefinedParametersRequestFn = async (
+  spinner: Ora,
+  serviceImports: ServiceImportsFactoryOptions,
+  output: OutputOptions
+) => {
+  spinner.start('Generating "createPredefinedParametersRequestFn"');
+
+  const clientFiles: GeneratorFile[] = [];
+
+  try {
+    const code = astToString(
+      getCreatePredefinedParametersRequestFnFactory({
+        servicesDirName: output.servicesDirName,
+        operationPredefinedParameters: output.operationPredefinedParameters,
+        openapiTypesImportPath: serviceImports.openapiTypesImportPath,
+      })
+    );
+
+    clientFiles.push({
+      file: new URL('create-predefined-parameters-request-fn.ts', output.dir),
+      code: formatFileHeader(output.fileHeader) + code,
+    });
+  } catch (error) {
+    spinner.fail(
+      c.redBright(
+        'Error occurred during "createPredefinedParametersRequestFn" generation'
+      )
+    );
+
+    throw error;
+  }
+
+  spinner.succeed(
+    c.green('"createPredefinedParametersRequestFn" has been generated')
+  );
 
   return clientFiles;
 };
