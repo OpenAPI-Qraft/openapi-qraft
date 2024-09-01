@@ -2859,7 +2859,7 @@ describe('Qraft uses Queries Invalidation', () => {
     expect(result_02.current.isFetching).toBeTruthy();
   });
 
-  describe('Qraft uses getQueryState', () => {
+  describe('Qraft uses "getQueryState(...)"', () => {
     it('supports getQueryState by parameters', async () => {
       const { qraft, queryClient } = createClient({
         queryClientConfig: {
@@ -2924,6 +2924,30 @@ describe('Qraft uses Queries Invalidation', () => {
           )?.status
         ).toEqual('success');
       });
+    });
+
+    it('return Query state if no arguments provided', async () => {
+      const { qraft } = createClient();
+
+      renderHook(() => qraft.files.findAll.useQuery());
+
+      await waitFor(() =>
+        expect(qraft.files.findAll.getQueryState()).toMatchObject({
+          status: 'success',
+        })
+      );
+    });
+
+    it('respects input argument types', () => {
+      const { qraft } = createClient();
+
+      // not emits type error when all parameters are optional and no arguments provided
+      qraft.files.findAll.getInfiniteQueryState();
+
+      // @ts-expect-error - `parameters` is required
+      qraft.approvalPolicies.getApprovalPoliciesId.getQueryState();
+      // @ts-expect-error - `parameters` is required
+      qraft.approvalPolicies.getApprovalPoliciesId.getInfiniteQueryState();
     });
   });
 
