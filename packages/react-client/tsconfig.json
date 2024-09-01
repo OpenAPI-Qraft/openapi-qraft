@@ -15,6 +15,7 @@
   "include": ["src/**/*"],
   "exclude": [
     "**/node_modules",
-    "**/.*/"
+    "**/.*/",
+    "src/tests/fixtures/migrate-to-v2-codemod/**/*"
   ]
 }
