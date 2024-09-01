@@ -1,5 +1,12 @@
 # @openapi-qraft/react
 
+## 2.0.0-next.2
+
+### Patch Changes
+
+- 56191e1: Updated the `getQueryState(...)` function to support being invoked without parameters if they are not required. This enhancement simplifies the usage in scenarios where the parameters are optional, providing a more flexible API.
+- bbcac65: Refined all types related to value in the `qraftPredefinedParametersRequestFn(...)` function.
+
 ## 2.0.0-next.1
 
 ### Minor Changes
