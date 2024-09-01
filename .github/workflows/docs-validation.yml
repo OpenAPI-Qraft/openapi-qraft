@@ -9,7 +9,7 @@ on:
 
 jobs:
   install:
-    name: Lint and Build
+    name: Lint and Build Docs
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repo
