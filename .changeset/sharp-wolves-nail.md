@@ -1,5 +1,5 @@
 ---
-"@openapi-qraft/react": patch
+'@openapi-qraft/react': patch
 ---
 
-Refined all types related to value in the qraftPredefinedParametersRequestFn function.
+Refined all types related to value in the `qraftPredefinedParametersRequestFn(...)` function.
