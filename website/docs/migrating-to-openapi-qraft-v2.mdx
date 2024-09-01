@@ -8,11 +8,13 @@ sidebar_label: Migrating to v2
 In this guide, we'll walk through the necessary steps to migrate your project from OpenAPI Qraft v1 to v2.
 This migration involves several breaking changes aimed at improving the developer experience and enhancing the library's overall functionality.
 
-:::danger
-#### This Migration Guide is currently a work in progress 🧪
+:::info
+Don't miss our automated migration tool using [Codemod 🪄](#automated-migration-),
+which can significantly ease the migration process!
+:::
 
-We will be updating it soon to include a CodeMode 🤖 tool
-that will automate the migration process, eliminating the need for manual changes. Stay tuned for updates!
+:::warning
+This Migration Guide is currently a work in progress 🧪
 :::
 
 ## Key Changes
@@ -54,4 +56,19 @@ that will automate the migration process, eliminating the need for manual change
 5. **Review Service Definitions**: Double-check your service definitions and ensure they align with the updated return structure of `qraftAPIClient(...)`.
 6. **Test and Validate**: Thoroughly test your application to ensure that all changes have been correctly implemented and that no regressions have been introduced.
 
-By following these steps, you should be able to smoothly transition your project to OpenAPI Qraft v2 while taking advantage of the new features and improvements.
+## Automated Migration 🪄
+
+To assist with the migration process, we've provided a Codemod script using [`jscodeshift`](https://github.com/facebook/jscodeshift).
+You can run this script to automatically update most of the breaking changes in your codebase.
+
+To use the migration script, run the following command in your project root:
+
+```bash
+npx jscodeshift@latest --extensions=tsx,ts --parser=tsx -t https://raw.githubusercontent.com/OpenAPI-Qraft/openapi-qraft/main/packages/react-client/src/migrate-to-v2-codemod.ts ./src/
+```
+
+This command will apply the migration transformations to all `.tsx` and `.ts` files in your `src` directory.
+After running the script, make sure to review the changes and manually adjust where necessary.
+
+By following these steps and using the automated migration script, you should be able to smoothly transition your project
+to OpenAPI Qraft v2 while taking advantage of the new features and improvements.
