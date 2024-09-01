@@ -7,9 +7,10 @@ import type {
 } from './lib/requestFn.js';
 import { shelfMerge } from './lib/shelfMerge.js';
 
-export type QraftPredefinedParameterValue<T> = T extends () => Promise<infer R>
-  ? R | undefined
-  : T | undefined;
+export type QraftPredefinedParameterValue<TValue> =
+  | TValue
+  | (() => Promise<TValue | undefined>)
+  | undefined;
 
 export type InputPredefinedParametersItem<TValue> = {
   requestPattern: string;
@@ -131,10 +132,18 @@ async function resolveQraftPredefinedParameters<T>(
   );
 }
 
-async function resolveQraftPredefinedParameterValue<T>(
-  value: QraftPredefinedParameterValue<T>
-): Promise<T | undefined> {
+type QraftPredefinedParameterResolvedValue<TData> = TData extends () => Promise<
+  infer TAsyncData
+>
+  ? TAsyncData
+  : TData;
+
+async function resolveQraftPredefinedParameterValue<TData>(
+  value: QraftPredefinedParameterValue<TData>
+): Promise<QraftPredefinedParameterResolvedValue<TData>> {
   if (value && typeof value === 'function')
-    return (await value()) as T | undefined;
-  return value as T | undefined;
+    return (await (
+      value as () => Promise<TData | undefined>
+    )()) as QraftPredefinedParameterResolvedValue<TData>;
+  return value as QraftPredefinedParameterResolvedValue<TData>;
 }
