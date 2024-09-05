@@ -70,8 +70,16 @@ export function qraftAPIClient<
   TCallbacks extends Callbacks,
 >(
   services: ServiceSchemasDeclaration<Services>,
+  callbacks: TCallbacks
+): APIUtilityClientServices<Services, TCallbacks>;
+
+export function qraftAPIClient<
+  Services extends ServicesDeclaration<Services>,
+  TCallbacks extends Callbacks,
+>(
+  services: ServiceSchemasDeclaration<Services>,
   callbacks: TCallbacks,
-  options: CreateAPIClientOptions
+  options?: CreateAPIClientOptions
 ): APIQueryClientServices<Services, TCallbacks> | Services {
   return createRecursiveProxy(
     function getCallback(getPath, key) {
@@ -97,7 +105,7 @@ export function qraftAPIClient<
         callbackName !== 'getQueryKey' &&
         callbackName !== 'getMutationKey'
       )
-        if (!('queryClient' in options && options.queryClient))
+        if (!options || !('queryClient' in options && options.queryClient))
           throw new Error(
             `'qraft.<service>.<operation>.${String(callbackName)}()' requires 'queryClient' in options.`
           );
@@ -235,13 +243,23 @@ export type APIQueryClientServices<
   MutationOperationCallbacks
 >;
 
+export type APIUtilityClientServices<
+  TServices extends ServicesDeclaration<TServices>,
+  TCallbacks extends Callbacks,
+> = ServicesFilteredByCallbacks<
+  TServices,
+  Omit<TCallbacks, 'operationInvokeFn'>,
+  Extract<QueryOperationCallbacks, 'getQueryKey' | 'getInfiniteQueryKey'>,
+  Extract<MutationOperationCallbacks, 'getMutationKey'>
+>;
+
 export type APIBasicClientServices<
   TServices extends ServicesDeclaration<TServices>,
   TCallbacks extends Callbacks,
 > = ServicesFilteredByCallbacks<
   TServices,
   TCallbacks,
-  Extract<QueryOperationCallbacks, 'getQueryKey'>,
+  Extract<QueryOperationCallbacks, 'getQueryKey' | 'getInfiniteQueryKey'>,
   Extract<MutationOperationCallbacks, 'getMutationKey'>
 >;
 
