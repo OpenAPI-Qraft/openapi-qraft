@@ -1,5 +1,11 @@
 # @openapi-qraft/react
 
+## 2.0.0-next.3
+
+### Patch Changes
+
+- 7e51026: Added the ability to call `getQueryKey`, `getMutationKey`, and similar non-request operations without providing `requestFn` or `baseUrl`
+
 ## 2.0.0-next.2
 
 ### Patch Changes
