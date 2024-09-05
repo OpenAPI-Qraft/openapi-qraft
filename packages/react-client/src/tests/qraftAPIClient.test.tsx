@@ -4208,6 +4208,46 @@ describe('Qraft is type-safe on Query Filters', () => {
   });
 });
 
+describe('Qraft is type-safe on if client created without options', () => {
+  it('does not throw an error', () => {
+    const qraft = createAPIClient();
+
+    qraft.approvalPolicies.getApprovalPoliciesId.getQueryKey({
+      header: { 'x-monite-version': '1.0.0' },
+      path: { approval_policy_id: '1' },
+    });
+
+    expect(() =>
+      // @ts-expect-error - no options provided (not required, no QueryClient) - must emit an error
+      qraft.approvalPolicies.getApprovalPoliciesId.useQuery({
+        header: { 'x-monite-version': '1.0.0' },
+        path: { approval_policy_id: '1' },
+      })
+    ).toThrow(
+      new Error(
+        `'qraft.<service>.<operation>.useQuery()' requires 'queryClient' in options.`
+      )
+    );
+
+    // @ts-expect-error - no required parameters - must emit an error
+    qraft.approvalPolicies.getApprovalPoliciesId.getQueryKey();
+
+    qraft.approvalPolicies.deleteApprovalPoliciesId.getMutationKey();
+
+    expect(() =>
+      // @ts-expect-error - no options provided for the request - must emit an error
+      qraft.approvalPolicies.deleteApprovalPoliciesId({
+        parameters: {
+          header: { 'x-monite-version': '1.0.0' },
+          path: { approval_policy_id: '1' },
+        },
+      })
+    ).toThrow(
+      new Error(`Cannot read properties of undefined (reading 'requestFn')`)
+    );
+  });
+});
+
 function Providers({
   children,
   queryClient,

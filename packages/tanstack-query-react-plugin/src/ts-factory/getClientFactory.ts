@@ -32,6 +32,7 @@ const getClientImportsFactory = ({
           ),
           ...[
             'APIBasicClientServices',
+            'APIUtilityClientServices',
             'CreateAPIBasicClientOptions',
             'CreateAPIClientOptions',
             'CreateAPIQueryClientOptions',
@@ -149,12 +150,33 @@ const getCreateClientFunctionFactory = () => {
       undefined,
       factory.createIdentifier('createAPIClient'),
       undefined,
+      [],
+      factory.createTypeReferenceNode(
+        factory.createIdentifier('APIUtilityClientServices'),
+        [
+          factory.createTypeReferenceNode(
+            factory.createIdentifier('Services'),
+            undefined
+          ),
+          factory.createTypeReferenceNode(
+            factory.createIdentifier('ServiceMethods'),
+            undefined
+          ),
+        ]
+      ),
+      undefined
+    ),
+    factory.createFunctionDeclaration(
+      [factory.createToken(ts.SyntaxKind.ExportKeyword)],
+      undefined,
+      factory.createIdentifier('createAPIClient'),
+      undefined,
       [
         factory.createParameterDeclaration(
           undefined,
           undefined,
           factory.createIdentifier('options'),
-          undefined,
+          factory.createToken(ts.SyntaxKind.QuestionToken),
           factory.createTypeReferenceNode(
             factory.createIdentifier('CreateAPIClientOptions'),
             undefined
@@ -180,9 +202,48 @@ const getCreateClientFunctionFactory = () => {
             ),
           ]
         ),
+        factory.createTypeReferenceNode(
+          factory.createIdentifier('APIUtilityClientServices'),
+          [
+            factory.createTypeReferenceNode(
+              factory.createIdentifier('Services'),
+              undefined
+            ),
+            factory.createTypeReferenceNode(
+              factory.createIdentifier('ServiceMethods'),
+              undefined
+            ),
+          ]
+        ),
       ]),
       factory.createBlock(
         [
+          factory.createIfStatement(
+            factory.createPrefixUnaryExpression(
+              ts.SyntaxKind.ExclamationToken,
+              factory.createIdentifier('options')
+            ),
+            factory.createReturnStatement(
+              factory.createCallExpression(
+                factory.createIdentifier('qraftAPIClient'),
+                [
+                  factory.createTypeReferenceNode(
+                    factory.createIdentifier('Services'),
+                    undefined
+                  ),
+                  factory.createTypeReferenceNode(
+                    factory.createIdentifier('ServiceMethods'),
+                    undefined
+                  ),
+                ],
+                [
+                  factory.createIdentifier('services'),
+                  factory.createIdentifier('callbacks'),
+                ]
+              )
+            ),
+            undefined
+          ),
           factory.createReturnStatement(
             factory.createCallExpression(
               factory.createIdentifier('qraftAPIClient'),
