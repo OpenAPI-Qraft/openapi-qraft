@@ -11,12 +11,12 @@ import { AreAllOptional } from '../lib/AreAllOptional.js';
 export interface ServiceOperationUseQuery<
   TSchema extends { url: string; method: string },
   TQueryFnData,
-  TParams = {},
+  TParams,
   TError = DefaultError,
 > {
-  getQueryKey<QueryKeyParams extends TParams | undefined = undefined>(
-    parameters?: QueryKeyParams
-  ): ServiceOperationQueryKey<TSchema, QueryKeyParams>;
+  getQueryKey(
+    parameters: TParams | void
+  ): ServiceOperationQueryKey<TSchema, TParams>;
 
   useQuery<TData = TQueryFnData>(
     parameters:
