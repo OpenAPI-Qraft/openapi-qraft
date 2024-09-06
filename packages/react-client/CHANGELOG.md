@@ -1,5 +1,11 @@
 # @openapi-qraft/react
 
+## 1.14.1
+
+### Patch Changes
+
+- 047034b: Restricted `getQueryKey(...)` and `getMutationKey(...)` input types to ensure correct variable usage.
+
 ## 1.14.0
 
 ## 1.14.0-beta.5
