@@ -3361,10 +3361,6 @@ describe('Qraft uses getMutationKey', () => {
         query: {
           referer: 'https://example.com',
         },
-        body: {
-          verification_document_back: 'back',
-          verification_document_front: 'front',
-        },
       })
     ).toEqual([
       {

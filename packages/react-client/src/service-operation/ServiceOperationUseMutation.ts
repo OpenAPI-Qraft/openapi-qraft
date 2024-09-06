@@ -13,9 +13,9 @@ export interface ServiceOperationUseMutation<
   TParams,
   TError = DefaultError,
 > {
-  getMutationKey<TMutationKeyParams extends TParams | undefined = undefined>(
-    parameters?: TMutationKeyParams
-  ): ServiceOperationMutationKey<TSchema, TMutationKeyParams>;
+  getMutationKey(
+    parameters: TParams | void
+  ): ServiceOperationMutationKey<TSchema, TParams>;
 
   useMutation<
     TVariables extends MutationVariables<TBody, TParams>,
