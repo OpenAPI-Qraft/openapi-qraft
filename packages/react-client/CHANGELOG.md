@@ -1,5 +1,7 @@
 # @openapi-qraft/react
 
+## 2.0.0-next.4
+
 ## 2.0.0-next.3
 
 ### Patch Changes
