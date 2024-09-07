@@ -81,6 +81,33 @@ describe('openapi-typescript types generation', () => {
       './__snapshots__/with-explicit-component-exports.ts.snapshot.ts'
     );
   });
+
+  test('with --explicit-component-exports and --enum', async () => {
+    const { QraftCommand } = await import(
+      '@openapi-qraft/plugin/lib/QraftCommand'
+    );
+    const { plugin } = await import('./plugin.js');
+    const command = new QraftCommand();
+    plugin.setupCommand(command);
+
+    await command.parseAsync([
+      'dummy-node',
+      'dummy-qraft-bin',
+      openAPIDocumentFixturePath,
+      '-o',
+      '/mock-fs',
+      '--openapi-types-file-name',
+      'openapi.ts',
+      '--filter-services',
+      '/files',
+      '--enum',
+      '--explicit-component-exports',
+    ]);
+
+    expect(fs.readFileSync('/mock-fs/openapi.ts', 'utf-8')).toMatchFileSnapshot(
+      './__snapshots__/with-explicit-component-enum-exports.ts.snapshot.ts'
+    );
+  });
 });
 
 describe('openapiTypesFileNameOptionParser', () => {
