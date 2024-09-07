@@ -49,15 +49,26 @@ export function createExportsForComponentSchemas(ast: ts.Node[]) {
 
 export function getExportedNames(ast: ts.Node[]) {
   return ast.reduce<string[]>((acc, node) => {
-    if (
-      ts.isInterfaceDeclaration(node) &&
-      ts.isIdentifier(node.name) &&
-      node.modifiers?.some(
-        (modifier) => modifier.kind === ts.SyntaxKind.ExportKeyword
-      )
-    )
-      acc.push(node.name.text);
+    if (isExported(node)) acc.push(node.name.text);
 
     return acc;
   }, []);
+}
+
+interface ExportableStructure extends ts.Node {
+  name: ts.Identifier;
+  modifiers: ts.ModifiersArray;
+}
+
+function isExported(node: ts.Node): node is ExportableStructure {
+  return (
+    'name' in node &&
+    ts.isIdentifier(node.name as any) &&
+    'modifiers' in node &&
+    Array.isArray(node.modifiers) &&
+    node.modifiers.every(ts.isModifier) &&
+    node.modifiers.some(
+      (modifier) => modifier.kind === ts.SyntaxKind.ExportKeyword
+    )
+  );
 }
