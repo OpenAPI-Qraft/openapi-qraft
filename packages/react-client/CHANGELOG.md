@@ -1,5 +1,7 @@
 # @openapi-qraft/react
 
+## 1.14.2
+
 ## 1.14.1
 
 ### Patch Changes
