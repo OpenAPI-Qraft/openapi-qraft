@@ -1,5 +1,12 @@
 # @openapi-qraft/openapi-typescript
 
+## 1.1.2
+
+### Patch Changes
+
+- bb229fb: Resolved conflict between explicit exports and generated enum exports by aligning export strategy.
+  - @openapi-qraft/plugin@1.14.2
+
 ## 1.1.1
 
 ### Patch Changes
