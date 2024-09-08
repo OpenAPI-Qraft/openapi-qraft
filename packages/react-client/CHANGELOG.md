@@ -1,5 +1,11 @@
 # @openapi-qraft/react
 
+## 2.0.0-next.7
+
+### Patch Changes
+
+- aff34d8: Made `RequestFnResponse` type more strict.
+
 ## 2.0.0-next.6
 
 ### Patch Changes
