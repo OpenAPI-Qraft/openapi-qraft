@@ -248,6 +248,25 @@ describe('Qraft uses Suspense Query', () => {
       },
     });
   });
+
+  it('not emits type error if optional parameters are not provided', async () => {
+    const { qraft } = createClient();
+
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    function testTsTypes() {
+      qraft.files.findAll.useSuspenseQuery();
+    }
+  });
+
+  it('emits type error if required parameters are not provided', async () => {
+    const { qraft } = createClient();
+
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    function testTsTypes() {
+      // @ts-expect-error - no parameters
+      qraft.approvalPolicies.getApprovalPoliciesId.useSuspenseQuery();
+    }
+  });
 });
 
 describe('Qraft uses Queries', () => {
@@ -822,6 +841,29 @@ describe('Qraft uses Suspense Infinite Queries', () => {
         },
       ],
     });
+  });
+
+  it('not emits type error if optional parameters are not provided', async () => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    function testTsTypes() {
+      const { qraft } = createClient();
+
+      qraft.files.findAll.useSuspenseInfiniteQuery(undefined, {
+        getNextPageParam: () => {
+          return {};
+        },
+        initialPageParam: {},
+      });
+    }
+  });
+
+  it('emits type error if required parameters are not provided', async () => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    function testTsTypes() {
+      const { qraft } = createClient();
+      // @ts-expect-error - no parameters
+      qraft.files.getFiles.useSuspenseInfiniteQuery();
+    }
   });
 });
 

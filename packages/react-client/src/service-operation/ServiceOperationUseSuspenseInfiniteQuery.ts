@@ -9,15 +9,18 @@ import type {
 import type { PartialParameters } from '../lib/PartialParameters.type.js';
 import type { OperationInfiniteData } from './OperationInfiniteData.js';
 import type { ServiceOperationInfiniteQueryKey } from './ServiceOperationKey.js';
+import { AreAllOptional } from '../lib/AreAllOptional.js';
 
 export interface ServiceOperationUseSuspenseInfiniteQuery<
   TSchema extends { url: string; method: string },
   TQueryFnData,
-  TParams = {},
+  TParams,
   TError = DefaultError,
 > {
   useSuspenseInfiniteQuery<TPageParam extends TParams, TData = TQueryFnData>(
-    parameters: TParams | ServiceOperationInfiniteQueryKey<TSchema, TParams>,
+    parameters:
+      | ServiceOperationInfiniteQueryKey<TSchema, TParams>
+      | (AreAllOptional<TParams> extends true ? TParams | void : TParams),
     options: Omit<
       UseSuspenseInfiniteQueryOptions<
         TQueryFnData,

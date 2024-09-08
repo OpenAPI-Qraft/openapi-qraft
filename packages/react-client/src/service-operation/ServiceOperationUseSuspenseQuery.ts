@@ -4,15 +4,18 @@ import type {
   UseSuspenseQueryResult,
 } from '@tanstack/react-query';
 import type { ServiceOperationQueryKey } from './ServiceOperationKey.js';
+import { AreAllOptional } from '../lib/AreAllOptional.js';
 
 export interface ServiceOperationUseSuspenseQuery<
   TSchema extends { url: string; method: string },
   TQueryFnData,
-  TParams = {},
+  TParams,
   TError = DefaultError,
 > {
   useSuspenseQuery<TData = TQueryFnData>(
-    parameters: TParams | ServiceOperationQueryKey<TSchema, TParams>,
+    parameters:
+      | ServiceOperationQueryKey<TSchema, TParams>
+      | (AreAllOptional<TParams> extends true ? TParams | void : TParams),
     options?: Omit<
       UseSuspenseQueryOptions<
         TQueryFnData,
