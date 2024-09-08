@@ -404,21 +404,21 @@ export type RequestFn<TData, TError> = typeof requestFn<TData, TError>;
 
 export type RequestFnResponse<TData, TError> =
   | {
-      data?: TData;
+      data: TData;
       response: Response;
-      error?: never;
+      error?: undefined;
     }
   | {
       // server error
-      error?: TError | Error;
+      data?: undefined;
       response: Response;
-      data?: never;
+      error: TError | Error;
     }
   | {
       // network error
-      error?: Error;
-      data?: never;
-      response?: never;
+      data?: undefined;
+      response?: undefined;
+      error: Error;
     };
 
 type WithRequired<T, K extends keyof T> = T & {
