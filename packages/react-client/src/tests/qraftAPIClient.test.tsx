@@ -10,6 +10,7 @@ import {
 } from '@openapi-qraft/react/callbacks/index';
 import { type QueryClientConfig } from '@tanstack/query-core';
 import {
+  hashKey,
   QueryClient,
   QueryClientProvider,
   useQueryClient,
@@ -17,7 +18,11 @@ import {
 import { act, renderHook, waitFor } from '@testing-library/react';
 import React, { ReactNode } from 'react';
 import { vi } from 'vitest';
-import { CreateAPIClientOptions, qraftAPIClient, requestFn } from '../index.js';
+import {
+  CreateAPIQueryClientOptions,
+  qraftAPIClient,
+  requestFn,
+} from '../index.js';
 import { createPredefinedParametersRequestFn } from './fixtures/api/create-predefined-parameters-request-fn.js';
 import { createAPIClient, services, Services } from './fixtures/api/index.js';
 import { filesFindAllResponsePayloadFixtures } from './msw/handlers.js';
@@ -37,7 +42,7 @@ const createClient = ({
   requestFn: requestFnProp = requestFn,
   queryClientConfig,
 }: { queryClientConfig?: QueryClientConfig } & Partial<
-  Pick<CreateAPIClientOptions, 'requestFn'>
+  Pick<CreateAPIQueryClientOptions, 'requestFn'>
 > = {}) => {
   const queryClient = new QueryClient(queryClientConfig);
   return {
@@ -1746,6 +1751,21 @@ describe('Qraft uses "fetchQuery(...) & "prefetchQuery(...)"', () => {
         },
       })
     ).rejects.toThrow(new Error('Failed to fetch'));
+  });
+
+  it('throws an error if requestFn is not provided', async () => {
+    const qraft = createAPIClient({
+      queryClient: new QueryClient(),
+      // @ts-expect-error - incorrect usage case
+      requestFn: undefined,
+      baseUrl: 'http://any',
+    });
+
+    await expect(() => qraft.files.findAll.fetchQuery()).rejects.toThrow(
+      new Error(
+        `Missing queryFn: '${hashKey(qraft.files.findAll.getQueryKey())}'`
+      )
+    );
   });
 
   it('uses fetchQuery with custom `baseUrl`', async () => {
@@ -4208,7 +4228,7 @@ describe('Qraft is type-safe on Query Filters', () => {
   });
 });
 
-describe('Qraft is type-safe on if client created without options', () => {
+describe('Qraft is type-safe if client created without options', () => {
   it('does not throw an error', () => {
     const qraft = createAPIClient();
 
@@ -4245,6 +4265,37 @@ describe('Qraft is type-safe on if client created without options', () => {
     ).toThrow(
       new Error(`Cannot read properties of undefined (reading 'requestFn')`)
     );
+  });
+});
+
+describe('Qraft is type-safe if client created with "QueryClient" only', () => {
+  it('does not throw an error', () => {
+    const qraft = createAPIClient({ queryClient: new QueryClient() });
+
+    qraft.files.findAll.resetQueries();
+    qraft.files.findAll.removeQueries();
+    qraft.files.findAll.cancelQueries();
+    qraft.files.findAll.invalidateQueries();
+    qraft.files.findAll.getQueryKey();
+    qraft.files.findAll.getInfiniteQueryKey();
+
+    // query hooks
+    qraft.files.findAll.useIsFetching;
+
+    qraft.files.postFiles.getMutationKey();
+
+    // mutation hooks
+    qraft.files.postFiles.useIsMutating;
+    qraft.files.postFiles.useMutationState;
+  });
+
+  it('emits type error if requestFn is not provided', async () => {
+    const qraft = createAPIClient({ queryClient: new QueryClient() });
+
+    await expect(() =>
+      // @ts-expect-error - no options provided for the request - must emit an error
+      qraft.files.findAll.fetchQuery()
+    ).rejects.toThrow();
   });
 });
 

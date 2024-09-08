@@ -46,17 +46,19 @@ export function callQueryClientMethodWithQueryKey<
 
   const queryFn =
     queryFnOption ??
-    // @ts-expect-error - Too complex union to type
-    function ({ queryKey: [, queryParams], signal, meta, pageParam }) {
-      return requestFn(schema, {
-        parameters: infinite
-          ? (shelfMerge(2, queryParams, pageParam) as never)
-          : queryParams,
-        baseUrl,
-        signal,
-        meta,
-      }).then(requestFnResponseResolver, requestFnResponseResolver);
-    };
+    (requestFn
+      ? // @ts-expect-error - Too complex union to type
+        function ({ queryKey: [, queryParams], signal, meta, pageParam }) {
+          return requestFn(schema, {
+            parameters: infinite
+              ? (shelfMerge(2, queryParams, pageParam) as never)
+              : queryParams,
+            baseUrl,
+            signal,
+            meta,
+          }).then(requestFnResponseResolver, requestFnResponseResolver);
+        }
+      : undefined);
 
   // @ts-expect-error - Too complex union to type
   return queryClient[queryFilterMethod]({

@@ -1,9 +1,11 @@
 export {
   qraftAPIClient,
   type CreateAPIClientOptions,
+  type CreateAPIBasicQueryClientOptions,
   type CreateAPIBasicClientOptions,
   type CreateAPIQueryClientOptions,
   type APIQueryClientServices,
+  type APIBasicQueryClientServices,
   type APIBasicClientServices,
   type APIUtilityClientServices,
   type QraftClientOptions,
