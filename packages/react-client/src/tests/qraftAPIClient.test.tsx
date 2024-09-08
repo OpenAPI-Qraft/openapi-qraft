@@ -2312,6 +2312,18 @@ describe('Custom Callbacks support', () => {
         },
       });
 
+      // @ts-expect-error - not yet inferred, `data` could be `undefined`
+      data.body;
+      data?.body; // `data` could be `undefined`, but `body` is a correct type
+      if (!error) {
+        data.body; // should be inferred because `error` is undefined
+      } else {
+        // @ts-expect-error - if error is defined, `data` is empty
+        data.body;
+        // @ts-expect-error - if error is defined, `body` is not a correct type
+        data?.body;
+      }
+
       expect(
         error satisfies
           | Services['entities']['postEntitiesIdDocuments']['types']['error']
