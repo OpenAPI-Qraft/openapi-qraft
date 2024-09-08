@@ -1,5 +1,11 @@
 # @openapi-qraft/react
 
+## 2.0.0-next.6
+
+### Patch Changes
+
+- d804cb6: Added missing dist file for `qraftPredefinedParametersRequestFn`.
+
 ## 2.0.0-next.5
 
 ### Minor Changes

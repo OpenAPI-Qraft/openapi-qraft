@@ -1,5 +1,12 @@
 # @openapi-qraft/tanstack-query-react-plugin
 
+## 2.0.0-next.6
+
+### Patch Changes
+
+- fc6b4e7: Use `import type` for types in generated `qraftPredefinedParametersRequestFn`.
+  - @openapi-qraft/plugin@2.0.0-next.6
+
 ## 2.0.0-next.5
 
 ### Minor Changes
