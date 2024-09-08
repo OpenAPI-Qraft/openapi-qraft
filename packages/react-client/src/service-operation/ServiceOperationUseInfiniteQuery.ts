@@ -24,9 +24,9 @@ export interface ServiceOperationUseInfiniteQuery<
   ): ServiceOperationInfiniteQueryKey<TSchema, TParams>;
 
   useInfiniteQuery<TPageParam extends TParams, TData = TQueryFnData>(
-    parameters: AreAllOptional<TParams> extends true
-      ? TParams | ServiceOperationInfiniteQueryKey<TSchema, TParams> | void
-      : TParams | ServiceOperationInfiniteQueryKey<TSchema, TParams>,
+    parameters:
+      | ServiceOperationInfiniteQueryKey<TSchema, TParams>
+      | (AreAllOptional<TParams> extends true ? TParams | void : TParams),
     options: Omit<
       UndefinedInitialDataInfiniteOptions<
         TQueryFnData,
@@ -50,9 +50,9 @@ export interface ServiceOperationUseInfiniteQuery<
   >;
 
   useInfiniteQuery<TPageParam extends TParams, TData = TQueryFnData>(
-    parameters: AreAllOptional<TParams> extends true
-      ? TParams | ServiceOperationInfiniteQueryKey<TSchema, TParams> | void
-      : TParams | ServiceOperationInfiniteQueryKey<TSchema, TParams>,
+    parameters:
+      | ServiceOperationInfiniteQueryKey<TSchema, TParams>
+      | (AreAllOptional<TParams> extends true ? TParams | void : TParams),
     options: Omit<
       DefinedInitialDataInfiniteOptions<
         TQueryFnData,
