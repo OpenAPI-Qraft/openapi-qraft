@@ -57,9 +57,27 @@ the necessary `requestFn`, `baseUrl` and `queryClient` for React Hooks.
     ### Returns
     - Qraft API client without `QueryClient`.
   </TabItem>
+  <TabItem value="only-query-client" label={<>Only&nbsp;<span style={{verticalAlign: 'middle'}}><code>QueryClient</code>&nbsp;🔧</span></>}>
+    If you need to type-safe `QueryClient` methods like `setQueryData()`, `getQueryState()`, or `invalidateQueries()`,
+    you can create an API client with only `QueryClient` provided.
+
+    ```tsx
+    import { createAPIClient } from './api'
+
+    const api = createAPIClient({ queryClient })
+    ```
+
+    ### Arguments
+    1. `options: QraftClientOptions` - **Required** options to be used by the Qraft API client
+       - `options.queryClient` - **Required** `QueryClient` instance to be used by Qraft Hooks.
+
+    ### Returns
+    - Qraft API client without request methods and React Hooks.
+  </TabItem>
+
   <TabItem value="no-query-client" label={<>No requests&nbsp;<span style={{textDecoration: 'line-through', color: 'red'}}>🛜</span></>}>
     If you only need to type `QueryKey` or `MutationKey`, you can create an API client without options.
-    In this case, be prepared that only methods that create typed `QueryKey` or `MutationKey` will be available.
+    In this case, be aware that only methods that create typed `QueryKey` or `MutationKey` will be available.
 
     ```tsx
     import { createAPIClient } from './api'

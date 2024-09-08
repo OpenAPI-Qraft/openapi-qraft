@@ -32,7 +32,9 @@ const getClientImportsFactory = ({
           ),
           ...[
             'APIBasicClientServices',
+            'APIBasicQueryClientServices',
             'APIUtilityClientServices',
+            'CreateAPIBasicQueryClientOptions',
             'CreateAPIBasicClientOptions',
             'CreateAPIClientOptions',
             'CreateAPIQueryClientOptions',
@@ -109,6 +111,39 @@ const getCreateClientFunctionFactory = () => {
       factory.createTypeReferenceNode(
         factory.createIdentifier('Services'),
         undefined
+      ),
+      undefined
+    ),
+    factory.createFunctionDeclaration(
+      [factory.createToken(ts.SyntaxKind.ExportKeyword)],
+      undefined,
+      factory.createIdentifier('createAPIClient'),
+      undefined,
+      [
+        factory.createParameterDeclaration(
+          undefined,
+          undefined,
+          factory.createIdentifier('options'),
+          undefined,
+          factory.createTypeReferenceNode(
+            factory.createIdentifier('CreateAPIBasicQueryClientOptions'),
+            undefined
+          ),
+          undefined
+        ),
+      ],
+      factory.createTypeReferenceNode(
+        factory.createIdentifier('APIBasicQueryClientServices'),
+        [
+          factory.createTypeReferenceNode(
+            factory.createIdentifier('Services'),
+            undefined
+          ),
+          factory.createTypeReferenceNode(
+            factory.createIdentifier('ServiceMethods'),
+            undefined
+          ),
+        ]
       ),
       undefined
     ),
@@ -239,6 +274,34 @@ const getCreateClientFunctionFactory = () => {
                 [
                   factory.createIdentifier('services'),
                   factory.createIdentifier('callbacks'),
+                ]
+              )
+            ),
+            undefined
+          ),
+          factory.createIfStatement(
+            factory.createBinaryExpression(
+              factory.createStringLiteral('requestFn'),
+              factory.createToken(ts.SyntaxKind.InKeyword),
+              factory.createIdentifier('options')
+            ),
+            factory.createReturnStatement(
+              factory.createCallExpression(
+                factory.createIdentifier('qraftAPIClient'),
+                [
+                  factory.createTypeReferenceNode(
+                    factory.createIdentifier('Services'),
+                    undefined
+                  ),
+                  factory.createTypeReferenceNode(
+                    factory.createIdentifier('ServiceMethods'),
+                    undefined
+                  ),
+                ],
+                [
+                  factory.createIdentifier('services'),
+                  factory.createIdentifier('callbacks'),
+                  factory.createIdentifier('options'),
                 ]
               )
             ),

@@ -22,10 +22,13 @@ export interface CreateAPIBasicClientOptions {
   baseUrl: string;
 }
 
-export interface CreateAPIQueryClientOptions
-  extends CreateAPIBasicClientOptions {
+export interface CreateAPIBasicQueryClientOptions {
   queryClient: QueryClient;
 }
+
+export interface CreateAPIQueryClientOptions
+  extends CreateAPIBasicClientOptions,
+    CreateAPIBasicQueryClientOptions {}
 
 /**
  * @deprecated use `CreateAPIClientOptions` instead
@@ -36,6 +39,7 @@ export type QraftClientOptions =
 
 export type CreateAPIClientOptions =
   | CreateAPIBasicClientOptions
+  | CreateAPIBasicQueryClientOptions
   | CreateAPIQueryClientOptions;
 
 export function qraftAPIClient<
@@ -55,6 +59,15 @@ export function qraftAPIClient<
   callbacks: TCallbacks,
   options: CreateAPIQueryClientOptions
 ): Services;
+
+export function qraftAPIClient<
+  Services extends ServicesDeclaration<Services>,
+  TCallbacks extends Callbacks,
+>(
+  services: ServiceSchemasDeclaration<Services>,
+  callbacks: TCallbacks,
+  options: CreateAPIBasicQueryClientOptions
+): APIBasicQueryClientServices<Services, TCallbacks>;
 
 export function qraftAPIClient<
   Services extends ServicesDeclaration<Services>,
@@ -241,6 +254,38 @@ export type APIQueryClientServices<
   TCallbacks,
   QueryOperationCallbacks,
   MutationOperationCallbacks
+>;
+
+export type APIBasicQueryClientServices<
+  TServices extends ServicesDeclaration<TServices>,
+  TCallbacks extends Callbacks,
+> = ServicesFilteredByCallbacks<
+  TServices,
+  Omit<TCallbacks, 'operationInvokeFn'>,
+  Extract<
+    QueryOperationCallbacks,
+    | 'resetQueries'
+    | 'removeQueries'
+    | 'cancelQueries'
+    | 'invalidateQueries'
+    | 'refetchQueries'
+    | 'getQueryKey'
+    | 'getInfiniteQueryState'
+    | 'getInfiniteQueryData'
+    | 'getInfiniteQueryKey'
+    | 'setInfiniteQueryData'
+    | 'getQueriesData'
+    | 'setQueriesData'
+    | 'getQueryState'
+    | 'getQueryData'
+    | 'setQueryData'
+    | 'useIsFetching'
+    | 'isFetching'
+  >,
+  Extract<
+    MutationOperationCallbacks,
+    'getMutationKey' | 'useMutationState' | 'useIsMutating' | 'isMutating'
+  >
 >;
 
 export type APIUtilityClientServices<
