@@ -4,8 +4,8 @@
  */
 
 import type { RequestFn } from "@openapi-qraft/react";
-import { qraftPredefinedParametersRequestFn, QraftPredefinedParameterValue } from "@openapi-qraft/react/qraftPredefinedParametersRequestFn";
-import { paths } from "./../openapi.d.ts";
+import { qraftPredefinedParametersRequestFn, type QraftPredefinedParameterValue } from "@openapi-qraft/react/qraftPredefinedParametersRequestFn";
+import type { paths } from "./../openapi.d.ts";
 export type ServiceOperationsPredefinedParameters = [
     {
         requestPattern: "post /entities/{entity_id}/documents";

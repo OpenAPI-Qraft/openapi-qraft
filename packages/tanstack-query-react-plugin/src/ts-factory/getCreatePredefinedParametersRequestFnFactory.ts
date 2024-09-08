@@ -59,7 +59,7 @@ const getCreatePredefinedParametersRequestFnImportsFactory = ({
             factory.createIdentifier('qraftPredefinedParametersRequestFn')
           ),
           factory.createImportSpecifier(
-            false,
+            true,
             undefined,
             factory.createIdentifier('QraftPredefinedParameterValue')
           ),
@@ -73,7 +73,7 @@ const getCreatePredefinedParametersRequestFnImportsFactory = ({
     factory.createImportDeclaration(
       undefined,
       factory.createImportClause(
-        false,
+        true,
         undefined,
         factory.createNamedImports([
           factory.createImportSpecifier(
