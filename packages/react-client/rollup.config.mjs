@@ -10,6 +10,9 @@ const config = [
   rollupConfig(moduleDist, { input: 'src/index.ts' }),
   rollupConfig(moduleDist, { input: 'src/callbacks/index.ts' }),
   rollupConfig(moduleDist, { input: 'src/Unstable_QraftSecureRequestFn.ts' }),
+  rollupConfig(moduleDist, {
+    input: 'src/qraftPredefinedParametersRequestFn.ts',
+  }),
 ];
 
 export default config;
