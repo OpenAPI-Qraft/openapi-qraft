@@ -15,6 +15,7 @@
     "openapi-qraft-website": "0.0.0"
   },
   "changesets": [
+    "curvy-lemons-breathe",
     "eighty-wolves-sin",
     "lemon-pans-flow",
     "lucky-cobras-melt",
