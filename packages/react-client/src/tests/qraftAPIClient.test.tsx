@@ -1748,6 +1748,21 @@ describe('Qraft uses "fetchQuery(...) & "prefetchQuery(...)"', () => {
     ).rejects.toThrow(new Error('Failed to fetch'));
   });
 
+  it('throws an error if requestFn is not provided', async () => {
+    const qraft = createAPIClient({
+      queryClient: new QueryClient(),
+      // @ts-expect-error - incorrect usage case
+      requestFn: undefined,
+      baseUrl: 'http://any',
+    });
+
+    await expect(() => qraft.files.findAll.fetchQuery()).rejects.toThrow(
+      new Error(
+        `Missing queryFn: '${hashKey(qraft.files.findAll.getQueryKey())}'`
+      )
+    );
+  });
+
   it('uses fetchQuery with custom `baseUrl`', async () => {
     const requestFnSpy = vi.fn(requestFn);
 
