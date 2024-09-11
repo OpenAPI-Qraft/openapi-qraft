@@ -1,6 +1,9 @@
-import type { OperationSchema } from '../lib/requestFn.js';
+import type {
+  OperationSchema,
+  ServiceOperationSetQueriesData,
+} from '@openapi-qraft/tanstack-query-react-types';
+import type { DefaultError } from '@tanstack/query-core';
 import type { CreateAPIQueryClientOptions } from '../qraftAPIClient.js';
-import type { ServiceOperationSetQueriesData } from '../service-operation/ServiceOperationSetQueriesData.js';
 import { callQueryClientMethodWithQueryFilters } from '../lib/callQueryClientMethodWithQueryFilters.js';
 
 export function setQueriesData<TData>(
@@ -10,7 +13,8 @@ export function setQueriesData<TData>(
     ServiceOperationSetQueriesData<
       OperationSchema,
       unknown,
-      TData
+      TData,
+      DefaultError
     >['setQueriesData']
   >
 ): TData | undefined {

@@ -1,6 +1,9 @@
-import type { OperationSchema } from '../lib/requestFn.js';
+import type {
+  OperationSchema,
+  ServiceOperationRefetchQueries,
+} from '@openapi-qraft/tanstack-query-react-types';
+import type { DefaultError } from '@tanstack/query-core';
 import type { CreateAPIQueryClientOptions } from '../qraftAPIClient.js';
-import type { ServiceOperationRefetchQueries } from '../service-operation/ServiceOperationRefetchQueries.js';
 import { callQueryClientMethodWithQueryFilters } from '../lib/callQueryClientMethodWithQueryFilters.js';
 
 export function refetchQueries<TData>(
@@ -10,7 +13,8 @@ export function refetchQueries<TData>(
     ServiceOperationRefetchQueries<
       OperationSchema,
       unknown,
-      TData
+      TData,
+      DefaultError
     >['refetchQueries']
   >
 ): Promise<void> {

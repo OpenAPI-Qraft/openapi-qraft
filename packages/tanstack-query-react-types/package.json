@@ -1,0 +1,45 @@
+{
+  "name": "@openapi-qraft/tanstack-query-react-types",
+  "version": "2.0.0-next.7",
+  "scripts": {
+    "build": "yarn clean && NODE_ENV=production rollup --config rollup.config.mjs && tsc --project tsconfig.build.json --emitDeclarationOnly",
+    "dev": "yarn clean && tsc --project tsconfig.build.json --watch --outDir ./dist/esm --noEmitOnError false",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint",
+    "clean": "rimraf dist/"
+  },
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": "./dist/esm/index.js",
+      "require": "./dist/cjs/index.cjs",
+      "types": "./dist/types/index.d.ts"
+    },
+    "./package.json": "./package.json"
+  },
+  "typesVersions": {
+    "*": {
+      "*": [
+        "dist/types/*"
+      ]
+    }
+  },
+  "devDependencies": {
+    "@openapi-qraft/eslint-config": "workspace:*",
+    "@openapi-qraft/rollup-config": "workspace:*",
+    "eslint": "^9.0.0",
+    "rimraf": "^5.0.10",
+    "rollup": "~4.18.0",
+    "typescript": "^5.5.4"
+  },
+  "packageManager": "yarn@4.2.1",
+  "files": [
+    "dist",
+    "src",
+    "!dist/**/*.test.*",
+    "!dist/**/*.spec.*",
+    "!src/**/__snapshots__/**",
+    "!src/**/*.test.*",
+    "!src/**/*.spec.*"
+  ]
+}

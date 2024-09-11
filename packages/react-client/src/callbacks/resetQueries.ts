@@ -1,6 +1,9 @@
-import type { OperationSchema } from '../lib/requestFn.js';
+import type {
+  OperationSchema,
+  ServiceOperationResetQueries,
+} from '@openapi-qraft/tanstack-query-react-types';
+import type { DefaultError } from '@tanstack/query-core';
 import type { CreateAPIQueryClientOptions } from '../qraftAPIClient.js';
-import type { ServiceOperationResetQueries } from '../service-operation/ServiceOperationResetQueries.js';
 import { callQueryClientMethodWithQueryFilters } from '../lib/callQueryClientMethodWithQueryFilters.js';
 
 export function resetQueries<TData>(
@@ -10,7 +13,8 @@ export function resetQueries<TData>(
     ServiceOperationResetQueries<
       OperationSchema,
       unknown,
-      TData
+      TData,
+      DefaultError
     >['resetQueries']
   >
 ): Promise<void> {

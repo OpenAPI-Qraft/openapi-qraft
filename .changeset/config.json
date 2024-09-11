@@ -7,7 +7,8 @@
       "@openapi-qraft/cli",
       "@openapi-qraft/plugin",
       "@openapi-qraft/tanstack-query-react-plugin",
-      "@openapi-qraft/react"
+      "@openapi-qraft/react",
+      "@openapi-qraft/tanstack-query-react-types"
     ]
   ],
   "linked": [],

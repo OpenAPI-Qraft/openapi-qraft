@@ -1,6 +1,9 @@
-import type { OperationSchema } from '../lib/requestFn.js';
+import type {
+  OperationSchema,
+  ServiceOperationIsFetchingQueries,
+} from '@openapi-qraft/tanstack-query-react-types';
+import type { DefaultError } from '@tanstack/query-core';
 import type { CreateAPIQueryClientOptions } from '../qraftAPIClient.js';
-import type { ServiceOperationIsFetchingQueries } from '../service-operation/ServiceOperationIsFetchingQueries.js';
 import { callQueryClientMethodWithQueryFilters } from '../lib/callQueryClientMethodWithQueryFilters.js';
 
 export function isFetching<TData>(
@@ -10,7 +13,8 @@ export function isFetching<TData>(
     ServiceOperationIsFetchingQueries<
       OperationSchema,
       unknown,
-      TData
+      TData,
+      DefaultError
     >['isFetching']
   >
 ): Promise<void> {

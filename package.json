@@ -22,5 +22,8 @@
     "e2e",
     "website"
   ],
-  "packageManager": "yarn@4.2.1"
+  "packageManager": "yarn@4.2.1",
+  "resolutions": {
+    "ts-morph@npm:^17.0.1": "patch:ts-morph@npm%3A17.0.1#~/.yarn/patches/ts-morph-npm-17.0.1-6097358fba.patch"
+  }
 }

@@ -1,4 +1,4 @@
-import type { ServiceOperationMutationKey } from '../service-operation/ServiceOperationKey.js';
+import type { ServiceOperationMutationKey } from '@openapi-qraft/tanstack-query-react-types';
 import type { OperationSchema } from './requestFn.js';
 
 /**

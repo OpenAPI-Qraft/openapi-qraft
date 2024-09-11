@@ -26,5 +26,3 @@ export type {
   OperationSchema,
   RequestFn,
 } from './lib/requestFn.js';
-
-export type * from './service-operation/index.js';

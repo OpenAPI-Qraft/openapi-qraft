@@ -1,9 +1,12 @@
 'use client';
 
+import type {
+  OperationSchema,
+  ServiceOperationUseSuspenseQueries,
+} from '@openapi-qraft/tanstack-query-react-types';
+import type { DefaultError } from '@tanstack/query-core';
 import type { SuspenseQueriesResults } from '@tanstack/react-query';
-import type { OperationSchema } from '../lib/requestFn.js';
 import type { CreateAPIQueryClientOptions } from '../qraftAPIClient.js';
-import type { ServiceOperationQuery } from '../service-operation/ServiceOperation.js';
 import { useSuspenseQueries as useSuspenseQueriesTanstack } from '@tanstack/react-query';
 import { composeQueryKey } from '../lib/composeQueryKey.js';
 import { requestFnResponseResolver } from '../lib/requestFnResponseResolver.js';
@@ -12,10 +15,11 @@ export const useSuspenseQueries: (
   qraftOptions: CreateAPIQueryClientOptions,
   schema: OperationSchema,
   args: Parameters<
-    ServiceOperationQuery<
+    ServiceOperationUseSuspenseQueries<
       OperationSchema,
       unknown,
-      unknown
+      unknown,
+      DefaultError
     >['useSuspenseQueries']
   >
 ) => SuspenseQueriesResults<never> = (qraftOptions, schema, args) => {

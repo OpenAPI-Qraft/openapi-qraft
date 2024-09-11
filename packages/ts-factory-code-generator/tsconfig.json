@@ -1,0 +1,18 @@
+{
+  "compilerOptions": {
+    "outDir": "dist",
+    "strict": true,
+    "declaration": true,
+    "declarationMap": true,
+    "target": "es2016",
+    "module": "CommonJS",
+    "esModuleInterop": false,
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true
+  },
+  "files": [
+    "generateTsFactoryCLI.ts",
+    "getSourceFileFactoryCode.ts",
+    "index.ts"
+  ]
+}

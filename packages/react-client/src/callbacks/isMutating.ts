@@ -1,6 +1,9 @@
-import type { OperationSchema } from '../lib/requestFn.js';
+import type {
+  OperationSchema,
+  ServiceOperationIsMutatingQueries,
+} from '@openapi-qraft/tanstack-query-react-types';
+import type { DefaultError } from '@tanstack/query-core';
 import type { CreateAPIQueryClientOptions } from '../qraftAPIClient.js';
-import type { ServiceOperationIsMutatingQueries } from '../service-operation/ServiceOperationIsMutatingQueries.js';
 import { callQueryClientMethodWithMutationFilters } from '../lib/callQueryClientMethodWithMutationFilters.js';
 
 export function isMutating<TData>(
@@ -10,7 +13,9 @@ export function isMutating<TData>(
     ServiceOperationIsMutatingQueries<
       OperationSchema,
       unknown,
-      TData
+      TData,
+      unknown,
+      DefaultError
     >['isMutating']
   >
 ): Promise<void> {

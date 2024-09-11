@@ -1,5 +1,6 @@
+import type { ServiceOperationFetchInfiniteQuery } from '@openapi-qraft/tanstack-query-react-types';
+import type { DefaultError } from '@tanstack/query-core';
 import type { CreateAPIQueryClientOptions } from '../qraftAPIClient.js';
-import type { ServiceOperationFetchInfiniteQuery } from '../service-operation/ServiceOperationFetchInfiniteQuery.js';
 import { callQueryClientMethodWithQueryKey } from '../lib/callQueryClientFetchMethod.js';
 
 export const prefetchInfiniteQuery: <
@@ -13,7 +14,8 @@ export const prefetchInfiniteQuery: <
     ServiceOperationFetchInfiniteQuery<
       TSchema,
       TData,
-      TParams
+      TParams,
+      DefaultError
     >['prefetchInfiniteQuery']
   >
 ) => Promise<TData> = (qraftOptions, schema, args) => {

@@ -1,3 +1,13 @@
+import type {
+  HeadersOptions,
+  OperationSchema,
+  RequestFn,
+  RequestFnInfo,
+  RequestFnOptions,
+  RequestFnPayload,
+  RequestFnResponse,
+} from '@openapi-qraft/tanstack-query-react-types';
+
 /**
  * This function is used to make a request to a specified endpoint.
  *
@@ -315,112 +325,16 @@ function resolveResponse<TData, TError>(
     );
 }
 
-// To have definitely typed headers without a conversion to stings
-export type HeadersOptions =
-  | HeadersInit
-  | Record<string, string | number | boolean | null | undefined>;
-
-export interface OperationSchema {
-  /**
-   * Operation path
-   * @example /user/{id}
-   */
-  readonly url: string; //todo::rename to `path`
-
-  /**
-   * Operation method
-   */
-  readonly method:
-    | 'get'
-    | 'put'
-    | 'post'
-    | 'patch'
-    | 'delete'
-    | 'options'
-    | 'head'
-    | 'trace';
-
-  /**
-   * Media type of the request body
-   * @example application/json
-   */
-  readonly mediaType?: string;
-
-  readonly security?: string[];
-}
-
-export interface RequestFnPayload {
-  /**
-   * Base URL to use for the request
-   * @example 'https://api.example.com'
-   */
-  baseUrl?: string;
-
-  /**
-   * OpenAPI parameters
-   * @example
-   * ```ts
-   * { path: {id: 1}, query: {search: 'hello'} }
-   * ```
-   */
-  readonly parameters?: {
-    readonly path?: Record<string, any>;
-    readonly header?: Record<string, any>;
-    readonly query?: Record<string, any>;
-  };
-
-  /**
-   * Request body
-   * @example { name: 'John' }
-   */
-  readonly body?: BodyInit | Record<string, unknown> | null;
-
-  /**
-   * Tanstack Query Meta
-   */
-  meta?: Record<string, unknown>;
-
-  /** An AbortSignal to set request's signal. */
-  signal?: AbortSignal | null;
-}
-
-export interface RequestFnInfo
-  extends RequestFnPayload,
-    Omit<RequestInit, 'headers' | 'method' | 'body' | 'signal'> {
-  /**
-   * Request headers
-   * @example { 'X-Auth': '123' }
-   */
-  readonly headers?: HeadersOptions;
-}
-
-export interface RequestFnOptions {
-  urlSerializer?: typeof urlSerializer;
-  bodySerializer?: typeof bodySerializer;
-  fetch?: typeof fetch;
-}
-
-export type RequestFn<TData, TError> = typeof requestFn<TData, TError>;
-
-export type RequestFnResponse<TData, TError> =
-  | {
-      data: TData;
-      response: Response;
-      error?: undefined;
-    }
-  | {
-      // server error
-      data?: undefined;
-      response: Response;
-      error: TError | Error;
-    }
-  | {
-      // network error
-      data?: undefined;
-      response?: undefined;
-      error: Error;
-    };
-
 type WithRequired<T, K extends keyof T> = T & {
   [_ in K]: {};
+};
+
+export type {
+  RequestFn,
+  RequestFnResponse,
+  HeadersOptions,
+  RequestFnPayload,
+  RequestFnOptions,
+  RequestFnInfo,
+  OperationSchema,
 };

@@ -1,7 +1,7 @@
 import type {
   ServiceOperationInfiniteQueryKey,
   ServiceOperationQueryKey,
-} from '../service-operation/ServiceOperationKey.js';
+} from '@openapi-qraft/tanstack-query-react-types';
 import type { OperationSchema } from './requestFn.js';
 
 export function composeBaseQueryKey<TSchema extends OperationSchema, TParams>(

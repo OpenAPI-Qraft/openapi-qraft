@@ -1,0 +1,14 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "rootDir": "src",
+    "outDir": "dist",
+    "baseUrl": ".",
+    "lib": ["ES2019", "DOM", "DOM.Iterable"],
+    "jsx": "react"
+  },
+  "include": ["src/**/*"],
+  "exclude": [
+    "**/node_modules"
+  ]
+}

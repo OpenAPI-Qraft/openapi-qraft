@@ -1,16 +1,20 @@
-import type { OperationSchema } from '../lib/requestFn.js';
+import type {
+  OperationSchema,
+  ServiceOperationUseInfiniteQuery,
+} from '@openapi-qraft/tanstack-query-react-types';
+import type { DefaultError } from '@tanstack/query-core';
+import type { CreateAPIBasicClientOptions } from '../qraftAPIClient.js';
 import { composeInfiniteQueryKey } from '../lib/composeInfiniteQueryKey.js';
-import { CreateAPIBasicClientOptions } from '../qraftAPIClient.js';
-import { ServiceOperationQuery } from '../service-operation/ServiceOperation.js';
 
 export const getInfiniteQueryKey = (
   _qraftOptions: CreateAPIBasicClientOptions,
   schema: OperationSchema,
   args: Parameters<
-    ServiceOperationQuery<
+    ServiceOperationUseInfiniteQuery<
       OperationSchema,
       unknown,
-      unknown
+      unknown,
+      DefaultError
     >['getInfiniteQueryKey']
   >
 ) => {

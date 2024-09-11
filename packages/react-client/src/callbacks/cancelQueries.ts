@@ -1,6 +1,9 @@
-import type { OperationSchema } from '../lib/requestFn.js';
+import type {
+  OperationSchema,
+  ServiceOperationCancelQueries,
+} from '@openapi-qraft/tanstack-query-react-types';
+import type { DefaultError } from '@tanstack/query-core';
 import type { CreateAPIQueryClientOptions } from '../qraftAPIClient.js';
-import type { ServiceOperationCancelQueries } from '../service-operation/ServiceOperationCancelQueries.js';
 import { callQueryClientMethodWithQueryFilters } from '../lib/callQueryClientMethodWithQueryFilters.js';
 
 export function cancelQueries<TData>(
@@ -10,7 +13,8 @@ export function cancelQueries<TData>(
     ServiceOperationCancelQueries<
       OperationSchema,
       unknown,
-      TData
+      TData,
+      DefaultError
     >['cancelQueries']
   >
 ): Promise<void> {
