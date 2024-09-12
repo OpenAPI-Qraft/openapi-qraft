@@ -34,16 +34,12 @@ const factory = ts.factory;
 
 export type ServiceImportsFactoryOptions = {
   openapiTypesImportPath: string;
-  operationGenericsImportPath: string;
 };
 
 export const getServiceFactory = (
   service: { typeName: string; variableName: string },
   operations: ServiceOperation[],
-  {
-    openapiTypesImportPath,
-    operationGenericsImportPath, // todo::remove me and type and update docs
-  }: ServiceImportsFactoryOptions
+  { openapiTypesImportPath }: ServiceImportsFactoryOptions
 ) => {
   return [
     getOpenAPISchemaImportsFactory(openapiTypesImportPath),
