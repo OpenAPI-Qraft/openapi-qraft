@@ -41,5 +41,8 @@
     "!src/**/__snapshots__/**",
     "!src/**/*.test.*",
     "!src/**/*.spec.*"
-  ]
+  ],
+  "publishConfig": {
+    "access": "public"
+  }
 }
