@@ -1,10 +1,12 @@
 'use client';
 
+import type {
+  OperationSchema,
+  ServiceOperationUseMutationState,
+} from '@openapi-qraft/tanstack-query-react-types';
 import type { DefaultError } from '@tanstack/query-core';
 import type { UseMutationResult } from '@tanstack/react-query';
-import type { OperationSchema } from '../lib/requestFn.js';
 import type { CreateAPIQueryClientOptions } from '../qraftAPIClient.js';
-import type { ServiceOperationMutation } from '../service-operation/ServiceOperation.js';
 import { useMutationState as useMutationStateTanstack } from '@tanstack/react-query';
 import { composeMutationFilters } from '../lib/composeMutationFilters.js';
 
@@ -17,11 +19,12 @@ export const useMutationState: <
   qraftOptions: CreateAPIQueryClientOptions,
   schema: OperationSchema,
   args: Parameters<
-    ServiceOperationMutation<
+    ServiceOperationUseMutationState<
       OperationSchema,
       object | undefined,
       TVariables,
-      TData
+      TData,
+      DefaultError
     >['useMutationState']
   >
 ) => UseMutationResult<TData, TError, TVariables, TContext> = (

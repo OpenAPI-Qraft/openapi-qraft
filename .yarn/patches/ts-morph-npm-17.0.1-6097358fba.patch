@@ -1,0 +1,13 @@
+diff --git a/dist/ts-morph.js b/dist/ts-morph.js
+index a0dddc39797ba9f3db9b21b689195bd2b59e4ae2..50e0970b06842f7bcf0a49114cbb08a7197505f9 100644
+--- a/dist/ts-morph.js
++++ b/dist/ts-morph.js
+@@ -20200,6 +20200,8 @@ class Project {
+         });
+     }
+     addSourceFileAtPath(filePath) {
++        if (filePath.startsWith('node_modules/typescript'))
++            filePath = `../../${filePath}`
+         return this._context.directoryCoordinator.addSourceFileAtPath(this._context.fileSystemWrapper.getStandardizedAbsolutePath(filePath), {
+             markInProject: true,
+         });

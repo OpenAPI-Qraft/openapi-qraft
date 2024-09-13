@@ -1,9 +1,12 @@
 'use client';
 
+import type {
+  OperationSchema,
+  ServiceOperationUseQueries,
+} from '@openapi-qraft/tanstack-query-react-types';
+import type { DefaultError } from '@tanstack/query-core';
 import type { QueriesResults } from '@tanstack/react-query';
-import type { OperationSchema } from '../lib/requestFn.js';
 import type { CreateAPIQueryClientOptions } from '../qraftAPIClient.js';
-import type { ServiceOperationQuery } from '../service-operation/ServiceOperation.js';
 import { useQueries as useQueriesTanstack } from '@tanstack/react-query';
 import { composeQueryKey } from '../lib/composeQueryKey.js';
 import { requestFnResponseResolver } from '../lib/requestFnResponseResolver.js';
@@ -12,7 +15,12 @@ export const useQueries: (
   qraftOptions: CreateAPIQueryClientOptions,
   schema: OperationSchema,
   args: Parameters<
-    ServiceOperationQuery<OperationSchema, unknown, unknown>['useQueries']
+    ServiceOperationUseQueries<
+      OperationSchema,
+      unknown,
+      unknown,
+      DefaultError
+    >['useQueries']
   >
 ) => QueriesResults<never> = (qraftOptions, schema, args) => {
   const [options] = args;

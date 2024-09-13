@@ -1,3 +1,9 @@
+import type {
+  ServiceOperationMutation,
+  ServiceOperationMutationFn,
+  ServiceOperationQuery,
+  ServiceOperationQueryFn,
+} from '@openapi-qraft/tanstack-query-react-types';
 import type { QueryClient } from '@tanstack/query-core';
 import type * as callbacks from './callbacks/index.js';
 import type * as operationInvokeModule from './callbacks/operationInvokeFn.js';
@@ -6,12 +12,6 @@ import type {
   RequestFnInfo,
   RequestFnResponse,
 } from './lib/requestFn.js';
-import type {
-  ServiceOperationMutation,
-  ServiceOperationQuery,
-} from './service-operation/index.js';
-import type { ServiceOperationMutationFn } from './service-operation/ServiceOperationMutationFn.js';
-import type { ServiceOperationQueryFn } from './service-operation/ServiceOperationQueryFn.js';
 import { createRecursiveProxy } from './lib/createRecursiveProxy.js';
 
 export interface CreateAPIBasicClientOptions {

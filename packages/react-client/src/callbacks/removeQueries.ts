@@ -1,6 +1,9 @@
-import type { OperationSchema } from '../lib/requestFn.js';
+import type {
+  OperationSchema,
+  ServiceOperationRemoveQueries,
+} from '@openapi-qraft/tanstack-query-react-types';
+import type { DefaultError } from '@tanstack/query-core';
 import type { CreateAPIQueryClientOptions } from '../qraftAPIClient.js';
-import type { ServiceOperationRemoveQueries } from '../service-operation/ServiceOperationRemoveQueries.js';
 import { callQueryClientMethodWithQueryFilters } from '../lib/callQueryClientMethodWithQueryFilters.js';
 
 export function removeQueries<TData>(
@@ -10,7 +13,8 @@ export function removeQueries<TData>(
     ServiceOperationRemoveQueries<
       OperationSchema,
       unknown,
-      TData
+      TData,
+      DefaultError
     >['removeQueries']
   >
 ): Promise<void> {

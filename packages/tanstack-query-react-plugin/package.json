@@ -4,6 +4,7 @@
   "type": "module",
   "scripts": {
     "build": "tsc --project tsconfig.build.json",
+    "codegen": "yarn exec ./generate-ts-factory.mjs",
     "dev": "yarn build --watch --noEmitOnError false",
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
@@ -32,6 +33,8 @@
   "devDependencies": {
     "@openapi-qraft/eslint-config": "workspace:*",
     "@openapi-qraft/test-fixtures": "workspace:*",
+    "@openapi-qraft/ts-factory-code-generator": "workspace:*",
+    "camelcase": "^8.0.0",
     "eslint": "^9.0.0",
     "memfs": "^4.9.2",
     "rimraf": "^5.0.10",

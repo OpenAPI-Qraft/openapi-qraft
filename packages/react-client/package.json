@@ -14,11 +14,15 @@
     "_prettify-api": "prettier --write src/tests/fixtures/api/**/*.ts"
   },
   "sideEffects": false,
+  "dependencies": {
+    "@openapi-qraft/tanstack-query-react-types": "workspace:*"
+  },
   "devDependencies": {
     "@openapi-qraft/cli": "workspace:*",
     "@openapi-qraft/eslint-config": "workspace:*",
     "@openapi-qraft/openapi-typescript-plugin": "workspace:^",
     "@openapi-qraft/rollup-config": "workspace:*",
+    "@openapi-qraft/tanstack-query-react-plugin": "workspace:*",
     "@openapi-qraft/test-fixtures": "workspace:*",
     "@tanstack/react-query": "^5.17.3",
     "@testing-library/jest-dom": "^5.17.0",

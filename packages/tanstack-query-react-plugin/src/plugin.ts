@@ -26,17 +26,11 @@ export const plugin: QraftCommandPlugin = {
           return arg?.toLowerCase() !== 'false';
         }
       )
-      .option(
-        '--operation-generics-import-path <path>',
-        'Path to operation generics file',
-        '@openapi-qraft/react'
-      )
       .action(async ({ spinner, output, args, services, schema }, resolve) => {
         return void (await generateCode({
           spinner,
           services,
           serviceImports: {
-            operationGenericsImportPath: args.operationGenericsImportPath,
             openapiTypesImportPath: args.openapiTypesImportPath,
           },
           output: {

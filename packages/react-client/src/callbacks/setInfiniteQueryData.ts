@@ -1,7 +1,9 @@
+import type {
+  OperationSchema,
+  ServiceOperationSetInfiniteQueryData,
+} from '@openapi-qraft/tanstack-query-react-types';
 import type { InfiniteData } from '@tanstack/query-core';
-import type { OperationSchema } from '../lib/requestFn.js';
 import type { CreateAPIQueryClientOptions } from '../qraftAPIClient.js';
-import type { ServiceOperationSetInfiniteQueryData } from '../service-operation/ServiceOperationSetInfiniteQueryData.js';
 import { callQueryClientMethodWithQueryKey } from '../lib/callQueryClientMethodWithQueryKey.js';
 
 export function setInfiniteQueryData<TData>(

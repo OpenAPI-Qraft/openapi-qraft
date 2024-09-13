@@ -4,42 +4,305 @@
  */
 
 import type { paths } from "../../openapi.js";
-import type { ServiceOperationQuery, ServiceOperationMutation } from "@openapi-qraft/react";
+import type { QueryFiltersByParameters, QueryFiltersByQueryKey, AreAllOptional, ServiceOperationQueryKey, FetchInfiniteQueryOptionsByParameters, FetchInfiniteQueryOptionsByQueryKey, FetchInfiniteQueryOptionsQueryFn, OperationInfiniteData, ServiceOperationFetchQueryOptions, ServiceOperationInfiniteQueryKey, InvalidateQueryFilters, QueryFnOptionsByParameters, QueryFnOptionsByQueryKey, RequestFnResponse, PartialParameters, UseQueryOptionsForUseQueries, UseQueryOptionsForUseSuspenseQuery, WithOptional, MutationVariables, ServiceOperationMutationKey, ServiceOperationUseMutationOptions, MutationFiltersByMutationKey, MutationFiltersByParameters, ServiceOperationMutationFnOptions } from "@openapi-qraft/tanstack-query-react-types";
+import type { CancelOptions, NoInfer, QueryState, InvalidateOptions, RefetchOptions, ResetOptions, SetDataOptions, Updater, InfiniteQueryPageParamsOptions, Mutation, MutationState } from "@tanstack/query-core";
+import type { DefinedInitialDataOptions, DefinedUseQueryResult, UndefinedInitialDataOptions, UseQueryResult, DefinedInitialDataInfiniteOptions, DefinedUseInfiniteQueryResult, UndefinedInitialDataInfiniteOptions, UseInfiniteQueryResult, UseSuspenseInfiniteQueryOptions, UseSuspenseInfiniteQueryResult, UseSuspenseQueryResult, UseSuspenseQueryOptions, UseMutationResult } from "@tanstack/react-query";
 export interface ApprovalPoliciesService {
     /**
      * @summary Get an approval policy by ID
      * @description Retrieve a specific approval policy.
      */
-    getApprovalPoliciesId: ServiceOperationQuery<{
-        method: "get";
-        url: "/approval_policies/{approval_policy_id}";
-        security: [
-            "partnerToken"
-        ];
-    }, paths["/approval_policies/{approval_policy_id}"]["get"]["responses"]["200"]["content"]["application/json"], paths["/approval_policies/{approval_policy_id}"]["get"]["parameters"], paths["/approval_policies/{approval_policy_id}"]["get"]["responses"]["401"]["content"]["application/json"] | paths["/approval_policies/{approval_policy_id}"]["get"]["responses"]["422"]["content"]["application/json"] | paths["/approval_policies/{approval_policy_id}"]["get"]["responses"]["default"]["content"]["application/json"]>;
+    getApprovalPoliciesId: {
+        /**
+         * @summary Get an approval policy by ID
+         * @description Retrieve a specific approval policy.
+         */
+        cancelQueries<TInfinite extends boolean = false>(filters?: QueryFiltersByParameters<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdData, TInfinite, GetApprovalPoliciesIdParameters, GetApprovalPoliciesIdError> | QueryFiltersByQueryKey<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdData, TInfinite, GetApprovalPoliciesIdParameters, GetApprovalPoliciesIdError>, options?: CancelOptions): Promise<void>;
+        /**
+         * @summary Get an approval policy by ID
+         * @description Retrieve a specific approval policy.
+         */
+        getQueryKey(parameters: AreAllOptional<GetApprovalPoliciesIdParameters> extends true ? GetApprovalPoliciesIdParameters | void : GetApprovalPoliciesIdParameters): ServiceOperationQueryKey<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdParameters>;
+        /**
+         * @summary Get an approval policy by ID
+         * @description Retrieve a specific approval policy.
+         */
+        useQuery<TData = GetApprovalPoliciesIdData>(parameters: ServiceOperationQueryKey<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdParameters> | (AreAllOptional<GetApprovalPoliciesIdParameters> extends true ? GetApprovalPoliciesIdParameters | void : GetApprovalPoliciesIdParameters), options?: Omit<UndefinedInitialDataOptions<GetApprovalPoliciesIdData, GetApprovalPoliciesIdError, TData, ServiceOperationQueryKey<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdParameters>>, "queryKey">): UseQueryResult<TData, GetApprovalPoliciesIdError | Error>;
+        /**
+         * @summary Get an approval policy by ID
+         * @description Retrieve a specific approval policy.
+         */
+        useQuery<TData = GetApprovalPoliciesIdData>(parameters: ServiceOperationQueryKey<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdParameters> | (AreAllOptional<GetApprovalPoliciesIdParameters> extends true ? GetApprovalPoliciesIdParameters | void : GetApprovalPoliciesIdParameters), options: Omit<DefinedInitialDataOptions<GetApprovalPoliciesIdData, GetApprovalPoliciesIdError, TData, ServiceOperationQueryKey<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdParameters>>, "queryKey">): DefinedUseQueryResult<TData, GetApprovalPoliciesIdError | Error>;
+        /**
+         * @summary Get an approval policy by ID
+         * @description Retrieve a specific approval policy.
+         */
+        fetchInfiniteQuery<TPageParam extends GetApprovalPoliciesIdParameters>(options: (FetchInfiniteQueryOptionsByQueryKey<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdData, GetApprovalPoliciesIdParameters, TPageParam, GetApprovalPoliciesIdError> & FetchInfiniteQueryOptionsQueryFn<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdData, GetApprovalPoliciesIdParameters, GetApprovalPoliciesIdError>) | (FetchInfiniteQueryOptionsByParameters<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdData, GetApprovalPoliciesIdParameters, TPageParam, GetApprovalPoliciesIdError> & FetchInfiniteQueryOptionsQueryFn<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdData, GetApprovalPoliciesIdParameters, GetApprovalPoliciesIdError>)): Promise<OperationInfiniteData<GetApprovalPoliciesIdData, GetApprovalPoliciesIdParameters>>;
+        /**
+         * @summary Get an approval policy by ID
+         * @description Retrieve a specific approval policy.
+         */
+        prefetchInfiniteQuery<TPageParam extends GetApprovalPoliciesIdParameters>(options: (FetchInfiniteQueryOptionsByQueryKey<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdData, GetApprovalPoliciesIdParameters, TPageParam, GetApprovalPoliciesIdError> & FetchInfiniteQueryOptionsQueryFn<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdData, GetApprovalPoliciesIdParameters, GetApprovalPoliciesIdError>) | (FetchInfiniteQueryOptionsByParameters<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdData, GetApprovalPoliciesIdParameters, TPageParam, GetApprovalPoliciesIdError> & FetchInfiniteQueryOptionsQueryFn<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdData, GetApprovalPoliciesIdParameters, GetApprovalPoliciesIdError>)): Promise<void>;
+        /**
+         * @summary Get an approval policy by ID
+         * @description Retrieve a specific approval policy.
+         */
+        fetchQuery(options: AreAllOptional<GetApprovalPoliciesIdParameters> extends true ? ServiceOperationFetchQueryOptions<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdData, GetApprovalPoliciesIdParameters, GetApprovalPoliciesIdError> | void : ServiceOperationFetchQueryOptions<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdData, GetApprovalPoliciesIdParameters, GetApprovalPoliciesIdError>): Promise<GetApprovalPoliciesIdData>;
+        /**
+         * @summary Get an approval policy by ID
+         * @description Retrieve a specific approval policy.
+         */
+        prefetchQuery(options: AreAllOptional<GetApprovalPoliciesIdParameters> extends true ? ServiceOperationFetchQueryOptions<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdData, GetApprovalPoliciesIdParameters, GetApprovalPoliciesIdError> | void : ServiceOperationFetchQueryOptions<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdData, GetApprovalPoliciesIdParameters, GetApprovalPoliciesIdError>): Promise<void>;
+        /**
+         * @summary Get an approval policy by ID
+         * @description Retrieve a specific approval policy.
+         */
+        getInfiniteQueryData(parameters: AreAllOptional<GetApprovalPoliciesIdParameters> extends true ? GetApprovalPoliciesIdParameters | ServiceOperationInfiniteQueryKey<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdParameters> | void : GetApprovalPoliciesIdParameters | ServiceOperationInfiniteQueryKey<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdParameters>): OperationInfiniteData<GetApprovalPoliciesIdData, GetApprovalPoliciesIdParameters> | undefined;
+        /**
+         * @summary Get an approval policy by ID
+         * @description Retrieve a specific approval policy.
+         */
+        getQueriesData<TInfinite extends boolean = false>(filters?: QueryFiltersByParameters<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdData, TInfinite, GetApprovalPoliciesIdParameters, GetApprovalPoliciesIdError> | QueryFiltersByQueryKey<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdData, TInfinite, GetApprovalPoliciesIdParameters, GetApprovalPoliciesIdError>): TInfinite extends true ? Array<[
+            queryKey: ServiceOperationInfiniteQueryKey<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdParameters>,
+            data: NoInfer<OperationInfiniteData<GetApprovalPoliciesIdData, GetApprovalPoliciesIdParameters>> | undefined
+        ]> : Array<[
+            queryKey: ServiceOperationQueryKey<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdParameters>,
+            data: GetApprovalPoliciesIdData | undefined
+        ]>;
+        /**
+         * @summary Get an approval policy by ID
+         * @description Retrieve a specific approval policy.
+         */
+        getQueryData(parameters: AreAllOptional<GetApprovalPoliciesIdParameters> extends true ? GetApprovalPoliciesIdParameters | ServiceOperationQueryKey<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdParameters> | void : GetApprovalPoliciesIdParameters | ServiceOperationQueryKey<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdParameters>): GetApprovalPoliciesIdData | undefined;
+        /**
+         * @summary Get an approval policy by ID
+         * @description Retrieve a specific approval policy.
+         */
+        getQueryState(parameters: AreAllOptional<GetApprovalPoliciesIdParameters> extends true ? GetApprovalPoliciesIdParameters | ServiceOperationQueryKey<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdParameters> | void : GetApprovalPoliciesIdParameters | ServiceOperationQueryKey<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdParameters>): QueryState<GetApprovalPoliciesIdData, GetApprovalPoliciesIdError> | undefined;
+        /**
+         * @summary Get an approval policy by ID
+         * @description Retrieve a specific approval policy.
+         */
+        getInfiniteQueryState(parameters: AreAllOptional<GetApprovalPoliciesIdParameters> extends true ? GetApprovalPoliciesIdParameters | ServiceOperationInfiniteQueryKey<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdParameters> | void : GetApprovalPoliciesIdParameters | ServiceOperationInfiniteQueryKey<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdParameters>): QueryState<OperationInfiniteData<GetApprovalPoliciesIdData, GetApprovalPoliciesIdParameters>, GetApprovalPoliciesIdError> | undefined;
+        /**
+         * @summary Get an approval policy by ID
+         * @description Retrieve a specific approval policy.
+         */
+        invalidateQueries<TInfinite extends boolean = false>(filters?: InvalidateQueryFilters<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdData, TInfinite, GetApprovalPoliciesIdParameters, GetApprovalPoliciesIdError>, options?: InvalidateOptions): Promise<void>;
+        /**
+         * @summary Get an approval policy by ID
+         * @description Retrieve a specific approval policy.
+         */
+        isFetching<TInfinite extends boolean = false>(filters?: QueryFiltersByParameters<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdData, TInfinite, GetApprovalPoliciesIdParameters, GetApprovalPoliciesIdError> | QueryFiltersByQueryKey<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdData, TInfinite, GetApprovalPoliciesIdParameters, GetApprovalPoliciesIdError>): number;
+        /**
+         * @summary Get an approval policy by ID
+         * @description Retrieve a specific approval policy.
+         */
+        <TMeta extends Record<string, any>, TSignal extends AbortSignal = AbortSignal>(options: AreAllOptional<GetApprovalPoliciesIdParameters> extends true ? void | QueryFnOptionsByParameters<GetApprovalPoliciesIdParameters, TMeta, TSignal> | QueryFnOptionsByQueryKey<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdParameters, TMeta, TSignal> : QueryFnOptionsByParameters<GetApprovalPoliciesIdParameters, TMeta, TSignal> | QueryFnOptionsByQueryKey<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdParameters, TMeta, TSignal>, client?: (schema: GetApprovalPoliciesIdSchema, options: {
+            parameters: GetApprovalPoliciesIdParameters;
+            signal?: TSignal;
+            meta?: TMeta;
+        }) => Promise<RequestFnResponse<GetApprovalPoliciesIdData, GetApprovalPoliciesIdError>>): Promise<RequestFnResponse<GetApprovalPoliciesIdData, GetApprovalPoliciesIdError>>;
+        /**
+         * @summary Get an approval policy by ID
+         * @description Retrieve a specific approval policy.
+         */
+        refetchQueries<TInfinite extends boolean = false>(filters?: QueryFiltersByParameters<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdData, TInfinite, GetApprovalPoliciesIdParameters, GetApprovalPoliciesIdError> | QueryFiltersByQueryKey<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdData, TInfinite, GetApprovalPoliciesIdParameters, GetApprovalPoliciesIdError>, options?: RefetchOptions): Promise<void>;
+        /**
+         * @summary Get an approval policy by ID
+         * @description Retrieve a specific approval policy.
+         */
+        removeQueries<TInfinite extends boolean = false>(filters?: QueryFiltersByParameters<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdData, TInfinite, GetApprovalPoliciesIdParameters, GetApprovalPoliciesIdError> | QueryFiltersByQueryKey<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdData, TInfinite, GetApprovalPoliciesIdParameters, GetApprovalPoliciesIdError>): void;
+        /**
+         * @summary Get an approval policy by ID
+         * @description Retrieve a specific approval policy.
+         */
+        resetQueries<TInfinite extends boolean = false>(filters?: QueryFiltersByParameters<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdData, TInfinite, GetApprovalPoliciesIdParameters, GetApprovalPoliciesIdError> | QueryFiltersByQueryKey<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdData, TInfinite, GetApprovalPoliciesIdParameters, GetApprovalPoliciesIdError>, options?: ResetOptions): Promise<void>;
+        /**
+         * @summary Get an approval policy by ID
+         * @description Retrieve a specific approval policy.
+         */
+        setInfiniteQueryData(parameters: GetApprovalPoliciesIdParameters | ServiceOperationInfiniteQueryKey<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdParameters>, updater: Updater<NoInfer<OperationInfiniteData<GetApprovalPoliciesIdData, GetApprovalPoliciesIdParameters>> | undefined, NoInfer<OperationInfiniteData<GetApprovalPoliciesIdData, GetApprovalPoliciesIdParameters>> | undefined>, options?: SetDataOptions): OperationInfiniteData<GetApprovalPoliciesIdData, GetApprovalPoliciesIdParameters> | undefined;
+        /**
+         * @summary Get an approval policy by ID
+         * @description Retrieve a specific approval policy.
+         */
+        setQueriesData<TInfinite extends boolean = false>(filters: QueryFiltersByParameters<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdData, TInfinite, GetApprovalPoliciesIdParameters, GetApprovalPoliciesIdError> | QueryFiltersByQueryKey<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdData, TInfinite, GetApprovalPoliciesIdParameters, GetApprovalPoliciesIdError>, updater: Updater<NoInfer<GetApprovalPoliciesIdData> | undefined, NoInfer<GetApprovalPoliciesIdData> | undefined>, options?: SetDataOptions): Array<GetApprovalPoliciesIdData | undefined>;
+        /**
+         * @summary Get an approval policy by ID
+         * @description Retrieve a specific approval policy.
+         */
+        setQueryData(parameters: GetApprovalPoliciesIdParameters | ServiceOperationQueryKey<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdParameters>, updater: Updater<NoInfer<GetApprovalPoliciesIdData> | undefined, NoInfer<GetApprovalPoliciesIdData> | undefined>, options?: SetDataOptions): GetApprovalPoliciesIdData | undefined;
+        /**
+         * @summary Get an approval policy by ID
+         * @description Retrieve a specific approval policy.
+         */
+        getInfiniteQueryKey(parameters: AreAllOptional<GetApprovalPoliciesIdParameters> extends true ? GetApprovalPoliciesIdParameters | void : GetApprovalPoliciesIdParameters): ServiceOperationInfiniteQueryKey<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdParameters>;
+        /**
+         * @summary Get an approval policy by ID
+         * @description Retrieve a specific approval policy.
+         */
+        useInfiniteQuery<TPageParam extends GetApprovalPoliciesIdParameters, TData = GetApprovalPoliciesIdData>(parameters: ServiceOperationInfiniteQueryKey<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdParameters> | (AreAllOptional<GetApprovalPoliciesIdParameters> extends true ? GetApprovalPoliciesIdParameters | void : GetApprovalPoliciesIdParameters), options: Omit<UndefinedInitialDataInfiniteOptions<GetApprovalPoliciesIdData, GetApprovalPoliciesIdError, OperationInfiniteData<TData, GetApprovalPoliciesIdParameters>, ServiceOperationInfiniteQueryKey<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdParameters>, PartialParameters<TPageParam>>, "queryKey" | "getPreviousPageParam" | "getNextPageParam" | "initialPageParam"> & InfiniteQueryPageParamsOptions<GetApprovalPoliciesIdData, PartialParameters<TPageParam>>): UseInfiniteQueryResult<OperationInfiniteData<TData, GetApprovalPoliciesIdParameters>, GetApprovalPoliciesIdError | Error>;
+        /**
+         * @summary Get an approval policy by ID
+         * @description Retrieve a specific approval policy.
+         */
+        useInfiniteQuery<TPageParam extends GetApprovalPoliciesIdParameters, TData = GetApprovalPoliciesIdData>(parameters: ServiceOperationInfiniteQueryKey<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdParameters> | (AreAllOptional<GetApprovalPoliciesIdParameters> extends true ? GetApprovalPoliciesIdParameters | void : GetApprovalPoliciesIdParameters), options: Omit<DefinedInitialDataInfiniteOptions<GetApprovalPoliciesIdData, GetApprovalPoliciesIdError, OperationInfiniteData<TData, GetApprovalPoliciesIdParameters>, ServiceOperationInfiniteQueryKey<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdParameters>, PartialParameters<TPageParam>>, "queryKey" | "getPreviousPageParam" | "getNextPageParam" | "initialPageParam"> & InfiniteQueryPageParamsOptions<GetApprovalPoliciesIdData, PartialParameters<TPageParam>>): DefinedUseInfiniteQueryResult<OperationInfiniteData<TData, GetApprovalPoliciesIdParameters>, GetApprovalPoliciesIdError | Error>;
+        /**
+         * @summary Get an approval policy by ID
+         * @description Retrieve a specific approval policy.
+         */
+        useIsFetching<TInfinite extends boolean = false>(filters?: QueryFiltersByParameters<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdData, TInfinite, GetApprovalPoliciesIdParameters, GetApprovalPoliciesIdError> | QueryFiltersByQueryKey<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdData, TInfinite, GetApprovalPoliciesIdParameters, GetApprovalPoliciesIdError>): number;
+        /**
+         * @summary Get an approval policy by ID
+         * @description Retrieve a specific approval policy.
+         */
+        useQueries<T extends Array<UseQueryOptionsForUseQueries<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdParameters, GetApprovalPoliciesIdData, GetApprovalPoliciesIdError>>, TCombinedResult = Array<UseQueryResult<GetApprovalPoliciesIdData, GetApprovalPoliciesIdError>>>(options: {
+            queries: T;
+            combine?: (results: Array<UseQueryResult<GetApprovalPoliciesIdData, GetApprovalPoliciesIdError>>) => TCombinedResult;
+        }): TCombinedResult;
+        /**
+         * @summary Get an approval policy by ID
+         * @description Retrieve a specific approval policy.
+         */
+        getQueryKey(parameters: AreAllOptional<GetApprovalPoliciesIdParameters> extends true ? GetApprovalPoliciesIdParameters | void : GetApprovalPoliciesIdParameters): ServiceOperationQueryKey<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdParameters>;
+        /**
+         * @summary Get an approval policy by ID
+         * @description Retrieve a specific approval policy.
+         */
+        useQuery<TData = GetApprovalPoliciesIdData>(parameters: ServiceOperationQueryKey<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdParameters> | (AreAllOptional<GetApprovalPoliciesIdParameters> extends true ? GetApprovalPoliciesIdParameters | void : GetApprovalPoliciesIdParameters), options?: Omit<UndefinedInitialDataOptions<GetApprovalPoliciesIdData, GetApprovalPoliciesIdError, TData, ServiceOperationQueryKey<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdParameters>>, "queryKey">): UseQueryResult<TData, GetApprovalPoliciesIdError | Error>;
+        /**
+         * @summary Get an approval policy by ID
+         * @description Retrieve a specific approval policy.
+         */
+        useQuery<TData = GetApprovalPoliciesIdData>(parameters: ServiceOperationQueryKey<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdParameters> | (AreAllOptional<GetApprovalPoliciesIdParameters> extends true ? GetApprovalPoliciesIdParameters | void : GetApprovalPoliciesIdParameters), options: Omit<DefinedInitialDataOptions<GetApprovalPoliciesIdData, GetApprovalPoliciesIdError, TData, ServiceOperationQueryKey<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdParameters>>, "queryKey">): DefinedUseQueryResult<TData, GetApprovalPoliciesIdError | Error>;
+        /**
+         * @summary Get an approval policy by ID
+         * @description Retrieve a specific approval policy.
+         */
+        useSuspenseInfiniteQuery<TPageParam extends GetApprovalPoliciesIdParameters, TData = GetApprovalPoliciesIdData>(parameters: ServiceOperationInfiniteQueryKey<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdParameters> | (AreAllOptional<GetApprovalPoliciesIdParameters> extends true ? GetApprovalPoliciesIdParameters | void : GetApprovalPoliciesIdParameters), options: Omit<UseSuspenseInfiniteQueryOptions<GetApprovalPoliciesIdData, GetApprovalPoliciesIdError, OperationInfiniteData<TData, GetApprovalPoliciesIdParameters>, GetApprovalPoliciesIdData, ServiceOperationInfiniteQueryKey<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdParameters>, PartialParameters<TPageParam>>, "queryKey" | "getPreviousPageParam" | "getNextPageParam" | "initialPageParam"> & InfiniteQueryPageParamsOptions<GetApprovalPoliciesIdData, PartialParameters<TPageParam>>): UseSuspenseInfiniteQueryResult<OperationInfiniteData<TData, GetApprovalPoliciesIdParameters>, GetApprovalPoliciesIdError | Error>;
+        /**
+         * @summary Get an approval policy by ID
+         * @description Retrieve a specific approval policy.
+         */
+        useSuspenseQueries<T extends Array<UseQueryOptionsForUseSuspenseQuery<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdParameters, GetApprovalPoliciesIdData, GetApprovalPoliciesIdError>>, TCombinedResult = Array<UseSuspenseQueryResult<GetApprovalPoliciesIdData, GetApprovalPoliciesIdError>>>(options: {
+            queries: T;
+            combine?: (results: Array<WithOptional<UseSuspenseQueryResult<GetApprovalPoliciesIdData, GetApprovalPoliciesIdError>, "data">>) => TCombinedResult;
+        }): TCombinedResult;
+        /**
+         * @summary Get an approval policy by ID
+         * @description Retrieve a specific approval policy.
+         */
+        useSuspenseQuery<TData = GetApprovalPoliciesIdData>(parameters: ServiceOperationQueryKey<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdParameters> | (AreAllOptional<GetApprovalPoliciesIdParameters> extends true ? GetApprovalPoliciesIdParameters | void : GetApprovalPoliciesIdParameters), options?: Omit<UseSuspenseQueryOptions<GetApprovalPoliciesIdData, GetApprovalPoliciesIdError, TData, ServiceOperationQueryKey<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdParameters>>, "queryKey">): UseSuspenseQueryResult<TData, GetApprovalPoliciesIdError | Error>;
+        schema: GetApprovalPoliciesIdSchema;
+        types: {
+            parameters: GetApprovalPoliciesIdParameters;
+            data: GetApprovalPoliciesIdData;
+            error: GetApprovalPoliciesIdError;
+        };
+    };
     /**
      * @summary Delete an approval policy
      * @description Delete an existing approval policy.
      */
-    deleteApprovalPoliciesId: ServiceOperationMutation<{
-        method: "delete";
-        url: "/approval_policies/{approval_policy_id}";
-        security: [
-            "HTTPBearer"
-        ];
-    }, undefined, paths["/approval_policies/{approval_policy_id}"]["delete"]["responses"]["200"]["content"]["application/json"], paths["/approval_policies/{approval_policy_id}"]["delete"]["parameters"], paths["/approval_policies/{approval_policy_id}"]["delete"]["responses"]["401"]["content"]["application/json"] | paths["/approval_policies/{approval_policy_id}"]["delete"]["responses"]["422"]["content"]["application/json"] | paths["/approval_policies/{approval_policy_id}"]["delete"]["responses"]["default"]["content"]["application/json"]>;
+    deleteApprovalPoliciesId: {
+        /**
+         * @summary Delete an approval policy
+         * @description Delete an existing approval policy.
+         */
+        getMutationKey(parameters: DeleteApprovalPoliciesIdParameters | void): ServiceOperationMutationKey<DeleteApprovalPoliciesIdSchema, DeleteApprovalPoliciesIdParameters>;
+        /**
+         * @summary Delete an approval policy
+         * @description Delete an existing approval policy.
+         */
+        useMutation<TVariables extends MutationVariables<DeleteApprovalPoliciesIdBody, DeleteApprovalPoliciesIdParameters>, TContext = unknown>(parameters?: undefined, options?: ServiceOperationUseMutationOptions<DeleteApprovalPoliciesIdSchema, DeleteApprovalPoliciesIdData, DeleteApprovalPoliciesIdParameters, TVariables, DeleteApprovalPoliciesIdError, TContext>): UseMutationResult<DeleteApprovalPoliciesIdData, DeleteApprovalPoliciesIdError | Error, TVariables, TContext>;
+        /**
+         * @summary Delete an approval policy
+         * @description Delete an existing approval policy.
+         */
+        useMutation<TVariables extends DeleteApprovalPoliciesIdBody, TContext = unknown>(parameters: AreAllOptional<DeleteApprovalPoliciesIdParameters> extends true ? DeleteApprovalPoliciesIdParameters | void : DeleteApprovalPoliciesIdParameters, options?: ServiceOperationUseMutationOptions<DeleteApprovalPoliciesIdSchema, DeleteApprovalPoliciesIdData, DeleteApprovalPoliciesIdParameters, TVariables, DeleteApprovalPoliciesIdError, TContext>): UseMutationResult<DeleteApprovalPoliciesIdData, DeleteApprovalPoliciesIdError | Error, AreAllOptional<TVariables> extends true ? TVariables | void : TVariables, TContext>;
+        /**
+         * @summary Delete an approval policy
+         * @description Delete an existing approval policy.
+         */
+        useIsMutating<TContext = unknown>(filters?: MutationFiltersByParameters<DeleteApprovalPoliciesIdBody, DeleteApprovalPoliciesIdData, DeleteApprovalPoliciesIdParameters, DeleteApprovalPoliciesIdError, TContext> | MutationFiltersByMutationKey<DeleteApprovalPoliciesIdSchema, DeleteApprovalPoliciesIdBody, DeleteApprovalPoliciesIdData, DeleteApprovalPoliciesIdParameters, DeleteApprovalPoliciesIdError, TContext>): number;
+        /**
+         * @summary Delete an approval policy
+         * @description Delete an existing approval policy.
+         */
+        isMutating<TContext>(filters?: MutationFiltersByParameters<DeleteApprovalPoliciesIdBody, DeleteApprovalPoliciesIdData, DeleteApprovalPoliciesIdParameters, DeleteApprovalPoliciesIdError, TContext> | MutationFiltersByMutationKey<DeleteApprovalPoliciesIdSchema, DeleteApprovalPoliciesIdBody, DeleteApprovalPoliciesIdData, DeleteApprovalPoliciesIdParameters, DeleteApprovalPoliciesIdError, TContext>): number;
+        /**
+         * @summary Delete an approval policy
+         * @description Delete an existing approval policy.
+         */
+        <TOptions extends ServiceOperationMutationFnOptions<DeleteApprovalPoliciesIdBody, DeleteApprovalPoliciesIdParameters>>(options: TOptions, client?: (schema: DeleteApprovalPoliciesIdSchema, options: TOptions) => Promise<RequestFnResponse<DeleteApprovalPoliciesIdData, DeleteApprovalPoliciesIdError>>): Promise<RequestFnResponse<DeleteApprovalPoliciesIdData, DeleteApprovalPoliciesIdError>>;
+        /**
+         * @summary Delete an approval policy
+         * @description Delete an existing approval policy.
+         */
+        useMutationState<TContext = unknown, TResult = MutationState<DeleteApprovalPoliciesIdData, DeleteApprovalPoliciesIdError, MutationVariables<DeleteApprovalPoliciesIdBody, DeleteApprovalPoliciesIdParameters>, TContext>>(options?: {
+            filters?: MutationFiltersByParameters<DeleteApprovalPoliciesIdBody, DeleteApprovalPoliciesIdData, DeleteApprovalPoliciesIdParameters, DeleteApprovalPoliciesIdError, TContext> | MutationFiltersByMutationKey<DeleteApprovalPoliciesIdSchema, DeleteApprovalPoliciesIdBody, DeleteApprovalPoliciesIdData, DeleteApprovalPoliciesIdParameters, DeleteApprovalPoliciesIdError, TContext>;
+            select?: (mutation: Mutation<DeleteApprovalPoliciesIdData, DeleteApprovalPoliciesIdError, MutationVariables<DeleteApprovalPoliciesIdBody, DeleteApprovalPoliciesIdParameters>, TContext>) => TResult;
+        }): Array<TResult>;
+        schema: DeleteApprovalPoliciesIdSchema;
+        types: {
+            parameters: DeleteApprovalPoliciesIdParameters;
+            data: DeleteApprovalPoliciesIdData;
+            error: DeleteApprovalPoliciesIdError;
+            body: DeleteApprovalPoliciesIdBody;
+        };
+    };
     /**
      * @summary Update an approval policy
      * @description Update an existing approval policy.
      */
-    patchApprovalPoliciesId: ServiceOperationMutation<{
-        method: "patch";
-        url: "/approval_policies/{approval_policy_id}";
-        mediaType: "application/json";
-        security: [
-            "HTTPBearer"
-        ];
-    }, NonNullable<paths["/approval_policies/{approval_policy_id}"]["patch"]["requestBody"]>["content"]["application/json"], paths["/approval_policies/{approval_policy_id}"]["patch"]["responses"]["200"]["content"]["application/json"], paths["/approval_policies/{approval_policy_id}"]["patch"]["parameters"], paths["/approval_policies/{approval_policy_id}"]["patch"]["responses"]["401"]["content"]["application/json"] | paths["/approval_policies/{approval_policy_id}"]["patch"]["responses"]["422"]["content"]["application/json"] | paths["/approval_policies/{approval_policy_id}"]["patch"]["responses"]["default"]["content"]["application/json"]>;
+    patchApprovalPoliciesId: {
+        /**
+         * @summary Update an approval policy
+         * @description Update an existing approval policy.
+         */
+        getMutationKey(parameters: PatchApprovalPoliciesIdParameters | void): ServiceOperationMutationKey<PatchApprovalPoliciesIdSchema, PatchApprovalPoliciesIdParameters>;
+        /**
+         * @summary Update an approval policy
+         * @description Update an existing approval policy.
+         */
+        useMutation<TVariables extends MutationVariables<PatchApprovalPoliciesIdBody, PatchApprovalPoliciesIdParameters>, TContext = unknown>(parameters?: undefined, options?: ServiceOperationUseMutationOptions<PatchApprovalPoliciesIdSchema, PatchApprovalPoliciesIdData, PatchApprovalPoliciesIdParameters, TVariables, PatchApprovalPoliciesIdError, TContext>): UseMutationResult<PatchApprovalPoliciesIdData, PatchApprovalPoliciesIdError | Error, TVariables, TContext>;
+        /**
+         * @summary Update an approval policy
+         * @description Update an existing approval policy.
+         */
+        useMutation<TVariables extends PatchApprovalPoliciesIdBody, TContext = unknown>(parameters: AreAllOptional<PatchApprovalPoliciesIdParameters> extends true ? PatchApprovalPoliciesIdParameters | void : PatchApprovalPoliciesIdParameters, options?: ServiceOperationUseMutationOptions<PatchApprovalPoliciesIdSchema, PatchApprovalPoliciesIdData, PatchApprovalPoliciesIdParameters, TVariables, PatchApprovalPoliciesIdError, TContext>): UseMutationResult<PatchApprovalPoliciesIdData, PatchApprovalPoliciesIdError | Error, AreAllOptional<TVariables> extends true ? TVariables | void : TVariables, TContext>;
+        /**
+         * @summary Update an approval policy
+         * @description Update an existing approval policy.
+         */
+        useIsMutating<TContext = unknown>(filters?: MutationFiltersByParameters<PatchApprovalPoliciesIdBody, PatchApprovalPoliciesIdData, PatchApprovalPoliciesIdParameters, PatchApprovalPoliciesIdError, TContext> | MutationFiltersByMutationKey<PatchApprovalPoliciesIdSchema, PatchApprovalPoliciesIdBody, PatchApprovalPoliciesIdData, PatchApprovalPoliciesIdParameters, PatchApprovalPoliciesIdError, TContext>): number;
+        /**
+         * @summary Update an approval policy
+         * @description Update an existing approval policy.
+         */
+        isMutating<TContext>(filters?: MutationFiltersByParameters<PatchApprovalPoliciesIdBody, PatchApprovalPoliciesIdData, PatchApprovalPoliciesIdParameters, PatchApprovalPoliciesIdError, TContext> | MutationFiltersByMutationKey<PatchApprovalPoliciesIdSchema, PatchApprovalPoliciesIdBody, PatchApprovalPoliciesIdData, PatchApprovalPoliciesIdParameters, PatchApprovalPoliciesIdError, TContext>): number;
+        /**
+         * @summary Update an approval policy
+         * @description Update an existing approval policy.
+         */
+        <TOptions extends ServiceOperationMutationFnOptions<PatchApprovalPoliciesIdBody, PatchApprovalPoliciesIdParameters>>(options: TOptions, client?: (schema: PatchApprovalPoliciesIdSchema, options: TOptions) => Promise<RequestFnResponse<PatchApprovalPoliciesIdData, PatchApprovalPoliciesIdError>>): Promise<RequestFnResponse<PatchApprovalPoliciesIdData, PatchApprovalPoliciesIdError>>;
+        /**
+         * @summary Update an approval policy
+         * @description Update an existing approval policy.
+         */
+        useMutationState<TContext = unknown, TResult = MutationState<PatchApprovalPoliciesIdData, PatchApprovalPoliciesIdError, MutationVariables<PatchApprovalPoliciesIdBody, PatchApprovalPoliciesIdParameters>, TContext>>(options?: {
+            filters?: MutationFiltersByParameters<PatchApprovalPoliciesIdBody, PatchApprovalPoliciesIdData, PatchApprovalPoliciesIdParameters, PatchApprovalPoliciesIdError, TContext> | MutationFiltersByMutationKey<PatchApprovalPoliciesIdSchema, PatchApprovalPoliciesIdBody, PatchApprovalPoliciesIdData, PatchApprovalPoliciesIdParameters, PatchApprovalPoliciesIdError, TContext>;
+            select?: (mutation: Mutation<PatchApprovalPoliciesIdData, PatchApprovalPoliciesIdError, MutationVariables<PatchApprovalPoliciesIdBody, PatchApprovalPoliciesIdParameters>, TContext>) => TResult;
+        }): Array<TResult>;
+        schema: PatchApprovalPoliciesIdSchema;
+        types: {
+            parameters: PatchApprovalPoliciesIdParameters;
+            data: PatchApprovalPoliciesIdData;
+            error: PatchApprovalPoliciesIdError;
+            body: PatchApprovalPoliciesIdBody;
+        };
+    };
 }
 export const approvalPoliciesService: {
     /**
@@ -106,3 +369,36 @@ export const approvalPoliciesService: {
         }
     }
 };
+type GetApprovalPoliciesIdSchema = {
+    method: "get";
+    url: "/approval_policies/{approval_policy_id}";
+    security: [
+        "partnerToken"
+    ];
+};
+type GetApprovalPoliciesIdParameters = paths["/approval_policies/{approval_policy_id}"]["get"]["parameters"];
+type GetApprovalPoliciesIdData = paths["/approval_policies/{approval_policy_id}"]["get"]["responses"]["200"]["content"]["application/json"];
+type GetApprovalPoliciesIdError = paths["/approval_policies/{approval_policy_id}"]["get"]["responses"]["401"]["content"]["application/json"] | paths["/approval_policies/{approval_policy_id}"]["get"]["responses"]["422"]["content"]["application/json"] | paths["/approval_policies/{approval_policy_id}"]["get"]["responses"]["default"]["content"]["application/json"];
+type DeleteApprovalPoliciesIdSchema = {
+    method: "delete";
+    url: "/approval_policies/{approval_policy_id}";
+    security: [
+        "HTTPBearer"
+    ];
+};
+type DeleteApprovalPoliciesIdParameters = paths["/approval_policies/{approval_policy_id}"]["delete"]["parameters"];
+type DeleteApprovalPoliciesIdData = paths["/approval_policies/{approval_policy_id}"]["delete"]["responses"]["200"]["content"]["application/json"];
+type DeleteApprovalPoliciesIdError = paths["/approval_policies/{approval_policy_id}"]["delete"]["responses"]["401"]["content"]["application/json"] | paths["/approval_policies/{approval_policy_id}"]["delete"]["responses"]["422"]["content"]["application/json"] | paths["/approval_policies/{approval_policy_id}"]["delete"]["responses"]["default"]["content"]["application/json"];
+type DeleteApprovalPoliciesIdBody = undefined;
+type PatchApprovalPoliciesIdSchema = {
+    method: "patch";
+    url: "/approval_policies/{approval_policy_id}";
+    mediaType: "application/json";
+    security: [
+        "HTTPBearer"
+    ];
+};
+type PatchApprovalPoliciesIdParameters = paths["/approval_policies/{approval_policy_id}"]["patch"]["parameters"];
+type PatchApprovalPoliciesIdData = paths["/approval_policies/{approval_policy_id}"]["patch"]["responses"]["200"]["content"]["application/json"];
+type PatchApprovalPoliciesIdError = paths["/approval_policies/{approval_policy_id}"]["patch"]["responses"]["401"]["content"]["application/json"] | paths["/approval_policies/{approval_policy_id}"]["patch"]["responses"]["422"]["content"]["application/json"] | paths["/approval_policies/{approval_policy_id}"]["patch"]["responses"]["default"]["content"]["application/json"];
+type PatchApprovalPoliciesIdBody = NonNullable<paths["/approval_policies/{approval_policy_id}"]["patch"]["requestBody"]>["content"]["application/json"];

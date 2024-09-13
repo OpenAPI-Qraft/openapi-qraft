@@ -1,13 +1,19 @@
-import type { OperationSchema } from '../lib/requestFn.js';
+import type {
+  OperationSchema,
+  ServiceOperationGetQueryData,
+} from '@openapi-qraft/tanstack-query-react-types';
 import type { CreateAPIQueryClientOptions } from '../qraftAPIClient.js';
-import type { ServiceOperationQuery } from '../service-operation/ServiceOperation.js';
 import { callQueryClientMethodWithQueryKey } from '../lib/callQueryClientMethodWithQueryKey.js';
 
 export function getQueryData<TData>(
   qraftOptions: CreateAPIQueryClientOptions,
   schema: OperationSchema,
   args: Parameters<
-    ServiceOperationQuery<OperationSchema, unknown, TData>['getQueryData']
+    ServiceOperationGetQueryData<
+      OperationSchema,
+      unknown,
+      TData
+    >['getQueryData']
   >
 ): TData | undefined {
   return callQueryClientMethodWithQueryKey(

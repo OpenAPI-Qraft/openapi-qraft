@@ -1,7 +1,10 @@
+import type {
+  OperationSchema,
+  RequestFnResponse,
+  ServiceOperationMutationFn,
+  ServiceOperationQueryFn,
+} from '@openapi-qraft/tanstack-query-react-types';
 import type { CreateAPIBasicClientOptions } from '../qraftAPIClient.js';
-import type { ServiceOperationMutationFn } from '../service-operation/ServiceOperationMutationFn.js';
-import type { ServiceOperationQueryFn } from '../service-operation/ServiceOperationQueryFn.js';
-import { OperationSchema, RequestFnResponse } from '../lib/requestFn.js';
 
 /**
  * Called when <service>.<operation>(...) is invoked.

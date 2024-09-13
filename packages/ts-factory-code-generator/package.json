@@ -1,0 +1,30 @@
+{
+  "name": "@openapi-qraft/ts-factory-code-generator",
+  "version": "1.0.0",
+  "private": true,
+  "type": "commonjs",
+  "scripts": {
+    "build": "yarn exec ./generateFactoryCodeGenerator.mjs && tsc --build",
+    "generate-ts-factory": "tsx generateTsFactoryCLI.ts -- --source-file /Users/radist/WebstormProjects/qraft/packages/react-client/src/service-operation/ServiceOperationUseQuery.ts"
+  },
+  "exports": {
+    "./package.json": "./package.json",
+    ".": "./dist/index.js",
+    "./*": "./dist/*.js"
+  },
+  "typesVersions": {
+    "*": {
+      "*": [
+        "dist/*"
+      ]
+    }
+  },
+  "dependencies": {
+    "ts-factory-code-generator-generator": "^0.7.0",
+    "typescript-5.5.4": "npm:typescript@5.5.4"
+  },
+  "devDependencies": {
+    "@types/node": "^22.5.4",
+    "tsx": "^4.19.0"
+  }
+}

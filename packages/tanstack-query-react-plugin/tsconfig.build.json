@@ -5,5 +5,11 @@
     "declaration": true,
     "declarationMap": true
   },
-  "exclude": ["src/**/*.spec.ts", "src/**/*.test.ts", "src/tmp/**", "src/__snapshots__/**/*"]
+  "exclude": [
+    "src/**/*.spec.ts",
+    "src/**/*.test.ts",
+    "src/tmp/**",
+    "src/__snapshots__/**/*",
+    "src/ts-factory-source/service-operation/**/*"
+  ]
 }
