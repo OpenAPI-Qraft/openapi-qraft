@@ -12,15 +12,19 @@
     "@openapi-qraft/tanstack-query-react-plugin": "1.14.0",
     "@openapi-qraft/test-fixtures": "1.0.0",
     "playground": "0.0.14",
-    "openapi-qraft-website": "0.0.0"
+    "openapi-qraft-website": "0.0.0",
+    "@openapi-qraft/tanstack-query-react-types": "2.0.0-next.7",
+    "@openapi-qraft/ts-factory-code-generator": "1.0.0"
   },
   "changesets": [
     "curvy-lemons-breathe",
     "eighty-wolves-sin",
+    "good-lizards-grow",
     "hip-ducks-love",
     "lemon-pans-flow",
     "lucky-cobras-melt",
     "mighty-dancers-enjoy",
+    "nine-goats-repair",
     "olive-schools-grin",
     "plenty-forks-tickle",
     "purple-drinks-move",
