@@ -73,7 +73,7 @@ export type MutationVariables<TBody, TParams> =
   AreAllOptional<TBody> extends true
     ? AreAllOptional<TParams> extends true
       ? ({ body?: TBody } & NonNullableObject<TParams>) | void
-      : { body?: TBody } & TParams
+      : { body?: TBody } & NonNullableObject<TParams>
     : { body: TBody } & NonNullableObject<TParams>;
 
 type NonNullableObject<T> = NonNullable<T> extends never ? {} : T;

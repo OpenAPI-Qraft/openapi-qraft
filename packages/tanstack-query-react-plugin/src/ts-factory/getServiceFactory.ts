@@ -1,6 +1,7 @@
 import { ServiceOperation } from '@openapi-qraft/plugin/lib/open-api/getServices';
 import camelCase from 'camelcase';
 import ts from 'typescript';
+import { createOperationCommonTSDoc } from '../lib/createOperationCommonTSDoc.js';
 import { createServiceOperationCancelQueriesNodes } from './service-operation.generated/ServiceOperationCancelQueries.js';
 import { createServiceOperationFetchInfiniteQueryNodes } from './service-operation.generated/ServiceOperationFetchInfiniteQuery.js';
 import { createServiceOperationFetchQueryNodes } from './service-operation.generated/ServiceOperationFetchQuery.js';
@@ -29,6 +30,7 @@ import { createServiceOperationUseQueryNodes } from './service-operation.generat
 import { createServiceOperationUseSuspenseInfiniteQueryNodes } from './service-operation.generated/ServiceOperationUseSuspenseInfiniteQuery.js';
 import { createServiceOperationUseSuspenseQueriesNodes } from './service-operation.generated/ServiceOperationUseSuspenseQueries.js';
 import { createServiceOperationUseSuspenseQueryNodes } from './service-operation.generated/ServiceOperationUseSuspenseQuery.js';
+import { createOperationMethodTSDocExample } from './tsdoc/createOperationMethodTSDocExample.js';
 
 const factory = ts.factory;
 
@@ -36,8 +38,10 @@ export type ServiceImportsFactoryOptions = {
   openapiTypesImportPath: string;
 };
 
+type Service = { typeName: string; variableName: string };
+
 export const getServiceFactory = (
-  service: { typeName: string; variableName: string },
+  service: Service,
   operations: ServiceOperation[],
   { openapiTypesImportPath }: ServiceImportsFactoryOptions
 ) => {
@@ -106,34 +110,77 @@ const getServiceOperationImportsFactory = (operations: ServiceOperation[]) => {
 };
 
 const getServiceInterfaceFactory = (
-  { typeName }: { typeName: string },
+  service: Service,
   operations: ServiceOperation[]
 ) => {
   return factory.createInterfaceDeclaration(
     [factory.createToken(ts.SyntaxKind.ExportKeyword)],
-    factory.createIdentifier(typeName),
+    factory.createIdentifier(service.typeName),
     undefined,
     undefined,
-    operations.map(getServiceInterfaceOperationFactory)
+    operations.map((operation) =>
+      getServiceInterfaceOperationFactory(operation, service)
+    )
   );
 };
 
-const getServiceInterfaceOperationFactory = (operation: ServiceOperation) => {
+const getServiceInterfaceOperationFactory = (
+  operation: ServiceOperation,
+  service: Service
+) => {
   const operationMethodNodes = getMethodSignatureNodes(
     operation.method === 'get'
       ? createServicesQueryOperationNodes()
       : createServicesMutationOperationNodes()
   );
-  operationMethodNodes.forEach(
-    (node) => void addSyntheticLeadingOperationComment(node, operation)
-  );
+
+  operationMethodNodes.forEach((node) => {
+    if (
+      ts.isMethodSignature(node) &&
+      ts.isIdentifier(node.name) &&
+      node.name.text
+    ) {
+      const operationCustomTSDoc = createOperationMethodTSDocExample(
+        operation,
+        {
+          serviceVariableName: service.variableName,
+          operationMethodName: node.name.text,
+        }
+      );
+      // Query and Mutation methods (hooks and QueryClient methods)
+      ts.addSyntheticLeadingComment(
+        node,
+        ts.SyntaxKind.MultiLineCommentTrivia,
+        createMultilineComment(
+          operationCustomTSDoc
+            ? operationCustomTSDoc
+            : createOperationCommonTSDoc(operation)
+        ),
+        true
+      );
+    } else if (ts.isCallSignatureDeclaration(node)) {
+      // Query and Mutation functions (invoke methods)
+      ts.addSyntheticLeadingComment(
+        node,
+        ts.SyntaxKind.MultiLineCommentTrivia,
+        createMultilineComment([...createOperationCommonTSDoc(operation)]),
+        true
+      );
+    }
+  });
 
   const node = factory.createPropertySignature(
     undefined,
     factory.createIdentifier(operation.name),
     undefined,
     factory.createTypeLiteralNode([
-      ...replaceGenericTypesWithOperationTypes(operationMethodNodes, operation),
+      ...replaceGenericTypesWithOperationTypes(
+        reduceAreAllOptionalConditionalTParamsType(
+          operationMethodNodes,
+          operation
+        ),
+        operation
+      ),
       factory.createPropertySignature(
         undefined,
         factory.createIdentifier('schema'),
@@ -193,7 +240,7 @@ const getServiceInterfaceOperationFactory = (operation: ServiceOperation) => {
     ])
   );
 
-  addSyntheticLeadingOperationComment(node, operation);
+  addOperationTSDoc(node, operation);
 
   return node;
 };
@@ -336,9 +383,12 @@ const getOperationBodyFactory = (operation: ServiceOperation) => {
   );
 };
 
-const getOperationParametersFactory = (operation: ServiceOperation) => {
-  if (!operation.parameters)
-    return factory.createKeywordTypeNode(ts.SyntaxKind.UndefinedKeyword);
+const createOperationParametersFactory = (operation: ServiceOperation) => {
+  if (!operation.parameters?.length)
+    return operation.method === 'get'
+      ? factory.createKeywordTypeNode(ts.SyntaxKind.UndefinedKeyword)
+      : // mutation with predefined parameters fallback to an empty object
+        factory.createTypeLiteralNode([]);
 
   return factory.createIndexedAccessTypeNode(
     factory.createIndexedAccessTypeNode(
@@ -360,7 +410,7 @@ const getOperationParametersFactory = (operation: ServiceOperation) => {
 };
 
 const getServiceVariableFactory = (
-  { variableName }: { variableName: string },
+  service: Service,
   operations: ServiceOperation[]
 ) => {
   return factory.createVariableStatement(
@@ -368,10 +418,12 @@ const getServiceVariableFactory = (
     factory.createVariableDeclarationList(
       [
         factory.createVariableDeclaration(
-          factory.createIdentifier(variableName),
+          factory.createIdentifier(service.variableName),
           undefined,
           factory.createTypeLiteralNode(
-            operations.map(getServiceVariableTypeFactory)
+            operations.map((operation) =>
+              getServiceVariableTypeFactory(operation)
+            )
           ),
           factory.createObjectLiteralExpression(
             operations.map(getServiceVariablePropertyFactory),
@@ -397,7 +449,7 @@ const getOperationsTypes = (operations: ServiceOperation[]) => {
         undefined,
         factory.createIdentifier(getOperationParametersTypeName(operation)),
         undefined,
-        getOperationParametersFactory(operation)
+        createOperationParametersFactory(operation)
       ),
       factory.createTypeAliasDeclaration(
         undefined,
@@ -458,7 +510,7 @@ const getServiceVariableTypeFactory = (operation: ServiceOperation) => {
     ])
   );
 
-  addSyntheticLeadingOperationComment(node, operation);
+  addOperationTSDoc(node, operation);
 
   return node;
 };
@@ -525,23 +577,8 @@ const createMultilineComment = (comment: string[]) => {
   return '';
 };
 
-const createOperationComment = (operation: ServiceOperation) => {
-  return createMultilineComment(
-    [
-      operation.deprecated ? '@deprecated' : null,
-      operation.summary ? `@summary ${operation.summary}` : null,
-      operation.description ? `@description ${operation.description}` : null,
-    ].filter((comment): comment is NonNullable<typeof comment> =>
-      Boolean(comment)
-    )
-  );
-};
-
-const addSyntheticLeadingOperationComment = (
-  node: ts.Node,
-  operation: ServiceOperation
-) => {
-  const comment = createOperationComment(operation);
+const addOperationTSDoc = (node: ts.Node, operation: ServiceOperation) => {
+  const comment = createMultilineComment(createOperationCommonTSDoc(operation));
 
   if (comment)
     ts.addSyntheticLeadingComment(
@@ -639,6 +676,12 @@ const getModuleTypeImports = (nodes: ts.Node[]) => {
     }, {});
 };
 
+/**
+ * Replaces generic types with operation types with named types.
+ *
+ * For example, replaces `TParams` and `TQueryFnData` will be
+ * replaced with `GetEntitiesSchemaParameters` and `GetEntitiesSchemaData`.
+ */
 function replaceGenericTypesWithOperationTypes<T extends ts.Node>(
   node: T[],
   operation: ServiceOperation
@@ -668,6 +711,49 @@ function replaceGenericTypesWithOperationTypes<T extends ts.Node>(
               ts.factory.createIdentifier(newTypeName),
               node.typeArguments
             );
+          }
+        }
+        return ts.visitEachChild(node, visit, context);
+      }
+      return ts.visitNode(rootNode, visit);
+    };
+
+  const result = ts.transform(node, [transformer]);
+
+  return result.transformed as T[];
+}
+
+/**
+ * Replaces `AreAllOptional<TParams>` with `TParams | void` if `TParams` is optional,
+ * and  with `TParams` when at least one parameter is required.
+ */
+function reduceAreAllOptionalConditionalTParamsType<T extends ts.Node>(
+  node: T[],
+  operation: ServiceOperation
+): T[] {
+  const transformer =
+    (context: ts.TransformationContext) => (rootNode: ts.Node) => {
+      function visit(node: ts.Node): ts.Node {
+        if (
+          ts.isConditionalTypeNode(node) &&
+          ts.isTypeReferenceNode(node.checkType) &&
+          ts.isIdentifier(node.checkType.typeName) &&
+          node.checkType.typeName.text === 'AreAllOptional' &&
+          node.checkType.typeArguments?.every((node) => {
+            return (
+              ts.isTypeReferenceNode(node) &&
+              ts.isIdentifier(node.typeName) &&
+              node.typeName.text === 'TParams'
+            );
+          })
+        ) {
+          if (
+            !operation.parameters?.length ||
+            operation.parameters.every((parameter) => !parameter.required)
+          ) {
+            return node.trueType;
+          } else {
+            return node.falseType;
           }
         }
         return ts.visitEachChild(node, visit, context);
