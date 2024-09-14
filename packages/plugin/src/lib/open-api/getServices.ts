@@ -21,9 +21,6 @@ export type Service = {
   operations: ServiceOperation[];
 };
 
-/**
- * @deprecated move to separate file
- */
 export type ServiceOperation = {
   method:
     | 'get'
