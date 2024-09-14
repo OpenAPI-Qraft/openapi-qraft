@@ -15,14 +15,11 @@ export interface ServiceOperationQueryFn<
     TMeta extends Record<string, any>,
     TSignal extends AbortSignal = AbortSignal,
   >(
-    options: AreAllOptional<TParams> extends true
-      ?
-          | void
-          | QueryFnOptionsByParameters<TParams, TMeta, TSignal>
-          | QueryFnOptionsByQueryKey<TSchema, TParams, TMeta, TSignal>
-      :
-          | QueryFnOptionsByParameters<TParams, TMeta, TSignal>
-          | QueryFnOptionsByQueryKey<TSchema, TParams, TMeta, TSignal>,
+    options:
+      | QueryFnOptionsByQueryKey<TSchema, TParams, TMeta, TSignal>
+      | (AreAllOptional<TParams> extends true
+          ? QueryFnOptionsByParameters<TParams, TMeta, TSignal> | void
+          : QueryFnOptionsByParameters<TParams, TMeta, TSignal>),
     client?: (
       schema: TSchema,
       options: {

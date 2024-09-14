@@ -17,23 +17,8 @@ export interface ServiceOperationUseMutation<
     parameters: TParams | void
   ): ServiceOperationMutationKey<TSchema, TParams>;
 
-  useMutation<
-    TVariables extends MutationVariables<TBody, TParams>,
-    TContext = unknown,
-  >(
-    parameters?: undefined,
-    options?: ServiceOperationUseMutationOptions<
-      TSchema,
-      TMutationData,
-      TParams,
-      TVariables,
-      TError,
-      TContext
-    >
-  ): UseMutationResult<TMutationData, TError | Error, TVariables, TContext>;
-
   useMutation<TVariables extends TBody, TContext = unknown>(
-    parameters: AreAllOptional<TParams> extends true ? TParams | void : TParams,
+    parameters: TParams,
     options?: ServiceOperationUseMutationOptions<
       TSchema,
       TMutationData,
@@ -48,4 +33,19 @@ export interface ServiceOperationUseMutation<
     AreAllOptional<TVariables> extends true ? TVariables | void : TVariables,
     TContext
   >;
+
+  useMutation<
+    TVariables extends MutationVariables<TBody, TParams>,
+    TContext = unknown,
+  >(
+    parameters: void,
+    options?: ServiceOperationUseMutationOptions<
+      TSchema,
+      TMutationData,
+      TParams,
+      TVariables,
+      TError,
+      TContext
+    >
+  ): UseMutationResult<TMutationData, TError | Error, TVariables, TContext>;
 }
