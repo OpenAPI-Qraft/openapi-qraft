@@ -105,47 +105,6 @@ const getServiceOperationImportsFactory = (operations: ServiceOperation[]) => {
   );
 };
 
-const __getServiceOperationGenericsPathImportsFactory = (
-  operationGenericsPath: string,
-  operations: ServiceOperation[]
-) => {
-  const factory = ts.factory;
-
-  const queryMethods = ['get', 'head', 'options'] as const; // todo::make it shared
-
-  return factory.createImportDeclaration(
-    undefined,
-    factory.createImportClause(
-      true,
-      undefined,
-      factory.createNamedImports(
-        [
-          operations.some((operation) =>
-            queryMethods.some((method) => method === operation.method)
-          )
-            ? factory.createImportSpecifier(
-                false,
-                undefined,
-                factory.createIdentifier('ServiceOperationQuery')
-              )
-            : null,
-          operations.some(
-            (operation) =>
-              !queryMethods.some((method) => method === operation.method)
-          )
-            ? factory.createImportSpecifier(
-                false,
-                undefined,
-                factory.createIdentifier('ServiceOperationMutation')
-              )
-            : null,
-        ].filter((node): node is NonNullable<typeof node> => Boolean(node))
-      )
-    ),
-    factory.createStringLiteral(operationGenericsPath)
-  );
-};
-
 const getServiceInterfaceFactory = (
   { typeName }: { typeName: string },
   operations: ServiceOperation[]
