@@ -80,7 +80,7 @@ export interface RequestFnInfo
   readonly body?: BodyInit | Record<string, unknown> | null;
 
   /**
-   * Tanstack Query Meta
+   * TanStack Query Meta
    */
   meta?: Record<string, unknown>;
 
