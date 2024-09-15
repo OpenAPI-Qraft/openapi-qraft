@@ -1,5 +1,12 @@
 # @openapi-qraft/openapi-typescript
 
+## 1.2.0-next.9
+
+### Patch Changes
+
+- 9dc1918: Simplified `TParams` type for conditional expressions.
+  - @openapi-qraft/plugin@2.0.0-next.9
+
 ## 1.2.0-next.8
 
 ### Patch Changes
