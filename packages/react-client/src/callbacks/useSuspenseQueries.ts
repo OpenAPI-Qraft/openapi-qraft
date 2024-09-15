@@ -28,6 +28,7 @@ export const useSuspenseQueries: (
   return useSuspenseQueriesTanstack(
     {
       ...options,
+      // @ts-expect-error - Too complex to type
       queries: options.queries.map((queryOptions) => {
         const optionsWithQueryKey =
           'parameters' in queryOptions

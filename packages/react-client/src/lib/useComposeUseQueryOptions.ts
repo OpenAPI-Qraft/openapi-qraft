@@ -24,7 +24,6 @@ export function useComposeUseQueryOptions(
 
   const queryFn =
     options?.queryFn ??
-    // @ts-expect-error - Too complex to type
     function ({ queryKey: [, queryParams], signal, meta, pageParam }) {
       return qraftOptions
         .requestFn(schema, {
