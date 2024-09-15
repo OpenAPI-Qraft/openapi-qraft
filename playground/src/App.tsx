@@ -39,7 +39,7 @@ function AppComponent() {
 }
 
 function PetListFilter() {
-  const { petStatusToCreate, setPetStatusToCreate } = usePetStatusToCreate();
+  const { setPetStatusToCreate } = usePetStatusToCreate();
 
   const { petsFilter, setPetsFilter } = usePetsFilter();
   return (
@@ -47,9 +47,7 @@ function PetListFilter() {
       onSubmit={(event) => {
         event.preventDefault();
         const formData = new FormData(event.currentTarget);
-        setPetStatusToCreate(
-          formData.get('status') as typeof petStatusToCreate
-        );
+        setPetStatusToCreate(formData.get('status') as PetStatusToCreate);
       }}
     >
       <label htmlFor="status">Select Status:</label>{' '}
@@ -234,7 +232,6 @@ function PetCreateForm({
 }: {
   status: Services['pet']['addPet']['types']['body']['status'];
 }) {
-  const { setPetIdToEditToEdit } = usePetToEdit();
   const { setPetStatusToCreate } = usePetStatusToCreate();
 
   const qraft = useCreateAPIClient();
@@ -244,7 +241,7 @@ function PetCreateForm({
       await qraft.pet.findPetsByStatus.invalidateQueries();
       if (!createdPet)
         throw new Error('createdPet not found in addPet.onSuccess');
-      setPetIdToEditToEdit(createdPet.id);
+      setPetStatusToCreate(undefined);
     },
   });
 
@@ -366,10 +363,11 @@ const [UsePetToEditProvider, usePetToEdit] = constate(() => {
   return { petIdToEdit, setPetIdToEditToEdit };
 });
 
+type PetStatusToCreate = NonNullable<components['schemas']['Pet']['status']>;
+
 const [UsePetStatusToCreateProvider, usePetStatusToCreate] = constate(() => {
-  const [petStatusToCreate, setPetStatusToCreate] = useState<
-    'available' | 'pending' | 'sold'
-  >();
+  const [petStatusToCreate, setPetStatusToCreate] =
+    useState<PetStatusToCreate>();
 
   return { petStatusToCreate, setPetStatusToCreate };
 });
