@@ -24,7 +24,7 @@
     "typescript-5.5.4": "npm:typescript@5.5.4"
   },
   "devDependencies": {
-    "@types/node": "^22.5.4",
-    "tsx": "^4.19.0"
+    "@types/node": "^22.5.5",
+    "tsx": "^4.19.1"
   }
 }
