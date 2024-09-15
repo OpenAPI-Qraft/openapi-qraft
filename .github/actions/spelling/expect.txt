@@ -94,3 +94,4 @@ nochange
 codemod
 jscodeshift
 webhooks
+tsdoc

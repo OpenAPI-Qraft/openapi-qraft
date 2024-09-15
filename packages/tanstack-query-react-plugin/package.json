@@ -12,8 +12,7 @@
     "clean": "rimraf dist/"
   },
   "publishConfig": {
-    "access": "public",
-    "registry": "https://registry.npmjs.org/"
+    "access": "public"
   },
   "exports": {
     "./package.json": "./package.json",

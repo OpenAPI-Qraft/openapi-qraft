@@ -45,9 +45,11 @@ const qraft = createAPIClient();
 
 function DocumentsUploadStatus() {
   const creatingDocument = qraft.entities.postEntitiesIdDocuments.useIsMutating({
-    path: {
-      entity_id: '1',
-    },
+    parameters: {
+      path: {
+        entity_id: '1',
+      },
+    }
   });
 
   const creatingDocumentTotal = qraft.entities.postEntitiesIdDocuments.useIsMutating();

@@ -10,8 +10,8 @@ export interface ServiceOperationGetInfiniteQueryData<
   TParams,
 > {
   getInfiniteQueryData(
-    parameters: AreAllOptional<TParams> extends true
-      ? TParams | ServiceOperationInfiniteQueryKey<TSchema, TParams> | void
-      : TParams | ServiceOperationInfiniteQueryKey<TSchema, TParams>
+    parameters:
+      | ServiceOperationInfiniteQueryKey<TSchema, TParams>
+      | (AreAllOptional<TParams> extends true ? TParams | void : TParams)
   ): OperationInfiniteData<TQueryFnData, TParams> | undefined;
 }

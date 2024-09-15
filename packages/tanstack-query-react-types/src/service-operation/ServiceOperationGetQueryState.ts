@@ -13,9 +13,9 @@ export interface ServiceOperationGetQueryState<
   TError,
 > {
   getQueryState(
-    parameters: AreAllOptional<TParams> extends true
-      ? TParams | ServiceOperationQueryKey<TSchema, TParams> | void
-      : TParams | ServiceOperationQueryKey<TSchema, TParams>
+    parameters:
+      | ServiceOperationQueryKey<TSchema, TParams>
+      | (AreAllOptional<TParams> extends true ? TParams | void : TParams)
   ): QueryState<TQueryFnData, TError> | undefined;
 
   getInfiniteQueryState(

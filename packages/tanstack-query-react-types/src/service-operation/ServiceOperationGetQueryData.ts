@@ -9,8 +9,8 @@ export interface ServiceOperationGetQueryData<
   TParams,
 > {
   getQueryData(
-    parameters: AreAllOptional<TParams> extends true
-      ? TParams | ServiceOperationQueryKey<TSchema, TParams> | void
-      : TParams | ServiceOperationQueryKey<TSchema, TParams>
+    parameters:
+      | ServiceOperationQueryKey<TSchema, TParams>
+      | (AreAllOptional<TParams> extends true ? TParams | void : TParams)
   ): TQueryFnData | undefined;
 }

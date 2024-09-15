@@ -16,13 +16,11 @@ export {
   urlSerializer,
   bodySerializer,
   mergeHeaders,
+  type RequestFn,
   type RequestFnResponse,
-} from './lib/requestFn.js';
-
-export type {
-  RequestFnPayload,
-  RequestFnOptions,
-  HeadersOptions,
-  OperationSchema,
-  RequestFn,
+  type HeadersOptions,
+  type RequestFnOptions,
+  type RequestFnInfo,
+  type OperationSchema,
+  type RequestFnPayload,
 } from './lib/requestFn.js';

@@ -3,6 +3,11 @@ import {
   CreateAPIBasicClientOptions,
   qraftAPIClient,
   requestFn,
+  RequestFnResponse,
+  RequestFn,
+  RequestFnOptions,
+  RequestFnPayload,
+  RequestFnInfo
 } from '@openapi-qraft/react';
 import { operationInvokeFn } from '@openapi-qraft/react/callbacks/operationInvokeFn';
 import {
@@ -39,3 +44,11 @@ export function createNodeAPIClient(
     options
   );
 }
+
+interface RequestTypeTest<TData, TError> {
+  requestFn: RequestFn<TData, TError>;
+  requestFnOptions: RequestFnOptions;
+  requestFnPayload: RequestFnPayload;
+  requestFnResponse: RequestFnResponse<TData, TError>;
+  requestFnInfo: RequestFnInfo;
+};

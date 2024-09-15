@@ -21,9 +21,6 @@ export type Service = {
   operations: ServiceOperation[];
 };
 
-/**
- * @deprecated move to separate file
- */
 export type ServiceOperation = {
   method:
     | 'get'
@@ -42,7 +39,16 @@ export type ServiceOperation = {
   mediaType: string | undefined;
   errors: Record<string, string | undefined>;
   success: Record<string, string | undefined>;
-  parameters: Record<string, any> | undefined;
+  parameters:
+    | {
+        name: string;
+        in: 'header' | 'query' | 'cookie';
+        description: string;
+        required: boolean;
+        schema: any;
+        example: string | undefined;
+      }[]
+    | undefined;
   security: Array<Record<string, string[] | undefined>> | undefined;
 };
 

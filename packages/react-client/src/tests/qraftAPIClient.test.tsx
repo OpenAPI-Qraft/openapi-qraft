@@ -1301,6 +1301,79 @@ describe('Qraft uses Mutations', () => {
       });
     });
   });
+
+  it('supports useMutation without predefined parameters and options', async () => {
+    const { qraft, queryClient } = createClient();
+
+    const { result } = renderHook(
+      () =>
+        qraft.files.postFiles.useMutation(undefined, {
+          onMutate: (variables) => {
+            // check types inference when parameters are not specified
+            variables?.body?.file satisfies Blob | undefined;
+            variables?.body?.file_description satisfies string | undefined;
+          },
+        }),
+      {
+        wrapper: (props) => <Providers {...props} queryClient={queryClient} />,
+      }
+    );
+
+    act(() => {
+      result.current.mutate({
+        body: {
+          file: new File([''], 'file.png'),
+          file_description: 'my file',
+        },
+      });
+    });
+
+    await waitFor(() => {
+      expect(result.current.data).toEqual({
+        body: {
+          file: 'file.png',
+          file_description: 'my file',
+        },
+      });
+    });
+  });
+
+  it('supports useMutation with empty predefined parameters and options', async () => {
+    const { qraft, queryClient } = createClient();
+
+    const { result } = renderHook(
+      () =>
+        qraft.files.postFiles.useMutation(
+          {},
+          {
+            onMutate: (variables) => {
+              // check types inference when parameters are specified
+              variables?.file satisfies Blob | undefined;
+              variables?.file_description satisfies string | undefined;
+            },
+          }
+        ),
+      {
+        wrapper: (props) => <Providers {...props} queryClient={queryClient} />,
+      }
+    );
+
+    act(() => {
+      result.current.mutate({
+        file: new File([''], 'file.png'),
+        file_description: 'my file',
+      });
+    });
+
+    await waitFor(() => {
+      expect(result.current.data).toEqual({
+        body: {
+          file: 'file.png',
+          file_description: 'my file',
+        },
+      });
+    });
+  });
 });
 
 describe('Qraft uses useIsMutating', () => {
