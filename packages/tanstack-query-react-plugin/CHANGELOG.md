@@ -1,5 +1,13 @@
 # @openapi-qraft/tanstack-query-react-plugin
 
+## 2.0.0-next.9
+
+### Patch Changes
+
+- 4ef9ce0: Clarified `FetchInfiniteQueryOptions` type to align with the latest TanStack Query version (5.56.2).
+- 78638a5: Extended TSDoc generation for existing `useQuery`, `useMutation`, `useInfiniteQuery`, `useIsFetching` and `useIsMutating` hooks, now including detailed usage examples.
+  - @openapi-qraft/plugin@2.0.0-next.9
+
 ## 2.0.0-next.8
 
 ### Major Changes

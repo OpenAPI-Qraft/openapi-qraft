@@ -1,5 +1,15 @@
 # @openapi-qraft/react
 
+## 2.0.0-next.9
+
+### Patch Changes
+
+- 4ef9ce0: Clarified `FetchInfiniteQueryOptions` type to align with the latest TanStack Query version (5.56.2).
+- 9dc1918: Simplified `TParams` type for conditional expressions.
+- 78638a5: Extended TSDoc generation for existing `useQuery`, `useMutation`, `useInfiniteQuery`, `useIsFetching` and `useIsMutating` hooks, now including detailed usage examples.
+- 1168760: Marked `RequestFnPayload` as deprecated in favor of `RequestFnInfo` for a more descriptive and consistent API.
+  - @openapi-qraft/tanstack-query-react-types@2.0.0-next.9
+
 ## 2.0.0-next.8
 
 ### Major Changes
