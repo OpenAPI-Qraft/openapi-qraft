@@ -1,10 +1,8 @@
 import type {
   HeadersOptions,
   OperationSchema,
-  RequestFn,
   RequestFnInfo,
   RequestFnOptions,
-  RequestFnPayload,
   RequestFnResponse,
 } from '@openapi-qraft/tanstack-query-react-types';
 
@@ -98,7 +96,7 @@ export async function baseRequestFn<TData, TError>(
  */
 export function urlSerializer(
   schema: OperationSchema,
-  info: RequestFnPayload
+  info: Pick<RequestFnInfo, 'baseUrl' | 'parameters'>
 ): string {
   const path = schema.url.replace(
     /{(.*?)}/g,
@@ -181,10 +179,7 @@ export function mergeHeaders(...allHeaders: (HeadersOptions | undefined)[]) {
   return headers;
 }
 
-export function bodySerializer(
-  schema: OperationSchema,
-  info: RequestFnPayload
-) {
+export function bodySerializer(schema: OperationSchema, info: RequestFnInfo) {
   if (info.body === undefined) return;
 
   if (
@@ -211,7 +206,7 @@ export function bodySerializer(
 
 function getRequestBodyFormData({
   body,
-}: Pick<RequestFnPayload, 'body'>): FormData | undefined {
+}: Pick<RequestFnInfo, 'body'>): FormData | undefined {
   if (body instanceof FormData) return body;
   if (body === null) return;
 
@@ -250,7 +245,7 @@ function getRequestBodyFormData({
   return formData;
 }
 
-function getBodyContentType(body: RequestFnPayload['body']) {
+function getBodyContentType(body: RequestFnInfo['body']) {
   if (!body) return;
   if (body instanceof Blob) return body.type || 'application/octet-stream';
   if (typeof body === 'string') return 'text/plain';
@@ -333,8 +328,12 @@ export type {
   RequestFn,
   RequestFnResponse,
   HeadersOptions,
-  RequestFnPayload,
   RequestFnOptions,
   RequestFnInfo,
   OperationSchema,
-};
+} from '@openapi-qraft/tanstack-query-react-types';
+
+/**
+ * @deprecated use `RequestFnInfo` instead
+ */
+export type RequestFnPayload = RequestFnInfo;
