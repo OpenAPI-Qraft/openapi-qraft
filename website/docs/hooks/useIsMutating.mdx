@@ -47,9 +47,11 @@ const api = createAPIClient({
 
 function DocumentsUploadStatus() {
   const creatingDocument = api.entities.postEntitiesIdDocuments.useIsMutating({
-    path: {
-      entity_id: '1',
-    },
+    parameters: {
+      path: {
+        entity_id: '1',
+      },
+    }
   });
 
   const creatingDocumentTotal = api.entities.postEntitiesIdDocuments.useIsMutating();
