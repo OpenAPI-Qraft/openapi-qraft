@@ -11,22 +11,18 @@ export const createOperationMethodExampleNodes = (
 ) => {
   const factory = ts.factory;
 
-  return [
-    factory.createExpressionStatement(
-      factory.createCallExpression(
+  return factory.createCallExpression(
+    factory.createPropertyAccessExpression(
+      factory.createPropertyAccessExpression(
         factory.createPropertyAccessExpression(
-          factory.createPropertyAccessExpression(
-            factory.createPropertyAccessExpression(
-              factory.createIdentifier('qraft'),
-              factory.createIdentifier(serviceVariableName)
-            ),
-            factory.createIdentifier(operation.name)
-          ),
-          factory.createIdentifier(operationMethodName)
+          factory.createIdentifier('qraft'),
+          factory.createIdentifier(serviceVariableName)
         ),
-        undefined,
-        nodes
-      )
+        factory.createIdentifier(operation.name)
+      ),
+      factory.createIdentifier(operationMethodName)
     ),
-  ];
+    undefined,
+    nodes
+  );
 };
