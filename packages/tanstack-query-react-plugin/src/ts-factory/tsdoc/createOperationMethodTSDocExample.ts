@@ -4,6 +4,7 @@ import { createUseIsFetchingOperationTSDocExample } from './createUseIsFetchingO
 import { createUseIsMutatingOperationTSDocExample } from './createUseIsMutatingOperationTSDocExample.js';
 import { createUseMutationOperationTSDocExample } from './createUseMutationOperationTSDocExample.js';
 import { createUseMutationStateOperationTSDocExample } from './createUseMutationStateOperationTSDocExample.js';
+import { createUseQueriesOperationTSDocExample } from './createUseQueriesOperationTSDocExample.js';
 import { createUseQueryOperationTSDocExample } from './createUseQueryOperationTSDocExample.js';
 
 export const createOperationMethodTSDocExample = (
@@ -44,6 +45,11 @@ export const createOperationMethodTSDocExample = (
       );
     case 'useMutationState':
       return createUseMutationStateOperationTSDocExample(
+        operation,
+        serviceVariableName
+      );
+    case 'useQueries':
+      return createUseQueriesOperationTSDocExample(
         operation,
         serviceVariableName
       );
