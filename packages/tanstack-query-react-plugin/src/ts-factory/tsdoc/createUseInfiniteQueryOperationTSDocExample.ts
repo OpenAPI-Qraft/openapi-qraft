@@ -19,36 +19,12 @@ export const createUseInfiniteQueryOperationTSDocExample = (
     '',
   ];
 
-  if (!operation.parameters?.length) {
-    return [
-      ...commonTSDoc,
-      '@example Infinite Query without parameters',
-      '```ts',
-      ...(
-        'const { data, isLoading } = ' +
-        astToString(
-          createOperationMethodCallExpressionExampleNode(
-            operation,
-            {
-              serviceVariableName,
-              operationMethodName: 'useInfiniteQuery',
-            },
-            undefined
-          )
-        )
-      )
-        .trim()
-        .split('\n'),
-      '```',
-    ];
-  }
-
   return [
     ...commonTSDoc,
-    '@example Infinite Query with parameters',
+    '@example Infinite Query',
     '```ts',
     ...(
-      'const { data, isLoading } = ' +
+      'const { data, isLoading, fetchNextPage } = ' +
       astToString(
         createOperationMethodCallExpressionExampleNode(
           operation,
@@ -58,89 +34,102 @@ export const createUseInfiniteQueryOperationTSDocExample = (
           },
           [
             factory.createObjectLiteralExpression(
-              createOperationMethodParametersExampleNodes(operation),
+              createOperationMethodParametersExampleNodes({
+                ...operation,
+                parameters: operation.parameters?.filter((parameter) =>
+                  parameter.in === 'query' ? parameter.required : true
+                ),
+              }),
               true
             ),
-            createInfiniteQueryOptionsArgumentExampleNodes(operation),
+            factory.createObjectLiteralExpression(
+              createInfiniteQueryOptionsArgumentExamplePropertyAssigmentNodes(
+                operation
+              ),
+              true
+            ),
           ]
         )
       )
     )
       .trim()
       .split('\n'),
+    '',
+    'console.log(data);',
+    'fetchNextPage(); // Fetch the next page',
     '```',
   ];
 };
 
-function createInfiniteQueryOptionsArgumentExampleNodes(
+export function createInfiniteQueryOptionsArgumentExamplePropertyAssigmentNodes(
   operation: ServiceOperation
-): ts.ObjectLiteralExpression {
+): ts.PropertyAssignment[] {
   const factory = ts.factory;
 
-  return factory.createObjectLiteralExpression(
-    [
-      factory.createPropertyAssignment(
-        factory.createIdentifier('getNextPageParam'),
-        factory.createArrowFunction(
-          undefined,
-          undefined,
-          [
-            factory.createParameterDeclaration(
-              undefined,
-              undefined,
-              factory.createIdentifier('lastPage'),
-              undefined,
-              undefined,
-              undefined
+  return [
+    factory.createPropertyAssignment(
+      factory.createIdentifier('initialPageParam'),
+      factory.createObjectLiteralExpression(
+        createOperationMethodParametersExampleNodes(
+          {
+            ...operation,
+            parameters: operation.parameters?.filter(
+              (parameter) => parameter.in === 'query'
             ),
-            factory.createParameterDeclaration(
-              undefined,
-              undefined,
-              factory.createIdentifier('allPages'),
-              undefined,
-              undefined,
-              undefined
-            ),
-            factory.createParameterDeclaration(
-              undefined,
-              undefined,
-              factory.createIdentifier('lastPageParam'),
-              undefined,
-              undefined,
-              undefined
-            ),
-            factory.createParameterDeclaration(
-              undefined,
-              undefined,
-              factory.createIdentifier('allPageParams'),
-              undefined,
-              undefined,
-              undefined
-            ),
-          ],
-          undefined,
-          factory.createToken(ts.SyntaxKind.EqualsGreaterThanToken),
-          factory.createCallExpression(
-            factory.createIdentifier('getNextPageParams'),
+          },
+          (operationParameter) =>
+            camelcase(`initial-${operationParameter.name}`)
+        ),
+        true
+      )
+    ),
+    factory.createPropertyAssignment(
+      factory.createIdentifier('getNextPageParam'),
+      factory.createArrowFunction(
+        undefined,
+        undefined,
+        [
+          factory.createParameterDeclaration(
             undefined,
-            [factory.createIdentifier('lastPage')]
-          )
-        )
-      ),
-      factory.createPropertyAssignment(
-        factory.createIdentifier('initialPageParam'),
-        factory.createObjectLiteralExpression(
-          createOperationMethodParametersExampleNodes(
-            operation,
-            (operationParameter) =>
-              operationParameter.in === 'query'
-                ? camelcase(`initial-${operationParameter.name}`)
-                : camelcase(operationParameter.name)
+            undefined,
+            factory.createIdentifier('lastPage'),
+            undefined,
+            undefined,
+            undefined
           ),
-          true
+          factory.createParameterDeclaration(
+            undefined,
+            undefined,
+            factory.createIdentifier('allPages'),
+            undefined,
+            undefined,
+            undefined
+          ),
+          factory.createParameterDeclaration(
+            undefined,
+            undefined,
+            factory.createIdentifier('lastPageParam'),
+            undefined,
+            undefined,
+            undefined
+          ),
+          factory.createParameterDeclaration(
+            undefined,
+            undefined,
+            factory.createIdentifier('allPageParams'),
+            undefined,
+            undefined,
+            undefined
+          ),
+        ],
+        undefined,
+        factory.createToken(ts.SyntaxKind.EqualsGreaterThanToken),
+        factory.createCallExpression(
+          factory.createIdentifier('getNextPageParams'),
+          undefined,
+          [factory.createIdentifier('lastPage')]
         )
-      ),
-    ],
-    true
-  );
+      )
+    ),
+  ];
 }
