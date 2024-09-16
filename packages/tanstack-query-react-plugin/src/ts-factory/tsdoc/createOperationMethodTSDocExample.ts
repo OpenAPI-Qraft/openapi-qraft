@@ -3,6 +3,7 @@ import { createUseInfiniteQueryOperationTSDocExample } from './createUseInfinite
 import { createUseIsFetchingOperationTSDocExample } from './createUseIsFetchingOperationTSDocExample.js';
 import { createUseIsMutatingOperationTSDocExample } from './createUseIsMutatingOperationTSDocExample.js';
 import { createUseMutationOperationTSDocExample } from './createUseMutationOperationTSDocExample.js';
+import { createUseMutationStateOperationTSDocExample } from './createUseMutationStateOperationTSDocExample.js';
 import { createUseQueryOperationTSDocExample } from './createUseQueryOperationTSDocExample.js';
 
 export const createOperationMethodTSDocExample = (
@@ -38,6 +39,11 @@ export const createOperationMethodTSDocExample = (
       );
     case 'useIsMutating':
       return createUseIsMutatingOperationTSDocExample(
+        operation,
+        serviceVariableName
+      );
+    case 'useMutationState':
+      return createUseMutationStateOperationTSDocExample(
         operation,
         serviceVariableName
       );
