@@ -1,7 +1,7 @@
 import { ServiceOperation } from '@openapi-qraft/plugin/lib/open-api/getServices';
 import ts from 'typescript';
 
-export const createOperationMethodExampleNodes = (
+export const createOperationMethodCallExpressionExampleNode = (
   operation: ServiceOperation,
   {
     serviceVariableName,

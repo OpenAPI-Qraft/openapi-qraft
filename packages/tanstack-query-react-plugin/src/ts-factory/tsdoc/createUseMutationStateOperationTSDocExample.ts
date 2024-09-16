@@ -3,7 +3,7 @@ import camelcase from 'camelcase';
 import ts from 'typescript';
 import { createOperationCommonTSDoc } from '../../lib/createOperationCommonTSDoc.js';
 import { astToString } from '../astToString.js';
-import { createOperationMethodExampleNodes } from './lib/createOperationMethodExampleNodes.js';
+import { createOperationMethodCallExpressionExampleNode } from './lib/createOperationMethodCallExpressionExampleNode.js';
 import { createOperationMethodParametersExampleNodes } from './lib/createOperationMethodParametersExampleNodes.js';
 
 export const createUseMutationStateOperationTSDocExample = (
@@ -23,7 +23,7 @@ export const createUseMutationStateOperationTSDocExample = (
     ...(
       `const ${camelcase(operation.name + '-pending-mutation-variables')} = ` +
       astToString(
-        createOperationMethodExampleNodes(
+        createOperationMethodCallExpressionExampleNode(
           operation,
           {
             serviceVariableName,
@@ -86,7 +86,7 @@ export const createUseMutationStateOperationTSDocExample = (
     ...(
       `const ${camelcase(operation.name + '-mutation-data')} = ` +
       astToString(
-        createOperationMethodExampleNodes(
+        createOperationMethodCallExpressionExampleNode(
           operation,
           {
             serviceVariableName,
