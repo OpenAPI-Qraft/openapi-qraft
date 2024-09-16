@@ -81,14 +81,4 @@ const useEntityQueries = () => {
     combine: (results) => results.map((result) => result.data),
   });
 }
-
-// const EntityComponentWithUseEntityQueries = () => { ... }
-
-export default function() {
-  return (
-    <QueryClientProvider client={queryClient}>
-      {/*<EntityComponentWithUseEntityQueries />*/}
-    </QueryClientProvider>
-  );
-}
 ```
