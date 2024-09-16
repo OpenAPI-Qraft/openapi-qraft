@@ -46,7 +46,9 @@ export const createOperationMethodParametersExampleNodes = (
           factory.createObjectLiteralExpression(
             operationParameters.map((parameter) =>
               factory.createPropertyAssignment(
-                factory.createStringLiteral(parameter.name),
+                isIdentifierCompatibleVariableName(parameter.name)
+                  ? factory.createIdentifier(parameter.name)
+                  : factory.createStringLiteral(parameter.name),
                 parameter.example // todo:: add example type inferring
                   ? factory.createStringLiteral(parameter.example)
                   : factory.createIdentifier(
@@ -64,3 +66,18 @@ export const createOperationMethodParametersExampleNodes = (
     []
   );
 };
+
+/**
+ * Checks if the given name is a valid identifier name.
+ *
+ * @example
+ * ```ts
+ * isIdentifierCompatibleVariableName('foo'); // true
+ * isIdentifierCompatibleVariableName('foo-bar'); // false
+ * isIdentifierCompatibleVariableName('foo_bar'); // true
+ * isIdentifierCompatibleVariableName('foo.bar'); // false
+ * ```
+ */
+function isIdentifierCompatibleVariableName(name: string) {
+  return !/[^a-zA-Z0-9_$]/.test(name);
+}
