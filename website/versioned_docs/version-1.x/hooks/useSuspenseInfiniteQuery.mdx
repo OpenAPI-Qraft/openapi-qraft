@@ -40,6 +40,18 @@ const query = qraft.<service>.<operation>.useSuspenseInfiniteQuery(
      - [_useQueryClient() 🌴_](https://tanstack.com/query/latest/docs/framework/react/reference/useQueryClient)
        result will be used as a fallback
 
+### Returns
+
+Same object as `UseInfiniteQueryResult` object, except that:
+
+- `data` is guaranteed to be defined
+- `isPlaceholderData` is missing
+- `status` is always success
+  - the derived flags are set accordingly.
+
+See the TanStack [_useSuspenseInfiniteQuery(...) 🌴_](https://tanstack.com/query/latest/docs/framework/react/reference/useSuspenseInfiniteQuery#:~:text=placeholderData-,Returns,-Same%20object%20as)
+documentation for more details.
+
 ### Examples
 
 ```tsx title="src/PostList.tsx"
