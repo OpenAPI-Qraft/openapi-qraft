@@ -13,8 +13,7 @@ export const getOperationName = (
   if (operationId) return getOperationIdName(operationId);
 
   const urlWithoutPlaceholders = url
-    .replace(/[^/]*?{api-version}.*?\//g, '')
-    .replace(/{(.*?)}/g, '')
+    .replace(/{(.*?)}/g, '$1')
     .replace(/\//g, '-');
 
   return camelCase(`${method}-${urlWithoutPlaceholders}`);
