@@ -37,12 +37,12 @@ export interface ApprovalPoliciesService {
          *         "x-monite-entity-id": xMoniteEntityId
          *     },
          *     path: {
-         *         "approval_policy_id": approvalPolicyId
+         *         approval_policy_id: approvalPolicyId
          *     },
          *     query: {
-         *         "items_order": itemsOrder
+         *         items_order: itemsOrder
          *     }
-         * });
+         * })
          * ```
          */
         useQuery<TData = GetApprovalPoliciesIdData>(parameters: ServiceOperationQueryKey<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdParameters> | (GetApprovalPoliciesIdParameters), options?: Omit<UndefinedInitialDataOptions<GetApprovalPoliciesIdData, GetApprovalPoliciesIdError, TData, ServiceOperationQueryKey<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdParameters>>, "queryKey">): UseQueryResult<TData, GetApprovalPoliciesIdError | Error>;
@@ -60,12 +60,12 @@ export interface ApprovalPoliciesService {
          *         "x-monite-entity-id": xMoniteEntityId
          *     },
          *     path: {
-         *         "approval_policy_id": approvalPolicyId
+         *         approval_policy_id: approvalPolicyId
          *     },
          *     query: {
-         *         "items_order": itemsOrder
+         *         items_order: itemsOrder
          *     }
-         * });
+         * })
          * ```
          */
         useQuery<TData = GetApprovalPoliciesIdData>(parameters: ServiceOperationQueryKey<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdParameters> | (GetApprovalPoliciesIdParameters), options: Omit<DefinedInitialDataOptions<GetApprovalPoliciesIdData, GetApprovalPoliciesIdError, TData, ServiceOperationQueryKey<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdParameters>>, "queryKey">): DefinedUseQueryResult<TData, GetApprovalPoliciesIdError | Error>;
@@ -180,34 +180,27 @@ export interface ApprovalPoliciesService {
          *
          * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/hooks/useInfiniteQuery|`useInfiniteQuery(...)` documentation}
          *
-         * @example Infinite Query with parameters
+         * @example Infinite Query
          * ```ts
-         * const { data, isLoading } = qraft.approvalPoliciesService.getApprovalPoliciesId.useInfiniteQuery({
+         * const { data, isLoading, fetchNextPage } = qraft.approvalPoliciesService.getApprovalPoliciesId.useInfiniteQuery({
          *     header: {
          *         "x-monite-version": "2023-06-04",
          *         "x-monite-entity-id": xMoniteEntityId
          *     },
          *     path: {
-         *         "approval_policy_id": approvalPolicyId
-         *     },
-         *     query: {
-         *         "items_order": itemsOrder
+         *         approval_policy_id: approvalPolicyId
          *     }
          * }, {
-         *     getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) => getNextPageParams(lastPage),
          *     initialPageParam: {
-         *         header: {
-         *             "x-monite-version": "2023-06-04",
-         *             "x-monite-entity-id": xMoniteEntityId
-         *         },
-         *         path: {
-         *             "approval_policy_id": approvalPolicyId
-         *         },
          *         query: {
-         *             "items_order": initialItemsOrder
+         *             items_order: initialItemsOrder
          *         }
-         *     }
-         * });
+         *     },
+         *     getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) => getNextPageParams(lastPage)
+         * })
+         *
+         * console.log(data);
+         * fetchNextPage(); // Fetch the next page
          * ```
          */
         useInfiniteQuery<TPageParam extends GetApprovalPoliciesIdParameters, TData = GetApprovalPoliciesIdData>(parameters: ServiceOperationInfiniteQueryKey<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdParameters> | (GetApprovalPoliciesIdParameters), options: Omit<UndefinedInitialDataInfiniteOptions<GetApprovalPoliciesIdData, GetApprovalPoliciesIdError, OperationInfiniteData<TData, GetApprovalPoliciesIdParameters>, ServiceOperationInfiniteQueryKey<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdParameters>, PartialParameters<TPageParam>>, "queryKey" | "getPreviousPageParam" | "getNextPageParam" | "initialPageParam"> & InfiniteQueryPageParamsOptions<GetApprovalPoliciesIdData, PartialParameters<TPageParam>>): UseInfiniteQueryResult<OperationInfiniteData<TData, GetApprovalPoliciesIdParameters>, GetApprovalPoliciesIdError | Error>;
@@ -217,34 +210,27 @@ export interface ApprovalPoliciesService {
          *
          * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/hooks/useInfiniteQuery|`useInfiniteQuery(...)` documentation}
          *
-         * @example Infinite Query with parameters
+         * @example Infinite Query
          * ```ts
-         * const { data, isLoading } = qraft.approvalPoliciesService.getApprovalPoliciesId.useInfiniteQuery({
+         * const { data, isLoading, fetchNextPage } = qraft.approvalPoliciesService.getApprovalPoliciesId.useInfiniteQuery({
          *     header: {
          *         "x-monite-version": "2023-06-04",
          *         "x-monite-entity-id": xMoniteEntityId
          *     },
          *     path: {
-         *         "approval_policy_id": approvalPolicyId
-         *     },
-         *     query: {
-         *         "items_order": itemsOrder
+         *         approval_policy_id: approvalPolicyId
          *     }
          * }, {
-         *     getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) => getNextPageParams(lastPage),
          *     initialPageParam: {
-         *         header: {
-         *             "x-monite-version": "2023-06-04",
-         *             "x-monite-entity-id": xMoniteEntityId
-         *         },
-         *         path: {
-         *             "approval_policy_id": approvalPolicyId
-         *         },
          *         query: {
-         *             "items_order": initialItemsOrder
+         *             items_order: initialItemsOrder
          *         }
-         *     }
-         * });
+         *     },
+         *     getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) => getNextPageParams(lastPage)
+         * })
+         *
+         * console.log(data);
+         * fetchNextPage(); // Fetch the next page
          * ```
          */
         useInfiniteQuery<TPageParam extends GetApprovalPoliciesIdParameters, TData = GetApprovalPoliciesIdData>(parameters: ServiceOperationInfiniteQueryKey<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdParameters> | (GetApprovalPoliciesIdParameters), options: Omit<DefinedInitialDataInfiniteOptions<GetApprovalPoliciesIdData, GetApprovalPoliciesIdError, OperationInfiniteData<TData, GetApprovalPoliciesIdParameters>, ServiceOperationInfiniteQueryKey<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdParameters>, PartialParameters<TPageParam>>, "queryKey" | "getPreviousPageParam" | "getNextPageParam" | "initialPageParam"> & InfiniteQueryPageParamsOptions<GetApprovalPoliciesIdData, PartialParameters<TPageParam>>): DefinedUseInfiniteQueryResult<OperationInfiniteData<TData, GetApprovalPoliciesIdParameters>, GetApprovalPoliciesIdError | Error>;
@@ -256,7 +242,7 @@ export interface ApprovalPoliciesService {
          * @example Checks the total number of queries fetching from the specified service method,
          * both normal and infinite. If no parameters are provided, no filtering is applied.
          * ```ts
-         * const getApprovalPoliciesIdTotal = qraft.approvalPoliciesService.getApprovalPoliciesId.useIsFetching();
+         * const getApprovalPoliciesIdTotal = qraft.approvalPoliciesService.getApprovalPoliciesId.useIsFetching()
          * ```
          * @example Checks the number of normal queries fetching with the specified parameters.
          * ```ts
@@ -268,19 +254,87 @@ export interface ApprovalPoliciesService {
          *             "x-monite-entity-id": xMoniteEntityId
          *         },
          *         path: {
-         *             "approval_policy_id": approvalPolicyId
+         *             approval_policy_id: approvalPolicyId
          *         },
          *         query: {
-         *             "items_order": itemsOrder
+         *             items_order: itemsOrder
          *         }
          *     }
-         * });
+         * })
          * ```
          */
         useIsFetching<TInfinite extends boolean = false>(filters?: QueryFiltersByParameters<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdData, TInfinite, GetApprovalPoliciesIdParameters, GetApprovalPoliciesIdError> | QueryFiltersByQueryKey<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdData, TInfinite, GetApprovalPoliciesIdParameters, GetApprovalPoliciesIdError>): number;
         /**
+         * Allows you to execute multiple asynchronous data fetching operations concurrently. This is especially useful for managing complex data dependencies in parallel.
+         *
          * @summary Get an approval policy by ID
          * @description Retrieve a specific approval policy.
+         * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/hooks/useQueries|`useQueries(...)` documentation}
+         * @example Multiple queries. Returns `data`, `error`, `isSuccess` and other properties.
+         * ```ts
+         * const getApprovalPoliciesIdResults = qraft.approvalPoliciesService.getApprovalPoliciesId.useQueries({
+         *     queries: [
+         *         {
+         *             header: {
+         *                 "x-monite-version": "2023-06-04",
+         *                 "x-monite-entity-id": xMoniteEntityId1
+         *             },
+         *             path: {
+         *                 approval_policy_id: approvalPolicyId1
+         *             },
+         *             query: {
+         *                 items_order: itemsOrder1
+         *             }
+         *         },
+         *         {
+         *             header: {
+         *                 "x-monite-version": "2023-06-04",
+         *                 "x-monite-entity-id": xMoniteEntityId2
+         *             },
+         *             path: {
+         *                 approval_policy_id: approvalPolicyId2
+         *             },
+         *             query: {
+         *                 items_order: itemsOrder2
+         *             }
+         *         }
+         *     ]
+         * });
+         * getApprovalPoliciesIdResults.forEach(({ isSuccess, data, error }) => console.log({ isSuccess, data, error }));
+         * ```
+         * @example Combined results. Only the data will be returned.
+         * ```ts
+         * const getApprovalPoliciesIdCombinedResults = qraft.approvalPoliciesService.getApprovalPoliciesId.useQueries({
+         *     combine: results => results.map(result => result.data),
+         *     queries: [
+         *         {
+         *             header: {
+         *                 "x-monite-version": "2023-06-04",
+         *                 "x-monite-entity-id": xMoniteEntityId1
+         *             },
+         *             path: {
+         *                 approval_policy_id: approvalPolicyId1
+         *             },
+         *             query: {
+         *                 items_order: itemsOrder1
+         *             }
+         *         },
+         *         {
+         *             header: {
+         *                 "x-monite-version": "2023-06-04",
+         *                 "x-monite-entity-id": xMoniteEntityId2
+         *             },
+         *             path: {
+         *                 approval_policy_id: approvalPolicyId2
+         *             },
+         *             query: {
+         *                 items_order: itemsOrder2
+         *             }
+         *         }
+         *     ]
+         * });
+         * getApprovalPoliciesIdCombinedResults.forEach(data => console.log({ data }));
+         * ```
          */
         useQueries<T extends Array<UseQueryOptionsForUseQueries<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdParameters, GetApprovalPoliciesIdData, GetApprovalPoliciesIdError>>, TCombinedResult = Array<UseQueryResult<GetApprovalPoliciesIdData, GetApprovalPoliciesIdError>>>(options: {
             queries: T;
@@ -305,12 +359,12 @@ export interface ApprovalPoliciesService {
          *         "x-monite-entity-id": xMoniteEntityId
          *     },
          *     path: {
-         *         "approval_policy_id": approvalPolicyId
+         *         approval_policy_id: approvalPolicyId
          *     },
          *     query: {
-         *         "items_order": itemsOrder
+         *         items_order: itemsOrder
          *     }
-         * });
+         * })
          * ```
          */
         useQuery<TData = GetApprovalPoliciesIdData>(parameters: ServiceOperationQueryKey<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdParameters> | (GetApprovalPoliciesIdParameters), options?: Omit<UndefinedInitialDataOptions<GetApprovalPoliciesIdData, GetApprovalPoliciesIdError, TData, ServiceOperationQueryKey<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdParameters>>, "queryKey">): UseQueryResult<TData, GetApprovalPoliciesIdError | Error>;
@@ -328,18 +382,44 @@ export interface ApprovalPoliciesService {
          *         "x-monite-entity-id": xMoniteEntityId
          *     },
          *     path: {
-         *         "approval_policy_id": approvalPolicyId
+         *         approval_policy_id: approvalPolicyId
          *     },
          *     query: {
-         *         "items_order": itemsOrder
+         *         items_order: itemsOrder
          *     }
-         * });
+         * })
          * ```
          */
         useQuery<TData = GetApprovalPoliciesIdData>(parameters: ServiceOperationQueryKey<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdParameters> | (GetApprovalPoliciesIdParameters), options: Omit<DefinedInitialDataOptions<GetApprovalPoliciesIdData, GetApprovalPoliciesIdError, TData, ServiceOperationQueryKey<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdParameters>>, "queryKey">): DefinedUseQueryResult<TData, GetApprovalPoliciesIdError | Error>;
         /**
-         * @summary Get an approval policy by ID
-         * @description Retrieve a specific approval policy.
+         * Performs asynchronous data fetching with support for infinite scrolling scenarios.
+         * Manages paginated data and provides utilities for fetching additional pages.
+         * It functions similarly to `useInfiniteQuery`, but with added support for React Suspense.
+         *
+         * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/hooks/useSuspenseInfiniteQuery|`useSuspenseInfiniteQuery(...)` documentation}
+         *
+         * @example Suspense Infinite Query
+         * ```ts
+         * const { data, isLoading, fetchNextPage } = qraft.approvalPoliciesService.getApprovalPoliciesId.useSuspenseInfiniteQuery({
+         *     header: {
+         *         "x-monite-version": "2023-06-04",
+         *         "x-monite-entity-id": xMoniteEntityId
+         *     },
+         *     path: {
+         *         approval_policy_id: approvalPolicyId
+         *     }
+         * }, {
+         *     initialPageParam: {
+         *         query: {
+         *             items_order: initialItemsOrder
+         *         }
+         *     },
+         *     getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) => getNextPageParams(lastPage)
+         * })
+         *
+         * console.log(data);
+         * fetchNextPage(); // Fetch the next page
+         * ```
          */
         useSuspenseInfiniteQuery<TPageParam extends GetApprovalPoliciesIdParameters, TData = GetApprovalPoliciesIdData>(parameters: ServiceOperationInfiniteQueryKey<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdParameters> | (GetApprovalPoliciesIdParameters), options: Omit<UseSuspenseInfiniteQueryOptions<GetApprovalPoliciesIdData, GetApprovalPoliciesIdError, OperationInfiniteData<TData, GetApprovalPoliciesIdParameters>, GetApprovalPoliciesIdData, ServiceOperationInfiniteQueryKey<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdParameters>, PartialParameters<TPageParam>>, "queryKey" | "getPreviousPageParam" | "getNextPageParam" | "initialPageParam"> & InfiniteQueryPageParamsOptions<GetApprovalPoliciesIdData, PartialParameters<TPageParam>>): UseSuspenseInfiniteQueryResult<OperationInfiniteData<TData, GetApprovalPoliciesIdParameters>, GetApprovalPoliciesIdError | Error>;
         /**
@@ -385,17 +465,17 @@ export interface ApprovalPoliciesService {
          *         "x-monite-entity-id": xMoniteEntityId
          *     },
          *     path: {
-         *         "approval_policy_id": approvalPolicyId
+         *         approval_policy_id: approvalPolicyId
          *     },
          *     query: {
-         *         "limit": limit
+         *         limit: limit
          *     }
-         * });
+         * })
          * mutate(body);
          * ```
          * @example Mutation without predefined parameters, e.g., for creating
          * ```ts
-         * const { mutate, isPending } = qraft.approvalPoliciesService.deleteApprovalPoliciesId.useMutation();
+         * const { mutate, isPending } = qraft.approvalPoliciesService.deleteApprovalPoliciesId.useMutation()
          * mutate({
          *     body: bodyPayload,
          *     header: {
@@ -403,10 +483,10 @@ export interface ApprovalPoliciesService {
          *         "x-monite-entity-id": xMoniteEntityId
          *     },
          *     path: {
-         *         "approval_policy_id": approvalPolicyId
+         *         approval_policy_id: approvalPolicyId
          *     },
          *     query: {
-         *         "limit": limit
+         *         limit: limit
          *     }
          * });
          * ```
@@ -425,17 +505,17 @@ export interface ApprovalPoliciesService {
          *         "x-monite-entity-id": xMoniteEntityId
          *     },
          *     path: {
-         *         "approval_policy_id": approvalPolicyId
+         *         approval_policy_id: approvalPolicyId
          *     },
          *     query: {
-         *         "limit": limit
+         *         limit: limit
          *     }
-         * });
+         * })
          * mutate(body);
          * ```
          * @example Mutation without predefined parameters, e.g., for creating
          * ```ts
-         * const { mutate, isPending } = qraft.approvalPoliciesService.deleteApprovalPoliciesId.useMutation();
+         * const { mutate, isPending } = qraft.approvalPoliciesService.deleteApprovalPoliciesId.useMutation()
          * mutate({
          *     body: bodyPayload,
          *     header: {
@@ -443,10 +523,10 @@ export interface ApprovalPoliciesService {
          *         "x-monite-entity-id": xMoniteEntityId
          *     },
          *     path: {
-         *         "approval_policy_id": approvalPolicyId
+         *         approval_policy_id: approvalPolicyId
          *     },
          *     query: {
-         *         "limit": limit
+         *         limit: limit
          *     }
          * });
          * ```
@@ -460,7 +540,7 @@ export interface ApprovalPoliciesService {
          * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/hooks/useIsMutating|`useIsMutating(...)` documentation}
          * @example Check how many mutations are currently in progress for the specified service method.
          * ```ts
-         * const deleteApprovalPoliciesIdTotal = qraft.approvalPoliciesService.deleteApprovalPoliciesId.useIsMutating();
+         * const deleteApprovalPoliciesIdTotal = qraft.approvalPoliciesService.deleteApprovalPoliciesId.useIsMutating()
          * ```
          * @example Check how many mutations are currently in progress with the specified parameters.
          * ```ts
@@ -471,13 +551,13 @@ export interface ApprovalPoliciesService {
          *             "x-monite-entity-id": xMoniteEntityId
          *         },
          *         path: {
-         *             "approval_policy_id": approvalPolicyId
+         *             approval_policy_id: approvalPolicyId
          *         },
          *         query: {
-         *             "limit": limit
+         *             limit: limit
          *         }
          *     }
-         * });
+         * })
          * ```
          */
         useIsMutating<TContext = unknown>(filters?: MutationFiltersByParameters<DeleteApprovalPoliciesIdBody, DeleteApprovalPoliciesIdData, DeleteApprovalPoliciesIdParameters, DeleteApprovalPoliciesIdError, TContext> | MutationFiltersByMutationKey<DeleteApprovalPoliciesIdSchema, DeleteApprovalPoliciesIdBody, DeleteApprovalPoliciesIdData, DeleteApprovalPoliciesIdParameters, DeleteApprovalPoliciesIdError, TContext>): number;
@@ -492,8 +572,40 @@ export interface ApprovalPoliciesService {
          */
         <TOptions extends ServiceOperationMutationFnOptions<DeleteApprovalPoliciesIdBody, DeleteApprovalPoliciesIdParameters>>(options: TOptions, client?: (schema: DeleteApprovalPoliciesIdSchema, options: TOptions) => Promise<RequestFnResponse<DeleteApprovalPoliciesIdData, DeleteApprovalPoliciesIdError>>): Promise<RequestFnResponse<DeleteApprovalPoliciesIdData, DeleteApprovalPoliciesIdError>>;
         /**
+         * Provides access to the current state of a mutation, including its status, any resulting data, and associated errors.
+         *
          * @summary Delete an approval policy
          * @description Delete an existing approval policy.
+         * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/hooks/useMutationState|`useMutationState(...)` documentation}
+         * @example Get all variables of all running mutations.
+         * ```ts
+         * const deleteApprovalPoliciesIdPendingMutationVariables = qraft.approvalPoliciesService.deleteApprovalPoliciesId.useMutationState({
+         *     filters: {
+         *         status: "pending"
+         *     },
+         *     select: mutation => mutation.state.variables
+         * })
+         * ```
+         * @example Get all data for specific mutations via the `parameters`.
+         * ```ts
+         * const deleteApprovalPoliciesIdMutationData = qraft.approvalPoliciesService.deleteApprovalPoliciesId.useMutationState({
+         *     filters: {
+         *         parameters: {
+         *             header: {
+         *                 "x-monite-version": "2023-06-04",
+         *                 "x-monite-entity-id": xMoniteEntityId
+         *             },
+         *             path: {
+         *                 approval_policy_id: approvalPolicyId
+         *             },
+         *             query: {
+         *                 limit: limit
+         *             }
+         *         }
+         *     },
+         *     select: mutation => mutation.state.data
+         * })
+         * ```
          */
         useMutationState<TContext = unknown, TResult = MutationState<DeleteApprovalPoliciesIdData, DeleteApprovalPoliciesIdError, MutationVariables<DeleteApprovalPoliciesIdBody, DeleteApprovalPoliciesIdParameters>, TContext>>(options?: {
             filters?: MutationFiltersByParameters<DeleteApprovalPoliciesIdBody, DeleteApprovalPoliciesIdData, DeleteApprovalPoliciesIdParameters, DeleteApprovalPoliciesIdError, TContext> | MutationFiltersByMutationKey<DeleteApprovalPoliciesIdSchema, DeleteApprovalPoliciesIdBody, DeleteApprovalPoliciesIdData, DeleteApprovalPoliciesIdParameters, DeleteApprovalPoliciesIdError, TContext>;
@@ -530,17 +642,17 @@ export interface ApprovalPoliciesService {
          *         "x-monite-entity-id": xMoniteEntityId
          *     },
          *     path: {
-         *         "approval_policy_id": approvalPolicyId
+         *         approval_policy_id: approvalPolicyId
          *     },
          *     query: {
-         *         "limit": limit
+         *         limit: limit
          *     }
-         * });
+         * })
          * mutate(body);
          * ```
          * @example Mutation without predefined parameters, e.g., for creating
          * ```ts
-         * const { mutate, isPending } = qraft.approvalPoliciesService.patchApprovalPoliciesId.useMutation();
+         * const { mutate, isPending } = qraft.approvalPoliciesService.patchApprovalPoliciesId.useMutation()
          * mutate({
          *     body: bodyPayload,
          *     header: {
@@ -548,10 +660,10 @@ export interface ApprovalPoliciesService {
          *         "x-monite-entity-id": xMoniteEntityId
          *     },
          *     path: {
-         *         "approval_policy_id": approvalPolicyId
+         *         approval_policy_id: approvalPolicyId
          *     },
          *     query: {
-         *         "limit": limit
+         *         limit: limit
          *     }
          * });
          * ```
@@ -570,17 +682,17 @@ export interface ApprovalPoliciesService {
          *         "x-monite-entity-id": xMoniteEntityId
          *     },
          *     path: {
-         *         "approval_policy_id": approvalPolicyId
+         *         approval_policy_id: approvalPolicyId
          *     },
          *     query: {
-         *         "limit": limit
+         *         limit: limit
          *     }
-         * });
+         * })
          * mutate(body);
          * ```
          * @example Mutation without predefined parameters, e.g., for creating
          * ```ts
-         * const { mutate, isPending } = qraft.approvalPoliciesService.patchApprovalPoliciesId.useMutation();
+         * const { mutate, isPending } = qraft.approvalPoliciesService.patchApprovalPoliciesId.useMutation()
          * mutate({
          *     body: bodyPayload,
          *     header: {
@@ -588,10 +700,10 @@ export interface ApprovalPoliciesService {
          *         "x-monite-entity-id": xMoniteEntityId
          *     },
          *     path: {
-         *         "approval_policy_id": approvalPolicyId
+         *         approval_policy_id: approvalPolicyId
          *     },
          *     query: {
-         *         "limit": limit
+         *         limit: limit
          *     }
          * });
          * ```
@@ -605,7 +717,7 @@ export interface ApprovalPoliciesService {
          * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/hooks/useIsMutating|`useIsMutating(...)` documentation}
          * @example Check how many mutations are currently in progress for the specified service method.
          * ```ts
-         * const patchApprovalPoliciesIdTotal = qraft.approvalPoliciesService.patchApprovalPoliciesId.useIsMutating();
+         * const patchApprovalPoliciesIdTotal = qraft.approvalPoliciesService.patchApprovalPoliciesId.useIsMutating()
          * ```
          * @example Check how many mutations are currently in progress with the specified parameters.
          * ```ts
@@ -616,13 +728,13 @@ export interface ApprovalPoliciesService {
          *             "x-monite-entity-id": xMoniteEntityId
          *         },
          *         path: {
-         *             "approval_policy_id": approvalPolicyId
+         *             approval_policy_id: approvalPolicyId
          *         },
          *         query: {
-         *             "limit": limit
+         *             limit: limit
          *         }
          *     }
-         * });
+         * })
          * ```
          */
         useIsMutating<TContext = unknown>(filters?: MutationFiltersByParameters<PatchApprovalPoliciesIdBody, PatchApprovalPoliciesIdData, PatchApprovalPoliciesIdParameters, PatchApprovalPoliciesIdError, TContext> | MutationFiltersByMutationKey<PatchApprovalPoliciesIdSchema, PatchApprovalPoliciesIdBody, PatchApprovalPoliciesIdData, PatchApprovalPoliciesIdParameters, PatchApprovalPoliciesIdError, TContext>): number;
@@ -637,8 +749,40 @@ export interface ApprovalPoliciesService {
          */
         <TOptions extends ServiceOperationMutationFnOptions<PatchApprovalPoliciesIdBody, PatchApprovalPoliciesIdParameters>>(options: TOptions, client?: (schema: PatchApprovalPoliciesIdSchema, options: TOptions) => Promise<RequestFnResponse<PatchApprovalPoliciesIdData, PatchApprovalPoliciesIdError>>): Promise<RequestFnResponse<PatchApprovalPoliciesIdData, PatchApprovalPoliciesIdError>>;
         /**
+         * Provides access to the current state of a mutation, including its status, any resulting data, and associated errors.
+         *
          * @summary Update an approval policy
          * @description Update an existing approval policy.
+         * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/hooks/useMutationState|`useMutationState(...)` documentation}
+         * @example Get all variables of all running mutations.
+         * ```ts
+         * const patchApprovalPoliciesIdPendingMutationVariables = qraft.approvalPoliciesService.patchApprovalPoliciesId.useMutationState({
+         *     filters: {
+         *         status: "pending"
+         *     },
+         *     select: mutation => mutation.state.variables
+         * })
+         * ```
+         * @example Get all data for specific mutations via the `parameters`.
+         * ```ts
+         * const patchApprovalPoliciesIdMutationData = qraft.approvalPoliciesService.patchApprovalPoliciesId.useMutationState({
+         *     filters: {
+         *         parameters: {
+         *             header: {
+         *                 "x-monite-version": "2023-06-04",
+         *                 "x-monite-entity-id": xMoniteEntityId
+         *             },
+         *             path: {
+         *                 approval_policy_id: approvalPolicyId
+         *             },
+         *             query: {
+         *                 limit: limit
+         *             }
+         *         }
+         *     },
+         *     select: mutation => mutation.state.data
+         * })
+         * ```
          */
         useMutationState<TContext = unknown, TResult = MutationState<PatchApprovalPoliciesIdData, PatchApprovalPoliciesIdError, MutationVariables<PatchApprovalPoliciesIdBody, PatchApprovalPoliciesIdParameters>, TContext>>(options?: {
             filters?: MutationFiltersByParameters<PatchApprovalPoliciesIdBody, PatchApprovalPoliciesIdData, PatchApprovalPoliciesIdParameters, PatchApprovalPoliciesIdError, TContext> | MutationFiltersByMutationKey<PatchApprovalPoliciesIdSchema, PatchApprovalPoliciesIdBody, PatchApprovalPoliciesIdData, PatchApprovalPoliciesIdParameters, PatchApprovalPoliciesIdError, TContext>;

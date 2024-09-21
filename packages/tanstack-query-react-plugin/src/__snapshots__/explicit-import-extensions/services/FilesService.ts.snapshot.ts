@@ -26,9 +26,9 @@ export interface FilesService {
          *         "x-monite-version": "2023-06-04"
          *     },
          *     query: {
-         *         "id__in": idIn
+         *         id__in: idIn
          *     }
-         * });
+         * })
          * ```
          */
         useQuery<TData = GetFilesData>(parameters: ServiceOperationQueryKey<GetFilesSchema, GetFilesParameters> | (GetFilesParameters), options?: Omit<UndefinedInitialDataOptions<GetFilesData, GetFilesError, TData, ServiceOperationQueryKey<GetFilesSchema, GetFilesParameters>>, "queryKey">): UseQueryResult<TData, GetFilesError | Error>;
@@ -44,9 +44,9 @@ export interface FilesService {
          *         "x-monite-version": "2023-06-04"
          *     },
          *     query: {
-         *         "id__in": idIn
+         *         id__in: idIn
          *     }
-         * });
+         * })
          * ```
          */
         useQuery<TData = GetFilesData>(parameters: ServiceOperationQueryKey<GetFilesSchema, GetFilesParameters> | (GetFilesParameters), options: Omit<DefinedInitialDataOptions<GetFilesData, GetFilesError, TData, ServiceOperationQueryKey<GetFilesSchema, GetFilesParameters>>, "queryKey">): DefinedUseQueryResult<TData, GetFilesError | Error>;
@@ -104,26 +104,26 @@ export interface FilesService {
          *
          * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/hooks/useInfiniteQuery|`useInfiniteQuery(...)` documentation}
          *
-         * @example Infinite Query with parameters
+         * @example Infinite Query
          * ```ts
-         * const { data, isLoading } = qraft.filesService.getFiles.useInfiniteQuery({
+         * const { data, isLoading, fetchNextPage } = qraft.filesService.getFiles.useInfiniteQuery({
          *     header: {
          *         "x-monite-version": "2023-06-04"
          *     },
          *     query: {
-         *         "id__in": idIn
+         *         id__in: idIn
          *     }
          * }, {
-         *     getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) => getNextPageParams(lastPage),
          *     initialPageParam: {
-         *         header: {
-         *             "x-monite-version": "2023-06-04"
-         *         },
          *         query: {
-         *             "id__in": initialIdIn
+         *             id__in: initialIdIn
          *         }
-         *     }
-         * });
+         *     },
+         *     getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) => getNextPageParams(lastPage)
+         * })
+         *
+         * console.log(data);
+         * fetchNextPage(); // Fetch the next page
          * ```
          */
         useInfiniteQuery<TPageParam extends GetFilesParameters, TData = GetFilesData>(parameters: ServiceOperationInfiniteQueryKey<GetFilesSchema, GetFilesParameters> | (GetFilesParameters), options: Omit<UndefinedInitialDataInfiniteOptions<GetFilesData, GetFilesError, OperationInfiniteData<TData, GetFilesParameters>, ServiceOperationInfiniteQueryKey<GetFilesSchema, GetFilesParameters>, PartialParameters<TPageParam>>, "queryKey" | "getPreviousPageParam" | "getNextPageParam" | "initialPageParam"> & InfiniteQueryPageParamsOptions<GetFilesData, PartialParameters<TPageParam>>): UseInfiniteQueryResult<OperationInfiniteData<TData, GetFilesParameters>, GetFilesError | Error>;
@@ -133,26 +133,26 @@ export interface FilesService {
          *
          * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/hooks/useInfiniteQuery|`useInfiniteQuery(...)` documentation}
          *
-         * @example Infinite Query with parameters
+         * @example Infinite Query
          * ```ts
-         * const { data, isLoading } = qraft.filesService.getFiles.useInfiniteQuery({
+         * const { data, isLoading, fetchNextPage } = qraft.filesService.getFiles.useInfiniteQuery({
          *     header: {
          *         "x-monite-version": "2023-06-04"
          *     },
          *     query: {
-         *         "id__in": idIn
+         *         id__in: idIn
          *     }
          * }, {
-         *     getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) => getNextPageParams(lastPage),
          *     initialPageParam: {
-         *         header: {
-         *             "x-monite-version": "2023-06-04"
-         *         },
          *         query: {
-         *             "id__in": initialIdIn
+         *             id__in: initialIdIn
          *         }
-         *     }
-         * });
+         *     },
+         *     getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) => getNextPageParams(lastPage)
+         * })
+         *
+         * console.log(data);
+         * fetchNextPage(); // Fetch the next page
          * ```
          */
         useInfiniteQuery<TPageParam extends GetFilesParameters, TData = GetFilesData>(parameters: ServiceOperationInfiniteQueryKey<GetFilesSchema, GetFilesParameters> | (GetFilesParameters), options: Omit<DefinedInitialDataInfiniteOptions<GetFilesData, GetFilesError, OperationInfiniteData<TData, GetFilesParameters>, ServiceOperationInfiniteQueryKey<GetFilesSchema, GetFilesParameters>, PartialParameters<TPageParam>>, "queryKey" | "getPreviousPageParam" | "getNextPageParam" | "initialPageParam"> & InfiniteQueryPageParamsOptions<GetFilesData, PartialParameters<TPageParam>>): DefinedUseInfiniteQueryResult<OperationInfiniteData<TData, GetFilesParameters>, GetFilesError | Error>;
@@ -164,7 +164,7 @@ export interface FilesService {
          * @example Checks the total number of queries fetching from the specified service method,
          * both normal and infinite. If no parameters are provided, no filtering is applied.
          * ```ts
-         * const getFilesTotal = qraft.filesService.getFiles.useIsFetching();
+         * const getFilesTotal = qraft.filesService.getFiles.useIsFetching()
          * ```
          * @example Checks the number of normal queries fetching with the specified parameters.
          * ```ts
@@ -175,14 +175,68 @@ export interface FilesService {
          *             "x-monite-version": "2023-06-04"
          *         },
          *         query: {
-         *             "id__in": idIn
+         *             id__in: idIn
          *         }
          *     }
-         * });
+         * })
          * ```
          */
         useIsFetching<TInfinite extends boolean = false>(filters?: QueryFiltersByParameters<GetFilesSchema, GetFilesData, TInfinite, GetFilesParameters, GetFilesError> | QueryFiltersByQueryKey<GetFilesSchema, GetFilesData, TInfinite, GetFilesParameters, GetFilesError>): number;
-        /** @summary Get a files by ID */
+        /**
+         * Allows you to execute multiple asynchronous data fetching operations concurrently. This is especially useful for managing complex data dependencies in parallel.
+         *
+         * @summary Get a files by ID
+         * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/hooks/useQueries|`useQueries(...)` documentation}
+         * @example Multiple queries. Returns `data`, `error`, `isSuccess` and other properties.
+         * ```ts
+         * const getFilesResults = qraft.filesService.getFiles.useQueries({
+         *     queries: [
+         *         {
+         *             header: {
+         *                 "x-monite-version": "2023-06-04"
+         *             },
+         *             query: {
+         *                 id__in: idIn1
+         *             }
+         *         },
+         *         {
+         *             header: {
+         *                 "x-monite-version": "2023-06-04"
+         *             },
+         *             query: {
+         *                 id__in: idIn2
+         *             }
+         *         }
+         *     ]
+         * });
+         * getFilesResults.forEach(({ isSuccess, data, error }) => console.log({ isSuccess, data, error }));
+         * ```
+         * @example Combined results. Only the data will be returned.
+         * ```ts
+         * const getFilesCombinedResults = qraft.filesService.getFiles.useQueries({
+         *     combine: results => results.map(result => result.data),
+         *     queries: [
+         *         {
+         *             header: {
+         *                 "x-monite-version": "2023-06-04"
+         *             },
+         *             query: {
+         *                 id__in: idIn1
+         *             }
+         *         },
+         *         {
+         *             header: {
+         *                 "x-monite-version": "2023-06-04"
+         *             },
+         *             query: {
+         *                 id__in: idIn2
+         *             }
+         *         }
+         *     ]
+         * });
+         * getFilesCombinedResults.forEach(data => console.log({ data }));
+         * ```
+         */
         useQueries<T extends Array<UseQueryOptionsForUseQueries<GetFilesSchema, GetFilesParameters, GetFilesData, GetFilesError>>, TCombinedResult = Array<UseQueryResult<GetFilesData, GetFilesError>>>(options: {
             queries: T;
             combine?: (results: Array<UseQueryResult<GetFilesData, GetFilesError>>) => TCombinedResult;
@@ -201,9 +255,9 @@ export interface FilesService {
          *         "x-monite-version": "2023-06-04"
          *     },
          *     query: {
-         *         "id__in": idIn
+         *         id__in: idIn
          *     }
-         * });
+         * })
          * ```
          */
         useQuery<TData = GetFilesData>(parameters: ServiceOperationQueryKey<GetFilesSchema, GetFilesParameters> | (GetFilesParameters), options?: Omit<UndefinedInitialDataOptions<GetFilesData, GetFilesError, TData, ServiceOperationQueryKey<GetFilesSchema, GetFilesParameters>>, "queryKey">): UseQueryResult<TData, GetFilesError | Error>;
@@ -219,13 +273,41 @@ export interface FilesService {
          *         "x-monite-version": "2023-06-04"
          *     },
          *     query: {
-         *         "id__in": idIn
+         *         id__in: idIn
          *     }
-         * });
+         * })
          * ```
          */
         useQuery<TData = GetFilesData>(parameters: ServiceOperationQueryKey<GetFilesSchema, GetFilesParameters> | (GetFilesParameters), options: Omit<DefinedInitialDataOptions<GetFilesData, GetFilesError, TData, ServiceOperationQueryKey<GetFilesSchema, GetFilesParameters>>, "queryKey">): DefinedUseQueryResult<TData, GetFilesError | Error>;
-        /** @summary Get a files by ID */
+        /**
+         * Performs asynchronous data fetching with support for infinite scrolling scenarios.
+         * Manages paginated data and provides utilities for fetching additional pages.
+         * It functions similarly to `useInfiniteQuery`, but with added support for React Suspense.
+         *
+         * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/hooks/useSuspenseInfiniteQuery|`useSuspenseInfiniteQuery(...)` documentation}
+         *
+         * @example Suspense Infinite Query
+         * ```ts
+         * const { data, isLoading, fetchNextPage } = qraft.filesService.getFiles.useSuspenseInfiniteQuery({
+         *     header: {
+         *         "x-monite-version": "2023-06-04"
+         *     },
+         *     query: {
+         *         id__in: idIn
+         *     }
+         * }, {
+         *     initialPageParam: {
+         *         query: {
+         *             id__in: initialIdIn
+         *         }
+         *     },
+         *     getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) => getNextPageParams(lastPage)
+         * })
+         *
+         * console.log(data);
+         * fetchNextPage(); // Fetch the next page
+         * ```
+         */
         useSuspenseInfiniteQuery<TPageParam extends GetFilesParameters, TData = GetFilesData>(parameters: ServiceOperationInfiniteQueryKey<GetFilesSchema, GetFilesParameters> | (GetFilesParameters), options: Omit<UseSuspenseInfiniteQueryOptions<GetFilesData, GetFilesError, OperationInfiniteData<TData, GetFilesParameters>, GetFilesData, ServiceOperationInfiniteQueryKey<GetFilesSchema, GetFilesParameters>, PartialParameters<TPageParam>>, "queryKey" | "getPreviousPageParam" | "getNextPageParam" | "initialPageParam"> & InfiniteQueryPageParamsOptions<GetFilesData, PartialParameters<TPageParam>>): UseSuspenseInfiniteQueryResult<OperationInfiniteData<TData, GetFilesParameters>, GetFilesError | Error>;
         /** @summary Get a files by ID */
         useSuspenseQueries<T extends Array<UseQueryOptionsForUseSuspenseQuery<GetFilesSchema, GetFilesParameters, GetFilesData, GetFilesError>>, TCombinedResult = Array<UseSuspenseQueryResult<GetFilesData, GetFilesError>>>(options: {
@@ -252,12 +334,12 @@ export interface FilesService {
          * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/hooks/useMutation|`useMutation(...)` documentation}
          * @example Mutation with predefined parameters, e.g., for updating
          * ```ts
-         * const { mutate, isPending } = qraft.filesService.postFiles.useMutation({});
+         * const { mutate, isPending } = qraft.filesService.postFiles.useMutation({})
          * mutate(body);
          * ```
          * @example Mutation without predefined parameters, e.g., for creating
          * ```ts
-         * const { mutate, isPending } = qraft.filesService.postFiles.useMutation();
+         * const { mutate, isPending } = qraft.filesService.postFiles.useMutation()
          * mutate({
          *     body: bodyPayload
          * });
@@ -271,12 +353,12 @@ export interface FilesService {
          * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/hooks/useMutation|`useMutation(...)` documentation}
          * @example Mutation with predefined parameters, e.g., for updating
          * ```ts
-         * const { mutate, isPending } = qraft.filesService.postFiles.useMutation({});
+         * const { mutate, isPending } = qraft.filesService.postFiles.useMutation({})
          * mutate(body);
          * ```
          * @example Mutation without predefined parameters, e.g., for creating
          * ```ts
-         * const { mutate, isPending } = qraft.filesService.postFiles.useMutation();
+         * const { mutate, isPending } = qraft.filesService.postFiles.useMutation()
          * mutate({
          *     body: bodyPayload
          * });
@@ -290,13 +372,13 @@ export interface FilesService {
          * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/hooks/useIsMutating|`useIsMutating(...)` documentation}
          * @example Check how many mutations are currently in progress for the specified service method.
          * ```ts
-         * const postFilesTotal = qraft.filesService.postFiles.useIsMutating();
+         * const postFilesTotal = qraft.filesService.postFiles.useIsMutating()
          * ```
          * @example Check how many mutations are currently in progress with the specified parameters.
          * ```ts
          * const postFilesTotal = qraft.filesService.postFiles.useIsMutating({
          *     parameters: {}
-         * });
+         * })
          * ```
          */
         useIsMutating<TContext = unknown>(filters?: MutationFiltersByParameters<PostFilesBody, PostFilesData, PostFilesParameters, PostFilesError, TContext> | MutationFiltersByMutationKey<PostFilesSchema, PostFilesBody, PostFilesData, PostFilesParameters, PostFilesError, TContext>): number;
@@ -304,7 +386,30 @@ export interface FilesService {
         isMutating<TContext>(filters?: MutationFiltersByParameters<PostFilesBody, PostFilesData, PostFilesParameters, PostFilesError, TContext> | MutationFiltersByMutationKey<PostFilesSchema, PostFilesBody, PostFilesData, PostFilesParameters, PostFilesError, TContext>): number;
         /** @summary Upload a files by ID */
         <TOptions extends ServiceOperationMutationFnOptions<PostFilesBody, PostFilesParameters>>(options: TOptions, client?: (schema: PostFilesSchema, options: TOptions) => Promise<RequestFnResponse<PostFilesData, PostFilesError>>): Promise<RequestFnResponse<PostFilesData, PostFilesError>>;
-        /** @summary Upload a files by ID */
+        /**
+         * Provides access to the current state of a mutation, including its status, any resulting data, and associated errors.
+         *
+         * @summary Upload a files by ID
+         * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/hooks/useMutationState|`useMutationState(...)` documentation}
+         * @example Get all variables of all running mutations.
+         * ```ts
+         * const postFilesPendingMutationVariables = qraft.filesService.postFiles.useMutationState({
+         *     filters: {
+         *         status: "pending"
+         *     },
+         *     select: mutation => mutation.state.variables
+         * })
+         * ```
+         * @example Get all data for specific mutations via the `parameters`.
+         * ```ts
+         * const postFilesMutationData = qraft.filesService.postFiles.useMutationState({
+         *     filters: {
+         *         parameters: {}
+         *     },
+         *     select: mutation => mutation.state.data
+         * })
+         * ```
+         */
         useMutationState<TContext = unknown, TResult = MutationState<PostFilesData, PostFilesError, MutationVariables<PostFilesBody, PostFilesParameters>, TContext>>(options?: {
             filters?: MutationFiltersByParameters<PostFilesBody, PostFilesData, PostFilesParameters, PostFilesError, TContext> | MutationFiltersByMutationKey<PostFilesSchema, PostFilesBody, PostFilesData, PostFilesParameters, PostFilesError, TContext>;
             select?: (mutation: Mutation<PostFilesData, PostFilesError, MutationVariables<PostFilesBody, PostFilesParameters>, TContext>) => TResult;
@@ -330,18 +435,18 @@ export interface FilesService {
          * ```ts
          * const { mutate, isPending } = qraft.filesService.deleteFiles.useMutation({
          *     query: {
-         *         "all": all
+         *         all: all
          *     }
-         * });
+         * })
          * mutate(body);
          * ```
          * @example Mutation without predefined parameters, e.g., for creating
          * ```ts
-         * const { mutate, isPending } = qraft.filesService.deleteFiles.useMutation();
+         * const { mutate, isPending } = qraft.filesService.deleteFiles.useMutation()
          * mutate({
          *     body: bodyPayload,
          *     query: {
-         *         "all": all
+         *         all: all
          *     }
          * });
          * ```
@@ -356,18 +461,18 @@ export interface FilesService {
          * ```ts
          * const { mutate, isPending } = qraft.filesService.deleteFiles.useMutation({
          *     query: {
-         *         "all": all
+         *         all: all
          *     }
-         * });
+         * })
          * mutate(body);
          * ```
          * @example Mutation without predefined parameters, e.g., for creating
          * ```ts
-         * const { mutate, isPending } = qraft.filesService.deleteFiles.useMutation();
+         * const { mutate, isPending } = qraft.filesService.deleteFiles.useMutation()
          * mutate({
          *     body: bodyPayload,
          *     query: {
-         *         "all": all
+         *         all: all
          *     }
          * });
          * ```
@@ -380,17 +485,17 @@ export interface FilesService {
          * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/hooks/useIsMutating|`useIsMutating(...)` documentation}
          * @example Check how many mutations are currently in progress for the specified service method.
          * ```ts
-         * const deleteFilesTotal = qraft.filesService.deleteFiles.useIsMutating();
+         * const deleteFilesTotal = qraft.filesService.deleteFiles.useIsMutating()
          * ```
          * @example Check how many mutations are currently in progress with the specified parameters.
          * ```ts
          * const deleteFilesTotal = qraft.filesService.deleteFiles.useIsMutating({
          *     parameters: {
          *         query: {
-         *             "all": all
+         *             all: all
          *         }
          *     }
-         * });
+         * })
          * ```
          */
         useIsMutating<TContext = unknown>(filters?: MutationFiltersByParameters<DeleteFilesBody, DeleteFilesData, DeleteFilesParameters, DeleteFilesError, TContext> | MutationFiltersByMutationKey<DeleteFilesSchema, DeleteFilesBody, DeleteFilesData, DeleteFilesParameters, DeleteFilesError, TContext>): number;
@@ -398,7 +503,34 @@ export interface FilesService {
         isMutating<TContext>(filters?: MutationFiltersByParameters<DeleteFilesBody, DeleteFilesData, DeleteFilesParameters, DeleteFilesError, TContext> | MutationFiltersByMutationKey<DeleteFilesSchema, DeleteFilesBody, DeleteFilesData, DeleteFilesParameters, DeleteFilesError, TContext>): number;
         /** @summary Delete all files */
         <TOptions extends ServiceOperationMutationFnOptions<DeleteFilesBody, DeleteFilesParameters>>(options: TOptions, client?: (schema: DeleteFilesSchema, options: TOptions) => Promise<RequestFnResponse<DeleteFilesData, DeleteFilesError>>): Promise<RequestFnResponse<DeleteFilesData, DeleteFilesError>>;
-        /** @summary Delete all files */
+        /**
+         * Provides access to the current state of a mutation, including its status, any resulting data, and associated errors.
+         *
+         * @summary Delete all files
+         * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/hooks/useMutationState|`useMutationState(...)` documentation}
+         * @example Get all variables of all running mutations.
+         * ```ts
+         * const deleteFilesPendingMutationVariables = qraft.filesService.deleteFiles.useMutationState({
+         *     filters: {
+         *         status: "pending"
+         *     },
+         *     select: mutation => mutation.state.variables
+         * })
+         * ```
+         * @example Get all data for specific mutations via the `parameters`.
+         * ```ts
+         * const deleteFilesMutationData = qraft.filesService.deleteFiles.useMutationState({
+         *     filters: {
+         *         parameters: {
+         *             query: {
+         *                 all: all
+         *             }
+         *         }
+         *     },
+         *     select: mutation => mutation.state.data
+         * })
+         * ```
+         */
         useMutationState<TContext = unknown, TResult = MutationState<DeleteFilesData, DeleteFilesError, MutationVariables<DeleteFilesBody, DeleteFilesParameters>, TContext>>(options?: {
             filters?: MutationFiltersByParameters<DeleteFilesBody, DeleteFilesData, DeleteFilesParameters, DeleteFilesError, TContext> | MutationFiltersByMutationKey<DeleteFilesSchema, DeleteFilesBody, DeleteFilesData, DeleteFilesParameters, DeleteFilesError, TContext>;
             select?: (mutation: Mutation<DeleteFilesData, DeleteFilesError, MutationVariables<DeleteFilesBody, DeleteFilesParameters>, TContext>) => TResult;
@@ -434,7 +566,7 @@ export interface FilesService {
          * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/hooks/useQuery|`useQuery(...)` documentation}
          * @example Query without parameters
          * ```ts
-         * const { data, isLoading } = qraft.filesService.getFileList.useQuery();
+         * const { data, isLoading } = qraft.filesService.getFileList.useQuery()
          * ```
          * @example Query with parameters
          * ```ts
@@ -443,9 +575,9 @@ export interface FilesService {
          *         "x-monite-version": "2023-06-04"
          *     },
          *     query: {
-         *         "id__in": idIn
+         *         id__in: idIn
          *     }
-         * });
+         * })
          * ```
          */
         useQuery<TData = GetFileListData>(parameters: ServiceOperationQueryKey<GetFileListSchema, GetFileListParameters> | (GetFileListParameters | void), options?: Omit<UndefinedInitialDataOptions<GetFileListData, GetFileListError, TData, ServiceOperationQueryKey<GetFileListSchema, GetFileListParameters>>, "queryKey">): UseQueryResult<TData, GetFileListError | Error>;
@@ -457,7 +589,7 @@ export interface FilesService {
          * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/hooks/useQuery|`useQuery(...)` documentation}
          * @example Query without parameters
          * ```ts
-         * const { data, isLoading } = qraft.filesService.getFileList.useQuery();
+         * const { data, isLoading } = qraft.filesService.getFileList.useQuery()
          * ```
          * @example Query with parameters
          * ```ts
@@ -466,9 +598,9 @@ export interface FilesService {
          *         "x-monite-version": "2023-06-04"
          *     },
          *     query: {
-         *         "id__in": idIn
+         *         id__in: idIn
          *     }
-         * });
+         * })
          * ```
          */
         useQuery<TData = GetFileListData>(parameters: ServiceOperationQueryKey<GetFileListSchema, GetFileListParameters> | (GetFileListParameters | void), options: Omit<DefinedInitialDataOptions<GetFileListData, GetFileListError, TData, ServiceOperationQueryKey<GetFileListSchema, GetFileListParameters>>, "queryKey">): DefinedUseQueryResult<TData, GetFileListError | Error>;
@@ -583,26 +715,23 @@ export interface FilesService {
          *
          * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/hooks/useInfiniteQuery|`useInfiniteQuery(...)` documentation}
          *
-         * @example Infinite Query with parameters
+         * @example Infinite Query
          * ```ts
-         * const { data, isLoading } = qraft.filesService.getFileList.useInfiniteQuery({
+         * const { data, isLoading, fetchNextPage } = qraft.filesService.getFileList.useInfiniteQuery({
          *     header: {
          *         "x-monite-version": "2023-06-04"
-         *     },
-         *     query: {
-         *         "id__in": idIn
          *     }
          * }, {
-         *     getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) => getNextPageParams(lastPage),
          *     initialPageParam: {
-         *         header: {
-         *             "x-monite-version": "2023-06-04"
-         *         },
          *         query: {
-         *             "id__in": initialIdIn
+         *             id__in: initialIdIn
          *         }
-         *     }
-         * });
+         *     },
+         *     getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) => getNextPageParams(lastPage)
+         * })
+         *
+         * console.log(data);
+         * fetchNextPage(); // Fetch the next page
          * ```
          */
         useInfiniteQuery<TPageParam extends GetFileListParameters, TData = GetFileListData>(parameters: ServiceOperationInfiniteQueryKey<GetFileListSchema, GetFileListParameters> | (GetFileListParameters | void), options: Omit<UndefinedInitialDataInfiniteOptions<GetFileListData, GetFileListError, OperationInfiniteData<TData, GetFileListParameters>, ServiceOperationInfiniteQueryKey<GetFileListSchema, GetFileListParameters>, PartialParameters<TPageParam>>, "queryKey" | "getPreviousPageParam" | "getNextPageParam" | "initialPageParam"> & InfiniteQueryPageParamsOptions<GetFileListData, PartialParameters<TPageParam>>): UseInfiniteQueryResult<OperationInfiniteData<TData, GetFileListParameters>, GetFileListError | Error>;
@@ -612,26 +741,23 @@ export interface FilesService {
          *
          * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/hooks/useInfiniteQuery|`useInfiniteQuery(...)` documentation}
          *
-         * @example Infinite Query with parameters
+         * @example Infinite Query
          * ```ts
-         * const { data, isLoading } = qraft.filesService.getFileList.useInfiniteQuery({
+         * const { data, isLoading, fetchNextPage } = qraft.filesService.getFileList.useInfiniteQuery({
          *     header: {
          *         "x-monite-version": "2023-06-04"
-         *     },
-         *     query: {
-         *         "id__in": idIn
          *     }
          * }, {
-         *     getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) => getNextPageParams(lastPage),
          *     initialPageParam: {
-         *         header: {
-         *             "x-monite-version": "2023-06-04"
-         *         },
          *         query: {
-         *             "id__in": initialIdIn
+         *             id__in: initialIdIn
          *         }
-         *     }
-         * });
+         *     },
+         *     getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) => getNextPageParams(lastPage)
+         * })
+         *
+         * console.log(data);
+         * fetchNextPage(); // Fetch the next page
          * ```
          */
         useInfiniteQuery<TPageParam extends GetFileListParameters, TData = GetFileListData>(parameters: ServiceOperationInfiniteQueryKey<GetFileListSchema, GetFileListParameters> | (GetFileListParameters | void), options: Omit<DefinedInitialDataInfiniteOptions<GetFileListData, GetFileListError, OperationInfiniteData<TData, GetFileListParameters>, ServiceOperationInfiniteQueryKey<GetFileListSchema, GetFileListParameters>, PartialParameters<TPageParam>>, "queryKey" | "getPreviousPageParam" | "getNextPageParam" | "initialPageParam"> & InfiniteQueryPageParamsOptions<GetFileListData, PartialParameters<TPageParam>>): DefinedUseInfiniteQueryResult<OperationInfiniteData<TData, GetFileListParameters>, GetFileListError | Error>;
@@ -643,7 +769,7 @@ export interface FilesService {
          * @example Checks the total number of queries fetching from the specified service method,
          * both normal and infinite. If no parameters are provided, no filtering is applied.
          * ```ts
-         * const getFileListTotal = qraft.filesService.getFileList.useIsFetching();
+         * const getFileListTotal = qraft.filesService.getFileList.useIsFetching()
          * ```
          * @example Checks the number of normal queries fetching with the specified parameters.
          * ```ts
@@ -654,16 +780,68 @@ export interface FilesService {
          *             "x-monite-version": "2023-06-04"
          *         },
          *         query: {
-         *             "id__in": idIn
+         *             id__in: idIn
          *         }
          *     }
-         * });
+         * })
          * ```
          */
         useIsFetching<TInfinite extends boolean = false>(filters?: QueryFiltersByParameters<GetFileListSchema, GetFileListData, TInfinite, GetFileListParameters, GetFileListError> | QueryFiltersByQueryKey<GetFileListSchema, GetFileListData, TInfinite, GetFileListParameters, GetFileListError>): number;
         /**
+         * Allows you to execute multiple asynchronous data fetching operations concurrently. This is especially useful for managing complex data dependencies in parallel.
+         *
          * @deprecated
          * @summary Get a file list
+         * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/hooks/useQueries|`useQueries(...)` documentation}
+         * @example Multiple queries. Returns `data`, `error`, `isSuccess` and other properties.
+         * ```ts
+         * const getFileListResults = qraft.filesService.getFileList.useQueries({
+         *     queries: [
+         *         {
+         *             header: {
+         *                 "x-monite-version": "2023-06-04"
+         *             },
+         *             query: {
+         *                 id__in: idIn1
+         *             }
+         *         },
+         *         {
+         *             header: {
+         *                 "x-monite-version": "2023-06-04"
+         *             },
+         *             query: {
+         *                 id__in: idIn2
+         *             }
+         *         }
+         *     ]
+         * });
+         * getFileListResults.forEach(({ isSuccess, data, error }) => console.log({ isSuccess, data, error }));
+         * ```
+         * @example Combined results. Only the data will be returned.
+         * ```ts
+         * const getFileListCombinedResults = qraft.filesService.getFileList.useQueries({
+         *     combine: results => results.map(result => result.data),
+         *     queries: [
+         *         {
+         *             header: {
+         *                 "x-monite-version": "2023-06-04"
+         *             },
+         *             query: {
+         *                 id__in: idIn1
+         *             }
+         *         },
+         *         {
+         *             header: {
+         *                 "x-monite-version": "2023-06-04"
+         *             },
+         *             query: {
+         *                 id__in: idIn2
+         *             }
+         *         }
+         *     ]
+         * });
+         * getFileListCombinedResults.forEach(data => console.log({ data }));
+         * ```
          */
         useQueries<T extends Array<UseQueryOptionsForUseQueries<GetFileListSchema, GetFileListParameters, GetFileListData, GetFileListError>>, TCombinedResult = Array<UseQueryResult<GetFileListData, GetFileListError>>>(options: {
             queries: T;
@@ -682,7 +860,7 @@ export interface FilesService {
          * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/hooks/useQuery|`useQuery(...)` documentation}
          * @example Query without parameters
          * ```ts
-         * const { data, isLoading } = qraft.filesService.getFileList.useQuery();
+         * const { data, isLoading } = qraft.filesService.getFileList.useQuery()
          * ```
          * @example Query with parameters
          * ```ts
@@ -691,9 +869,9 @@ export interface FilesService {
          *         "x-monite-version": "2023-06-04"
          *     },
          *     query: {
-         *         "id__in": idIn
+         *         id__in: idIn
          *     }
-         * });
+         * })
          * ```
          */
         useQuery<TData = GetFileListData>(parameters: ServiceOperationQueryKey<GetFileListSchema, GetFileListParameters> | (GetFileListParameters | void), options?: Omit<UndefinedInitialDataOptions<GetFileListData, GetFileListError, TData, ServiceOperationQueryKey<GetFileListSchema, GetFileListParameters>>, "queryKey">): UseQueryResult<TData, GetFileListError | Error>;
@@ -705,7 +883,7 @@ export interface FilesService {
          * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/hooks/useQuery|`useQuery(...)` documentation}
          * @example Query without parameters
          * ```ts
-         * const { data, isLoading } = qraft.filesService.getFileList.useQuery();
+         * const { data, isLoading } = qraft.filesService.getFileList.useQuery()
          * ```
          * @example Query with parameters
          * ```ts
@@ -714,15 +892,37 @@ export interface FilesService {
          *         "x-monite-version": "2023-06-04"
          *     },
          *     query: {
-         *         "id__in": idIn
+         *         id__in: idIn
          *     }
-         * });
+         * })
          * ```
          */
         useQuery<TData = GetFileListData>(parameters: ServiceOperationQueryKey<GetFileListSchema, GetFileListParameters> | (GetFileListParameters | void), options: Omit<DefinedInitialDataOptions<GetFileListData, GetFileListError, TData, ServiceOperationQueryKey<GetFileListSchema, GetFileListParameters>>, "queryKey">): DefinedUseQueryResult<TData, GetFileListError | Error>;
         /**
-         * @deprecated
-         * @summary Get a file list
+         * Performs asynchronous data fetching with support for infinite scrolling scenarios.
+         * Manages paginated data and provides utilities for fetching additional pages.
+         * It functions similarly to `useInfiniteQuery`, but with added support for React Suspense.
+         *
+         * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/hooks/useSuspenseInfiniteQuery|`useSuspenseInfiniteQuery(...)` documentation}
+         *
+         * @example Suspense Infinite Query
+         * ```ts
+         * const { data, isLoading, fetchNextPage } = qraft.filesService.getFileList.useSuspenseInfiniteQuery({
+         *     header: {
+         *         "x-monite-version": "2023-06-04"
+         *     }
+         * }, {
+         *     initialPageParam: {
+         *         query: {
+         *             id__in: initialIdIn
+         *         }
+         *     },
+         *     getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) => getNextPageParams(lastPage)
+         * })
+         *
+         * console.log(data);
+         * fetchNextPage(); // Fetch the next page
+         * ```
          */
         useSuspenseInfiniteQuery<TPageParam extends GetFileListParameters, TData = GetFileListData>(parameters: ServiceOperationInfiniteQueryKey<GetFileListSchema, GetFileListParameters> | (GetFileListParameters | void), options: Omit<UseSuspenseInfiniteQueryOptions<GetFileListData, GetFileListError, OperationInfiniteData<TData, GetFileListParameters>, GetFileListData, ServiceOperationInfiniteQueryKey<GetFileListSchema, GetFileListParameters>, PartialParameters<TPageParam>>, "queryKey" | "getPreviousPageParam" | "getNextPageParam" | "initialPageParam"> & InfiniteQueryPageParamsOptions<GetFileListData, PartialParameters<TPageParam>>): UseSuspenseInfiniteQueryResult<OperationInfiniteData<TData, GetFileListParameters>, GetFileListError | Error>;
         /**
