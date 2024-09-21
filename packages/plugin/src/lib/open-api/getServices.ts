@@ -141,7 +141,12 @@ export const getServices = (
           method,
           path,
           errors,
-          name: getOperationName(path, method, methodOperation.operationId),
+          name: getOperationName(
+            path,
+            method,
+            methodOperation.operationId,
+            serviceNameBase
+          ),
           description: methodOperation.description,
           summary: methodOperation.summary,
           deprecated: methodOperation.deprecated,
