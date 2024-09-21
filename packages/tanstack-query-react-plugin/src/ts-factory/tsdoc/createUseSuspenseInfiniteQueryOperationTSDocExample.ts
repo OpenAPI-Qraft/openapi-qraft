@@ -1,7 +1,7 @@
 import { ServiceOperation } from '@openapi-qraft/plugin/lib/open-api/getServices';
 import ts from 'typescript';
 import { astToString } from '../astToString.js';
-import { createInfiniteQueryOptionsArgumentExamplePropertyAssigmentNodes } from './createUseInfiniteQueryOperationTSDocExample.js';
+import { createInfiniteQueryOptionsArgumentExamplePropertyAssignmentNodes } from './createUseInfiniteQueryOperationTSDocExample.js';
 import { createOperationMethodCallExpressionExampleNode } from './lib/createOperationMethodCallExpressionExampleNode.js';
 import { createOperationMethodParametersExampleNodes } from './lib/createOperationMethodParametersExampleNodes.js';
 
@@ -44,7 +44,7 @@ export const createUseSuspenseInfiniteQueryOperationTSDocExample = (
               true
             ),
             factory.createObjectLiteralExpression(
-              createInfiniteQueryOptionsArgumentExamplePropertyAssigmentNodes(
+              createInfiniteQueryOptionsArgumentExamplePropertyAssignmentNodes(
                 operation
               ),
               true

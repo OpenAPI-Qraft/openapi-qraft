@@ -43,7 +43,7 @@ export const createUseInfiniteQueryOperationTSDocExample = (
               true
             ),
             factory.createObjectLiteralExpression(
-              createInfiniteQueryOptionsArgumentExamplePropertyAssigmentNodes(
+              createInfiniteQueryOptionsArgumentExamplePropertyAssignmentNodes(
                 operation
               ),
               true
@@ -61,7 +61,7 @@ export const createUseInfiniteQueryOperationTSDocExample = (
   ];
 };
 
-export function createInfiniteQueryOptionsArgumentExamplePropertyAssigmentNodes(
+export function createInfiniteQueryOptionsArgumentExamplePropertyAssignmentNodes(
   operation: ServiceOperation
 ): ts.PropertyAssignment[] {
   const factory = ts.factory;
