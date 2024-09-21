@@ -40,10 +40,18 @@ export const reduceUrlByEndpointPartIndex = (
   url: string,
   serviceNameBase: ServiceBaseNameByEndpointOption
 ) => {
-  const reducedPath = (url.startsWith('/') ? url.slice(1) : url)
-    .split('/')
-    .slice(getEndpointPartIndex(serviceNameBase))
-    .join('/');
+  const pathSegments = (url.startsWith('/') ? url.slice(1) : url).split('/');
+
+  // skip the first segment
+  const pathOperationNameStartIndex = getEndpointPartIndex(serviceNameBase) + 1;
+
+  if (pathSegments.length + 1 <= pathOperationNameStartIndex) {
+    throw new Error(
+      `Invalid service name base '${serviceNameBase}'. The path '${url}' does not contain enough segments to generate a service name.`
+    );
+  }
+
+  const reducedPath = pathSegments.slice(pathOperationNameStartIndex).join('/');
 
   return url.startsWith('/') ? `/${reducedPath}` : reducedPath;
 };

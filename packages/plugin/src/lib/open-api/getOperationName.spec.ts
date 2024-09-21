@@ -17,7 +17,7 @@ describe('getOperationName', () => {
     ).toEqual('getApiV1UsersId');
     expect(
       getOperationName('/api/v1/users/{id}', 'POST', undefined, 'endpoint[0]')
-    ).toEqual('postApiV1UsersId');
+    ).toEqual('postV1UsersId');
     expect(
       getOperationName('/api/v1/users/{id}/{key}', 'POST', undefined, 'tags')
     ).toEqual('postApiV1UsersIdKey');
@@ -28,7 +28,7 @@ describe('getOperationName', () => {
         undefined,
         'endpoint[2]'
       )
-    ).toEqual('postUsersIdKey');
+    ).toEqual('postIdKey');
 
     expect(getOperationName('/users', 'GET', 'fooBar', 'tags')).toEqual(
       'fooBar'
