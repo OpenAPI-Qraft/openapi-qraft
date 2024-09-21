@@ -3,7 +3,7 @@ import camelcase from 'camelcase';
 import ts from 'typescript';
 import { createOperationCommonTSDoc } from '../../lib/createOperationCommonTSDoc.js';
 import { astToString } from '../astToString.js';
-import { createOperationMethodExampleNodes } from './lib/createOperationMethodExampleNodes.js';
+import { createOperationMethodCallExpressionExampleNode } from './lib/createOperationMethodCallExpressionExampleNode.js';
 import { createOperationMethodParametersExampleNodes } from './lib/createOperationMethodParametersExampleNodes.js';
 
 export const createUseIsMutatingOperationTSDocExample = (
@@ -23,7 +23,7 @@ export const createUseIsMutatingOperationTSDocExample = (
     ...(
       `const ${camelcase(operation.name + '-total')} = ` +
       astToString(
-        createOperationMethodExampleNodes(
+        createOperationMethodCallExpressionExampleNode(
           operation,
           {
             serviceVariableName,
@@ -42,7 +42,7 @@ export const createUseIsMutatingOperationTSDocExample = (
     ...(
       `const ${camelcase(operation.name + '-total')} = ` +
       astToString(
-        createOperationMethodExampleNodes(
+        createOperationMethodCallExpressionExampleNode(
           operation,
           {
             serviceVariableName,

@@ -3,7 +3,10 @@ import { createUseInfiniteQueryOperationTSDocExample } from './createUseInfinite
 import { createUseIsFetchingOperationTSDocExample } from './createUseIsFetchingOperationTSDocExample.js';
 import { createUseIsMutatingOperationTSDocExample } from './createUseIsMutatingOperationTSDocExample.js';
 import { createUseMutationOperationTSDocExample } from './createUseMutationOperationTSDocExample.js';
+import { createUseMutationStateOperationTSDocExample } from './createUseMutationStateOperationTSDocExample.js';
+import { createUseQueriesOperationTSDocExample } from './createUseQueriesOperationTSDocExample.js';
 import { createUseQueryOperationTSDocExample } from './createUseQueryOperationTSDocExample.js';
+import { createUseSuspenseInfiniteQueryOperationTSDocExample } from './createUseSuspenseInfiniteQueryOperationTSDocExample.js';
 
 export const createOperationMethodTSDocExample = (
   operation: ServiceOperation,
@@ -38,6 +41,21 @@ export const createOperationMethodTSDocExample = (
       );
     case 'useIsMutating':
       return createUseIsMutatingOperationTSDocExample(
+        operation,
+        serviceVariableName
+      );
+    case 'useMutationState':
+      return createUseMutationStateOperationTSDocExample(
+        operation,
+        serviceVariableName
+      );
+    case 'useQueries':
+      return createUseQueriesOperationTSDocExample(
+        operation,
+        serviceVariableName
+      );
+    case 'useSuspenseInfiniteQuery':
+      return createUseSuspenseInfiniteQueryOperationTSDocExample(
         operation,
         serviceVariableName
       );

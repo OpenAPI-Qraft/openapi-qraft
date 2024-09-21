@@ -2,7 +2,7 @@ import { ServiceOperation } from '@openapi-qraft/plugin/lib/open-api/getServices
 import ts from 'typescript';
 import { createOperationCommonTSDoc } from '../../lib/createOperationCommonTSDoc.js';
 import { astToString } from '../astToString.js';
-import { createOperationMethodExampleNodes } from './lib/createOperationMethodExampleNodes.js';
+import { createOperationMethodCallExpressionExampleNode } from './lib/createOperationMethodCallExpressionExampleNode.js';
 import { createOperationMethodParametersExampleNodes } from './lib/createOperationMethodParametersExampleNodes.js';
 
 export const createUseQueryOperationTSDocExample = (
@@ -26,7 +26,7 @@ export const createUseQueryOperationTSDocExample = (
       ...(
         'const { data, isLoading } = ' +
         astToString(
-          createOperationMethodExampleNodes(
+          createOperationMethodCallExpressionExampleNode(
             operation,
             {
               serviceVariableName,
@@ -51,7 +51,7 @@ export const createUseQueryOperationTSDocExample = (
       ...(
         'const { data, isLoading } = ' +
         astToString(
-          createOperationMethodExampleNodes(
+          createOperationMethodCallExpressionExampleNode(
             operation,
             {
               serviceVariableName,

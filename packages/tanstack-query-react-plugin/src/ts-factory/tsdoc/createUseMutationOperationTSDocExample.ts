@@ -1,7 +1,7 @@
 import type { ServiceOperation } from '@openapi-qraft/plugin/lib/open-api/getServices';
 import ts from 'typescript';
 import { astToString } from '../astToString.js';
-import { createOperationMethodExampleNodes } from './lib/createOperationMethodExampleNodes.js';
+import { createOperationMethodCallExpressionExampleNode } from './lib/createOperationMethodCallExpressionExampleNode.js';
 import { createOperationMethodParametersExampleNodes } from './lib/createOperationMethodParametersExampleNodes.js';
 
 export const createUseMutationOperationTSDocExample = (
@@ -20,7 +20,7 @@ export const createUseMutationOperationTSDocExample = (
     ...(
       'const { mutate, isPending } = ' +
       astToString(
-        createOperationMethodExampleNodes(
+        createOperationMethodCallExpressionExampleNode(
           operation,
           {
             serviceVariableName,
@@ -47,7 +47,7 @@ export const createUseMutationOperationTSDocExample = (
     ...(
       'const { mutate, isPending } = ' +
       astToString(
-        createOperationMethodExampleNodes(
+        createOperationMethodCallExpressionExampleNode(
           operation,
           {
             serviceVariableName,
