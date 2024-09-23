@@ -11,6 +11,7 @@
     "lint": "eslint",
     "clean": "rimraf dist/",
     "codegen": "openapi-qraft --plugin tanstack-query-react --plugin openapi-typescript ../test-fixtures/openapi.json -rm -o src/tests/fixtures/api --openapi-types-file-name openapi.ts --explicit-import-extensions --filter-services '/approval_policies/**,/entities/**,/files/**,!/internal/**' --operation-predefined-parameters '/approval_policies/{approval_policy_id}/**:header.x-monite-entity-id' '/entities/{entity_id}/documents:header.x-monite-version' --operation-name-modifier '/files/list:[a-zA-Z]+List ==> findAll' && yarn _prettify-api",
+    "codegen2": "openapi-qraft --plugin tanstack-query-react --plugin openapi-typescript http://localhost:3000/api/doc -rm -o src/tests/fixtures/api --openapi-types-file-name openapi.ts --explicit-import-extensions && yarn _prettify-api",
     "_prettify-api": "prettier --write src/tests/fixtures/api/**/*.ts"
   },
   "sideEffects": false,

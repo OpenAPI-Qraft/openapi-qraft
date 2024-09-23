@@ -1309,6 +1309,8 @@ describe('Qraft uses Mutations', () => {
       () =>
         qraft.files.postFiles.useMutation(undefined, {
           onMutate: (variables) => {
+            if (variables?.body instanceof FormData)
+              throw new Error('FormData');
             // check types inference when parameters are not specified
             variables?.body?.file satisfies Blob | undefined;
             variables?.body?.file_description satisfies string | undefined;
@@ -1347,6 +1349,7 @@ describe('Qraft uses Mutations', () => {
           {},
           {
             onMutate: (variables) => {
+              if (variables instanceof FormData) throw new Error('FormData');
               // check types inference when parameters are specified
               variables?.file satisfies Blob | undefined;
               variables?.file_description satisfies string | undefined;
