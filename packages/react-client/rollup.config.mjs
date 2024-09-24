@@ -13,6 +13,7 @@ const config = [
   rollupConfig(moduleDist, {
     input: 'src/qraftPredefinedParametersRequestFn.ts',
   }),
+  rollupConfig(moduleDist, { input: 'src/unstable__responseUtils.ts' }),
 ];
 
 export default config;

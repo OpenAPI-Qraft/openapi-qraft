@@ -78,6 +78,11 @@
       "require": "./dist/cjs/qraftPredefinedParametersRequestFn.cjs",
       "types": "./dist/types/qraftPredefinedParametersRequestFn.d.ts"
     },
+    "./unstable__responseUtils": {
+      "import": "./dist/esm/unstable__responseUtils.js",
+      "require": "./dist/cjs/unstable__responseUtils.cjs",
+      "types": "./dist/types/unstable__responseUtils.d.ts"
+    },
     "./package.json": "./package.json"
   },
   "typesVersions": {

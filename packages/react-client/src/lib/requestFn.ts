@@ -5,6 +5,7 @@ import type {
   RequestFnOptions,
   RequestFnResponse,
 } from '@openapi-qraft/tanstack-query-react-types';
+import { processResponse, resolveResponse } from './responseUtils.js';
 
 /**
  * This function is used to make a request to a specified endpoint.
@@ -69,18 +70,8 @@ export async function baseRequestFn<TData, TError>(
     ),
     ...requestInfoRest,
   })
-    .then(
-      unstable__processResponse as typeof unstable__processResponse<
-        TData,
-        TError
-      >
-    )
-    .catch(
-      unstable__resolveResponse as typeof unstable__resolveResponse<
-        TData,
-        TError
-      >
-    );
+    .then(processResponse as typeof processResponse<TData, TError>)
+    .catch(resolveResponse as typeof resolveResponse<TData, TError>);
 }
 
 /**
@@ -304,74 +295,6 @@ function getRequestBodyFormData(
     });
 
   return formData;
-}
-
-async function processResponse<TData, TError>(
-  response: Response
-): Promise<RequestFnResponse<TData, TError>> {
-  if (response.status === 204 || response.headers.get('Content-Length') === '0')
-    return (
-      response.ok ? { data: {}, response } : { error: {}, response }
-    ) as RequestFnResponse<TData, TError>;
-
-  if (isJsonResponse(response)) {
-    // clone response before parsing every time to allow multiple reads
-    const jsonResponse = response.clone().json();
-    return resolveResponse(
-      response,
-      response.ok ? jsonResponse : Promise.reject(await jsonResponse)
-    );
-  }
-
-  const jsonResponse = new Promise<TData>((resolve, reject) =>
-    // attempt to parse JSON for successful responses, otherwise fail
-    response.clone().text().then(JSON.parse).then(resolve, reject)
-  );
-
-  return resolveResponse(
-    response,
-    response.ok ? jsonResponse : Promise.reject(await jsonResponse)
-  );
-}
-
-function isJsonResponse(response: Response) {
-  const contentType = response.headers.get('Content-Type')?.toLowerCase();
-  return contentType?.includes('/json') || contentType?.includes('+json');
-}
-
-function resolveResponse<TData, TError>(
-  error: Error
-): Promise<RequestFnResponse<TData, TError>>;
-function resolveResponse<TData, TError>(
-  responseToReturn: Response,
-  responsePromise: Promise<TData>
-): Promise<RequestFnResponse<TData, TError>>;
-function resolveResponse<TData, TError>(
-  responseToReturn: Response | Error,
-  responsePromise?: Promise<TData>
-): Promise<RequestFnResponse<TData, TError>> {
-  if (!responsePromise)
-    return Promise.reject({
-      error: responseToReturn,
-      response: undefined,
-      data: undefined,
-    });
-
-  return responsePromise
-    .then(
-      (data) =>
-        ({ data, response: responseToReturn }) as RequestFnResponse<
-          TData,
-          TError
-        >
-    )
-    .catch(
-      (error) =>
-        ({ error, response: responseToReturn }) as RequestFnResponse<
-          TData,
-          TError
-        >
-    );
 }
 
 type WithRequired<T, K extends keyof T> = T & {
