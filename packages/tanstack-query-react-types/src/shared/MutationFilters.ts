@@ -69,8 +69,9 @@ export interface MutationFiltersByMutationKey<
   parameters?: never;
 }
 
-export type MutationVariables<TBody, TParams> =
-  AreAllOptional<TBody> extends true
+export type MutationVariables<TBody, TParams> = TBody extends FormData
+  ? { body: TBody } & NonNullableObject<TParams>
+  : AreAllOptional<TBody> extends true
     ? AreAllOptional<TParams> extends true
       ? ({ body?: TBody } & NonNullableObject<TParams>) | void
       : { body?: TBody } & NonNullableObject<TParams>

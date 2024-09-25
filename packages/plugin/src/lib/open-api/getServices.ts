@@ -36,8 +36,8 @@ export type ServiceOperation = {
   description: string | undefined;
   summary: string | undefined;
   deprecated: boolean | undefined;
-  mediaType: string | undefined;
   errors: Record<string, string | undefined>;
+  requestBody: OpenAPISchemaType['paths'][string]['post']['requestBody'];
   success: Record<string, string | undefined>;
   parameters:
     | {
@@ -155,9 +155,7 @@ export const getServices = (
             !methodOperation.parameters.length
               ? undefined
               : methodOperation.parameters,
-          mediaType: methodOperation.requestBody?.content
-            ? getContentMediaType(methodOperation.requestBody.content)
-            : undefined,
+          requestBody: methodOperation.requestBody,
           success: success,
           security: methodOperation.security,
         });

@@ -41,7 +41,7 @@ export interface OperationSchema {
    * Media type of the request body
    * @example application/json
    */
-  readonly mediaType?: string;
+  readonly mediaType?: string[];
 
   readonly security?: string[];
 }
@@ -118,8 +118,13 @@ export interface RequestFnOptions {
 
 type BodySerializer = (
   schema: OperationSchema,
-  info: RequestFnInfo
-) => string | FormData | Blob | undefined;
+  body: RequestFnInfo['body']
+) =>
+  | {
+      body: string | FormData | Blob;
+      headers: HeadersOptions;
+    }
+  | undefined;
 
 type UrlSerializer = (schema: OperationSchema, info: RequestFnInfo) => string;
 

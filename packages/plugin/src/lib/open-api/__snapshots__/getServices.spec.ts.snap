@@ -15,7 +15,6 @@ exports[`getServices > matches snapshot with "serviceNameBase: endpoint" 1`] = `
           "422": "application/json",
           "default": "application/json",
         },
-        "mediaType": "application/json",
         "method": "post",
         "name": "postEntitiesIdDocuments",
         "parameters": [
@@ -50,6 +49,15 @@ exports[`getServices > matches snapshot with "serviceNameBase: endpoint" 1`] = `
           },
         ],
         "path": "/entities/{entity_id}/documents",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EntityOnboardingDocuments",
+              },
+            },
+          },
+        },
         "security": [
           {
             "userToken": [],
@@ -79,7 +87,6 @@ exports[`getServices > matches snapshot with "serviceNameBase: endpoint" 1`] = `
           "422": "application/json",
           "default": "application/json",
         },
-        "mediaType": undefined,
         "method": "get",
         "name": "getApprovalPoliciesId",
         "parameters": [
@@ -127,6 +134,7 @@ exports[`getServices > matches snapshot with "serviceNameBase: endpoint" 1`] = `
           },
         ],
         "path": "/approval_policies/{approval_policy_id}",
+        "requestBody": undefined,
         "security": [
           {
             "partnerToken": [],
@@ -145,7 +153,6 @@ exports[`getServices > matches snapshot with "serviceNameBase: endpoint" 1`] = `
           "422": "application/json",
           "default": "application/json",
         },
-        "mediaType": undefined,
         "method": "delete",
         "name": "deleteApprovalPoliciesId",
         "parameters": [
@@ -189,6 +196,7 @@ exports[`getServices > matches snapshot with "serviceNameBase: endpoint" 1`] = `
           },
         ],
         "path": "/approval_policies/{approval_policy_id}",
+        "requestBody": undefined,
         "security": [
           {
             "HTTPBearer": [],
@@ -207,7 +215,6 @@ exports[`getServices > matches snapshot with "serviceNameBase: endpoint" 1`] = `
           "422": "application/json",
           "default": "application/json",
         },
-        "mediaType": "application/json",
         "method": "patch",
         "name": "patchApprovalPoliciesId",
         "parameters": [
@@ -251,6 +258,16 @@ exports[`getServices > matches snapshot with "serviceNameBase: endpoint" 1`] = `
           },
         ],
         "path": "/approval_policies/{approval_policy_id}",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ApprovalPolicyUpdate",
+              },
+            },
+          },
+          "required": true,
+        },
         "security": [
           {
             "HTTPBearer": [],
@@ -277,7 +294,6 @@ exports[`getServices > matches snapshot with "serviceNameBase: endpoint" 1`] = `
           "422": "application/json",
           "default": "application/json",
         },
-        "mediaType": undefined,
         "method": "get",
         "name": "getFiles",
         "parameters": [
@@ -316,6 +332,7 @@ exports[`getServices > matches snapshot with "serviceNameBase: endpoint" 1`] = `
           },
         ],
         "path": "/files",
+        "requestBody": undefined,
         "security": [
           {
             "HTTPBearer": [],
@@ -332,11 +349,28 @@ exports[`getServices > matches snapshot with "serviceNameBase: endpoint" 1`] = `
         "errors": {
           "default": "application/json",
         },
-        "mediaType": "multipart/form-data",
         "method": "post",
         "name": "postFiles",
         "parameters": undefined,
         "path": "/files",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "properties": {
+                  "file": {
+                    "format": "binary",
+                    "type": "string",
+                  },
+                  "file_description": {
+                    "type": "string",
+                  },
+                },
+                "type": "object",
+              },
+            },
+          },
+        },
         "security": undefined,
         "success": {
           "200": "application/json",
@@ -349,7 +383,6 @@ exports[`getServices > matches snapshot with "serviceNameBase: endpoint" 1`] = `
         "errors": {
           "default": "application/json",
         },
-        "mediaType": undefined,
         "method": "delete",
         "name": "deleteFiles",
         "parameters": [
@@ -363,6 +396,7 @@ exports[`getServices > matches snapshot with "serviceNameBase: endpoint" 1`] = `
           },
         ],
         "path": "/files",
+        "requestBody": undefined,
         "security": undefined,
         "success": {
           "200": "application/json",
@@ -375,7 +409,6 @@ exports[`getServices > matches snapshot with "serviceNameBase: endpoint" 1`] = `
         "errors": {
           "default": "application/json",
         },
-        "mediaType": undefined,
         "method": "get",
         "name": "getFileList",
         "parameters": [
@@ -404,6 +437,7 @@ exports[`getServices > matches snapshot with "serviceNameBase: endpoint" 1`] = `
           },
         ],
         "path": "/files/list",
+        "requestBody": undefined,
         "security": [
           {
             "HTTPBearer": [],
@@ -436,7 +470,6 @@ exports[`getServices > matches snapshot with "serviceNameBase: tags" 1`] = `
           "422": "application/json",
           "default": "application/json",
         },
-        "mediaType": "application/json",
         "method": "post",
         "name": "postEntitiesIdDocuments",
         "parameters": [
@@ -471,6 +504,15 @@ exports[`getServices > matches snapshot with "serviceNameBase: tags" 1`] = `
           },
         ],
         "path": "/entities/{entity_id}/documents",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EntityOnboardingDocuments",
+              },
+            },
+          },
+        },
         "security": [
           {
             "userToken": [],
@@ -500,7 +542,6 @@ exports[`getServices > matches snapshot with "serviceNameBase: tags" 1`] = `
           "422": "application/json",
           "default": "application/json",
         },
-        "mediaType": undefined,
         "method": "get",
         "name": "getApprovalPoliciesId",
         "parameters": [
@@ -548,6 +589,7 @@ exports[`getServices > matches snapshot with "serviceNameBase: tags" 1`] = `
           },
         ],
         "path": "/approval_policies/{approval_policy_id}",
+        "requestBody": undefined,
         "security": [
           {
             "partnerToken": [],
@@ -566,7 +608,6 @@ exports[`getServices > matches snapshot with "serviceNameBase: tags" 1`] = `
           "422": "application/json",
           "default": "application/json",
         },
-        "mediaType": undefined,
         "method": "delete",
         "name": "deleteApprovalPoliciesId",
         "parameters": [
@@ -610,6 +651,7 @@ exports[`getServices > matches snapshot with "serviceNameBase: tags" 1`] = `
           },
         ],
         "path": "/approval_policies/{approval_policy_id}",
+        "requestBody": undefined,
         "security": [
           {
             "HTTPBearer": [],
@@ -628,7 +670,6 @@ exports[`getServices > matches snapshot with "serviceNameBase: tags" 1`] = `
           "422": "application/json",
           "default": "application/json",
         },
-        "mediaType": "application/json",
         "method": "patch",
         "name": "patchApprovalPoliciesId",
         "parameters": [
@@ -672,6 +713,16 @@ exports[`getServices > matches snapshot with "serviceNameBase: tags" 1`] = `
           },
         ],
         "path": "/approval_policies/{approval_policy_id}",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ApprovalPolicyUpdate",
+              },
+            },
+          },
+          "required": true,
+        },
         "security": [
           {
             "HTTPBearer": [],
@@ -698,7 +749,6 @@ exports[`getServices > matches snapshot with "serviceNameBase: tags" 1`] = `
           "422": "application/json",
           "default": "application/json",
         },
-        "mediaType": undefined,
         "method": "get",
         "name": "getFiles",
         "parameters": [
@@ -737,6 +787,7 @@ exports[`getServices > matches snapshot with "serviceNameBase: tags" 1`] = `
           },
         ],
         "path": "/files",
+        "requestBody": undefined,
         "security": [
           {
             "HTTPBearer": [],
@@ -753,11 +804,28 @@ exports[`getServices > matches snapshot with "serviceNameBase: tags" 1`] = `
         "errors": {
           "default": "application/json",
         },
-        "mediaType": "multipart/form-data",
         "method": "post",
         "name": "postFiles",
         "parameters": undefined,
         "path": "/files",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "properties": {
+                  "file": {
+                    "format": "binary",
+                    "type": "string",
+                  },
+                  "file_description": {
+                    "type": "string",
+                  },
+                },
+                "type": "object",
+              },
+            },
+          },
+        },
         "security": undefined,
         "success": {
           "200": "application/json",
@@ -770,7 +838,6 @@ exports[`getServices > matches snapshot with "serviceNameBase: tags" 1`] = `
         "errors": {
           "default": "application/json",
         },
-        "mediaType": undefined,
         "method": "delete",
         "name": "deleteFiles",
         "parameters": [
@@ -784,6 +851,7 @@ exports[`getServices > matches snapshot with "serviceNameBase: tags" 1`] = `
           },
         ],
         "path": "/files",
+        "requestBody": undefined,
         "security": undefined,
         "success": {
           "200": "application/json",
@@ -796,7 +864,6 @@ exports[`getServices > matches snapshot with "serviceNameBase: tags" 1`] = `
         "errors": {
           "default": "application/json",
         },
-        "mediaType": undefined,
         "method": "get",
         "name": "getFileList",
         "parameters": [
@@ -825,6 +892,7 @@ exports[`getServices > matches snapshot with "serviceNameBase: tags" 1`] = `
           },
         ],
         "path": "/files/list",
+        "requestBody": undefined,
         "security": [
           {
             "HTTPBearer": [],
@@ -857,7 +925,6 @@ exports[`getServices > matches snapshot with custom \`postfixServices\` 1`] = `
           "422": "application/json",
           "default": "application/json",
         },
-        "mediaType": "application/json",
         "method": "post",
         "name": "postEntitiesIdDocuments",
         "parameters": [
@@ -892,6 +959,15 @@ exports[`getServices > matches snapshot with custom \`postfixServices\` 1`] = `
           },
         ],
         "path": "/entities/{entity_id}/documents",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EntityOnboardingDocuments",
+              },
+            },
+          },
+        },
         "security": [
           {
             "userToken": [],
@@ -921,7 +997,6 @@ exports[`getServices > matches snapshot with custom \`postfixServices\` 1`] = `
           "422": "application/json",
           "default": "application/json",
         },
-        "mediaType": undefined,
         "method": "get",
         "name": "getApprovalPoliciesId",
         "parameters": [
@@ -969,6 +1044,7 @@ exports[`getServices > matches snapshot with custom \`postfixServices\` 1`] = `
           },
         ],
         "path": "/approval_policies/{approval_policy_id}",
+        "requestBody": undefined,
         "security": [
           {
             "partnerToken": [],
@@ -987,7 +1063,6 @@ exports[`getServices > matches snapshot with custom \`postfixServices\` 1`] = `
           "422": "application/json",
           "default": "application/json",
         },
-        "mediaType": undefined,
         "method": "delete",
         "name": "deleteApprovalPoliciesId",
         "parameters": [
@@ -1031,6 +1106,7 @@ exports[`getServices > matches snapshot with custom \`postfixServices\` 1`] = `
           },
         ],
         "path": "/approval_policies/{approval_policy_id}",
+        "requestBody": undefined,
         "security": [
           {
             "HTTPBearer": [],
@@ -1049,7 +1125,6 @@ exports[`getServices > matches snapshot with custom \`postfixServices\` 1`] = `
           "422": "application/json",
           "default": "application/json",
         },
-        "mediaType": "application/json",
         "method": "patch",
         "name": "patchApprovalPoliciesId",
         "parameters": [
@@ -1093,6 +1168,16 @@ exports[`getServices > matches snapshot with custom \`postfixServices\` 1`] = `
           },
         ],
         "path": "/approval_policies/{approval_policy_id}",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ApprovalPolicyUpdate",
+              },
+            },
+          },
+          "required": true,
+        },
         "security": [
           {
             "HTTPBearer": [],
@@ -1119,7 +1204,6 @@ exports[`getServices > matches snapshot with custom \`postfixServices\` 1`] = `
           "422": "application/json",
           "default": "application/json",
         },
-        "mediaType": undefined,
         "method": "get",
         "name": "getFiles",
         "parameters": [
@@ -1158,6 +1242,7 @@ exports[`getServices > matches snapshot with custom \`postfixServices\` 1`] = `
           },
         ],
         "path": "/files",
+        "requestBody": undefined,
         "security": [
           {
             "HTTPBearer": [],
@@ -1174,11 +1259,28 @@ exports[`getServices > matches snapshot with custom \`postfixServices\` 1`] = `
         "errors": {
           "default": "application/json",
         },
-        "mediaType": "multipart/form-data",
         "method": "post",
         "name": "postFiles",
         "parameters": undefined,
         "path": "/files",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "properties": {
+                  "file": {
+                    "format": "binary",
+                    "type": "string",
+                  },
+                  "file_description": {
+                    "type": "string",
+                  },
+                },
+                "type": "object",
+              },
+            },
+          },
+        },
         "security": undefined,
         "success": {
           "200": "application/json",
@@ -1191,7 +1293,6 @@ exports[`getServices > matches snapshot with custom \`postfixServices\` 1`] = `
         "errors": {
           "default": "application/json",
         },
-        "mediaType": undefined,
         "method": "delete",
         "name": "deleteFiles",
         "parameters": [
@@ -1205,6 +1306,7 @@ exports[`getServices > matches snapshot with custom \`postfixServices\` 1`] = `
           },
         ],
         "path": "/files",
+        "requestBody": undefined,
         "security": undefined,
         "success": {
           "200": "application/json",
@@ -1217,7 +1319,6 @@ exports[`getServices > matches snapshot with custom \`postfixServices\` 1`] = `
         "errors": {
           "default": "application/json",
         },
-        "mediaType": undefined,
         "method": "get",
         "name": "getFileList",
         "parameters": [
@@ -1246,6 +1347,7 @@ exports[`getServices > matches snapshot with custom \`postfixServices\` 1`] = `
           },
         ],
         "path": "/files/list",
+        "requestBody": undefined,
         "security": [
           {
             "HTTPBearer": [],
@@ -1277,7 +1379,6 @@ exports[`getServices > matches snapshot with custom \`servicesGlob\` 1`] = `
           "422": "application/json",
           "default": "application/json",
         },
-        "mediaType": undefined,
         "method": "get",
         "name": "getFiles",
         "parameters": [
@@ -1316,6 +1417,7 @@ exports[`getServices > matches snapshot with custom \`servicesGlob\` 1`] = `
           },
         ],
         "path": "/files",
+        "requestBody": undefined,
         "security": [
           {
             "HTTPBearer": [],
@@ -1332,11 +1434,28 @@ exports[`getServices > matches snapshot with custom \`servicesGlob\` 1`] = `
         "errors": {
           "default": "application/json",
         },
-        "mediaType": "multipart/form-data",
         "method": "post",
         "name": "postFiles",
         "parameters": undefined,
         "path": "/files",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "properties": {
+                  "file": {
+                    "format": "binary",
+                    "type": "string",
+                  },
+                  "file_description": {
+                    "type": "string",
+                  },
+                },
+                "type": "object",
+              },
+            },
+          },
+        },
         "security": undefined,
         "success": {
           "200": "application/json",
@@ -1349,7 +1468,6 @@ exports[`getServices > matches snapshot with custom \`servicesGlob\` 1`] = `
         "errors": {
           "default": "application/json",
         },
-        "mediaType": undefined,
         "method": "delete",
         "name": "deleteFiles",
         "parameters": [
@@ -1363,6 +1481,7 @@ exports[`getServices > matches snapshot with custom \`servicesGlob\` 1`] = `
           },
         ],
         "path": "/files",
+        "requestBody": undefined,
         "security": undefined,
         "success": {
           "200": "application/json",
@@ -1375,7 +1494,6 @@ exports[`getServices > matches snapshot with custom \`servicesGlob\` 1`] = `
         "errors": {
           "default": "application/json",
         },
-        "mediaType": undefined,
         "method": "get",
         "name": "getFileList",
         "parameters": [
@@ -1404,6 +1522,7 @@ exports[`getServices > matches snapshot with custom \`servicesGlob\` 1`] = `
           },
         ],
         "path": "/files/list",
+        "requestBody": undefined,
         "security": [
           {
             "HTTPBearer": [],
@@ -1436,7 +1555,6 @@ exports[`getServices > matches snapshot with default options 1`] = `
           "422": "application/json",
           "default": "application/json",
         },
-        "mediaType": "application/json",
         "method": "post",
         "name": "postEntitiesIdDocuments",
         "parameters": [
@@ -1471,6 +1589,15 @@ exports[`getServices > matches snapshot with default options 1`] = `
           },
         ],
         "path": "/entities/{entity_id}/documents",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EntityOnboardingDocuments",
+              },
+            },
+          },
+        },
         "security": [
           {
             "userToken": [],
@@ -1500,7 +1627,6 @@ exports[`getServices > matches snapshot with default options 1`] = `
           "422": "application/json",
           "default": "application/json",
         },
-        "mediaType": undefined,
         "method": "get",
         "name": "getApprovalPoliciesId",
         "parameters": [
@@ -1548,6 +1674,7 @@ exports[`getServices > matches snapshot with default options 1`] = `
           },
         ],
         "path": "/approval_policies/{approval_policy_id}",
+        "requestBody": undefined,
         "security": [
           {
             "partnerToken": [],
@@ -1566,7 +1693,6 @@ exports[`getServices > matches snapshot with default options 1`] = `
           "422": "application/json",
           "default": "application/json",
         },
-        "mediaType": undefined,
         "method": "delete",
         "name": "deleteApprovalPoliciesId",
         "parameters": [
@@ -1610,6 +1736,7 @@ exports[`getServices > matches snapshot with default options 1`] = `
           },
         ],
         "path": "/approval_policies/{approval_policy_id}",
+        "requestBody": undefined,
         "security": [
           {
             "HTTPBearer": [],
@@ -1628,7 +1755,6 @@ exports[`getServices > matches snapshot with default options 1`] = `
           "422": "application/json",
           "default": "application/json",
         },
-        "mediaType": "application/json",
         "method": "patch",
         "name": "patchApprovalPoliciesId",
         "parameters": [
@@ -1672,6 +1798,16 @@ exports[`getServices > matches snapshot with default options 1`] = `
           },
         ],
         "path": "/approval_policies/{approval_policy_id}",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ApprovalPolicyUpdate",
+              },
+            },
+          },
+          "required": true,
+        },
         "security": [
           {
             "HTTPBearer": [],
@@ -1698,7 +1834,6 @@ exports[`getServices > matches snapshot with default options 1`] = `
           "422": "application/json",
           "default": "application/json",
         },
-        "mediaType": undefined,
         "method": "get",
         "name": "getFiles",
         "parameters": [
@@ -1737,6 +1872,7 @@ exports[`getServices > matches snapshot with default options 1`] = `
           },
         ],
         "path": "/files",
+        "requestBody": undefined,
         "security": [
           {
             "HTTPBearer": [],
@@ -1753,11 +1889,28 @@ exports[`getServices > matches snapshot with default options 1`] = `
         "errors": {
           "default": "application/json",
         },
-        "mediaType": "multipart/form-data",
         "method": "post",
         "name": "postFiles",
         "parameters": undefined,
         "path": "/files",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "properties": {
+                  "file": {
+                    "format": "binary",
+                    "type": "string",
+                  },
+                  "file_description": {
+                    "type": "string",
+                  },
+                },
+                "type": "object",
+              },
+            },
+          },
+        },
         "security": undefined,
         "success": {
           "200": "application/json",
@@ -1770,7 +1923,6 @@ exports[`getServices > matches snapshot with default options 1`] = `
         "errors": {
           "default": "application/json",
         },
-        "mediaType": undefined,
         "method": "delete",
         "name": "deleteFiles",
         "parameters": [
@@ -1784,6 +1936,7 @@ exports[`getServices > matches snapshot with default options 1`] = `
           },
         ],
         "path": "/files",
+        "requestBody": undefined,
         "security": undefined,
         "success": {
           "200": "application/json",
@@ -1796,7 +1949,6 @@ exports[`getServices > matches snapshot with default options 1`] = `
         "errors": {
           "default": "application/json",
         },
-        "mediaType": undefined,
         "method": "get",
         "name": "getFileList",
         "parameters": [
@@ -1825,6 +1977,7 @@ exports[`getServices > matches snapshot with default options 1`] = `
           },
         ],
         "path": "/files/list",
+        "requestBody": undefined,
         "security": [
           {
             "HTTPBearer": [],

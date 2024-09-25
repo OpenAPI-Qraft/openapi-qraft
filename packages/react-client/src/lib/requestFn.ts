@@ -5,6 +5,7 @@ import type {
   RequestFnOptions,
   RequestFnResponse,
 } from '@openapi-qraft/tanstack-query-react-types';
+import { processResponse, resolveResponse } from './responseUtils.js';
 
 /**
  * This function is used to make a request to a specified endpoint.
@@ -33,7 +34,7 @@ export async function requestFn<TData, TError>(
 
 /**
  * This function is used to make a request to a specified endpoint.
- * It's needed to create a custom `requestFn` with a custom `urlSerializer`
+ * It's necessary to create a custom `requestFn` with a custom `urlSerializer`
  * and `bodySerializer`, with the tree-shaking of the default `requestFn`
  * and its serializers.
  *
@@ -54,24 +55,18 @@ export async function baseRequestFn<TData, TError>(
 ): Promise<RequestFnResponse<TData, TError>> {
   const { parameters, headers, body, ...requestInfoRest } = requestInfo;
 
-  const requestBody = options.bodySerializer(requestSchema, requestInfo);
+  const requestPayload = options.bodySerializer(requestSchema, body);
 
   const baseFetch = options.fetch ?? fetch;
 
   return baseFetch(options.urlSerializer(requestSchema, requestInfo), {
     method: requestSchema.method.toUpperCase(),
-    body: requestBody,
+    body: requestPayload?.body,
     headers: mergeHeaders(
-      {
-        Accept: 'application/json',
-        'Content-Type': requestSchema.mediaType ?? getBodyContentType(body),
-      },
+      { Accept: 'application/json' },
+      requestPayload?.headers,
       headers,
-      parameters?.header,
-      requestBody instanceof FormData
-        ? // remove `Content-Type` if the serialized body is FormData; the browser will correctly set Content-Type & boundary expression
-          { 'Content-Type': null }
-        : undefined
+      parameters?.header
     ),
     ...requestInfoRest,
   })
@@ -179,46 +174,103 @@ export function mergeHeaders(...allHeaders: (HeadersOptions | undefined)[]) {
   return headers;
 }
 
-export function bodySerializer(schema: OperationSchema, info: RequestFnInfo) {
-  if (info.body === undefined) return;
-
+export function bodySerializer(
+  schema: OperationSchema,
+  body: RequestFnInfo['body']
+) {
   if (
     schema.method === 'get' ||
     schema.method === 'head' ||
     schema.method === 'options'
   )
-    return;
+    return undefined;
 
-  if (schema.mediaType?.includes('/form-data'))
-    return getRequestBodyFormData(info);
+  if (body === undefined || body === null) return undefined;
 
-  if (
-    !schema.mediaType?.includes('/json') &&
-    (typeof info.body === 'string' ||
-      info.body instanceof Blob ||
-      info.body instanceof FormData)
-  ) {
-    return info.body;
+  if (typeof body === 'string') {
+    return {
+      body,
+      headers: {
+        'Content-Type':
+          // prefer text/* media type
+          schema.mediaType?.find((mediaType) => mediaType.includes('text/')) ??
+          // prefer JSON media type, assume that body is serialized as JSON
+          schema.mediaType?.find((mediaType) => mediaType.includes('/json')) ??
+          'text/plain',
+      },
+    };
   }
 
-  return JSON.stringify(info.body);
+  if (body instanceof FormData) {
+    return {
+      body,
+      headers: {
+        // remove `Content-Type` if the serialized body is FormData;
+        // the browser will correctly set Content-Type & boundary expression
+        'Content-Type': null,
+      },
+    };
+  }
+
+  if (body instanceof Blob) {
+    return {
+      body,
+      headers: {
+        'Content-Type':
+          body.type ||
+          schema.mediaType?.find(
+            (mediaType) =>
+              !(
+                mediaType.includes('text/') &&
+                mediaType.includes('/form-data') &&
+                mediaType.includes('/json')
+              )
+          ) ||
+          'application/octet-stream',
+      },
+    };
+  }
+
+  let jsonMediaType: string | null = null;
+  let formDataMediaType: string | null = null;
+
+  if (schema.mediaType) {
+    for (let i = 0; i < schema.mediaType.length; i++) {
+      const mediaType = schema.mediaType[i];
+      if (mediaType.includes('/json')) jsonMediaType = mediaType;
+      else if (mediaType.includes('/form-data')) formDataMediaType = mediaType;
+    }
+  }
+
+  if (formDataMediaType) {
+    if (
+      !jsonMediaType ||
+      // Prefer FormData serialization if one of the fields is a Blob
+      Object.values(body).some((value) => value instanceof Blob)
+    ) {
+      return {
+        body: getRequestBodyFormData(body),
+        headers: {
+          // remove `Content-Type` if the serialized body is FormData;
+          // the browser will correctly set Content-Type & boundary expression
+          'Content-Type': null,
+        },
+      };
+    }
+  }
+
+  return {
+    body: JSON.stringify(body),
+    headers: {
+      'Content-Type': jsonMediaType ?? 'application/json',
+    },
+  };
 }
 
-function getRequestBodyFormData({
-  body,
-}: Pick<RequestFnInfo, 'body'>): FormData | undefined {
+function getRequestBodyFormData(
+  body: NonNullable<RequestFnInfo['body']>
+): FormData {
   if (body instanceof FormData) return body;
-  if (body === null) return;
-
-  if (body instanceof Blob) throw new Error('Blob not supported in form-data');
-  if (body instanceof ArrayBuffer)
-    throw new Error('ArrayBuffer not supported in form-data');
-  if (body instanceof URLSearchParams)
-    throw new Error('URLSearchParams not supported in form-data');
-  if (body instanceof ReadableStream)
-    throw new Error('ReadableStream not supported in form-data');
-  if (typeof body === 'string')
-    throw new Error('String not supported in form-data');
   if (typeof body !== 'object')
     throw new Error(`Unsupported body type ${typeof body} in form-data.`);
 
@@ -243,81 +295,6 @@ function getRequestBodyFormData({
     });
 
   return formData;
-}
-
-function getBodyContentType(body: RequestFnInfo['body']) {
-  if (!body) return;
-  if (body instanceof Blob) return body.type || 'application/octet-stream';
-  if (typeof body === 'string') return 'text/plain';
-  if (!(body instanceof FormData)) return 'application/json';
-}
-
-async function processResponse<TData, TError>(
-  response: Response
-): Promise<RequestFnResponse<TData, TError>> {
-  if (response.status === 204 || response.headers.get('Content-Length') === '0')
-    return (
-      response.ok ? { data: {}, response } : { error: {}, response }
-    ) as RequestFnResponse<TData, TError>;
-
-  if (isJsonResponse(response)) {
-    // clone response before parsing every time to allow multiple reads
-    const jsonResponse = response.clone().json();
-    return resolveResponse(
-      response,
-      response.ok ? jsonResponse : Promise.reject(await jsonResponse)
-    );
-  }
-
-  const jsonResponse = new Promise<TData>((resolve, reject) =>
-    // attempt to parse JSON for successful responses, otherwise fail
-    response.clone().text().then(JSON.parse).then(resolve, reject)
-  );
-
-  return resolveResponse(
-    response,
-    response.ok ? jsonResponse : Promise.reject(await jsonResponse)
-  );
-}
-
-function isJsonResponse(response: Response) {
-  const contentType = response.headers.get('Content-Type')?.toLowerCase();
-  return contentType?.includes('/json') || contentType?.includes('+json');
-}
-
-function resolveResponse<TData, TError>(
-  error: Error
-): Promise<RequestFnResponse<TData, TError>>;
-function resolveResponse<TData, TError>(
-  responseToReturn: Response,
-  responsePromise: Promise<TData>
-): Promise<RequestFnResponse<TData, TError>>;
-function resolveResponse<TData, TError>(
-  responseToReturn: Response | Error,
-  responsePromise?: Promise<TData>
-): Promise<RequestFnResponse<TData, TError>> {
-  if (!responsePromise)
-    return Promise.reject({
-      error: responseToReturn,
-      response: undefined,
-      data: undefined,
-    });
-
-  return responsePromise
-    .then(
-      (data) =>
-        ({ data, response: responseToReturn }) as RequestFnResponse<
-          TData,
-          TError
-        >
-    )
-    .catch(
-      (error) =>
-        ({ error, response: responseToReturn }) as RequestFnResponse<
-          TData,
-          TError
-        >
-    );
 }
 
 type WithRequired<T, K extends keyof T> = T & {

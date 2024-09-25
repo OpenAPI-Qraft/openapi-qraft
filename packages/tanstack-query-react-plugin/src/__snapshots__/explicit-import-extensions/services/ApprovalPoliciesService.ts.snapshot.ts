@@ -832,7 +832,9 @@ export const approvalPoliciesService: {
         schema: {
             method: "patch";
             url: "/approval_policies/{approval_policy_id}";
-            mediaType: "application/json";
+            mediaType: [
+                "application/json"
+            ];
             security: [
                 "HTTPBearer"
             ];
@@ -857,7 +859,7 @@ export const approvalPoliciesService: {
         schema: {
             method: "patch",
             url: "/approval_policies/{approval_policy_id}",
-            mediaType: "application/json",
+            mediaType: ["application/json"],
             security: ["HTTPBearer"]
         }
     }
@@ -886,7 +888,9 @@ type DeleteApprovalPoliciesIdBody = undefined;
 type PatchApprovalPoliciesIdSchema = {
     method: "patch";
     url: "/approval_policies/{approval_policy_id}";
-    mediaType: "application/json";
+    mediaType: [
+        "application/json"
+    ];
     security: [
         "HTTPBearer"
     ];

@@ -962,7 +962,9 @@ export const filesService: {
         schema: {
             method: "post";
             url: "/files";
-            mediaType: "multipart/form-data";
+            mediaType: [
+                "multipart/form-data"
+            ];
         };
     };
     /** @summary Delete all files */
@@ -997,7 +999,7 @@ export const filesService: {
         schema: {
             method: "post",
             url: "/files",
-            mediaType: "multipart/form-data"
+            mediaType: ["multipart/form-data"]
         }
     },
     deleteFiles: {
@@ -1027,12 +1029,14 @@ type GetFilesError = paths["/files"]["get"]["responses"]["405"]["content"]["appl
 type PostFilesSchema = {
     method: "post";
     url: "/files";
-    mediaType: "multipart/form-data";
+    mediaType: [
+        "multipart/form-data"
+    ];
 };
 type PostFilesParameters = {};
 type PostFilesData = paths["/files"]["post"]["responses"]["200"]["content"]["application/json"];
 type PostFilesError = paths["/files"]["post"]["responses"]["default"]["content"]["application/json"];
-type PostFilesBody = NonNullable<paths["/files"]["post"]["requestBody"]>["content"]["multipart/form-data"];
+type PostFilesBody = NonNullable<paths["/files"]["post"]["requestBody"]>["content"]["multipart/form-data"] | FormData;
 type DeleteFilesSchema = {
     method: "delete";
     url: "/files";

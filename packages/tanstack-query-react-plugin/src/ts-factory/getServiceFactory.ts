@@ -266,13 +266,17 @@ const getOperationSchemaFactory = (operation: ServiceOperation) => {
         )
       ),
 
-      operation.mediaType
+      operation.requestBody
         ? factory.createPropertySignature(
             undefined,
             factory.createIdentifier('mediaType'),
             undefined,
-            factory.createLiteralTypeNode(
-              factory.createStringLiteral(operation.mediaType)
+            factory.createTupleTypeNode(
+              Object.keys(operation.requestBody.content).map((mediaType) =>
+                factory.createLiteralTypeNode(
+                  factory.createStringLiteral(mediaType)
+                )
+              )
             )
           )
         : null,
@@ -348,39 +352,49 @@ const getOperationResponseFactory = (
 };
 
 const getOperationBodyFactory = (operation: ServiceOperation) => {
-  if (!operation.mediaType)
+  if (!operation.requestBody)
     return factory.createKeywordTypeNode(ts.SyntaxKind.UndefinedKeyword);
 
-  return factory.createIndexedAccessTypeNode(
-    factory.createIndexedAccessTypeNode(
-      factory.createTypeReferenceNode(factory.createIdentifier('NonNullable'), [
+  const mediaTypes = Object.keys(operation.requestBody.content);
+
+  return factory.createUnionTypeNode([
+    ...mediaTypes.map((mediaType) =>
+      factory.createIndexedAccessTypeNode(
         factory.createIndexedAccessTypeNode(
-          factory.createIndexedAccessTypeNode(
-            factory.createIndexedAccessTypeNode(
-              factory.createTypeReferenceNode(
-                factory.createIdentifier('paths'),
-                undefined
+          factory.createTypeReferenceNode(
+            factory.createIdentifier('NonNullable'),
+            [
+              factory.createIndexedAccessTypeNode(
+                factory.createIndexedAccessTypeNode(
+                  factory.createIndexedAccessTypeNode(
+                    factory.createTypeReferenceNode(
+                      factory.createIdentifier('paths'),
+                      undefined
+                    ),
+                    factory.createLiteralTypeNode(
+                      factory.createStringLiteral(operation.path)
+                    )
+                  ),
+                  factory.createLiteralTypeNode(
+                    factory.createStringLiteral(operation.method)
+                  )
+                ),
+                factory.createLiteralTypeNode(
+                  factory.createStringLiteral('requestBody')
+                )
               ),
-              factory.createLiteralTypeNode(
-                factory.createStringLiteral(operation.path)
-              )
-            ),
-            factory.createLiteralTypeNode(
-              factory.createStringLiteral(operation.method)
-            )
+            ]
           ),
-          factory.createLiteralTypeNode(
-            factory.createStringLiteral('requestBody')
-          )
+          // todo::Add optional NonNullable inference, see `POST /entities/{entity_id}/documents`
+          factory.createLiteralTypeNode(factory.createStringLiteral('content'))
         ),
-      ]),
-      // todo::Add optional NonNullable inference, see `POST /entities/{entity_id}/documents`
-      factory.createLiteralTypeNode(factory.createStringLiteral('content'))
+        factory.createLiteralTypeNode(factory.createStringLiteral(mediaType))
+      )
     ),
-    factory.createLiteralTypeNode(
-      factory.createStringLiteral(operation.mediaType)
-    )
-  );
+    ...(mediaTypes.some((mediaType) => mediaType.includes('/form-data'))
+      ? [factory.createTypeReferenceNode(factory.createIdentifier('FormData'))]
+      : []),
+  ]);
 };
 
 const createOperationParametersFactory = (operation: ServiceOperation) => {
@@ -532,10 +546,14 @@ const getServiceVariablePropertyFactory = (operation: ServiceOperation) => {
                 factory.createIdentifier('url'),
                 factory.createStringLiteral(operation.path)
               ),
-              operation.mediaType
+              operation.requestBody
                 ? factory.createPropertyAssignment(
                     factory.createIdentifier('mediaType'),
-                    factory.createStringLiteral(operation.mediaType)
+                    factory.createArrayLiteralExpression(
+                      Object.keys(operation.requestBody.content).map(
+                        (mediaType) => factory.createStringLiteral(mediaType)
+                      )
+                    )
                   )
                 : null,
 
