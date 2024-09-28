@@ -1,5 +1,7 @@
 # @openapi-qraft/plugin
 
+## 2.0.0-next.12
+
 ## 2.0.0-next.11
 
 ## 2.0.0-next.10

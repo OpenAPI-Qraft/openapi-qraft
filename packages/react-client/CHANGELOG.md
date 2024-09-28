@@ -1,5 +1,15 @@
 # @openapi-qraft/react
 
+## 2.0.0-next.12
+
+### Minor Changes
+
+- a50253a: Responses with the `text/plain` content type are now always processed as plain text, without attempting to fallback to `JSON.parse`.
+
+### Patch Changes
+
+- @openapi-qraft/tanstack-query-react-types@2.0.0-next.12
+
 ## 2.0.0-next.11
 
 ### Patch Changes
