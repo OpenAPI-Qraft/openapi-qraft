@@ -1,6 +1,6 @@
 {
   "name": "@openapi-qraft/react",
-  "version": "2.0.0-next.11",
+  "version": "2.0.0-next.12",
   "description": "OpenAPI client for React, providing type-safe requests and dynamic TanStack Query React Hooks via a modular, Proxy-based architecture.",
   "scripts": {
     "build": "NODE_ENV=production rollup --config rollup.config.mjs && tsc --project tsconfig.build.json --emitDeclarationOnly",
