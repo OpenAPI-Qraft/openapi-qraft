@@ -12,7 +12,12 @@ export async function processResponse<TData, TError>(
       response.ok ? { data: {}, response } : { error: {}, response }
     ) as RequestFnResponse<TData, TError>;
 
-  if (isJsonResponse(response)) {
+  const contentType = response.headers.get('Content-Type')?.toLowerCase();
+
+  const isJsonResponse =
+    contentType?.includes('/json') || contentType?.includes('+json');
+
+  if (isJsonResponse) {
     // clone response before parsing every time to allow multiple reads
     const jsonResponse = response.clone().json();
     return resolveResponse(
@@ -21,14 +26,11 @@ export async function processResponse<TData, TError>(
     );
   }
 
-  const jsonResponse = new Promise<TData>((resolve, reject) =>
-    // attempt to parse JSON for successful responses, otherwise fail
-    response.clone().text().then(JSON.parse).then(resolve, reject)
-  );
+  const textResponse = response.clone().text() as Promise<TData>;
 
   return resolveResponse(
     response,
-    response.ok ? jsonResponse : Promise.reject(await jsonResponse)
+    response.ok ? textResponse : Promise.reject(await textResponse)
   );
 }
 
@@ -69,9 +71,4 @@ export function resolveResponse<TData, TError>(
           TError
         >
     );
-}
-
-function isJsonResponse(response: Response) {
-  const contentType = response.headers.get('Content-Type')?.toLowerCase();
-  return contentType?.includes('/json') || contentType?.includes('+json');
 }
