@@ -5,6 +5,7 @@ import {
   ReferenceObject,
 } from 'openapi-typescript/src/types.js';
 import { createServicePathMatch } from './createServicePathMatch.js';
+import { replaceRefParametersWithComponent } from './open-api/replaceRefParametersWithComponent.js';
 import {
   OperationGlobMethods,
   parseOperationGlobs,
@@ -43,12 +44,12 @@ export function predefineSchemaParameters(
         const predefinedOperation = predefinedPathItem?.[method];
         if (predefinedOperation) assertIsOperationObject(predefinedOperation);
 
-        const operationParameters =
-          predefinedOperation?.parameters ?? operation.parameters ?? [];
+        const operationParameters = replaceRefParametersWithComponent(
+          predefinedOperation?.parameters ?? operation.parameters,
+          schema.components?.parameters
+        );
 
-        assertIsParameterObjects(operationParameters);
-
-        const predefinedParameters = operationParameters.map(
+        const predefinedParameters = operationParameters?.map(
           (operationParameter) => {
             if (
               findPredefinedOperationParameter(
@@ -204,8 +205,11 @@ export function createPredefinedParametersGlobs(
 
         assertIsOperationObject(operation);
 
-        const operationParameters = operation.parameters ?? [];
-        assertIsParameterObjects(operationParameters);
+        const operationParameters = replaceRefParametersWithComponent(
+          // @ts-expect-error the issue with custom OpenAPISchemaType
+          operation.parameters,
+          schema.components?.parameters
+        );
 
         const predefinedParametersGlobKey = createOperationGlobsKey(
           pathGlobs,
@@ -231,6 +235,7 @@ export function createPredefinedParametersGlobs(
         for (const parameterSchemaToPredefine of parametersToPredefine) {
           const parameterToPredefine = findPredefinedOperationParameter(
             parameterSchemaToPredefine,
+            // @ts-expect-error the issue with custom OpenAPISchemaType
             operationParameters
           );
 
@@ -339,18 +344,6 @@ export function assertIsOperationObject(
       `Expected a OperationObject, but got a ReferenceObject: ${operationItem}`
     );
   }
-}
-
-export function assertIsParameterObjects(
-  parameterObjects: Array<ParameterObject | ReferenceObject>
-): asserts parameterObjects is Array<ParameterObject> {
-  parameterObjects.forEach((parameterObject) => {
-    if ('$ref' in parameterObject) {
-      throw new Error(
-        `Expected a ParameterObject, but got a ReferenceObject: ${parameterObject}`
-      );
-    }
-  });
 }
 
 type ParsedPredefinedParametersOption = {

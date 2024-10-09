@@ -1,8 +1,8 @@
+import type { ParameterObject, ReferenceObject } from 'openapi-typescript';
 import openAPI from '@openapi-qraft/test-fixtures/openapi.json' with { type: 'json' };
 import { describe, expect, it } from 'vitest';
 import {
   assertIsOperationObject,
-  assertIsParameterObjects,
   createPredefinedParametersGlobs,
   parseOperationPredefinedParametersOption,
   predefineSchemaParameters,
@@ -508,3 +508,15 @@ describe('predefineSchemaParameters utils', () => {
     });
   });
 });
+
+function assertIsParameterObjects(
+  parameterObjects: Array<ParameterObject | ReferenceObject>
+): asserts parameterObjects is Array<ParameterObject> {
+  parameterObjects.forEach((parameterObject) => {
+    if ('$ref' in parameterObject) {
+      throw new Error(
+        `Expected a ParameterObject, but got a ReferenceObject: ${parameterObject}`
+      );
+    }
+  });
+}

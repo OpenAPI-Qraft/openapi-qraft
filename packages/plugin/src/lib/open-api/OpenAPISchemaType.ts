@@ -34,4 +34,7 @@ export type OpenAPISchemaType = {
       };
     };
   };
+  components: {
+    parameters: Record<string, any> | undefined;
+  };
 };

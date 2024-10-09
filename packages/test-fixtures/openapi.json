@@ -618,23 +618,8 @@
         "summary": "Get a file list",
         "operationId": "get_file_list",
         "parameters": [
-          {
-            "required": false,
-            "schema": { "type": "string", "format": "date" },
-            "example": "2023-06-04",
-            "name": "x-monite-version",
-            "in": "header"
-          },
-          {
-            "required": false,
-            "schema": {
-              "items": { "type": "string", "format": "uuid" },
-              "type": "array",
-              "maxItems": 100
-            },
-            "name": "id__in",
-            "in": "query"
-          }
+          { "$ref": "#/components/parameters/XMoniteVersion" },
+          { "$ref": "#/components/parameters/IdIn" }
         ],
         "responses": {
           "200": {
@@ -805,6 +790,25 @@
         "additionalProperties": false,
         "type": "object",
         "required": ["id", "file_type", "name", "url"]
+      }
+    },
+    "parameters": {
+      "IdIn": {
+        "in": "query",
+        "required": false,
+        "schema": {
+          "items": { "type": "string", "format": "uuid" },
+          "type": "array",
+          "maxItems": 100
+        },
+        "name": "id__in"
+      },
+      "XMoniteVersion": {
+        "required": false,
+        "schema": { "type": "string", "format": "date" },
+        "example": "2023-06-04",
+        "name": "x-monite-version",
+        "in": "header"
       }
     }
   }

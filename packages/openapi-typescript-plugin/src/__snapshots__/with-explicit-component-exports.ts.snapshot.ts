@@ -90,7 +90,11 @@ export interface components {
         };
     };
     responses: never;
-    parameters: never;
+    parameters: {
+        IdIn: string[];
+        /** @example 2023-06-04 */
+        XMoniteVersion: string;
+    };
     requestBodies: never;
     headers: never;
     pathItems: never;

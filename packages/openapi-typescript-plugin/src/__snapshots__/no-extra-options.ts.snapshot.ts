@@ -158,7 +158,11 @@ export interface components {
         };
     };
     responses: never;
-    parameters: never;
+    parameters: {
+        IdIn: string[];
+        /** @example 2023-06-04 */
+        XMoniteVersion: string;
+    };
     requestBodies: never;
     headers: never;
     pathItems: never;
@@ -582,11 +586,11 @@ export interface operations {
     get_file_list: {
         parameters: {
             query?: {
-                id__in?: string[];
+                id__in?: components["parameters"]["IdIn"];
             };
             header?: {
                 /** @example 2023-06-04 */
-                "x-monite-version"?: string;
+                "x-monite-version"?: components["parameters"]["XMoniteVersion"];
             };
             path?: never;
             cookie?: never;

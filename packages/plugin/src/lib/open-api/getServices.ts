@@ -7,6 +7,7 @@ import {
   ServiceBaseNameByEndpointOption,
 } from './getServiceNamesByOperationEndpoint.js';
 import { getServiceNamesByOperationTags } from './getServiceNamesByOperationTags.js';
+import { replaceRefParametersWithComponent } from './replaceRefParametersWithComponent.js';
 
 export type ServiceBaseName = ServiceBaseNameByEndpointOption | 'tags';
 
@@ -65,6 +66,7 @@ export const getServices = (
   }: ServiceOutputOptions = {}
 ) => {
   const paths = openApiJson.paths;
+  const parametersComponents = openApiJson.components.parameters ?? {};
 
   const services = new Map<string, Service>();
 
@@ -150,11 +152,11 @@ export const getServices = (
           description: methodOperation.description,
           summary: methodOperation.summary,
           deprecated: methodOperation.deprecated,
-          parameters:
-            Array.isArray(methodOperation.parameters) &&
-            !methodOperation.parameters.length
-              ? undefined
-              : methodOperation.parameters,
+          parameters: replaceRefParametersWithComponent(
+            // @ts-expect-error the issue with custom OpenAPISchemaType
+            methodOperation.parameters,
+            parametersComponents
+          ),
           requestBody: methodOperation.requestBody,
           success: success,
           security: methodOperation.security,
