@@ -1,5 +1,11 @@
 # @openapi-qraft/plugin
 
+## 2.0.0-next.13
+
+### Patch Changes
+
+- c111be6: Added support for operation parameters referencing `$ref` from OpenAPI `components/parameters`.
+
 ## 2.0.0-next.12
 
 ## 2.0.0-next.11
