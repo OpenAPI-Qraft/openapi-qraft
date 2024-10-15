@@ -168,7 +168,7 @@ export interface ApprovalPoliciesService {
          * @summary Get an approval policy by ID
          * @description Retrieve a specific approval policy.
          */
-        setQueryData(parameters: GetApprovalPoliciesIdParameters | ServiceOperationQueryKey<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdParameters>, updater: Updater<NoInfer<GetApprovalPoliciesIdData> | undefined, NoInfer<GetApprovalPoliciesIdData> | undefined>, options?: SetDataOptions): GetApprovalPoliciesIdData | undefined;
+        setQueryData(parameters: (GetApprovalPoliciesIdParameters) | ServiceOperationQueryKey<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdParameters>, updater: Updater<NoInfer<GetApprovalPoliciesIdData> | undefined, NoInfer<GetApprovalPoliciesIdData> | undefined>, options?: SetDataOptions): GetApprovalPoliciesIdData | undefined;
         /**
          * @summary Get an approval policy by ID
          * @description Retrieve a specific approval policy.
@@ -570,7 +570,7 @@ export interface ApprovalPoliciesService {
          * @summary Delete an approval policy
          * @description Delete an existing approval policy.
          */
-        <TOptions extends ServiceOperationMutationFnOptions<DeleteApprovalPoliciesIdBody, DeleteApprovalPoliciesIdParameters>>(options: TOptions, client?: (schema: DeleteApprovalPoliciesIdSchema, options: TOptions) => Promise<RequestFnResponse<DeleteApprovalPoliciesIdData, DeleteApprovalPoliciesIdError>>): Promise<RequestFnResponse<DeleteApprovalPoliciesIdData, DeleteApprovalPoliciesIdError>>;
+        (options: ServiceOperationMutationFnOptions<DeleteApprovalPoliciesIdBody, DeleteApprovalPoliciesIdParameters>, client?: (schema: DeleteApprovalPoliciesIdSchema, options: ServiceOperationMutationFnOptions<DeleteApprovalPoliciesIdBody, DeleteApprovalPoliciesIdParameters>) => Promise<RequestFnResponse<DeleteApprovalPoliciesIdData, DeleteApprovalPoliciesIdError>>): Promise<RequestFnResponse<DeleteApprovalPoliciesIdData, DeleteApprovalPoliciesIdError>>;
         /**
          * Provides access to the current state of a mutation, including its status, any resulting data, and associated errors.
          *
@@ -747,7 +747,7 @@ export interface ApprovalPoliciesService {
          * @summary Update an approval policy
          * @description Update an existing approval policy.
          */
-        <TOptions extends ServiceOperationMutationFnOptions<PatchApprovalPoliciesIdBody, PatchApprovalPoliciesIdParameters>>(options: TOptions, client?: (schema: PatchApprovalPoliciesIdSchema, options: TOptions) => Promise<RequestFnResponse<PatchApprovalPoliciesIdData, PatchApprovalPoliciesIdError>>): Promise<RequestFnResponse<PatchApprovalPoliciesIdData, PatchApprovalPoliciesIdError>>;
+        (options: ServiceOperationMutationFnOptions<PatchApprovalPoliciesIdBody, PatchApprovalPoliciesIdParameters>, client?: (schema: PatchApprovalPoliciesIdSchema, options: ServiceOperationMutationFnOptions<PatchApprovalPoliciesIdBody, PatchApprovalPoliciesIdParameters>) => Promise<RequestFnResponse<PatchApprovalPoliciesIdData, PatchApprovalPoliciesIdError>>): Promise<RequestFnResponse<PatchApprovalPoliciesIdData, PatchApprovalPoliciesIdError>>;
         /**
          * Provides access to the current state of a mutation, including its status, any resulting data, and associated errors.
          *

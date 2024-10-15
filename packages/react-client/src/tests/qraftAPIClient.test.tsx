@@ -2156,7 +2156,7 @@ describe('Qraft uses Operation Mutation Function', () => {
     });
   });
 
-  it('supports Operation Mutation', async () => {
+  it('supports Operation Mutation with parameters and body', async () => {
     const { qraft } = createClient();
 
     const { data, error } = await qraft.entities.postEntitiesIdDocuments({
@@ -2203,6 +2203,11 @@ describe('Qraft uses Operation Mutation Function', () => {
         verification_document_front: 'front',
       },
     });
+  });
+
+  it('handles mutation operation without body or parameters when optional or undefined', async () => {
+    const { qraft } = createClient();
+    void qraft.files.deleteFiles();
   });
 
   it('supports Operation Mutation with `requestFn` and `baseUrl`', async () => {
@@ -2623,6 +2628,11 @@ describe('Qraft uses "setQueryData(...)"', () => {
     });
   });
 
+  it('supports getQueryData without parameters when all parameters are optional', () => {
+    const { qraft } = createClient();
+    qraft.files.findAll.getQueryData(); // should not emit type error
+  });
+
   it('emits type error if parameters is not provided', async () => {
     const { qraft } = createClient();
 
@@ -2775,6 +2785,20 @@ describe('Qraft uses getQueriesData', () => {
     expect(
       qraft.files.getFiles.getQueriesData({ parameters, infinite: false })
     ).toEqual([[qraft.files.getFiles.getQueryKey(parameters), parameters]]);
+  });
+
+  it('uses setQueryData with undefined parameters when all parameters are optional', () => {
+    const { qraft } = createClient();
+    qraft.files.findAll.setQueryData(undefined, {
+      data: [
+        {
+          id: '1',
+          name: 'file1',
+          url: 'https://example.com',
+          file_type: 'pdf',
+        },
+      ],
+    }); // should not emit type error
   });
 
   it('uses getQueriesData Infinite Queries', async () => {
