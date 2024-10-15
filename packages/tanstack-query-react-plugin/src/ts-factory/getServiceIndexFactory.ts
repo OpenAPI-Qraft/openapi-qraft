@@ -1,7 +1,7 @@
 import { Service } from '@openapi-qraft/plugin/lib/open-api/getServices';
 import ts from 'typescript';
 
-type Options = { explicitImportExtensions: boolean };
+type Options = { explicitImportExtensions: '.js' | '.ts' | undefined };
 
 export const getServiceIndexFactory = (
   services: Service[],
@@ -96,7 +96,7 @@ const getServicesImportsFactory = (
         ])
       ),
       factory.createStringLiteral(
-        `./${fileBaseName}${explicitImportExtensions ? '.js' : ''}`
+        `./${fileBaseName}${explicitImportExtensions ?? ''}`
       )
     )
   );

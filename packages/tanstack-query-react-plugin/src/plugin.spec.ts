@@ -176,6 +176,7 @@ describe('TanStack Query React Client Generation', () => {
         '/mock-fs',
         '--export-openapi-types',
         '--explicit-import-extensions',
+        '.ts',
         '--openapi-types-import-path',
         '../../openapi.d.ts',
       ]);
