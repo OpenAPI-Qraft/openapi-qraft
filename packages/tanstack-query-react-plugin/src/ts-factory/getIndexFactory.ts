@@ -18,8 +18,17 @@ export const getIndexFactory = ({
       ? [
           factory.createExportDeclaration(
             undefined,
-            openapiTypesImportPath.endsWith('.d.ts'),
-            undefined,
+            true,
+            factory.createNamedExports(
+              ['$defs', 'paths', 'components', 'operations', 'webhooks'].map(
+                (name) =>
+                  factory.createExportSpecifier(
+                    false,
+                    undefined,
+                    factory.createIdentifier(name)
+                  )
+              )
+            ),
             factory.createStringLiteral(
               maybeResolveImport({ openapiTypesImportPath, servicesDirName })
             ),
