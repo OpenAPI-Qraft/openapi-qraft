@@ -10,11 +10,11 @@ export interface ServiceOperationMutationFn<
   TParams,
   TError,
 > {
-  <TOptions extends ServiceOperationMutationFnOptions<TBody, TParams>>(
-    options: TOptions,
+  (
+    options: ServiceOperationMutationFnOptions<TBody, TParams>,
     client?: (
       schema: TSchema,
-      options: TOptions
+      options: ServiceOperationMutationFnOptions<TBody, TParams>
     ) => Promise<RequestFnResponse<TMutationData, TError>>
   ): Promise<RequestFnResponse<TMutationData, TError>>;
 }

@@ -95,7 +95,7 @@ export interface FilesService {
         /** @summary Get a files by ID */
         setQueriesData<TInfinite extends boolean = false>(filters: QueryFiltersByParameters<GetFilesSchema, GetFilesData, TInfinite, GetFilesParameters, GetFilesError> | QueryFiltersByQueryKey<GetFilesSchema, GetFilesData, TInfinite, GetFilesParameters, GetFilesError>, updater: Updater<NoInfer<GetFilesData> | undefined, NoInfer<GetFilesData> | undefined>, options?: SetDataOptions): Array<GetFilesData | undefined>;
         /** @summary Get a files by ID */
-        setQueryData(parameters: GetFilesParameters | ServiceOperationQueryKey<GetFilesSchema, GetFilesParameters>, updater: Updater<NoInfer<GetFilesData> | undefined, NoInfer<GetFilesData> | undefined>, options?: SetDataOptions): GetFilesData | undefined;
+        setQueryData(parameters: (GetFilesParameters) | ServiceOperationQueryKey<GetFilesSchema, GetFilesParameters>, updater: Updater<NoInfer<GetFilesData> | undefined, NoInfer<GetFilesData> | undefined>, options?: SetDataOptions): GetFilesData | undefined;
         /** @summary Get a files by ID */
         getInfiniteQueryKey(parameters: GetFilesParameters): ServiceOperationInfiniteQueryKey<GetFilesSchema, GetFilesParameters>;
         /**
@@ -385,7 +385,7 @@ export interface FilesService {
         /** @summary Upload a files by ID */
         isMutating<TContext>(filters?: MutationFiltersByParameters<PostFilesBody, PostFilesData, PostFilesParameters, PostFilesError, TContext> | MutationFiltersByMutationKey<PostFilesSchema, PostFilesBody, PostFilesData, PostFilesParameters, PostFilesError, TContext>): number;
         /** @summary Upload a files by ID */
-        <TOptions extends ServiceOperationMutationFnOptions<PostFilesBody, PostFilesParameters>>(options: TOptions, client?: (schema: PostFilesSchema, options: TOptions) => Promise<RequestFnResponse<PostFilesData, PostFilesError>>): Promise<RequestFnResponse<PostFilesData, PostFilesError>>;
+        (options: ServiceOperationMutationFnOptions<PostFilesBody, PostFilesParameters>, client?: (schema: PostFilesSchema, options: ServiceOperationMutationFnOptions<PostFilesBody, PostFilesParameters>) => Promise<RequestFnResponse<PostFilesData, PostFilesError>>): Promise<RequestFnResponse<PostFilesData, PostFilesError>>;
         /**
          * Provides access to the current state of a mutation, including its status, any resulting data, and associated errors.
          *
@@ -502,7 +502,7 @@ export interface FilesService {
         /** @summary Delete all files */
         isMutating<TContext>(filters?: MutationFiltersByParameters<DeleteFilesBody, DeleteFilesData, DeleteFilesParameters, DeleteFilesError, TContext> | MutationFiltersByMutationKey<DeleteFilesSchema, DeleteFilesBody, DeleteFilesData, DeleteFilesParameters, DeleteFilesError, TContext>): number;
         /** @summary Delete all files */
-        <TOptions extends ServiceOperationMutationFnOptions<DeleteFilesBody, DeleteFilesParameters>>(options: TOptions, client?: (schema: DeleteFilesSchema, options: TOptions) => Promise<RequestFnResponse<DeleteFilesData, DeleteFilesError>>): Promise<RequestFnResponse<DeleteFilesData, DeleteFilesError>>;
+        (options: ServiceOperationMutationFnOptions<DeleteFilesBody, DeleteFilesParameters>, client?: (schema: DeleteFilesSchema, options: ServiceOperationMutationFnOptions<DeleteFilesBody, DeleteFilesParameters>) => Promise<RequestFnResponse<DeleteFilesData, DeleteFilesError>>): Promise<RequestFnResponse<DeleteFilesData, DeleteFilesError>>;
         /**
          * Provides access to the current state of a mutation, including its status, any resulting data, and associated errors.
          *
@@ -703,7 +703,7 @@ export interface FilesService {
          * @deprecated
          * @summary Get a file list
          */
-        setQueryData(parameters: GetFileListParameters | ServiceOperationQueryKey<GetFileListSchema, GetFileListParameters>, updater: Updater<NoInfer<GetFileListData> | undefined, NoInfer<GetFileListData> | undefined>, options?: SetDataOptions): GetFileListData | undefined;
+        setQueryData(parameters: (GetFileListParameters | undefined) | ServiceOperationQueryKey<GetFileListSchema, GetFileListParameters>, updater: Updater<NoInfer<GetFileListData> | undefined, NoInfer<GetFileListData> | undefined>, options?: SetDataOptions): GetFileListData | undefined;
         /**
          * @deprecated
          * @summary Get a file list

@@ -2156,7 +2156,7 @@ describe('Qraft uses Operation Mutation Function', () => {
     });
   });
 
-  it('supports Operation Mutation', async () => {
+  it('supports Operation Mutation with parameters and body', async () => {
     const { qraft } = createClient();
 
     const { data, error } = await qraft.entities.postEntitiesIdDocuments({
@@ -2203,6 +2203,11 @@ describe('Qraft uses Operation Mutation Function', () => {
         verification_document_front: 'front',
       },
     });
+  });
+
+  it('handles mutation operation without body or parameters when optional or undefined', async () => {
+    const { qraft } = createClient();
+    void qraft.files.deleteFiles();
   });
 
   it('supports Operation Mutation with `requestFn` and `baseUrl`', async () => {
