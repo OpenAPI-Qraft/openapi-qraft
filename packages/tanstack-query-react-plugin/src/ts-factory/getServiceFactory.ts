@@ -765,13 +765,10 @@ function reduceAreAllOptionalConditionalTParamsType<T extends ts.Node>(
             );
           })
         ) {
-          if (
-            !operation.parameters?.length ||
-            operation.parameters.every((parameter) => !parameter.required)
-          ) {
-            return node.trueType;
-          } else {
+          if (operation.parameters?.some((parameter) => parameter.required)) {
             return node.falseType;
+          } else {
+            return node.trueType;
           }
         }
         return ts.visitEachChild(node, visit, context);
