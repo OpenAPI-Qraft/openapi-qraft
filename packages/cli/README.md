@@ -38,7 +38,7 @@ Options:
   --service-name-base <endpoint[<index>] | tags>   Use OpenAPI Operation `endpoint[<index>]` path part (e.g.: "/0/1/2") or `tags` as the base name of the service. (default: "endpoint[0]")
   --file-header <string>                           Header to be added to the generated file (eg: /* eslint-disable */)
   --openapi-types-import-path <path>               Path to schema types file (.d.ts), eg: "../schema.d.ts"
-  --explicit-import-extensions                     All import statements will include explicit `.js` extensions. Ideal for projects using ECMAScript modules.
+  --explicit-import-extensions [extension]         All import statements will contain an explicit file extension. Ideal for projects using ECMAScript modules. (choices: ".js", ".ts", preset: ".js")
   --export-openapi-types [bool]                    Export the OpenAPI schema types from the generated `./index.ts` file (default: true)
   --operation-generics-import-path <path>          Path to operation generics file (default: "@openapi-qraft/react")
   --openapi-types-file-name <path>                 OpenAPI Schema types file name, eg: "schema.d.ts" (default: "schema.ts")
@@ -145,7 +145,8 @@ npx openapi-qraft --plugin tanstack-query-react --plugin openapi-typescript http
     - `--service-name-base tags` will generate services based on the OpenAPI Operation tags instead of the endpoint.
       - If multiple tags are present for the operation, similar services will be created for each tag. Operation with `tags: [Foo, Bar]` will generate `services/FooService.ts` and `services/BarService.ts`.
       - If there are no tags for the operation, the services will be created under the `default` tag. Operation with empty `tags: []` will generate `services/DefaultService.ts`.
-- **`--explicit-import-extensions`:** Include explicit `.js` extensions in all import statements. Ideal for projects using ECMAScript modules when TypeScript's _--moduleResolution_ is `node16` or `nodenext` _(optional)_.
+- **`--explicit-import-extensions [extension]`**: All import statements will contain an explicit file extension. Ideal for projects using ECMAScript modules
+  when TypeScript's _--moduleResolution_ is `node16` or `nodenext`. Choices: `.js`, `.ts`, preset: `.js`. _(optional)_
 - **`--file-header <string>`:** Add a custom header to each generated file, useful for disabling linting rules or adding file
   comments _(optional)_.
   - Example: `--file-header '/* eslint-disable */'`
