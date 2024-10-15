@@ -2628,6 +2628,11 @@ describe('Qraft uses "setQueryData(...)"', () => {
     });
   });
 
+  it('supports getQueryData without parameters when all parameters are optional', () => {
+    const { qraft } = createClient();
+    qraft.files.findAll.getQueryData(); // should not emit type error
+  });
+
   it('emits type error if parameters is not provided', async () => {
     const { qraft } = createClient();
 
