@@ -2782,6 +2782,20 @@ describe('Qraft uses getQueriesData', () => {
     ).toEqual([[qraft.files.getFiles.getQueryKey(parameters), parameters]]);
   });
 
+  it('uses setQueryData with undefined parameters when all parameters are optional', () => {
+    const { qraft } = createClient();
+    qraft.files.findAll.setQueryData(undefined, {
+      data: [
+        {
+          id: '1',
+          name: 'file1',
+          url: 'https://example.com',
+          file_type: 'pdf',
+        },
+      ],
+    }); // should not emit type error
+  });
+
   it('uses getQueriesData Infinite Queries', async () => {
     const { qraft } = createClient();
 
