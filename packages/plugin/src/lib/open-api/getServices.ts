@@ -38,7 +38,7 @@ export type ServiceOperation = {
   summary: string | undefined;
   deprecated: boolean | undefined;
   errors: Record<string, string | undefined>;
-  requestBody: OpenAPISchemaType['paths'][string]['post']['requestBody'];
+  requestBody: OpenAPISchemaType['paths'][string][string]['requestBody'];
   success: Record<string, string | undefined>;
   parameters:
     | {

@@ -48,7 +48,8 @@
                 "$ref": "#/components/schemas/EntityOnboardingDocuments"
               }
             }
-          }
+          },
+          "required": true
         },
         "responses": {
           "201": {
@@ -529,7 +530,8 @@
                 }
               }
             }
-          }
+          },
+          "required": true
         },
         "responses": {
           "200": {

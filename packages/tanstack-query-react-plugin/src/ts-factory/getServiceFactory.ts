@@ -665,7 +665,7 @@ const getMethodSignatureNodes = (
 const getModuleTypeImports = (nodes: ts.Node[]) => {
   return nodes
     .map((node) => {
-      const foo =
+      const imports =
         ts.isImportDeclaration(node) &&
         ts.isStringLiteral(node.moduleSpecifier) &&
         node.importClause?.isTypeOnly &&
@@ -679,7 +679,15 @@ const getModuleTypeImports = (nodes: ts.Node[]) => {
             }
           : undefined;
 
-      return foo;
+      if (imports?.module === '@openapi-qraft/tanstack-query-react-types')
+        return {
+          module: imports.module,
+          imports: imports.imports.filter(
+            (specifier) => specifier !== 'AreAllOptional'
+          ),
+        };
+
+      return imports;
     })
     .reduce<Record<string, string[]>>((acc, item) => {
       if (!item) return acc;
@@ -756,22 +764,45 @@ function reduceAreAllOptionalConditionalTParamsType<T extends ts.Node>(
           ts.isConditionalTypeNode(node) &&
           ts.isTypeReferenceNode(node.checkType) &&
           ts.isIdentifier(node.checkType.typeName) &&
-          node.checkType.typeName.text === 'AreAllOptional' &&
-          node.checkType.typeArguments?.every((node) => {
-            return (
-              ts.isTypeReferenceNode(node) &&
-              ts.isIdentifier(node.typeName) &&
-              node.typeName.text === 'TParams'
-            );
-          })
+          node.checkType.typeName.text === 'AreAllOptional'
         ) {
           if (
-            !operation.parameters?.length ||
-            operation.parameters.every((parameter) => !parameter.required)
+            node.checkType.typeArguments?.every(
+              (node) =>
+                ts.isTypeReferenceNode(node) &&
+                ts.isIdentifier(node.typeName) &&
+                node.typeName.text === 'TParams'
+            )
           ) {
-            return node.trueType;
-          } else {
-            return node.falseType;
+            if (operation.parameters?.some((parameter) => parameter.required)) {
+              return node.falseType;
+            } else {
+              return node.trueType;
+            }
+          } else if (
+            node.checkType.typeArguments?.every(
+              (node) =>
+                ts.isTypeReferenceNode(node) &&
+                ts.isIdentifier(node.typeName) &&
+                node.typeName.text === 'TVariables'
+            )
+          ) {
+            /**
+             * todo::fix ussue with
+             * TVariables extends MutationVariables<
+             *         DeleteFilesBody,
+             *         DeleteFilesParameters
+             *       >,
+             *
+             * and
+             * TVariables extends DeleteFilesBody
+             *
+             */
+            if (operation.requestBody?.required) {
+              return node.falseType;
+            } else {
+              return node.trueType;
+            }
           }
         }
         return ts.visitEachChild(node, visit, context);

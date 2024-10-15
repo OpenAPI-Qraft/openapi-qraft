@@ -14,6 +14,7 @@ export type OpenAPISchemaType = {
         parameters?: Array<any>;
         deprecated?: boolean;
         requestBody?: {
+          required?: boolean;
           content: {
             [contentType: string]: {
               schema: any;
