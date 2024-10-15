@@ -4,8 +4,7 @@
   "private": true,
   "type": "commonjs",
   "scripts": {
-    "build": "yarn exec ./generateFactoryCodeGenerator.mjs && tsc --build",
-    "generate-ts-factory": "tsx generateTsFactoryCLI.ts -- --source-file /Users/radist/WebstormProjects/qraft/packages/react-client/src/service-operation/ServiceOperationUseQuery.ts"
+    "build": "yarn exec ./generateFactoryCodeGenerator.mjs && tsc --build"
   },
   "exports": {
     "./package.json": "./package.json",
