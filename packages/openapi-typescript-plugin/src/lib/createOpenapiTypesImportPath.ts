@@ -5,13 +5,13 @@
  */
 export function createOpenapiTypesImportPath(
   openapiTypesFileName: string,
-  explicitImportExtensions: boolean
+  explicitImportExtensions: '.ts' | '.js' | undefined
 ) {
   if (openapiTypesFileName.endsWith('.d.ts'))
     return `../${getTypeScriptFileBaseName(openapiTypesFileName)}.d.ts`;
 
   return explicitImportExtensions
-    ? `../${getTypeScriptFileBaseName(openapiTypesFileName)}.js`
+    ? `../${getTypeScriptFileBaseName(openapiTypesFileName)}${explicitImportExtensions}`
     : `../${openapiTypesFileName}`;
 }
 
