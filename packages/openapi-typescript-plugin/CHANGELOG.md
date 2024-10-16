@@ -1,5 +1,12 @@
 # @openapi-qraft/openapi-typescript
 
+## 1.2.0-next.15
+
+### Patch Changes
+
+- 4b1c13f: Fixed support for the `--explicit-import-extensions .ts` option when using the `openapi-typescript-plugin`.
+  - @openapi-qraft/plugin@2.0.0-next.15
+
 ## 1.2.0-next.14
 
 ### Patch Changes
