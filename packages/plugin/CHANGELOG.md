@@ -1,5 +1,7 @@
 # @openapi-qraft/plugin
 
+## 2.0.0-next.14
+
 ## 2.0.0-next.13
 
 ### Patch Changes
