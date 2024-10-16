@@ -4,6 +4,6 @@
  */
 
 export type { $defs, paths, components, operations, webhooks } from "./../openapi.d.ts";
-export { services } from "./services/index.js";
-export type { Services } from "./services/index.js";
-export { createAPIClient } from "./create-api-client.js";
+export { services } from "./services/index.ts";
+export type { Services } from "./services/index.ts";
+export { createAPIClient } from "./create-api-client.ts";

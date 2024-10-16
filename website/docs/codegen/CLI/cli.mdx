@@ -115,7 +115,8 @@ npx openapi-qraft --plugin tanstack-query-react --plugin openapi-typescript http
         - If `tags` are used as the base name, operation names will be generated based on the `operationId` from the
           OpenAPI Operation, or from the path if `operationId` is not provided.
           You can use `--operation-name-modifier` to customize the operation names.
-- **`--explicit-import-extensions`:** Include explicit `.js` extensions in all import statements. Ideal for projects using ECMAScript modules when TypeScript's _--moduleResolution_ is `node16` or `nodenext` _(optional)_.
+- **`--explicit-import-extensions [extension]`**: All import statements will contain an explicit file extension. Ideal for projects using ECMAScript modules
+  when TypeScript's _--moduleResolution_ is `node16` or `nodenext`. Choices: `.js`, `.ts`, preset: `.js`. _(optional)_
 - **`--file-header <string>`:** Add a custom header to each generated file, useful for disabling linting rules or adding file
   comments _(optional)_.
   - Example: `--file-header '/* eslint-disable */'`

@@ -2,7 +2,7 @@ import ts from 'typescript';
 
 type Options = {
   servicesDirName: string;
-  explicitImportExtensions: boolean;
+  explicitImportExtensions: '.js' | '.ts' | undefined;
 };
 
 export const getClientFactory = (options: Options) => {
@@ -79,7 +79,7 @@ const getClientImportsFactory = ({
         ])
       ),
       factory.createStringLiteral(
-        `./${servicesDirName}/index${explicitImportExtensions ? '.js' : ''}`
+        `./${servicesDirName}/index${explicitImportExtensions ?? ''}`
       ),
       undefined
     ),

@@ -19,7 +19,7 @@ import { getServiceIndexFactory } from './ts-factory/getServiceIndexFactory.js';
 interface OutputOptions extends OutputOptionsBase {
   fileHeader: string | undefined;
   servicesDirName: string;
-  explicitImportExtensions: boolean;
+  explicitImportExtensions: '.js' | '.ts' | undefined;
   exportSchemaTypes: boolean | undefined;
   operationPredefinedParameters: Array<PredefinedParametersGlob> | undefined;
 }
@@ -127,7 +127,7 @@ const generateServiceIndex = async (
   try {
     const code = astToString(
       getServiceIndexFactory(services, {
-        explicitImportExtensions: Boolean(output.explicitImportExtensions),
+        explicitImportExtensions: output.explicitImportExtensions,
       })
     );
 
@@ -157,7 +157,7 @@ const generateClient = async (spinner: Ora, output: OutputOptions) => {
     const code = astToString(
       getClientFactory({
         servicesDirName: output.servicesDirName,
-        explicitImportExtensions: Boolean(output.explicitImportExtensions),
+        explicitImportExtensions: output.explicitImportExtensions,
       })
     );
 
@@ -228,7 +228,7 @@ const generateIndex = async (
     const code = astToString(
       getIndexFactory({
         servicesDirName: output.servicesDirName,
-        explicitImportExtensions: Boolean(output.explicitImportExtensions),
+        explicitImportExtensions: output.explicitImportExtensions,
         openapiTypesImportPath: output.exportSchemaTypes
           ? serviceImports.openapiTypesImportPath
           : undefined,

@@ -8,10 +8,10 @@ export const getIndexFactory = ({
   explicitImportExtensions,
 }: {
   servicesDirName: string;
-  explicitImportExtensions: boolean;
+  explicitImportExtensions: '.js' | '.ts' | undefined;
 } & Partial<Pick<ServiceImportsFactoryOptions, 'openapiTypesImportPath'>>) => {
   const factory = ts.factory;
-  const importExtension = explicitImportExtensions ? '.js' : '';
+  const importExtension = explicitImportExtensions ?? '';
 
   return [
     ...(openapiTypesImportPath
