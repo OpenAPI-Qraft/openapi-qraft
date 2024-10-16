@@ -158,7 +158,7 @@ describe('TanStack Query React Client Generation', () => {
     });
   });
 
-  describe('--explicit-import-extensions --openapi-types-import-path ./openapi.d.ts', () => {
+  describe('--explicit-import-extensions .ts --openapi-types-import-path ./openapi.d.ts', () => {
     beforeAll(async () => {
       const { QraftCommand } = await import(
         '@openapi-qraft/plugin/lib/QraftCommand'
