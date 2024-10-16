@@ -3,7 +3,7 @@
  * Do not make direct changes to the file.
  */
 
-export type * from "./../openapi.d.ts";
+export type { $defs, paths, components, operations, webhooks } from "./../openapi.d.ts";
 export { services } from "./services/index.js";
 export type { Services } from "./services/index.js";
 export { createAPIClient } from "./create-api-client.js";
