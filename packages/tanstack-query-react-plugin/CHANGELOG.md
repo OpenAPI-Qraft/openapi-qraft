@@ -1,5 +1,16 @@
 # @openapi-qraft/tanstack-query-react-plugin
 
+## 2.0.0-next.14
+
+### Major Changes
+
+- 54fd011: Changed the exports from the schema file to include only the essential types: `$defs`, `paths`, `components`, `operations`, `webhooks`. This adjustment improves the development experience by preventing the export of all schema types, which could result in an excessive number of exported types, complicating development and reducing clarity.
+
+### Patch Changes
+
+- 7ab718b: Enhanced the `--explicit-import-extensions` option to support `.ts` in addition to `.js`, making it easier for projects using TypeScript to explicitly specify import extensions.
+  - @openapi-qraft/plugin@2.0.0-next.14
+
 ## 2.0.0-next.13
 
 ### Patch Changes

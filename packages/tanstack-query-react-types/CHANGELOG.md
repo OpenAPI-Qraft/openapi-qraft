@@ -1,5 +1,11 @@
 # @openapi-qraft/tanstack-query-react-types
 
+## 2.0.0-next.14
+
+### Patch Changes
+
+- 34ff132: Added support for `void` and `undefined` arguments in mutation operations and `setQueryData`.
+
 ## 2.0.0-next.13
 
 ## 2.0.0-next.12

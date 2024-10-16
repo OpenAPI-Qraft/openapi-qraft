@@ -1,5 +1,12 @@
 # @openapi-qraft/openapi-typescript
 
+## 1.2.0-next.14
+
+### Patch Changes
+
+- 34ff132: Added support for `void` and `undefined` arguments in mutation operations and `setQueryData`.
+  - @openapi-qraft/plugin@2.0.0-next.14
+
 ## 1.2.0-next.13
 
 ### Patch Changes
