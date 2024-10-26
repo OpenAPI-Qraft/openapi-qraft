@@ -4399,7 +4399,7 @@ describe('Qraft is type-safe if client created without options', () => {
       })
     ).toThrow(
       new Error(
-        `'qraft.<service>.<operation>.useQuery()' requires 'queryClient' in options.`
+        `'qraft.<service>.<operation>.useQuery()' requires 'queryClient' in 'createAPIClient(...)' options.`
       )
     );
 
