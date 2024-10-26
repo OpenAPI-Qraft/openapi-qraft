@@ -116,7 +116,8 @@ export function qraftAPIClient<
       if (
         callbackName !== 'operationInvokeFn' &&
         callbackName !== 'getQueryKey' &&
-        callbackName !== 'getMutationKey'
+        callbackName !== 'getMutationKey' &&
+        callbackName !== 'getInfiniteQueryKey'
       )
         if (!options || !('queryClient' in options && options.queryClient))
           throw new Error(

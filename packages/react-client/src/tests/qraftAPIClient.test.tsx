@@ -4071,8 +4071,8 @@ describe('Qraft uses "getQueryKey(...)"', () => {
 });
 
 describe('Qraft uses "getInfiniteQueryKey(...)"', () => {
-  it('returns infinite query key without parameters', async () => {
-    const { qraft } = createClient();
+  it('returns infinite query key without parameters and without "createAPIClient(...)" options', async () => {
+    const qraft = createAPIClient();
 
     expect(
       qraft.files.findAll.getInfiniteQueryKey() satisfies [
