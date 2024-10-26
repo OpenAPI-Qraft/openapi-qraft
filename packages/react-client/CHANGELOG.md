@@ -1,5 +1,12 @@
 # @openapi-qraft/react
 
+## 2.0.0-next.16
+
+### Patch Changes
+
+- cfe7d0a: `createAPIClient` now allows calling `getInfiniteQueryKey()` without requiring `queryClient` in options.
+  - @openapi-qraft/tanstack-query-react-types@2.0.0-next.16
+
 ## 2.0.0-next.15
 
 ### Patch Changes
