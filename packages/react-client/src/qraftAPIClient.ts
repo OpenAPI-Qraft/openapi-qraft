@@ -116,11 +116,12 @@ export function qraftAPIClient<
       if (
         callbackName !== 'operationInvokeFn' &&
         callbackName !== 'getQueryKey' &&
-        callbackName !== 'getMutationKey'
+        callbackName !== 'getMutationKey' &&
+        callbackName !== 'getInfiniteQueryKey'
       )
         if (!options || !('queryClient' in options && options.queryClient))
           throw new Error(
-            `'qraft.<service>.<operation>.${String(callbackName)}()' requires 'queryClient' in options.`
+            `'qraft.<service>.<operation>.${String(callbackName)}()' requires 'queryClient' in 'createAPIClient(...)' options.`
           );
 
       // @ts-expect-error - Too complex union type

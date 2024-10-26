@@ -36,7 +36,7 @@
     "globals": "^15.9.0",
     "jscodeshift": "^17.0.0",
     "jsdom": "^25.0.0",
-    "msw": "^2.4.7",
+    "msw": "^2.5.1",
     "prettier": "^3.3.3",
     "query-string": "^8.2.0",
     "react": "^18.3.1",
