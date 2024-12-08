@@ -1839,7 +1839,7 @@ describe('Qraft uses Operation Query Function', () => {
   });
 });
 
-describe('Qraft uses "fetchQuery(...) & "prefetchQuery(...)"', () => {
+describe('Qraft uses "fetchQuery(...) & "prefetchQuery(...)" & "ensureQueryData(...)"', () => {
   const parameters: Services['approvalPolicies']['getApprovalPoliciesId']['types']['parameters'] =
     {
       header: {
@@ -2020,6 +2020,21 @@ describe('Qraft uses "fetchQuery(...) & "prefetchQuery(...)"', () => {
       qraft.approvalPolicies.getApprovalPoliciesId.getQueryData(parameters)
     ).toEqual(parameters);
   });
+
+  it('uses ensureQueryData with `parameters`', async () => {
+    const { qraft } = createClient();
+
+    const result = qraft.approvalPolicies.getApprovalPoliciesId.ensureQueryData(
+      { parameters }
+    );
+
+    // Prefetching doesn't return the data
+    await expect(result).resolves.toEqual(parameters);
+
+    expect(
+      qraft.approvalPolicies.getApprovalPoliciesId.getQueryData(parameters)
+    ).toEqual(parameters);
+  });
 });
 
 describe('Qraft uses "fetchInfiniteQuery(...) & "prefetchInfiniteQuery(...)"', () => {
@@ -2113,6 +2128,40 @@ describe('Qraft uses "fetchInfiniteQuery(...) & "prefetchInfiniteQuery(...)"', (
         parameters
       )
     ).toEqual({
+      pageParams: [
+        {
+          query: {
+            items_order: ['asc', 'asc', 'asc'],
+          },
+        },
+      ],
+      pages: [
+        {
+          ...parameters,
+          query: {
+            ...parameters.query,
+            items_order: ['asc', 'asc', 'asc'],
+          },
+        },
+      ],
+    });
+  });
+
+  it('uses ensureInfiniteQueryData', async () => {
+    const { qraft } = createClient();
+
+    const result =
+      qraft.approvalPolicies.getApprovalPoliciesId.ensureInfiniteQueryData({
+        requestFn: requestFn,
+        parameters,
+        initialPageParam: {
+          query: {
+            items_order: ['asc', 'asc', 'asc'],
+          },
+        },
+      });
+
+    await expect(result).resolves.toEqual({
       pageParams: [
         {
           query: {

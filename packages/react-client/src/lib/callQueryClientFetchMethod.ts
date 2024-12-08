@@ -84,8 +84,10 @@ type QueryClientMethodArgs<QMethod extends keyof QueryClientPrototype> = [
 type QueryKeyMethods =
   | QueryKeyMethod<'fetchQuery'>
   | QueryKeyMethod<'prefetchQuery'>
+  | QueryKeyMethod<'ensureQueryData'>
   | QueryKeyMethod<'fetchInfiniteQuery'>
-  | QueryKeyMethod<'prefetchInfiniteQuery'>;
+  | QueryKeyMethod<'prefetchInfiniteQuery'>
+  | QueryKeyMethod<'ensureInfiniteQueryData'>;
 
 type QueryClientPrototype = typeof QueryClient.prototype;
 

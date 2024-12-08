@@ -1,8 +1,7 @@
 import type {
-  FetchInfiniteQueryOptionsByParameters,
-  FetchInfiniteQueryOptionsByQueryKey,
-  FetchInfiniteQueryOptionsQueryFn,
   OperationInfiniteData,
+  ServiceOperationEnsureInfiniteQueryDataOptions,
+  ServiceOperationFetchInfiniteQueryOptions,
 } from '@openapi-qraft/tanstack-query-react-types';
 
 export interface ServiceOperationFetchInfiniteQuery<
@@ -12,62 +11,32 @@ export interface ServiceOperationFetchInfiniteQuery<
   TError,
 > {
   fetchInfiniteQuery<TPageParam extends TParams>(
-    options:
-      | (FetchInfiniteQueryOptionsByQueryKey<
-          TSchema,
-          TQueryFnData,
-          TParams,
-          TPageParam,
-          TError
-        > &
-          FetchInfiniteQueryOptionsQueryFn<
-            TSchema,
-            TQueryFnData,
-            TParams,
-            TError
-          >)
-      | (FetchInfiniteQueryOptionsByParameters<
-          TSchema,
-          TQueryFnData,
-          TParams,
-          TPageParam,
-          TError
-        > &
-          FetchInfiniteQueryOptionsQueryFn<
-            TSchema,
-            TQueryFnData,
-            TParams,
-            TError
-          >)
+    options: ServiceOperationFetchInfiniteQueryOptions<
+      TSchema,
+      TQueryFnData,
+      TParams,
+      TPageParam,
+      TError
+    >
   ): Promise<OperationInfiniteData<TQueryFnData, TParams>>;
 
   prefetchInfiniteQuery<TPageParam extends TParams>(
-    options:
-      | (FetchInfiniteQueryOptionsByQueryKey<
-          TSchema,
-          TQueryFnData,
-          TParams,
-          TPageParam,
-          TError
-        > &
-          FetchInfiniteQueryOptionsQueryFn<
-            TSchema,
-            TQueryFnData,
-            TParams,
-            TError
-          >)
-      | (FetchInfiniteQueryOptionsByParameters<
-          TSchema,
-          TQueryFnData,
-          TParams,
-          TPageParam,
-          TError
-        > &
-          FetchInfiniteQueryOptionsQueryFn<
-            TSchema,
-            TQueryFnData,
-            TParams,
-            TError
-          >)
+    options: ServiceOperationFetchInfiniteQueryOptions<
+      TSchema,
+      TQueryFnData,
+      TParams,
+      TPageParam,
+      TError
+    >
   ): Promise<void>;
+
+  ensureInfiniteQueryData<TPageParam extends TParams>(
+    options: ServiceOperationEnsureInfiniteQueryDataOptions<
+      TSchema,
+      TQueryFnData,
+      TParams,
+      TPageParam,
+      TError
+    >
+  ): Promise<OperationInfiniteData<TQueryFnData, TParams>>;
 }
