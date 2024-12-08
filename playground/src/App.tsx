@@ -11,7 +11,6 @@ import {
   QueryClientProvider,
   useQueryClient,
 } from '@tanstack/react-query';
-import constate from 'constate';
 import {
   ComponentProps,
   createContext,
@@ -22,34 +21,61 @@ import {
 import { components, createAPIClient, Services } from './api';
 
 function AppComponent() {
-  const { petIdToEdit } = usePetToEdit();
-  const { petStatusToCreate } = usePetStatusToCreate();
+  const [petIdToEdit, setPetIdToEditToEdit] = useState<number | null>(null);
+  const [petStatusToCreate, setPetStatusToCreate] = useState<PetStatus | null>(
+    null
+  );
+  const [petsFilter, setPetsFilter] = useState<PetsFilter>({
+    status: 'available',
+  });
 
   return (
     <div style={{ display: 'flex', flexFlow: 'column', gap: 20 }}>
-      {!petIdToEdit && !petStatusToCreate && <PetListFilter />}
-
-      {petIdToEdit && <PetUpdateForm petId={petIdToEdit} />}
-      {!petIdToEdit && petStatusToCreate && (
-        <PetCreateForm status={petStatusToCreate} />
+      {!petIdToEdit && !petStatusToCreate && (
+        <PetListFilter
+          onCreate={setPetStatusToCreate}
+          petsFilter={petsFilter}
+          setPetsFilter={setPetsFilter}
+        />
       )}
-      {!petIdToEdit && !petStatusToCreate && <PetList />}
+
+      {petIdToEdit && (
+        <PetUpdateForm
+          petId={petIdToEdit}
+          onUpdate={() => setPetIdToEditToEdit(null)}
+          onReset={() => setPetIdToEditToEdit(null)}
+        />
+      )}
+      {!petIdToEdit && petStatusToCreate && (
+        <PetCreateForm
+          status={petStatusToCreate}
+          onCreate={() => setPetStatusToCreate(null)}
+          onReset={() => setPetStatusToCreate(null)}
+        />
+      )}
+      {!petIdToEdit && !petStatusToCreate && (
+        <PetList petsFilter={petsFilter} onEdit={setPetIdToEditToEdit} />
+      )}
     </div>
   );
 }
 
-function PetListFilter() {
-  const { petStatusToCreate, setPetStatusToCreate } = usePetStatusToCreate();
-
-  const { petsFilter, setPetsFilter } = usePetsFilter();
+function PetListFilter({
+  petsFilter,
+  onCreate,
+  setPetsFilter,
+}: {
+  petsFilter: PetsFilter;
+  onCreate: (petStatusToCreate: PetStatus) => void;
+  setPetsFilter: (petsFilter: PetsFilter) => void;
+}) {
   return (
     <form
       onSubmit={(event) => {
         event.preventDefault();
-        const formData = new FormData(event.currentTarget);
-        setPetStatusToCreate(
-          formData.get('status') as typeof petStatusToCreate
-        );
+        const status = new FormData(event.currentTarget).get('status');
+        assertPetStatus(status);
+        onCreate(status);
       }}
     >
       <label htmlFor="status">Select Status:</label>{' '}
@@ -57,10 +83,12 @@ function PetListFilter() {
         name="status"
         value={petsFilter.status}
         onChange={(event) => {
-          setPetsFilter((prev) => ({
-            ...prev,
-            status: event.target.value as typeof prev.status,
-          }));
+          const status = event.target.value;
+          assertPetStatus(status);
+          setPetsFilter({
+            ...petsFilter,
+            status,
+          });
         }}
       />
       <button type="submit" style={{ marginLeft: 10 }}>
@@ -70,9 +98,14 @@ function PetListFilter() {
   );
 }
 
-function PetList() {
+function PetList({
+  petsFilter,
+  onEdit,
+}: {
+  petsFilter: PetsFilter;
+  onEdit: (petId: number) => void;
+}) {
   const qraft = useCreateAPIClient();
-  const { petsFilter } = usePetsFilter();
   const { data, error, isPending } = qraft.pet.findPetsByStatus.useQuery({
     query: { status: petsFilter.status },
   });
@@ -90,14 +123,27 @@ function PetList() {
         gap: 20,
       }}
     >
-      {data?.map((pet) => <PetCard key={pet.id} pet={pet} />)}
+      {data?.map((pet) => (
+        <PetCard
+          key={pet.id}
+          pet={pet}
+          onEdit={() => {
+            if (!pet.id) throw new Error('pet.id not found');
+            onEdit(pet.id);
+          }}
+        />
+      ))}
     </div>
   );
 }
 
-function PetCard({ pet }: { pet: components['schemas']['Pet'] }) {
-  const { setPetIdToEditToEdit } = usePetToEdit();
-
+function PetCard({
+  pet,
+  onEdit,
+}: {
+  pet: components['schemas']['Pet'];
+  onEdit: () => void;
+}) {
   return (
     <div
       key={pet.id}
@@ -124,7 +170,7 @@ function PetCard({ pet }: { pet: components['schemas']['Pet'] }) {
         onClick={(event) => {
           event.preventDefault();
           if (!pet.id) throw new Error('pet.id not found');
-          setPetIdToEditToEdit(pet.id);
+          onEdit();
         }}
       >
         Edit
@@ -133,8 +179,15 @@ function PetCard({ pet }: { pet: components['schemas']['Pet'] }) {
   );
 }
 
-function PetUpdateForm({ petId }: { petId: number }) {
-  const { setPetIdToEditToEdit } = usePetToEdit();
+function PetUpdateForm({
+  petId,
+  onUpdate,
+  onReset,
+}: {
+  petId: number;
+  onUpdate: () => void;
+  onReset: () => void;
+}) {
   const qraft = useCreateAPIClient();
 
   const petParameters: typeof qraft.pet.getPetById.types.parameters = {
@@ -168,7 +221,7 @@ function PetUpdateForm({ petId }: { petId: number }) {
     async onSuccess(updatedPet) {
       qraft.pet.getPetById.setQueryData(petParameters, updatedPet);
       await qraft.pet.findPetsByStatus.invalidateQueries();
-      setPetIdToEditToEdit(undefined);
+      onUpdate();
     },
   });
 
@@ -202,19 +255,20 @@ function PetUpdateForm({ petId }: { petId: number }) {
           onSubmit={(event) => {
             event.preventDefault();
             const formData = new FormData(event.currentTarget);
-            if (!pet) throw new Error('pet not found');
+            const status = formData.get('status');
+            assertPetStatus(status);
             mutate({
               body: {
                 id: pet.id,
+                status,
+                name: String(formData.get('name')),
                 photoUrls: pet.photoUrls, // required by schema
-                status: formData.get('status') as typeof pet.status,
-                name: formData.get('name') as typeof pet.name,
               },
             });
           }}
           onReset={(event) => {
             event.preventDefault();
-            setPetIdToEditToEdit(undefined);
+            onReset();
           }}
           id="updatePetForm"
           style={{
@@ -231,12 +285,13 @@ function PetUpdateForm({ petId }: { petId: number }) {
 
 function PetCreateForm({
   status,
+  onCreate,
+  onReset,
 }: {
   status: Services['pet']['addPet']['types']['body']['status'];
+  onCreate: (pet: components['schemas']['Pet']) => void;
+  onReset: () => void;
 }) {
-  const { setPetIdToEditToEdit } = usePetToEdit();
-  const { setPetStatusToCreate } = usePetStatusToCreate();
-
   const qraft = useCreateAPIClient();
 
   const { isPending, mutate, error } = qraft.pet.addPet.useMutation(undefined, {
@@ -244,7 +299,7 @@ function PetCreateForm({
       await qraft.pet.findPetsByStatus.invalidateQueries();
       if (!createdPet)
         throw new Error('createdPet not found in addPet.onSuccess');
-      setPetIdToEditToEdit(createdPet.id);
+      onCreate(createdPet);
     },
   });
 
@@ -270,7 +325,7 @@ function PetCreateForm({
       }}
       onReset={(event) => {
         event.preventDefault();
-        setPetStatusToCreate(undefined);
+        onReset();
       }}
       id="updatePetForm"
       style={{
@@ -350,30 +405,6 @@ const StatusesSelect = (props: Omit<ComponentProps<'select'>, 'children'>) => {
   );
 };
 
-const [UsePetsFilterProvider, usePetsFilter] = constate(() => {
-  const [petsFilter, setPetsFilter] = useState<{
-    status: 'available' | 'pending' | 'sold';
-    limit: number;
-    page: 1;
-  }>({ status: 'available', limit: 4, page: 1 });
-
-  return { petsFilter, setPetsFilter };
-});
-
-const [UsePetToEditProvider, usePetToEdit] = constate(() => {
-  const [petIdToEdit, setPetIdToEditToEdit] = useState<number>();
-
-  return { petIdToEdit, setPetIdToEditToEdit };
-});
-
-const [UsePetStatusToCreateProvider, usePetStatusToCreate] = constate(() => {
-  const [petStatusToCreate, setPetStatusToCreate] = useState<
-    'available' | 'pending' | 'sold'
-  >();
-
-  return { petStatusToCreate, setPetStatusToCreate };
-});
-
 function getErrorMessage(error: unknown) {
   return `Error: ${
     error instanceof Error ? error.message : JSON.stringify(error)
@@ -433,6 +464,8 @@ function useCreateAPIClient(options?: Partial<QraftClientOptions>) {
   });
 }
 
+type PetStatus = NonNullable<components['schemas']['Pet']['status']>;
+
 export interface APIContextValue {
   /**
    * Base URL to use for the request
@@ -454,16 +487,30 @@ export interface APIContextValue {
 
 export const APIContext = createContext<APIContextValue | undefined>(undefined);
 
+function assertPetStatus(
+  petStatusToCreate: unknown
+): asserts petStatusToCreate is PetStatus {
+  if (
+    !Object.values({
+      available: 'available',
+      pending: 'pending',
+      sold: 'sold',
+    } satisfies {
+      // A type-safe check ensuring all possible PetStatusToCreate values are included
+      [key in PetStatus]: key;
+    }).includes(petStatusToCreate as never)
+  )
+    throw new Error('petStatusToCreate not found in PetStatusToCreate');
+}
+
+type PetsFilter = {
+  status: 'available' | 'pending' | 'sold';
+};
+
 export default function App() {
   return (
     <QraftProviders>
-      <UsePetsFilterProvider>
-        <UsePetToEditProvider>
-          <UsePetStatusToCreateProvider>
-            <AppComponent />
-          </UsePetStatusToCreateProvider>
-        </UsePetToEditProvider>
-      </UsePetsFilterProvider>
+      <AppComponent />
     </QraftProviders>
   );
 }
