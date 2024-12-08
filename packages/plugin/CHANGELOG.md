@@ -1,5 +1,11 @@
 # @openapi-qraft/plugin
 
+## 2.0.0-next.17
+
+### Patch Changes
+
+- 16b380f: Added validation for unused `--operation-name-modifier` options in the plugin. An explicit error is now thrown if a modifier is specified but does not match any paths or operations during code generation, ensuring all provided modifiers are purposeful and correctly configured.
+
 ## 2.0.0-next.16
 
 ## 2.0.0-next.15
