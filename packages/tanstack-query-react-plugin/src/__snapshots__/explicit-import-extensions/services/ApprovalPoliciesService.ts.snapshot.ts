@@ -4,7 +4,7 @@
  */
 
 import type { paths } from "../../openapi.js";
-import type { QueryFiltersByParameters, QueryFiltersByQueryKey, AreAllOptional, ServiceOperationQueryKey, FetchInfiniteQueryOptionsByParameters, FetchInfiniteQueryOptionsByQueryKey, FetchInfiniteQueryOptionsQueryFn, OperationInfiniteData, ServiceOperationFetchQueryOptions, ServiceOperationInfiniteQueryKey, InvalidateQueryFilters, QueryFnOptionsByParameters, QueryFnOptionsByQueryKey, RequestFnResponse, PartialParameters, UseQueryOptionsForUseQueries, UseQueryOptionsForUseSuspenseQuery, WithOptional, MutationVariables, ServiceOperationMutationKey, ServiceOperationUseMutationOptions, MutationFiltersByMutationKey, MutationFiltersByParameters, ServiceOperationMutationFnOptions } from "@openapi-qraft/tanstack-query-react-types";
+import type { QueryFiltersByParameters, QueryFiltersByQueryKey, AreAllOptional, ServiceOperationQueryKey, OperationInfiniteData, ServiceOperationEnsureInfiniteQueryDataOptions, ServiceOperationFetchInfiniteQueryOptions, ServiceOperationEnsureQueryDataOptions, ServiceOperationFetchQueryOptions, ServiceOperationInfiniteQueryKey, InvalidateQueryFilters, QueryFnOptionsByParameters, QueryFnOptionsByQueryKey, RequestFnResponse, PartialParameters, UseQueryOptionsForUseQueries, UseQueryOptionsForUseSuspenseQuery, WithOptional, MutationVariables, ServiceOperationMutationKey, ServiceOperationUseMutationOptions, MutationFiltersByMutationKey, MutationFiltersByParameters, ServiceOperationMutationFnOptions } from "@openapi-qraft/tanstack-query-react-types";
 import type { CancelOptions, NoInfer, QueryState, InvalidateOptions, RefetchOptions, ResetOptions, SetDataOptions, Updater, InfiniteQueryPageParamsOptions, Mutation, MutationState } from "@tanstack/query-core";
 import type { DefinedInitialDataOptions, DefinedUseQueryResult, UndefinedInitialDataOptions, UseQueryResult, DefinedInitialDataInfiniteOptions, DefinedUseInfiniteQueryResult, UndefinedInitialDataInfiniteOptions, UseInfiniteQueryResult, UseSuspenseInfiniteQueryOptions, UseSuspenseInfiniteQueryResult, UseSuspenseQueryResult, UseSuspenseQueryOptions, UseMutationResult } from "@tanstack/react-query";
 export interface ApprovalPoliciesService {
@@ -73,12 +73,17 @@ export interface ApprovalPoliciesService {
          * @summary Get an approval policy by ID
          * @description Retrieve a specific approval policy.
          */
-        fetchInfiniteQuery<TPageParam extends GetApprovalPoliciesIdParameters>(options: (FetchInfiniteQueryOptionsByQueryKey<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdData, GetApprovalPoliciesIdParameters, TPageParam, GetApprovalPoliciesIdError> & FetchInfiniteQueryOptionsQueryFn<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdData, GetApprovalPoliciesIdParameters, GetApprovalPoliciesIdError>) | (FetchInfiniteQueryOptionsByParameters<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdData, GetApprovalPoliciesIdParameters, TPageParam, GetApprovalPoliciesIdError> & FetchInfiniteQueryOptionsQueryFn<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdData, GetApprovalPoliciesIdParameters, GetApprovalPoliciesIdError>)): Promise<OperationInfiniteData<GetApprovalPoliciesIdData, GetApprovalPoliciesIdParameters>>;
+        fetchInfiniteQuery<TPageParam extends GetApprovalPoliciesIdParameters>(options: ServiceOperationFetchInfiniteQueryOptions<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdData, GetApprovalPoliciesIdParameters, TPageParam, GetApprovalPoliciesIdError>): Promise<OperationInfiniteData<GetApprovalPoliciesIdData, GetApprovalPoliciesIdParameters>>;
         /**
          * @summary Get an approval policy by ID
          * @description Retrieve a specific approval policy.
          */
-        prefetchInfiniteQuery<TPageParam extends GetApprovalPoliciesIdParameters>(options: (FetchInfiniteQueryOptionsByQueryKey<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdData, GetApprovalPoliciesIdParameters, TPageParam, GetApprovalPoliciesIdError> & FetchInfiniteQueryOptionsQueryFn<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdData, GetApprovalPoliciesIdParameters, GetApprovalPoliciesIdError>) | (FetchInfiniteQueryOptionsByParameters<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdData, GetApprovalPoliciesIdParameters, TPageParam, GetApprovalPoliciesIdError> & FetchInfiniteQueryOptionsQueryFn<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdData, GetApprovalPoliciesIdParameters, GetApprovalPoliciesIdError>)): Promise<void>;
+        prefetchInfiniteQuery<TPageParam extends GetApprovalPoliciesIdParameters>(options: ServiceOperationFetchInfiniteQueryOptions<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdData, GetApprovalPoliciesIdParameters, TPageParam, GetApprovalPoliciesIdError>): Promise<void>;
+        /**
+         * @summary Get an approval policy by ID
+         * @description Retrieve a specific approval policy.
+         */
+        ensureInfiniteQueryData<TPageParam extends GetApprovalPoliciesIdParameters>(options: ServiceOperationEnsureInfiniteQueryDataOptions<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdData, GetApprovalPoliciesIdParameters, TPageParam, GetApprovalPoliciesIdError>): Promise<OperationInfiniteData<GetApprovalPoliciesIdData, GetApprovalPoliciesIdParameters>>;
         /**
          * @summary Get an approval policy by ID
          * @description Retrieve a specific approval policy.
@@ -89,6 +94,11 @@ export interface ApprovalPoliciesService {
          * @description Retrieve a specific approval policy.
          */
         prefetchQuery(options: ServiceOperationFetchQueryOptions<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdData, GetApprovalPoliciesIdParameters, GetApprovalPoliciesIdError>): Promise<void>;
+        /**
+         * @summary Get an approval policy by ID
+         * @description Retrieve a specific approval policy.
+         */
+        ensureQueryData(options: ServiceOperationEnsureQueryDataOptions<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdData, GetApprovalPoliciesIdParameters, GetApprovalPoliciesIdError>): Promise<GetApprovalPoliciesIdData>;
         /**
          * @summary Get an approval policy by ID
          * @description Retrieve a specific approval policy.
