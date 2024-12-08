@@ -7,11 +7,66 @@ import type {
 } from '@tanstack/query-core';
 import type { OperationInfiniteData } from './OperationInfiniteData.js';
 import type { PartialParameters } from './PartialParameters.js';
-import type {
-  ServiceOperationInfiniteQueryKey,
-  ServiceOperationQueryKey,
-} from './ServiceOperationKey.js';
+import type { ServiceOperationInfiniteQueryKey } from './ServiceOperationKey.js';
 import { RequestFn } from './RequestFn.js';
+
+export type ServiceOperationFetchInfiniteQueryOptions<
+  TSchema extends { url: string; method: string },
+  TQueryFnData,
+  TParams,
+  TPageParam,
+  TError = DefaultError,
+> =
+  | (FetchInfiniteQueryOptionsByQueryKey<
+      TSchema,
+      TQueryFnData,
+      TParams,
+      TPageParam,
+      TError
+    > &
+      FetchInfiniteQueryOptionsQueryFn<TSchema, TQueryFnData, TParams, TError>)
+  | (FetchInfiniteQueryOptionsByParameters<
+      TSchema,
+      TQueryFnData,
+      TParams,
+      TPageParam,
+      TError
+    > &
+      FetchInfiniteQueryOptionsQueryFn<TSchema, TQueryFnData, TParams, TError>);
+
+export type ServiceOperationEnsureInfiniteQueryDataOptions<
+  TSchema extends { url: string; method: string },
+  TQueryFnData,
+  TParams,
+  TPageParam,
+  TError = DefaultError,
+> =
+  | ((FetchInfiniteQueryOptionsByQueryKey<
+      TSchema,
+      TQueryFnData,
+      TParams,
+      TPageParam,
+      TError
+    > &
+      FetchInfiniteQueryOptionsQueryFn<
+        TSchema,
+        TQueryFnData,
+        TParams,
+        TError
+      >) & { revalidateIfStale?: boolean })
+  | ((FetchInfiniteQueryOptionsByParameters<
+      TSchema,
+      TQueryFnData,
+      TParams,
+      TPageParam,
+      TError
+    > &
+      FetchInfiniteQueryOptionsQueryFn<
+        TSchema,
+        TQueryFnData,
+        TParams,
+        TError
+      >) & { revalidateIfStale?: boolean });
 
 type FetchInfiniteQueryPages<TQueryFnData = unknown, TPageParam = unknown> =
   | {
@@ -28,7 +83,7 @@ type FetchInfiniteQueryPages<TQueryFnData = unknown, TPageParam = unknown> =
 type FetchInfiniteQueryOptionsBase<
   TSchema extends { url: string; method: string },
   TQueryFnData,
-  TParams = {},
+  TParams,
   TPageParam = unknown,
   TError = DefaultError,
 > = Omit<
@@ -36,7 +91,7 @@ type FetchInfiniteQueryOptionsBase<
     TQueryFnData,
     TError,
     OperationInfiniteData<TQueryFnData, TParams>,
-    ServiceOperationQueryKey<TSchema, TParams>,
+    ServiceOperationInfiniteQueryKey<TSchema, TParams>,
     TPageParam
   >,
   'queryKey' | 'initialPageParam'
@@ -44,11 +99,11 @@ type FetchInfiniteQueryOptionsBase<
   InitialPageParam<PartialParameters<TPageParam>> &
   FetchInfiniteQueryPages<TQueryFnData, TPageParam>;
 
-export type FetchInfiniteQueryOptionsByQueryKey<
+type FetchInfiniteQueryOptionsByQueryKey<
   TSchema extends { url: string; method: string },
   TQueryFnData,
-  TParams = {},
-  TPageParam = {},
+  TParams,
+  TPageParam,
   TError = DefaultError,
 > = FetchInfiniteQueryOptionsBase<
   TSchema,
@@ -63,11 +118,12 @@ export type FetchInfiniteQueryOptionsByQueryKey<
   queryKey?: ServiceOperationInfiniteQueryKey<TSchema, TParams>;
   parameters?: never;
 };
-export type FetchInfiniteQueryOptionsByParameters<
+
+type FetchInfiniteQueryOptionsByParameters<
   TSchema extends { url: string; method: string },
   TQueryFnData,
-  TParams = {},
-  TPageParam = {},
+  TParams,
+  TPageParam,
   TError = DefaultError,
 > = FetchInfiniteQueryOptionsBase<
   TSchema,
@@ -83,7 +139,7 @@ export type FetchInfiniteQueryOptionsByParameters<
   queryKey?: never;
 };
 
-export type FetchInfiniteQueryOptionsQueryFn<
+type FetchInfiniteQueryOptionsQueryFn<
   TSchema extends { url: string; method: string },
   TQueryFnData,
   TParams,

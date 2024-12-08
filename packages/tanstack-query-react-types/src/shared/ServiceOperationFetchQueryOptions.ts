@@ -17,6 +17,21 @@ export type ServiceOperationFetchQueryOptions<
   | (FetchQueryOptionsByParameters<TSchema, TQueryFnData, TParams, TError> &
       FetchQueryOptionsQueryFn<TSchema, TQueryFnData, TParams, TError>);
 
+export type ServiceOperationEnsureQueryDataOptions<
+  TSchema extends { url: string; method: string },
+  TQueryFnData,
+  TParams,
+  TError,
+> =
+  | (FetchQueryOptionsByQueryKey<TSchema, TQueryFnData, TParams, TError> &
+      FetchQueryOptionsQueryFn<TSchema, TQueryFnData, TParams, TError> & {
+        revalidateIfStale?: boolean;
+      })
+  | (FetchQueryOptionsByParameters<TSchema, TQueryFnData, TParams, TError> &
+      FetchQueryOptionsQueryFn<TSchema, TQueryFnData, TParams, TError> & {
+        revalidateIfStale?: boolean;
+      });
+
 type FetchQueryOptionsBase<
   TSchema extends { url: string; method: string },
   TQueryFnData,

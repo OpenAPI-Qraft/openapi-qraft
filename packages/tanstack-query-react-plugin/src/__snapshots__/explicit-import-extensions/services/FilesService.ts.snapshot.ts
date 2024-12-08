@@ -4,7 +4,7 @@
  */
 
 import type { paths } from "../../openapi.js";
-import type { QueryFiltersByParameters, QueryFiltersByQueryKey, AreAllOptional, ServiceOperationQueryKey, FetchInfiniteQueryOptionsByParameters, FetchInfiniteQueryOptionsByQueryKey, FetchInfiniteQueryOptionsQueryFn, OperationInfiniteData, ServiceOperationFetchQueryOptions, ServiceOperationInfiniteQueryKey, InvalidateQueryFilters, QueryFnOptionsByParameters, QueryFnOptionsByQueryKey, RequestFnResponse, PartialParameters, UseQueryOptionsForUseQueries, UseQueryOptionsForUseSuspenseQuery, WithOptional, MutationVariables, ServiceOperationMutationKey, ServiceOperationUseMutationOptions, MutationFiltersByMutationKey, MutationFiltersByParameters, ServiceOperationMutationFnOptions } from "@openapi-qraft/tanstack-query-react-types";
+import type { QueryFiltersByParameters, QueryFiltersByQueryKey, AreAllOptional, ServiceOperationQueryKey, OperationInfiniteData, ServiceOperationEnsureInfiniteQueryDataOptions, ServiceOperationFetchInfiniteQueryOptions, ServiceOperationEnsureQueryDataOptions, ServiceOperationFetchQueryOptions, ServiceOperationInfiniteQueryKey, InvalidateQueryFilters, QueryFnOptionsByParameters, QueryFnOptionsByQueryKey, RequestFnResponse, PartialParameters, UseQueryOptionsForUseQueries, UseQueryOptionsForUseSuspenseQuery, WithOptional, MutationVariables, ServiceOperationMutationKey, ServiceOperationUseMutationOptions, MutationFiltersByMutationKey, MutationFiltersByParameters, ServiceOperationMutationFnOptions } from "@openapi-qraft/tanstack-query-react-types";
 import type { CancelOptions, NoInfer, QueryState, InvalidateOptions, RefetchOptions, ResetOptions, SetDataOptions, Updater, InfiniteQueryPageParamsOptions, Mutation, MutationState } from "@tanstack/query-core";
 import type { DefinedInitialDataOptions, DefinedUseQueryResult, UndefinedInitialDataOptions, UseQueryResult, DefinedInitialDataInfiniteOptions, DefinedUseInfiniteQueryResult, UndefinedInitialDataInfiniteOptions, UseInfiniteQueryResult, UseSuspenseInfiniteQueryOptions, UseSuspenseInfiniteQueryResult, UseSuspenseQueryResult, UseSuspenseQueryOptions, UseMutationResult } from "@tanstack/react-query";
 export interface FilesService {
@@ -51,13 +51,17 @@ export interface FilesService {
          */
         useQuery<TData = GetFilesData>(parameters: ServiceOperationQueryKey<GetFilesSchema, GetFilesParameters> | (GetFilesParameters), options: Omit<DefinedInitialDataOptions<GetFilesData, GetFilesError, TData, ServiceOperationQueryKey<GetFilesSchema, GetFilesParameters>>, "queryKey">): DefinedUseQueryResult<TData, GetFilesError | Error>;
         /** @summary Get a files by ID */
-        fetchInfiniteQuery<TPageParam extends GetFilesParameters>(options: (FetchInfiniteQueryOptionsByQueryKey<GetFilesSchema, GetFilesData, GetFilesParameters, TPageParam, GetFilesError> & FetchInfiniteQueryOptionsQueryFn<GetFilesSchema, GetFilesData, GetFilesParameters, GetFilesError>) | (FetchInfiniteQueryOptionsByParameters<GetFilesSchema, GetFilesData, GetFilesParameters, TPageParam, GetFilesError> & FetchInfiniteQueryOptionsQueryFn<GetFilesSchema, GetFilesData, GetFilesParameters, GetFilesError>)): Promise<OperationInfiniteData<GetFilesData, GetFilesParameters>>;
+        fetchInfiniteQuery<TPageParam extends GetFilesParameters>(options: ServiceOperationFetchInfiniteQueryOptions<GetFilesSchema, GetFilesData, GetFilesParameters, TPageParam, GetFilesError>): Promise<OperationInfiniteData<GetFilesData, GetFilesParameters>>;
         /** @summary Get a files by ID */
-        prefetchInfiniteQuery<TPageParam extends GetFilesParameters>(options: (FetchInfiniteQueryOptionsByQueryKey<GetFilesSchema, GetFilesData, GetFilesParameters, TPageParam, GetFilesError> & FetchInfiniteQueryOptionsQueryFn<GetFilesSchema, GetFilesData, GetFilesParameters, GetFilesError>) | (FetchInfiniteQueryOptionsByParameters<GetFilesSchema, GetFilesData, GetFilesParameters, TPageParam, GetFilesError> & FetchInfiniteQueryOptionsQueryFn<GetFilesSchema, GetFilesData, GetFilesParameters, GetFilesError>)): Promise<void>;
+        prefetchInfiniteQuery<TPageParam extends GetFilesParameters>(options: ServiceOperationFetchInfiniteQueryOptions<GetFilesSchema, GetFilesData, GetFilesParameters, TPageParam, GetFilesError>): Promise<void>;
+        /** @summary Get a files by ID */
+        ensureInfiniteQueryData<TPageParam extends GetFilesParameters>(options: ServiceOperationEnsureInfiniteQueryDataOptions<GetFilesSchema, GetFilesData, GetFilesParameters, TPageParam, GetFilesError>): Promise<OperationInfiniteData<GetFilesData, GetFilesParameters>>;
         /** @summary Get a files by ID */
         fetchQuery(options: ServiceOperationFetchQueryOptions<GetFilesSchema, GetFilesData, GetFilesParameters, GetFilesError>): Promise<GetFilesData>;
         /** @summary Get a files by ID */
         prefetchQuery(options: ServiceOperationFetchQueryOptions<GetFilesSchema, GetFilesData, GetFilesParameters, GetFilesError>): Promise<void>;
+        /** @summary Get a files by ID */
+        ensureQueryData(options: ServiceOperationEnsureQueryDataOptions<GetFilesSchema, GetFilesData, GetFilesParameters, GetFilesError>): Promise<GetFilesData>;
         /** @summary Get a files by ID */
         getInfiniteQueryData(parameters: ServiceOperationInfiniteQueryKey<GetFilesSchema, GetFilesParameters> | (GetFilesParameters)): OperationInfiniteData<GetFilesData, GetFilesParameters> | undefined;
         /** @summary Get a files by ID */
@@ -608,12 +612,17 @@ export interface FilesService {
          * @deprecated
          * @summary Get a file list
          */
-        fetchInfiniteQuery<TPageParam extends GetFileListParameters>(options: (FetchInfiniteQueryOptionsByQueryKey<GetFileListSchema, GetFileListData, GetFileListParameters, TPageParam, GetFileListError> & FetchInfiniteQueryOptionsQueryFn<GetFileListSchema, GetFileListData, GetFileListParameters, GetFileListError>) | (FetchInfiniteQueryOptionsByParameters<GetFileListSchema, GetFileListData, GetFileListParameters, TPageParam, GetFileListError> & FetchInfiniteQueryOptionsQueryFn<GetFileListSchema, GetFileListData, GetFileListParameters, GetFileListError>)): Promise<OperationInfiniteData<GetFileListData, GetFileListParameters>>;
+        fetchInfiniteQuery<TPageParam extends GetFileListParameters>(options: ServiceOperationFetchInfiniteQueryOptions<GetFileListSchema, GetFileListData, GetFileListParameters, TPageParam, GetFileListError>): Promise<OperationInfiniteData<GetFileListData, GetFileListParameters>>;
         /**
          * @deprecated
          * @summary Get a file list
          */
-        prefetchInfiniteQuery<TPageParam extends GetFileListParameters>(options: (FetchInfiniteQueryOptionsByQueryKey<GetFileListSchema, GetFileListData, GetFileListParameters, TPageParam, GetFileListError> & FetchInfiniteQueryOptionsQueryFn<GetFileListSchema, GetFileListData, GetFileListParameters, GetFileListError>) | (FetchInfiniteQueryOptionsByParameters<GetFileListSchema, GetFileListData, GetFileListParameters, TPageParam, GetFileListError> & FetchInfiniteQueryOptionsQueryFn<GetFileListSchema, GetFileListData, GetFileListParameters, GetFileListError>)): Promise<void>;
+        prefetchInfiniteQuery<TPageParam extends GetFileListParameters>(options: ServiceOperationFetchInfiniteQueryOptions<GetFileListSchema, GetFileListData, GetFileListParameters, TPageParam, GetFileListError>): Promise<void>;
+        /**
+         * @deprecated
+         * @summary Get a file list
+         */
+        ensureInfiniteQueryData<TPageParam extends GetFileListParameters>(options: ServiceOperationEnsureInfiniteQueryDataOptions<GetFileListSchema, GetFileListData, GetFileListParameters, TPageParam, GetFileListError>): Promise<OperationInfiniteData<GetFileListData, GetFileListParameters>>;
         /**
          * @deprecated
          * @summary Get a file list
@@ -624,6 +633,11 @@ export interface FilesService {
          * @summary Get a file list
          */
         prefetchQuery(options: ServiceOperationFetchQueryOptions<GetFileListSchema, GetFileListData, GetFileListParameters, GetFileListError> | void): Promise<void>;
+        /**
+         * @deprecated
+         * @summary Get a file list
+         */
+        ensureQueryData(options: ServiceOperationEnsureQueryDataOptions<GetFileListSchema, GetFileListData, GetFileListParameters, GetFileListError> | void): Promise<GetFileListData>;
         /**
          * @deprecated
          * @summary Get a file list
