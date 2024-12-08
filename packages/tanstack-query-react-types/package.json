@@ -27,7 +27,7 @@
   "devDependencies": {
     "@openapi-qraft/eslint-config": "workspace:*",
     "@openapi-qraft/rollup-config": "workspace:*",
-    "eslint": "^9.10.0",
+    "eslint": "^9.16.0",
     "rimraf": "^5.0.10",
     "rollup": "~4.22.4",
     "typescript": "^5.6.2"
