@@ -17,7 +17,7 @@ export const processOperationNameModifierOption = (
       services,
     };
 
-  const operationNameModifiers = modifiers.map((modifier) => ({
+  const availableOperationNameModifiers = modifiers.map((modifier) => ({
     ...modifier,
     isPathMatch: createServicePathMatch(
       splitCommaSeparatedGlobs(modifier.pathGlobs)
@@ -36,6 +36,8 @@ export const processOperationNameModifierOption = (
     >
   >();
 
+  const processedOperationNameModifiers = new Set<(typeof modifiers)[number]>();
+
   for (const service of services) {
     serviceOperationReplacements.set(service.name, new Map());
 
@@ -47,7 +49,7 @@ export const processOperationNameModifierOption = (
       if (!operationReplacements)
         throw new Error('operationReplacements not found');
 
-      const operationModifiers = operationNameModifiers.filter(
+      const operationNameModifiers = availableOperationNameModifiers.filter(
         (modifier) =>
           modifier.isPathMatch(operation.path) &&
           (modifier.methods === undefined ||
@@ -58,16 +60,16 @@ export const processOperationNameModifierOption = (
       );
 
       const replacedOperationName = getOperationIdName(
-        operationModifiers.reduce(
-          (operationName, modifier) =>
-            operationName.replace(
-              normalizeOperationNameModifierRegex(
-                modifier.operationNameModifierRegex
-              ),
-              modifier.operationNameModifierReplace
+        operationNameModifiers.reduce((operationNameAcc, modifier) => {
+          processedOperationNameModifiers.add(modifier);
+
+          return operationNameAcc.replace(
+            normalizeOperationNameModifierRegex(
+              modifier.operationNameModifierRegex
             ),
-          operation.name
-        )
+            modifier.operationNameModifierReplace
+          );
+        }, operation.name)
       );
 
       if (replacedOperationName !== operation.name) {
@@ -75,7 +77,7 @@ export const processOperationNameModifierOption = (
           operationReplacements.set(replacedOperationName, new Map());
         operationReplacements.get(replacedOperationName)?.set(
           operation.name,
-          operationModifiers.map(
+          operationNameModifiers.map(
             ({ isPathMatch: _, ...operationModifiersRest }) =>
               operationModifiersRest
           )
@@ -102,13 +104,26 @@ export const processOperationNameModifierOption = (
     }),
   }));
 
-  const errors = Array.from(serviceOperationReplacements).flatMap(
+  const errors: Array<
+    | {
+        type: 'conflictingOperationNameModifier';
+        serviceName: string;
+        replacedOperationName: string;
+        originalOperationName: string | undefined;
+        modifiers: OperationNameModifier[];
+      }
+    | {
+        type: 'unusedOperationNameModifier';
+        modifier: OperationNameModifier;
+      }
+  > = Array.from(serviceOperationReplacements).flatMap(
     ([serviceName, modifiedOperations]) =>
       Array.from(modifiedOperations).flatMap(
         ([replacedOperationName, operationModifierMap]) => {
           if (operationModifierMap.size > 1) {
             return Array.from(operationModifierMap).map(
               ([originalOperationName, modifiers]) => ({
+                type: 'conflictingOperationNameModifier',
                 serviceName,
                 replacedOperationName,
                 originalOperationName,
@@ -123,6 +138,7 @@ export const processOperationNameModifierOption = (
           if (modifiers && modifiers.length > 1) {
             return [
               {
+                type: 'conflictingOperationNameModifier',
                 serviceName,
                 replacedOperationName,
                 originalOperationName,
@@ -135,6 +151,20 @@ export const processOperationNameModifierOption = (
         }
       )
   );
+
+  availableOperationNameModifiers.forEach((modifier) => {
+    if (!processedOperationNameModifiers.has(modifier)) {
+      errors.push({
+        type: 'unusedOperationNameModifier',
+        modifier: {
+          methods: modifier.methods,
+          pathGlobs: modifier.pathGlobs,
+          operationNameModifierRegex: modifier.operationNameModifierRegex,
+          operationNameModifierReplace: modifier.operationNameModifierReplace,
+        },
+      });
+    }
+  });
 
   return {
     errors,

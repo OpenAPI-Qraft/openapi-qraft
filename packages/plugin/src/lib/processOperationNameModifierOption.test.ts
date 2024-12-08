@@ -163,6 +163,7 @@ describe('# processOperationNameModifierOption', () => {
             "originalOperationName": "postEntitiesIdDocuments",
             "replacedOperationName": "createOne",
             "serviceName": "entities",
+            "type": "conflictingOperationNameModifier",
           },
         ]
       `);
@@ -191,6 +192,7 @@ describe('# processOperationNameModifierOption', () => {
             "originalOperationName": "getApprovalPoliciesId",
             "replacedOperationName": "deleteOne",
             "serviceName": "approvalPolicies",
+            "type": "conflictingOperationNameModifier",
           },
           {
             "modifiers": [
@@ -204,6 +206,33 @@ describe('# processOperationNameModifierOption', () => {
             "originalOperationName": "deleteApprovalPoliciesId",
             "replacedOperationName": "deleteOne",
             "serviceName": "approvalPolicies",
+            "type": "conflictingOperationNameModifier",
+          },
+        ]
+      `);
+    });
+
+    it('generates errors for unused modifiers', () => {
+      const { errors } = processOperationNameModifierOption(
+        parseOperationNameModifier(
+          // used modifier
+          '/approval_policies/{approval_policy_id}:delete[A-Za-z]+sId ==> deleteOne',
+          // unused modifier
+          '/some/{unused}/modifier:delete[A-Za-z]+sId ==> deleteOne'
+        ),
+        getServices(openAPI)
+      );
+
+      expect(errors).toMatchInlineSnapshot(`
+        [
+          {
+            "modifier": {
+              "methods": undefined,
+              "operationNameModifierRegex": "delete[A-Za-z]+sId",
+              "operationNameModifierReplace": "deleteOne",
+              "pathGlobs": "/some/{unused}/modifier",
+            },
+            "type": "unusedOperationNameModifier",
           },
         ]
       `);

@@ -151,26 +151,37 @@ export class QraftCommand extends Command {
 
       if (operationNameModifierErrors.length) {
         operationNameModifierErrors.forEach((error) => {
-          spinner.fail(
-            [
-              c.red.bold(
-                `Error occurred during operation name modifier setup: '${error.serviceName}.${error.originalOperationName}' to '${error.replacedOperationName}'`
-              ),
-              c.yellow(
-                error.modifiers
-                  .map(
-                    ({
-                      pathGlobs,
-                      operationNameModifierRegex,
-                      operationNameModifierReplace,
-                    }) =>
-                      `Conflicting operation name modifier: '${pathGlobs}': '${operationNameModifierRegex}' => '${operationNameModifierReplace}'`
-                  )
-                  .join('\n')
-              ),
-            ].join('\n')
-          );
+          if (error.type === 'conflictingOperationNameModifier') {
+            spinner.fail(
+              [
+                c.red.bold(
+                  `Error occurred during operation name modifier setup: '${error.serviceName}.${error.originalOperationName}' to '${error.replacedOperationName}'`
+                ),
+                c.yellow(
+                  error.modifiers
+                    .map(
+                      ({
+                        pathGlobs,
+                        operationNameModifierRegex,
+                        operationNameModifierReplace,
+                      }) =>
+                        `Conflicting operation name modifier: '${pathGlobs}': '${operationNameModifierRegex}' => '${operationNameModifierReplace}'`
+                    )
+                    .join('\n')
+                ),
+              ].join('\n')
+            );
+          } else if (error.type === 'unusedOperationNameModifier') {
+            spinner.fail(
+              [
+                c.yellow.bold(
+                  `Unused operation name modifier: '${error.modifier.pathGlobs}': '${error.modifier.operationNameModifierRegex}' => '${error.modifier.operationNameModifierReplace}'`
+                ),
+              ].join('\n')
+            );
+          }
         });
+
         process.exit(1);
       }
 
