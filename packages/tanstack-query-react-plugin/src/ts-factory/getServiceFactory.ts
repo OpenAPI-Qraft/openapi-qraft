@@ -2,6 +2,7 @@ import { ServiceOperation } from '@openapi-qraft/plugin/lib/open-api/getServices
 import camelCase from 'camelcase';
 import ts from 'typescript';
 import { createOperationCommonTSDoc } from '../lib/createOperationCommonTSDoc.js';
+import { filterUnusedTypes } from './filterUnusedTypes.js';
 import { createServiceOperationCancelQueriesNodes } from './service-operation.generated/ServiceOperationCancelQueries.js';
 import { createServiceOperationFetchInfiniteQueryNodes } from './service-operation.generated/ServiceOperationFetchInfiniteQuery.js';
 import { createServiceOperationFetchQueryNodes } from './service-operation.generated/ServiceOperationFetchQuery.js';
@@ -45,13 +46,20 @@ export const getServiceFactory = (
   operations: ServiceOperation[],
   { openapiTypesImportPath }: ServiceImportsFactoryOptions
 ) => {
-  return [
-    getOpenAPISchemaImportsFactory(openapiTypesImportPath),
-    ...getServiceOperationImportsFactory(operations),
+  const mainNodes = [
     getServiceInterfaceFactory(service, operations),
     getServiceVariableFactory(service, operations),
     ...getOperationsTypes(operations),
   ];
+
+  const importNodes = [
+    getOpenAPISchemaImportsFactory(openapiTypesImportPath),
+    ...getServiceOperationImportsFactory(
+      filterUnusedTypes(getModuleTypeImports(operations), mainNodes)
+    ),
+  ];
+
+  return [...importNodes, ...mainNodes];
 };
 
 const getOpenAPISchemaImportsFactory = (schemaTypesPath: string) => {
@@ -74,17 +82,10 @@ const getOpenAPISchemaImportsFactory = (schemaTypesPath: string) => {
   );
 };
 
-const getServiceOperationImportsFactory = (operations: ServiceOperation[]) => {
+const getServiceOperationImportsFactory = (
+  moduleImports: Record<string, string[]>
+) => {
   const factory = ts.factory;
-
-  const moduleImports = getModuleTypeImports([
-    ...(operations.some((operation) => operation.method === 'get')
-      ? createServicesQueryOperationNodes()
-      : []),
-    ...(operations.some((operation) => operation.method !== 'get')
-      ? createServicesMutationOperationNodes()
-      : []),
-  ]);
 
   return Object.entries(moduleImports).map(
     ([moduleName, importSpecifierNames]) => {
@@ -662,25 +663,36 @@ const getMethodSignatureNodes = (
   );
 };
 
-const getModuleTypeImports = (nodes: ts.Node[]) => {
-  return nodes
-    .map((node) => {
-      const foo =
-        ts.isImportDeclaration(node) &&
-        ts.isStringLiteral(node.moduleSpecifier) &&
-        node.importClause?.isTypeOnly &&
-        node.importClause.namedBindings &&
-        ts.isNamedImports(node.importClause.namedBindings)
-          ? {
-              module: node.moduleSpecifier.text,
-              imports: node.importClause.namedBindings.elements
-                .filter(ts.isImportSpecifier)
-                .map((specifier) => specifier.name.text),
-            }
-          : undefined;
+/**
+ * Returns a list of all the modules that are imported by the operations.
+ * @param operations
+ * @returns Record<moduleName, importSpecifierNames[]>
+ */
+const getModuleTypeImports = (operations: ServiceOperation[]) => {
+  const nodes = [
+    ...(operations.some((operation) => operation.method === 'get')
+      ? createServicesQueryOperationNodes()
+      : []),
+    ...(operations.some((operation) => operation.method !== 'get')
+      ? createServicesMutationOperationNodes()
+      : []),
+  ];
 
-      return foo;
-    })
+  return nodes
+    .map((node) =>
+      ts.isImportDeclaration(node) &&
+      ts.isStringLiteral(node.moduleSpecifier) &&
+      node.importClause?.isTypeOnly &&
+      node.importClause.namedBindings &&
+      ts.isNamedImports(node.importClause.namedBindings)
+        ? {
+            module: node.moduleSpecifier.text,
+            imports: node.importClause.namedBindings.elements
+              .filter(ts.isImportSpecifier)
+              .map((specifier) => specifier.name.text),
+          }
+        : undefined
+    )
     .reduce<Record<string, string[]>>((acc, item) => {
       if (!item) return acc;
       if (!acc[item.module])
@@ -689,6 +701,8 @@ const getModuleTypeImports = (nodes: ts.Node[]) => {
         acc[item.module] = [...acc[item.module], ...item.imports].filter(
           arrayFilterUniqueCallback
         );
+
+      acc[item.module].sort();
 
       return acc;
     }, {});
