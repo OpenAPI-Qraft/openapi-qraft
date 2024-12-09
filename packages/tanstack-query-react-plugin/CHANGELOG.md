@@ -1,5 +1,17 @@
 # @openapi-qraft/tanstack-query-react-plugin
 
+## 2.0.0-next.17
+
+### Minor Changes
+
+- 8bbe14b: Added two new utility functions: `ensureQueryData` and `ensureInfiniteQueryData`. These methods improve data fetching workflows by allowing seamless retrieval of cached data or fetching it when unavailable. `ensureQueryData` supports standard queries, while `ensureInfiniteQueryData` is tailored for infinite queries, including paginated data handling.
+- cd3fe16: Added a filtering mechanism to remove unused type imports from generated service files. This improves code readability by including only the necessary types and reduces clutter in the output.
+
+### Patch Changes
+
+- Updated dependencies [16b380f]
+  - @openapi-qraft/plugin@2.0.0-next.17
+
 ## 2.0.0-next.16
 
 ### Patch Changes
