@@ -8961,15 +8961,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"constate@npm:^3.3.2":
-  version: 3.3.2
-  resolution: "constate@npm:3.3.2"
-  peerDependencies:
-    react: ^16.8.0 || ^17.0.0 || ^18.0.0
-  checksum: 10c0/60e797fa19d0d358a3fab17bff0a0e5cf33b438c23211be0854f86b80b4fc8620e911094582d6e02195362a9ba201563c5d91bc2631e41567525c305dca06153
-  languageName: node
-  linkType: hard
-
 "content-disposition@npm:0.5.2":
   version: 0.5.2
   resolution: "content-disposition@npm:0.5.2"
@@ -16490,7 +16481,6 @@ __metadata:
     "@typescript-eslint/eslint-plugin": "npm:^6.21.0"
     "@typescript-eslint/parser": "npm:^6.21.0"
     "@vitejs/plugin-react-swc": "npm:^3.7.0"
-    constate: "npm:^3.3.2"
     dotenv: "npm:^16.4.5"
     dotenv-expand: "npm:^10.0.0"
     eslint: "npm:^8.57.0"
