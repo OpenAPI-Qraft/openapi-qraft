@@ -3332,7 +3332,8 @@ describe('Qraft uses Queries Invalidation', () => {
       expect(result_01.current.isFetching).toBeFalsy();
     });
 
-    const counterFn = vi.fn<[{ infinite: boolean | undefined }]>();
+    const counterFn =
+      vi.fn<(options: { infinite: boolean | undefined }) => void>();
 
     expect(
       qraft.approvalPolicies.getApprovalPoliciesId.invalidateQueries({
@@ -3446,7 +3447,9 @@ describe('Qraft uses Queries Invalidation', () => {
 
     const counterFn =
       vi.fn<
-        [typeof qraft.approvalPolicies.getApprovalPoliciesId.types.parameters]
+        (
+          options: typeof qraft.approvalPolicies.getApprovalPoliciesId.types.parameters
+        ) => void
       >();
 
     expect(
@@ -3512,7 +3515,9 @@ describe('Qraft uses Queries Invalidation', () => {
 
     const counterFn =
       vi.fn<
-        [typeof qraft.approvalPolicies.getApprovalPoliciesId.types.parameters]
+        (
+          options: typeof qraft.approvalPolicies.getApprovalPoliciesId.types.parameters
+        ) => void
       >();
 
     expect(

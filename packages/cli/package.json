@@ -23,11 +23,11 @@
   "devDependencies": {
     "@openapi-qraft/eslint-config": "workspace:*",
     "@types/node": "^20.16.5",
-    "eslint": "^9.10.0",
+    "eslint": "^9.16.0",
     "globals": "^15.9.0",
     "rimraf": "^5.0.10",
     "typescript": "^5.6.2",
-    "vitest": "^1.6.0"
+    "vitest": "^2.1.8"
   },
   "files": [
     "dist",

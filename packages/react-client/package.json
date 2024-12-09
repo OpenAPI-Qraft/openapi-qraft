@@ -31,18 +31,18 @@
     "@types/jscodeshift": "^0.11.11",
     "@types/react": "^18.3.5",
     "@vitejs/plugin-react": "^4.3.1",
-    "@vitest/coverage-v8": "^1.6.0",
-    "eslint": "^9.10.0",
+    "@vitest/coverage-v8": "^2.1.8",
+    "eslint": "^9.16.0",
     "globals": "^15.9.0",
     "jscodeshift": "^17.0.0",
     "jsdom": "^25.0.0",
-    "msw": "^2.5.1",
+    "msw": "^2.6.8",
     "prettier": "^3.3.3",
     "query-string": "^8.2.0",
     "react": "^18.3.1",
     "rimraf": "^5.0.10",
     "rollup": "~4.22.4",
-    "vitest": "^1.6.0"
+    "vitest": "^2.1.8"
   },
   "peerDependencies": {
     "@tanstack/query-core": "^5.0.0",
