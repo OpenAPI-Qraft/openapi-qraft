@@ -1,6 +1,6 @@
 {
   "name": "@openapi-qraft/openapi-typescript-plugin",
-  "version": "1.2.0-next.16",
+  "version": "1.2.0-next.17",
   "type": "module",
   "scripts": {
     "build": "tsc --project tsconfig.build.json",
