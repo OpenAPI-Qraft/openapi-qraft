@@ -224,6 +224,8 @@ type QueryOperationCallbacks = Extract<
   | 'prefetchInfiniteQuery'
   | 'prefetchQuery'
   | 'refetchQueries'
+  | 'ensureQueryData'
+  | 'ensureInfiniteQueryData'
   | 'removeQueries'
   | 'resetQueries'
   | 'setInfiniteQueryData'
