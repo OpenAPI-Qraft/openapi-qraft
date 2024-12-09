@@ -1,5 +1,12 @@
 # @openapi-qraft/react
 
+## 2.0.0-next.18
+
+### Patch Changes
+
+- 665a77d: Add `ensureQueryData` methods to `QueryOperationCallbacks`.
+  - @openapi-qraft/tanstack-query-react-types@2.0.0-next.18
+
 ## 2.0.0-next.17
 
 ### Minor Changes
