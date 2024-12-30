@@ -1,5 +1,11 @@
 # @openapi-qraft/plugin
 
+## 2.0.0-next.19
+
+### Patch Changes
+
+- 62ff8e0: Refactor `Service` and `ServiceOperation` types.
+
 ## 2.0.0-next.18
 
 ## 2.0.0-next.17
