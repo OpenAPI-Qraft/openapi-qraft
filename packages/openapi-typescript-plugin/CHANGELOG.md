@@ -1,5 +1,24 @@
 # @openapi-qraft/openapi-typescript
 
+## 1.2.0
+
+### Minor Changes
+
+- 2a53608: Updated TypeScript to version 5.5.4
+
+### Patch Changes
+
+- 9dc1918: Simplified `TParams` type for conditional expressions.
+- cd8a856: Resolved conflict between explicit exports and generated enum exports by aligning export strategy.
+- 34ff132: Added support for `void` and `undefined` arguments in mutation operations and `setQueryData`.
+- Updated dependencies [16b380f]
+- Updated dependencies [8c77eb2]
+- Updated dependencies [2a53608]
+- Updated dependencies [76634bf]
+- Updated dependencies [c111be6]
+- Updated dependencies [62ff8e0]
+  - @openapi-qraft/plugin@2.0.0
+
 ## 1.2.0-next.19
 
 ### Patch Changes
