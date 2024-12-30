@@ -1,4 +1,4 @@
-import { ServiceOperation } from '@openapi-qraft/plugin/lib/open-api/getServices';
+import { ServiceOperation } from '@openapi-qraft/plugin/lib/open-api/OpenAPIService';
 
 export const createOperationCommonTSDoc = (operation: ServiceOperation) => {
   return [

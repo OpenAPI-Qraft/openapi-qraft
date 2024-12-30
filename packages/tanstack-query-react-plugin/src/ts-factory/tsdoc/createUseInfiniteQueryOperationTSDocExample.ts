@@ -1,4 +1,4 @@
-import { ServiceOperation } from '@openapi-qraft/plugin/lib/open-api/getServices';
+import { ServiceOperation } from '@openapi-qraft/plugin/lib/open-api/OpenAPIService';
 import camelcase from 'camelcase';
 import ts from 'typescript';
 import { astToString } from '../astToString.js';

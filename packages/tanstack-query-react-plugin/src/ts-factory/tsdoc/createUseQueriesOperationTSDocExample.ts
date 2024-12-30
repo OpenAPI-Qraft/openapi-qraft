@@ -1,4 +1,4 @@
-import type { ServiceOperation } from '@openapi-qraft/plugin/lib/open-api/getServices';
+import type { ServiceOperation } from '@openapi-qraft/plugin/lib/open-api/OpenAPIService';
 import camelcase from 'camelcase';
 import ts from 'typescript';
 import { createOperationCommonTSDoc } from '../../lib/createOperationCommonTSDoc.js';

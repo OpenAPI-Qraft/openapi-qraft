@@ -7,51 +7,23 @@ import {
   ServiceBaseNameByEndpointOption,
 } from './getServiceNamesByOperationEndpoint.js';
 import { getServiceNamesByOperationTags } from './getServiceNamesByOperationTags.js';
+import {
+  OpenAPIService,
+  ServiceOperation as ServiceOperationStable,
+} from './OpenAPIService.js';
 import { replaceRefParametersWithComponent } from './replaceRefParametersWithComponent.js';
 
 export type ServiceBaseName = ServiceBaseNameByEndpointOption | 'tags';
 
 /**
- * @deprecated move to separate file
+ * @deprecated use `OpenAPIService` instead from './OpenAPIService.js'
  */
-export type Service = {
-  name: string;
-  variableName: string;
-  typeName: string;
-  fileBaseName: string;
-  operations: ServiceOperation[];
-};
+export type Service = OpenAPIService;
 
-export type ServiceOperation = {
-  method:
-    | 'get'
-    | 'put'
-    | 'post'
-    | 'patch'
-    | 'delete'
-    | 'options'
-    | 'head'
-    | 'trace';
-  path: string;
-  name: string;
-  description: string | undefined;
-  summary: string | undefined;
-  deprecated: boolean | undefined;
-  errors: Record<string, string | undefined>;
-  requestBody: OpenAPISchemaType['paths'][string]['post']['requestBody'];
-  success: Record<string, string | undefined>;
-  parameters:
-    | {
-        name: string;
-        in: 'header' | 'query' | 'cookie';
-        description: string;
-        required: boolean;
-        schema: any;
-        example: string | undefined;
-      }[]
-    | undefined;
-  security: Array<Record<string, string[] | undefined>> | undefined;
-};
+/**
+ * @deprecated use `ServiceOperation` instead from './OpenAPIService.js'
+ */
+export type ServiceOperation = ServiceOperationStable;
 
 export interface ServiceOutputOptions {
   postfixServices?: string; // todo::rename to `postfixService`
@@ -68,7 +40,7 @@ export const getServices = (
   const paths = openApiJson.paths;
   const parametersComponents = openApiJson.components.parameters ?? {};
 
-  const services = new Map<string, Service>();
+  const services = new Map<string, OpenAPIService>();
 
   for (const path in paths) {
     if (!Object.prototype.hasOwnProperty.call(paths, path)) continue;
@@ -184,4 +156,4 @@ const supportedHTTPMethods = Object.values({
   options: 'options',
   head: 'head',
   trace: 'trace',
-} satisfies { [key in ServiceOperation['method']]: key });
+} satisfies { [key in ServiceOperationStable['method']]: key });

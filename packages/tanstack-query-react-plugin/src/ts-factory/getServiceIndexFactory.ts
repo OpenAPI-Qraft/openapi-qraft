@@ -1,10 +1,10 @@
-import { Service } from '@openapi-qraft/plugin/lib/open-api/getServices';
+import { OpenAPIService } from '@openapi-qraft/plugin/lib/open-api/OpenAPIService';
 import ts from 'typescript';
 
 type Options = { explicitImportExtensions: '.js' | '.ts' | undefined };
 
 export const getServiceIndexFactory = (
-  services: Service[],
+  services: OpenAPIService[],
   options: Options
 ) => {
   return [
@@ -14,7 +14,7 @@ export const getServiceIndexFactory = (
   ];
 };
 
-const getServiceIndexInterfaceFactory = (services: Service[]) => {
+const getServiceIndexInterfaceFactory = (services: OpenAPIService[]) => {
   const factory = ts.factory;
 
   return factory.createTypeAliasDeclaration(
@@ -37,7 +37,7 @@ const getServiceIndexInterfaceFactory = (services: Service[]) => {
   );
 };
 
-const getServiceIndexVariableFactory = (services: Service[]) => {
+const getServiceIndexVariableFactory = (services: OpenAPIService[]) => {
   const factory = ts.factory;
 
   return factory.createVariableStatement(
@@ -71,7 +71,7 @@ const getServiceIndexVariableFactory = (services: Service[]) => {
 };
 
 const getServicesImportsFactory = (
-  services: Service[],
+  services: OpenAPIService[],
   { explicitImportExtensions }: Options
 ) => {
   const factory = ts.factory;

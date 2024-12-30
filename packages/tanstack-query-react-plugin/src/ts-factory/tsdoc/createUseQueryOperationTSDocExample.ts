@@ -1,4 +1,4 @@
-import { ServiceOperation } from '@openapi-qraft/plugin/lib/open-api/getServices';
+import { ServiceOperation } from '@openapi-qraft/plugin/lib/open-api/OpenAPIService';
 import ts from 'typescript';
 import { createOperationCommonTSDoc } from '../../lib/createOperationCommonTSDoc.js';
 import { astToString } from '../astToString.js';

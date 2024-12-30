@@ -1,7 +1,7 @@
 import { URL } from 'node:url';
 import { formatFileHeader } from '@openapi-qraft/plugin/lib/formatFileHeader';
 import { GeneratorFile } from '@openapi-qraft/plugin/lib/GeneratorFile';
-import { Service } from '@openapi-qraft/plugin/lib/open-api/getServices';
+import { OpenAPIService } from '@openapi-qraft/plugin/lib/open-api/OpenAPIService';
 import { OutputOptions as OutputOptionsBase } from '@openapi-qraft/plugin/lib/OutputOptions';
 import { PredefinedParametersGlob } from '@openapi-qraft/plugin/lib/predefineSchemaParameters';
 import c from 'ansi-colors';
@@ -31,7 +31,7 @@ export const generateCode = async ({
   output,
 }: {
   spinner: Ora;
-  services: Service[];
+  services: OpenAPIService[];
   serviceImports: ServiceImportsFactoryOptions;
   output: OutputOptions;
 }) => {
@@ -58,7 +58,7 @@ const composeServicesDirPath = (
 
 const generateServices = async (
   spinner: Ora,
-  services: Service[],
+  services: OpenAPIService[],
   serviceImports: ServiceImportsFactoryOptions,
   output: OutputOptions
 ) => {
@@ -112,7 +112,7 @@ const generateServices = async (
 
 const generateServiceIndex = async (
   spinner: Ora,
-  services: Service[],
+  services: OpenAPIService[],
   output: OutputOptions
 ) => {
   spinner.start('Generating services index');
