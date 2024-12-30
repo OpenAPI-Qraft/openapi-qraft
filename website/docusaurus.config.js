@@ -43,10 +43,13 @@ const config = {
         docs: {
           path: 'docs',
           sidebarPath: './sidebars.js',
-          lastVersion: '1.x',
+          lastVersion: 'current',
           versions: {
             current: {
-              label: '2.x 🚧',
+              label: '2.x',
+            },
+            '1.x': {
+              label: '1.x',
             },
           },
           // Please change this to your repo.
@@ -124,11 +127,11 @@ const config = {
         indexName: 'openapi-qraftio',
       },
       announcementBar: {
-        id: `announcementBar-v2@next`, // used in `localStorage`
-        content: `🎉️ <b>
-          <a href="/openapi-qraft/docs/next/getting-started/quick-start">
-            OpenAPI Qraft 2@next
-          </a> 🚧 is out!
+        id: `announcementBar-v2`, // used in `localStorage`
+        content: `️⛏︎ <b>
+          <a href="/openapi-qraft/docs/getting-started/quick-start">
+            OpenAPI Qraft 2
+          </a> is out! 🎉
         </b>`,
       },
     }),
