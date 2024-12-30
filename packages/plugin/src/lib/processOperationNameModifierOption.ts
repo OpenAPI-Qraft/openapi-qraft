@@ -1,6 +1,6 @@
 import { createServicePathMatch } from './createServicePathMatch.js';
 import { getOperationIdName } from './open-api/getOperationName.js';
-import { Service } from './open-api/getServices.js';
+import { OpenAPIService } from './open-api/OpenAPIService.js';
 import {
   OperationGlobMethods,
   parseOperationGlobs,
@@ -9,7 +9,7 @@ import { splitCommaSeparatedGlobs } from './splitCommaSeparatedGlobs.js';
 
 export const processOperationNameModifierOption = (
   modifiers: OperationNameModifier[],
-  services: Service[]
+  services: OpenAPIService[]
 ) => {
   if (!modifiers.length)
     return {

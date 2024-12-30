@@ -1,4 +1,4 @@
-import { ServiceOperation } from './open-api/getServices.js';
+import { ServiceOperation } from './open-api/OpenAPIService.js';
 import { splitCommaSeparatedGlobs } from './splitCommaSeparatedGlobs.js';
 
 /**

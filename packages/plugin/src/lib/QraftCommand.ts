@@ -1,5 +1,4 @@
 import type { Option } from 'commander';
-import type { Service } from './open-api/getServices.js';
 import { sep } from 'node:path';
 import process from 'node:process';
 import { pathToFileURL, URL } from 'node:url';
@@ -12,6 +11,7 @@ import { GeneratorFile } from './GeneratorFile.js';
 import { handleSchemaInput } from './handleSchemaInput.js';
 import { getServices } from './open-api/getServices.js';
 import { OpenAPISchemaType } from './open-api/OpenAPISchemaType.js';
+import { OpenAPIService } from './open-api/OpenAPIService.js';
 import { readSchema } from './open-api/readSchema.js';
 import { OutputOptions } from './OutputOptions.js';
 import {
@@ -377,7 +377,7 @@ export type QraftCommandActionCallback = (
     /**
      * OpenAPI services
      */
-    services: Service[];
+    services: OpenAPIService[];
     /**
      * OpenAPI schema
      */

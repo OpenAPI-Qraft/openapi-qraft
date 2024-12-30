@@ -1,4 +1,4 @@
-import { ServiceOperation } from '@openapi-qraft/plugin/lib/open-api/getServices';
+import { ServiceOperation } from '@openapi-qraft/plugin/lib/open-api/OpenAPIService';
 import { createUseInfiniteQueryOperationTSDocExample } from './createUseInfiniteQueryOperationTSDocExample.js';
 import { createUseIsFetchingOperationTSDocExample } from './createUseIsFetchingOperationTSDocExample.js';
 import { createUseIsMutatingOperationTSDocExample } from './createUseIsMutatingOperationTSDocExample.js';

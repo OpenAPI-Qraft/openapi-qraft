@@ -1,4 +1,4 @@
-import type { ServiceOperation } from '@openapi-qraft/plugin/lib/open-api/getServices';
+import type { ServiceOperation } from '@openapi-qraft/plugin/lib/open-api/OpenAPIService';
 import ts from 'typescript';
 import { astToString } from '../astToString.js';
 import { createOperationMethodCallExpressionExampleNode } from './lib/createOperationMethodCallExpressionExampleNode.js';
