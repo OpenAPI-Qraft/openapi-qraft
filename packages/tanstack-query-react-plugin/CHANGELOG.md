@@ -1,5 +1,13 @@
 # @openapi-qraft/tanstack-query-react-plugin
 
+## 2.0.1
+
+### Patch Changes
+
+- def57df: Ensure external libraries are declared in `peerDependencies` to prevent conflicts and duplication.
+- Updated dependencies [def57df]
+  - @openapi-qraft/plugin@2.0.1
+
 ## 2.0.1-beta.0
 
 ### Patch Changes

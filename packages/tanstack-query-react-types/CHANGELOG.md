@@ -1,5 +1,7 @@
 # @openapi-qraft/tanstack-query-react-types
 
+## 2.0.1
+
 ## 2.0.1-beta.0
 
 ## 2.0.0
