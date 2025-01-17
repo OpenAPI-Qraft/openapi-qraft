@@ -5909,6 +5909,11 @@ __metadata:
     rimraf: "npm:^5.0.10"
     typescript: "npm:^5.6.2"
     vitest: "npm:^2.1.8"
+  peerDependencies:
+    commander: ^11.1.0
+  peerDependenciesMeta:
+    commander:
+      optional: false
   languageName: unknown
   linkType: soft
 
@@ -5931,6 +5936,11 @@ __metadata:
     typescript: "npm:^5.6.2"
     vitest: "npm:^2.1.8"
     yaml: "npm:^2.5.1"
+  peerDependencies:
+    commander: ^11.1.0
+  peerDependenciesMeta:
+    commander:
+      optional: false
   languageName: unknown
   linkType: soft
 
@@ -6002,6 +6012,11 @@ __metadata:
     rimraf: "npm:^5.0.10"
     typescript: "npm:^5.6.2"
     vitest: "npm:^2.1.8"
+  peerDependencies:
+    commander: ^11.1.0
+  peerDependenciesMeta:
+    commander:
+      optional: false
   languageName: unknown
   linkType: soft
 
