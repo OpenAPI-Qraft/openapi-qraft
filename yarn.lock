@@ -18071,7 +18071,7 @@ __metadata:
     rimraf: "npm:^5.0.10"
     typescript: "npm:^5.6.2"
     typescript-eslint: "npm:^8.11.0"
-    vite: "npm:^5.4.12"
+    vite: "npm:^5.4.14"
   languageName: unknown
   linkType: soft
 
@@ -23923,7 +23923,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"vite@npm:^5.4.12":
+"vite@npm:^5.4.14":
   version: 5.4.14
   resolution: "vite@npm:5.4.14"
   dependencies:
