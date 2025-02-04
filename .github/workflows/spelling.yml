@@ -59,19 +59,19 @@ name: Check Spelling
 on:
   push:
     branches:
-    - "**"
+      - "**"
     tags-ignore:
-    - "**"
+      - "**"
   pull_request_target:
     branches:
-    - "**"
+      - "**"
     types:
-    - 'opened'
-    - 'reopened'
-    - 'synchronize'
+      - 'opened'
+      - 'reopened'
+      - 'synchronize'
   issue_comment:
     types:
-    - 'created'
+      - 'created'
 
 jobs:
   spelling:
@@ -90,40 +90,36 @@ jobs:
       # note: If you use only_check_changed_files, you do not want cancel-in-progress
       cancel-in-progress: true
     steps:
-    - name: check-spelling
-      id: spelling
-      uses: check-spelling/check-spelling@v0.0.24
-      with:
-        suppress_push_for_open_pull_request: ${{ github.actor != 'dependabot[bot]' && 1 }}
-        checkout: true
-        check_file_names: 1
-        spell_check_this: check-spelling/spell-check-this@prerelease
-        post_comment: 0
-        use_magic_file: 1
-        report-timing: 1
-        warnings: bad-regex,binary-file,deprecated-feature,large-file,limited-references,no-newline-at-eof,noisy-file,non-alpha-in-dictionary,token-is-substring,unexpected-line-ending,whitespace-in-dictionary,minified-file,unsupported-configuration,no-files-to-check
-        experimental_apply_changes_via_bot: 1
-        use_sarif: ${{ (!github.event.pull_request || (github.event.pull_request.head.repo.full_name == github.repository)) && 1 }}
-        # ⚠️ important (⁉️)
-        #check_extra_dictionaries: ''
-        dictionary_source_prefixes: >
-          {
-          "cspell": "https://raw.githubusercontent.com/check-spelling/cspell-dicts/v20230509/dictionaries/",
-          "cspell1": "https://raw.githubusercontent.com/check-spelling/cspell-dicts/v20241114/dictionaries/"
-          }
-        extra_dictionary_limit: 30
-        extra_dictionaries:
-          cspell:aws/aws.txt
-          cspell:bash/bash-words.txt
-          cspell:css/css.txt
-          cspell:filetypes/filetypes.txt
-          cspell:fonts/fonts.txt
-          cspell:fullstack/fullstack.txt
-          cspell:html/html.txt
-          cspell:html-symbol-entities/html-symbol-entities.txt
-          cspell:node/node.txt
-          cspell:npm/npm.txt
-          cspell:typescript/typescript.txt
+      - name: check-spelling
+        id: spelling
+        uses: check-spelling/check-spelling@v0.0.24
+        with:
+          suppress_push_for_open_pull_request: ${{ github.actor != 'dependabot[bot]' && 1 }}
+          checkout: true
+          check_file_names: 1
+          spell_check_this: check-spelling/spell-check-this@prerelease
+          post_comment: 0
+          use_magic_file: 1
+          report-timing: 1
+          warnings: bad-regex,binary-file,deprecated-feature,large-file,limited-references,no-newline-at-eof,noisy-file,non-alpha-in-dictionary,token-is-substring,unexpected-line-ending,whitespace-in-dictionary,minified-file,unsupported-configuration,no-files-to-check
+          experimental_apply_changes_via_bot: 1
+          use_sarif: ${{ (!github.event.pull_request || (github.event.pull_request.head.repo.full_name == github.repository)) && 1 }}
+          check_extra_dictionaries: ''
+          extra_dictionary_limit: 20
+          dictionary_source_prefixes: >
+            {
+              "cspell": "https://raw.githubusercontent.com/streetsidesoftware/cspell-dicts/refs/heads/main/dictionaries/"
+            }
+          extra_dictionaries:
+            cspell:software-terms/dict/softwareTerms.txt
+            cspell:npm/dict/npm.txt
+            cspell:filetypes/src/filetypes.txt
+            cspell:typescript/dict/typescript.txt
+            cspell:node/dict/node.txt
+            cspell:shell/dict/shell-all-words.txt
+            cspell:html/dict/html.txt
+            cspell:fullstack/dict/fullstack.txt
+            cspell:css/dict/css.txt
 
   comment-push:
     name: Report (Push)
@@ -134,12 +130,12 @@ jobs:
       contents: write
     if: (success() || failure()) && needs.spelling.outputs.followup && github.event_name == 'push'
     steps:
-    - name: comment
-      uses: check-spelling/check-spelling@v0.0.24
-      with:
-        checkout: true
-        spell_check_this: check-spelling/spell-check-this@prerelease
-        task: ${{ needs.spelling.outputs.followup }}
+      - name: comment
+        uses: check-spelling/check-spelling@v0.0.24
+        with:
+          checkout: true
+          spell_check_this: check-spelling/spell-check-this@prerelease
+          task: ${{ needs.spelling.outputs.followup }}
 
   comment-pr:
     name: Report (PR)
@@ -151,13 +147,13 @@ jobs:
       pull-requests: write
     if: (success() || failure()) && needs.spelling.outputs.followup && contains(github.event_name, 'pull_request')
     steps:
-    - name: comment
-      uses: check-spelling/check-spelling@v0.0.24
-      with:
-        checkout: true
-        spell_check_this: check-spelling/spell-check-this@prerelease
-        task: ${{ needs.spelling.outputs.followup }}
-        experimental_apply_changes_via_bot: 1
+      - name: comment
+        uses: check-spelling/check-spelling@v0.0.24
+        with:
+          checkout: true
+          spell_check_this: check-spelling/spell-check-this@prerelease
+          task: ${{ needs.spelling.outputs.followup }}
+          experimental_apply_changes_via_bot: 1
 
   update:
     name: Update PR
@@ -167,17 +163,17 @@ jobs:
       actions: read
     runs-on: ubuntu-latest
     if: ${{
-        github.event_name == 'issue_comment' &&
-        github.event.issue.pull_request &&
-        contains(github.event.comment.body, '@check-spelling-bot apply')
+      github.event_name == 'issue_comment' &&
+      github.event.issue.pull_request &&
+      contains(github.event.comment.body, '@check-spelling-bot apply')
       }}
     concurrency:
       group: spelling-update-${{ github.event.issue.number }}
       cancel-in-progress: false
     steps:
-    - name: apply spelling updates
-      uses: check-spelling/check-spelling@v0.0.24
-      with:
-        experimental_apply_changes_via_bot: 1
-        checkout: true
-        ssh_key: "${{ secrets.CHECK_SPELLING }}"
+      - name: apply spelling updates
+        uses: check-spelling/check-spelling@v0.0.24
+        with:
+          experimental_apply_changes_via_bot: 1
+          checkout: true
+          ssh_key: "${{ secrets.CHECK_SPELLING }}"
