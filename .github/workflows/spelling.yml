@@ -105,7 +105,12 @@ jobs:
         experimental_apply_changes_via_bot: 1
         use_sarif: ${{ (!github.event.pull_request || (github.event.pull_request.head.repo.full_name == github.repository)) && 1 }}
         # ⚠️ important (⁉️)
-        check_extra_dictionaries: ''
+        #check_extra_dictionaries: ''
+        dictionary_source_prefixes: >
+          {
+          "cspell": "https://raw.githubusercontent.com/check-spelling/cspell-dicts/v20230509/dictionaries/",
+          "cspell1": "https://raw.githubusercontent.com/check-spelling/cspell-dicts/v20241114/dictionaries/"
+          }
         extra_dictionary_limit: 30
         extra_dictionaries:
           cspell:aws/aws.txt
