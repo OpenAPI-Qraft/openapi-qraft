@@ -212,7 +212,7 @@ describe('predefineSchemaParameters utils', () => {
       ]);
     });
 
-    it('creates errors for paths with non existing parameters', () => {
+    it('creates errors for paths with non-existing parameters', () => {
       expect(
         createPredefinedParametersGlobs(openAPI as never, [
           {

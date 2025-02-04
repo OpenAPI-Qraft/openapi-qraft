@@ -104,17 +104,21 @@ jobs:
         warnings: bad-regex,binary-file,deprecated-feature,large-file,limited-references,no-newline-at-eof,noisy-file,non-alpha-in-dictionary,token-is-substring,unexpected-line-ending,whitespace-in-dictionary,minified-file,unsupported-configuration,no-files-to-check
         experimental_apply_changes_via_bot: 1
         use_sarif: ${{ (!github.event.pull_request || (github.event.pull_request.head.repo.full_name == github.repository)) && 1 }}
-        #check_extra_dictionaries: ''
-        extra_dictionary_limit: 20
+        # ⚠️ important (⁉️)
+        check_extra_dictionaries: ''
+        extra_dictionary_limit: 30
         extra_dictionaries:
-          cspell:software-terms/dict/softwareTerms.txt
-          cspell:npm/dict/npm.txt
+          cspell:aws/aws.txt
+          cspell:bash/bash-words.txt
+          cspell:css/css.txt
           cspell:filetypes/filetypes.txt
-          cspell:typescript/dict/typescript.txt
-          cspell:node/dict/node.txt
-          cspell:shell/dict/shell-all-words.txt
-          cspell:html/dict/html.txt
-          cspell:fullstack/dict/fullstack.txt
+          cspell:fonts/fonts.txt
+          cspell:fullstack/fullstack.txt
+          cspell:html/html.txt
+          cspell:html-symbol-entities/html-symbol-entities.txt
+          cspell:node/node.txt
+          cspell:npm/npm.txt
+          cspell:typescript/typescript.txt
 
   comment-push:
     name: Report (Push)
