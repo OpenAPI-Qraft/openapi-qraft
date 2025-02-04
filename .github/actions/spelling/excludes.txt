@@ -1,93 +1,30 @@
-# See https://github.com/check-spelling/check-spelling/wiki/Configuration-Examples:-excludes
-(?:^|/)(?i)COPYRIGHT
-(?:^|/)(?i)LICEN[CS]E
-(?:^|/)3rdparty/
-(?:^|/)go\.sum$
+# Ignore npm files
 (?:^|/)package(?:-lock|)\.json$
-(?:^|/)Pipfile$
-(?:^|/)pyproject.toml
-(?:^|/)requirements(?:-dev|-doc|-test|)\.txt$
-(?:^|/)vendor/
-/__snapshots__/
-\.a$
-\.ai$
-\.all-contributorsrc$
-\.avi$
-\.bmp$
-\.bz2$
-\.cer$
-\.class$
-\.coveragerc$
-\.crl$
-\.crt$
-\.csr$
-\.dll$
-\.docx?$
-\.drawio$
-\.DS_Store$
-\.eot$
-\.eps$
-\.exe$
-\.gif$
-\.git-blame-ignore-revs$
-\.gitattributes$
-\.gitkeep$
-\.graffle$
-\.gz$
-\.icns$
-\.ico$
-\.ipynb$
-\.jar$
-\.jks$
-\.jpe?g$
-\.key$
-\.lib$
-\.lock$
-\.map$
-\.min\..
-\.mo$
-\.mod$
-\.mp[34]$
-\.o$
-\.ocf$
-\.otf$
-\.p12$
-\.parquet$
-\.pdf$
-\.pem$
-\.pfx$
-\.png$
-\.psd$
-\.pyc$
-\.pylintrc$
-\.qm$
-\.s$
-\.sig$
-\.so$
-\.svgz?$
-\.sys$
-\.tar$
-\.tgz$
-\.tiff?$
-\.ttf$
-\.wav$
-\.webm$
-\.webp$
-\.woff2?$
-\.xcf$
-\.xlsx?$
-\.xpm$
-\.xz$
-\.zip$
-^\.github/actions/spelling/
-^\Q.github/workflows/spelling.yml\E$
-^\Q.yarn/
-^\Qwebsite/static/.nojekyll\E$
-^\website/static/
-^packages/react-client/src/tests/fixtures
-^packages/tanstack-query-react-plugin/src/ts-factory/service-operation.generated/
+
+# Ignore files named (yarn for Node.js) `yarn.lock`
+(?:^|/)yarn\.lock$
+
+# Ignore named `.yarn/*`
+(?:^|/).yarn/
+
+# Ignore `node_modules`
+(?:^|/)node_modules/
+
+# Ignore files or directories that case-insensitively have `LICENSE` somewhere in their path
+(?:(?i)LICENSE)
+
+# Ignore files ending in...
+\.(?:ico|png|jpg|svg|json)$
+
+# Ignore `CHANGELOG.md` files
+(?:^|/)CHANGELOG\.md$
+
+# Ignore the website's static files
 ^website/static/
-ignore$
-\b(?:package.json)$
-\b(?:yarn.lock)$
-\b(?:yarn-error.log)$
+
+# Ignore the action's configuration data
+^\.github/actions/spelling/
+
+# Ignore __snapshots__
+^packages/tanstack-query-react-plugin/src/__snapshots__/
+^packages/openapi-typescript-plugin/src/__snapshots__/
