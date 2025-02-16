@@ -59,29 +59,29 @@
   "type": "module",
   "exports": {
     ".": {
+      "types": "./dist/types/index.d.ts",
       "import": "./dist/esm/index.js",
-      "require": "./dist/cjs/index.cjs",
-      "types": "./dist/types/index.d.ts"
+      "require": "./dist/cjs/index.cjs"
     },
     "./callbacks/*": {
+      "types": "./dist/types/callbacks/*.d.ts",
       "import": "./dist/esm/callbacks/*.js",
-      "require": "./dist/cjs/callbacks/*.cjs",
-      "types": "./dist/types/callbacks/*.d.ts"
+      "require": "./dist/cjs/callbacks/*.cjs"
     },
     "./Unstable_QraftSecureRequestFn": {
+      "types": "./dist/types/Unstable_QraftSecureRequestFn.d.ts",
       "import": "./dist/esm/Unstable_QraftSecureRequestFn.js",
-      "require": "./dist/cjs/Unstable_QraftSecureRequestFn.cjs",
-      "types": "./dist/types/Unstable_QraftSecureRequestFn.d.ts"
+      "require": "./dist/cjs/Unstable_QraftSecureRequestFn.cjs"
     },
     "./qraftPredefinedParametersRequestFn": {
+      "types": "./dist/types/qraftPredefinedParametersRequestFn.d.ts",
       "import": "./dist/esm/qraftPredefinedParametersRequestFn.js",
-      "require": "./dist/cjs/qraftPredefinedParametersRequestFn.cjs",
-      "types": "./dist/types/qraftPredefinedParametersRequestFn.d.ts"
+      "require": "./dist/cjs/qraftPredefinedParametersRequestFn.cjs"
     },
     "./unstable__responseUtils": {
+      "types": "./dist/types/unstable__responseUtils.d.ts",
       "import": "./dist/esm/unstable__responseUtils.js",
-      "require": "./dist/cjs/unstable__responseUtils.cjs",
-      "types": "./dist/types/unstable__responseUtils.d.ts"
+      "require": "./dist/cjs/unstable__responseUtils.cjs"
     },
     "./package.json": "./package.json"
   },
