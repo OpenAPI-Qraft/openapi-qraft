@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import { composeMutationFilters } from '../lib/composeMutationFilters.js';
 
 describe('composeMutationFilters', () => {

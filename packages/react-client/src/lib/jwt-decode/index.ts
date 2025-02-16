@@ -50,7 +50,7 @@ function base64UrlDecode(str: string) {
 
   try {
     return b64DecodeUnicode(output);
-  } catch (err) {
+  } catch (_err) {
     return atob(output);
   }
 }

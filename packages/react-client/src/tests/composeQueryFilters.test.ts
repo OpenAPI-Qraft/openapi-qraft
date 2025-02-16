@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import { composeQueryFilters } from '../lib/composeQueryFilters.js';
 
 describe('composeQueryFilters', () => {

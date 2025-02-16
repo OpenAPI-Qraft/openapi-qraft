@@ -1,5 +1,5 @@
 import { requestFn } from '@openapi-qraft/react';
-import { vi } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { qraftPredefinedParametersRequestFn } from '../qraftPredefinedParametersRequestFn.js';
 import { services } from './fixtures/api/index.js';
 

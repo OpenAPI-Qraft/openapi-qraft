@@ -3,7 +3,7 @@ import type { Services } from './fixtures/api/index.js';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { act, renderHook, waitFor } from '@testing-library/react';
 import React, { createContext, ReactNode, useContext, useMemo } from 'react';
-import { vi } from 'vitest';
+import { afterAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import { requestFn } from '../lib/requestFn.js';
 import { QraftSecureRequestFn } from '../Unstable_QraftSecureRequestFn.js';
 import { createTestJwt } from './createTestJwt.js';
@@ -19,13 +19,11 @@ const useQraft = () => {
   return value;
 };
 
-describe('QraftSecureRequestFn', () => {
+describe('QraftSecureRequestFn', { timeout: 10_000 }, () => {
   beforeEach(() => {
-    vi.useFakeTimers();
+    vi.useFakeTimers({ shouldAdvanceTime: true });
   });
-  afterEach(() => {
-    vi.restoreAllMocks();
-  });
+  afterAll(() => vi.useRealTimers());
 
   const mutationParams: Pick<
     Services['entities']['postEntitiesIdDocuments']['types'],

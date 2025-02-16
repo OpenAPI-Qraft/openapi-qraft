@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import { HeadersOptions, mergeHeaders } from '../lib/requestFn.js';
 
 describe('mergeHeaders', () => {

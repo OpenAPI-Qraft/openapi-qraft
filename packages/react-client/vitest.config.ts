@@ -9,6 +9,24 @@ export default defineConfig({
     environment: 'jsdom',
     setupFiles: './src/tests/setupTests.ts',
     css: false,
+    fakeTimers: {
+      toFake: [
+        // The "queueMicrotask" must not be used for the correct work of the `<QraftSecureRequestFn/>` component
+        'setTimeout',
+        'clearTimeout',
+        'setImmediate',
+        'clearImmediate',
+        'setInterval',
+        'clearInterval',
+        'Date',
+        'hrtime',
+        'requestAnimationFrame',
+        'cancelAnimationFrame',
+        'requestIdleCallback',
+        'cancelIdleCallback',
+        'performance',
+      ],
+    },
     alias: [
       {
         find: '@openapi-qraft/react/callbacks',

@@ -26,14 +26,15 @@
   },
   "peerDependencies": {
     "@tanstack/query-core": "^5.0.0",
-    "@tanstack/react-query": "^5.0.0"
+    "@tanstack/react-query": "^5.0.0",
+    "react": "^18 || ^19"
   },
   "devDependencies": {
     "@openapi-qraft/eslint-config": "workspace:*",
     "@openapi-qraft/rollup-config": "workspace:*",
     "@tanstack/query-core": "^5.66.3",
     "@tanstack/react-query": "^5.66.3",
-    "eslint": "^9.16.0",
+    "eslint": "^9.20.1",
     "rimraf": "^5.0.10",
     "rollup": "~4.22.4",
     "typescript": "^5.6.2"
