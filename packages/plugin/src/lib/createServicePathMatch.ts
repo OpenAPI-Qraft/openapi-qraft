@@ -9,9 +9,8 @@ export const createServicePathMatch = (servicesGlob: string[]) => {
     Record<'match' | 'ignore', string[]>
   >(
     (acc, glob) => {
-      glob.startsWith('!')
-        ? acc.ignore.push(glob.slice(1))
-        : acc.match.push(glob);
+      if (glob.startsWith('!')) acc.ignore.push(glob.slice(1));
+      else acc.match.push(glob);
       return acc;
     },
     {

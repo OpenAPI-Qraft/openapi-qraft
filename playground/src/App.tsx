@@ -485,7 +485,7 @@ export interface APIContextValue {
   queryClient?: QueryClient;
 }
 
-export const APIContext = createContext<APIContextValue | undefined>(undefined);
+const APIContext = createContext<APIContextValue | undefined>(undefined);
 
 function assertPetStatus(
   petStatusToCreate: unknown
