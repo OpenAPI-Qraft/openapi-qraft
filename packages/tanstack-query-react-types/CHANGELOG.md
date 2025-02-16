@@ -1,5 +1,11 @@
 # @openapi-qraft/tanstack-query-react-types
 
+## 2.0.2
+
+### Patch Changes
+
+- 45f756b: Declared `@tanstack/*` modules as peer dependencies to ensure correct package resolution.
+
 ## 2.0.1
 
 ## 2.0.1-beta.0
