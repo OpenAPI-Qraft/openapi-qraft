@@ -29,8 +29,8 @@
   "type": "module",
   "exports": {
     ".": {
-      "import": "./dist/rollup.config.js",
-      "types": "./dist/rollup.config.d.ts"
+      "types": "./dist/rollup.config.d.ts",
+      "import": "./dist/rollup.config.js"
     },
     "./package.json": "./package.json"
   }
