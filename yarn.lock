@@ -5955,13 +5955,13 @@ __metadata:
     "@openapi-qraft/tanstack-query-react-plugin": "workspace:*"
     "@openapi-qraft/tanstack-query-react-types": "workspace:*"
     "@openapi-qraft/test-fixtures": "workspace:*"
-    "@tanstack/query-core": "npm:^5.66.3"
-    "@tanstack/react-query": "npm:^5.66.3"
+    "@tanstack/react-query": "npm:^5.56.2"
     "@testing-library/jest-dom": "npm:^5.17.0"
     "@testing-library/react": "npm:^13.4.0"
     "@testing-library/user-event": "npm:^14.5.2"
     "@types/jscodeshift": "npm:^0.11.11"
-    "@types/react": "npm:^18.3.5"
+    "@types/react": "npm:^19.0.9"
+    "@types/react-dom": "npm:^19.0.3"
     "@vitejs/plugin-react": "npm:^4.3.1"
     "@vitest/coverage-v8": "npm:^2.1.8"
     eslint: "npm:^9.16.0"
@@ -5971,14 +5971,15 @@ __metadata:
     msw: "npm:^2.6.8"
     prettier: "npm:^3.3.3"
     query-string: "npm:^8.2.0"
-    react: "npm:^18.3.1"
+    react: "npm:^19.0.0"
+    react-dom: "npm:^19.0.0"
     rimraf: "npm:^5.0.10"
     rollup: "npm:~4.22.4"
     vitest: "npm:^2.1.9"
   peerDependencies:
     "@tanstack/query-core": ^5.0.0
     "@tanstack/react-query": ^5.0.0
-    react: ^18.0.0
+    react: ^18 || ^19
   languageName: unknown
   linkType: soft
 
@@ -6027,8 +6028,6 @@ __metadata:
   dependencies:
     "@openapi-qraft/eslint-config": "workspace:*"
     "@openapi-qraft/rollup-config": "workspace:*"
-    "@tanstack/query-core": "npm:^5.66.3"
-    "@tanstack/react-query": "npm:^5.66.3"
     eslint: "npm:^9.16.0"
     rimraf: "npm:^5.0.10"
     rollup: "npm:~4.22.4"
@@ -6036,6 +6035,7 @@ __metadata:
   peerDependencies:
     "@tanstack/query-core": ^5.0.0
     "@tanstack/react-query": ^5.0.0
+    react: ^18 || ^19
   languageName: unknown
   linkType: soft
 
@@ -6747,21 +6747,21 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@tanstack/query-core@npm:5.66.3, @tanstack/query-core@npm:^5.66.3":
-  version: 5.66.3
-  resolution: "@tanstack/query-core@npm:5.66.3"
-  checksum: 10c0/93375becb7e611a0913a833cb5ee6df01adefdcf43c043473fc37f6934590a297a72db2f55cd0d113e48ec85d4ea665be930b9eaf8f4c72f99cb50aa22840602
+"@tanstack/query-core@npm:5.56.2":
+  version: 5.56.2
+  resolution: "@tanstack/query-core@npm:5.56.2"
+  checksum: 10c0/54ff55f02b01f6ba089f4965bfd46f430c18ce7e11d874de04c4d58cc8f698598b41e1c017ba029d08ae75e321e546b26f1ea7f788474db265eeba46e780f2f6
   languageName: node
   linkType: hard
 
-"@tanstack/react-query@npm:^5.66.3":
-  version: 5.66.3
-  resolution: "@tanstack/react-query@npm:5.66.3"
+"@tanstack/react-query@npm:^5.56.2":
+  version: 5.56.2
+  resolution: "@tanstack/react-query@npm:5.56.2"
   dependencies:
-    "@tanstack/query-core": "npm:5.66.3"
+    "@tanstack/query-core": "npm:5.56.2"
   peerDependencies:
     react: ^18 || ^19
-  checksum: 10c0/3a6663d369fd3f55b9c8a906707169ba37d36c54066c300707ce26709aad714c77347df62ac54c504b6cf92e505b134f37681596b7d23a431bfdc20c6cd59b1c
+  checksum: 10c0/6e883b4ca1948f990215b7bce194251faf13a79c6ecf3f3c660af6c6788ed113ab629cefdafb496dfb04866f12dd48d7314e936b75c881b6749127b6496ac8fd
   languageName: node
   linkType: hard
 
@@ -7318,12 +7318,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/react-dom@npm:^18.3.1":
-  version: 18.3.2
-  resolution: "@types/react-dom@npm:18.3.2"
-  dependencies:
-    "@types/react": "npm:^18"
-  checksum: 10c0/22510231af67044a9542633b5b52ec16a8d71fa1da177f82428b8120d36619fd874c3b975b2eda6895baa53667f9fe8cba3acea1232a0244dffe8b11f6b32284
+"@types/react-dom@npm:^19.0.3":
+  version: 19.0.3
+  resolution: "@types/react-dom@npm:19.0.3"
+  peerDependencies:
+    "@types/react": ^19.0.0
+  checksum: 10c0/3867427b333cbe8cbba496d7cc20ec9676d32c25ae44f4d1263a4129d42e57cf4adf0039ad263432f1215b88075c27d326e7eb4ed646128235d01a76e661d48f
   languageName: node
   linkType: hard
 
@@ -7370,23 +7370,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/react@npm:^18, @types/react@npm:^18.3.12":
-  version: 18.3.14
-  resolution: "@types/react@npm:18.3.14"
+"@types/react@npm:^19.0.9":
+  version: 19.0.9
+  resolution: "@types/react@npm:19.0.9"
   dependencies:
-    "@types/prop-types": "npm:*"
     csstype: "npm:^3.0.2"
-  checksum: 10c0/d925fbfcf084238b93d1a0b5406d4cf9aeb37c4a1191559aa4ee107c2e55cc15327989140f03eddda4d471f5b935d4673fd74a86f451860edea18eae48ca44f8
-  languageName: node
-  linkType: hard
-
-"@types/react@npm:^18.3.5":
-  version: 18.3.5
-  resolution: "@types/react@npm:18.3.5"
-  dependencies:
-    "@types/prop-types": "npm:*"
-    csstype: "npm:^3.0.2"
-  checksum: 10c0/548b1d3d7c2f0242fbfdbbd658731b4ce69a134be072fa83e6ab516f2840402a3f20e3e7f72e95133b23d4880ef24a6d864050dc8e1f7c68f39fa87ca8445917
+  checksum: 10c0/a0324890a7d9f3bae018b8735c8978cebea35bc00e7e5cdfcead110683a3b95aab550606abb2fe3189215d60dfcf7059335d206a5f20f41868c56daef60f62c1
   languageName: node
   linkType: hard
 
@@ -18062,8 +18051,8 @@ __metadata:
     "@eslint/js": "npm:^9.13.0"
     "@openapi-qraft/cli": "workspace:~"
     "@openapi-qraft/react": "workspace:~"
-    "@types/react": "npm:^18.3.12"
-    "@types/react-dom": "npm:^18.3.1"
+    "@types/react": "npm:^19.0.9"
+    "@types/react-dom": "npm:^19.0.3"
     "@vitejs/plugin-react-swc": "npm:^3.5.0"
     dotenv: "npm:^16.4.5"
     dotenv-expand: "npm:^10.0.0"
@@ -18072,8 +18061,8 @@ __metadata:
     eslint-plugin-react-hooks: "npm:^5.0.0"
     eslint-plugin-react-refresh: "npm:^0.4.14"
     globals: "npm:^15.11.0"
-    react: "npm:^18.3.1"
-    react-dom: "npm:^18.3.1"
+    react: "npm:^19.0.0"
+    react-dom: "npm:^19.0.0"
     rimraf: "npm:^5.0.10"
     typescript: "npm:^5.6.2"
     typescript-eslint: "npm:^8.11.0"
@@ -19381,6 +19370,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"react-dom@npm:^19.0.0":
+  version: 19.0.0
+  resolution: "react-dom@npm:19.0.0"
+  dependencies:
+    scheduler: "npm:^0.25.0"
+  peerDependencies:
+    react: ^19.0.0
+  checksum: 10c0/a36ce7ab507b237ae2759c984cdaad4af4096d8199fb65b3815c16825e5cfeb7293da790a3fc2184b52bfba7ba3ff31c058c01947aff6fd1a3701632aabaa6a9
+  languageName: node
+  linkType: hard
+
 "react-error-overlay@npm:^6.0.11":
   version: 6.0.11
   resolution: "react-error-overlay@npm:6.0.11"
@@ -19539,6 +19539,13 @@ __metadata:
   dependencies:
     loose-envify: "npm:^1.1.0"
   checksum: 10c0/283e8c5efcf37802c9d1ce767f302dd569dd97a70d9bb8c7be79a789b9902451e0d16334b05d73299b20f048cbc3c7d288bbbde10b701fa194e2089c237dbea3
+  languageName: node
+  linkType: hard
+
+"react@npm:^19.0.0":
+  version: 19.0.0
+  resolution: "react@npm:19.0.0"
+  checksum: 10c0/9cad8f103e8e3a16d15cb18a0d8115d8bd9f9e1ce3420310aea381eb42aa0a4f812cf047bb5441349257a05fba8a291515691e3cb51267279b2d2c3253f38471
   languageName: node
   linkType: hard
 
@@ -21395,6 +21402,13 @@ __metadata:
   dependencies:
     loose-envify: "npm:^1.1.0"
   checksum: 10c0/26383305e249651d4c58e6705d5f8425f153211aef95f15161c151f7b8de885f24751b377e4a0b3dd42cce09aad3f87a61dab7636859c0d89b7daf1a1e2a5c78
+  languageName: node
+  linkType: hard
+
+"scheduler@npm:^0.25.0":
+  version: 0.25.0
+  resolution: "scheduler@npm:0.25.0"
+  checksum: 10c0/a4bb1da406b613ce72c1299db43759526058fdcc413999c3c3e0db8956df7633acf395cb20eb2303b6a65d658d66b6585d344460abaee8080b4aa931f10eaafe
   languageName: node
   linkType: hard
 

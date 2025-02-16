@@ -17,6 +17,11 @@
   "dependencies": {
     "@openapi-qraft/tanstack-query-react-types": "workspace:*"
   },
+  "peerDependencies": {
+    "@tanstack/query-core": "^5.0.0",
+    "@tanstack/react-query": "^5.0.0",
+    "react": "^18 || ^19"
+  },
   "devDependencies": {
     "@openapi-qraft/cli": "workspace:*",
     "@openapi-qraft/eslint-config": "workspace:*",
@@ -30,7 +35,8 @@
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^14.5.2",
     "@types/jscodeshift": "^0.11.11",
-    "@types/react": "^18.3.5",
+    "@types/react": "^19.0.9",
+    "@types/react-dom": "^19.0.3",
     "@vitejs/plugin-react": "^4.3.1",
     "@vitest/coverage-v8": "^2.1.8",
     "eslint": "^9.16.0",
@@ -40,15 +46,11 @@
     "msw": "^2.6.8",
     "prettier": "^3.3.3",
     "query-string": "^8.2.0",
-    "react": "^18.3.1",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
     "rimraf": "^5.0.10",
     "rollup": "~4.22.4",
     "vitest": "^2.1.9"
-  },
-  "peerDependencies": {
-    "@tanstack/query-core": "^5.0.0",
-    "@tanstack/react-query": "^5.0.0",
-    "react": "^18.0.0"
   },
   "files": [
     "dist",
