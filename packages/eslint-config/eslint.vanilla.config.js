@@ -1,5 +1,4 @@
 import pluginJs from '@eslint/js';
-
 import prettierPlugin from 'eslint-plugin-prettier/recommended';
 import tseslint from 'typescript-eslint';
 
@@ -24,6 +23,7 @@ export default [
       ],
       '@typescript-eslint/no-explicit-any': 'off',
       '@typescript-eslint/ban-types': 'off',
+      '@typescript-eslint/no-empty-object-type': 'off',
     },
   },
   { ignores: ['dist/**', 'coverage/**', '**/__snapshots__/**'] },
