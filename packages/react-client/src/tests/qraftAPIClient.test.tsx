@@ -17,7 +17,7 @@ import {
 } from '@tanstack/react-query';
 import { act, renderHook, waitFor } from '@testing-library/react';
 import React, { ReactNode } from 'react';
-import { vi } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import {
   CreateAPIQueryClientOptions,
   qraftAPIClient,
@@ -1895,7 +1895,7 @@ describe('Qraft uses "fetchQuery(...) & "prefetchQuery(...)" & "ensureQueryData(
           },
         },
       })
-    ).rejects.toThrow(new Error('Failed to fetch'));
+    ).rejects.toThrow('Failed to fetch');
   });
 
   it('throws an error if requestFn is not provided', async () => {
@@ -4497,9 +4497,7 @@ describe('Qraft is type-safe if client created without options', () => {
           path: { approval_policy_id: '1' },
         },
       })
-    ).toThrow(
-      new Error(`Cannot read properties of undefined (reading 'requestFn')`)
-    );
+    ).toThrow(`Cannot read properties of undefined (reading 'requestFn')`);
   });
 });
 

@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import { composeMutationKey } from '../lib/composeMutationKey.js';
 
 describe('composeMutationKey', () => {

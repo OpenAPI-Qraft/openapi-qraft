@@ -1,4 +1,5 @@
 import { requestFn } from '@openapi-qraft/react';
+import { describe, it } from 'vitest';
 import { createPredefinedParametersRequestFn } from './fixtures/api/create-predefined-parameters-request-fn.js';
 
 describe('createPredefinedParametersRequestFn(...)', () => {

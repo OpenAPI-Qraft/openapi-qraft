@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import { shallowEqualObjects } from '../Unstable_QraftSecureRequestFn.js';
 
 describe('shallowCompare', () => {

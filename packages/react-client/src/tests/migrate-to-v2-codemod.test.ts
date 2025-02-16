@@ -1,6 +1,6 @@
 import type transformer from '../migrate-to-v2-codemod.js';
 import path from 'node:path';
-import { expect } from 'vitest';
+import { describe, expect, it } from 'vitest';
 
 describe('migrate-to-v2-codemod', () => {
   const transformPath = path.resolve('./src/migrate-to-v2-codemod.ts');

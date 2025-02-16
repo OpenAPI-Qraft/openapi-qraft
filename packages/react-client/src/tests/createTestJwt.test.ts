@@ -1,4 +1,4 @@
-import { expect } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import { jwtDecode } from '../lib/jwt-decode/index.js';
 import { createTestJwt } from './createTestJwt.js';
 
