@@ -5,12 +5,11 @@ sidebar_label: Migrating to v2
 
 # Migrating to OpenAPI Qraft v2
 
-In this guide, we'll walk through the necessary steps to migrate your project from OpenAPI Qraft v1 to v2.
-This migration involves several breaking changes aimed at improving the developer experience and enhancing the library's overall functionality.
+This guide outlines the steps required to migrate your project from OpenAPI Qraft v1 to v2.
+The new version introduces several breaking changes designed to improve developer experience and enhance the library's functionality.
 
 :::info
-Don't miss our automated migration tool using [Codemod 🪄](#automated-migration-),
-which can significantly ease the migration process!
+Speed up your migration process with our automated [Codemod tool 🪄](#automated-migration-)!
 :::
 
 :::warning
@@ -21,54 +20,54 @@ This Migration Guide is currently a work in progress 🧪
 
 ### 1. Removal of `QraftContext`
 
-- **Change**: The `QraftContext` has been removed in favor of an enhanced API design in `createAPIClient`.
-- **Impact**: You will now need to pass `baseUrl` and `queryClient` directly to the `createAPIClient` function.
-  This change ensures that your API client is always configured consistently across your project.
+- **Change**: The `QraftContext` has been removed in favor of a more streamlined API design in `createAPIClient`.
+- **Impact**: You'll now need to provide `baseUrl` and `queryClient` directly to the `createAPIClient` function.
+  This change ensures consistent API client configuration throughout your project.
 
 ### 2. Simplified `QueryClient` Usage
 
-- **Change**: The option to pass a `QueryClient` for hooks or methods has been removed.
-- **Impact**: There is now a single `QueryClient` instance associated with `createAPIClient`, which simplifies
-  the API and reduces potential errors. Update your hooks and methods to rely on this single instance.
+- **Change**: The ability to pass a `QueryClient` for individual hooks or methods has been removed.
+- **Impact**: A single `QueryClient` instance is now associated with `createAPIClient`, simplifying
+  the API and preventing potential configuration conflicts.
 
 ### 3. Deprecation and Removal of `mutationFn` and `queryFn` Methods
 
-- **Change**: The deprecated `mutationFn` and `queryFn` methods have been removed.
-- **Impact**: Refactor your code to use the new API methods that align with the updated approach in v2.
+- **Change**: The legacy `mutationFn` and `queryFn` methods have been removed.
+- **Impact**: You'll need to update your code to use the new API methods introduced in v2.
 
 ### 4. Error Handling Enhancements
 
-- **Change**: The `requestFn` now returns `{ data, error, response }` instead of `Promise.resolve(...) | Promise.reject(error)`.
-- **Impact**: This change promotes stricter error handling within your application. Ensure your error handling logic is updated to accommodate this new structure.
+- **Change**: The `requestFn` now returns a structured `{ data, error, response }` object instead of using Promise rejection.
+- **Impact**: This change enables more robust error handling within your application. Update your error handling logic accordingly.
 
 ### 5. Updates to `qraftAPIClient`
 
-- **Change**: The `qraftAPIClient(...)` now returns only the set of services corresponding to the methods for which callbacks were passed.
-- **Impact**: Review and update your service definitions to match this new behavior.
+- **Change**: The `qraftAPIClient(...)` now only returns services corresponding to methods with provided callbacks.
+- **Impact**: Review your service definitions to ensure compatibility with this behavior.
 
 ## Migration Steps
 
-1. **Remove `QraftContext`**: Refactor all instances where `QraftContext` was used, and pass the required parameters directly to `createAPIClient`.
-2. **Update Hooks and Methods**: Ensure that all hooks and methods are not using `QueryClient` and are now using the single `queryClient` instance.
-3. **Refactor Deprecated Methods**: Search for any usage of `mutationFn` and `queryFn`, and replace them with the appropriate new methods,
-   see core [Query](/core/query-operation.mdx) and [Mutation](/core/mutation-operation.mdx) methods.
-4. **Revise Error Handling**: Adjust your error handling logic to work with the new `{ data, error, response }` structure returned by `requestFn`.
-5. **Review Service Definitions**: Double-check your service definitions and ensure they align with the updated return structure of `qraftAPIClient(...)`.
-6. **Test and Validate**: Thoroughly test your application to ensure that all changes have been correctly implemented and that no regressions have been introduced.
+1. **Update `QraftContext` Usage**: Replace all `QraftContext` implementations by passing configuration directly to `createAPIClient`.
+2. **Consolidate QueryClient Usage**: Remove any per-hook or per-method `QueryClient` configurations and use the instance provided to `createAPIClient`.
+3. **Update Legacy Methods**: Replace any `mutationFn` and `queryFn` usage with their v2 equivalents,
+   referring to the core [Query](/core/query-operation.mdx) and [Mutation](/core/mutation-operation.mdx) documentation.
+4. **Enhance Error Handling**: Update your error handling to work with the new structured response format from `requestFn`.
+5. **Review Service Definitions**: Verify that your service definitions align with the new `qraftAPIClient(...)` behavior.
+6. **Test Thoroughly**: Perform comprehensive testing to ensure all changes work as expected and no regressions are introduced.
 
 ## Automated Migration 🪄
 
-To assist with the migration process, we've provided a Codemod script using [`jscodeshift`](https://github.com/facebook/jscodeshift).
-You can run this script to automatically update most of the breaking changes in your codebase.
+We provide a Codemod script powered by [`jscodeshift`](https://github.com/facebook/jscodeshift)
+to automate most of the migration process.
 
-To use the migration script, run the following command in your project root:
+Run this command in your project root to apply the migrations:
 
 ```bash
 npx jscodeshift@latest --extensions=tsx,ts --parser=tsx -t https://raw.githubusercontent.com/OpenAPI-Qraft/openapi-qraft/main/packages/react-client/src/migrate-to-v2-codemod.ts ./src/
 ```
 
-This command will apply the migration transformations to all `.tsx` and `.ts` files in your `src` directory.
-After running the script, make sure to review the changes and manually adjust where necessary.
+This command will transform all `.tsx` and `.ts` files in your `src` directory.
+After running the script, review the changes and make any necessary manual adjustments.
 
-By following these steps and using the automated migration script, you should be able to smoothly transition your project
-to OpenAPI Qraft v2 while taking advantage of the new features and improvements.
+Following these steps and utilizing the automated migration tool will help you smoothly transition to OpenAPI Qraft v2
+while taking advantage of its improved features and capabilities.
