@@ -7,12 +7,12 @@ import TabItem from '@theme/TabItem';
 
 # Quick Start
 
-To get started with OpenAPI Qraft, you first need to generate types from your OpenAPI Document,
-and also generate services that will use these types to interact with your API.
+To get started with OpenAPI Qraft, you'll need to generate types from your OpenAPI Document
+and create services that will use these types to interact with your API.
 
 ### 1. Generate OpenAPI Types & Services
 
-**Assumed that you already [installed](installation.mdx) `@openapi-qraft/react` package ✅**
+**Make sure you have already [installed](installation.mdx) the `@openapi-qraft/react` package ✅**
 
 <Tabs>
   <TabItem value="cli" label={<span style={{verticalAlign: "middle"}}>Instant <code>CLI</code></span>} default>
@@ -51,7 +51,7 @@ and also generate services that will use these types to interact with your API.
 
 :::info
 
-`openapi-qraft` creates service files in the `src/api` directory of your project:
+`openapi-qraft` generates service files in the `src/api` directory of your project:
 
 ```text
 src/
@@ -65,13 +65,13 @@ src/
 │   └── UserService.ts
 ```
 
-- `--clean` option could be useful. With the option, `src/api/services` directory will be cleared before the new services are generated.
+- The `--clean` option is available if you want to clear the `src/api/services` directory before generating new services.
 
 :::
 
 ### 2. Use the generated services in your React application
 
-Here are examples of how to use the generated services in your React application with
+Below are examples demonstrating how to use the generated services in your React application with
 `useQuery`, `useMutation`, and `useInfiniteQuery` hooks from [TanStack Query](https://tanstack.com/query/latest).
 
 <Tabs>
