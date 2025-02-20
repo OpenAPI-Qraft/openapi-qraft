@@ -1,5 +1,15 @@
 # @openapi-qraft/react
 
+## 2.1.0
+
+### Minor Changes
+
+- 3da985f: Added support for React 19.
+
+### Patch Changes
+
+- @openapi-qraft/tanstack-query-react-types@2.1.0
+
 ## 2.1.0-beta.0
 
 ### Minor Changes

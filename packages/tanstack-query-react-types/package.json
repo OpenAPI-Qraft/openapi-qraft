@@ -1,6 +1,6 @@
 {
   "name": "@openapi-qraft/tanstack-query-react-types",
-  "version": "2.1.0-beta.0",
+  "version": "2.1.0",
   "scripts": {
     "build": "yarn clean && NODE_ENV=production rollup --config rollup.config.mjs && tsc --project tsconfig.build.json --emitDeclarationOnly",
     "dev": "yarn clean && tsc --project tsconfig.build.json --watch --outDir ./dist/esm --noEmitOnError false",
