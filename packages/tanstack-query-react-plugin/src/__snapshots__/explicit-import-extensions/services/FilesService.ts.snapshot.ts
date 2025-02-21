@@ -349,7 +349,7 @@ export interface FilesService {
          * });
          * ```
          */
-        useMutation<TVariables extends PostFilesBody, TContext = unknown>(parameters: PostFilesParameters, options?: ServiceOperationUseMutationOptions<PostFilesSchema, PostFilesData, PostFilesParameters, TVariables, PostFilesError, TContext>): UseMutationResult<PostFilesData, PostFilesError | Error, AreAllOptional<TVariables> extends true ? TVariables | void : TVariables, TContext>;
+        useMutation<TVariables extends PostFilesBody, TContext = unknown>(parameters: PostFilesParameters, options?: ServiceOperationUseMutationOptions<PostFilesSchema, PostFilesData, PostFilesParameters, TVariables, PostFilesError | Error, TContext>): UseMutationResult<PostFilesData, PostFilesError | Error, AreAllOptional<TVariables> extends true ? TVariables | void : TVariables, TContext>;
         /**
          * Enables performing asynchronous data mutation operations such as POST, PUT, PATCH, or DELETE requests.
          * Handles loading state, optimistic updates, and error handling.
@@ -368,7 +368,7 @@ export interface FilesService {
          * });
          * ```
          */
-        useMutation<TVariables extends MutationVariables<PostFilesBody, PostFilesParameters>, TContext = unknown>(parameters: void, options?: ServiceOperationUseMutationOptions<PostFilesSchema, PostFilesData, PostFilesParameters, TVariables, PostFilesError, TContext>): UseMutationResult<PostFilesData, PostFilesError | Error, TVariables, TContext>;
+        useMutation<TVariables extends MutationVariables<PostFilesBody, PostFilesParameters>, TContext = unknown>(parameters: void, options?: ServiceOperationUseMutationOptions<PostFilesSchema, PostFilesData, PostFilesParameters, TVariables, PostFilesError | Error, TContext>): UseMutationResult<PostFilesData, PostFilesError | Error, TVariables, TContext>;
         /**
          * Returns the count of currently in-progress mutations.
          *
@@ -385,9 +385,9 @@ export interface FilesService {
          * })
          * ```
          */
-        useIsMutating<TContext = unknown>(filters?: MutationFiltersByParameters<PostFilesBody, PostFilesData, PostFilesParameters, PostFilesError, TContext> | MutationFiltersByMutationKey<PostFilesSchema, PostFilesBody, PostFilesData, PostFilesParameters, PostFilesError, TContext>): number;
+        useIsMutating<TContext = unknown>(filters?: MutationFiltersByParameters<PostFilesBody, PostFilesData, PostFilesParameters, PostFilesError | Error, TContext> | MutationFiltersByMutationKey<PostFilesSchema, PostFilesBody, PostFilesData, PostFilesParameters, PostFilesError | Error, TContext>): number;
         /** @summary Upload a files by ID */
-        isMutating<TContext>(filters?: MutationFiltersByParameters<PostFilesBody, PostFilesData, PostFilesParameters, PostFilesError, TContext> | MutationFiltersByMutationKey<PostFilesSchema, PostFilesBody, PostFilesData, PostFilesParameters, PostFilesError, TContext>): number;
+        isMutating<TContext>(filters?: MutationFiltersByParameters<PostFilesBody, PostFilesData, PostFilesParameters, PostFilesError | Error, TContext> | MutationFiltersByMutationKey<PostFilesSchema, PostFilesBody, PostFilesData, PostFilesParameters, PostFilesError | Error, TContext>): number;
         /** @summary Upload a files by ID */
         (options: ServiceOperationMutationFnOptions<PostFilesBody, PostFilesParameters>, client?: (schema: PostFilesSchema, options: ServiceOperationMutationFnOptions<PostFilesBody, PostFilesParameters>) => Promise<RequestFnResponse<PostFilesData, PostFilesError>>): Promise<RequestFnResponse<PostFilesData, PostFilesError>>;
         /**
@@ -414,9 +414,9 @@ export interface FilesService {
          * })
          * ```
          */
-        useMutationState<TContext = unknown, TResult = MutationState<PostFilesData, PostFilesError, MutationVariables<PostFilesBody, PostFilesParameters>, TContext>>(options?: {
-            filters?: MutationFiltersByParameters<PostFilesBody, PostFilesData, PostFilesParameters, PostFilesError, TContext> | MutationFiltersByMutationKey<PostFilesSchema, PostFilesBody, PostFilesData, PostFilesParameters, PostFilesError, TContext>;
-            select?: (mutation: Mutation<PostFilesData, PostFilesError, MutationVariables<PostFilesBody, PostFilesParameters>, TContext>) => TResult;
+        useMutationState<TContext = unknown, TResult = MutationState<PostFilesData, PostFilesError | Error, MutationVariables<PostFilesBody, PostFilesParameters>, TContext>>(options?: {
+            filters?: MutationFiltersByParameters<PostFilesBody, PostFilesData, PostFilesParameters, PostFilesError | Error, TContext> | MutationFiltersByMutationKey<PostFilesSchema, PostFilesBody, PostFilesData, PostFilesParameters, PostFilesError | Error, TContext>;
+            select?: (mutation: Mutation<PostFilesData, PostFilesError | Error, MutationVariables<PostFilesBody, PostFilesParameters>, TContext>) => TResult;
         }): Array<TResult>;
         schema: PostFilesSchema;
         types: {
@@ -455,7 +455,7 @@ export interface FilesService {
          * });
          * ```
          */
-        useMutation<TVariables extends DeleteFilesBody, TContext = unknown>(parameters: DeleteFilesParameters, options?: ServiceOperationUseMutationOptions<DeleteFilesSchema, DeleteFilesData, DeleteFilesParameters, TVariables, DeleteFilesError, TContext>): UseMutationResult<DeleteFilesData, DeleteFilesError | Error, AreAllOptional<TVariables> extends true ? TVariables | void : TVariables, TContext>;
+        useMutation<TVariables extends DeleteFilesBody, TContext = unknown>(parameters: DeleteFilesParameters, options?: ServiceOperationUseMutationOptions<DeleteFilesSchema, DeleteFilesData, DeleteFilesParameters, TVariables, DeleteFilesError | Error, TContext>): UseMutationResult<DeleteFilesData, DeleteFilesError | Error, AreAllOptional<TVariables> extends true ? TVariables | void : TVariables, TContext>;
         /**
          * Enables performing asynchronous data mutation operations such as POST, PUT, PATCH, or DELETE requests.
          * Handles loading state, optimistic updates, and error handling.
@@ -481,7 +481,7 @@ export interface FilesService {
          * });
          * ```
          */
-        useMutation<TVariables extends MutationVariables<DeleteFilesBody, DeleteFilesParameters>, TContext = unknown>(parameters: void, options?: ServiceOperationUseMutationOptions<DeleteFilesSchema, DeleteFilesData, DeleteFilesParameters, TVariables, DeleteFilesError, TContext>): UseMutationResult<DeleteFilesData, DeleteFilesError | Error, TVariables, TContext>;
+        useMutation<TVariables extends MutationVariables<DeleteFilesBody, DeleteFilesParameters>, TContext = unknown>(parameters: void, options?: ServiceOperationUseMutationOptions<DeleteFilesSchema, DeleteFilesData, DeleteFilesParameters, TVariables, DeleteFilesError | Error, TContext>): UseMutationResult<DeleteFilesData, DeleteFilesError | Error, TVariables, TContext>;
         /**
          * Returns the count of currently in-progress mutations.
          *
@@ -502,9 +502,9 @@ export interface FilesService {
          * })
          * ```
          */
-        useIsMutating<TContext = unknown>(filters?: MutationFiltersByParameters<DeleteFilesBody, DeleteFilesData, DeleteFilesParameters, DeleteFilesError, TContext> | MutationFiltersByMutationKey<DeleteFilesSchema, DeleteFilesBody, DeleteFilesData, DeleteFilesParameters, DeleteFilesError, TContext>): number;
+        useIsMutating<TContext = unknown>(filters?: MutationFiltersByParameters<DeleteFilesBody, DeleteFilesData, DeleteFilesParameters, DeleteFilesError | Error, TContext> | MutationFiltersByMutationKey<DeleteFilesSchema, DeleteFilesBody, DeleteFilesData, DeleteFilesParameters, DeleteFilesError | Error, TContext>): number;
         /** @summary Delete all files */
-        isMutating<TContext>(filters?: MutationFiltersByParameters<DeleteFilesBody, DeleteFilesData, DeleteFilesParameters, DeleteFilesError, TContext> | MutationFiltersByMutationKey<DeleteFilesSchema, DeleteFilesBody, DeleteFilesData, DeleteFilesParameters, DeleteFilesError, TContext>): number;
+        isMutating<TContext>(filters?: MutationFiltersByParameters<DeleteFilesBody, DeleteFilesData, DeleteFilesParameters, DeleteFilesError | Error, TContext> | MutationFiltersByMutationKey<DeleteFilesSchema, DeleteFilesBody, DeleteFilesData, DeleteFilesParameters, DeleteFilesError | Error, TContext>): number;
         /** @summary Delete all files */
         (options: ServiceOperationMutationFnOptions<DeleteFilesBody, DeleteFilesParameters>, client?: (schema: DeleteFilesSchema, options: ServiceOperationMutationFnOptions<DeleteFilesBody, DeleteFilesParameters>) => Promise<RequestFnResponse<DeleteFilesData, DeleteFilesError>>): Promise<RequestFnResponse<DeleteFilesData, DeleteFilesError>>;
         /**
@@ -535,9 +535,9 @@ export interface FilesService {
          * })
          * ```
          */
-        useMutationState<TContext = unknown, TResult = MutationState<DeleteFilesData, DeleteFilesError, MutationVariables<DeleteFilesBody, DeleteFilesParameters>, TContext>>(options?: {
-            filters?: MutationFiltersByParameters<DeleteFilesBody, DeleteFilesData, DeleteFilesParameters, DeleteFilesError, TContext> | MutationFiltersByMutationKey<DeleteFilesSchema, DeleteFilesBody, DeleteFilesData, DeleteFilesParameters, DeleteFilesError, TContext>;
-            select?: (mutation: Mutation<DeleteFilesData, DeleteFilesError, MutationVariables<DeleteFilesBody, DeleteFilesParameters>, TContext>) => TResult;
+        useMutationState<TContext = unknown, TResult = MutationState<DeleteFilesData, DeleteFilesError | Error, MutationVariables<DeleteFilesBody, DeleteFilesParameters>, TContext>>(options?: {
+            filters?: MutationFiltersByParameters<DeleteFilesBody, DeleteFilesData, DeleteFilesParameters, DeleteFilesError | Error, TContext> | MutationFiltersByMutationKey<DeleteFilesSchema, DeleteFilesBody, DeleteFilesData, DeleteFilesParameters, DeleteFilesError | Error, TContext>;
+            select?: (mutation: Mutation<DeleteFilesData, DeleteFilesError | Error, MutationVariables<DeleteFilesBody, DeleteFilesParameters>, TContext>) => TResult;
         }): Array<TResult>;
         schema: DeleteFilesSchema;
         types: {

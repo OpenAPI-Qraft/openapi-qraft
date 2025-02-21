@@ -501,7 +501,7 @@ export interface ApprovalPoliciesService {
          * });
          * ```
          */
-        useMutation<TVariables extends DeleteApprovalPoliciesIdBody, TContext = unknown>(parameters: DeleteApprovalPoliciesIdParameters, options?: ServiceOperationUseMutationOptions<DeleteApprovalPoliciesIdSchema, DeleteApprovalPoliciesIdData, DeleteApprovalPoliciesIdParameters, TVariables, DeleteApprovalPoliciesIdError, TContext>): UseMutationResult<DeleteApprovalPoliciesIdData, DeleteApprovalPoliciesIdError | Error, AreAllOptional<TVariables> extends true ? TVariables | void : TVariables, TContext>;
+        useMutation<TVariables extends DeleteApprovalPoliciesIdBody, TContext = unknown>(parameters: DeleteApprovalPoliciesIdParameters, options?: ServiceOperationUseMutationOptions<DeleteApprovalPoliciesIdSchema, DeleteApprovalPoliciesIdData, DeleteApprovalPoliciesIdParameters, TVariables, DeleteApprovalPoliciesIdError | Error, TContext>): UseMutationResult<DeleteApprovalPoliciesIdData, DeleteApprovalPoliciesIdError | Error, AreAllOptional<TVariables> extends true ? TVariables | void : TVariables, TContext>;
         /**
          * Enables performing asynchronous data mutation operations such as POST, PUT, PATCH, or DELETE requests.
          * Handles loading state, optimistic updates, and error handling.
@@ -541,7 +541,7 @@ export interface ApprovalPoliciesService {
          * });
          * ```
          */
-        useMutation<TVariables extends MutationVariables<DeleteApprovalPoliciesIdBody, DeleteApprovalPoliciesIdParameters>, TContext = unknown>(parameters: void, options?: ServiceOperationUseMutationOptions<DeleteApprovalPoliciesIdSchema, DeleteApprovalPoliciesIdData, DeleteApprovalPoliciesIdParameters, TVariables, DeleteApprovalPoliciesIdError, TContext>): UseMutationResult<DeleteApprovalPoliciesIdData, DeleteApprovalPoliciesIdError | Error, TVariables, TContext>;
+        useMutation<TVariables extends MutationVariables<DeleteApprovalPoliciesIdBody, DeleteApprovalPoliciesIdParameters>, TContext = unknown>(parameters: void, options?: ServiceOperationUseMutationOptions<DeleteApprovalPoliciesIdSchema, DeleteApprovalPoliciesIdData, DeleteApprovalPoliciesIdParameters, TVariables, DeleteApprovalPoliciesIdError | Error, TContext>): UseMutationResult<DeleteApprovalPoliciesIdData, DeleteApprovalPoliciesIdError | Error, TVariables, TContext>;
         /**
          * Returns the count of currently in-progress mutations.
          *
@@ -570,12 +570,12 @@ export interface ApprovalPoliciesService {
          * })
          * ```
          */
-        useIsMutating<TContext = unknown>(filters?: MutationFiltersByParameters<DeleteApprovalPoliciesIdBody, DeleteApprovalPoliciesIdData, DeleteApprovalPoliciesIdParameters, DeleteApprovalPoliciesIdError, TContext> | MutationFiltersByMutationKey<DeleteApprovalPoliciesIdSchema, DeleteApprovalPoliciesIdBody, DeleteApprovalPoliciesIdData, DeleteApprovalPoliciesIdParameters, DeleteApprovalPoliciesIdError, TContext>): number;
+        useIsMutating<TContext = unknown>(filters?: MutationFiltersByParameters<DeleteApprovalPoliciesIdBody, DeleteApprovalPoliciesIdData, DeleteApprovalPoliciesIdParameters, DeleteApprovalPoliciesIdError | Error, TContext> | MutationFiltersByMutationKey<DeleteApprovalPoliciesIdSchema, DeleteApprovalPoliciesIdBody, DeleteApprovalPoliciesIdData, DeleteApprovalPoliciesIdParameters, DeleteApprovalPoliciesIdError | Error, TContext>): number;
         /**
          * @summary Delete an approval policy
          * @description Delete an existing approval policy.
          */
-        isMutating<TContext>(filters?: MutationFiltersByParameters<DeleteApprovalPoliciesIdBody, DeleteApprovalPoliciesIdData, DeleteApprovalPoliciesIdParameters, DeleteApprovalPoliciesIdError, TContext> | MutationFiltersByMutationKey<DeleteApprovalPoliciesIdSchema, DeleteApprovalPoliciesIdBody, DeleteApprovalPoliciesIdData, DeleteApprovalPoliciesIdParameters, DeleteApprovalPoliciesIdError, TContext>): number;
+        isMutating<TContext>(filters?: MutationFiltersByParameters<DeleteApprovalPoliciesIdBody, DeleteApprovalPoliciesIdData, DeleteApprovalPoliciesIdParameters, DeleteApprovalPoliciesIdError | Error, TContext> | MutationFiltersByMutationKey<DeleteApprovalPoliciesIdSchema, DeleteApprovalPoliciesIdBody, DeleteApprovalPoliciesIdData, DeleteApprovalPoliciesIdParameters, DeleteApprovalPoliciesIdError | Error, TContext>): number;
         /**
          * @summary Delete an approval policy
          * @description Delete an existing approval policy.
@@ -617,9 +617,9 @@ export interface ApprovalPoliciesService {
          * })
          * ```
          */
-        useMutationState<TContext = unknown, TResult = MutationState<DeleteApprovalPoliciesIdData, DeleteApprovalPoliciesIdError, MutationVariables<DeleteApprovalPoliciesIdBody, DeleteApprovalPoliciesIdParameters>, TContext>>(options?: {
-            filters?: MutationFiltersByParameters<DeleteApprovalPoliciesIdBody, DeleteApprovalPoliciesIdData, DeleteApprovalPoliciesIdParameters, DeleteApprovalPoliciesIdError, TContext> | MutationFiltersByMutationKey<DeleteApprovalPoliciesIdSchema, DeleteApprovalPoliciesIdBody, DeleteApprovalPoliciesIdData, DeleteApprovalPoliciesIdParameters, DeleteApprovalPoliciesIdError, TContext>;
-            select?: (mutation: Mutation<DeleteApprovalPoliciesIdData, DeleteApprovalPoliciesIdError, MutationVariables<DeleteApprovalPoliciesIdBody, DeleteApprovalPoliciesIdParameters>, TContext>) => TResult;
+        useMutationState<TContext = unknown, TResult = MutationState<DeleteApprovalPoliciesIdData, DeleteApprovalPoliciesIdError | Error, MutationVariables<DeleteApprovalPoliciesIdBody, DeleteApprovalPoliciesIdParameters>, TContext>>(options?: {
+            filters?: MutationFiltersByParameters<DeleteApprovalPoliciesIdBody, DeleteApprovalPoliciesIdData, DeleteApprovalPoliciesIdParameters, DeleteApprovalPoliciesIdError | Error, TContext> | MutationFiltersByMutationKey<DeleteApprovalPoliciesIdSchema, DeleteApprovalPoliciesIdBody, DeleteApprovalPoliciesIdData, DeleteApprovalPoliciesIdParameters, DeleteApprovalPoliciesIdError | Error, TContext>;
+            select?: (mutation: Mutation<DeleteApprovalPoliciesIdData, DeleteApprovalPoliciesIdError | Error, MutationVariables<DeleteApprovalPoliciesIdBody, DeleteApprovalPoliciesIdParameters>, TContext>) => TResult;
         }): Array<TResult>;
         schema: DeleteApprovalPoliciesIdSchema;
         types: {
@@ -678,7 +678,7 @@ export interface ApprovalPoliciesService {
          * });
          * ```
          */
-        useMutation<TVariables extends PatchApprovalPoliciesIdBody, TContext = unknown>(parameters: PatchApprovalPoliciesIdParameters, options?: ServiceOperationUseMutationOptions<PatchApprovalPoliciesIdSchema, PatchApprovalPoliciesIdData, PatchApprovalPoliciesIdParameters, TVariables, PatchApprovalPoliciesIdError, TContext>): UseMutationResult<PatchApprovalPoliciesIdData, PatchApprovalPoliciesIdError | Error, AreAllOptional<TVariables> extends true ? TVariables | void : TVariables, TContext>;
+        useMutation<TVariables extends PatchApprovalPoliciesIdBody, TContext = unknown>(parameters: PatchApprovalPoliciesIdParameters, options?: ServiceOperationUseMutationOptions<PatchApprovalPoliciesIdSchema, PatchApprovalPoliciesIdData, PatchApprovalPoliciesIdParameters, TVariables, PatchApprovalPoliciesIdError | Error, TContext>): UseMutationResult<PatchApprovalPoliciesIdData, PatchApprovalPoliciesIdError | Error, AreAllOptional<TVariables> extends true ? TVariables | void : TVariables, TContext>;
         /**
          * Enables performing asynchronous data mutation operations such as POST, PUT, PATCH, or DELETE requests.
          * Handles loading state, optimistic updates, and error handling.
@@ -718,7 +718,7 @@ export interface ApprovalPoliciesService {
          * });
          * ```
          */
-        useMutation<TVariables extends MutationVariables<PatchApprovalPoliciesIdBody, PatchApprovalPoliciesIdParameters>, TContext = unknown>(parameters: void, options?: ServiceOperationUseMutationOptions<PatchApprovalPoliciesIdSchema, PatchApprovalPoliciesIdData, PatchApprovalPoliciesIdParameters, TVariables, PatchApprovalPoliciesIdError, TContext>): UseMutationResult<PatchApprovalPoliciesIdData, PatchApprovalPoliciesIdError | Error, TVariables, TContext>;
+        useMutation<TVariables extends MutationVariables<PatchApprovalPoliciesIdBody, PatchApprovalPoliciesIdParameters>, TContext = unknown>(parameters: void, options?: ServiceOperationUseMutationOptions<PatchApprovalPoliciesIdSchema, PatchApprovalPoliciesIdData, PatchApprovalPoliciesIdParameters, TVariables, PatchApprovalPoliciesIdError | Error, TContext>): UseMutationResult<PatchApprovalPoliciesIdData, PatchApprovalPoliciesIdError | Error, TVariables, TContext>;
         /**
          * Returns the count of currently in-progress mutations.
          *
@@ -747,12 +747,12 @@ export interface ApprovalPoliciesService {
          * })
          * ```
          */
-        useIsMutating<TContext = unknown>(filters?: MutationFiltersByParameters<PatchApprovalPoliciesIdBody, PatchApprovalPoliciesIdData, PatchApprovalPoliciesIdParameters, PatchApprovalPoliciesIdError, TContext> | MutationFiltersByMutationKey<PatchApprovalPoliciesIdSchema, PatchApprovalPoliciesIdBody, PatchApprovalPoliciesIdData, PatchApprovalPoliciesIdParameters, PatchApprovalPoliciesIdError, TContext>): number;
+        useIsMutating<TContext = unknown>(filters?: MutationFiltersByParameters<PatchApprovalPoliciesIdBody, PatchApprovalPoliciesIdData, PatchApprovalPoliciesIdParameters, PatchApprovalPoliciesIdError | Error, TContext> | MutationFiltersByMutationKey<PatchApprovalPoliciesIdSchema, PatchApprovalPoliciesIdBody, PatchApprovalPoliciesIdData, PatchApprovalPoliciesIdParameters, PatchApprovalPoliciesIdError | Error, TContext>): number;
         /**
          * @summary Update an approval policy
          * @description Update an existing approval policy.
          */
-        isMutating<TContext>(filters?: MutationFiltersByParameters<PatchApprovalPoliciesIdBody, PatchApprovalPoliciesIdData, PatchApprovalPoliciesIdParameters, PatchApprovalPoliciesIdError, TContext> | MutationFiltersByMutationKey<PatchApprovalPoliciesIdSchema, PatchApprovalPoliciesIdBody, PatchApprovalPoliciesIdData, PatchApprovalPoliciesIdParameters, PatchApprovalPoliciesIdError, TContext>): number;
+        isMutating<TContext>(filters?: MutationFiltersByParameters<PatchApprovalPoliciesIdBody, PatchApprovalPoliciesIdData, PatchApprovalPoliciesIdParameters, PatchApprovalPoliciesIdError | Error, TContext> | MutationFiltersByMutationKey<PatchApprovalPoliciesIdSchema, PatchApprovalPoliciesIdBody, PatchApprovalPoliciesIdData, PatchApprovalPoliciesIdParameters, PatchApprovalPoliciesIdError | Error, TContext>): number;
         /**
          * @summary Update an approval policy
          * @description Update an existing approval policy.
@@ -794,9 +794,9 @@ export interface ApprovalPoliciesService {
          * })
          * ```
          */
-        useMutationState<TContext = unknown, TResult = MutationState<PatchApprovalPoliciesIdData, PatchApprovalPoliciesIdError, MutationVariables<PatchApprovalPoliciesIdBody, PatchApprovalPoliciesIdParameters>, TContext>>(options?: {
-            filters?: MutationFiltersByParameters<PatchApprovalPoliciesIdBody, PatchApprovalPoliciesIdData, PatchApprovalPoliciesIdParameters, PatchApprovalPoliciesIdError, TContext> | MutationFiltersByMutationKey<PatchApprovalPoliciesIdSchema, PatchApprovalPoliciesIdBody, PatchApprovalPoliciesIdData, PatchApprovalPoliciesIdParameters, PatchApprovalPoliciesIdError, TContext>;
-            select?: (mutation: Mutation<PatchApprovalPoliciesIdData, PatchApprovalPoliciesIdError, MutationVariables<PatchApprovalPoliciesIdBody, PatchApprovalPoliciesIdParameters>, TContext>) => TResult;
+        useMutationState<TContext = unknown, TResult = MutationState<PatchApprovalPoliciesIdData, PatchApprovalPoliciesIdError | Error, MutationVariables<PatchApprovalPoliciesIdBody, PatchApprovalPoliciesIdParameters>, TContext>>(options?: {
+            filters?: MutationFiltersByParameters<PatchApprovalPoliciesIdBody, PatchApprovalPoliciesIdData, PatchApprovalPoliciesIdParameters, PatchApprovalPoliciesIdError | Error, TContext> | MutationFiltersByMutationKey<PatchApprovalPoliciesIdSchema, PatchApprovalPoliciesIdBody, PatchApprovalPoliciesIdData, PatchApprovalPoliciesIdParameters, PatchApprovalPoliciesIdError | Error, TContext>;
+            select?: (mutation: Mutation<PatchApprovalPoliciesIdData, PatchApprovalPoliciesIdError | Error, MutationVariables<PatchApprovalPoliciesIdBody, PatchApprovalPoliciesIdParameters>, TContext>) => TResult;
         }): Array<TResult>;
         schema: PatchApprovalPoliciesIdSchema;
         types: {

@@ -16,7 +16,7 @@ export interface ServiceOperationIsMutatingQueries<
           TBody,
           TMutationData,
           TParams,
-          TError,
+          TError | Error,
           TContext
         >
       | MutationFiltersByMutationKey<
@@ -24,7 +24,7 @@ export interface ServiceOperationIsMutatingQueries<
           TBody,
           TMutationData,
           TParams,
-          TError,
+          TError | Error,
           TContext
         >
   ): number;
