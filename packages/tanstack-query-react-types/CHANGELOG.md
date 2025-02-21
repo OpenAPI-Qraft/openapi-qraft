@@ -1,5 +1,12 @@
 # @openapi-qraft/tanstack-query-react-types
 
+## 2.1.1
+
+### Patch Changes
+
+- 8a52230: Enhanced type consistency: now, in addition to the standard errors declared in the OpenAPI Document, all methods and
+  hook-off mutations will also return the `Error` type.
+
 ## 2.1.0
 
 ## 2.1.0-beta.0
