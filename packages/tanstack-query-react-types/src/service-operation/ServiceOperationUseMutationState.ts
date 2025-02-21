@@ -16,7 +16,7 @@ export interface ServiceOperationUseMutationState<
     TContext = unknown,
     TResult = MutationState<
       TMutationData,
-      TError,
+      TError | Error,
       MutationVariables<TBody, TParams>,
       TContext
     >,
@@ -26,7 +26,7 @@ export interface ServiceOperationUseMutationState<
           TBody,
           TMutationData,
           TParams,
-          TError,
+          TError | Error,
           TContext
         >
       | MutationFiltersByMutationKey<
@@ -34,13 +34,13 @@ export interface ServiceOperationUseMutationState<
           TBody,
           TMutationData,
           TParams,
-          TError,
+          TError | Error,
           TContext
         >;
     select?: (
       mutation: Mutation<
         TMutationData,
-        TError,
+        TError | Error,
         MutationVariables<TBody, TParams>,
         TContext
       >

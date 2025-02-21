@@ -24,7 +24,7 @@ export interface ServiceOperationUseMutation<
       TMutationData,
       TParams,
       TVariables,
-      TError,
+      TError | Error,
       TContext
     >
   ): UseMutationResult<
@@ -44,7 +44,7 @@ export interface ServiceOperationUseMutation<
       TMutationData,
       TParams,
       TVariables,
-      TError,
+      TError | Error,
       TContext
     >
   ): UseMutationResult<TMutationData, TError | Error, TVariables, TContext>;
