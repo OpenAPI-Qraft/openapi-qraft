@@ -8,6 +8,7 @@ import type {
 import type { OperationInfiniteData } from './OperationInfiniteData.js';
 import type { PartialParameters } from './PartialParameters.js';
 import type { ServiceOperationInfiniteQueryKey } from './ServiceOperationKey.js';
+import { AreAllOptional } from './AreAllOptional.js';
 import { RequestFn } from './RequestFn.js';
 
 export type ServiceOperationFetchInfiniteQueryOptions<
@@ -96,7 +97,9 @@ type FetchInfiniteQueryOptionsBase<
   >,
   'queryKey' | 'initialPageParam'
 > &
-  InitialPageParam<PartialParameters<TPageParam>> &
+  (AreAllOptional<TParams> extends true
+    ? Partial<InitialPageParam<PartialParameters<TPageParam>>>
+    : InitialPageParam<PartialParameters<TPageParam>>) &
   FetchInfiniteQueryPages<TQueryFnData, TPageParam>;
 
 type FetchInfiniteQueryOptionsByQueryKey<
