@@ -6,15 +6,16 @@ import type { NoInfer, SetDataOptions, Updater } from '@tanstack/query-core';
 
 export interface ServiceOperationSetInfiniteQueryData<
   TSchema extends { url: string; method: string },
-  TQueryFnData,
+  TOperationQueryFnData,
   TParams = {},
 > {
   setInfiniteQueryData(
     parameters: TParams | ServiceOperationInfiniteQueryKey<TSchema, TParams>,
     updater: Updater<
-      NoInfer<OperationInfiniteData<TQueryFnData, TParams>> | undefined,
-      NoInfer<OperationInfiniteData<TQueryFnData, TParams>> | undefined
+      | NoInfer<OperationInfiniteData<TOperationQueryFnData, TParams>>
+      | undefined,
+      NoInfer<OperationInfiniteData<TOperationQueryFnData, TParams>> | undefined
     >,
     options?: SetDataOptions
-  ): OperationInfiniteData<TQueryFnData, TParams> | undefined;
+  ): OperationInfiniteData<TOperationQueryFnData, TParams> | undefined;
 }

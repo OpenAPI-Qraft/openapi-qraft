@@ -7,7 +7,7 @@ import type {
 
 export interface ServiceOperationQueryFn<
   TSchema extends { url: string; method: string },
-  TQueryFnData,
+  TOperationQueryFnData,
   TParams,
   TError,
 > {
@@ -27,6 +27,6 @@ export interface ServiceOperationQueryFn<
         signal?: TSignal;
         meta?: TMeta;
       }
-    ) => Promise<RequestFnResponse<TQueryFnData, TError>>
-  ): Promise<RequestFnResponse<TQueryFnData, TError>>;
+    ) => Promise<RequestFnResponse<TOperationQueryFnData, TError>>
+  ): Promise<RequestFnResponse<TOperationQueryFnData, TError>>;
 }

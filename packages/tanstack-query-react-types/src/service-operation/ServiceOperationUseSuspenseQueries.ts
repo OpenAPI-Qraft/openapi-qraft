@@ -6,20 +6,30 @@ import type { UseSuspenseQueryResult } from '@tanstack/react-query';
 
 export interface ServiceOperationUseSuspenseQueries<
   TSchema extends { url: string; method: string },
-  TQueryFnData,
+  TOperationQueryFnData,
   TParams,
   TError,
 > {
   useSuspenseQueries<
     T extends Array<
-      UseQueryOptionsForUseSuspenseQuery<TSchema, TParams, TQueryFnData, TError>
+      UseQueryOptionsForUseSuspenseQuery<
+        TSchema,
+        TParams,
+        TOperationQueryFnData,
+        TError
+      >
     >,
-    TCombinedResult = Array<UseSuspenseQueryResult<TQueryFnData, TError>>,
+    TCombinedResult = Array<
+      UseSuspenseQueryResult<TOperationQueryFnData, TError>
+    >,
   >(options: {
     queries: T;
     combine?: (
       results: Array<
-        WithOptional<UseSuspenseQueryResult<TQueryFnData, TError>, 'data'>
+        WithOptional<
+          UseSuspenseQueryResult<TOperationQueryFnData, TError>,
+          'data'
+        >
       >
     ) => TCombinedResult;
   }): TCombinedResult;

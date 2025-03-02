@@ -6,7 +6,7 @@ import type { ResetOptions } from '@tanstack/query-core';
 
 export interface ServiceOperationResetQueries<
   TSchema extends { url: string; method: string },
-  TQueryFnData,
+  TOperationQueryFnData,
   TParams,
   TError,
 > {
@@ -14,14 +14,14 @@ export interface ServiceOperationResetQueries<
     filters?:
       | QueryFiltersByParameters<
           TSchema,
-          TQueryFnData,
+          TOperationQueryFnData,
           TInfinite,
           TParams,
           TError
         >
       | QueryFiltersByQueryKey<
           TSchema,
-          TQueryFnData,
+          TOperationQueryFnData,
           TInfinite,
           TParams,
           TError

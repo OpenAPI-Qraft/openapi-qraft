@@ -6,7 +6,7 @@ import type { CancelOptions } from '@tanstack/query-core';
 
 export interface ServiceOperationCancelQueries<
   TSchema extends { url: string; method: string },
-  TQueryFnData,
+  TOperationQueryFnData,
   TParams,
   TError,
 > {
@@ -14,14 +14,14 @@ export interface ServiceOperationCancelQueries<
     filters?:
       | QueryFiltersByParameters<
           TSchema,
-          TQueryFnData,
+          TOperationQueryFnData,
           TInfinite,
           TParams,
           TError
         >
       | QueryFiltersByQueryKey<
           TSchema,
-          TQueryFnData,
+          TOperationQueryFnData,
           TInfinite,
           TParams,
           TError

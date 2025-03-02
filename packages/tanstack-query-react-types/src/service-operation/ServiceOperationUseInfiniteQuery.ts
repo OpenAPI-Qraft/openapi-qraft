@@ -14,7 +14,7 @@ import type {
 
 export interface ServiceOperationUseInfiniteQuery<
   TSchema extends { url: string; method: string },
-  TQueryFnData,
+  TOperationQueryFnData,
   TParams,
   TError,
 > {
@@ -22,7 +22,11 @@ export interface ServiceOperationUseInfiniteQuery<
     parameters: AreAllOptional<TParams> extends true ? TParams | void : TParams
   ): ServiceOperationInfiniteQueryKey<TSchema, TParams>;
 
-  useInfiniteQuery<TPageParam extends TParams, TData = TQueryFnData>(
+  useInfiniteQuery<
+    TPageParam extends TParams,
+    TQueryFnData = TOperationQueryFnData,
+    TData = OperationInfiniteData<TQueryFnData, TParams>,
+  >(
     parameters:
       | ServiceOperationInfiniteQueryKey<TSchema, TParams>
       | (AreAllOptional<TParams> extends true ? TParams | void : TParams),
@@ -30,7 +34,7 @@ export interface ServiceOperationUseInfiniteQuery<
       UndefinedInitialDataInfiniteOptions<
         TQueryFnData,
         TError,
-        OperationInfiniteData<TData, TParams>,
+        TData,
         ServiceOperationInfiniteQueryKey<TSchema, TParams>,
         PartialParameters<TPageParam>
       >,
@@ -43,12 +47,13 @@ export interface ServiceOperationUseInfiniteQuery<
         TQueryFnData,
         PartialParameters<TPageParam>
       >
-  ): UseInfiniteQueryResult<
-    OperationInfiniteData<TData, TParams>,
-    TError | Error
-  >;
+  ): UseInfiniteQueryResult<TData, TError | Error>;
 
-  useInfiniteQuery<TPageParam extends TParams, TData = TQueryFnData>(
+  useInfiniteQuery<
+    TPageParam extends TParams,
+    TQueryFnData = TOperationQueryFnData,
+    TData = OperationInfiniteData<TQueryFnData, TParams>,
+  >(
     parameters:
       | ServiceOperationInfiniteQueryKey<TSchema, TParams>
       | (AreAllOptional<TParams> extends true ? TParams | void : TParams),
@@ -56,7 +61,7 @@ export interface ServiceOperationUseInfiniteQuery<
       DefinedInitialDataInfiniteOptions<
         TQueryFnData,
         TError,
-        OperationInfiniteData<TData, TParams>,
+        TData,
         ServiceOperationInfiniteQueryKey<TSchema, TParams>,
         PartialParameters<TPageParam>
       >,
@@ -66,11 +71,8 @@ export interface ServiceOperationUseInfiniteQuery<
       | 'initialPageParam'
     > &
       InfiniteQueryPageParamsOptions<
-        TQueryFnData,
+        TOperationQueryFnData,
         PartialParameters<TPageParam>
       >
-  ): DefinedUseInfiniteQueryResult<
-    OperationInfiniteData<TData, TParams>,
-    TError | Error
-  >;
+  ): DefinedUseInfiniteQueryResult<TData, TError | Error>;
 }

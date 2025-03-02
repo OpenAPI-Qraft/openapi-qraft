@@ -3,19 +3,24 @@ import type { UseQueryResult } from '@tanstack/react-query';
 
 export interface ServiceOperationUseQueries<
   TSchema extends { url: string; method: string },
-  TQueryFnData,
+  TOperationQueryFnData,
   TParams,
   TError,
 > {
   useQueries<
     T extends Array<
-      UseQueryOptionsForUseQueries<TSchema, TParams, TQueryFnData, TError>
+      UseQueryOptionsForUseQueries<
+        TSchema,
+        TParams,
+        TOperationQueryFnData,
+        TError
+      >
     >,
-    TCombinedResult = Array<UseQueryResult<TQueryFnData, TError>>,
+    TCombinedResult = Array<UseQueryResult<TOperationQueryFnData, TError>>,
   >(options: {
     queries: T;
     combine?: (
-      results: Array<UseQueryResult<TQueryFnData, TError>>
+      results: Array<UseQueryResult<TOperationQueryFnData, TError>>
     ) => TCombinedResult;
   }): TCombinedResult;
 }

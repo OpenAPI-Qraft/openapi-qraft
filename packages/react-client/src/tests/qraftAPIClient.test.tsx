@@ -573,10 +573,7 @@ describe('Qraft uses "useInfiniteQuery(...)"', () => {
                 page: '1',
               },
             },
-            select: (data) => ({
-              pages: data.pages.map((page) => page.query?.id__in),
-              pageParams: data.pageParams,
-            }),
+            select: (data) => data.pages.map((page) => page.query?.id__in),
           }
         ),
       {
@@ -585,30 +582,9 @@ describe('Qraft uses "useInfiniteQuery(...)"', () => {
     );
 
     await waitFor(() => {
-      result.current.data?.pages.map((page) => page);
-      result.current.data?.pageParams.map((pageParam) => pageParam);
-
       expect(
-        result.current.data satisfies
-          | {
-              pages: Array<string[] | undefined>;
-              pageParams: {
-                query?: {
-                  page?: string;
-                };
-              }[];
-            }
-          | undefined
-      ).toEqual({
-        pages: [['1', '2']],
-        pageParams: [
-          {
-            query: {
-              page: '1',
-            },
-          },
-        ],
-      });
+        result.current.data satisfies Array<string[] | undefined> | undefined
+      ).toEqual([['1', '2']]);
     });
   });
 
