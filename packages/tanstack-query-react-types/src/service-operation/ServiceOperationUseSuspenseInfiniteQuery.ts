@@ -12,20 +12,23 @@ import type {
 
 export interface ServiceOperationUseSuspenseInfiniteQuery<
   TSchema extends { url: string; method: string },
-  TQueryFnData,
+  TOperationQueryFnData,
   TParams,
   TError,
 > {
-  useSuspenseInfiniteQuery<TPageParam extends TParams, TData = TQueryFnData>(
+  useSuspenseInfiniteQuery<
+    TPageParam extends TParams,
+    TData = TOperationQueryFnData,
+  >(
     parameters:
       | ServiceOperationInfiniteQueryKey<TSchema, TParams>
       | (AreAllOptional<TParams> extends true ? TParams | void : TParams),
     options: Omit<
       UseSuspenseInfiniteQueryOptions<
-        TQueryFnData,
+        TOperationQueryFnData,
         TError,
         OperationInfiniteData<TData, TParams>,
-        TQueryFnData,
+        TOperationQueryFnData,
         ServiceOperationInfiniteQueryKey<TSchema, TParams>,
         PartialParameters<TPageParam>
       >,
@@ -35,7 +38,7 @@ export interface ServiceOperationUseSuspenseInfiniteQuery<
       | 'initialPageParam'
     > &
       InfiniteQueryPageParamsOptions<
-        TQueryFnData,
+        TOperationQueryFnData,
         PartialParameters<TPageParam>
       >
   ): UseSuspenseInfiniteQueryResult<

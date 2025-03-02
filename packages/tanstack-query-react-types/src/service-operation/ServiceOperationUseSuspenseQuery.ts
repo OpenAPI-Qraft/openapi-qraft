@@ -9,17 +9,17 @@ import type {
 
 export interface ServiceOperationUseSuspenseQuery<
   TSchema extends { url: string; method: string },
-  TQueryFnData,
+  TOperationQueryFnData,
   TParams,
   TError,
 > {
-  useSuspenseQuery<TData = TQueryFnData>(
+  useSuspenseQuery<TData = TOperationQueryFnData>(
     parameters:
       | ServiceOperationQueryKey<TSchema, TParams>
       | (AreAllOptional<TParams> extends true ? TParams | void : TParams),
     options?: Omit<
       UseSuspenseQueryOptions<
-        TQueryFnData,
+        TOperationQueryFnData,
         TError,
         TData,
         ServiceOperationQueryKey<TSchema, TParams>

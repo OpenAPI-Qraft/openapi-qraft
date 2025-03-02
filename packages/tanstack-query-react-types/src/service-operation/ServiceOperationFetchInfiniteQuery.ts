@@ -6,24 +6,24 @@ import type {
 
 export interface ServiceOperationFetchInfiniteQuery<
   TSchema extends { url: string; method: string },
-  TQueryFnData,
+  TOperationQueryFnData,
   TParams,
   TError,
 > {
   fetchInfiniteQuery<TPageParam extends TParams>(
     options: ServiceOperationFetchInfiniteQueryOptions<
       TSchema,
-      TQueryFnData,
+      TOperationQueryFnData,
       TParams,
       TPageParam,
       TError
     >
-  ): Promise<OperationInfiniteData<TQueryFnData, TParams>>;
+  ): Promise<OperationInfiniteData<TOperationQueryFnData, TParams>>;
 
   prefetchInfiniteQuery<TPageParam extends TParams>(
     options: ServiceOperationFetchInfiniteQueryOptions<
       TSchema,
-      TQueryFnData,
+      TOperationQueryFnData,
       TParams,
       TPageParam,
       TError
@@ -33,10 +33,10 @@ export interface ServiceOperationFetchInfiniteQuery<
   ensureInfiniteQueryData<TPageParam extends TParams>(
     options: ServiceOperationEnsureInfiniteQueryDataOptions<
       TSchema,
-      TQueryFnData,
+      TOperationQueryFnData,
       TParams,
       TPageParam,
       TError
     >
-  ): Promise<OperationInfiniteData<TQueryFnData, TParams>>;
+  ): Promise<OperationInfiniteData<TOperationQueryFnData, TParams>>;
 }

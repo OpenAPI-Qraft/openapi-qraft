@@ -8,7 +8,7 @@ import type { QueryState } from '@tanstack/query-core';
 
 export interface ServiceOperationGetQueryState<
   TSchema extends { url: string; method: string },
-  TQueryFnData,
+  TOperationQueryFnData,
   TParams,
   TError,
 > {
@@ -16,13 +16,13 @@ export interface ServiceOperationGetQueryState<
     parameters:
       | ServiceOperationQueryKey<TSchema, TParams>
       | (AreAllOptional<TParams> extends true ? TParams | void : TParams)
-  ): QueryState<TQueryFnData, TError> | undefined;
+  ): QueryState<TOperationQueryFnData, TError> | undefined;
 
   getInfiniteQueryState(
     parameters: AreAllOptional<TParams> extends true
       ? TParams | ServiceOperationInfiniteQueryKey<TSchema, TParams> | void
       : TParams | ServiceOperationInfiniteQueryKey<TSchema, TParams>
   ):
-    | QueryState<OperationInfiniteData<TQueryFnData, TParams>, TError>
+    | QueryState<OperationInfiniteData<TOperationQueryFnData, TParams>, TError>
     | undefined;
 }

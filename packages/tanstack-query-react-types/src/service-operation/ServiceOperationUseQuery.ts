@@ -11,7 +11,7 @@ import type {
 
 export interface ServiceOperationUseQuery<
   TSchema extends { url: string; method: string },
-  TQueryFnData,
+  TOperationQueryFnData,
   TParams,
   TError,
 > {
@@ -19,13 +19,13 @@ export interface ServiceOperationUseQuery<
     parameters: AreAllOptional<TParams> extends true ? TParams | void : TParams
   ): ServiceOperationQueryKey<TSchema, TParams>;
 
-  useQuery<TData = TQueryFnData>(
+  useQuery<TData = TOperationQueryFnData>(
     parameters:
       | ServiceOperationQueryKey<TSchema, TParams>
       | (AreAllOptional<TParams> extends true ? TParams | void : TParams),
     options?: Omit<
       UndefinedInitialDataOptions<
-        TQueryFnData,
+        TOperationQueryFnData,
         TError,
         TData,
         ServiceOperationQueryKey<TSchema, TParams>
@@ -34,13 +34,13 @@ export interface ServiceOperationUseQuery<
     >
   ): UseQueryResult<TData, TError | Error>;
 
-  useQuery<TData = TQueryFnData>(
+  useQuery<TData = TOperationQueryFnData>(
     parameters:
       | ServiceOperationQueryKey<TSchema, TParams>
       | (AreAllOptional<TParams> extends true ? TParams | void : TParams),
     options: Omit<
       DefinedInitialDataOptions<
-        TQueryFnData,
+        TOperationQueryFnData,
         TError,
         TData,
         ServiceOperationQueryKey<TSchema, TParams>

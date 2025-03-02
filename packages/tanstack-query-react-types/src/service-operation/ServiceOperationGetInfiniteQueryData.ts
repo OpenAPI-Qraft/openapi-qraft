@@ -6,12 +6,12 @@ import type {
 
 export interface ServiceOperationGetInfiniteQueryData<
   TSchema extends { url: string; method: string },
-  TQueryFnData,
+  TOperationQueryFnData,
   TParams,
 > {
   getInfiniteQueryData(
     parameters:
       | ServiceOperationInfiniteQueryKey<TSchema, TParams>
       | (AreAllOptional<TParams> extends true ? TParams | void : TParams)
-  ): OperationInfiniteData<TQueryFnData, TParams> | undefined;
+  ): OperationInfiniteData<TOperationQueryFnData, TParams> | undefined;
 }

@@ -9,7 +9,7 @@ import type { NoInfer } from '@tanstack/query-core';
 
 export interface ServiceOperationGetQueriesData<
   TSchema extends { url: string; method: string },
-  TQueryFnData,
+  TOperationQueryFnData,
   TParams,
   TError,
 > {
@@ -17,14 +17,14 @@ export interface ServiceOperationGetQueriesData<
     filters?:
       | QueryFiltersByParameters<
           TSchema,
-          TQueryFnData,
+          TOperationQueryFnData,
           TInfinite,
           TParams,
           TError
         >
       | QueryFiltersByQueryKey<
           TSchema,
-          TQueryFnData,
+          TOperationQueryFnData,
           TInfinite,
           TParams,
           TError
@@ -34,14 +34,14 @@ export interface ServiceOperationGetQueriesData<
         [
           queryKey: ServiceOperationInfiniteQueryKey<TSchema, TParams>,
           data:
-            | NoInfer<OperationInfiniteData<TQueryFnData, TParams>>
+            | NoInfer<OperationInfiniteData<TOperationQueryFnData, TParams>>
             | undefined,
         ]
       >
     : Array<
         [
           queryKey: ServiceOperationQueryKey<TSchema, TParams>,
-          data: TQueryFnData | undefined,
+          data: TOperationQueryFnData | undefined,
         ]
       >;
 }

@@ -6,7 +6,7 @@ import type {
 
 export interface ServiceOperationFetchQuery<
   TSchema extends { url: string; method: string },
-  TQueryFnData,
+  TOperationQueryFnData,
   TParams,
   TError,
 > {
@@ -14,29 +14,29 @@ export interface ServiceOperationFetchQuery<
     options: AreAllOptional<TParams> extends true
       ? ServiceOperationFetchQueryOptions<
           TSchema,
-          TQueryFnData,
+          TOperationQueryFnData,
           TParams,
           TError
         > | void
       : ServiceOperationFetchQueryOptions<
           TSchema,
-          TQueryFnData,
+          TOperationQueryFnData,
           TParams,
           TError
         >
-  ): Promise<TQueryFnData>;
+  ): Promise<TOperationQueryFnData>;
 
   prefetchQuery(
     options: AreAllOptional<TParams> extends true
       ? ServiceOperationFetchQueryOptions<
           TSchema,
-          TQueryFnData,
+          TOperationQueryFnData,
           TParams,
           TError
         > | void
       : ServiceOperationFetchQueryOptions<
           TSchema,
-          TQueryFnData,
+          TOperationQueryFnData,
           TParams,
           TError
         >
@@ -46,15 +46,15 @@ export interface ServiceOperationFetchQuery<
     options: AreAllOptional<TParams> extends true
       ? ServiceOperationEnsureQueryDataOptions<
           TSchema,
-          TQueryFnData,
+          TOperationQueryFnData,
           TParams,
           TError
         > | void
       : ServiceOperationEnsureQueryDataOptions<
           TSchema,
-          TQueryFnData,
+          TOperationQueryFnData,
           TParams,
           TError
         >
-  ): Promise<TQueryFnData>;
+  ): Promise<TOperationQueryFnData>;
 }

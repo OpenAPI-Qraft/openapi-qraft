@@ -3,14 +3,14 @@ import type { InvalidateOptions } from '@tanstack/query-core';
 
 export interface ServiceOperationInvalidateQueries<
   TSchema extends { url: string; method: string },
-  TQueryFnData,
+  TOperationQueryFnData,
   TParams,
   TError,
 > {
   invalidateQueries<TInfinite extends boolean = false>(
     filters?: InvalidateQueryFilters<
       TSchema,
-      TQueryFnData,
+      TOperationQueryFnData,
       TInfinite,
       TParams,
       TError

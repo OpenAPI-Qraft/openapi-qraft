@@ -729,7 +729,7 @@ function replaceGenericTypesWithOperationTypes<T extends ts.Node>(
           else if (node.typeName.text === 'TParams')
             newTypeName = getOperationParametersTypeName(operation);
           else if (
-            node.typeName.text === 'TQueryFnData' ||
+            node.typeName.text === 'TOperationQueryFnData' ||
             node.typeName.text === 'TMutationData'
           )
             newTypeName = getOperationDataTypeName(operation);

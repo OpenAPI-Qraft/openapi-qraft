@@ -5,12 +5,12 @@ import type {
 
 export interface ServiceOperationGetQueryData<
   TSchema extends { url: string; method: string },
-  TQueryFnData,
+  TOperationQueryFnData,
   TParams,
 > {
   getQueryData(
     parameters:
       | ServiceOperationQueryKey<TSchema, TParams>
       | (AreAllOptional<TParams> extends true ? TParams | void : TParams)
-  ): TQueryFnData | undefined;
+  ): TOperationQueryFnData | undefined;
 }

@@ -85,14 +85,14 @@ export interface ServiceOperationMutation<
 
 export interface ServiceOperationQuerySchema<
   TSchema extends { url: string; method: string },
-  TQueryFnData,
+  TOperationQueryFnData,
   TParams,
   TError,
 > {
   schema: TSchema;
   types: {
     parameters: TParams;
-    data: TQueryFnData;
+    data: TOperationQueryFnData;
     error: TError;
   };
 }
