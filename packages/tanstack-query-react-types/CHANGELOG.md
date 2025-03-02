@@ -1,5 +1,11 @@
 # @openapi-qraft/tanstack-query-react-types
 
+## 2.1.2
+
+### Patch Changes
+
+- 168b761: Improve types inferring on Infinite Queries
+
 ## 2.1.1
 
 ### Patch Changes
