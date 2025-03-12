@@ -70,7 +70,6 @@ mryechkin
 mycdn
 nbf
 nochange
-nodenext
 npmjs
 openapis
 opensource
@@ -134,3 +133,5 @@ workflows
 workspaces
 XMonite
 TOperation
+npmrc
+npx
