@@ -14,11 +14,12 @@ export type OpenAPISchemaType = {
         parameters?: Array<any>;
         deprecated?: boolean;
         requestBody?: {
-          content: {
+          content?: {
             [contentType: string]: {
               schema: any;
             };
           };
+          $ref?: string;
         };
         responses: {
           [statusCode in number | 'default']: {

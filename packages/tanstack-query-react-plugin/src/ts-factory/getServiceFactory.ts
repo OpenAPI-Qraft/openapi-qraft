@@ -267,7 +267,7 @@ const getOperationSchemaFactory = (operation: ServiceOperation) => {
         )
       ),
 
-      operation.requestBody
+      operation.requestBody?.content
         ? factory.createPropertySignature(
             undefined,
             factory.createIdentifier('mediaType'),
@@ -353,7 +353,7 @@ const getOperationResponseFactory = (
 };
 
 const getOperationBodyFactory = (operation: ServiceOperation) => {
-  if (!operation.requestBody)
+  if (!operation.requestBody?.content)
     return factory.createKeywordTypeNode(ts.SyntaxKind.UndefinedKeyword);
 
   const mediaTypes = Object.keys(operation.requestBody.content);
@@ -547,7 +547,7 @@ const getServiceVariablePropertyFactory = (operation: ServiceOperation) => {
                 factory.createIdentifier('url'),
                 factory.createStringLiteral(operation.path)
               ),
-              operation.requestBody
+              operation.requestBody?.content
                 ? factory.createPropertyAssignment(
                     factory.createIdentifier('mediaType'),
                     factory.createArrayLiteralExpression(

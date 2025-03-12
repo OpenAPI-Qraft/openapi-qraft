@@ -12,6 +12,7 @@ import {
   ServiceOperation as ServiceOperationStable,
 } from './OpenAPIService.js';
 import { replaceRefParametersWithComponent } from './replaceRefParametersWithComponent.js';
+import { resolveDocumentLocalRef } from './resolveDocumentLocalRef.js';
 
 export type ServiceBaseName = ServiceBaseNameByEndpointOption | 'tags';
 
@@ -38,7 +39,6 @@ export const getServices = (
   }: ServiceOutputOptions = {}
 ) => {
   const paths = openApiJson.paths;
-  const parametersComponents = openApiJson.components.parameters ?? {};
 
   const services = new Map<string, OpenAPIService>();
 
@@ -127,9 +127,15 @@ export const getServices = (
           parameters: replaceRefParametersWithComponent(
             // @ts-expect-error the issue with custom OpenAPISchemaType
             methodOperation.parameters,
-            parametersComponents
+            openApiJson
           ),
-          requestBody: methodOperation.requestBody,
+          requestBody:
+            (methodOperation.requestBody?.$ref
+              ? resolveDocumentLocalRef(
+                  methodOperation.requestBody.$ref,
+                  openApiJson
+                )
+              : methodOperation.requestBody) ?? undefined,
           success: success,
           security: methodOperation.security,
         });
