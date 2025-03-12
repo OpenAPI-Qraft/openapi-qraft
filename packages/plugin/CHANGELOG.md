@@ -1,5 +1,11 @@
 # @openapi-qraft/plugin
 
+## 2.2.0
+
+### Minor Changes
+
+- 9cef242: Added support for `$ref` in `requestBody`.
+
 ## 2.1.2
 
 ## 2.1.1
