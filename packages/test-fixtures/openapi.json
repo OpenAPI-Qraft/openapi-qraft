@@ -42,13 +42,7 @@
           }
         ],
         "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/EntityOnboardingDocuments"
-              }
-            }
-          }
+          "$ref": "#/components/requestBodies/EntityOnboardingDocuments"
         },
         "responses": {
           "201": {
@@ -809,6 +803,17 @@
         "example": "2023-06-04",
         "name": "x-monite-version",
         "in": "header"
+      }
+    },
+    "requestBodies": {
+      "EntityOnboardingDocuments": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/EntityOnboardingDocuments"
+            }
+          }
+        }
       }
     }
   }
