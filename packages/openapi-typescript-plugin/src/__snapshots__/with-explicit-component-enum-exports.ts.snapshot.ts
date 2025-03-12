@@ -95,7 +95,13 @@ export interface components {
         /** @example 2023-06-04 */
         XMoniteVersion: string;
     };
-    requestBodies: never;
+    requestBodies: {
+        EntityOnboardingDocuments: {
+            content: {
+                "application/json": components["schemas"]["EntityOnboardingDocuments"];
+            };
+        };
+    };
     headers: never;
     pathItems: never;
 }

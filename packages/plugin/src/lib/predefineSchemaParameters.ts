@@ -46,7 +46,7 @@ export function predefineSchemaParameters(
 
         const operationParameters = replaceRefParametersWithComponent(
           predefinedOperation?.parameters ?? operation.parameters,
-          schema.components?.parameters
+          schema
         );
 
         const predefinedParameters = operationParameters?.map(
@@ -208,7 +208,7 @@ export function createPredefinedParametersGlobs(
         const operationParameters = replaceRefParametersWithComponent(
           // @ts-expect-error the issue with custom OpenAPISchemaType
           operation.parameters,
-          schema.components?.parameters
+          schema
         );
 
         const predefinedParametersGlobKey = createOperationGlobsKey(

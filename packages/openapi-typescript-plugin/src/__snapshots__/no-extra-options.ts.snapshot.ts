@@ -163,7 +163,13 @@ export interface components {
         /** @example 2023-06-04 */
         XMoniteVersion: string;
     };
-    requestBodies: never;
+    requestBodies: {
+        EntityOnboardingDocuments: {
+            content: {
+                "application/json": components["schemas"]["EntityOnboardingDocuments"];
+            };
+        };
+    };
     headers: never;
     pathItems: never;
 }
@@ -184,11 +190,7 @@ export interface operations {
             };
             cookie?: never;
         };
-        requestBody?: {
-            content: {
-                "application/json": components["schemas"]["EntityOnboardingDocuments"];
-            };
-        };
+        requestBody?: components["requestBodies"]["EntityOnboardingDocuments"];
         responses: {
             /** @description Successful Response */
             201: {
