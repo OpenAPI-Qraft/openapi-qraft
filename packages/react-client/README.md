@@ -23,7 +23,7 @@ Read the full documentation at [openapi-qraft.github.io/openapi-qraft](https://o
 First, install the core package for your project:
 
 ```bash
-npm install @openapi-qraft/react@next
+npm install @openapi-qraft/react
 ```
 
 If your project doesn't already include `@tanstack/react-query`, you'll also need to install it. This package is
@@ -47,7 +47,7 @@ and schemas from your OpenAPI Document.
 To generate both TypeScript definitions and services using `openapi-qraft`, run the following command in the root directory of your project:
 
 ```bash
-npx @openapi-qraft/cli@next --plugin tanstack-query-react --plugin openapi-typescript https://api.dev.monite.com/openapi.json?version=2023-09-01 --output-dir src/api
+npx @openapi-qraft/cli --plugin tanstack-query-react --plugin openapi-typescript https://api.dev.monite.com/openapi.json?version=2023-09-01 --output-dir src/api
 ```
 
 By completing this step, you will generate `src/api/schema.d.ts`, which serves as a TypeScript representation of the specified OpenAPI,
