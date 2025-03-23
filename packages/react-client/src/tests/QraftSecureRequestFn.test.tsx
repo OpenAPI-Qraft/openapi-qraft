@@ -125,18 +125,18 @@ describe('QraftSecureRequestFn', { timeout: 10_000 }, () => {
       }
     );
 
-    await act(async () => {
-      await result.current.mutateAsync(mutationParams);
+    await act(async () => result.current.mutateAsync(mutationParams));
+    await act(async () => vi.advanceTimersByTimeAsync(3600_000));
 
-      vi.advanceTimersByTime(3600_000);
-
-      await result.current.mutateAsync({
-        ...mutationParams,
-        header: {
-          'x-monite-version': '2.0.0',
-        },
-      });
-    });
+    await act(
+      async () =>
+        await result.current.mutateAsync({
+          ...mutationParams,
+          header: {
+            'x-monite-version': '2.0.0',
+          },
+        })
+    );
 
     await waitFor(() => expect(result.current.data).toBeDefined());
 
@@ -157,7 +157,7 @@ describe('QraftSecureRequestFn', { timeout: 10_000 }, () => {
       ],
       [
         {
-          isRefreshing: false,
+          isRefreshing: true,
           signal: new AbortController().signal,
         },
       ],
