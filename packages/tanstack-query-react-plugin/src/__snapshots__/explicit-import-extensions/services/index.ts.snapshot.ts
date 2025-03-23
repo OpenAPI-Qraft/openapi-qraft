@@ -3,9 +3,12 @@
  * Do not make direct changes to the file.
  */
 
-import { EntitiesService, entitiesService } from "./EntitiesService.js";
-import { ApprovalPoliciesService, approvalPoliciesService } from "./ApprovalPoliciesService.js";
-import { FilesService, filesService } from "./FilesService.js";
+import type { EntitiesService } from "./EntitiesService.js";
+import { entitiesService } from "./EntitiesService.js";
+import type { ApprovalPoliciesService } from "./ApprovalPoliciesService.js";
+import { approvalPoliciesService } from "./ApprovalPoliciesService.js";
+import type { FilesService } from "./FilesService.js";
+import { filesService } from "./FilesService.js";
 export type Services = {
     entities: EntitiesService;
     approvalPolicies: ApprovalPoliciesService;
