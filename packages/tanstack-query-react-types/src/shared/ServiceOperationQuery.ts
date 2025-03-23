@@ -1,4 +1,4 @@
-import { ServiceOperationQueryKey } from '@openapi-qraft/tanstack-query-react-types';
+import type { ServiceOperationQueryKey } from '@openapi-qraft/tanstack-query-react-types';
 
 interface QueryFnOptionsBase<
   TMeta extends Record<string, any>,

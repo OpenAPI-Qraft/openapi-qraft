@@ -1,10 +1,6 @@
+import type { JwtPayload } from './index.js';
 import { describe, expect, it } from 'vitest';
-import {
-  b64DecodeUnicode,
-  InvalidTokenError,
-  jwtDecode,
-  JwtPayload,
-} from './index.js';
+import { b64DecodeUnicode, InvalidTokenError, jwtDecode } from './index.js';
 
 const token =
   'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJmb28iOiJiYXIiLCJleHAiOjEzOTMyODY4OTMsImlhdCI6MTM5MzI2ODg5M30.4-iaDojEVl0pJQMjrbM1EzUIfAZgsbK_kgnVyVxFSVo';

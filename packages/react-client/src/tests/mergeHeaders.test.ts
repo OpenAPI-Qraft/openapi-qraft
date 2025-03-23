@@ -1,5 +1,6 @@
+import type { HeadersOptions } from '../lib/requestFn.js';
 import { describe, expect, it } from 'vitest';
-import { HeadersOptions, mergeHeaders } from '../lib/requestFn.js';
+import { mergeHeaders } from '../lib/requestFn.js';
 
 describe('mergeHeaders', () => {
   it('returns an empty Headers instance when no arguments are provided', () => {
