@@ -22,16 +22,16 @@ const query = api.<service>.<operation>.useMutation(
 
 ### Arguments
 
-1. `parameters?: { path, query, header }`
-   - **Optional**, OpenAPI request parameters for the query, strictly-typed ✨
-   - When `parameters` provided, it will be used to generate the `mutationKey`
+1.  `parameters?: { path, query, header }`
+    - **Optional**, OpenAPI request parameters for the query, strictly-typed ✨
+    - When `parameters` provided, it will be used to generate the `mutationKey`
 
-2. `mutationOptions?: UseMutationOptions`
-   - **Optional**, represents the options of the [_useMutation(...) 🌴_](https://tanstack.com/query/latest/docs/framework/react/reference/useMutation) Hook
-   - When `api.<srv>.<op>.useMutation(parameters)` is used (with the predefined _parameters_), `mutationKey` will contain the `parameters` and _operation schema_
-   - When `api.<srv>.<op>.useMutation(undefined)` is used (without predefined _parameters_), `mutationKey` will contain just _operation schema_
-   - `mutationOptions.mutationFn` could be provided to override the default `mutationFn` used by Qraft, strictly-typed ✨
-   - `mutationOptions.mutationKey` could be provided to override the generated key from `parameters`, strictly-typed ✨
+2.  `mutationOptions?: UseMutationOptions`
+    - **Optional**, represents the options of the [_useMutation(...) 🌴_](https://tanstack.com/query/latest/docs/framework/react/reference/useMutation) Hook
+    - When `api.<srv>.<op>.useMutation(parameters)` is used (with the predefined _parameters_), `mutationKey` will contain the `parameters` and _operation schema_
+    - When `api.<srv>.<op>.useMutation(undefined)` is used (without predefined _parameters_), `mutationKey` will contain just _operation schema_
+    - `mutationOptions.mutationFn` could be provided to override the default `mutationFn` used by Qraft, strictly-typed ✨
+    - `mutationOptions.mutationKey` could be provided to override the generated key from `parameters`, strictly-typed ✨
 
 ### Returns
 - `mutation: MutationResult`

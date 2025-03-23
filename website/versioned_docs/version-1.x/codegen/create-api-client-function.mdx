@@ -20,11 +20,11 @@ const qraft = createAPIClient({
 ```
 
 ### Arguments
-1. `options?: QraftClientOptions` - **Optional** options to be used by the Qraft API client
-   - `options.context?: Context<QraftContextValue>` - **Optional** custom Context to be used by Qraft Hooks.
-     If not provided, a _default_ `QraftContext` will be used. The custom Context must be used
-     when multiple Qraft API clients for the multiple OpenAPIs are used in the same application.
-     In case if you are going to publish your API client as a library, it's _highly_ recommended to use a custom Context.
+1.  `options?: QraftClientOptions` - **Optional** options to be used by the Qraft API client
+    - `options.context?: Context<QraftContextValue>` - **Optional** custom Context to be used by Qraft Hooks.
+      If not provided, a _default_ `QraftContext` will be used. The custom Context must be used
+      when multiple Qraft API clients for the multiple OpenAPIs are used in the same application.
+      In case if you are going to publish your API client as a library, it's _highly_ recommended to use a custom Context.
 
 ### Returns
 - `qraft` - The Qraft API client with the necessary context for Qraft Hooks.

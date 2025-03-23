@@ -19,14 +19,14 @@ const requestFn = createPredefinedParametersRequestFn(
 ```
 
 ### Arguments
-1. `inputPredefinedParameters: InputPredefinedParametersItem[]` - **Required** predefined parameters for the operations
-   - `inputPredefinedParameters.requestPattern` - **Required** request pattern to match operation methods and paths provided
-     by `--operation-predefined-parameters <...patterns>` option, e.g. `get,post /approval_policies/{approval_policy_id}/**`
-   - `inputPredefinedParameters.parameters` - **Required** predefined parameters for the operation
-     - `inputPredefinedParameters.parameters.in` - **Required** parameter location
-     - `inputPredefinedParameters.parameters.name` - **Required** parameter name
-     - `inputPredefinedParameters.parameters.value: T | (() => Promise<T>)` - **Required** parameter value
-2. `baseRequestFn` - **Required** `requestFn` function to be wrapped with predefined parameters
+1.  `inputPredefinedParameters: InputPredefinedParametersItem[]` - **Required** predefined parameters for the operations
+    - `inputPredefinedParameters.requestPattern` - **Required** request pattern to match operation methods and paths provided
+      by `--operation-predefined-parameters <...patterns>` option, e.g. `get,post /approval_policies/{approval_policy_id}/**`
+    - `inputPredefinedParameters.parameters` - **Required** predefined parameters for the operation
+      - `inputPredefinedParameters.parameters.in` - **Required** parameter location
+      - `inputPredefinedParameters.parameters.name` - **Required** parameter name
+      - `inputPredefinedParameters.parameters.value: T | (() => Promise<T>)` - **Required** parameter value
+2.  `baseRequestFn` - **Required** `requestFn` function to be wrapped with predefined parameters
 
 ### Returns
 `requestFn` function with predefined parameters
@@ -37,8 +37,8 @@ Let's say we generate the API client with the following command:
 
 ```bash npm2yarn
 npx openapi-qraft ... --operation-predefined-parameters \
-   '/**:header.x-monite-version' \
-   'get /**,!/auth/**:header.x-monite-entity-id'
+  '/**:header.x-monite-version' \
+  'get /**,!/auth/**:header.x-monite-entity-id'
 ```
 
 With the API client generated, `./api/create-predefined-parameters-request-fn.ts` file will be generated,

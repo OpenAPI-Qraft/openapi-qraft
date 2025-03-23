@@ -27,17 +27,17 @@ const response = await requestFn(
 ```
 
 ### Arguments
-1. `schema` - An OpenAPI request schema object with the following properties:
-   - `url` - The URL of the request, e.g. `/pet/{pet_id}`
-   - `method` - The HTTP method of the request, e.g. `GET`, `POST`, `PUT`, `DELETE`
-   - `mediaType` - The media type of the request, e.g. `application/json`
-2. `info` - An object with the following properties:
-   - `baseUrl` - The base URL of the API, e.g. `https://petstore3.swagger.io/api/v3`
-   - `parameters` - The request parameters, e.g. `{ path: { pet_id: 1 }, query: { fields: ['id', 'name'] }, header }`
-   - `body` - The request body, e.g. `{ name: 'doggie', photoUrls: ['https://example.com/doggie.jpg'] }`
-   - `meta` - The request meta. The purpose is to provide additional information to the `requestFn` from the TanStack's hooks
-   - `...requestInit` - The [`RequestInit`](https://developer.mozilla.org/en-US/docs/Web/API/Request#instance_properties)
-     object with `signal`, `cache`, `credentials`, `headers`, etc.
+1.  `schema` - An OpenAPI request schema object with the following properties:
+    - `url` - The URL of the request, e.g. `/pet/{pet_id}`
+    - `method` - The HTTP method of the request, e.g. `GET`, `POST`, `PUT`, `DELETE`
+    - `mediaType` - The media type of the request, e.g. `application/json`
+2.  `info` - An object with the following properties:
+    - `baseUrl` - The base URL of the API, e.g. `https://petstore3.swagger.io/api/v3`
+    - `parameters` - The request parameters, e.g. `{ path: { pet_id: 1 }, query: { fields: ['id', 'name'] }, header }`
+    - `body` - The request body, e.g. `{ name: 'doggie', photoUrls: ['https://example.com/doggie.jpg'] }`
+    - `meta` - The request meta. The purpose is to provide additional information to the `requestFn` from the TanStack's hooks
+    - `...requestInit` - The [`RequestInit`](https://developer.mozilla.org/en-US/docs/Web/API/Request#instance_properties)
+      object with `signal`, `cache`, `credentials`, `headers`, etc.
 
 ### Examples
 

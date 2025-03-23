@@ -32,26 +32,26 @@ const result = qraft.<service>.<operation>.fetchQuery(
 
 ### Arguments
 
-1. - `parameters: { path, query, header } | QueryKey | {}`
-     - **Required**, OpenAPI request parameters for the query, strictly-typed ✨
-     - `parameters` will be used to generate the `QueryKey`
-     - If operation does not require parameters, you must pass an empty object `{}` for strictness
-   - `requestFn: RequestFn`
-     - **Optional**, a function that will be used to execute the request
-     - The function should be provided, otherwise it will throw an error if default `queryFn` is not set previously using `QueryClient.setDefaultOptions(...)` method
-   - `baseUrl: string`
-     - **Required if `requestFn` is set**, the base URL of the API
-   - `...fetchQueryOptions?: FetchQueryOptions`
-     - **Optional**, represents the rest options of the [_fetchQuery(...) 🌴_](https://tanstack.com/query/latest/docs/reference/QueryClient#queryclientfetchquery) method
-       - `queryOptions.queryFn` could be provided instead of ~~`requestFn`~~
-       - `queryOptions.queryKey` could be provided instead of ~~`parameters`~~
+1.  - `parameters: { path, query, header } | QueryKey | {}`
+      - **Required**, OpenAPI request parameters for the query, strictly-typed ✨
+      - `parameters` will be used to generate the `QueryKey`
+      - If operation does not require parameters, you must pass an empty object `{}` for strictness
+      - `requestFn: RequestFn`
+        - **Optional**, a function that will be used to execute the request
+        - The function should be provided, otherwise it will throw an error if default `queryFn` is not set previously using `QueryClient.setDefaultOptions(...)` method
+    - `baseUrl: string`
+      - **Required if `requestFn` is set**, the base URL of the API
+    - `...fetchQueryOptions?: FetchQueryOptions`
+      - **Optional**, represents the rest options of the [_fetchQuery(...) 🌴_](https://tanstack.com/query/latest/docs/reference/QueryClient#queryclientfetchquery) method
+        - `queryOptions.queryFn` could be provided instead of ~~`requestFn`~~
+        - `queryOptions.queryKey` could be provided instead of ~~`parameters`~~
 
-2. `queryClient: QueryClient`
-   - **Required** [_QueryClient 🌴_](https://tanstack.com/query/latest/docs/reference/QueryClient) to be used
-   - _If not provided_
-     - `QraftContext.queryClient` will be used if available
-     - [_useQueryClient() 🌴_](https://tanstack.com/query/latest/docs/framework/react/reference/useQueryClient)
-       result will be used as a fallback
+2.  `queryClient: QueryClient`
+    - **Required** [_QueryClient 🌴_](https://tanstack.com/query/latest/docs/reference/QueryClient) to be used
+    - _If not provided_
+      - `QraftContext.queryClient` will be used if available
+      - [_useQueryClient() 🌴_](https://tanstack.com/query/latest/docs/framework/react/reference/useQueryClient)
+        result will be used as a fallback
 
 ### Returns
 

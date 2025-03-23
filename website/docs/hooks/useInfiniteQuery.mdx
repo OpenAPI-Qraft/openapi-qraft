@@ -20,17 +20,17 @@ const query = api.<service>.<operation>.useInfiniteQuery(
 
 ### Arguments
 
-1. `parameters: { path, query, header } | QueryKey | undefined`
-   - **Required only if OpenAPI specification defines required parameters**
-   - If the operation has no required parameters according to OpenAPI, you can omit this argument
-   - `parameters` will be used to generate the `QueryKey`
-   - Instead of an object with `{path, query, header}`, you can pass a `QueryKey` as an array
-     which is also strictly-typed ✨
-   - If operation does not require parameters, you must pass an empty object `{}` for strictness
+1.  `parameters: { path, query, header } | QueryKey | undefined`
+    - **Required only if OpenAPI specification defines required parameters**
+    - If the operation has no required parameters according to OpenAPI, you can omit this argument
+    - `parameters` will be used to generate the `QueryKey`
+    - Instead of an object with `{path, query, header}`, you can pass a `QueryKey` as an array
+      which is also strictly-typed ✨
+    - If operation does not require parameters, you must pass an empty object `{}` for strictness
 
-2. `infiniteQueryOptions?: UseInfiniteQueryOptions`
-   - **Optional**, represents the options of the [_useInfiniteQuery(...) 🌴_](https://tanstack.com/query/latest/docs/framework/react/reference/useInfiniteQuery) Hook
-     - `queryOptions.queryFn` could be provided to override the default `queryFn` used by Qraft
+2.  `infiniteQueryOptions?: UseInfiniteQueryOptions`
+    - **Optional**, represents the options of the [_useInfiniteQuery(...) 🌴_](https://tanstack.com/query/latest/docs/framework/react/reference/useInfiniteQuery) Hook
+      - `queryOptions.queryFn` could be provided to override the default `queryFn` used by Qraft
 
 ### Returns
 
