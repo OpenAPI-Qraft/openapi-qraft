@@ -1,4 +1,4 @@
-import { AreAllOptional } from '@openapi-qraft/tanstack-query-react-types';
+import type { AreAllOptional } from '@openapi-qraft/tanstack-query-react-types';
 
 interface QueryFnBaseUrlOptions {
   /**

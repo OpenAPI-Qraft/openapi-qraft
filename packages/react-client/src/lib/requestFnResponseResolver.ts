@@ -1,4 +1,4 @@
-import { RequestFnResponse } from './requestFn.js';
+import type { RequestFnResponse } from './requestFn.js';
 
 export function requestFnResponseResolver<TData, TError>(
   requestFnResponse: RequestFnResponse<TData, TError>

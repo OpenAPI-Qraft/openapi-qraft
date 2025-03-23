@@ -1,14 +1,14 @@
-import {
+import type {
   APIBasicClientServices,
   CreateAPIBasicClientOptions,
-  qraftAPIClient,
-  requestFn,
-  RequestFnResponse,
   RequestFn,
+  RequestFnInfo,
   RequestFnOptions,
   RequestFnPayload,
-  RequestFnInfo
+  RequestFnResponse,
 } from '@openapi-qraft/react';
+import type { Services } from './api/services/index';
+import { qraftAPIClient, requestFn } from '@openapi-qraft/react';
 import { operationInvokeFn } from '@openapi-qraft/react/callbacks/operationInvokeFn';
 import {
   createSecureRequestFn,
@@ -16,7 +16,7 @@ import {
 } from '@openapi-qraft/react/Unstable_QraftSecureRequestFn';
 import { QueryClient } from '@tanstack/query-core';
 import { createAPIClient } from './api/index';
-import { services, Services } from './api/services/index';
+import { services } from './api/services/index';
 
 QraftSecureRequestFn({
   requestFn: createSecureRequestFn({}, requestFn, new QueryClient()),
@@ -51,4 +51,4 @@ interface RequestTypeTest<TData, TError> {
   requestFnPayload: RequestFnPayload;
   requestFnResponse: RequestFnResponse<TData, TError>;
   requestFnInfo: RequestFnInfo;
-};
+}

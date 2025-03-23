@@ -1,8 +1,9 @@
+import type { ReactNode } from 'react';
 import type { CreateAPIBasicClientOptions } from '../qraftAPIClient.js';
 import type { Services } from './fixtures/api/index.js';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { act, renderHook, waitFor } from '@testing-library/react';
-import React, { createContext, ReactNode, useContext, useMemo } from 'react';
+import React, { createContext, useContext, useMemo } from 'react';
 import { afterAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import { requestFn } from '../lib/requestFn.js';
 import { QraftSecureRequestFn } from '../Unstable_QraftSecureRequestFn.js';
@@ -71,7 +72,7 @@ describe('QraftSecureRequestFn', { timeout: 10_000 }, () => {
     await act(async () => {
       await result.current.mutateAsync(mutationParams);
 
-      vi.advanceTimersByTime(3600_000 / 2);
+      await vi.advanceTimersByTimeAsync(3600_000 / 2);
 
       await result.current.mutateAsync({
         ...mutationParams,
@@ -124,18 +125,18 @@ describe('QraftSecureRequestFn', { timeout: 10_000 }, () => {
       }
     );
 
-    await act(async () => {
-      await result.current.mutateAsync(mutationParams);
+    await act(async () => result.current.mutateAsync(mutationParams));
+    await act(async () => vi.advanceTimersByTimeAsync(3600_000));
 
-      vi.advanceTimersByTime(3600_000);
-
-      await result.current.mutateAsync({
-        ...mutationParams,
-        header: {
-          'x-monite-version': '2.0.0',
-        },
-      });
-    });
+    await act(
+      async () =>
+        await result.current.mutateAsync({
+          ...mutationParams,
+          header: {
+            'x-monite-version': '2.0.0',
+          },
+        })
+    );
 
     await waitFor(() => expect(result.current.data).toBeDefined());
 
@@ -156,7 +157,7 @@ describe('QraftSecureRequestFn', { timeout: 10_000 }, () => {
       ],
       [
         {
-          isRefreshing: false,
+          isRefreshing: true,
           signal: new AbortController().signal,
         },
       ],
@@ -201,7 +202,7 @@ describe('QraftSecureRequestFn', { timeout: 10_000 }, () => {
 
     await act(() =>
       /// run MSW timers
-      vi.advanceTimersByTime(100)
+      vi.advanceTimersByTimeAsync(100)
     );
 
     await waitFor(() =>
@@ -298,7 +299,7 @@ describe('QraftSecureRequestFn', { timeout: 10_000 }, () => {
     await act(async () => {
       await result.current.mutateAsync(mutationParams);
 
-      vi.advanceTimersByTime(3600_000 * 0.9);
+      await vi.advanceTimersByTimeAsync(3600_000 * 0.9);
 
       await result.current.mutateAsync({
         ...mutationParams,

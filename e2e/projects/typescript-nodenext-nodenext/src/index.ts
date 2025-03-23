@@ -1,16 +1,12 @@
+import type { components, paths } from './api/index.js';
 import * as callbacks from '@openapi-qraft/react/callbacks/index';
 import { useMutation } from '@openapi-qraft/react/callbacks/useMutation';
 import { useQuery } from '@openapi-qraft/react/callbacks/useQuery';
 import {
-  QraftSecureRequestFn,
   createSecureRequestFn,
+  QraftSecureRequestFn,
 } from '@openapi-qraft/react/Unstable_QraftSecureRequestFn';
-
-import {
-  createAPIClient as createAPIClientMjs,
-  components,
-  paths,
-} from './api/index.js';
+import { createAPIClient as createAPIClientMjs } from './api/index.js';
 
 console.log({} satisfies Partial<components>);
 console.log({} satisfies Partial<paths>);

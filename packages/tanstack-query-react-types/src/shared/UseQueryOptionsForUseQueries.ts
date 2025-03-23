@@ -1,6 +1,6 @@
+import type { QueriesPlaceholderDataFunction } from '@tanstack/query-core';
 import type { UseQueryOptions } from '@tanstack/react-query';
 import type { ServiceOperationQueryKey } from './ServiceOperationKey.js';
-import { QueriesPlaceholderDataFunction } from '@tanstack/query-core';
 
 export type UseQueryOptionsForUseQueries<
   TSchema extends { url: string; method: string },

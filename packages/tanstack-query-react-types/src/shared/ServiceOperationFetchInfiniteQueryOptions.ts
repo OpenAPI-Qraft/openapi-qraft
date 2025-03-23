@@ -5,11 +5,11 @@ import type {
   InitialPageParam,
   QueryFunction,
 } from '@tanstack/query-core';
+import type { AreAllOptional } from './AreAllOptional.js';
 import type { OperationInfiniteData } from './OperationInfiniteData.js';
 import type { PartialParameters } from './PartialParameters.js';
+import type { RequestFn } from './RequestFn.js';
 import type { ServiceOperationInfiniteQueryKey } from './ServiceOperationKey.js';
-import { AreAllOptional } from './AreAllOptional.js';
-import { RequestFn } from './RequestFn.js';
 
 export type ServiceOperationFetchInfiniteQueryOptions<
   TSchema extends { url: string; method: string },

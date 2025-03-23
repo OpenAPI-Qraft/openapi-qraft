@@ -1,11 +1,5 @@
-import {
-  API,
-  ASTPath,
-  CallExpression,
-  FileInfo,
-  MemberExpression,
-  Options,
-} from 'jscodeshift';
+import type { API, ASTPath, FileInfo, Options } from 'jscodeshift';
+import { CallExpression, MemberExpression } from 'jscodeshift';
 
 export default function transformer(
   file: FileInfo,
