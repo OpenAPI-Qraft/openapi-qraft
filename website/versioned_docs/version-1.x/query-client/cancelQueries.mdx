@@ -25,18 +25,18 @@ guide for more information.
 
     ### Arguments
 
-    1. `filters: QueryFiltersByParameters | QueryFiltersByQueryKey`
-       - **Required**, represents the [_Query Filters 🌴_](https://tanstack.com/query/latest/docs/framework/react/guides/filters#query-filters)
-         to be used, strictly-typed ✨
-       - `filters.parameters: { path, query, header }` will be used for filtering queries by parameters
-       - `filters.infinite: boolean` will be used to filter infinite or normal queries
-       - `filters.queryKey: QueryKey` will be used for filtering queries by _QueryKey_ instead of parameters
-         - `filters.queryKey` and `filters.parameters` are mutually exclusive
-       - `filters.predicate?: (query: Query) => boolean` will be used for filtering queries by custom predicate
-       - _If not provided_
-         - All queries for the specified endpoint will be canceled
-    2. `queryClient: QueryClient`
-       - **Required** [_QueryClient 🌴_](https://tanstack.com/query/latest/docs/reference/QueryClient) to be used
+    1.  `filters: QueryFiltersByParameters | QueryFiltersByQueryKey`
+        - **Required**, represents the [_Query Filters 🌴_](https://tanstack.com/query/latest/docs/framework/react/guides/filters#query-filters)
+          to be used, strictly-typed ✨
+        - `filters.parameters: { path, query, header }` will be used for filtering queries by parameters
+        - `filters.infinite: boolean` will be used to filter infinite or normal queries
+        - `filters.queryKey: QueryKey` will be used for filtering queries by _QueryKey_ instead of parameters
+          - `filters.queryKey` and `filters.parameters` are mutually exclusive
+        - `filters.predicate?: (query: Query) => boolean` will be used for filtering queries by custom predicate
+        - _If not provided_
+          - All queries for the specified endpoint will be canceled
+    2.  `queryClient: QueryClient`
+        - **Required** [_QueryClient 🌴_](https://tanstack.com/query/latest/docs/reference/QueryClient) to be used
   </TabItem>
   <TabItem value="with-filter-and-options" label={<span style={{verticalAlign: "middle"}}>With <code>filters</code>, <code>options</code></span>}>
     Cancels queries for the specified endpoint using the provided filters with the specified options.
@@ -51,21 +51,21 @@ guide for more information.
 
     ### Arguments
 
-    1. `filters: QueryFiltersByParameters | QueryFiltersByQueryKey`
-       - **Required**, represents the [_Query Filters 🌴_](https://tanstack.com/query/latest/docs/framework/react/guides/filters#query-filters)
-         to be used, strictly-typed ✨
-       - `filters.parameters: { path, query, header }` will be used for filtering queries by parameters
-       - `filters.infinite: boolean` will be used to filter infinite or normal queries
-       - `filters.queryKey: QueryKey` will be used for filtering queries by _QueryKey_ instead of parameters
-         - `filters.queryKey` and `filters.parameters` are mutually exclusive
-       - `filters.predicate?: (query: Query) => boolean` will be used for filtering queries by custom predicate
-       - _If not provided_
-         - All queries for the specified endpoint will be canceled
-    2. `options: CancelOptions`
-       - **Required** [_CancelOptions 🌴_](https://tanstack.com/query/latest/docs/reference/QueryClient#queryclientcancelqueries)
-        to be used
-    2. `queryClient: QueryClient`
-       - **Required** [_QueryClient 🌴_](https://tanstack.com/query/latest/docs/reference/QueryClient) to be used
+    1.  `filters: QueryFiltersByParameters | QueryFiltersByQueryKey`
+        - **Required**, represents the [_Query Filters 🌴_](https://tanstack.com/query/latest/docs/framework/react/guides/filters#query-filters)
+          to be used, strictly-typed ✨
+        - `filters.parameters: { path, query, header }` will be used for filtering queries by parameters
+        - `filters.infinite: boolean` will be used to filter infinite or normal queries
+        - `filters.queryKey: QueryKey` will be used for filtering queries by _QueryKey_ instead of parameters
+          - `filters.queryKey` and `filters.parameters` are mutually exclusive
+        - `filters.predicate?: (query: Query) => boolean` will be used for filtering queries by custom predicate
+        - _If not provided_
+          - All queries for the specified endpoint will be canceled
+    2.  `options: CancelOptions`
+        - **Required** [_CancelOptions 🌴_](https://tanstack.com/query/latest/docs/reference/QueryClient#queryclientcancelqueries)
+          to be used
+    2.  `queryClient: QueryClient`
+        - **Required** [_QueryClient 🌴_](https://tanstack.com/query/latest/docs/reference/QueryClient) to be used
   </TabItem>
   <TabItem value="without-filters" label={<span style={{verticalAlign: "middle"}}>No <code style={{textDecoration: "line-through"}}>filters</code>, <code style={{textDecoration: "line-through"}}>options</code></span>}>
     Cancels _all_ normal and _Infinite_ queries for the specified endpoint.
@@ -78,8 +78,8 @@ guide for more information.
 
     ### Arguments
 
-    1. `queryClient: QueryClient`
-       - **Required** [_QueryClient 🌴_](https://tanstack.com/query/latest/docs/reference/QueryClient) to be used
+    1.  `queryClient: QueryClient`
+        - **Required** [_QueryClient 🌴_](https://tanstack.com/query/latest/docs/reference/QueryClient) to be used
   </TabItem>
 </Tabs>
 

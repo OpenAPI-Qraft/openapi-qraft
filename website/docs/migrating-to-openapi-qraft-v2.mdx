@@ -47,13 +47,13 @@ This Migration Guide is currently a work in progress 🧪
 
 ## Migration Steps
 
-1. **Update `QraftContext` Usage**: Replace all `QraftContext` implementations by passing configuration directly to `createAPIClient`.
-2. **Consolidate QueryClient Usage**: Remove any per-hook or per-method `QueryClient` configurations and use the instance provided to `createAPIClient`.
-3. **Update Legacy Methods**: Replace any `mutationFn` and `queryFn` usage with their v2 equivalents,
-   referring to the core [Query](/core/query-operation.mdx) and [Mutation](/core/mutation-operation.mdx) documentation.
-4. **Enhance Error Handling**: Update your error handling to work with the new structured response format from `requestFn`.
-5. **Review Service Definitions**: Verify that your service definitions align with the new `qraftAPIClient(...)` behavior.
-6. **Test Thoroughly**: Perform comprehensive testing to ensure all changes work as expected and no regressions are introduced.
+1.  **Update `QraftContext` Usage**: Replace all `QraftContext` implementations by passing configuration directly to `createAPIClient`.
+2.  **Consolidate QueryClient Usage**: Remove any per-hook or per-method `QueryClient` configurations and use the instance provided to `createAPIClient`.
+3.  **Update Legacy Methods**: Replace any `mutationFn` and `queryFn` usage with their v2 equivalents,
+    referring to the core [Query](/core/query-operation.mdx) and [Mutation](/core/mutation-operation.mdx) documentation.
+4.  **Enhance Error Handling**: Update your error handling to work with the new structured response format from `requestFn`.
+5.  **Review Service Definitions**: Verify that your service definitions align with the new `qraftAPIClient(...)` behavior.
+6.  **Test Thoroughly**: Perform comprehensive testing to ensure all changes work as expected and no regressions are introduced.
 
 ## Automated Migration 🪄
 

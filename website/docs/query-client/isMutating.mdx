@@ -23,13 +23,13 @@ guide for more information.
 
     ### Arguments
 
-    1. `filters: UseMutationStateFiltersByParameters | UseMutationStateFiltersByMutationKey`,
-       - **Required**, represents the [_Mutation Filters 🌴_](https://tanstack.com/query/latest/docs/framework/react/guides/filters#mutation-filters)
-         to be used, strictly-typed ✨
-       - `filters.parameters: { path, query, header }` will be used for filtering mutations by parameters
-       - `filters.mutationKey: MutationKey` will be used for filtering mutations by _MutationKey_ instead of parameters
-         - `filters.mutationKey` and `filters.parameters` are mutually exclusive
-       - `filters.predicate?: (mutation: Mutation) => boolean` will be used for filtering mutations by custom predicate
+    1.  `filters: UseMutationStateFiltersByParameters | UseMutationStateFiltersByMutationKey`,
+        - **Required**, represents the [_Mutation Filters 🌴_](https://tanstack.com/query/latest/docs/framework/react/guides/filters#mutation-filters)
+          to be used, strictly-typed ✨
+        - `filters.parameters: { path, query, header }` will be used for filtering mutations by parameters
+        - `filters.mutationKey: MutationKey` will be used for filtering mutations by _MutationKey_ instead of parameters
+          - `filters.mutationKey` and `filters.parameters` are mutually exclusive
+        - `filters.predicate?: (mutation: Mutation) => boolean` will be used for filtering mutations by custom predicate
 
     ### Returns
 

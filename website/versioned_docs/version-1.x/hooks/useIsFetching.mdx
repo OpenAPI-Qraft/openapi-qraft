@@ -18,20 +18,20 @@ const queriesNumber = qraft.<service>.<operation>.useIsFetching(
 
 ### Arguments
 
-1. `filters?: QueryFiltersByParameters | QueryFiltersByQueryKey`
-   - **Optional**, represents the [_Query Filters 🌴_](https://tanstack.com/query/latest/docs/framework/react/guides/filters#query-filters)
-     to be used. If not provided, _all_ normal and _Infinite_ queries will be used to filter.
-   - `filters.parameters: { path, query, header }` will be used for filtering queries by parameters
-   - `filters.infinite: boolean` will be used to filter infinite or normal queries
-   - `filters.queryKey: QueryKey` will be used for filtering queries by _QueryKey_ instead of parameters
-     - `filters.queryKey` and `filters.parameters` are mutually exclusive
-   - `filters.predicate?: (query: Query) => boolean` will be used for filtering queries by custom predicate
-2. `queryClient?: QueryClient`
-   - **Optional** [_QueryClient 🌴_](https://tanstack.com/query/latest/docs/reference/QueryClient) to be used
-   - _If not provided_
-     - `QraftContext.queryClient` will be used if available
-     - [_useQueryClient() 🌴_](https://tanstack.com/query/latest/docs/framework/react/reference/useQueryClient)
-       result will be used as a fallback
+1.  `filters?: QueryFiltersByParameters | QueryFiltersByQueryKey`
+    - **Optional**, represents the [_Query Filters 🌴_](https://tanstack.com/query/latest/docs/framework/react/guides/filters#query-filters)
+      to be used. If not provided, _all_ normal and _Infinite_ queries will be used to filter.
+    - `filters.parameters: { path, query, header }` will be used for filtering queries by parameters
+    - `filters.infinite: boolean` will be used to filter infinite or normal queries
+    - `filters.queryKey: QueryKey` will be used for filtering queries by _QueryKey_ instead of parameters
+      - `filters.queryKey` and `filters.parameters` are mutually exclusive
+    - `filters.predicate?: (query: Query) => boolean` will be used for filtering queries by custom predicate
+2.  `queryClient?: QueryClient`
+    - **Optional** [_QueryClient 🌴_](https://tanstack.com/query/latest/docs/reference/QueryClient) to be used
+    - _If not provided_
+      - `QraftContext.queryClient` will be used if available
+      - [_useQueryClient() 🌴_](https://tanstack.com/query/latest/docs/framework/react/reference/useQueryClient)
+        result will be used as a fallback
 
 ### Returns
 `number`: The number of queries that are matching the provided filters.

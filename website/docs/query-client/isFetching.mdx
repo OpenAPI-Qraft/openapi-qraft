@@ -23,16 +23,16 @@ guide for more information.
 
     ### Arguments
 
-    1. `filters: QueryFiltersByParameters | QueryFiltersByQueryKey`
-       - **Required**, represents the [_Query Filters 🌴_](https://tanstack.com/query/latest/docs/framework/react/guides/filters#query-filters)
-         to be used, strictly-typed ✨
-       - `filters.parameters: { path, query, header }` will be used for filtering queries by parameters
-       - `filters.infinite: boolean` will be used to filter infinite or normal queries
-       - `filters.queryKey: QueryKey` will be used for filtering queries by _QueryKey_ instead of parameters
-         - `filters.queryKey` and `filters.parameters` are mutually exclusive
-       - `filters.predicate?: (query: Query) => boolean` will be used for filtering queries by custom predicate
-       - _If not provided_
-         - All queries for the specified endpoint will be checked
+    1.  `filters: QueryFiltersByParameters | QueryFiltersByQueryKey`
+        - **Required**, represents the [_Query Filters 🌴_](https://tanstack.com/query/latest/docs/framework/react/guides/filters#query-filters)
+          to be used, strictly-typed ✨
+        - `filters.parameters: { path, query, header }` will be used for filtering queries by parameters
+        - `filters.infinite: boolean` will be used to filter infinite or normal queries
+        - `filters.queryKey: QueryKey` will be used for filtering queries by _QueryKey_ instead of parameters
+          - `filters.queryKey` and `filters.parameters` are mutually exclusive
+        - `filters.predicate?: (query: Query) => boolean` will be used for filtering queries by custom predicate
+        - _If not provided_
+          - All queries for the specified endpoint will be checked
   </TabItem>
   <TabItem value="without-filters" label={<span style={{verticalAlign: "middle"}}>Without <code>filters</code></span>}>
     Check _all_ normal and _Infinite_ queries for the specified endpoint.

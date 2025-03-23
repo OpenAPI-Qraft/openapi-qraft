@@ -19,26 +19,26 @@ const query = qraft.<service>.<operation>.useSuspenseInfiniteQuery(
 
 ### Arguments
 
-1. `parameters: { path, query, header } | QueryKey | {}`
-   - **Required** and strictly-typed ✨ parameters for the query
-   - `parameters` will be used to generate the `QueryKey`
-   - Instead of an object with `{path, query, header}`, you can pass a `QueryKey` as an array
-     which is also strictly-typed ✨
-   - If operation does not require parameters, you must pass an empty object `{}` for strictness
+1.  `parameters: { path, query, header } | QueryKey | {}`
+    - **Required** and strictly-typed ✨ parameters for the query
+    - `parameters` will be used to generate the `QueryKey`
+    - Instead of an object with `{path, query, header}`, you can pass a `QueryKey` as an array
+      which is also strictly-typed ✨
+    - If operation does not require parameters, you must pass an empty object `{}` for strictness
 
-2. `suspenseInfiniteQueryOptions?: UseSuspenseInfiniteQueryOptions`
-   - **Optional**, represents the options of the
-     [_useSuspenseInfiniteQuery(...) 🌴_](https://tanstack.com/query/latest/docs/framework/react/reference/useSuspenseInfiniteQuery)
-     Hook
-     - `queryOptions.queryFn` could be provided to override the default `queryFn` used by Qraft
-     - ~~`queryOptions.queryKey`~~ is not allowed, as it will be generated from `parameters`
+2.  `suspenseInfiniteQueryOptions?: UseSuspenseInfiniteQueryOptions`
+    - **Optional**, represents the options of the
+      [_useSuspenseInfiniteQuery(...) 🌴_](https://tanstack.com/query/latest/docs/framework/react/reference/useSuspenseInfiniteQuery)
+      Hook
+      - `queryOptions.queryFn` could be provided to override the default `queryFn` used by Qraft
+      - ~~`queryOptions.queryKey`~~ is not allowed, as it will be generated from `parameters`
 
-3. `queryClient?: QueryClient`
-   - **Optional** [_QueryClient 🌴_](https://tanstack.com/query/latest/docs/reference/QueryClient) to be used
-   - _If not provided_
-     - `QraftContext.queryClient` will be used if available
-     - [_useQueryClient() 🌴_](https://tanstack.com/query/latest/docs/framework/react/reference/useQueryClient)
-       result will be used as a fallback
+3.  `queryClient?: QueryClient`
+    - **Optional** [_QueryClient 🌴_](https://tanstack.com/query/latest/docs/reference/QueryClient) to be used
+    - _If not provided_
+      - `QraftContext.queryClient` will be used if available
+      - [_useQueryClient() 🌴_](https://tanstack.com/query/latest/docs/framework/react/reference/useQueryClient)
+        result will be used as a fallback
 
 ### Returns
 

@@ -22,21 +22,21 @@ const result = api.<service>.<operation>.ensureInfiniteQueryData({
 ```
 
 ### Arguments
-1. - `parameters: { path, query, header } | QueryKey | void`
-     - OpenAPI request parameters for the query, strictly-typed ✨
-     - `parameters` will be used to generate the `QueryKey`
-   - `fetchInfiniteQueryOptions?: FetchInfiniteQueryOptions`
-     - `requestFn?: RequestFn`
-       - **Optional**, a function that will be used to execute the request
-       - The function should be provided, otherwise it will throw an error if default `queryFn` is not set previously using `QueryClient.setDefaultOptions(...)` method
-     - `baseUrl?: string`
-       - **Optional**, the base URL of the API
-     - `revalidateIfStale?: boolean`
-       - **Optional**, defaults to `false`. If `true`, stale data will be revalidated in the background while returning cached data immediately.
-     - `...fetchInfiniteQueryOptions?: FetchInfiniteQueryOptions`
-     - **Optional**, represents the rest options of the [_fetchInfiniteQuery(...) 🌴_](https://tanstack.com/query/latest/docs/reference/QueryClient#queryclientfetchinfinitequery) method
-       - `queryOptions.queryFn` could be provided instead of ~~`requestFn`~~
-       - `queryOptions.queryKey` could be provided instead of ~~`parameters`~~
+1.  - `parameters: { path, query, header } | QueryKey | void`
+      - OpenAPI request parameters for the query, strictly-typed ✨
+      - `parameters` will be used to generate the `QueryKey`
+    - `fetchInfiniteQueryOptions?: FetchInfiniteQueryOptions`
+      - `requestFn?: RequestFn`
+        - **Optional**, a function that will be used to execute the request
+        - The function should be provided, otherwise it will throw an error if default `queryFn` is not set previously using `QueryClient.setDefaultOptions(...)` method
+      - `baseUrl?: string`
+        - **Optional**, the base URL of the API
+      - `revalidateIfStale?: boolean`
+        - **Optional**, defaults to `false`. If `true`, stale data will be revalidated in the background while returning cached data immediately.
+      - `...fetchInfiniteQueryOptions?: FetchInfiniteQueryOptions`
+      - **Optional**, represents the rest options of the [_fetchInfiniteQuery(...) 🌴_](https://tanstack.com/query/latest/docs/reference/QueryClient#queryclientfetchinfinitequery) method
+        - `queryOptions.queryFn` could be provided instead of ~~`requestFn`~~
+        - `queryOptions.queryKey` could be provided instead of ~~`parameters`~~
 
 ### Returns
 

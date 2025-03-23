@@ -19,15 +19,15 @@ const result = api.<service>.<operation>.useSuspenseQueries(
 
 ### Arguments
 
-1. `options: UseQueriesOptions`
-   - **Required**, represents the options for queries, see [_useSuspenseQueries(...) 🌴_](https://tanstack.com/query/latest/docs/framework/react/reference/useSuspenseQueries) documentation
-   - `options.queries: QueryOptions[]`
-     - **Required** array of _Queries_ to be executed
-     - `parameters: { path, query, header }` will be used for the request
-     - `queryKey: QueryKey` will be used for the request instead of the `parameters`
-       - `queryKey` and `parameters` are mutually exclusive
-   - `options.combine?: (result: UseQueriesResults) => TCombinedResult`
-     - **Optional**, a function to select the data from the mutation
+1.  `options: UseQueriesOptions`
+    - **Required**, represents the options for queries, see [_useSuspenseQueries(...) 🌴_](https://tanstack.com/query/latest/docs/framework/react/reference/useSuspenseQueries) documentation
+    - `options.queries: QueryOptions[]`
+      - **Required** array of _Queries_ to be executed
+      - `parameters: { path, query, header }` will be used for the request
+      - `queryKey: QueryKey` will be used for the request instead of the `parameters`
+        - `queryKey` and `parameters` are mutually exclusive
+    - `options.combine?: (result: UseQueriesResults) => TCombinedResult`
+      - **Optional**, a function to select the data from the mutation
 
 ### Returns
 

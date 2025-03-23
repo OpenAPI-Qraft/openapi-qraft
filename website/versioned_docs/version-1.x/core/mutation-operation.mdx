@@ -28,12 +28,12 @@ The method allows you to execute a _Mutations_ without TanStack's ~~_QueryClient
 
     ### Arguments
 
-    1. - `parameters: { path, query, header } | {}`
-         - **Required**, OpenAPI request parameters for the query, strictly-typed ✨
+    1.  - `parameters: { path, query, header } | {}`
+          - **Required**, OpenAPI request parameters for the query, strictly-typed ✨
           - If operation does not require parameters, you must pass an empty object `{}` for strictness
-       - `baseUrl` - **Required** base URL for the `requestFn`
-    2. `requestFn: RequestFn`
-       - **Required**, a function that will be used to execute the request
+        - `baseUrl` - **Required** base URL for the `requestFn`
+    2.  `requestFn: RequestFn`
+        - **Required**, a function that will be used to execute the request
   </TabItem>
   <TabItem value="no-base-url" label={<span style={{verticalAlign: 'middle'}}>No <code style={{textDecoration: 'line-through'}}>baseUrl</code></span>} default>
     ```ts
@@ -49,11 +49,11 @@ The method allows you to execute a _Mutations_ without TanStack's ~~_QueryClient
     ### Arguments
 
     1. - `parameters: { path, query, header } | {}`
-         - **Required**, OpenAPI request parameters for the query, strictly-typed ✨
+          - **Required**, OpenAPI request parameters for the query, strictly-typed ✨
           - If operation does not require parameters, you must pass an empty object `{}` for strictness
-    2. `requestFn: Omit<RequestFn, 'baseUrl'>`
-       - **Required**, a function that will be used to execute the request. Note,
-         that `baseUrl` will not be provided in the `requestFn`.
+    2.  `requestFn: Omit<RequestFn, 'baseUrl'>`
+        - **Required**, a function that will be used to execute the request. Note,
+          that `baseUrl` will not be provided in the `requestFn`.
   </TabItem>
 </Tabs>
 
