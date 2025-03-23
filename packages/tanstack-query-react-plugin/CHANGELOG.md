@@ -1,5 +1,12 @@
 # @openapi-qraft/tanstack-query-react-plugin
 
+## 2.2.1
+
+### Patch Changes
+
+- 92de06c: Added support for the verbatimModuleSyntax option in the TypeScript configuration.
+  - @openapi-qraft/plugin@2.2.1
+
 ## 2.2.0
 
 ### Patch Changes
