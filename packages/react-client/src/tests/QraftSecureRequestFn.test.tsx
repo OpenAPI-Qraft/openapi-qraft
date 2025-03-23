@@ -72,7 +72,7 @@ describe('QraftSecureRequestFn', { timeout: 10_000 }, () => {
     await act(async () => {
       await result.current.mutateAsync(mutationParams);
 
-      vi.advanceTimersByTime(3600_000 / 2);
+      await vi.advanceTimersByTimeAsync(3600_000 / 2);
 
       await result.current.mutateAsync({
         ...mutationParams,
@@ -202,7 +202,7 @@ describe('QraftSecureRequestFn', { timeout: 10_000 }, () => {
 
     await act(() =>
       /// run MSW timers
-      vi.advanceTimersByTime(100)
+      vi.advanceTimersByTimeAsync(100)
     );
 
     await waitFor(() =>
@@ -299,7 +299,7 @@ describe('QraftSecureRequestFn', { timeout: 10_000 }, () => {
     await act(async () => {
       await result.current.mutateAsync(mutationParams);
 
-      vi.advanceTimersByTime(3600_000 * 0.9);
+      await vi.advanceTimersByTimeAsync(3600_000 * 0.9);
 
       await result.current.mutateAsync({
         ...mutationParams,
