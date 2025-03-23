@@ -76,28 +76,42 @@ const getServicesImportsFactory = (
 ) => {
   const factory = ts.factory;
 
-  return services.map(({ variableName, typeName, fileBaseName }) =>
-    factory.createImportDeclaration(
-      undefined,
-      factory.createImportClause(
-        false,
+  return services.flatMap(({ variableName, typeName, fileBaseName }) => {
+    return [
+      factory.createImportDeclaration(
         undefined,
-        factory.createNamedImports([
-          factory.createImportSpecifier(
-            false,
-            undefined,
-            factory.createIdentifier(typeName)
-          ),
-          factory.createImportSpecifier(
-            false,
-            undefined,
-            factory.createIdentifier(variableName)
-          ),
-        ])
+        factory.createImportClause(
+          true,
+          undefined,
+          factory.createNamedImports([
+            factory.createImportSpecifier(
+              false,
+              undefined,
+              factory.createIdentifier(typeName)
+            ),
+          ])
+        ),
+        factory.createStringLiteral(
+          `./${fileBaseName}${explicitImportExtensions ?? ''}`
+        )
       ),
-      factory.createStringLiteral(
-        `./${fileBaseName}${explicitImportExtensions ?? ''}`
-      )
-    )
-  );
+      factory.createImportDeclaration(
+        undefined,
+        factory.createImportClause(
+          false,
+          undefined,
+          factory.createNamedImports([
+            factory.createImportSpecifier(
+              false,
+              undefined,
+              factory.createIdentifier(variableName)
+            ),
+          ])
+        ),
+        factory.createStringLiteral(
+          `./${fileBaseName}${explicitImportExtensions ?? ''}`
+        )
+      ),
+    ];
+  });
 };
