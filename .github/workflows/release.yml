@@ -12,6 +12,7 @@ jobs:
     permissions:
       contents: write
       pull-requests: write
+      id-token: write # Required to perform `npm publish --provenance`
     environment: production
     steps:
       - name: Checkout Repo
