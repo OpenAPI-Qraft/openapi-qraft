@@ -313,7 +313,62 @@ export interface FilesService {
          * ```
          */
         useSuspenseInfiniteQuery<TPageParam extends GetFilesParameters, TData = GetFilesData>(parameters: ServiceOperationInfiniteQueryKey<GetFilesSchema, GetFilesParameters> | (GetFilesParameters), options: Omit<UseSuspenseInfiniteQueryOptions<GetFilesData, GetFilesError, OperationInfiniteData<TData, GetFilesParameters>, GetFilesData, ServiceOperationInfiniteQueryKey<GetFilesSchema, GetFilesParameters>, PartialParameters<TPageParam>>, "queryKey" | "getPreviousPageParam" | "getNextPageParam" | "initialPageParam"> & InfiniteQueryPageParamsOptions<GetFilesData, PartialParameters<TPageParam>>): UseSuspenseInfiniteQueryResult<OperationInfiniteData<TData, GetFilesParameters>, GetFilesError | Error>;
-        /** @summary Get a files by ID */
+        /**
+         * Allows you to execute multiple asynchronous data fetching operations concurrently with Suspense support.
+         * Similar to useQueries but integrates with React Suspense for loading states.
+         *
+         * @summary Get a files by ID
+         * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/hooks/useSuspenseQueries|`useSuspenseQueries(...)` documentation}
+         * @example Basic usage with Suspense
+         * ```ts
+         * const getFilesData = qraft.filesService.getFiles.useSuspenseQueries({
+         *     queries: [
+         *         {
+         *             header: {
+         *                 "x-monite-version": "2023-06-04"
+         *             },
+         *             query: {
+         *                 id__in: idIn1
+         *             }
+         *         },
+         *         {
+         *             header: {
+         *                 "x-monite-version": "2023-06-04"
+         *             },
+         *             query: {
+         *                 id__in: idIn2
+         *             }
+         *         }
+         *     ]
+         * });
+         * getFilesResults.forEach(({ isSuccess, data, error }) => console.log({ isSuccess, data, error }));
+         * ```
+         * @example With data transformation using combine
+         * ```ts
+         * const getFilesCombinedData = qraft.filesService.getFiles.useSuspenseQueries({
+         *     combine: results => results.map(result => result.data),
+         *     queries: [
+         *         {
+         *             header: {
+         *                 "x-monite-version": "2023-06-04"
+         *             },
+         *             query: {
+         *                 id__in: idIn1
+         *             }
+         *         },
+         *         {
+         *             header: {
+         *                 "x-monite-version": "2023-06-04"
+         *             },
+         *             query: {
+         *                 id__in: idIn2
+         *             }
+         *         }
+         *     ]
+         * });
+         * getFilesCombinedData.forEach(data => console.log({ data }));
+         * ```
+         */
         useSuspenseQueries<T extends Array<UseQueryOptionsForUseSuspenseQuery<GetFilesSchema, GetFilesParameters, GetFilesData, GetFilesError>>, TCombinedResult = Array<UseSuspenseQueryResult<GetFilesData, GetFilesError>>>(options: {
             queries: T;
             combine?: (results: Array<WithOptional<UseSuspenseQueryResult<GetFilesData, GetFilesError>, "data">>) => TCombinedResult;
@@ -957,8 +1012,61 @@ export interface FilesService {
          */
         useSuspenseInfiniteQuery<TPageParam extends GetFileListParameters, TData = GetFileListData>(parameters: ServiceOperationInfiniteQueryKey<GetFileListSchema, GetFileListParameters> | (GetFileListParameters | void), options: Omit<UseSuspenseInfiniteQueryOptions<GetFileListData, GetFileListError, OperationInfiniteData<TData, GetFileListParameters>, GetFileListData, ServiceOperationInfiniteQueryKey<GetFileListSchema, GetFileListParameters>, PartialParameters<TPageParam>>, "queryKey" | "getPreviousPageParam" | "getNextPageParam" | "initialPageParam"> & InfiniteQueryPageParamsOptions<GetFileListData, PartialParameters<TPageParam>>): UseSuspenseInfiniteQueryResult<OperationInfiniteData<TData, GetFileListParameters>, GetFileListError | Error>;
         /**
+         * Allows you to execute multiple asynchronous data fetching operations concurrently with Suspense support.
+         * Similar to useQueries but integrates with React Suspense for loading states.
+         *
          * @deprecated
          * @summary Get a file list
+         * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/hooks/useSuspenseQueries|`useSuspenseQueries(...)` documentation}
+         * @example Basic usage with Suspense
+         * ```ts
+         * const getFileListData = qraft.filesService.getFileList.useSuspenseQueries({
+         *     queries: [
+         *         {
+         *             header: {
+         *                 "x-monite-version": "2023-06-04"
+         *             },
+         *             query: {
+         *                 id__in: idIn1
+         *             }
+         *         },
+         *         {
+         *             header: {
+         *                 "x-monite-version": "2023-06-04"
+         *             },
+         *             query: {
+         *                 id__in: idIn2
+         *             }
+         *         }
+         *     ]
+         * });
+         * getFileListResults.forEach(({ isSuccess, data, error }) => console.log({ isSuccess, data, error }));
+         * ```
+         * @example With data transformation using combine
+         * ```ts
+         * const getFileListCombinedData = qraft.filesService.getFileList.useSuspenseQueries({
+         *     combine: results => results.map(result => result.data),
+         *     queries: [
+         *         {
+         *             header: {
+         *                 "x-monite-version": "2023-06-04"
+         *             },
+         *             query: {
+         *                 id__in: idIn1
+         *             }
+         *         },
+         *         {
+         *             header: {
+         *                 "x-monite-version": "2023-06-04"
+         *             },
+         *             query: {
+         *                 id__in: idIn2
+         *             }
+         *         }
+         *     ]
+         * });
+         * getFileListCombinedData.forEach(data => console.log({ data }));
+         * ```
          */
         useSuspenseQueries<T extends Array<UseQueryOptionsForUseSuspenseQuery<GetFileListSchema, GetFileListParameters, GetFileListData, GetFileListError>>, TCombinedResult = Array<UseSuspenseQueryResult<GetFileListData, GetFileListError>>>(options: {
             queries: T;
