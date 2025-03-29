@@ -318,7 +318,24 @@ export interface FilesService {
             queries: T;
             combine?: (results: Array<WithOptional<UseSuspenseQueryResult<GetFilesData, GetFilesError>, "data">>) => TCombinedResult;
         }): TCombinedResult;
-        /** @summary Get a files by ID */
+        /**
+         * Performs asynchronous data fetching with Suspense support.
+         * Similar to useQuery but integrates with React Suspense for loading states.
+         *
+         * @summary Get a files by ID
+         * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/hooks/useSuspenseQuery|`useSuspenseQuery(...)` documentation}
+         * @example Suspense Query with parameters
+         * ```ts
+         * const data = qraft.filesService.getFiles.useSuspenseQuery({
+         *     header: {
+         *         "x-monite-version": "2023-06-04"
+         *     },
+         *     query: {
+         *         id__in: idIn
+         *     }
+         * })
+         * ```
+         */
         useSuspenseQuery<TData = GetFilesData>(parameters: ServiceOperationQueryKey<GetFilesSchema, GetFilesParameters> | (GetFilesParameters), options?: Omit<UseSuspenseQueryOptions<GetFilesData, GetFilesError, TData, ServiceOperationQueryKey<GetFilesSchema, GetFilesParameters>>, "queryKey">): UseSuspenseQueryResult<TData, GetFilesError | Error>;
         schema: GetFilesSchema;
         types: {
@@ -948,8 +965,27 @@ export interface FilesService {
             combine?: (results: Array<WithOptional<UseSuspenseQueryResult<GetFileListData, GetFileListError>, "data">>) => TCombinedResult;
         }): TCombinedResult;
         /**
+         * Performs asynchronous data fetching with Suspense support.
+         * Similar to useQuery but integrates with React Suspense for loading states.
+         *
          * @deprecated
          * @summary Get a file list
+         * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/hooks/useSuspenseQuery|`useSuspenseQuery(...)` documentation}
+         * @example Suspense Query without parameters
+         * ```ts
+         * const data = qraft.filesService.getFileList.useSuspenseQuery()
+         * ```
+         * @example Suspense Query with parameters
+         * ```ts
+         * const data = qraft.filesService.getFileList.useSuspenseQuery({
+         *     header: {
+         *         "x-monite-version": "2023-06-04"
+         *     },
+         *     query: {
+         *         id__in: idIn
+         *     }
+         * })
+         * ```
          */
         useSuspenseQuery<TData = GetFileListData>(parameters: ServiceOperationQueryKey<GetFileListSchema, GetFileListParameters> | (GetFileListParameters | void), options?: Omit<UseSuspenseQueryOptions<GetFileListData, GetFileListError, TData, ServiceOperationQueryKey<GetFileListSchema, GetFileListParameters>>, "queryKey">): UseSuspenseQueryResult<TData, GetFileListError | Error>;
         schema: GetFileListSchema;

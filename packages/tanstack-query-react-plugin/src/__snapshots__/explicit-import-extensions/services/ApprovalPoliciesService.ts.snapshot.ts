@@ -441,8 +441,27 @@ export interface ApprovalPoliciesService {
             combine?: (results: Array<WithOptional<UseSuspenseQueryResult<GetApprovalPoliciesIdData, GetApprovalPoliciesIdError>, "data">>) => TCombinedResult;
         }): TCombinedResult;
         /**
+         * Performs asynchronous data fetching with Suspense support.
+         * Similar to useQuery but integrates with React Suspense for loading states.
+         *
          * @summary Get an approval policy by ID
          * @description Retrieve a specific approval policy.
+         * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/hooks/useSuspenseQuery|`useSuspenseQuery(...)` documentation}
+         * @example Suspense Query with parameters
+         * ```ts
+         * const data = qraft.approvalPoliciesService.getApprovalPoliciesId.useSuspenseQuery({
+         *     header: {
+         *         "x-monite-version": "2023-06-04",
+         *         "x-monite-entity-id": xMoniteEntityId
+         *     },
+         *     path: {
+         *         approval_policy_id: approvalPolicyId
+         *     },
+         *     query: {
+         *         items_order: itemsOrder
+         *     }
+         * })
+         * ```
          */
         useSuspenseQuery<TData = GetApprovalPoliciesIdData>(parameters: ServiceOperationQueryKey<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdParameters> | (GetApprovalPoliciesIdParameters), options?: Omit<UseSuspenseQueryOptions<GetApprovalPoliciesIdData, GetApprovalPoliciesIdError, TData, ServiceOperationQueryKey<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdParameters>>, "queryKey">): UseSuspenseQueryResult<TData, GetApprovalPoliciesIdError | Error>;
         schema: GetApprovalPoliciesIdSchema;
