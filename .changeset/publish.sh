@@ -48,18 +48,14 @@ for scope in $NPM_PUBLISH_SCOPES; do
   from_flags="$from_flags --from '@${scope}/*'"
 done
 
-if [ "$WITH_PROVENANCE" = "true" ]; then
-  provenance_flags="--provenance"
-fi
-
 TAG=$(release_tag)
 
 if [ -n "$TAG" ]; then
   echo "Publishing under @${TAG} tag"
-  sh -c "yarn workspaces foreach --verbose --recursive --no-private $from_flags npm publish $provenance_flags --tolerate-republish --tag '$TAG'"
+  sh -c "yarn workspaces foreach --verbose --recursive --no-private $from_flags npm publish --tolerate-republish --tag '$TAG'"
 else
   echo "Publishing as @latest"
-  sh -c "yarn workspaces foreach --verbose --recursive --no-private $from_flags npm publish $provenance_flags --tolerate-republish"
+  sh -c "yarn workspaces foreach --verbose --recursive --no-private $from_flags npm publish --tolerate-republish"
 fi
 
 for arg in "$@"; do
