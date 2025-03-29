@@ -1,5 +1,12 @@
 # @openapi-qraft/tanstack-query-react-plugin
 
+## 2.2.2
+
+### Patch Changes
+
+- 3e90392: Added TSDoc `@example` generation for `useSuspenseQuery` and `useSuspenseQueries` hooks.
+  - @openapi-qraft/plugin@2.2.2
+
 ## 2.2.1
 
 ### Patch Changes
