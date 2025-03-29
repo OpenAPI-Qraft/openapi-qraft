@@ -433,16 +433,104 @@ export interface ApprovalPoliciesService {
          */
         useSuspenseInfiniteQuery<TPageParam extends GetApprovalPoliciesIdParameters, TData = GetApprovalPoliciesIdData>(parameters: ServiceOperationInfiniteQueryKey<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdParameters> | (GetApprovalPoliciesIdParameters), options: Omit<UseSuspenseInfiniteQueryOptions<GetApprovalPoliciesIdData, GetApprovalPoliciesIdError, OperationInfiniteData<TData, GetApprovalPoliciesIdParameters>, GetApprovalPoliciesIdData, ServiceOperationInfiniteQueryKey<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdParameters>, PartialParameters<TPageParam>>, "queryKey" | "getPreviousPageParam" | "getNextPageParam" | "initialPageParam"> & InfiniteQueryPageParamsOptions<GetApprovalPoliciesIdData, PartialParameters<TPageParam>>): UseSuspenseInfiniteQueryResult<OperationInfiniteData<TData, GetApprovalPoliciesIdParameters>, GetApprovalPoliciesIdError | Error>;
         /**
+         * Allows you to execute multiple asynchronous data fetching operations concurrently with Suspense support.
+         * Similar to useQueries but integrates with React Suspense for loading states.
+         *
          * @summary Get an approval policy by ID
          * @description Retrieve a specific approval policy.
+         * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/hooks/useSuspenseQueries|`useSuspenseQueries(...)` documentation}
+         * @example Basic usage with Suspense
+         * ```ts
+         * const getApprovalPoliciesIdData = qraft.approvalPoliciesService.getApprovalPoliciesId.useSuspenseQueries({
+         *     queries: [
+         *         {
+         *             header: {
+         *                 "x-monite-version": "2023-06-04",
+         *                 "x-monite-entity-id": xMoniteEntityId1
+         *             },
+         *             path: {
+         *                 approval_policy_id: approvalPolicyId1
+         *             },
+         *             query: {
+         *                 items_order: itemsOrder1
+         *             }
+         *         },
+         *         {
+         *             header: {
+         *                 "x-monite-version": "2023-06-04",
+         *                 "x-monite-entity-id": xMoniteEntityId2
+         *             },
+         *             path: {
+         *                 approval_policy_id: approvalPolicyId2
+         *             },
+         *             query: {
+         *                 items_order: itemsOrder2
+         *             }
+         *         }
+         *     ]
+         * });
+         * getApprovalPoliciesIdResults.forEach(({ isSuccess, data, error }) => console.log({ isSuccess, data, error }));
+         * ```
+         * @example With data transformation using combine
+         * ```ts
+         * const getApprovalPoliciesIdCombinedData = qraft.approvalPoliciesService.getApprovalPoliciesId.useSuspenseQueries({
+         *     combine: results => results.map(result => result.data),
+         *     queries: [
+         *         {
+         *             header: {
+         *                 "x-monite-version": "2023-06-04",
+         *                 "x-monite-entity-id": xMoniteEntityId1
+         *             },
+         *             path: {
+         *                 approval_policy_id: approvalPolicyId1
+         *             },
+         *             query: {
+         *                 items_order: itemsOrder1
+         *             }
+         *         },
+         *         {
+         *             header: {
+         *                 "x-monite-version": "2023-06-04",
+         *                 "x-monite-entity-id": xMoniteEntityId2
+         *             },
+         *             path: {
+         *                 approval_policy_id: approvalPolicyId2
+         *             },
+         *             query: {
+         *                 items_order: itemsOrder2
+         *             }
+         *         }
+         *     ]
+         * });
+         * getApprovalPoliciesIdCombinedData.forEach(data => console.log({ data }));
+         * ```
          */
         useSuspenseQueries<T extends Array<UseQueryOptionsForUseSuspenseQuery<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdParameters, GetApprovalPoliciesIdData, GetApprovalPoliciesIdError>>, TCombinedResult = Array<UseSuspenseQueryResult<GetApprovalPoliciesIdData, GetApprovalPoliciesIdError>>>(options: {
             queries: T;
             combine?: (results: Array<WithOptional<UseSuspenseQueryResult<GetApprovalPoliciesIdData, GetApprovalPoliciesIdError>, "data">>) => TCombinedResult;
         }): TCombinedResult;
         /**
+         * Performs asynchronous data fetching with Suspense support.
+         * Similar to useQuery but integrates with React Suspense for loading states.
+         *
          * @summary Get an approval policy by ID
          * @description Retrieve a specific approval policy.
+         * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/hooks/useSuspenseQuery|`useSuspenseQuery(...)` documentation}
+         * @example Suspense Query with parameters
+         * ```ts
+         * const data = qraft.approvalPoliciesService.getApprovalPoliciesId.useSuspenseQuery({
+         *     header: {
+         *         "x-monite-version": "2023-06-04",
+         *         "x-monite-entity-id": xMoniteEntityId
+         *     },
+         *     path: {
+         *         approval_policy_id: approvalPolicyId
+         *     },
+         *     query: {
+         *         items_order: itemsOrder
+         *     }
+         * })
+         * ```
          */
         useSuspenseQuery<TData = GetApprovalPoliciesIdData>(parameters: ServiceOperationQueryKey<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdParameters> | (GetApprovalPoliciesIdParameters), options?: Omit<UseSuspenseQueryOptions<GetApprovalPoliciesIdData, GetApprovalPoliciesIdError, TData, ServiceOperationQueryKey<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdParameters>>, "queryKey">): UseSuspenseQueryResult<TData, GetApprovalPoliciesIdError | Error>;
         schema: GetApprovalPoliciesIdSchema;

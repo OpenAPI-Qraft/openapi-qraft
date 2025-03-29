@@ -7,6 +7,8 @@ import { createUseMutationStateOperationTSDocExample } from './createUseMutation
 import { createUseQueriesOperationTSDocExample } from './createUseQueriesOperationTSDocExample.js';
 import { createUseQueryOperationTSDocExample } from './createUseQueryOperationTSDocExample.js';
 import { createUseSuspenseInfiniteQueryOperationTSDocExample } from './createUseSuspenseInfiniteQueryOperationTSDocExample.js';
+import { createUseSuspenseQueriesOperationTSDocExample } from './createUseSuspenseQueriesOperationTSDocExample.js';
+import { createUseSuspenseQueryOperationTSDocExample } from './createUseSuspenseQueryOperationTSDocExample.js';
 
 export const createOperationMethodTSDocExample = (
   operation: ServiceOperation,
@@ -24,6 +26,11 @@ export const createOperationMethodTSDocExample = (
         operation,
         serviceVariableName
       );
+    case 'useSuspenseQuery':
+      return createUseSuspenseQueryOperationTSDocExample(
+        operation,
+        serviceVariableName
+      );
     case 'useMutation':
       return createUseMutationOperationTSDocExample(
         operation,
@@ -31,6 +38,11 @@ export const createOperationMethodTSDocExample = (
       );
     case 'useInfiniteQuery':
       return createUseInfiniteQueryOperationTSDocExample(
+        operation,
+        serviceVariableName
+      );
+    case 'useSuspenseInfiniteQuery':
+      return createUseSuspenseInfiniteQueryOperationTSDocExample(
         operation,
         serviceVariableName
       );
@@ -54,8 +66,8 @@ export const createOperationMethodTSDocExample = (
         operation,
         serviceVariableName
       );
-    case 'useSuspenseInfiniteQuery':
-      return createUseSuspenseInfiniteQueryOperationTSDocExample(
+    case 'useSuspenseQueries':
+      return createUseSuspenseQueriesOperationTSDocExample(
         operation,
         serviceVariableName
       );

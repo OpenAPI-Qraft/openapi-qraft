@@ -40,25 +40,7 @@ export const createUseQueriesOperationTSDocExample = (
                     [
                       factory.createPropertyAssignment(
                         factory.createIdentifier('queries'),
-                        factory.createArrayLiteralExpression(
-                          [
-                            factory.createObjectLiteralExpression(
-                              createOperationMethodParametersExampleNodes(
-                                operation,
-                                (parameter) => camelcase(`${parameter.name}-1`)
-                              ),
-                              true
-                            ),
-                            factory.createObjectLiteralExpression(
-                              createOperationMethodParametersExampleNodes(
-                                operation,
-                                (parameter) => camelcase(`${parameter.name}-2`)
-                              ),
-                              true
-                            ),
-                          ],
-                          true
-                        )
+                        createQueriesArrayExpression(operation, factory)
                       ),
                     ],
                     true
@@ -70,68 +52,9 @@ export const createUseQueriesOperationTSDocExample = (
           ts.NodeFlags.Const
         )
       ),
-      factory.createExpressionStatement(
-        factory.createCallExpression(
-          factory.createPropertyAccessExpression(
-            factory.createIdentifier(camelcase(operation.name + '-results')),
-            factory.createIdentifier('forEach')
-          ),
-          undefined,
-          [
-            factory.createArrowFunction(
-              undefined,
-              undefined,
-              [
-                factory.createParameterDeclaration(
-                  undefined,
-                  undefined,
-                  factory.createObjectBindingPattern([
-                    factory.createBindingElement(
-                      undefined,
-                      undefined,
-                      factory.createIdentifier('isSuccess')
-                    ),
-                    factory.createBindingElement(
-                      undefined,
-                      undefined,
-                      factory.createIdentifier('data')
-                    ),
-                    factory.createBindingElement(
-                      undefined,
-                      undefined,
-                      factory.createIdentifier('error')
-                    ),
-                  ])
-                ),
-              ],
-              undefined,
-              factory.createToken(ts.SyntaxKind.EqualsGreaterThanToken),
-              factory.createCallExpression(
-                factory.createPropertyAccessExpression(
-                  factory.createIdentifier('console'),
-                  factory.createIdentifier('log')
-                ),
-                undefined,
-                [
-                  factory.createObjectLiteralExpression(
-                    [
-                      factory.createShorthandPropertyAssignment(
-                        factory.createIdentifier('isSuccess')
-                      ),
-                      factory.createShorthandPropertyAssignment(
-                        factory.createIdentifier('data')
-                      ),
-                      factory.createShorthandPropertyAssignment(
-                        factory.createIdentifier('error')
-                      ),
-                    ],
-                    false
-                  ),
-                ]
-              )
-            ),
-          ]
-        )
+      createResultsForEachExpression(
+        camelcase(operation.name + '-results'),
+        factory
       ),
     ])
       .trim()
@@ -162,71 +85,11 @@ export const createUseQueriesOperationTSDocExample = (
                     [
                       factory.createPropertyAssignment(
                         factory.createIdentifier('combine'),
-                        factory.createArrowFunction(
-                          undefined,
-                          undefined,
-                          [
-                            factory.createParameterDeclaration(
-                              undefined,
-                              undefined,
-                              factory.createIdentifier('results')
-                            ),
-                          ],
-                          undefined,
-                          factory.createToken(
-                            ts.SyntaxKind.EqualsGreaterThanToken
-                          ),
-                          factory.createCallExpression(
-                            factory.createPropertyAccessExpression(
-                              factory.createIdentifier('results'),
-                              factory.createIdentifier('map')
-                            ),
-                            undefined,
-                            [
-                              factory.createArrowFunction(
-                                undefined,
-                                undefined,
-                                [
-                                  factory.createParameterDeclaration(
-                                    undefined,
-                                    undefined,
-                                    factory.createIdentifier('result')
-                                  ),
-                                ],
-                                undefined,
-                                factory.createToken(
-                                  ts.SyntaxKind.EqualsGreaterThanToken
-                                ),
-                                factory.createPropertyAccessExpression(
-                                  factory.createIdentifier('result'),
-                                  factory.createIdentifier('data')
-                                )
-                              ),
-                            ]
-                          )
-                        )
+                        createCombineFunction(factory)
                       ),
                       factory.createPropertyAssignment(
                         factory.createIdentifier('queries'),
-                        factory.createArrayLiteralExpression(
-                          [
-                            factory.createObjectLiteralExpression(
-                              createOperationMethodParametersExampleNodes(
-                                operation,
-                                (parameter) => camelcase(`${parameter.name}-1`)
-                              ),
-                              true
-                            ),
-                            factory.createObjectLiteralExpression(
-                              createOperationMethodParametersExampleNodes(
-                                operation,
-                                (parameter) => camelcase(`${parameter.name}-2`)
-                              ),
-                              true
-                            ),
-                          ],
-                          true
-                        )
+                        createQueriesArrayExpression(operation, factory)
                       ),
                     ],
                     true
@@ -238,49 +101,9 @@ export const createUseQueriesOperationTSDocExample = (
           ts.NodeFlags.Const
         )
       ),
-      factory.createExpressionStatement(
-        factory.createCallExpression(
-          factory.createPropertyAccessExpression(
-            factory.createIdentifier(
-              camelcase(operation.name + '-combined-results')
-            ),
-            factory.createIdentifier('forEach')
-          ),
-          undefined,
-          [
-            factory.createArrowFunction(
-              undefined,
-              undefined,
-              [
-                factory.createParameterDeclaration(
-                  undefined,
-                  undefined,
-                  factory.createIdentifier('data')
-                ),
-              ],
-              undefined,
-              factory.createToken(ts.SyntaxKind.EqualsGreaterThanToken),
-              factory.createCallExpression(
-                factory.createPropertyAccessExpression(
-                  factory.createIdentifier('console'),
-                  factory.createIdentifier('log')
-                ),
-                undefined,
-                [
-                  factory.createObjectLiteralExpression(
-                    [
-                      factory.createShorthandPropertyAssignment(
-                        factory.createIdentifier('data'),
-                        undefined
-                      ),
-                    ],
-                    false
-                  ),
-                ]
-              )
-            ),
-          ]
-        )
+      createCombinedResultsForEachExpression(
+        camelcase(operation.name + '-combined-results'),
+        factory
       ),
     ])
       .trim()
@@ -289,4 +112,187 @@ export const createUseQueriesOperationTSDocExample = (
   ];
 
   return example;
+};
+
+export const createQueriesArrayExpression = (
+  operation: ServiceOperation,
+  factory: ts.NodeFactory
+): ts.ArrayLiteralExpression => {
+  return factory.createArrayLiteralExpression(
+    [
+      factory.createObjectLiteralExpression(
+        createOperationMethodParametersExampleNodes(operation, (parameter) =>
+          camelcase(`${parameter.name}-1`)
+        ),
+        true
+      ),
+      factory.createObjectLiteralExpression(
+        createOperationMethodParametersExampleNodes(operation, (parameter) =>
+          camelcase(`${parameter.name}-2`)
+        ),
+        true
+      ),
+    ],
+    true
+  );
+};
+
+export const createCombineFunction = (
+  factory: ts.NodeFactory
+): ts.ArrowFunction => {
+  return factory.createArrowFunction(
+    undefined,
+    undefined,
+    [
+      factory.createParameterDeclaration(
+        undefined,
+        undefined,
+        factory.createIdentifier('results')
+      ),
+    ],
+    undefined,
+    factory.createToken(ts.SyntaxKind.EqualsGreaterThanToken),
+    factory.createCallExpression(
+      factory.createPropertyAccessExpression(
+        factory.createIdentifier('results'),
+        factory.createIdentifier('map')
+      ),
+      undefined,
+      [
+        factory.createArrowFunction(
+          undefined,
+          undefined,
+          [
+            factory.createParameterDeclaration(
+              undefined,
+              undefined,
+              factory.createIdentifier('result')
+            ),
+          ],
+          undefined,
+          factory.createToken(ts.SyntaxKind.EqualsGreaterThanToken),
+          factory.createPropertyAccessExpression(
+            factory.createIdentifier('result'),
+            factory.createIdentifier('data')
+          )
+        ),
+      ]
+    )
+  );
+};
+
+export const createResultsForEachExpression = (
+  variableName: string,
+  factory: ts.NodeFactory
+): ts.ExpressionStatement => {
+  return factory.createExpressionStatement(
+    factory.createCallExpression(
+      factory.createPropertyAccessExpression(
+        factory.createIdentifier(variableName),
+        factory.createIdentifier('forEach')
+      ),
+      undefined,
+      [
+        factory.createArrowFunction(
+          undefined,
+          undefined,
+          [
+            factory.createParameterDeclaration(
+              undefined,
+              undefined,
+              factory.createObjectBindingPattern([
+                factory.createBindingElement(
+                  undefined,
+                  undefined,
+                  factory.createIdentifier('isSuccess')
+                ),
+                factory.createBindingElement(
+                  undefined,
+                  undefined,
+                  factory.createIdentifier('data')
+                ),
+                factory.createBindingElement(
+                  undefined,
+                  undefined,
+                  factory.createIdentifier('error')
+                ),
+              ])
+            ),
+          ],
+          undefined,
+          factory.createToken(ts.SyntaxKind.EqualsGreaterThanToken),
+          factory.createCallExpression(
+            factory.createPropertyAccessExpression(
+              factory.createIdentifier('console'),
+              factory.createIdentifier('log')
+            ),
+            undefined,
+            [
+              factory.createObjectLiteralExpression(
+                [
+                  factory.createShorthandPropertyAssignment(
+                    factory.createIdentifier('isSuccess')
+                  ),
+                  factory.createShorthandPropertyAssignment(
+                    factory.createIdentifier('data')
+                  ),
+                  factory.createShorthandPropertyAssignment(
+                    factory.createIdentifier('error')
+                  ),
+                ],
+                false
+              ),
+            ]
+          )
+        ),
+      ]
+    )
+  );
+};
+
+export const createCombinedResultsForEachExpression = (
+  variableName: string,
+  factory: ts.NodeFactory
+): ts.ExpressionStatement => {
+  return factory.createExpressionStatement(
+    factory.createCallExpression(
+      factory.createPropertyAccessExpression(
+        factory.createIdentifier(variableName),
+        factory.createIdentifier('forEach')
+      ),
+      undefined,
+      [
+        factory.createArrowFunction(
+          undefined,
+          undefined,
+          [
+            factory.createParameterDeclaration(
+              undefined,
+              undefined,
+              factory.createIdentifier('data')
+            ),
+          ],
+          undefined,
+          factory.createToken(ts.SyntaxKind.EqualsGreaterThanToken),
+          factory.createCallExpression(
+            factory.createPropertyAccessExpression(
+              factory.createIdentifier('console'),
+              factory.createIdentifier('log')
+            ),
+            undefined,
+            [
+              factory.createObjectLiteralExpression(
+                [
+                  factory.createShorthandPropertyAssignment(
+                    factory.createIdentifier('data')
+                  ),
+                ],
+                false
+              ),
+            ]
+          )
+        ),
+      ]
+    )
+  );
 };
