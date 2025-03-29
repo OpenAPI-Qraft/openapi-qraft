@@ -7,6 +7,7 @@ import { createUseMutationStateOperationTSDocExample } from './createUseMutation
 import { createUseQueriesOperationTSDocExample } from './createUseQueriesOperationTSDocExample.js';
 import { createUseQueryOperationTSDocExample } from './createUseQueryOperationTSDocExample.js';
 import { createUseSuspenseInfiniteQueryOperationTSDocExample } from './createUseSuspenseInfiniteQueryOperationTSDocExample.js';
+import { createUseSuspenseQueriesOperationTSDocExample } from './createUseSuspenseQueriesOperationTSDocExample.js';
 import { createUseSuspenseQueryOperationTSDocExample } from './createUseSuspenseQueryOperationTSDocExample.js';
 
 export const createOperationMethodTSDocExample = (
@@ -62,6 +63,11 @@ export const createOperationMethodTSDocExample = (
       );
     case 'useQueries':
       return createUseQueriesOperationTSDocExample(
+        operation,
+        serviceVariableName
+      );
+    case 'useSuspenseQueries':
+      return createUseSuspenseQueriesOperationTSDocExample(
         operation,
         serviceVariableName
       );
