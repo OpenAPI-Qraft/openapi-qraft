@@ -1,5 +1,13 @@
 # @openapi-qraft/cli
 
+## 2.2.3-provenance-test.0
+
+### Patch Changes
+
+- @openapi-qraft/plugin@2.2.3-provenance-test.0
+- @openapi-qraft/tanstack-query-react-plugin@2.2.3-provenance-test.0
+- @openapi-qraft/openapi-typescript-plugin@1.2.9-provenance-test.0
+
 ## 2.2.2
 
 ### Patch Changes

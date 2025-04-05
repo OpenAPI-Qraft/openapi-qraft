@@ -1,5 +1,11 @@
 # @openapi-qraft/openapi-typescript
 
+## 1.2.9-provenance-test.0
+
+### Patch Changes
+
+- @openapi-qraft/plugin@2.2.3-provenance-test.0
+
 ## 1.2.8
 
 ### Patch Changes

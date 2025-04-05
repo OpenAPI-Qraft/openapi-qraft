@@ -1,5 +1,12 @@
 # @openapi-qraft/react
 
+## 2.2.3-provenance-test.0
+
+### Patch Changes
+
+- Updated dependencies [9c0eccb]
+  - @openapi-qraft/tanstack-query-react-types@2.2.3-provenance-test.0
+
 ## 2.2.2
 
 ### Patch Changes
