@@ -56,5 +56,10 @@
     "!src/**/__snapshots__/**",
     "!src/**/*.spec.*"
   ],
-  "packageManager": "yarn@4.0.2"
+  "packageManager": "yarn@4.0.2",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/OpenAPI-Qraft/openapi-qraft.git",
+    "directory": "packages/cli"
+  }
 }
