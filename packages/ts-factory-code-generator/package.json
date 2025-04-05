@@ -4,12 +4,20 @@
   "private": true,
   "type": "commonjs",
   "scripts": {
-    "build": "yarn exec ./generateFactoryCodeGenerator.mjs && tsc --build"
+    "build": "yarn clean && tsc --build",
+    "codegen": "yarn exec ./generate-factory-code-generator.mjs",
+    "clean": "rimraf dist/"
   },
   "exports": {
-    "./package.json": "./package.json",
-    ".": "./dist/index.js",
-    "./*": "./dist/*.js"
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./*": {
+      "types": "./dist/*.d.ts",
+      "import": "./dist/*.js"
+    },
+    "./package.json": "./package.json"
   },
   "typesVersions": {
     "*": {
@@ -24,6 +32,6 @@
   },
   "devDependencies": {
     "@types/node": "^22.5.5",
-    "tsx": "^4.19.1"
+    "rimraf": "^5.0.10"
   }
 }

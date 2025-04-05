@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
     "outDir": "dist",
+    "rootDir": "src",
     "strict": true,
     "declaration": true,
     "declarationMap": true,
@@ -10,9 +11,7 @@
     "forceConsistentCasingInFileNames": true,
     "skipLibCheck": true
   },
-  "files": [
-    "generateTsFactoryCLI.ts",
-    "getSourceFileFactoryCode.ts",
-    "index.ts"
+  "include": [
+    "src/**/*"
   ]
 }
