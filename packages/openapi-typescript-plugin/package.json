@@ -48,6 +48,7 @@
     "vitest": "^3.0.5"
   },
   "peerDependencies": {
+    "@redocly/openapi-core": "^1.16.0",
     "commander": "^11.1.0"
   },
   "peerDependenciesMeta": {
