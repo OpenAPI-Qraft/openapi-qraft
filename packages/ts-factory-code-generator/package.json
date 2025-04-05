@@ -6,7 +6,8 @@
   "scripts": {
     "build": "yarn clean && tsc --build",
     "codegen": "yarn exec ./generate-factory-code-generator.mjs",
-    "clean": "rimraf dist/"
+    "clean": "rimraf dist/",
+    "lint": "eslint"
   },
   "exports": {
     ".": {
@@ -31,7 +32,9 @@
     "typescript-5.5.4": "npm:typescript@5.5.4"
   },
   "devDependencies": {
+    "@openapi-qraft/eslint-config": "workspace:*",
     "@types/node": "^22.5.5",
+    "eslint": "^9.24.0",
     "rimraf": "^5.0.10"
   }
 }
