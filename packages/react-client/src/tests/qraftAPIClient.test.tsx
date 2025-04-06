@@ -20,7 +20,7 @@ import {
 } from '@tanstack/react-query';
 import { act, renderHook, waitFor } from '@testing-library/react';
 import React from 'react';
-import { describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { qraftAPIClient, requestFn } from '../index.js';
 import { createPredefinedParametersRequestFn } from './fixtures/api/create-predefined-parameters-request-fn.js';
 import { createAPIClient, services } from './fixtures/api/index.js';
@@ -4504,6 +4504,158 @@ describe('Qraft is type-safe if client created with "QueryClient" only', () => {
       // @ts-expect-error - no options provided for the request - must emit an error
       qraft.files.findAll.fetchQuery()
     ).rejects.toThrow();
+  });
+});
+
+describe('Qraft API Client primitive conversions', () => {
+  let qraft: ReturnType<typeof createAPIClient>;
+
+  beforeEach(() => {
+    qraft = createAPIClient({ queryClient: new QueryClient() });
+  });
+
+  describe('Root level conversions', () => {
+    it('should handle string conversion', () => {
+      expect(String(qraft)).toBe(qraft.toString());
+      expect(`${qraft}`).toBe(qraft.toString());
+    });
+
+    it('should handle number conversion', () => {
+      expect(Number(qraft)).toBeNaN();
+      expect(+qraft).toBeNaN();
+    });
+
+    it('should handle JSON serialization', () => {
+      expect(JSON.stringify(qraft)).toBe(
+        JSON.stringify(JSON.stringify(services))
+      );
+    });
+
+    it('toJSON() returns JSON string', () => {
+      expect(
+        // @ts-expect-error - toJSON() is not a standard method for Qraft API Client
+        qraft.toJSON()
+      ).toBe(JSON.stringify(services));
+    });
+
+    it('should handle valueOf()', () => {
+      const value = qraft.valueOf();
+      expect(typeof value).toBe('object');
+      expect(value).toBe(services);
+    });
+
+    it('should handle Symbol.toStringTag', () => {
+      expect(Object.prototype.toString.call(qraft)).toBe(
+        '[object QraftAPIClient]'
+      );
+    });
+  });
+
+  describe('Service level conversions', () => {
+    it('should handle string conversion', () => {
+      expect(String(qraft.approvalPolicies)).toBe(
+        qraft.approvalPolicies.toString()
+      );
+      expect(`${qraft.approvalPolicies}`).toBe(
+        qraft.approvalPolicies.toString()
+      );
+    });
+
+    it('should handle number conversion', () => {
+      expect(Number(qraft.approvalPolicies)).toBeNaN();
+      expect(+qraft.approvalPolicies).toBeNaN();
+    });
+
+    it('should handle JSON serialization', () => {
+      expect(JSON.stringify(qraft.approvalPolicies)).toBe(
+        JSON.stringify(JSON.stringify(services.approvalPolicies))
+      );
+    });
+
+    it('should handle valueOf()', () => {
+      const value = qraft.approvalPolicies.valueOf();
+      expect(typeof value).toBe('object');
+      expect(value).toBe(qraft.approvalPolicies.valueOf());
+    });
+
+    it('should handle Symbol.toStringTag', () => {
+      expect(Object.prototype.toString.call(qraft.approvalPolicies)).toBe(
+        '[object QraftAPIClient]'
+      );
+    });
+  });
+
+  describe('Operation level conversions', () => {
+    it('should handle string conversion', () => {
+      expect(String(qraft.approvalPolicies.getApprovalPoliciesId)).toBe(
+        qraft.approvalPolicies.getApprovalPoliciesId.toString()
+      );
+    });
+
+    it('should handle number conversion', () => {
+      expect(Number(qraft.approvalPolicies.getApprovalPoliciesId)).toBeNaN();
+    });
+
+    it('should handle JSON serialization', () => {
+      expect(JSON.stringify(qraft.approvalPolicies.getApprovalPoliciesId)).toBe(
+        JSON.stringify(
+          JSON.stringify(services.approvalPolicies.getApprovalPoliciesId)
+        )
+      );
+    });
+
+    it('should handle valueOf()', () => {
+      const value = qraft.approvalPolicies.getApprovalPoliciesId.valueOf();
+      expect(typeof value).toBe('object');
+    });
+
+    it('should handle Symbol.toStringTag', () => {
+      expect(
+        Object.prototype.toString.call(
+          qraft.approvalPolicies.getApprovalPoliciesId
+        )
+      ).toBe('[object QraftAPIClient]');
+    });
+  });
+});
+
+describe('Qraft API Client console logging', () => {
+  let qraft: ReturnType<typeof createAPIClient>;
+
+  beforeEach(() => {
+    qraft = createAPIClient({ queryClient: new QueryClient() });
+  });
+
+  describe('Individual elements logging', () => {
+    it('should log root client without errors', () => {
+      expect(() => console.log(qraft)).not.toThrow();
+    });
+
+    it('should log service without errors', () => {
+      expect(() => console.log(qraft.approvalPolicies)).not.toThrow();
+    });
+
+    it('should log operation without errors', () => {
+      expect(() =>
+        console.log(qraft.approvalPolicies.getApprovalPoliciesId)
+      ).not.toThrow();
+    });
+  });
+
+  describe('Multiple levels mixed logging', () => {
+    it('should log multiple client elements without errors', () => {
+      const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+
+      try {
+        console.log('Client:', qraft);
+        console.log('Service:', qraft.approvalPolicies);
+        console.log('Operation:', qraft.approvalPolicies.getApprovalPoliciesId);
+
+        expect(consoleSpy).toHaveBeenCalledTimes(3);
+      } finally {
+        consoleSpy.mockRestore();
+      }
+    });
   });
 });
 

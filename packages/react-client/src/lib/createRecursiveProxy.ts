@@ -1,11 +1,16 @@
-type ProxyApplyCallback = (path: string[], args: unknown[]) => unknown;
+type ProxyApplyCallback = (
+  path: (string | symbol)[],
+  args: unknown[]
+) => unknown;
 /**
  * @internal
  * If returns `undefined | null`, the proxy will continue to create a new proxy for the next key.
  */
-type ProxyGetCallback = (path: string[], key: string) => unknown | undefined;
+type ProxyGetCallback = (
+  path: (string | symbol)[],
+  key: string | symbol
+) => unknown | undefined;
 
-// todo::rename to `qraftRecursiveProxy` with deprecated `createRecursiveProxy`
 /**
  * Creates a recursive proxy that calls the `getCallback` and `applyCallback` functions
  * @param getCallback The callback to call when a proxy property is accessed
@@ -15,11 +20,11 @@ type ProxyGetCallback = (path: string[], key: string) => unknown | undefined;
 export function createRecursiveProxy(
   getCallback: ProxyGetCallback,
   applyCallback: ProxyApplyCallback,
-  path: string[]
+  path: (string | symbol)[]
 ): unknown {
   return new Proxy(noop, {
     get(_obj, key) {
-      if (typeof key !== 'string' || key === 'then') {
+      if (key === 'then') {
         // special case for if the proxy is accidentally treated
         // like a PromiseLike (like in `Promise.resolve(proxy)`)
         return undefined;
