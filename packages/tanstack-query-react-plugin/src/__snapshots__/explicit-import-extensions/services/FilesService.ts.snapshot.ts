@@ -1191,7 +1191,11 @@ type PostFilesSchema = {
         "multipart/form-data"
     ];
 };
-type PostFilesParameters = {};
+type PostFilesParameters = {
+    query?: never;
+    header?: never;
+    path?: never;
+};
 type PostFilesData = paths["/files"]["post"]["responses"]["200"]["content"]["application/json"];
 type PostFilesError = paths["/files"]["post"]["responses"]["default"]["content"]["application/json"];
 type PostFilesBody = NonNullable<paths["/files"]["post"]["requestBody"]>["content"]["multipart/form-data"] | FormData;
