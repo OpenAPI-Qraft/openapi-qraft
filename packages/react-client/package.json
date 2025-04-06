@@ -60,6 +60,7 @@
     "!src/tests/**"
   ],
   "type": "module",
+  "module": "dist/esm/index.js",
   "exports": {
     ".": {
       "types": "./dist/types/index.d.ts",

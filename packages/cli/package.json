@@ -36,9 +36,14 @@
     "!src/**/*.test.*",
     "!src/**/*.spec.*"
   ],
+  "module": "dist/bin.js",
+  "types": "dist/bin.d.ts",
   "exports": {
     "./package.json": "./package.json",
-    "./*": "./dist/*.js"
+    "./*": {
+      "types": "./dist/*.d.ts",
+      "import": "./dist/*.js"
+    }
   },
   "typesVersions": {
     "*": {
