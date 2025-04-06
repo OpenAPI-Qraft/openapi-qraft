@@ -3,7 +3,7 @@
   "tasks": {
     "build": {
       "cache": true,
-      "dependsOn": ["write-package-version-file", "codegen", "^build"],
+      "dependsOn": ["write-package-version-file", "^build", "codegen"],
       "outputs": ["dist/**", "tsFactoryCodeGenerator.ts", "src/ts-factory/service-operation.generated/**"]
     },
     "test": {
@@ -13,6 +13,8 @@
     },
     "typecheck": {
       "cache": true,
+      "outputs": [],
+      "outputLogs": "full",
       "dependsOn": [
         "write-package-version-file",
         "^codegen",
@@ -27,6 +29,8 @@
     },
     "lint": {
       "cache": true,
+      "outputs": [],
+      "outputLogs": "full",
       "dependsOn": ["write-package-version-file", "codegen", "^build"]
     },
     "clean": {
