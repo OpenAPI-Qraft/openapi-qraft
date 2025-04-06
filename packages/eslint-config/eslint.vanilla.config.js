@@ -1,4 +1,5 @@
 import pluginJs from '@eslint/js';
+import eslintPluginImportX from 'eslint-plugin-import-x';
 import prettierPlugin from 'eslint-plugin-prettier/recommended';
 import tseslint from 'typescript-eslint';
 
@@ -8,7 +9,52 @@ import tseslint from 'typescript-eslint';
 export default [
   pluginJs.configs.recommended,
   ...tseslint.configs.recommended,
+  eslintPluginImportX.flatConfigs.recommended,
+  eslintPluginImportX.flatConfigs.typescript,
   prettierPlugin,
+  {
+    rules: {
+      'import-x/no-named-as-default-member': 'off',
+      'import-x/no-extraneous-dependencies': [
+        'error',
+        {
+          devDependencies: false,
+          optionalDependencies: false,
+          peerDependencies: true,
+          includeTypes: true,
+        },
+      ],
+    },
+  },
+  {
+    files: [
+      '**/**.spec.{ts,tsx}',
+      '**/**.test.{ts,tsx}',
+      '**/setupTests.ts',
+      '**/vitestFsMock.ts',
+    ],
+    rules: {
+      'import-x/no-extraneous-dependencies': [
+        'error',
+        {
+          devDependencies: true,
+          optionalDependencies: false,
+          peerDependencies: true,
+          includeTypes: true,
+        },
+      ],
+    },
+  },
+  {
+    files: [
+      'eslint.config.{js,mjs}',
+      'rollup.config.{js,mjs}',
+      'vitest.config.ts',
+    ],
+    rules: {
+      'import-x/no-extraneous-dependencies': ['off'],
+    },
+  },
   {
     rules: {
       'no-unused-vars': 'off',

@@ -6,13 +6,15 @@
   "type": "module",
   "dependencies": {
     "@eslint/js": "^9.20.0",
-    "eslint-config-prettier": "^10.0.1",
-    "eslint-plugin-prettier": "^5.2.3",
-    "globals": "^15.9.0",
+    "eslint-config-prettier": "^10.1.1",
+    "eslint-plugin-prettier": "^5.2.6",
+    "globals": "^15.15.0",
     "typescript-eslint": "^8.24.0"
   },
   "devDependencies": {
-    "eslint": "^9.20.1"
+    "eslint": "^9.24.0",
+    "eslint-import-resolver-typescript": "^4.3.1",
+    "eslint-plugin-import-x": "^4.10.0"
   },
   "exports": {
     "./package.json": "./package.json",

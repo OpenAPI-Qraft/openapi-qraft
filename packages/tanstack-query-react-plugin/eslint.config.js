@@ -10,4 +10,10 @@ export default [
       'prettier/prettier': 'off',
     },
   },
+  {
+    files: ['generate-ts-factory.mjs'],
+    rules: {
+      'import-x/no-extraneous-dependencies': ['off'],
+    },
+  },
 ];

@@ -1,2 +1,2 @@
-export * from './service-operation/index.js';
-export * from './shared/index.js';
+export type * from './service-operation/index.js';
+export type * from './shared/index.js';

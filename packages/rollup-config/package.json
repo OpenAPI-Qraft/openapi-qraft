@@ -27,6 +27,8 @@
     }
   },
   "type": "module",
+  "module": "dist/rollup.config.js",
+  "types": "dist/rollup.config.d.ts",
   "exports": {
     ".": {
       "types": "./dist/rollup.config.d.ts",

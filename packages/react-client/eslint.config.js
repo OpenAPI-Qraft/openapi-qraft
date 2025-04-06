@@ -1,5 +1,4 @@
 import openAPIQraftConfig from '@openapi-qraft/eslint-config/eslint.vanilla.config';
-// @ts-expect-error - no types
 import reactCompiler from 'eslint-plugin-react-compiler';
 import globals from 'globals';
 
@@ -18,6 +17,25 @@ export default [
     files: ['src/tests/qraftAPIClient.test.tsx'],
     rules: {
       '@typescript-eslint/no-unused-expressions': 'off',
+    },
+  },
+  {
+    files: ['src/migrate-to-v2-codemod.ts'],
+    rules: {
+      'import-x/no-extraneous-dependencies': ['off'],
+    },
+  },
+  {
+    files: ['src/tests/msw/**'],
+    rules: {
+      'import-x/no-extraneous-dependencies': [
+        'error',
+        {
+          devDependencies: true,
+          peerDependencies: true,
+          includeTypes: true,
+        },
+      ],
     },
   },
   reactCompiler.configs.recommended,
