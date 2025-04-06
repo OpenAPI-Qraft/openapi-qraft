@@ -403,7 +403,16 @@ const createOperationParametersFactory = (operation: ServiceOperation) => {
     return operation.method === 'get'
       ? factory.createKeywordTypeNode(ts.SyntaxKind.UndefinedKeyword)
       : // mutation with predefined parameters fallback to an empty object
-        factory.createTypeLiteralNode([]);
+        factory.createTypeLiteralNode(
+          ['query', 'header', 'path'].map((name) =>
+            factory.createPropertySignature(
+              undefined,
+              factory.createIdentifier(name),
+              factory.createToken(ts.SyntaxKind.QuestionToken),
+              factory.createKeywordTypeNode(ts.SyntaxKind.NeverKeyword)
+            )
+          )
+        );
 
   return factory.createIndexedAccessTypeNode(
     factory.createIndexedAccessTypeNode(
