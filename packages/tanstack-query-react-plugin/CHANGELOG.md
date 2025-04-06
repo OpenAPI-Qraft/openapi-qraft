@@ -1,5 +1,12 @@
 # @openapi-qraft/tanstack-query-react-plugin
 
+## 2.2.3
+
+### Patch Changes
+
+- 83c9d49: Add missing `peerDependencies`.
+  - @openapi-qraft/plugin@2.2.3
+
 ## 2.2.2
 
 ### Patch Changes

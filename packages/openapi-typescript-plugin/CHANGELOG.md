@@ -1,5 +1,12 @@
 # @openapi-qraft/openapi-typescript
 
+## 1.2.9
+
+### Patch Changes
+
+- 83c9d49: Add missing `peerDependencies`.
+  - @openapi-qraft/plugin@2.2.3
+
 ## 1.2.8
 
 ### Patch Changes
