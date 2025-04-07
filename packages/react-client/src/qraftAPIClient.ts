@@ -94,8 +94,44 @@ export function qraftAPIClient<
   callbacks: TCallbacks,
   options?: CreateAPIClientOptions
 ): APIQueryClientServices<Services, TCallbacks> | Services {
+  const stringTag = 'QraftAPIClient';
+
+  const toString = (path: (symbol | string)[]): string => {
+    return `[${stringTag}${path.length ? ' ' + path.join('.') : ''}]`;
+  };
+
+  const primitiveMethods = {
+    [Symbol.toPrimitive](
+      this: undefined,
+      path: (string | symbol)[],
+      hint: 'string' | 'number' | 'default'
+    ): unknown {
+      if (hint === 'number') return NaN;
+      if (hint === 'string') return toString(path);
+      return getByPath(services, path);
+    },
+    valueOf(this: undefined, path: (string | symbol)[]): unknown {
+      return getByPath(services, path);
+    },
+    toJSON(this: undefined, path: (string | symbol)[]): string {
+      return JSON.stringify(getByPath(services, path));
+    },
+    toString(this: undefined, path: (string | symbol)[]): string {
+      return toString(path);
+    },
+  };
+
   return createRecursiveProxy(
     function getCallback(getPath, key) {
+      if (Object.prototype.hasOwnProperty.call(primitiveMethods, key)) {
+        return primitiveMethods[key as keyof typeof primitiveMethods].bind(
+          undefined,
+          getPath
+        );
+      } else if (key === Symbol.toStringTag) {
+        return stringTag;
+      }
+
       if (getPath.length !== 2 || key !== 'schema') return; // todo::maybe return callback?
 
       const serviceOperation = getByPath(services, getPath);
@@ -152,7 +188,7 @@ function assertValidCallbackName<
  * Extracts Callback details from the applyPath
  * @param applyPath
  */
-function extractCallbackDetails(applyPath: string[]) {
+function extractCallbackDetails(applyPath: (string | symbol)[]) {
   // <service>.<operation>()
   if (applyPath.length === 2) {
     return {
@@ -175,7 +211,7 @@ function isServiceOperation(
   return input !== null && typeof input === 'object' && 'schema' in input;
 }
 
-function getByPath(obj: Record<string, unknown>, path: string[]) {
+function getByPath(obj: Record<string, unknown>, path: (string | symbol)[]) {
   return path.reduce<unknown>((acc, key) => {
     if (acc && typeof acc === 'object' && key in acc)
       return acc[key as keyof typeof acc];
