@@ -1,5 +1,15 @@
 # @openapi-qraft/tanstack-query-react-plugin
 
+## 2.3.0
+
+### Minor Changes
+
+- e26f895: Replaced empty object `{}` types in mutation parameters with `{ query?: never; header?: never; path?: never; }` to prevent accidental argument passing.
+
+### Patch Changes
+
+- @openapi-qraft/plugin@2.3.0
+
 ## 2.2.3
 
 ### Patch Changes

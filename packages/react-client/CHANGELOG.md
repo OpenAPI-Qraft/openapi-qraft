@@ -1,5 +1,15 @@
 # @openapi-qraft/react
 
+## 2.3.0
+
+### Minor Changes
+
+- 50a784e: Handle primitive methods (toString, toJSON, etc.) in API client to avoid implicit errors.
+
+### Patch Changes
+
+- @openapi-qraft/tanstack-query-react-types@2.3.0
+
 ## 2.2.3
 
 ### Patch Changes
