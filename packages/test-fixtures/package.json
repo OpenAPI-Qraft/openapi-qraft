@@ -1,6 +1,6 @@
 {
   "name": "@openapi-qraft/test-fixtures",
-  "version": "1.0.1-provenance-test.0",
+  "version": "1.0.1",
   "private": true,
   "packageManager": "yarn@4.0.2",
   "exports": {

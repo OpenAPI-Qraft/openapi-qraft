@@ -1,5 +1,17 @@
 # @openapi-qraft/tanstack-query-react-plugin
 
+## 2.3.1
+
+### Patch Changes
+
+- 37fbcd3: Enabled provenance support in GitHub Actions for npm publishing.
+
+  Special thanks to [GauBen](https://github.com/GauBen) for implementing provenance publishing support in Yarn — it
+  inspired this change.
+
+- Updated dependencies [37fbcd3]
+  - @openapi-qraft/plugin@2.3.1
+
 ## 2.3.1-provenance-test.0
 
 ### Patch Changes
