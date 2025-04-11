@@ -1,0 +1,20 @@
+{
+  "mode": "pre",
+  "tag": "provenance-test",
+  "initialVersions": {
+    "@openapi-qraft/e2e": "1.0.0",
+    "@openapi-qraft/cli": "2.3.0",
+    "@openapi-qraft/eslint-config": "1.0.0",
+    "@openapi-qraft/openapi-typescript-plugin": "1.2.10",
+    "@openapi-qraft/plugin": "2.3.0",
+    "@openapi-qraft/react": "2.3.0",
+    "@openapi-qraft/rollup-config": "1.1.0",
+    "@openapi-qraft/tanstack-query-react-plugin": "2.3.0",
+    "@openapi-qraft/tanstack-query-react-types": "2.3.0",
+    "@openapi-qraft/test-fixtures": "1.0.0",
+    "@openapi-qraft/ts-factory-code-generator": "1.0.1",
+    "playground": "0.0.14",
+    "openapi-qraft-website": "0.0.0"
+  },
+  "changesets": []
+}
