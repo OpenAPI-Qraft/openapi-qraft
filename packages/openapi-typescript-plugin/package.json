@@ -1,6 +1,6 @@
 {
   "name": "@openapi-qraft/openapi-typescript-plugin",
-  "version": "1.2.10",
+  "version": "1.2.11-provenance-test.0",
   "type": "module",
   "scripts": {
     "build": "tsc --project tsconfig.build.json",
@@ -65,5 +65,10 @@
     "!src/**/__snapshots__/**",
     "!src/**/*.spec.*"
   ],
-  "packageManager": "yarn@4.0.2"
+  "packageManager": "yarn@4.0.2",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/OpenAPI-Qraft/openapi-qraft.git",
+    "directory": "packages/cli"
+  }
 }

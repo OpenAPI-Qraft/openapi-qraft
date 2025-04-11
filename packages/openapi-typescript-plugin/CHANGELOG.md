@@ -1,5 +1,13 @@
 # @openapi-qraft/openapi-typescript
 
+## 1.2.11-provenance-test.0
+
+### Patch Changes
+
+- 37fbcd3: Enabled provenance support in GitHub Actions for npm publishing.
+- Updated dependencies [37fbcd3]
+  - @openapi-qraft/plugin@2.3.1-provenance-test.0
+
 ## 1.2.10
 
 ### Patch Changes

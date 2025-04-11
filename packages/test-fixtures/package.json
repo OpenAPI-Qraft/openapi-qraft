@@ -1,6 +1,6 @@
 {
   "name": "@openapi-qraft/test-fixtures",
-  "version": "1.0.0",
+  "version": "1.0.1-provenance-test.0",
   "private": true,
   "packageManager": "yarn@4.0.2",
   "exports": {
@@ -9,5 +9,10 @@
   },
   "files": [
     "openapi.json"
-  ]
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/OpenAPI-Qraft/openapi-qraft.git",
+    "directory": "packages/cli"
+  }
 }

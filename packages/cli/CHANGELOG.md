@@ -1,5 +1,15 @@
 # @openapi-qraft/cli
 
+## 2.3.1-provenance-test.0
+
+### Patch Changes
+
+- 37fbcd3: Enabled provenance support in GitHub Actions for npm publishing.
+- Updated dependencies [37fbcd3]
+  - @openapi-qraft/tanstack-query-react-plugin@2.3.1-provenance-test.0
+  - @openapi-qraft/openapi-typescript-plugin@1.2.11-provenance-test.0
+  - @openapi-qraft/plugin@2.3.1-provenance-test.0
+
 ## 2.3.0
 
 ### Patch Changes

@@ -1,5 +1,11 @@
 # @openapi-qraft/tanstack-query-react-types
 
+## 2.3.1-provenance-test.0
+
+### Patch Changes
+
+- 37fbcd3: Enabled provenance support in GitHub Actions for npm publishing.
+
 ## 2.3.0
 
 ## 2.2.3

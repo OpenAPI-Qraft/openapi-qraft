@@ -1,6 +1,6 @@
 {
   "name": "@openapi-qraft/ts-factory-code-generator",
-  "version": "1.0.1",
+  "version": "1.0.2-provenance-test.0",
   "private": true,
   "type": "commonjs",
   "scripts": {
@@ -38,5 +38,10 @@
     "@types/node": "^22.5.5",
     "eslint": "^9.24.0",
     "rimraf": "^5.0.10"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/OpenAPI-Qraft/openapi-qraft.git",
+    "directory": "packages/cli"
   }
 }
