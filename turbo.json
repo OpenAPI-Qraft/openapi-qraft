@@ -4,7 +4,7 @@
     "build": {
       "cache": true,
       "dependsOn": ["write-package-version-file", "^build", "codegen"],
-      "outputs": ["dist/**", "tsFactoryCodeGenerator.ts", "src/ts-factory/service-operation.generated/**"]
+      "outputs": ["dist/**", "src/ts-factory/service-operation.generated/**"]
     },
     "test": {
       "cache": true,
