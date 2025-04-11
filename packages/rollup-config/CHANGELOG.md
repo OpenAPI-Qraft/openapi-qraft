@@ -1,5 +1,11 @@
 # @openapi-qraft/rollup-config
 
+## 1.1.1-provenance-test.0
+
+### Patch Changes
+
+- 37fbcd3: Enabled provenance support in GitHub Actions for npm publishing.
+
 ## 1.1.0
 
 ### Minor Changes

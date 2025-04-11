@@ -1,6 +1,6 @@
 {
   "name": "@openapi-qraft/ts-factory-code-generator",
-  "version": "1.0.1",
+  "version": "1.0.2-provenance-test.0",
   "private": true,
   "type": "commonjs",
   "scripts": {

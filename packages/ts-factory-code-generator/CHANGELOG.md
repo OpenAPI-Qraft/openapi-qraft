@@ -1,5 +1,11 @@
 # @openapi-qraft/ts-factory-code-generator
 
+## 1.0.2-provenance-test.0
+
+### Patch Changes
+
+- 37fbcd3: Enabled provenance support in GitHub Actions for npm publishing.
+
 ## 1.0.1
 
 ### Patch Changes
