@@ -3,18 +3,19 @@
  * Do not make direct changes to the file.
  */
 
-import { qraftAPIClient, type APIBasicClientServices, type APIBasicQueryClientServices, type APIUtilityClientServices, type CreateAPIBasicQueryClientOptions, type CreateAPIBasicClientOptions, type CreateAPIClientOptions, type CreateAPIQueryClientOptions } from "@openapi-qraft/react";
+import { qraftAPIClient, type APIDefaultQueryClientServices, type APIBasicClientServices, type APIBasicQueryClientServices, type APIUtilityClientServices, type CreateAPIBasicQueryClientOptions, type CreateAPIBasicClientOptions, type CreateAPIClientOptions, type CreateAPIQueryClientOptions } from "@openapi-qraft/react";
 import * as callbacks from "@openapi-qraft/react/callbacks/index";
-import { services, type Services } from "./services/index.js";
-export function createAPIClient(options: CreateAPIQueryClientOptions): Services;
+import { services } from "./services/index.js";
+export function createAPIClient(options: CreateAPIQueryClientOptions): APIDefaultQueryClientServices<Services>;
 export function createAPIClient(options: CreateAPIBasicQueryClientOptions): APIBasicQueryClientServices<Services, ServiceMethods>;
 export function createAPIClient(options: CreateAPIBasicClientOptions): APIBasicClientServices<Services, ServiceMethods>;
 export function createAPIClient(): APIUtilityClientServices<Services, ServiceMethods>;
-export function createAPIClient(options?: CreateAPIClientOptions): Services | APIBasicClientServices<Services, ServiceMethods> | APIUtilityClientServices<Services, ServiceMethods> {
+export function createAPIClient(options?: CreateAPIClientOptions): APIDefaultQueryClientServices<Services> | APIBasicQueryClientServices<Services, ServiceMethods> | APIBasicClientServices<Services, ServiceMethods> | APIUtilityClientServices<Services, ServiceMethods> {
     if (!options)
-        return qraftAPIClient<Services, ServiceMethods>(services, callbacks);
+        return qraftAPIClient(services, callbacks);
     if ("requestFn" in options)
-        return qraftAPIClient<Services, ServiceMethods>(services, callbacks, options);
-    return qraftAPIClient<Services, ServiceMethods>(services, callbacks, options);
+        return qraftAPIClient(services, callbacks, options);
+    return qraftAPIClient(services, callbacks, options);
 }
 type ServiceMethods = typeof callbacks;
+type Services = typeof services;

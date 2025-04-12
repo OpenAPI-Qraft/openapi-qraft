@@ -4,7 +4,7 @@
  */
 
 import type { paths } from "../../openapi.js";
-import type { AreAllOptional, DeepReadonly, InvalidateQueryFilters, MutationFiltersByMutationKey, MutationFiltersByParameters, MutationVariables, OperationInfiniteData, PartialParameters, QueryFiltersByParameters, QueryFiltersByQueryKey, QueryFnOptionsByParameters, QueryFnOptionsByQueryKey, RequestFnResponse, ServiceOperationEnsureInfiniteQueryDataOptions, ServiceOperationEnsureQueryDataOptions, ServiceOperationFetchInfiniteQueryOptions, ServiceOperationFetchQueryOptions, ServiceOperationInfiniteQueryKey, ServiceOperationMutationFnOptions, ServiceOperationMutationKey, ServiceOperationQueryKey, ServiceOperationUseMutationOptions, UseQueryOptionsForUseQueries, UseQueryOptionsForUseSuspenseQuery, WithOptional } from "@openapi-qraft/tanstack-query-react-types";
+import type { AreAllOptional, DeepReadonly, InvalidateQueryFilters, MutationFiltersByMutationKey, MutationFiltersByParameters, MutationVariables, OperationInfiniteData, PartialParameters, QueryFiltersByParameters, QueryFiltersByQueryKey, QueryFnOptionsByParameters, QueryFnOptionsByQueryKey, RequestFnResponse, ServiceOperationEnsureInfiniteQueryDataOptions, ServiceOperationEnsureQueryDataOptions, ServiceOperationFetchInfiniteQueryOptions, ServiceOperationFetchQueryOptions, ServiceOperationInfiniteQueryKey, ServiceOperationMutationFnOptions, ServiceOperationMutationKey, ServiceOperationQueryKey, ServiceOperationUseMutationOptions, UseQueryOptionsForUseQueries, UseQueryOptionsForUseSuspenseQuery, WithOptional, QraftServiceOperationsToken } from "@openapi-qraft/tanstack-query-react-types";
 import type { CancelOptions, InfiniteQueryPageParamsOptions, InvalidateOptions, Mutation, MutationState, NoInfer, QueryState, RefetchOptions, ResetOptions, SetDataOptions, Updater } from "@tanstack/query-core";
 import type { DefinedInitialDataInfiniteOptions, DefinedInitialDataOptions, DefinedUseInfiniteQueryResult, DefinedUseQueryResult, UndefinedInitialDataInfiniteOptions, UndefinedInitialDataOptions, UseInfiniteQueryResult, UseMutationResult, UseQueryResult, UseSuspenseInfiniteQueryOptions, UseSuspenseInfiniteQueryResult, UseSuspenseQueryOptions, UseSuspenseQueryResult } from "@tanstack/react-query";
 export interface ApprovalPoliciesService {
@@ -911,29 +911,7 @@ export interface ApprovalPoliciesService {
         };
     };
 }
-export const approvalPoliciesService: {
-    /**
-     * @summary Get an approval policy by ID
-     * @description Retrieve a specific approval policy.
-     */
-    getApprovalPoliciesId: {
-        schema: GetApprovalPoliciesIdSchema;
-    };
-    /**
-     * @summary Delete an approval policy
-     * @description Delete an existing approval policy.
-     */
-    deleteApprovalPoliciesId: {
-        schema: DeleteApprovalPoliciesIdSchema;
-    };
-    /**
-     * @summary Update an approval policy
-     * @description Update an existing approval policy.
-     */
-    patchApprovalPoliciesId: {
-        schema: PatchApprovalPoliciesIdSchema;
-    };
-} = {
+export const approvalPoliciesService = {
     getApprovalPoliciesId: {
         schema: {
             method: "get",
@@ -956,6 +934,31 @@ export const approvalPoliciesService: {
             security: ["HTTPBearer"]
         }
     }
+} as {
+    /**
+     * @summary Get an approval policy by ID
+     * @description Retrieve a specific approval policy.
+     */
+    getApprovalPoliciesId: {
+        schema: GetApprovalPoliciesIdSchema;
+        [QraftServiceOperationsToken]: ApprovalPoliciesService["getApprovalPoliciesId"];
+    };
+    /**
+     * @summary Delete an approval policy
+     * @description Delete an existing approval policy.
+     */
+    deleteApprovalPoliciesId: {
+        schema: DeleteApprovalPoliciesIdSchema;
+        [QraftServiceOperationsToken]: ApprovalPoliciesService["deleteApprovalPoliciesId"];
+    };
+    /**
+     * @summary Update an approval policy
+     * @description Update an existing approval policy.
+     */
+    patchApprovalPoliciesId: {
+        schema: PatchApprovalPoliciesIdSchema;
+        [QraftServiceOperationsToken]: ApprovalPoliciesService["patchApprovalPoliciesId"];
+    };
 };
 type GetApprovalPoliciesIdSchema = {
     method: "get";

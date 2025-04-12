@@ -4,7 +4,7 @@
  */
 
 import type { paths } from "../../openapi.js";
-import type { AreAllOptional, DeepReadonly, InvalidateQueryFilters, MutationFiltersByMutationKey, MutationFiltersByParameters, MutationVariables, OperationInfiniteData, PartialParameters, QueryFiltersByParameters, QueryFiltersByQueryKey, QueryFnOptionsByParameters, QueryFnOptionsByQueryKey, RequestFnResponse, ServiceOperationEnsureInfiniteQueryDataOptions, ServiceOperationEnsureQueryDataOptions, ServiceOperationFetchInfiniteQueryOptions, ServiceOperationFetchQueryOptions, ServiceOperationInfiniteQueryKey, ServiceOperationMutationFnOptions, ServiceOperationMutationKey, ServiceOperationQueryKey, ServiceOperationUseMutationOptions, UseQueryOptionsForUseQueries, UseQueryOptionsForUseSuspenseQuery, WithOptional } from "@openapi-qraft/tanstack-query-react-types";
+import type { AreAllOptional, DeepReadonly, InvalidateQueryFilters, MutationFiltersByMutationKey, MutationFiltersByParameters, MutationVariables, OperationInfiniteData, PartialParameters, QueryFiltersByParameters, QueryFiltersByQueryKey, QueryFnOptionsByParameters, QueryFnOptionsByQueryKey, RequestFnResponse, ServiceOperationEnsureInfiniteQueryDataOptions, ServiceOperationEnsureQueryDataOptions, ServiceOperationFetchInfiniteQueryOptions, ServiceOperationFetchQueryOptions, ServiceOperationInfiniteQueryKey, ServiceOperationMutationFnOptions, ServiceOperationMutationKey, ServiceOperationQueryKey, ServiceOperationUseMutationOptions, UseQueryOptionsForUseQueries, UseQueryOptionsForUseSuspenseQuery, WithOptional, QraftServiceOperationsToken } from "@openapi-qraft/tanstack-query-react-types";
 import type { CancelOptions, InfiniteQueryPageParamsOptions, InvalidateOptions, Mutation, MutationState, NoInfer, QueryState, RefetchOptions, ResetOptions, SetDataOptions, Updater } from "@tanstack/query-core";
 import type { DefinedInitialDataInfiniteOptions, DefinedInitialDataOptions, DefinedUseInfiniteQueryResult, DefinedUseQueryResult, UndefinedInitialDataInfiniteOptions, UndefinedInitialDataOptions, UseInfiniteQueryResult, UseMutationResult, UseQueryResult, UseSuspenseInfiniteQueryOptions, UseSuspenseInfiniteQueryResult, UseSuspenseQueryOptions, UseSuspenseQueryResult } from "@tanstack/react-query";
 export interface FilesService {
@@ -1120,27 +1120,7 @@ export interface FilesService {
         };
     };
 }
-export const filesService: {
-    /** @summary Get a files by ID */
-    getFiles: {
-        schema: GetFilesSchema;
-    };
-    /** @summary Upload a files by ID */
-    postFiles: {
-        schema: PostFilesSchema;
-    };
-    /** @summary Delete all files */
-    deleteFiles: {
-        schema: DeleteFilesSchema;
-    };
-    /**
-     * @deprecated
-     * @summary Get a file list
-     */
-    getFileList: {
-        schema: GetFileListSchema;
-    };
-} = {
+export const filesService = {
     getFiles: {
         schema: {
             method: "get",
@@ -1168,6 +1148,30 @@ export const filesService: {
             security: ["HTTPBearer"]
         }
     }
+} as {
+    /** @summary Get a files by ID */
+    getFiles: {
+        schema: GetFilesSchema;
+        [QraftServiceOperationsToken]: FilesService["getFiles"];
+    };
+    /** @summary Upload a files by ID */
+    postFiles: {
+        schema: PostFilesSchema;
+        [QraftServiceOperationsToken]: FilesService["postFiles"];
+    };
+    /** @summary Delete all files */
+    deleteFiles: {
+        schema: DeleteFilesSchema;
+        [QraftServiceOperationsToken]: FilesService["deleteFiles"];
+    };
+    /**
+     * @deprecated
+     * @summary Get a file list
+     */
+    getFileList: {
+        schema: GetFileListSchema;
+        [QraftServiceOperationsToken]: FilesService["getFileList"];
+    };
 };
 type GetFilesSchema = {
     method: "get";
