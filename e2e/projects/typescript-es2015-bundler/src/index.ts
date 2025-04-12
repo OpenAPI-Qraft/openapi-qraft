@@ -7,7 +7,6 @@ import type {
   RequestFnPayload,
   RequestFnResponse,
 } from '@openapi-qraft/react';
-import type { Services } from './api/services/index';
 import { qraftAPIClient, requestFn } from '@openapi-qraft/react';
 import { operationInvokeFn } from '@openapi-qraft/react/callbacks/operationInvokeFn';
 import {
@@ -37,12 +36,8 @@ const nodeCallbacks = {
 
 export function createNodeAPIClient(
   options: CreateAPIBasicClientOptions
-): APIBasicClientServices<Services, typeof nodeCallbacks> {
-  return qraftAPIClient<Services, typeof nodeCallbacks>(
-    services,
-    nodeCallbacks,
-    options
-  );
+): APIBasicClientServices<typeof services, typeof nodeCallbacks> {
+  return qraftAPIClient(services, nodeCallbacks, options);
 }
 
 interface RequestTypeTest<TData, TError> {
