@@ -52,11 +52,20 @@ export const getServiceFactory = (
     ...getOperationsTypes(operations),
   ];
 
+  const internalModulesTypeImports = filterUnusedTypes(
+    getModuleTypeImports(operations),
+    mainNodes
+  );
+  internalModulesTypeImports['@openapi-qraft/tanstack-query-react-types'] = [
+    ...(internalModulesTypeImports[
+      '@openapi-qraft/tanstack-query-react-types'
+    ] ?? []),
+    'QraftServiceOperationsToken',
+  ];
+
   const importNodes = [
     getOpenAPISchemaImportsFactory(openapiTypesImportPath),
-    ...getServiceOperationImportsFactory(
-      filterUnusedTypes(getModuleTypeImports(operations), mainNodes)
-    ),
+    ...getServiceOperationImportsFactory(internalModulesTypeImports),
   ];
 
   return [...importNodes, ...mainNodes];
@@ -444,14 +453,17 @@ const getServiceVariableFactory = (
         factory.createVariableDeclaration(
           factory.createIdentifier(service.variableName),
           undefined,
-          factory.createTypeLiteralNode(
-            operations.map((operation) =>
-              getServiceVariableTypeFactory(operation)
-            )
-          ),
-          factory.createObjectLiteralExpression(
-            operations.map(getServiceVariablePropertyFactory),
-            true
+          undefined,
+          factory.createAsExpression(
+            factory.createObjectLiteralExpression(
+              operations.map(getServiceVariablePropertyFactory),
+              true
+            ),
+            factory.createTypeLiteralNode([
+              ...operations.map((operation) =>
+                getServiceVariableTypeFactory(service.typeName, operation)
+              ),
+            ])
           )
         ),
       ],
@@ -519,7 +531,10 @@ const getOperationErrorTypeName = (operation: ServiceOperation) =>
 const getOperationBodyTypeName = (operation: ServiceOperation) =>
   camelCase(`${operation.name}-Body`, { pascalCase: true });
 
-const getServiceVariableTypeFactory = (operation: ServiceOperation) => {
+const getServiceVariableTypeFactory = (
+  serviceName: string,
+  operation: ServiceOperation
+) => {
   const node = factory.createPropertySignature(
     undefined,
     factory.createIdentifier(operation.name),
@@ -530,6 +545,22 @@ const getServiceVariableTypeFactory = (operation: ServiceOperation) => {
         factory.createIdentifier('schema'),
         undefined,
         factory.createTypeReferenceNode(getOperationSchemaTypeName(operation))
+      ),
+      factory.createPropertySignature(
+        undefined,
+        factory.createComputedPropertyName(
+          factory.createIdentifier('QraftServiceOperationsToken')
+        ),
+        undefined,
+        factory.createIndexedAccessTypeNode(
+          factory.createTypeReferenceNode(
+            factory.createIdentifier(serviceName),
+            undefined
+          ),
+          factory.createLiteralTypeNode(
+            factory.createStringLiteral(operation.name)
+          )
+        )
       ),
     ])
   );
