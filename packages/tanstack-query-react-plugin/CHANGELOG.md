@@ -1,5 +1,18 @@
 # @openapi-qraft/tanstack-query-react-plugin
 
+## 2.3.1
+
+### Patch Changes
+
+- ae16908: Simplified the generated code by replacing inlined `schema` types with references to named types where applicable.
+- 37fbcd3: Enabled provenance support in GitHub Actions for npm publishing.
+
+  Special thanks to [GauBen](https://github.com/GauBen) for implementing provenance publishing support in Yarn — this work
+  inspired this change.
+
+- Updated dependencies [37fbcd3]
+  - @openapi-qraft/plugin@2.3.1
+
 ## 2.3.1-provenance-test.0
 
 ### Patch Changes
