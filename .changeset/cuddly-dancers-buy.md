@@ -13,5 +13,5 @@
 
 Enabled provenance support in GitHub Actions for npm publishing.
 
-Special thanks to [GauBen](https://github.com/GauBen) for implementing provenance publishing support in Yarn — it
+Special thanks to [GauBen](https://github.com/GauBen) for implementing provenance publishing support in Yarn — this work
 inspired this change.
