@@ -31,6 +31,7 @@ const getClientImportsFactory = ({
             factory.createIdentifier('qraftAPIClient')
           ),
           ...[
+            'APIDefaultQueryClientServices',
             'APIBasicClientServices',
             'APIBasicQueryClientServices',
             'APIUtilityClientServices',
@@ -71,11 +72,6 @@ const getClientImportsFactory = ({
             undefined,
             factory.createIdentifier('services')
           ),
-          factory.createImportSpecifier(
-            true,
-            undefined,
-            factory.createIdentifier('Services')
-          ),
         ])
       ),
       factory.createStringLiteral(
@@ -109,8 +105,13 @@ const getCreateClientFunctionFactory = () => {
         ),
       ],
       factory.createTypeReferenceNode(
-        factory.createIdentifier('Services'),
-        undefined
+        factory.createIdentifier('APIDefaultQueryClientServices'),
+        [
+          factory.createTypeReferenceNode(
+            factory.createIdentifier('Services'),
+            undefined
+          ),
+        ]
       ),
       undefined
     ),
@@ -221,8 +222,26 @@ const getCreateClientFunctionFactory = () => {
       ],
       factory.createUnionTypeNode([
         factory.createTypeReferenceNode(
-          factory.createIdentifier('Services'),
-          undefined
+          factory.createIdentifier('APIDefaultQueryClientServices'),
+          [
+            factory.createTypeReferenceNode(
+              factory.createIdentifier('Services'),
+              undefined
+            ),
+          ]
+        ),
+        factory.createTypeReferenceNode(
+          factory.createIdentifier('APIBasicQueryClientServices'),
+          [
+            factory.createTypeReferenceNode(
+              factory.createIdentifier('Services'),
+              undefined
+            ),
+            factory.createTypeReferenceNode(
+              factory.createIdentifier('ServiceMethods'),
+              undefined
+            ),
+          ]
         ),
         factory.createTypeReferenceNode(
           factory.createIdentifier('APIBasicClientServices'),
@@ -261,16 +280,7 @@ const getCreateClientFunctionFactory = () => {
             factory.createReturnStatement(
               factory.createCallExpression(
                 factory.createIdentifier('qraftAPIClient'),
-                [
-                  factory.createTypeReferenceNode(
-                    factory.createIdentifier('Services'),
-                    undefined
-                  ),
-                  factory.createTypeReferenceNode(
-                    factory.createIdentifier('ServiceMethods'),
-                    undefined
-                  ),
-                ],
+                undefined,
                 [
                   factory.createIdentifier('services'),
                   factory.createIdentifier('callbacks'),
@@ -288,16 +298,7 @@ const getCreateClientFunctionFactory = () => {
             factory.createReturnStatement(
               factory.createCallExpression(
                 factory.createIdentifier('qraftAPIClient'),
-                [
-                  factory.createTypeReferenceNode(
-                    factory.createIdentifier('Services'),
-                    undefined
-                  ),
-                  factory.createTypeReferenceNode(
-                    factory.createIdentifier('ServiceMethods'),
-                    undefined
-                  ),
-                ],
+                undefined,
                 [
                   factory.createIdentifier('services'),
                   factory.createIdentifier('callbacks'),
@@ -310,16 +311,7 @@ const getCreateClientFunctionFactory = () => {
           factory.createReturnStatement(
             factory.createCallExpression(
               factory.createIdentifier('qraftAPIClient'),
-              [
-                factory.createTypeReferenceNode(
-                  factory.createIdentifier('Services'),
-                  undefined
-                ),
-                factory.createTypeReferenceNode(
-                  factory.createIdentifier('ServiceMethods'),
-                  undefined
-                ),
-              ],
+              undefined,
               [
                 factory.createIdentifier('services'),
                 factory.createIdentifier('callbacks'),
@@ -337,6 +329,15 @@ const getCreateClientFunctionFactory = () => {
       undefined,
       factory.createTypeQueryNode(
         factory.createIdentifier('callbacks'),
+        undefined
+      )
+    ),
+    factory.createTypeAliasDeclaration(
+      undefined,
+      factory.createIdentifier('Services'),
+      undefined,
+      factory.createTypeQueryNode(
+        factory.createIdentifier('services'),
         undefined
       )
     ),
