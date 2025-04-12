@@ -2364,15 +2364,11 @@ describe('Custom Callbacks support', () => {
       } as const;
 
       const queryClient = new QueryClient();
-      const qraft = qraftAPIClient<Services, typeof customCallbacks>(
-        services,
-        customCallbacks,
-        {
-          requestFn,
-          baseUrl,
-          queryClient,
-        }
-      );
+      const qraft = qraftAPIClient(services, customCallbacks, {
+        requestFn,
+        baseUrl,
+        queryClient,
+      });
 
       const { result } = renderHook(
         () => qraft.approvalPolicies.getApprovalPoliciesId.useQuery(parameters),
@@ -2394,15 +2390,11 @@ describe('Custom Callbacks support', () => {
 
     it('throws errors callbacks not provided', async () => {
       const noCallbacks = {} as const;
-      const qraft = qraftAPIClient<Services, typeof noCallbacks>(
-        services,
-        noCallbacks,
-        {
-          requestFn,
-          baseUrl,
-          queryClient: new QueryClient(),
-        }
-      );
+      const qraft = qraftAPIClient(services, noCallbacks, {
+        requestFn,
+        baseUrl,
+        queryClient: new QueryClient(),
+      });
 
       expect(() =>
         // @ts-expect-error - `getQueryKey()` callback is not specified
@@ -2429,14 +2421,10 @@ describe('Custom Callbacks support', () => {
       const customCallbacks = {
         operationInvokeFn,
       } as const;
-      const qraft = qraftAPIClient<Services, typeof customCallbacks>(
-        services,
-        customCallbacks,
-        {
-          requestFn,
-          baseUrl,
-        }
-      );
+      const qraft = qraftAPIClient(services, customCallbacks, {
+        requestFn,
+        baseUrl,
+      });
 
       const { data, error } =
         await qraft.approvalPolicies.getApprovalPoliciesId({
@@ -2459,14 +2447,10 @@ describe('Custom Callbacks support', () => {
 
     it('supports POST "operationInvokeFn" if callback provided', async () => {
       const customCallbacks = { operationInvokeFn };
-      const qraft = qraftAPIClient<Services, typeof customCallbacks>(
-        services,
-        customCallbacks,
-        {
-          requestFn,
-          baseUrl,
-        }
-      );
+      const qraft = qraftAPIClient(services, customCallbacks, {
+        requestFn,
+        baseUrl,
+      });
 
       const { data, error } = await qraft.entities.postEntitiesIdDocuments({
         parameters: {
@@ -2531,14 +2515,10 @@ describe('Custom Callbacks support', () => {
         getQueryKey,
       } as const;
 
-      const qraft = qraftAPIClient<Services, typeof customCallbacks>(
-        services,
-        customCallbacks,
-        {
-          requestFn,
-          baseUrl,
-        }
-      );
+      const qraft = qraftAPIClient(services, customCallbacks, {
+        requestFn,
+        baseUrl,
+      });
 
       const queryKey =
         qraft.approvalPolicies.getApprovalPoliciesId.getQueryKey(parameters);
@@ -2560,14 +2540,10 @@ describe('Custom Callbacks support', () => {
 
     it('throws errors callbacks not provided', async () => {
       const noCallbacks = {} as const;
-      const qraft = qraftAPIClient<Services, typeof noCallbacks>(
-        services,
-        noCallbacks,
-        {
-          requestFn,
-          baseUrl,
-        }
-      );
+      const qraft = qraftAPIClient(services, noCallbacks, {
+        requestFn,
+        baseUrl,
+      });
 
       expect(() =>
         // @ts-expect-error - `getQueryKey()` callback is not specified
