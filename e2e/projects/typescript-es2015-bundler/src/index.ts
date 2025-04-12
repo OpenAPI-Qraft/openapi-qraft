@@ -8,6 +8,7 @@ import type {
   RequestFnResponse,
 } from '@openapi-qraft/react';
 import { qraftAPIClient, requestFn } from '@openapi-qraft/react';
+import * as callbacksIndex from '@openapi-qraft/react/callbacks';
 import { operationInvokeFn } from '@openapi-qraft/react/callbacks/operationInvokeFn';
 import {
   createSecureRequestFn,
@@ -16,6 +17,10 @@ import {
 import { QueryClient } from '@tanstack/query-core';
 import { createAPIClient } from './api/index';
 import { services } from './api/services/index';
+
+if (typeof callbacksIndex === 'undefined') {
+  throw new Error('Callbacks index is not imported from esm project.');
+}
 
 QraftSecureRequestFn({
   requestFn: createSecureRequestFn({}, requestFn, new QueryClient()),

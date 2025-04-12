@@ -67,6 +67,11 @@
       "import": "./dist/esm/index.js",
       "require": "./dist/cjs/index.cjs"
     },
+    "./callbacks": {
+      "types": "./dist/types/callbacks/index.d.ts",
+      "import": "./dist/esm/callbacks/index.js",
+      "require": "./dist/cjs/callbacks/index.cjs"
+    },
     "./callbacks/*": {
       "types": "./dist/types/callbacks/*.d.ts",
       "import": "./dist/esm/callbacks/*.js",
