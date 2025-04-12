@@ -1107,43 +1107,22 @@ export interface FilesService {
 export const filesService: {
     /** @summary Get a files by ID */
     getFiles: {
-        schema: {
-            method: "get";
-            url: "/files";
-            security: [
-                "HTTPBearer"
-            ];
-        };
+        schema: GetFilesSchema;
     };
     /** @summary Upload a files by ID */
     postFiles: {
-        schema: {
-            method: "post";
-            url: "/files";
-            mediaType: [
-                "multipart/form-data"
-            ];
-        };
+        schema: PostFilesSchema;
     };
     /** @summary Delete all files */
     deleteFiles: {
-        schema: {
-            method: "delete";
-            url: "/files";
-        };
+        schema: DeleteFilesSchema;
     };
     /**
      * @deprecated
      * @summary Get a file list
      */
     getFileList: {
-        schema: {
-            method: "get";
-            url: "/files/list";
-            security: [
-                "HTTPBearer"
-            ];
-        };
+        schema: GetFileListSchema;
     };
 } = {
     getFiles: {

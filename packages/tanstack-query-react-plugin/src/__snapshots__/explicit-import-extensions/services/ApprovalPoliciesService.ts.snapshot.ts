@@ -901,42 +901,21 @@ export const approvalPoliciesService: {
      * @description Retrieve a specific approval policy.
      */
     getApprovalPoliciesId: {
-        schema: {
-            method: "get";
-            url: "/approval_policies/{approval_policy_id}";
-            security: [
-                "partnerToken"
-            ];
-        };
+        schema: GetApprovalPoliciesIdSchema;
     };
     /**
      * @summary Delete an approval policy
      * @description Delete an existing approval policy.
      */
     deleteApprovalPoliciesId: {
-        schema: {
-            method: "delete";
-            url: "/approval_policies/{approval_policy_id}";
-            security: [
-                "HTTPBearer"
-            ];
-        };
+        schema: DeleteApprovalPoliciesIdSchema;
     };
     /**
      * @summary Update an approval policy
      * @description Update an existing approval policy.
      */
     patchApprovalPoliciesId: {
-        schema: {
-            method: "patch";
-            url: "/approval_policies/{approval_policy_id}";
-            mediaType: [
-                "application/json"
-            ];
-            security: [
-                "HTTPBearer"
-            ];
-        };
+        schema: PatchApprovalPoliciesIdSchema;
     };
 } = {
     getApprovalPoliciesId: {
