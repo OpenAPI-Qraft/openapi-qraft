@@ -529,7 +529,7 @@ const getServiceVariableTypeFactory = (operation: ServiceOperation) => {
         undefined,
         factory.createIdentifier('schema'),
         undefined,
-        getOperationSchemaFactory(operation)
+        factory.createTypeReferenceNode(getOperationSchemaTypeName(operation))
       ),
     ])
   );
