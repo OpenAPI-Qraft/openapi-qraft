@@ -24,6 +24,8 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { qraftAPIClient, requestFn } from '../index.js';
 import { createPredefinedParametersRequestFn } from './fixtures/api/create-predefined-parameters-request-fn.js';
 import { createAPIClient, services } from './fixtures/api/index.js';
+import { getApprovalPoliciesId } from './fixtures/api/services/ApprovalPoliciesService.js';
+import { createAPIOperationClient } from './fixtures/create-api-operation-client.js';
 import { filesFindAllResponsePayloadFixtures } from './msw/handlers.js';
 
 const baseUrl = 'https://api.sandbox.monite.com/v1';
@@ -2582,6 +2584,50 @@ describe('Custom Callbacks support', () => {
         },
         parameters,
       ]);
+    });
+
+    it('supports single operation calls', async () => {
+      const queryClient = new QueryClient();
+
+      const defaultOptions = {
+        requestFn,
+        baseUrl,
+        queryClient,
+      } as const;
+
+      const getApprovalPoliciesIdOperation = createAPIOperationClient(
+        getApprovalPoliciesId,
+        defaultOptions
+      );
+
+      const queryKey = getApprovalPoliciesIdOperation.getQueryKey({
+        header: {
+          'x-monite-version': '1.0.0',
+        },
+        path: {
+          approval_policy_id: '1',
+        },
+        query: {
+          items_order: ['asc', 'desc'],
+        },
+      });
+
+      const { result } = renderHook(
+        () => getApprovalPoliciesIdOperation.useQuery(queryKey),
+        {
+          wrapper: (props) => (
+            <Providers queryClient={queryClient} {...props} />
+          ),
+        }
+      );
+
+      await waitFor(() => {
+        expect(
+          result.current.data satisfies
+            | Services['approvalPolicies']['getApprovalPoliciesId']['types']['data']
+            | undefined
+        ).toEqual(queryKey[1]);
+      });
     });
 
     it('throws errors callbacks not provided', async () => {
