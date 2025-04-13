@@ -48,9 +48,16 @@ export const getServiceFactory = (
   operations: ServiceOperation[],
   options: ServiceFactoryOptions
 ) => {
+  const operationVariables = operations.map((operation) =>
+    getServiceOperationVariableFactory(service.typeName, operation)
+  );
+
+  const serviceVariable = getServiceVariableFactory(service, operations);
+
   const mainNodes = [
     getServiceInterfaceFactory(service, operations, options),
-    getServiceVariableFactory(service, operations),
+    ...operationVariables,
+    serviceVariable,
     ...getOperationsTypes(operations, options),
   ];
 
@@ -517,14 +524,18 @@ const getServiceVariableFactory = (
           undefined,
           factory.createAsExpression(
             factory.createObjectLiteralExpression(
-              operations.map(getServiceVariablePropertyFactory),
+              operations.map((operation) =>
+                factory.createShorthandPropertyAssignment(
+                  factory.createIdentifier(operation.name),
+                  undefined
+                )
+              ),
               true
             ),
-            factory.createTypeLiteralNode([
-              ...operations.map((operation) =>
-                getServiceVariableTypeFactory(service.typeName, operation)
-              ),
-            ])
+            factory.createTypeReferenceNode(
+              factory.createIdentifier('const'),
+              undefined
+            )
           )
         ),
       ],
@@ -643,94 +654,103 @@ const getOperationErrorTypeName = (operation: ServiceOperation) =>
 const getOperationBodyTypeName = (operation: ServiceOperation) =>
   camelCase(`${operation.name}-Body`, { pascalCase: true });
 
-const getServiceVariableTypeFactory = (
+const getServiceOperationVariableFactory = (
   serviceName: string,
   operation: ServiceOperation
 ) => {
-  const node = factory.createPropertySignature(
-    undefined,
-    factory.createIdentifier(operation.name),
-    undefined,
-    factory.createTypeLiteralNode([
-      factory.createPropertySignature(
-        undefined,
-        factory.createIdentifier('schema'),
-        undefined,
-        factory.createTypeReferenceNode(getOperationSchemaTypeName(operation))
-      ),
-      factory.createPropertySignature(
-        undefined,
-        factory.createComputedPropertyName(
-          factory.createIdentifier('QraftServiceOperationsToken')
-        ),
-        undefined,
-        factory.createIndexedAccessTypeNode(
-          factory.createTypeReferenceNode(
-            factory.createIdentifier(serviceName),
-            undefined
-          ),
-          factory.createLiteralTypeNode(
-            factory.createStringLiteral(operation.name)
-          )
-        )
-      ),
-    ])
-  );
-
-  addOperationTSDoc(node, operation);
-
-  return node;
-};
-
-const getServiceVariablePropertyFactory = (operation: ServiceOperation) => {
-  return factory.createPropertyAssignment(
-    factory.createIdentifier(operation.name),
-    factory.createObjectLiteralExpression(
+  const variableNode = factory.createVariableStatement(
+    [factory.createToken(ts.SyntaxKind.ExportKeyword)],
+    factory.createVariableDeclarationList(
       [
-        factory.createPropertyAssignment(
-          factory.createIdentifier('schema'),
-          factory.createObjectLiteralExpression(
-            [
-              factory.createPropertyAssignment(
-                factory.createIdentifier('method'),
-                factory.createStringLiteral(operation.method)
-              ),
-              factory.createPropertyAssignment(
-                factory.createIdentifier('url'),
-                factory.createStringLiteral(operation.path)
-              ),
-              operation.requestBody?.content
-                ? factory.createPropertyAssignment(
-                    factory.createIdentifier('mediaType'),
-                    factory.createArrayLiteralExpression(
-                      Object.keys(operation.requestBody.content).map(
-                        (mediaType) => factory.createStringLiteral(mediaType)
-                      )
-                    )
-                  )
-                : null,
+        factory.createVariableDeclaration(
+          factory.createIdentifier(operation.name),
+          undefined,
+          undefined,
+          factory.createAsExpression(
+            factory.createObjectLiteralExpression(
+              [
+                factory.createPropertyAssignment(
+                  factory.createIdentifier('schema'),
+                  factory.createObjectLiteralExpression(
+                    [
+                      factory.createPropertyAssignment(
+                        factory.createIdentifier('method'),
+                        factory.createStringLiteral(operation.method)
+                      ),
+                      factory.createPropertyAssignment(
+                        factory.createIdentifier('url'),
+                        factory.createStringLiteral(operation.path)
+                      ),
+                      operation.requestBody?.content
+                        ? factory.createPropertyAssignment(
+                            factory.createIdentifier('mediaType'),
+                            factory.createArrayLiteralExpression(
+                              Object.keys(operation.requestBody.content).map(
+                                (mediaType) =>
+                                  factory.createStringLiteral(mediaType)
+                              )
+                            )
+                          )
+                        : null,
 
-              operation.security
-                ? factory.createPropertyAssignment(
-                    factory.createIdentifier('security'),
-                    factory.createArrayLiteralExpression(
-                      getOperationSecuritySchemas(operation.security).map(
-                        (securitySchemaName) =>
-                          factory.createStringLiteral(securitySchemaName)
-                      )
-                    )
+                      operation.security
+                        ? factory.createPropertyAssignment(
+                            factory.createIdentifier('security'),
+                            factory.createArrayLiteralExpression(
+                              getOperationSecuritySchemas(
+                                operation.security
+                              ).map((securitySchemaName) =>
+                                factory.createStringLiteral(securitySchemaName)
+                              )
+                            )
+                          )
+                        : null,
+                    ].filter((node): node is NonNullable<typeof node> =>
+                      Boolean(node)
+                    ),
+                    true
                   )
-                : null,
-            ].filter((node): node is NonNullable<typeof node> => Boolean(node)),
-            true
+                ),
+              ],
+              true
+            ),
+            factory.createTypeLiteralNode([
+              factory.createPropertySignature(
+                undefined,
+                factory.createIdentifier('schema'),
+                undefined,
+                factory.createTypeReferenceNode(
+                  getOperationSchemaTypeName(operation)
+                )
+              ),
+              factory.createPropertySignature(
+                undefined,
+                factory.createComputedPropertyName(
+                  factory.createIdentifier('QraftServiceOperationsToken')
+                ),
+                undefined,
+                factory.createIndexedAccessTypeNode(
+                  factory.createTypeReferenceNode(
+                    factory.createIdentifier(serviceName),
+                    undefined
+                  ),
+                  factory.createLiteralTypeNode(
+                    factory.createStringLiteral(operation.name)
+                  )
+                )
+              ),
+            ])
           )
         ),
       ],
-      true
+      ts.NodeFlags.Const
     )
   );
-};
 
+  addOperationTSDoc(variableNode, operation);
+
+  return variableNode;
+};
 const createMultilineComment = (comment: string[]) => {
   const output = comment.flatMap((line) =>
     line.includes('\n') ? line.split('\n') : line
