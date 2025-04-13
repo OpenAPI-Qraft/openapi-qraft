@@ -1120,59 +1120,58 @@ export interface FilesService {
         };
     };
 }
-export const filesService = {
-    getFiles: {
-        schema: {
-            method: "get",
-            url: "/files",
-            security: ["HTTPBearer"]
-        }
-    },
-    postFiles: {
-        schema: {
-            method: "post",
-            url: "/files",
-            mediaType: ["multipart/form-data"]
-        }
-    },
-    deleteFiles: {
-        schema: {
-            method: "delete",
-            url: "/files"
-        }
-    },
-    getFileList: {
-        schema: {
-            method: "get",
-            url: "/files/list",
-            security: ["HTTPBearer"]
-        }
+/** @summary Get a files by ID */
+export const getFiles = {
+    schema: {
+        method: "get",
+        url: "/files",
+        security: ["HTTPBearer"]
     }
 } as {
-    /** @summary Get a files by ID */
-    getFiles: {
-        schema: GetFilesSchema;
-        [QraftServiceOperationsToken]: FilesService["getFiles"];
-    };
-    /** @summary Upload a files by ID */
-    postFiles: {
-        schema: PostFilesSchema;
-        [QraftServiceOperationsToken]: FilesService["postFiles"];
-    };
-    /** @summary Delete all files */
-    deleteFiles: {
-        schema: DeleteFilesSchema;
-        [QraftServiceOperationsToken]: FilesService["deleteFiles"];
-    };
-    /**
-     * @deprecated
-     * @summary Get a file list
-     */
-    getFileList: {
-        schema: GetFileListSchema;
-        [QraftServiceOperationsToken]: FilesService["getFileList"];
-    };
+    schema: GetFilesSchema;
+    [QraftServiceOperationsToken]: FilesService["getFiles"];
 };
+/** @summary Upload a files by ID */
+export const postFiles = {
+    schema: {
+        method: "post",
+        url: "/files",
+        mediaType: ["multipart/form-data"]
+    }
+} as {
+    schema: PostFilesSchema;
+    [QraftServiceOperationsToken]: FilesService["postFiles"];
+};
+/** @summary Delete all files */
+export const deleteFiles = {
+    schema: {
+        method: "delete",
+        url: "/files"
+    }
+} as {
+    schema: DeleteFilesSchema;
+    [QraftServiceOperationsToken]: FilesService["deleteFiles"];
+};
+/**
+ * @deprecated
+ * @summary Get a file list
+ */
+export const getFileList = {
+    schema: {
+        method: "get",
+        url: "/files/list",
+        security: ["HTTPBearer"]
+    }
+} as {
+    schema: GetFileListSchema;
+    [QraftServiceOperationsToken]: FilesService["getFileList"];
+};
+export const filesService = {
+    getFiles,
+    postFiles,
+    deleteFiles,
+    getFileList
+} as const;
 type GetFilesSchema = {
     method: "get";
     url: "/files";

@@ -6,3 +6,4 @@
 export { services } from "./services/index";
 export type { Services } from "./services/index";
 export { createAPIClient } from "./create-api-client";
+export { createAPIOperationClient } from "./create-api-operation-client";

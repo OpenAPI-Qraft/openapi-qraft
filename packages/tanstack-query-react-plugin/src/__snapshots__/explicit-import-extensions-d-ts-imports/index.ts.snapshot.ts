@@ -7,3 +7,4 @@ export type { $defs, paths, components, operations, webhooks } from "./../openap
 export { services } from "./services/index.ts";
 export type { Services } from "./services/index.ts";
 export { createAPIClient } from "./create-api-client.ts";
+export { createAPIOperationClient } from "./create-api-operation-client.ts";

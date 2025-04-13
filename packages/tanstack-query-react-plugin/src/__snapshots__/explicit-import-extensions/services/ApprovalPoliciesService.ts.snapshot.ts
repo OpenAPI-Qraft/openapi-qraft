@@ -911,55 +911,54 @@ export interface ApprovalPoliciesService {
         };
     };
 }
-export const approvalPoliciesService = {
-    getApprovalPoliciesId: {
-        schema: {
-            method: "get",
-            url: "/approval_policies/{approval_policy_id}",
-            security: ["partnerToken"]
-        }
-    },
-    deleteApprovalPoliciesId: {
-        schema: {
-            method: "delete",
-            url: "/approval_policies/{approval_policy_id}",
-            security: ["HTTPBearer"]
-        }
-    },
-    patchApprovalPoliciesId: {
-        schema: {
-            method: "patch",
-            url: "/approval_policies/{approval_policy_id}",
-            mediaType: ["application/json"],
-            security: ["HTTPBearer"]
-        }
+/**
+ * @summary Get an approval policy by ID
+ * @description Retrieve a specific approval policy.
+ */
+export const getApprovalPoliciesId = {
+    schema: {
+        method: "get",
+        url: "/approval_policies/{approval_policy_id}",
+        security: ["partnerToken"]
     }
 } as {
-    /**
-     * @summary Get an approval policy by ID
-     * @description Retrieve a specific approval policy.
-     */
-    getApprovalPoliciesId: {
-        schema: GetApprovalPoliciesIdSchema;
-        [QraftServiceOperationsToken]: ApprovalPoliciesService["getApprovalPoliciesId"];
-    };
-    /**
-     * @summary Delete an approval policy
-     * @description Delete an existing approval policy.
-     */
-    deleteApprovalPoliciesId: {
-        schema: DeleteApprovalPoliciesIdSchema;
-        [QraftServiceOperationsToken]: ApprovalPoliciesService["deleteApprovalPoliciesId"];
-    };
-    /**
-     * @summary Update an approval policy
-     * @description Update an existing approval policy.
-     */
-    patchApprovalPoliciesId: {
-        schema: PatchApprovalPoliciesIdSchema;
-        [QraftServiceOperationsToken]: ApprovalPoliciesService["patchApprovalPoliciesId"];
-    };
+    schema: GetApprovalPoliciesIdSchema;
+    [QraftServiceOperationsToken]: ApprovalPoliciesService["getApprovalPoliciesId"];
 };
+/**
+ * @summary Delete an approval policy
+ * @description Delete an existing approval policy.
+ */
+export const deleteApprovalPoliciesId = {
+    schema: {
+        method: "delete",
+        url: "/approval_policies/{approval_policy_id}",
+        security: ["HTTPBearer"]
+    }
+} as {
+    schema: DeleteApprovalPoliciesIdSchema;
+    [QraftServiceOperationsToken]: ApprovalPoliciesService["deleteApprovalPoliciesId"];
+};
+/**
+ * @summary Update an approval policy
+ * @description Update an existing approval policy.
+ */
+export const patchApprovalPoliciesId = {
+    schema: {
+        method: "patch",
+        url: "/approval_policies/{approval_policy_id}",
+        mediaType: ["application/json"],
+        security: ["HTTPBearer"]
+    }
+} as {
+    schema: PatchApprovalPoliciesIdSchema;
+    [QraftServiceOperationsToken]: ApprovalPoliciesService["patchApprovalPoliciesId"];
+};
+export const approvalPoliciesService = {
+    getApprovalPoliciesId,
+    deleteApprovalPoliciesId,
+    patchApprovalPoliciesId
+} as const;
 type GetApprovalPoliciesIdSchema = {
     method: "get";
     url: "/approval_policies/{approval_policy_id}";
