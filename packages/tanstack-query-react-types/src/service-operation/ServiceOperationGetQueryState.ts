@@ -1,5 +1,6 @@
 import type {
   AreAllOptional,
+  DeepReadonly,
   OperationInfiniteData,
   ServiceOperationInfiniteQueryKey,
   ServiceOperationQueryKey,
@@ -15,13 +16,20 @@ export interface ServiceOperationGetQueryState<
   getQueryState(
     parameters:
       | ServiceOperationQueryKey<TSchema, TParams>
-      | (AreAllOptional<TParams> extends true ? TParams | void : TParams)
+      | (AreAllOptional<TParams> extends true
+          ? DeepReadonly<TParams> | void
+          : DeepReadonly<TParams>)
   ): QueryState<TOperationQueryFnData, TError> | undefined;
 
   getInfiniteQueryState(
     parameters: AreAllOptional<TParams> extends true
-      ? TParams | ServiceOperationInfiniteQueryKey<TSchema, TParams> | void
-      : TParams | ServiceOperationInfiniteQueryKey<TSchema, TParams>
+      ?
+          | DeepReadonly<TParams>
+          | ServiceOperationInfiniteQueryKey<TSchema, TParams>
+          | void
+      :
+          | DeepReadonly<TParams>
+          | ServiceOperationInfiniteQueryKey<TSchema, TParams>
   ):
     | QueryState<OperationInfiniteData<TOperationQueryFnData, TParams>, TError>
     | undefined;

@@ -1,5 +1,6 @@
 import type {
   AreAllOptional,
+  DeepReadonly,
   ServiceOperationQueryKey,
 } from '@openapi-qraft/tanstack-query-react-types';
 import type { NoInfer, SetDataOptions, Updater } from '@tanstack/query-core';
@@ -11,11 +12,13 @@ export interface ServiceOperationSetQueryData<
 > {
   setQueryData(
     parameters:
-      | (AreAllOptional<TParams> extends true ? TParams | undefined : TParams)
+      | (AreAllOptional<TParams> extends true
+          ? DeepReadonly<TParams> | undefined
+          : DeepReadonly<TParams>)
       | ServiceOperationQueryKey<TSchema, TParams>,
     updater: Updater<
       NoInfer<TOperationQueryFnData> | undefined,
-      NoInfer<TOperationQueryFnData> | undefined
+      NoInfer<DeepReadonly<TOperationQueryFnData>> | undefined
     >,
     options?: SetDataOptions
   ): TOperationQueryFnData | undefined;

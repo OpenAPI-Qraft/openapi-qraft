@@ -1,5 +1,6 @@
 import type {
   AreAllOptional,
+  DeepReadonly,
   ServiceOperationQueryKey,
 } from '@openapi-qraft/tanstack-query-react-types';
 
@@ -11,6 +12,8 @@ export interface ServiceOperationGetQueryData<
   getQueryData(
     parameters:
       | ServiceOperationQueryKey<TSchema, TParams>
-      | (AreAllOptional<TParams> extends true ? TParams | void : TParams)
+      | (AreAllOptional<TParams> extends true
+          ? DeepReadonly<TParams> | void
+          : DeepReadonly<TParams>)
   ): TOperationQueryFnData | undefined;
 }

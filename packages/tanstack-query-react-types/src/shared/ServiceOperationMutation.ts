@@ -1,4 +1,5 @@
 import type { AreAllOptional } from '@openapi-qraft/tanstack-query-react-types';
+import type { DeepReadonly } from './DeepReadonly.js';
 
 interface QueryFnBaseUrlOptions {
   /**
@@ -14,19 +15,19 @@ export type ServiceOperationMutationFnOptions<TBody, TParams> =
       ?
           | void // todo::try to move void to arguments
           | ({
-              parameters?: TParams;
+              parameters?: DeepReadonly<TParams>;
               body?: TBody;
             } & QueryFnBaseUrlOptions)
       : {
-          parameters: TParams;
+          parameters: DeepReadonly<TParams>;
           body?: TBody;
         } & QueryFnBaseUrlOptions
     : AreAllOptional<TParams> extends true
       ? {
-          parameters?: TParams;
+          parameters?: DeepReadonly<TParams>;
           body: TBody;
         } & QueryFnBaseUrlOptions
       : {
-          parameters: TParams;
+          parameters: DeepReadonly<TParams>;
           body: TBody;
         } & QueryFnBaseUrlOptions;

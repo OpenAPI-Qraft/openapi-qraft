@@ -6,6 +6,7 @@ import type {
   QueryFunction,
 } from '@tanstack/query-core';
 import type { AreAllOptional } from './AreAllOptional.js';
+import type { DeepReadonly } from './DeepReadonly.js';
 import type { OperationInfiniteData } from './OperationInfiniteData.js';
 import type { PartialParameters } from './PartialParameters.js';
 import type { RequestFn } from './RequestFn.js';
@@ -138,7 +139,7 @@ type FetchInfiniteQueryOptionsByParameters<
   /**
    * Fetch Queries by parameters
    */
-  parameters?: TParams;
+  parameters?: DeepReadonly<TParams>;
   queryKey?: never;
 };
 

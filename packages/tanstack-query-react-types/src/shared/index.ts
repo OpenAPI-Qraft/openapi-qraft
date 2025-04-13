@@ -1,4 +1,5 @@
 export type * from './AreAllOptional.js';
+export type * from './DeepReadonly.js';
 export type * from './InvalidateQueryFilters.js';
 export type * from './MutationFilters.js';
 export type * from './OperationInfiniteData.js';

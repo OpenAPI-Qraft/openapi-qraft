@@ -5,6 +5,7 @@ import type {
 } from '@tanstack/query-core';
 import type { UseMutationOptions } from '@tanstack/react-query';
 import type { AreAllOptional } from './AreAllOptional.js';
+import type { DeepReadonly } from './DeepReadonly.js';
 import type { PartialParameters } from './PartialParameters.js';
 import type { ServiceOperationMutationKey } from './ServiceOperationKey.js';
 
@@ -47,7 +48,7 @@ export interface MutationFiltersByParameters<
   /**
    * Include mutations matching these parameters
    */
-  parameters?: PartialParameters<TParams>;
+  parameters?: PartialParameters<DeepReadonly<TParams>>;
   mutationKey?: never;
 }
 

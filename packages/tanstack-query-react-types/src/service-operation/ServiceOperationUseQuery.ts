@@ -1,5 +1,6 @@
 import type {
   AreAllOptional,
+  DeepReadonly,
   ServiceOperationQueryKey,
 } from '@openapi-qraft/tanstack-query-react-types';
 import type {
@@ -16,13 +17,17 @@ export interface ServiceOperationUseQuery<
   TError,
 > {
   getQueryKey(
-    parameters: AreAllOptional<TParams> extends true ? TParams | void : TParams
+    parameters: AreAllOptional<TParams> extends true
+      ? DeepReadonly<TParams> | void
+      : DeepReadonly<TParams>
   ): ServiceOperationQueryKey<TSchema, TParams>;
 
   useQuery<TData = TOperationQueryFnData>(
     parameters:
       | ServiceOperationQueryKey<TSchema, TParams>
-      | (AreAllOptional<TParams> extends true ? TParams | void : TParams),
+      | (AreAllOptional<TParams> extends true
+          ? DeepReadonly<TParams> | void
+          : DeepReadonly<TParams>),
     options?: Omit<
       UndefinedInitialDataOptions<
         TOperationQueryFnData,
@@ -37,7 +42,9 @@ export interface ServiceOperationUseQuery<
   useQuery<TData = TOperationQueryFnData>(
     parameters:
       | ServiceOperationQueryKey<TSchema, TParams>
-      | (AreAllOptional<TParams> extends true ? TParams | void : TParams),
+      | (AreAllOptional<TParams> extends true
+          ? DeepReadonly<TParams> | void
+          : DeepReadonly<TParams>),
     options: Omit<
       DefinedInitialDataOptions<
         TOperationQueryFnData,

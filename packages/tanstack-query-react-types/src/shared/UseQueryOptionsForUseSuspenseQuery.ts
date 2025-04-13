@@ -1,4 +1,5 @@
 import type { UseQueryOptions } from '@tanstack/react-query';
+import type { DeepReadonly } from './DeepReadonly.js';
 import type { ServiceOperationQueryKey } from './ServiceOperationKey.js';
 
 export type UseQueryOptionsForUseSuspenseQuery<
@@ -18,7 +19,7 @@ export type UseQueryOptionsForUseSuspenseQuery<
 > &
   (
     | {
-        parameters: TParams;
+        parameters: DeepReadonly<TParams>;
         queryKey?: never;
       }
     | {

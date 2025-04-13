@@ -4,6 +4,7 @@ import type {
   FetchQueryOptions,
   QueryFunction,
 } from '@tanstack/query-core';
+import type { DeepReadonly } from './DeepReadonly.js';
 import type { ServiceOperationQueryKey } from './ServiceOperationKey.js';
 
 export type ServiceOperationFetchQueryOptions<
@@ -69,7 +70,7 @@ interface FetchQueryOptionsByParameters<
   /**
    * Fetch Queries by parameters
    */
-  parameters: TParams;
+  parameters: DeepReadonly<TParams>;
   queryKey?: never;
 }
 

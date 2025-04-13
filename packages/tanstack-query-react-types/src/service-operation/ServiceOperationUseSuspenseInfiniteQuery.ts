@@ -1,5 +1,6 @@
 import type {
   AreAllOptional,
+  DeepReadonly,
   OperationInfiniteData,
   PartialParameters,
   ServiceOperationInfiniteQueryKey,
@@ -22,7 +23,9 @@ export interface ServiceOperationUseSuspenseInfiniteQuery<
   >(
     parameters:
       | ServiceOperationInfiniteQueryKey<TSchema, TParams>
-      | (AreAllOptional<TParams> extends true ? TParams | void : TParams),
+      | (AreAllOptional<TParams> extends true
+          ? DeepReadonly<TParams> | void
+          : DeepReadonly<TParams>),
     options: Omit<
       UseSuspenseInfiniteQueryOptions<
         TOperationQueryFnData,

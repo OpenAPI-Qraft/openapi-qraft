@@ -1,5 +1,6 @@
 import type {
   AreAllOptional,
+  DeepReadonly,
   MutationVariables,
   ServiceOperationMutationKey,
   ServiceOperationUseMutationOptions,
@@ -14,11 +15,11 @@ export interface ServiceOperationUseMutation<
   TError,
 > {
   getMutationKey(
-    parameters: TParams | void
+    parameters: DeepReadonly<TParams> | void
   ): ServiceOperationMutationKey<TSchema, TParams>;
 
   useMutation<TVariables extends TBody, TContext = unknown>(
-    parameters: TParams,
+    parameters: DeepReadonly<TParams>,
     options?: ServiceOperationUseMutationOptions<
       TSchema,
       TMutationData,

@@ -1,5 +1,6 @@
 import type {
   AreAllOptional,
+  DeepReadonly,
   OperationInfiniteData,
   ServiceOperationInfiniteQueryKey,
 } from '@openapi-qraft/tanstack-query-react-types';
@@ -12,6 +13,8 @@ export interface ServiceOperationGetInfiniteQueryData<
   getInfiniteQueryData(
     parameters:
       | ServiceOperationInfiniteQueryKey<TSchema, TParams>
-      | (AreAllOptional<TParams> extends true ? TParams | void : TParams)
+      | (AreAllOptional<TParams> extends true
+          ? DeepReadonly<TParams> | void
+          : DeepReadonly<TParams>)
   ): OperationInfiniteData<TOperationQueryFnData, TParams> | undefined;
 }

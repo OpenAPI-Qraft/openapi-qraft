@@ -1,5 +1,6 @@
 import type { QueriesPlaceholderDataFunction } from '@tanstack/query-core';
 import type { UseQueryOptions } from '@tanstack/react-query';
+import type { DeepReadonly } from './DeepReadonly.js';
 import type { ServiceOperationQueryKey } from './ServiceOperationKey.js';
 
 export type UseQueryOptionsForUseQueries<
@@ -19,7 +20,7 @@ export type UseQueryOptionsForUseQueries<
 > &
   (
     | {
-        parameters: TParams;
+        parameters: DeepReadonly<TParams>;
         placeholderData?:
           | TQueryFnData
           | QueriesPlaceholderDataFunction<TQueryFnData>;
