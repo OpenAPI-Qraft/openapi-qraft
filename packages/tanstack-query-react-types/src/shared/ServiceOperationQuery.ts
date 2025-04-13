@@ -1,4 +1,5 @@
 import type { ServiceOperationQueryKey } from '@openapi-qraft/tanstack-query-react-types';
+import type { DeepReadonly } from './DeepReadonly.js';
 
 interface QueryFnOptionsBase<
   TMeta extends Record<string, any>,
@@ -14,7 +15,7 @@ export interface QueryFnOptionsByParameters<
   TSignal extends AbortSignal = AbortSignal,
 > extends QueryFnOptionsBase<TMeta, TSignal>,
     QueryFnBaseUrlOptions {
-  parameters: TParams;
+  parameters: DeepReadonly<TParams>;
 
   queryKey?: never;
 }

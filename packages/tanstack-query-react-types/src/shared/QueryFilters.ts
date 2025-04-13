@@ -1,4 +1,5 @@
 import type { DefaultError, FetchStatus, Query } from '@tanstack/query-core';
+import type { DeepReadonly } from './DeepReadonly.js';
 import type { OperationInfiniteData } from './OperationInfiniteData.js';
 import type { PartialParameters } from './PartialParameters.js';
 import type {
@@ -150,7 +151,7 @@ interface QueryFiltersByExactParameters<
   /**
    * Include queries matching parameters
    */
-  parameters: TParams;
+  parameters: DeepReadonly<TParams>;
 }
 
 interface QueryFiltersByWeakParameters<
@@ -174,7 +175,7 @@ interface QueryFiltersByWeakParameters<
   /**
    * Include queries matching parameters
    */
-  parameters?: PartialParameters<TParams>;
+  parameters?: PartialParameters<DeepReadonly<TParams>>;
 }
 
 export type QueryFiltersByParameters<

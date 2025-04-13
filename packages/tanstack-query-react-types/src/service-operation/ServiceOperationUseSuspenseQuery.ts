@@ -1,5 +1,6 @@
 import type {
   AreAllOptional,
+  DeepReadonly,
   ServiceOperationQueryKey,
 } from '@openapi-qraft/tanstack-query-react-types';
 import type {
@@ -16,7 +17,9 @@ export interface ServiceOperationUseSuspenseQuery<
   useSuspenseQuery<TData = TOperationQueryFnData>(
     parameters:
       | ServiceOperationQueryKey<TSchema, TParams>
-      | (AreAllOptional<TParams> extends true ? TParams | void : TParams),
+      | (AreAllOptional<TParams> extends true
+          ? DeepReadonly<TParams> | void
+          : DeepReadonly<TParams>),
     options?: Omit<
       UseSuspenseQueryOptions<
         TOperationQueryFnData,

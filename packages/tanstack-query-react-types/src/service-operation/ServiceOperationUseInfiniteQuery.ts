@@ -1,5 +1,6 @@
 import type {
   AreAllOptional,
+  DeepReadonly,
   OperationInfiniteData,
   PartialParameters,
   ServiceOperationInfiniteQueryKey,
@@ -19,7 +20,9 @@ export interface ServiceOperationUseInfiniteQuery<
   TError,
 > {
   getInfiniteQueryKey(
-    parameters: AreAllOptional<TParams> extends true ? TParams | void : TParams
+    parameters: AreAllOptional<TParams> extends true
+      ? DeepReadonly<TParams> | void
+      : DeepReadonly<TParams>
   ): ServiceOperationInfiniteQueryKey<TSchema, TParams>;
 
   useInfiniteQuery<
@@ -29,7 +32,9 @@ export interface ServiceOperationUseInfiniteQuery<
   >(
     parameters:
       | ServiceOperationInfiniteQueryKey<TSchema, TParams>
-      | (AreAllOptional<TParams> extends true ? TParams | void : TParams),
+      | (AreAllOptional<TParams> extends true
+          ? DeepReadonly<TParams> | void
+          : DeepReadonly<TParams>),
     options: Omit<
       UndefinedInitialDataInfiniteOptions<
         TQueryFnData,
@@ -56,7 +61,9 @@ export interface ServiceOperationUseInfiniteQuery<
   >(
     parameters:
       | ServiceOperationInfiniteQueryKey<TSchema, TParams>
-      | (AreAllOptional<TParams> extends true ? TParams | void : TParams),
+      | (AreAllOptional<TParams> extends true
+          ? DeepReadonly<TParams> | void
+          : DeepReadonly<TParams>),
     options: Omit<
       DefinedInitialDataInfiniteOptions<
         TQueryFnData,

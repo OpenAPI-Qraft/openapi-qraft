@@ -4,7 +4,7 @@
  */
 
 import type { paths } from "../../openapi.js";
-import type { AreAllOptional, InvalidateQueryFilters, MutationFiltersByMutationKey, MutationFiltersByParameters, MutationVariables, OperationInfiniteData, PartialParameters, QueryFiltersByParameters, QueryFiltersByQueryKey, QueryFnOptionsByParameters, QueryFnOptionsByQueryKey, RequestFnResponse, ServiceOperationEnsureInfiniteQueryDataOptions, ServiceOperationEnsureQueryDataOptions, ServiceOperationFetchInfiniteQueryOptions, ServiceOperationFetchQueryOptions, ServiceOperationInfiniteQueryKey, ServiceOperationMutationFnOptions, ServiceOperationMutationKey, ServiceOperationQueryKey, ServiceOperationUseMutationOptions, UseQueryOptionsForUseQueries, UseQueryOptionsForUseSuspenseQuery, WithOptional } from "@openapi-qraft/tanstack-query-react-types";
+import type { AreAllOptional, DeepReadonly, InvalidateQueryFilters, MutationFiltersByMutationKey, MutationFiltersByParameters, MutationVariables, OperationInfiniteData, PartialParameters, QueryFiltersByParameters, QueryFiltersByQueryKey, QueryFnOptionsByParameters, QueryFnOptionsByQueryKey, RequestFnResponse, ServiceOperationEnsureInfiniteQueryDataOptions, ServiceOperationEnsureQueryDataOptions, ServiceOperationFetchInfiniteQueryOptions, ServiceOperationFetchQueryOptions, ServiceOperationInfiniteQueryKey, ServiceOperationMutationFnOptions, ServiceOperationMutationKey, ServiceOperationQueryKey, ServiceOperationUseMutationOptions, UseQueryOptionsForUseQueries, UseQueryOptionsForUseSuspenseQuery, WithOptional } from "@openapi-qraft/tanstack-query-react-types";
 import type { CancelOptions, InfiniteQueryPageParamsOptions, InvalidateOptions, Mutation, MutationState, NoInfer, QueryState, RefetchOptions, ResetOptions, SetDataOptions, Updater } from "@tanstack/query-core";
 import type { DefinedInitialDataInfiniteOptions, DefinedInitialDataOptions, DefinedUseInfiniteQueryResult, DefinedUseQueryResult, UndefinedInitialDataInfiniteOptions, UndefinedInitialDataOptions, UseInfiniteQueryResult, UseMutationResult, UseQueryResult, UseSuspenseInfiniteQueryOptions, UseSuspenseInfiniteQueryResult, UseSuspenseQueryOptions, UseSuspenseQueryResult } from "@tanstack/react-query";
 export interface ApprovalPoliciesService {
@@ -22,7 +22,7 @@ export interface ApprovalPoliciesService {
          * @summary Get an approval policy by ID
          * @description Retrieve a specific approval policy.
          */
-        getQueryKey(parameters: GetApprovalPoliciesIdParameters): ServiceOperationQueryKey<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdParameters>;
+        getQueryKey(parameters: DeepReadonly<GetApprovalPoliciesIdParameters>): ServiceOperationQueryKey<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdParameters>;
         /**
          * Performs asynchronous data fetching, manages loading states and error handling.
          *
@@ -45,7 +45,7 @@ export interface ApprovalPoliciesService {
          * })
          * ```
          */
-        useQuery<TData = GetApprovalPoliciesIdData>(parameters: ServiceOperationQueryKey<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdParameters> | (GetApprovalPoliciesIdParameters), options?: Omit<UndefinedInitialDataOptions<GetApprovalPoliciesIdData, GetApprovalPoliciesIdError, TData, ServiceOperationQueryKey<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdParameters>>, "queryKey">): UseQueryResult<TData, GetApprovalPoliciesIdError | Error>;
+        useQuery<TData = GetApprovalPoliciesIdData>(parameters: ServiceOperationQueryKey<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdParameters> | (DeepReadonly<GetApprovalPoliciesIdParameters>), options?: Omit<UndefinedInitialDataOptions<GetApprovalPoliciesIdData, GetApprovalPoliciesIdError, TData, ServiceOperationQueryKey<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdParameters>>, "queryKey">): UseQueryResult<TData, GetApprovalPoliciesIdError | Error>;
         /**
          * Performs asynchronous data fetching, manages loading states and error handling.
          *
@@ -68,7 +68,7 @@ export interface ApprovalPoliciesService {
          * })
          * ```
          */
-        useQuery<TData = GetApprovalPoliciesIdData>(parameters: ServiceOperationQueryKey<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdParameters> | (GetApprovalPoliciesIdParameters), options: Omit<DefinedInitialDataOptions<GetApprovalPoliciesIdData, GetApprovalPoliciesIdError, TData, ServiceOperationQueryKey<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdParameters>>, "queryKey">): DefinedUseQueryResult<TData, GetApprovalPoliciesIdError | Error>;
+        useQuery<TData = GetApprovalPoliciesIdData>(parameters: ServiceOperationQueryKey<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdParameters> | (DeepReadonly<GetApprovalPoliciesIdParameters>), options: Omit<DefinedInitialDataOptions<GetApprovalPoliciesIdData, GetApprovalPoliciesIdError, TData, ServiceOperationQueryKey<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdParameters>>, "queryKey">): DefinedUseQueryResult<TData, GetApprovalPoliciesIdError | Error>;
         /**
          * @summary Get an approval policy by ID
          * @description Retrieve a specific approval policy.
@@ -103,7 +103,7 @@ export interface ApprovalPoliciesService {
          * @summary Get an approval policy by ID
          * @description Retrieve a specific approval policy.
          */
-        getInfiniteQueryData(parameters: ServiceOperationInfiniteQueryKey<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdParameters> | (GetApprovalPoliciesIdParameters)): OperationInfiniteData<GetApprovalPoliciesIdData, GetApprovalPoliciesIdParameters> | undefined;
+        getInfiniteQueryData(parameters: ServiceOperationInfiniteQueryKey<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdParameters> | (DeepReadonly<GetApprovalPoliciesIdParameters>)): OperationInfiniteData<GetApprovalPoliciesIdData, GetApprovalPoliciesIdParameters> | undefined;
         /**
          * @summary Get an approval policy by ID
          * @description Retrieve a specific approval policy.
@@ -119,17 +119,17 @@ export interface ApprovalPoliciesService {
          * @summary Get an approval policy by ID
          * @description Retrieve a specific approval policy.
          */
-        getQueryData(parameters: ServiceOperationQueryKey<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdParameters> | (GetApprovalPoliciesIdParameters)): GetApprovalPoliciesIdData | undefined;
+        getQueryData(parameters: ServiceOperationQueryKey<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdParameters> | (DeepReadonly<GetApprovalPoliciesIdParameters>)): GetApprovalPoliciesIdData | undefined;
         /**
          * @summary Get an approval policy by ID
          * @description Retrieve a specific approval policy.
          */
-        getQueryState(parameters: ServiceOperationQueryKey<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdParameters> | (GetApprovalPoliciesIdParameters)): QueryState<GetApprovalPoliciesIdData, GetApprovalPoliciesIdError> | undefined;
+        getQueryState(parameters: ServiceOperationQueryKey<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdParameters> | (DeepReadonly<GetApprovalPoliciesIdParameters>)): QueryState<GetApprovalPoliciesIdData, GetApprovalPoliciesIdError> | undefined;
         /**
          * @summary Get an approval policy by ID
          * @description Retrieve a specific approval policy.
          */
-        getInfiniteQueryState(parameters: GetApprovalPoliciesIdParameters | ServiceOperationInfiniteQueryKey<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdParameters>): QueryState<OperationInfiniteData<GetApprovalPoliciesIdData, GetApprovalPoliciesIdParameters>, GetApprovalPoliciesIdError> | undefined;
+        getInfiniteQueryState(parameters: DeepReadonly<GetApprovalPoliciesIdParameters> | ServiceOperationInfiniteQueryKey<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdParameters>): QueryState<OperationInfiniteData<GetApprovalPoliciesIdData, GetApprovalPoliciesIdParameters>, GetApprovalPoliciesIdError> | undefined;
         /**
          * @summary Get an approval policy by ID
          * @description Retrieve a specific approval policy.
@@ -168,7 +168,7 @@ export interface ApprovalPoliciesService {
          * @summary Get an approval policy by ID
          * @description Retrieve a specific approval policy.
          */
-        setInfiniteQueryData(parameters: GetApprovalPoliciesIdParameters | ServiceOperationInfiniteQueryKey<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdParameters>, updater: Updater<NoInfer<OperationInfiniteData<GetApprovalPoliciesIdData, GetApprovalPoliciesIdParameters>> | undefined, NoInfer<OperationInfiniteData<GetApprovalPoliciesIdData, GetApprovalPoliciesIdParameters>> | undefined>, options?: SetDataOptions): OperationInfiniteData<GetApprovalPoliciesIdData, GetApprovalPoliciesIdParameters> | undefined;
+        setInfiniteQueryData(parameters: (DeepReadonly<GetApprovalPoliciesIdParameters>) | ServiceOperationInfiniteQueryKey<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdParameters>, updater: Updater<NoInfer<OperationInfiniteData<GetApprovalPoliciesIdData, GetApprovalPoliciesIdParameters>> | undefined, NoInfer<DeepReadonly<OperationInfiniteData<GetApprovalPoliciesIdData, GetApprovalPoliciesIdParameters>>> | undefined>, options?: SetDataOptions): OperationInfiniteData<GetApprovalPoliciesIdData, GetApprovalPoliciesIdParameters> | undefined;
         /**
          * @summary Get an approval policy by ID
          * @description Retrieve a specific approval policy.
@@ -178,12 +178,12 @@ export interface ApprovalPoliciesService {
          * @summary Get an approval policy by ID
          * @description Retrieve a specific approval policy.
          */
-        setQueryData(parameters: (GetApprovalPoliciesIdParameters) | ServiceOperationQueryKey<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdParameters>, updater: Updater<NoInfer<GetApprovalPoliciesIdData> | undefined, NoInfer<GetApprovalPoliciesIdData> | undefined>, options?: SetDataOptions): GetApprovalPoliciesIdData | undefined;
+        setQueryData(parameters: (DeepReadonly<GetApprovalPoliciesIdParameters>) | ServiceOperationQueryKey<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdParameters>, updater: Updater<NoInfer<GetApprovalPoliciesIdData> | undefined, NoInfer<DeepReadonly<GetApprovalPoliciesIdData>> | undefined>, options?: SetDataOptions): GetApprovalPoliciesIdData | undefined;
         /**
          * @summary Get an approval policy by ID
          * @description Retrieve a specific approval policy.
          */
-        getInfiniteQueryKey(parameters: GetApprovalPoliciesIdParameters): ServiceOperationInfiniteQueryKey<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdParameters>;
+        getInfiniteQueryKey(parameters: DeepReadonly<GetApprovalPoliciesIdParameters>): ServiceOperationInfiniteQueryKey<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdParameters>;
         /**
          * Performs asynchronous data fetching with support for infinite scrolling scenarios.
          * Manages paginated data and provides utilities for fetching additional pages.
@@ -213,7 +213,7 @@ export interface ApprovalPoliciesService {
          * fetchNextPage(); // Fetch the next page
          * ```
          */
-        useInfiniteQuery<TPageParam extends GetApprovalPoliciesIdParameters, TQueryFnData = GetApprovalPoliciesIdData, TData = OperationInfiniteData<TQueryFnData, GetApprovalPoliciesIdParameters>>(parameters: ServiceOperationInfiniteQueryKey<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdParameters> | (GetApprovalPoliciesIdParameters), options: Omit<UndefinedInitialDataInfiniteOptions<TQueryFnData, GetApprovalPoliciesIdError, TData, ServiceOperationInfiniteQueryKey<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdParameters>, PartialParameters<TPageParam>>, "queryKey" | "getPreviousPageParam" | "getNextPageParam" | "initialPageParam"> & InfiniteQueryPageParamsOptions<TQueryFnData, PartialParameters<TPageParam>>): UseInfiniteQueryResult<TData, GetApprovalPoliciesIdError | Error>;
+        useInfiniteQuery<TPageParam extends GetApprovalPoliciesIdParameters, TQueryFnData = GetApprovalPoliciesIdData, TData = OperationInfiniteData<TQueryFnData, GetApprovalPoliciesIdParameters>>(parameters: ServiceOperationInfiniteQueryKey<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdParameters> | (DeepReadonly<GetApprovalPoliciesIdParameters>), options: Omit<UndefinedInitialDataInfiniteOptions<TQueryFnData, GetApprovalPoliciesIdError, TData, ServiceOperationInfiniteQueryKey<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdParameters>, PartialParameters<TPageParam>>, "queryKey" | "getPreviousPageParam" | "getNextPageParam" | "initialPageParam"> & InfiniteQueryPageParamsOptions<TQueryFnData, PartialParameters<TPageParam>>): UseInfiniteQueryResult<TData, GetApprovalPoliciesIdError | Error>;
         /**
          * Performs asynchronous data fetching with support for infinite scrolling scenarios.
          * Manages paginated data and provides utilities for fetching additional pages.
@@ -243,7 +243,7 @@ export interface ApprovalPoliciesService {
          * fetchNextPage(); // Fetch the next page
          * ```
          */
-        useInfiniteQuery<TPageParam extends GetApprovalPoliciesIdParameters, TQueryFnData = GetApprovalPoliciesIdData, TData = OperationInfiniteData<TQueryFnData, GetApprovalPoliciesIdParameters>>(parameters: ServiceOperationInfiniteQueryKey<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdParameters> | (GetApprovalPoliciesIdParameters), options: Omit<DefinedInitialDataInfiniteOptions<TQueryFnData, GetApprovalPoliciesIdError, TData, ServiceOperationInfiniteQueryKey<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdParameters>, PartialParameters<TPageParam>>, "queryKey" | "getPreviousPageParam" | "getNextPageParam" | "initialPageParam"> & InfiniteQueryPageParamsOptions<GetApprovalPoliciesIdData, PartialParameters<TPageParam>>): DefinedUseInfiniteQueryResult<TData, GetApprovalPoliciesIdError | Error>;
+        useInfiniteQuery<TPageParam extends GetApprovalPoliciesIdParameters, TQueryFnData = GetApprovalPoliciesIdData, TData = OperationInfiniteData<TQueryFnData, GetApprovalPoliciesIdParameters>>(parameters: ServiceOperationInfiniteQueryKey<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdParameters> | (DeepReadonly<GetApprovalPoliciesIdParameters>), options: Omit<DefinedInitialDataInfiniteOptions<TQueryFnData, GetApprovalPoliciesIdError, TData, ServiceOperationInfiniteQueryKey<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdParameters>, PartialParameters<TPageParam>>, "queryKey" | "getPreviousPageParam" | "getNextPageParam" | "initialPageParam"> & InfiniteQueryPageParamsOptions<GetApprovalPoliciesIdData, PartialParameters<TPageParam>>): DefinedUseInfiniteQueryResult<TData, GetApprovalPoliciesIdError | Error>;
         /**
          * Monitors the number of queries currently fetching, matching the provided filters.
          * Useful for creating loading indicators or performing actions based on active requests.
@@ -354,7 +354,7 @@ export interface ApprovalPoliciesService {
          * @summary Get an approval policy by ID
          * @description Retrieve a specific approval policy.
          */
-        getQueryKey(parameters: GetApprovalPoliciesIdParameters): ServiceOperationQueryKey<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdParameters>;
+        getQueryKey(parameters: DeepReadonly<GetApprovalPoliciesIdParameters>): ServiceOperationQueryKey<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdParameters>;
         /**
          * Performs asynchronous data fetching, manages loading states and error handling.
          *
@@ -377,7 +377,7 @@ export interface ApprovalPoliciesService {
          * })
          * ```
          */
-        useQuery<TData = GetApprovalPoliciesIdData>(parameters: ServiceOperationQueryKey<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdParameters> | (GetApprovalPoliciesIdParameters), options?: Omit<UndefinedInitialDataOptions<GetApprovalPoliciesIdData, GetApprovalPoliciesIdError, TData, ServiceOperationQueryKey<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdParameters>>, "queryKey">): UseQueryResult<TData, GetApprovalPoliciesIdError | Error>;
+        useQuery<TData = GetApprovalPoliciesIdData>(parameters: ServiceOperationQueryKey<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdParameters> | (DeepReadonly<GetApprovalPoliciesIdParameters>), options?: Omit<UndefinedInitialDataOptions<GetApprovalPoliciesIdData, GetApprovalPoliciesIdError, TData, ServiceOperationQueryKey<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdParameters>>, "queryKey">): UseQueryResult<TData, GetApprovalPoliciesIdError | Error>;
         /**
          * Performs asynchronous data fetching, manages loading states and error handling.
          *
@@ -400,7 +400,7 @@ export interface ApprovalPoliciesService {
          * })
          * ```
          */
-        useQuery<TData = GetApprovalPoliciesIdData>(parameters: ServiceOperationQueryKey<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdParameters> | (GetApprovalPoliciesIdParameters), options: Omit<DefinedInitialDataOptions<GetApprovalPoliciesIdData, GetApprovalPoliciesIdError, TData, ServiceOperationQueryKey<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdParameters>>, "queryKey">): DefinedUseQueryResult<TData, GetApprovalPoliciesIdError | Error>;
+        useQuery<TData = GetApprovalPoliciesIdData>(parameters: ServiceOperationQueryKey<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdParameters> | (DeepReadonly<GetApprovalPoliciesIdParameters>), options: Omit<DefinedInitialDataOptions<GetApprovalPoliciesIdData, GetApprovalPoliciesIdError, TData, ServiceOperationQueryKey<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdParameters>>, "queryKey">): DefinedUseQueryResult<TData, GetApprovalPoliciesIdError | Error>;
         /**
          * Performs asynchronous data fetching with support for infinite scrolling scenarios.
          * Manages paginated data and provides utilities for fetching additional pages.
@@ -431,7 +431,7 @@ export interface ApprovalPoliciesService {
          * fetchNextPage(); // Fetch the next page
          * ```
          */
-        useSuspenseInfiniteQuery<TPageParam extends GetApprovalPoliciesIdParameters, TData = GetApprovalPoliciesIdData>(parameters: ServiceOperationInfiniteQueryKey<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdParameters> | (GetApprovalPoliciesIdParameters), options: Omit<UseSuspenseInfiniteQueryOptions<GetApprovalPoliciesIdData, GetApprovalPoliciesIdError, OperationInfiniteData<TData, GetApprovalPoliciesIdParameters>, GetApprovalPoliciesIdData, ServiceOperationInfiniteQueryKey<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdParameters>, PartialParameters<TPageParam>>, "queryKey" | "getPreviousPageParam" | "getNextPageParam" | "initialPageParam"> & InfiniteQueryPageParamsOptions<GetApprovalPoliciesIdData, PartialParameters<TPageParam>>): UseSuspenseInfiniteQueryResult<OperationInfiniteData<TData, GetApprovalPoliciesIdParameters>, GetApprovalPoliciesIdError | Error>;
+        useSuspenseInfiniteQuery<TPageParam extends GetApprovalPoliciesIdParameters, TData = GetApprovalPoliciesIdData>(parameters: ServiceOperationInfiniteQueryKey<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdParameters> | (DeepReadonly<GetApprovalPoliciesIdParameters>), options: Omit<UseSuspenseInfiniteQueryOptions<GetApprovalPoliciesIdData, GetApprovalPoliciesIdError, OperationInfiniteData<TData, GetApprovalPoliciesIdParameters>, GetApprovalPoliciesIdData, ServiceOperationInfiniteQueryKey<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdParameters>, PartialParameters<TPageParam>>, "queryKey" | "getPreviousPageParam" | "getNextPageParam" | "initialPageParam"> & InfiniteQueryPageParamsOptions<GetApprovalPoliciesIdData, PartialParameters<TPageParam>>): UseSuspenseInfiniteQueryResult<OperationInfiniteData<TData, GetApprovalPoliciesIdParameters>, GetApprovalPoliciesIdError | Error>;
         /**
          * Allows you to execute multiple asynchronous data fetching operations concurrently with Suspense support.
          * Similar to useQueries but integrates with React Suspense for loading states.
@@ -532,7 +532,7 @@ export interface ApprovalPoliciesService {
          * })
          * ```
          */
-        useSuspenseQuery<TData = GetApprovalPoliciesIdData>(parameters: ServiceOperationQueryKey<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdParameters> | (GetApprovalPoliciesIdParameters), options?: Omit<UseSuspenseQueryOptions<GetApprovalPoliciesIdData, GetApprovalPoliciesIdError, TData, ServiceOperationQueryKey<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdParameters>>, "queryKey">): UseSuspenseQueryResult<TData, GetApprovalPoliciesIdError | Error>;
+        useSuspenseQuery<TData = GetApprovalPoliciesIdData>(parameters: ServiceOperationQueryKey<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdParameters> | (DeepReadonly<GetApprovalPoliciesIdParameters>), options?: Omit<UseSuspenseQueryOptions<GetApprovalPoliciesIdData, GetApprovalPoliciesIdError, TData, ServiceOperationQueryKey<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdParameters>>, "queryKey">): UseSuspenseQueryResult<TData, GetApprovalPoliciesIdError | Error>;
         schema: GetApprovalPoliciesIdSchema;
         types: {
             parameters: GetApprovalPoliciesIdParameters;
@@ -549,7 +549,7 @@ export interface ApprovalPoliciesService {
          * @summary Delete an approval policy
          * @description Delete an existing approval policy.
          */
-        getMutationKey(parameters: DeleteApprovalPoliciesIdParameters | void): ServiceOperationMutationKey<DeleteApprovalPoliciesIdSchema, DeleteApprovalPoliciesIdParameters>;
+        getMutationKey(parameters: DeepReadonly<DeleteApprovalPoliciesIdParameters> | void): ServiceOperationMutationKey<DeleteApprovalPoliciesIdSchema, DeleteApprovalPoliciesIdParameters>;
         /**
          * Enables performing asynchronous data mutation operations such as POST, PUT, PATCH, or DELETE requests.
          * Handles loading state, optimistic updates, and error handling.
@@ -589,7 +589,7 @@ export interface ApprovalPoliciesService {
          * });
          * ```
          */
-        useMutation<TVariables extends DeleteApprovalPoliciesIdBody, TContext = unknown>(parameters: DeleteApprovalPoliciesIdParameters, options?: ServiceOperationUseMutationOptions<DeleteApprovalPoliciesIdSchema, DeleteApprovalPoliciesIdData, DeleteApprovalPoliciesIdParameters, TVariables, DeleteApprovalPoliciesIdError | Error, TContext>): UseMutationResult<DeleteApprovalPoliciesIdData, DeleteApprovalPoliciesIdError | Error, AreAllOptional<TVariables> extends true ? TVariables | void : TVariables, TContext>;
+        useMutation<TVariables extends DeleteApprovalPoliciesIdBody, TContext = unknown>(parameters: DeepReadonly<DeleteApprovalPoliciesIdParameters>, options?: ServiceOperationUseMutationOptions<DeleteApprovalPoliciesIdSchema, DeleteApprovalPoliciesIdData, DeleteApprovalPoliciesIdParameters, TVariables, DeleteApprovalPoliciesIdError | Error, TContext>): UseMutationResult<DeleteApprovalPoliciesIdData, DeleteApprovalPoliciesIdError | Error, AreAllOptional<TVariables> extends true ? TVariables | void : TVariables, TContext>;
         /**
          * Enables performing asynchronous data mutation operations such as POST, PUT, PATCH, or DELETE requests.
          * Handles loading state, optimistic updates, and error handling.
@@ -726,7 +726,7 @@ export interface ApprovalPoliciesService {
          * @summary Update an approval policy
          * @description Update an existing approval policy.
          */
-        getMutationKey(parameters: PatchApprovalPoliciesIdParameters | void): ServiceOperationMutationKey<PatchApprovalPoliciesIdSchema, PatchApprovalPoliciesIdParameters>;
+        getMutationKey(parameters: DeepReadonly<PatchApprovalPoliciesIdParameters> | void): ServiceOperationMutationKey<PatchApprovalPoliciesIdSchema, PatchApprovalPoliciesIdParameters>;
         /**
          * Enables performing asynchronous data mutation operations such as POST, PUT, PATCH, or DELETE requests.
          * Handles loading state, optimistic updates, and error handling.
@@ -766,7 +766,7 @@ export interface ApprovalPoliciesService {
          * });
          * ```
          */
-        useMutation<TVariables extends PatchApprovalPoliciesIdBody, TContext = unknown>(parameters: PatchApprovalPoliciesIdParameters, options?: ServiceOperationUseMutationOptions<PatchApprovalPoliciesIdSchema, PatchApprovalPoliciesIdData, PatchApprovalPoliciesIdParameters, TVariables, PatchApprovalPoliciesIdError | Error, TContext>): UseMutationResult<PatchApprovalPoliciesIdData, PatchApprovalPoliciesIdError | Error, AreAllOptional<TVariables> extends true ? TVariables | void : TVariables, TContext>;
+        useMutation<TVariables extends PatchApprovalPoliciesIdBody, TContext = unknown>(parameters: DeepReadonly<PatchApprovalPoliciesIdParameters>, options?: ServiceOperationUseMutationOptions<PatchApprovalPoliciesIdSchema, PatchApprovalPoliciesIdData, PatchApprovalPoliciesIdParameters, TVariables, PatchApprovalPoliciesIdError | Error, TContext>): UseMutationResult<PatchApprovalPoliciesIdData, PatchApprovalPoliciesIdError | Error, AreAllOptional<TVariables> extends true ? TVariables | void : TVariables, TContext>;
         /**
          * Enables performing asynchronous data mutation operations such as POST, PUT, PATCH, or DELETE requests.
          * Handles loading state, optimistic updates, and error handling.
