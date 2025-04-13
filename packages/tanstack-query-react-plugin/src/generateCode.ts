@@ -10,6 +10,7 @@ import { astToString } from './ts-factory/astToString.js';
 import { getClientFactory } from './ts-factory/getClientFactory.js';
 import { getCreatePredefinedParametersRequestFnFactory } from './ts-factory/getCreatePredefinedParametersRequestFnFactory.js';
 import { getIndexFactory } from './ts-factory/getIndexFactory.js';
+import { getOperationClientFactory } from './ts-factory/getOperationClientFactory.js';
 import {
   getServiceFactory,
   ServiceFactoryOptions,
@@ -39,6 +40,7 @@ export const generateCode = async ({
     ...(await generateServices(spinner, services, serviceImports, output)),
     ...(await generateServiceIndex(spinner, services, output)),
     ...(await generateClient(spinner, output)),
+    ...(await generateOperationClient(spinner, output)),
     ...(output.operationPredefinedParameters
       ? await generateCreatePredefinedParametersRequestFn(
           spinner,
@@ -174,6 +176,31 @@ const generateClient = async (spinner: Ora, output: OutputOptions) => {
   spinner.succeed(c.green('Client has been generated'));
 
   return clientFiles;
+};
+
+const generateOperationClient = async (spinner: Ora, output: OutputOptions) => {
+  spinner.start('Generating operation client');
+
+  const operationClientFiles: GeneratorFile[] = [];
+
+  try {
+    const code = astToString(getOperationClientFactory());
+
+    operationClientFiles.push({
+      file: new URL('create-api-operation-client.ts', output.dir),
+      code: formatFileHeader(output.fileHeader) + code,
+    });
+  } catch (error) {
+    spinner.fail(
+      c.redBright('Error occurred during operation client generation')
+    );
+
+    throw error;
+  }
+
+  spinner.succeed(c.green('Operation client has been generated'));
+
+  return operationClientFiles;
 };
 
 const generateCreatePredefinedParametersRequestFn = async (
