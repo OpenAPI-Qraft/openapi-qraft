@@ -23,6 +23,7 @@ interface OutputOptions extends OutputOptionsBase {
   explicitImportExtensions: '.js' | '.ts' | undefined;
   exportSchemaTypes: boolean | undefined;
   operationPredefinedParameters: Array<PredefinedParametersGlob> | undefined;
+  defaultClientCallbacks: string[] | ['all'] | ['none'] | undefined;
 }
 
 export const generateCode = async ({
@@ -184,7 +185,11 @@ const generateOperationClient = async (spinner: Ora, output: OutputOptions) => {
   const operationClientFiles: GeneratorFile[] = [];
 
   try {
-    const code = astToString(getOperationClientFactory());
+    const code = astToString(
+      getOperationClientFactory({
+        defaultClientCallbacks: output.defaultClientCallbacks,
+      })
+    );
 
     operationClientFiles.push({
       file: new URL('create-api-operation-client.ts', output.dir),
