@@ -9,6 +9,7 @@ export {
   type APIBasicQueryClientServices,
   type APIBasicClientServices,
   type APIUtilityClientServices,
+  type UnionServiceOperationsDeclaration,
   type QraftClientOptions,
 } from './qraftAPIClient.js';
 export {

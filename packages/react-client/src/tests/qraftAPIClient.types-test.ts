@@ -4,7 +4,10 @@ import { qraftAPIClient, requestFn } from '@openapi-qraft/react';
 import * as callbacks from '@openapi-qraft/react/callbacks/index';
 import { QueryClient } from '@tanstack/query-core';
 import { services } from './fixtures/api/index.js';
-import { filesService } from './fixtures/api/services/FilesService.js';
+import {
+  deleteFiles,
+  filesService,
+} from './fixtures/api/services/FilesService.js';
 
 //// APIDefaultQueryClientServices ////
 const client = qraftAPIClient(services, callbacks, {
@@ -129,3 +132,17 @@ apiBasicCustomClient.filesService.deleteFiles.getMutationKey({
 apiBasicCustomClient.filesService.deleteFiles.useMutation({
   query: { all: true },
 });
+
+//// APIDefaultQueryClientServices - single service operation ////
+const deleteFilesClient = qraftAPIClient(deleteFiles, callbacks, {
+  requestFn: requestFn,
+  baseUrl: 'https://api.sandbox.monite.com/v1',
+  queryClient: new QueryClient(),
+});
+
+deleteFilesClient({ parameters: { query: { all: true } } });
+deleteFilesClient.useIsMutating();
+deleteFilesClient.useMutation();
+deleteFilesClient.getMutationKey();
+// @ts-expect-error - OK, illegal usage
+deleteFilesClient.getQueryKey;
