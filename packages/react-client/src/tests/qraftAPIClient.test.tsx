@@ -23,9 +23,12 @@ import React from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { qraftAPIClient, requestFn } from '../index.js';
 import { createPredefinedParametersRequestFn } from './fixtures/api/create-predefined-parameters-request-fn.js';
-import { createAPIClient, services } from './fixtures/api/index.js';
+import {
+  createAPIClient,
+  createAPIOperationClient,
+  services,
+} from './fixtures/api/index.js';
 import { getApprovalPoliciesId } from './fixtures/api/services/ApprovalPoliciesService.js';
-import { createAPIOperationClient } from './fixtures/create-api-operation-client.js';
 import { filesFindAllResponsePayloadFixtures } from './msw/handlers.js';
 
 const baseUrl = 'https://api.sandbox.monite.com/v1';
