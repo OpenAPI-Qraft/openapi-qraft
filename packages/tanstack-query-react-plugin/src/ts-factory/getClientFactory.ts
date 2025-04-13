@@ -3,22 +3,103 @@ import ts from 'typescript';
 type Options = {
   servicesDirName: string;
   explicitImportExtensions: '.js' | '.ts' | undefined;
+  defaultClientCallbacks?: string[] | ['all'] | ['none'] | undefined;
 };
 
 export const getClientFactory = (options: Options) => {
   return [
     ...getClientImportsFactory(options),
-    ...getCreateClientFunctionFactory(),
+    ...getCreateClientFunctionFactory(options),
   ];
 };
 
 const getClientImportsFactory = ({
   servicesDirName,
   explicitImportExtensions,
+  defaultClientCallbacks,
 }: Options) => {
   const factory = ts.factory;
+  const shouldImportAllCallbacks = defaultClientCallbacks?.some(
+    (name) => name === 'all'
+  );
+  const clientCallbacks =
+    defaultClientCallbacks?.filter(
+      (name) => name !== 'all' && name !== 'none'
+    ) || [];
 
-  return [
+  const imports = [
+    factory.createImportDeclaration(
+      undefined,
+      factory.createImportClause(
+        true,
+        undefined,
+        factory.createNamedImports([
+          factory.createImportSpecifier(
+            false,
+            undefined,
+            factory.createIdentifier('APIBasicClientServices')
+          ),
+          factory.createImportSpecifier(
+            false,
+            undefined,
+            factory.createIdentifier('APIBasicQueryClientServices')
+          ),
+          factory.createImportSpecifier(
+            false,
+            undefined,
+            factory.createIdentifier('APIDefaultQueryClientServices')
+          ),
+          factory.createImportSpecifier(
+            false,
+            undefined,
+            factory.createIdentifier('APIQueryClientServices')
+          ),
+          factory.createImportSpecifier(
+            false,
+            undefined,
+            factory.createIdentifier('APIUtilityClientServices')
+          ),
+          factory.createImportSpecifier(
+            false,
+            undefined,
+            factory.createIdentifier('CreateAPIBasicClientOptions')
+          ),
+          factory.createImportSpecifier(
+            false,
+            undefined,
+            factory.createIdentifier('CreateAPIBasicQueryClientOptions')
+          ),
+          factory.createImportSpecifier(
+            false,
+            undefined,
+            factory.createIdentifier('CreateAPIClientOptions')
+          ),
+          factory.createImportSpecifier(
+            false,
+            undefined,
+            factory.createIdentifier('CreateAPIQueryClientOptions')
+          ),
+        ])
+      ),
+      factory.createStringLiteral('@openapi-qraft/react'),
+      undefined
+    ),
+  ];
+
+  imports.push(
+    factory.createImportDeclaration(
+      undefined,
+      factory.createImportClause(
+        !shouldImportAllCallbacks,
+        undefined,
+        factory.createNamespaceImport(factory.createIdentifier('allCallbacks'))
+      ),
+      factory.createStringLiteral('@openapi-qraft/react/callbacks/index'),
+      undefined
+    )
+  );
+
+  imports.push(
     factory.createImportDeclaration(
       undefined,
       factory.createImportClause(
@@ -30,37 +111,37 @@ const getClientImportsFactory = ({
             undefined,
             factory.createIdentifier('qraftAPIClient')
           ),
-          ...[
-            'APIDefaultQueryClientServices',
-            'APIBasicClientServices',
-            'APIBasicQueryClientServices',
-            'APIUtilityClientServices',
-            'CreateAPIBasicQueryClientOptions',
-            'CreateAPIBasicClientOptions',
-            'CreateAPIClientOptions',
-            'CreateAPIQueryClientOptions',
-          ].map((name) =>
-            factory.createImportSpecifier(
-              true,
-              undefined,
-              factory.createIdentifier(name)
-            )
-          ),
         ])
       ),
       factory.createStringLiteral('@openapi-qraft/react'),
       undefined
-    ),
-    factory.createImportDeclaration(
-      undefined,
-      factory.createImportClause(
-        false,
+    )
+  );
+
+  if (!shouldImportAllCallbacks && clientCallbacks.length) {
+    imports.push(
+      factory.createImportDeclaration(
         undefined,
-        factory.createNamespaceImport(factory.createIdentifier('callbacks'))
-      ),
-      factory.createStringLiteral('@openapi-qraft/react/callbacks/index'),
-      undefined
-    ),
+        factory.createImportClause(
+          false,
+          undefined,
+          factory.createNamedImports(
+            clientCallbacks.map((name) =>
+              factory.createImportSpecifier(
+                false,
+                undefined,
+                factory.createIdentifier(name)
+              )
+            )
+          )
+        ),
+        factory.createStringLiteral('@openapi-qraft/react/callbacks/index'),
+        undefined
+      )
+    );
+  }
+
+  imports.push(
     factory.createImportDeclaration(
       undefined,
       factory.createImportClause(
@@ -78,19 +159,65 @@ const getClientImportsFactory = ({
         `./${servicesDirName}/index${explicitImportExtensions ?? ''}`
       ),
       undefined
-    ),
-  ];
+    )
+  );
+
+  if (shouldImportAllCallbacks) return imports;
+
+  const defaultCallbacksDeclaration = factory.createVariableStatement(
+    undefined,
+    factory.createVariableDeclarationList(
+      [
+        factory.createVariableDeclaration(
+          factory.createIdentifier('defaultCallbacks'),
+          undefined,
+          undefined,
+          factory.createAsExpression(
+            factory.createObjectLiteralExpression(
+              clientCallbacks.map((name) =>
+                factory.createShorthandPropertyAssignment(
+                  factory.createIdentifier(name),
+                  undefined
+                )
+              ),
+              true
+            ),
+            factory.createTypeReferenceNode(
+              factory.createIdentifier('const'),
+              undefined
+            )
+          )
+        ),
+      ],
+      ts.NodeFlags.Const
+    )
+  );
+
+  return [...imports, defaultCallbacksDeclaration];
 };
 
-const getCreateClientFunctionFactory = () => {
+const getCreateClientFunctionFactory = (options: Options) => {
   const factory = ts.factory;
+  const shouldImportAllCallbacks = options.defaultClientCallbacks?.some(
+    (name) => name === 'all'
+  );
 
   return [
     factory.createFunctionDeclaration(
       [factory.createToken(ts.SyntaxKind.ExportKeyword)],
       undefined,
       factory.createIdentifier('createAPIClient'),
-      undefined,
+      [
+        factory.createTypeParameterDeclaration(
+          undefined,
+          factory.createIdentifier('Callbacks'),
+          factory.createTypeReferenceNode(
+            factory.createIdentifier('AllCallbacks'),
+            undefined
+          ),
+          undefined
+        ),
+      ],
       [
         factory.createParameterDeclaration(
           undefined,
@@ -99,6 +226,19 @@ const getCreateClientFunctionFactory = () => {
           undefined,
           factory.createTypeReferenceNode(
             factory.createIdentifier('CreateAPIQueryClientOptions'),
+            undefined
+          ),
+          undefined
+        ),
+        factory.createParameterDeclaration(
+          undefined,
+          undefined,
+          factory.createIdentifier('callbacks'),
+          shouldImportAllCallbacks
+            ? factory.createToken(ts.SyntaxKind.QuestionToken)
+            : undefined,
+          factory.createTypeReferenceNode(
+            factory.createIdentifier('Callbacks'),
             undefined
           ),
           undefined
@@ -119,7 +259,24 @@ const getCreateClientFunctionFactory = () => {
       [factory.createToken(ts.SyntaxKind.ExportKeyword)],
       undefined,
       factory.createIdentifier('createAPIClient'),
-      undefined,
+      [
+        factory.createTypeParameterDeclaration(
+          undefined,
+          factory.createIdentifier('Callbacks'),
+          factory.createTypeReferenceNode(factory.createIdentifier('Partial'), [
+            factory.createTypeReferenceNode(
+              factory.createIdentifier('AllCallbacks'),
+              undefined
+            ),
+          ]),
+          factory.createTypeReferenceNode(
+            factory.createIdentifier(
+              shouldImportAllCallbacks ? 'AllCallbacks' : 'DefaultCallbacks'
+            ),
+            undefined
+          )
+        ),
+      ],
       [
         factory.createParameterDeclaration(
           undefined,
@@ -128,6 +285,17 @@ const getCreateClientFunctionFactory = () => {
           undefined,
           factory.createTypeReferenceNode(
             factory.createIdentifier('CreateAPIBasicQueryClientOptions'),
+            undefined
+          ),
+          undefined
+        ),
+        factory.createParameterDeclaration(
+          undefined,
+          undefined,
+          factory.createIdentifier('callbacks'),
+          factory.createToken(ts.SyntaxKind.QuestionToken),
+          factory.createTypeReferenceNode(
+            factory.createIdentifier('Callbacks'),
             undefined
           ),
           undefined
@@ -141,7 +309,7 @@ const getCreateClientFunctionFactory = () => {
             undefined
           ),
           factory.createTypeReferenceNode(
-            factory.createIdentifier('ServiceMethods'),
+            factory.createIdentifier('Callbacks'),
             undefined
           ),
         ]
@@ -152,7 +320,24 @@ const getCreateClientFunctionFactory = () => {
       [factory.createToken(ts.SyntaxKind.ExportKeyword)],
       undefined,
       factory.createIdentifier('createAPIClient'),
-      undefined,
+      [
+        factory.createTypeParameterDeclaration(
+          undefined,
+          factory.createIdentifier('Callbacks'),
+          factory.createTypeReferenceNode(factory.createIdentifier('Partial'), [
+            factory.createTypeReferenceNode(
+              factory.createIdentifier('AllCallbacks'),
+              undefined
+            ),
+          ]),
+          factory.createTypeReferenceNode(
+            factory.createIdentifier(
+              shouldImportAllCallbacks ? 'AllCallbacks' : 'DefaultCallbacks'
+            ),
+            undefined
+          )
+        ),
+      ],
       [
         factory.createParameterDeclaration(
           undefined,
@@ -161,6 +346,17 @@ const getCreateClientFunctionFactory = () => {
           undefined,
           factory.createTypeReferenceNode(
             factory.createIdentifier('CreateAPIBasicClientOptions'),
+            undefined
+          ),
+          undefined
+        ),
+        factory.createParameterDeclaration(
+          undefined,
+          undefined,
+          factory.createIdentifier('callbacks'),
+          factory.createToken(ts.SyntaxKind.QuestionToken),
+          factory.createTypeReferenceNode(
+            factory.createIdentifier('Callbacks'),
             undefined
           ),
           undefined
@@ -174,7 +370,7 @@ const getCreateClientFunctionFactory = () => {
             undefined
           ),
           factory.createTypeReferenceNode(
-            factory.createIdentifier('ServiceMethods'),
+            factory.createIdentifier('Callbacks'),
             undefined
           ),
         ]
@@ -185,8 +381,37 @@ const getCreateClientFunctionFactory = () => {
       [factory.createToken(ts.SyntaxKind.ExportKeyword)],
       undefined,
       factory.createIdentifier('createAPIClient'),
-      undefined,
-      [],
+      [
+        factory.createTypeParameterDeclaration(
+          undefined,
+          factory.createIdentifier('Callbacks'),
+          factory.createTypeReferenceNode(factory.createIdentifier('Partial'), [
+            factory.createTypeReferenceNode(
+              factory.createIdentifier('AllCallbacks'),
+              undefined
+            ),
+          ]),
+          factory.createTypeReferenceNode(
+            factory.createIdentifier(
+              shouldImportAllCallbacks ? 'AllCallbacks' : 'DefaultCallbacks'
+            ),
+            undefined
+          )
+        ),
+      ],
+      [
+        factory.createParameterDeclaration(
+          undefined,
+          undefined,
+          factory.createIdentifier('callbacks'),
+          factory.createToken(ts.SyntaxKind.QuestionToken),
+          factory.createTypeReferenceNode(
+            factory.createIdentifier('Callbacks'),
+            undefined
+          ),
+          undefined
+        ),
+      ],
       factory.createTypeReferenceNode(
         factory.createIdentifier('APIUtilityClientServices'),
         [
@@ -195,7 +420,7 @@ const getCreateClientFunctionFactory = () => {
             undefined
           ),
           factory.createTypeReferenceNode(
-            factory.createIdentifier('ServiceMethods'),
+            factory.createIdentifier('Callbacks'),
             undefined
           ),
         ]
@@ -206,18 +431,59 @@ const getCreateClientFunctionFactory = () => {
       [factory.createToken(ts.SyntaxKind.ExportKeyword)],
       undefined,
       factory.createIdentifier('createAPIClient'),
-      undefined,
+      [
+        factory.createTypeParameterDeclaration(
+          undefined,
+          factory.createIdentifier('Callbacks'),
+          factory.createTypeReferenceNode(factory.createIdentifier('Partial'), [
+            factory.createTypeReferenceNode(
+              factory.createIdentifier('AllCallbacks'),
+              undefined
+            ),
+          ]),
+          factory.createTypeReferenceNode(
+            factory.createIdentifier(
+              shouldImportAllCallbacks ? 'AllCallbacks' : 'DefaultCallbacks'
+            ),
+            undefined
+          )
+        ),
+      ],
       [
         factory.createParameterDeclaration(
           undefined,
           undefined,
-          factory.createIdentifier('options'),
+          factory.createIdentifier('callbacksOrOptions'),
           factory.createToken(ts.SyntaxKind.QuestionToken),
+          factory.createUnionTypeNode([
+            factory.createTypeReferenceNode(
+              factory.createIdentifier('CreateAPIClientOptions'),
+              undefined
+            ),
+            factory.createTypeReferenceNode(
+              factory.createIdentifier('Callbacks'),
+              undefined
+            ),
+          ])
+        ),
+        factory.createParameterDeclaration(
+          undefined,
+          undefined,
+          factory.createIdentifier('callbacks'),
+          undefined,
           factory.createTypeReferenceNode(
-            factory.createIdentifier('CreateAPIClientOptions'),
+            factory.createIdentifier('Callbacks'),
             undefined
           ),
-          undefined
+          factory.createAsExpression(
+            factory.createIdentifier(
+              shouldImportAllCallbacks ? 'allCallbacks' : 'defaultCallbacks'
+            ),
+            factory.createTypeReferenceNode(
+              factory.createIdentifier('Callbacks'),
+              undefined
+            )
+          )
         ),
       ],
       factory.createUnionTypeNode([
@@ -231,6 +497,19 @@ const getCreateClientFunctionFactory = () => {
           ]
         ),
         factory.createTypeReferenceNode(
+          factory.createIdentifier('APIQueryClientServices'),
+          [
+            factory.createTypeReferenceNode(
+              factory.createIdentifier('Services'),
+              undefined
+            ),
+            factory.createTypeReferenceNode(
+              factory.createIdentifier('Callbacks'),
+              undefined
+            ),
+          ]
+        ),
+        factory.createTypeReferenceNode(
           factory.createIdentifier('APIBasicQueryClientServices'),
           [
             factory.createTypeReferenceNode(
@@ -238,7 +517,7 @@ const getCreateClientFunctionFactory = () => {
               undefined
             ),
             factory.createTypeReferenceNode(
-              factory.createIdentifier('ServiceMethods'),
+              factory.createIdentifier('Callbacks'),
               undefined
             ),
           ]
@@ -251,7 +530,7 @@ const getCreateClientFunctionFactory = () => {
               undefined
             ),
             factory.createTypeReferenceNode(
-              factory.createIdentifier('ServiceMethods'),
+              factory.createIdentifier('Callbacks'),
               undefined
             ),
           ]
@@ -264,7 +543,7 @@ const getCreateClientFunctionFactory = () => {
               undefined
             ),
             factory.createTypeReferenceNode(
-              factory.createIdentifier('ServiceMethods'),
+              factory.createIdentifier('Callbacks'),
               undefined
             ),
           ]
@@ -275,7 +554,7 @@ const getCreateClientFunctionFactory = () => {
           factory.createIfStatement(
             factory.createPrefixUnaryExpression(
               ts.SyntaxKind.ExclamationToken,
-              factory.createIdentifier('options')
+              factory.createIdentifier('callbacksOrOptions')
             ),
             factory.createReturnStatement(
               factory.createCallExpression(
@@ -293,7 +572,7 @@ const getCreateClientFunctionFactory = () => {
             factory.createBinaryExpression(
               factory.createStringLiteral('requestFn'),
               factory.createToken(ts.SyntaxKind.InKeyword),
-              factory.createIdentifier('options')
+              factory.createIdentifier('callbacksOrOptions')
             ),
             factory.createReturnStatement(
               factory.createCallExpression(
@@ -302,7 +581,26 @@ const getCreateClientFunctionFactory = () => {
                 [
                   factory.createIdentifier('services'),
                   factory.createIdentifier('callbacks'),
-                  factory.createIdentifier('options'),
+                  factory.createIdentifier('callbacksOrOptions'),
+                ]
+              )
+            ),
+            undefined
+          ),
+          factory.createIfStatement(
+            factory.createBinaryExpression(
+              factory.createStringLiteral('queryClient'),
+              factory.createToken(ts.SyntaxKind.InKeyword),
+              factory.createIdentifier('callbacksOrOptions')
+            ),
+            factory.createReturnStatement(
+              factory.createCallExpression(
+                factory.createIdentifier('qraftAPIClient'),
+                undefined,
+                [
+                  factory.createIdentifier('services'),
+                  factory.createIdentifier('callbacks'),
+                  factory.createIdentifier('callbacksOrOptions'),
                 ]
               )
             ),
@@ -314,8 +612,7 @@ const getCreateClientFunctionFactory = () => {
               undefined,
               [
                 factory.createIdentifier('services'),
-                factory.createIdentifier('callbacks'),
-                factory.createIdentifier('options'),
+                factory.createIdentifier('callbacksOrOptions'),
               ]
             )
           ),
@@ -323,12 +620,23 @@ const getCreateClientFunctionFactory = () => {
         true
       )
     ),
+    shouldImportAllCallbacks
+      ? null
+      : factory.createTypeAliasDeclaration(
+          undefined,
+          factory.createIdentifier('DefaultCallbacks'),
+          undefined,
+          factory.createTypeQueryNode(
+            factory.createIdentifier('defaultCallbacks'),
+            undefined
+          )
+        ),
     factory.createTypeAliasDeclaration(
       undefined,
-      factory.createIdentifier('ServiceMethods'),
+      factory.createIdentifier('AllCallbacks'),
       undefined,
       factory.createTypeQueryNode(
-        factory.createIdentifier('callbacks'),
+        factory.createIdentifier('allCallbacks'),
         undefined
       )
     ),
@@ -341,5 +649,5 @@ const getCreateClientFunctionFactory = () => {
         undefined
       )
     ),
-  ];
+  ].filter((node) => !!node);
 };

@@ -161,6 +161,7 @@ const generateClient = async (spinner: Ora, output: OutputOptions) => {
       getClientFactory({
         servicesDirName: output.servicesDirName,
         explicitImportExtensions: output.explicitImportExtensions,
+        defaultClientCallbacks: output.defaultClientCallbacks,
       })
     );
 
