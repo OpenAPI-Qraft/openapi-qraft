@@ -6099,6 +6099,7 @@ __metadata:
   dependencies:
     "@openapi-qraft/eslint-config": "workspace:*"
     "@openapi-qraft/plugin": "workspace:^"
+    "@openapi-qraft/tanstack-query-react-types": "workspace:*"
     "@openapi-qraft/test-fixtures": "workspace:*"
     "@openapi-qraft/ts-factory-code-generator": "workspace:*"
     camelcase: "npm:^8.0.0"
