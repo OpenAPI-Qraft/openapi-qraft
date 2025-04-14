@@ -1,6 +1,7 @@
 import { ServiceOperation } from '@openapi-qraft/plugin/lib/open-api/OpenAPIService';
 import camelcase from 'camelcase';
 import ts from 'typescript';
+import { createOperationCommonTSDoc } from '../../lib/createOperationCommonTSDoc.js';
 import { astToString } from '../astToString.js';
 import { createOperationMethodCallExpressionExampleNode } from './lib/createOperationMethodCallExpressionExampleNode.js';
 import { createOperationMethodParametersExampleNodes } from './lib/createOperationMethodParametersExampleNodes.js';
@@ -13,6 +14,7 @@ export const createUseIsFetchingOperationTSDocExample = (
     'Monitors the number of queries currently fetching, matching the provided filters.',
     'Useful for creating loading indicators or performing actions based on active requests.',
     '',
+    ...createOperationCommonTSDoc(operation),
     '@see {@link https://openapi-qraft.github.io/openapi-qraft/docs/hooks/useIsFetching|`useIsFetching(...)` documentation}',
     '@example Checks the total number of queries fetching from the specified service method,',
     'both normal and infinite. If no parameters are provided, no filtering is applied.',

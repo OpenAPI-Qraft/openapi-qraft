@@ -2,14 +2,29 @@ import { QueryClient } from '@tanstack/query-core';
 import { requestFn } from '../index.js';
 import { createAPIClient } from './fixtures/api/index.js';
 
-const qraft = createAPIClient({
-  queryClient: new QueryClient(),
-  requestFn: requestFn,
-  baseUrl: 'https://example.com',
-});
+/**
+ * Tests for correct parameter usage
+ */
 
+// Create client with only QueryClient
+const createBasicClient = () =>
+  createAPIClient({
+    queryClient: new QueryClient(),
+  });
+
+// Create client with a full set of parameters
+const createFullClient = () =>
+  createAPIClient({
+    queryClient: new QueryClient(),
+    requestFn: requestFn,
+    baseUrl: 'https://example.com',
+  });
+
+// 1. Inline parameters
 {
-  // Normal inline parameters
+  const qraft = createBasicClient();
+
+  // 1.1 Regular inline parameters
   qraft.files.getFiles.setQueryData(
     {
       query: { id__in: ['1', '2'] },
@@ -26,10 +41,8 @@ const qraft = createAPIClient({
       'x-monite-version': 'current',
     },
   });
-}
 
-{
-  // Const inline parameters
+  // 1.2 Const inline parameters (as const)
   qraft.files.getFiles.setQueryData(
     {
       query: { id__in: ['1', '2'] },
@@ -48,8 +61,10 @@ const qraft = createAPIClient({
   } as const);
 }
 
+// 2. External mutable parameters
 {
-  // External mutable parameters
+  const qraft = createFullClient();
+
   const parameters = {
     query: { id__in: ['1', '2'] },
     header: {
@@ -70,6 +85,10 @@ const qraft = createAPIClient({
     initialPageParam: {},
     getNextPageParam: () => undefined,
   });
+  qraft.files.getFiles.useSuspenseInfiniteQuery(parameters, {
+    initialPageParam: {},
+    getNextPageParam: () => undefined,
+  });
   void qraft.files.getFiles.fetchQuery({ parameters });
   void qraft.files.getFiles.fetchInfiniteQuery({
     parameters,
@@ -79,8 +98,10 @@ const qraft = createAPIClient({
   void qraft.files.getFiles({ parameters });
 }
 
+// 3. External const parameters (as const)
 {
-  // External const parameters
+  const qraft = createFullClient();
+
   const parameters = {
     query: { id__in: ['1', '2'] },
     header: {
@@ -89,7 +110,11 @@ const qraft = createAPIClient({
   } as const;
 
   const data = { query: { id__in: ['1'] } } as const;
+  const pageParam = {
+    query: { id__in: ['1'] },
+  } as const;
 
+  // 3.1 getFiles methods
   qraft.files.getFiles.setQueryData(parameters, data);
   qraft.files.getFiles.setInfiniteQueryData(parameters, (pages) => ({
     pages: [...(pages?.pages ?? []), data],
@@ -98,27 +123,69 @@ const qraft = createAPIClient({
   qraft.files.getFiles.getQueryData(parameters);
   qraft.files.getFiles.useQuery(parameters);
   qraft.files.getFiles.useInfiniteQuery(parameters, {
-    initialPageParam: {},
-    getNextPageParam: () => undefined,
+    initialPageParam: pageParam,
+    getNextPageParam: () => pageParam,
+    getPreviousPageParam: () => pageParam,
+  });
+  qraft.files.getFiles.useSuspenseInfiniteQuery(parameters, {
+    initialPageParam: pageParam,
+    getNextPageParam: () => pageParam,
+    getPreviousPageParam: () => pageParam,
   });
   void qraft.files.getFiles.fetchQuery({ parameters });
   void qraft.files.getFiles.fetchInfiniteQuery({
     parameters,
-    initialPageParam: {},
-    getNextPageParam: () => undefined,
+    initialPageParam: pageParam,
+    getNextPageParam: () => pageParam,
   });
   void qraft.files.getFiles({ parameters });
+
+  // 3.2 findAll methods
+  void qraft.files.findAll.fetchQuery({ parameters });
+  void qraft.files.findAll.fetchQuery();
+  void qraft.files.findAll.fetchQuery({});
+
+  qraft.files.findAll.useQuery();
+  qraft.files.findAll.useInfiniteQuery(parameters, {
+    initialPageParam: pageParam,
+    getNextPageParam: () => pageParam,
+    getPreviousPageParam: () => pageParam,
+  });
+  qraft.files.findAll.useSuspenseInfiniteQuery(parameters, {
+    initialPageParam: pageParam,
+    getNextPageParam: () => pageParam,
+    getPreviousPageParam: () => pageParam,
+  });
+  void qraft.files.findAll.fetchInfiniteQuery({
+    pages: 1,
+    parameters,
+    getNextPageParam: () => pageParam,
+  });
+  void qraft.files.findAll.fetchInfiniteQuery({
+    pages: 1,
+    getNextPageParam: () => pageParam,
+  });
+  void qraft.files.findAll.fetchInfiniteQuery({});
+  void qraft.files.findAll.fetchInfiniteQuery();
 }
 
+// 4. Tests for useMutation
 {
-  // External const parameters for useMutation
+  const qraft = createFullClient();
+
   const parameters = { query: { all: true } } as const;
   qraft.files.deleteFiles.useMutation(parameters);
   void qraft.files.deleteFiles({ parameters });
 }
 
+/**
+ * Tests for incorrect usage (type checking)
+ */
+
+// 5. Incorrect parameters
 {
-  // Incorrect usage
+  const qraft = createBasicClient();
+
   qraft.files.getFiles.setQueryData(
     {
       // @ts-expect-error - OK, incorrect usage
@@ -152,4 +219,67 @@ const qraft = createAPIClient({
       },
     } as const
   );
+
+  const parameters = {
+    query: { id__in: ['1', '2'] },
+    header: { 'x-monite-version': '1.0.0' },
+  } as const;
+
+  // @ts-expect-error - OK, incorrect usage (not existing method)
+  qraft.files.getFiles.useQuery(parameters);
+  // @ts-expect-error - OK, incorrect usage (not existing method)
+  qraft.files.getFiles.useInfiniteQuery(parameters, {
+    initialPageParam: {},
+    getNextPageParam: () => undefined,
+  });
+  // @ts-expect-error - OK, incorrect usage (not existing method)
+  void qraft.files.getFiles.fetchQuery({ parameters });
+  // @ts-expect-error - OK, incorrect usage (not existing method)
+  void qraft.files.getFiles.fetchInfiniteQuery({
+    parameters,
+    initialPageParam: {},
+    getNextPageParam: () => undefined,
+  });
+}
+
+// 6. Incorrect method usage with parameters
+{
+  const qraft = createFullClient();
+
+  const parameters = {
+    query: { id__in: ['1', '2'] },
+    header: { 'x-monite-version': '1.0.0' },
+  } as const;
+
+  // @ts-expect-error - OK, incorrect usage
+  void qraft.files.getFiles.fetchInfiniteQuery({ parameters });
+  // @ts-expect-error - OK, incorrect usage
+  void qraft.files.getFiles.fetchInfiniteQuery({
+    // initialPageParam: parameters, // OK, incorrect usage
+    parameters,
+    getNextPageParam: () => parameters,
+  });
+
+  // @ts-expect-error - OK, incorrect usage (not existing method)
+  qraft.files.getFiles.useQuery();
+  // @ts-expect-error - OK, incorrect usage (not existing method)
+  qraft.files.getFiles.useInfiniteQuery();
+  // @ts-expect-error - OK, incorrect usage (not existing method)
+  void qraft.files.getFiles.fetchQuery({});
+  // @ts-expect-error - OK, incorrect usage (not existing method)
+  void qraft.files.getFiles.fetchInfiniteQuery({});
+}
+
+// 7. Additional incorrect usage checks
+{
+  const qraft = createFullClient();
+
+  const parameters = { query: { id__in: ['1', '2'] } } as const;
+
+  // @ts-expect-error - OK, incorrect usage
+  void qraft.files.findAll.fetchInfiniteQuery({
+    // getNextPageParam: () => parameters, // OK, incorrect usage
+    pages: 1,
+    parameters,
+  });
 }

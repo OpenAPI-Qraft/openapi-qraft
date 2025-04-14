@@ -1,5 +1,6 @@
 import type { ServiceOperation } from '@openapi-qraft/plugin/lib/open-api/OpenAPIService';
 import ts from 'typescript';
+import { createOperationCommonTSDoc } from '../../lib/createOperationCommonTSDoc.js';
 import { astToString } from '../astToString.js';
 import { createOperationMethodCallExpressionExampleNode } from './lib/createOperationMethodCallExpressionExampleNode.js';
 import { createOperationMethodParametersExampleNodes } from './lib/createOperationMethodParametersExampleNodes.js';
@@ -14,6 +15,7 @@ export const createUseMutationOperationTSDocExample = (
     'Enables performing asynchronous data mutation operations such as POST, PUT, PATCH, or DELETE requests.',
     'Handles loading state, optimistic updates, and error handling.',
     '',
+    ...createOperationCommonTSDoc(operation),
     '@see {@link https://openapi-qraft.github.io/openapi-qraft/docs/hooks/useMutation|`useMutation(...)` documentation}',
     '@example Mutation with predefined parameters, e.g., for updating',
     '```ts',

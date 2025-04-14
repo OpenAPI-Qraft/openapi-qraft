@@ -73,17 +73,17 @@ export interface ApprovalPoliciesService {
          * @summary Get an approval policy by ID
          * @description Retrieve a specific approval policy.
          */
-        fetchInfiniteQuery<TPageParam extends GetApprovalPoliciesIdParameters>(options: ServiceOperationFetchInfiniteQueryOptions<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdData, GetApprovalPoliciesIdParameters, TPageParam, GetApprovalPoliciesIdError>): Promise<OperationInfiniteData<GetApprovalPoliciesIdData, GetApprovalPoliciesIdParameters>>;
+        fetchInfiniteQuery<TPageParam extends GetApprovalPoliciesIdParameters>(options: ServiceOperationFetchInfiniteQueryOptions<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdData, GetApprovalPoliciesIdParameters, DeepReadonly<TPageParam>, GetApprovalPoliciesIdError>): Promise<OperationInfiniteData<GetApprovalPoliciesIdData, GetApprovalPoliciesIdParameters>>;
         /**
          * @summary Get an approval policy by ID
          * @description Retrieve a specific approval policy.
          */
-        prefetchInfiniteQuery<TPageParam extends GetApprovalPoliciesIdParameters>(options: ServiceOperationFetchInfiniteQueryOptions<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdData, GetApprovalPoliciesIdParameters, TPageParam, GetApprovalPoliciesIdError>): Promise<void>;
+        prefetchInfiniteQuery<TPageParam extends GetApprovalPoliciesIdParameters>(options: ServiceOperationFetchInfiniteQueryOptions<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdData, GetApprovalPoliciesIdParameters, DeepReadonly<TPageParam>, GetApprovalPoliciesIdError>): Promise<void>;
         /**
          * @summary Get an approval policy by ID
          * @description Retrieve a specific approval policy.
          */
-        ensureInfiniteQueryData<TPageParam extends GetApprovalPoliciesIdParameters>(options: ServiceOperationEnsureInfiniteQueryDataOptions<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdData, GetApprovalPoliciesIdParameters, TPageParam, GetApprovalPoliciesIdError>): Promise<OperationInfiniteData<GetApprovalPoliciesIdData, GetApprovalPoliciesIdParameters>>;
+        ensureInfiniteQueryData<TPageParam extends GetApprovalPoliciesIdParameters>(options: ServiceOperationEnsureInfiniteQueryDataOptions<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdData, GetApprovalPoliciesIdParameters, DeepReadonly<TPageParam>, GetApprovalPoliciesIdError>): Promise<OperationInfiniteData<GetApprovalPoliciesIdData, GetApprovalPoliciesIdParameters>>;
         /**
          * @summary Get an approval policy by ID
          * @description Retrieve a specific approval policy.
@@ -188,6 +188,8 @@ export interface ApprovalPoliciesService {
          * Performs asynchronous data fetching with support for infinite scrolling scenarios.
          * Manages paginated data and provides utilities for fetching additional pages.
          *
+         * @summary Get an approval policy by ID
+         * @description Retrieve a specific approval policy.
          * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/hooks/useInfiniteQuery|`useInfiniteQuery(...)` documentation}
          *
          * @example Infinite Query
@@ -213,11 +215,13 @@ export interface ApprovalPoliciesService {
          * fetchNextPage(); // Fetch the next page
          * ```
          */
-        useInfiniteQuery<TPageParam extends GetApprovalPoliciesIdParameters, TQueryFnData = GetApprovalPoliciesIdData, TData = OperationInfiniteData<TQueryFnData, GetApprovalPoliciesIdParameters>>(parameters: ServiceOperationInfiniteQueryKey<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdParameters> | (DeepReadonly<GetApprovalPoliciesIdParameters>), options: Omit<UndefinedInitialDataInfiniteOptions<TQueryFnData, GetApprovalPoliciesIdError, TData, ServiceOperationInfiniteQueryKey<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdParameters>, PartialParameters<TPageParam>>, "queryKey" | "getPreviousPageParam" | "getNextPageParam" | "initialPageParam"> & InfiniteQueryPageParamsOptions<TQueryFnData, PartialParameters<TPageParam>>): UseInfiniteQueryResult<TData, GetApprovalPoliciesIdError | Error>;
+        useInfiniteQuery<TPageParam extends GetApprovalPoliciesIdParameters, TQueryFnData = GetApprovalPoliciesIdData, TData = OperationInfiniteData<TQueryFnData, GetApprovalPoliciesIdParameters>>(parameters: ServiceOperationInfiniteQueryKey<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdParameters> | (DeepReadonly<GetApprovalPoliciesIdParameters>), options: Omit<UndefinedInitialDataInfiniteOptions<TQueryFnData, GetApprovalPoliciesIdError, TData, ServiceOperationInfiniteQueryKey<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdParameters>, PartialParameters<DeepReadonly<TPageParam>>>, "queryKey" | "getPreviousPageParam" | "getNextPageParam" | "initialPageParam"> & InfiniteQueryPageParamsOptions<TQueryFnData, PartialParameters<DeepReadonly<TPageParam>>>): UseInfiniteQueryResult<TData, GetApprovalPoliciesIdError | Error>;
         /**
          * Performs asynchronous data fetching with support for infinite scrolling scenarios.
          * Manages paginated data and provides utilities for fetching additional pages.
          *
+         * @summary Get an approval policy by ID
+         * @description Retrieve a specific approval policy.
          * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/hooks/useInfiniteQuery|`useInfiniteQuery(...)` documentation}
          *
          * @example Infinite Query
@@ -243,11 +247,13 @@ export interface ApprovalPoliciesService {
          * fetchNextPage(); // Fetch the next page
          * ```
          */
-        useInfiniteQuery<TPageParam extends GetApprovalPoliciesIdParameters, TQueryFnData = GetApprovalPoliciesIdData, TData = OperationInfiniteData<TQueryFnData, GetApprovalPoliciesIdParameters>>(parameters: ServiceOperationInfiniteQueryKey<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdParameters> | (DeepReadonly<GetApprovalPoliciesIdParameters>), options: Omit<DefinedInitialDataInfiniteOptions<TQueryFnData, GetApprovalPoliciesIdError, TData, ServiceOperationInfiniteQueryKey<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdParameters>, PartialParameters<TPageParam>>, "queryKey" | "getPreviousPageParam" | "getNextPageParam" | "initialPageParam"> & InfiniteQueryPageParamsOptions<GetApprovalPoliciesIdData, PartialParameters<TPageParam>>): DefinedUseInfiniteQueryResult<TData, GetApprovalPoliciesIdError | Error>;
+        useInfiniteQuery<TPageParam extends GetApprovalPoliciesIdParameters, TQueryFnData = GetApprovalPoliciesIdData, TData = OperationInfiniteData<TQueryFnData, GetApprovalPoliciesIdParameters>>(parameters: ServiceOperationInfiniteQueryKey<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdParameters> | (DeepReadonly<GetApprovalPoliciesIdParameters>), options: Omit<DefinedInitialDataInfiniteOptions<TQueryFnData, GetApprovalPoliciesIdError, TData, ServiceOperationInfiniteQueryKey<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdParameters>, PartialParameters<DeepReadonly<TPageParam>>>, "queryKey" | "getPreviousPageParam" | "getNextPageParam" | "initialPageParam"> & InfiniteQueryPageParamsOptions<GetApprovalPoliciesIdData, PartialParameters<DeepReadonly<TPageParam>>>): DefinedUseInfiniteQueryResult<TData, GetApprovalPoliciesIdError | Error>;
         /**
          * Monitors the number of queries currently fetching, matching the provided filters.
          * Useful for creating loading indicators or performing actions based on active requests.
          *
+         * @summary Get an approval policy by ID
+         * @description Retrieve a specific approval policy.
          * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/hooks/useIsFetching|`useIsFetching(...)` documentation}
          * @example Checks the total number of queries fetching from the specified service method,
          * both normal and infinite. If no parameters are provided, no filtering is applied.
@@ -406,6 +412,8 @@ export interface ApprovalPoliciesService {
          * Manages paginated data and provides utilities for fetching additional pages.
          * It functions similarly to `useInfiniteQuery`, but with added support for React Suspense.
          *
+         * @summary Get an approval policy by ID
+         * @description Retrieve a specific approval policy.
          * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/hooks/useSuspenseInfiniteQuery|`useSuspenseInfiniteQuery(...)` documentation}
          *
          * @example Suspense Infinite Query
@@ -431,7 +439,7 @@ export interface ApprovalPoliciesService {
          * fetchNextPage(); // Fetch the next page
          * ```
          */
-        useSuspenseInfiniteQuery<TPageParam extends GetApprovalPoliciesIdParameters, TData = GetApprovalPoliciesIdData>(parameters: ServiceOperationInfiniteQueryKey<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdParameters> | (DeepReadonly<GetApprovalPoliciesIdParameters>), options: Omit<UseSuspenseInfiniteQueryOptions<GetApprovalPoliciesIdData, GetApprovalPoliciesIdError, OperationInfiniteData<TData, GetApprovalPoliciesIdParameters>, GetApprovalPoliciesIdData, ServiceOperationInfiniteQueryKey<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdParameters>, PartialParameters<TPageParam>>, "queryKey" | "getPreviousPageParam" | "getNextPageParam" | "initialPageParam"> & InfiniteQueryPageParamsOptions<GetApprovalPoliciesIdData, PartialParameters<TPageParam>>): UseSuspenseInfiniteQueryResult<OperationInfiniteData<TData, GetApprovalPoliciesIdParameters>, GetApprovalPoliciesIdError | Error>;
+        useSuspenseInfiniteQuery<TPageParam extends GetApprovalPoliciesIdParameters, TData = GetApprovalPoliciesIdData>(parameters: ServiceOperationInfiniteQueryKey<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdParameters> | (DeepReadonly<GetApprovalPoliciesIdParameters>), options: Omit<UseSuspenseInfiniteQueryOptions<GetApprovalPoliciesIdData, GetApprovalPoliciesIdError, OperationInfiniteData<TData, GetApprovalPoliciesIdParameters>, GetApprovalPoliciesIdData, ServiceOperationInfiniteQueryKey<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdParameters>, PartialParameters<DeepReadonly<TPageParam>>>, "queryKey" | "getPreviousPageParam" | "getNextPageParam" | "initialPageParam"> & InfiniteQueryPageParamsOptions<GetApprovalPoliciesIdData, PartialParameters<DeepReadonly<TPageParam>>>): UseSuspenseInfiniteQueryResult<OperationInfiniteData<TData, GetApprovalPoliciesIdParameters>, GetApprovalPoliciesIdError | Error>;
         /**
          * Allows you to execute multiple asynchronous data fetching operations concurrently with Suspense support.
          * Similar to useQueries but integrates with React Suspense for loading states.
@@ -554,6 +562,8 @@ export interface ApprovalPoliciesService {
          * Enables performing asynchronous data mutation operations such as POST, PUT, PATCH, or DELETE requests.
          * Handles loading state, optimistic updates, and error handling.
          *
+         * @summary Delete an approval policy
+         * @description Delete an existing approval policy.
          * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/hooks/useMutation|`useMutation(...)` documentation}
          * @example Mutation with predefined parameters, e.g., for updating
          * ```ts
@@ -594,6 +604,8 @@ export interface ApprovalPoliciesService {
          * Enables performing asynchronous data mutation operations such as POST, PUT, PATCH, or DELETE requests.
          * Handles loading state, optimistic updates, and error handling.
          *
+         * @summary Delete an approval policy
+         * @description Delete an existing approval policy.
          * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/hooks/useMutation|`useMutation(...)` documentation}
          * @example Mutation with predefined parameters, e.g., for updating
          * ```ts
@@ -731,6 +743,8 @@ export interface ApprovalPoliciesService {
          * Enables performing asynchronous data mutation operations such as POST, PUT, PATCH, or DELETE requests.
          * Handles loading state, optimistic updates, and error handling.
          *
+         * @summary Update an approval policy
+         * @description Update an existing approval policy.
          * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/hooks/useMutation|`useMutation(...)` documentation}
          * @example Mutation with predefined parameters, e.g., for updating
          * ```ts
@@ -771,6 +785,8 @@ export interface ApprovalPoliciesService {
          * Enables performing asynchronous data mutation operations such as POST, PUT, PATCH, or DELETE requests.
          * Handles loading state, optimistic updates, and error handling.
          *
+         * @summary Update an approval policy
+         * @description Update an existing approval policy.
          * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/hooks/useMutation|`useMutation(...)` documentation}
          * @example Mutation with predefined parameters, e.g., for updating
          * ```ts

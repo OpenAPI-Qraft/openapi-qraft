@@ -77,7 +77,7 @@ type FetchInfiniteQueryPages<TQueryFnData = unknown, TPageParam = unknown> =
   | {
       pages: number;
       getNextPageParam: GetNextPageParamFunction<
-        PartialParameters<TPageParam>,
+        PartialParameters<DeepReadonly<TPageParam>>,
         TQueryFnData
       >;
     };
@@ -115,11 +115,19 @@ type FetchInfiniteQueryOptionsByQueryKey<
   TParams,
   TPageParam,
   TError
-> & {
+> &
+  (AreAllOptional<TParams> extends true
+    ? Partial<FetchInfiniteQueryOptionsQueryKey<TSchema, TParams>>
+    : FetchInfiniteQueryOptionsQueryKey<TSchema, TParams>);
+
+type FetchInfiniteQueryOptionsQueryKey<
+  TSchema extends { url: string; method: string },
+  TParams,
+> = {
   /**
    * Fetch Queries by query key
    */
-  queryKey?: ServiceOperationInfiniteQueryKey<TSchema, TParams>;
+  queryKey: ServiceOperationInfiniteQueryKey<TSchema, TParams>;
   parameters?: never;
 };
 
@@ -135,11 +143,16 @@ type FetchInfiniteQueryOptionsByParameters<
   TParams,
   TPageParam,
   TError
-> & {
+> &
+  (AreAllOptional<TParams> extends true
+    ? Partial<FetchInfiniteQueryOptionsParameters<TParams>>
+    : FetchInfiniteQueryOptionsParameters<TParams>);
+
+type FetchInfiniteQueryOptionsParameters<TParams> = {
   /**
    * Fetch Queries by parameters
    */
-  parameters?: DeepReadonly<TParams>;
+  parameters: DeepReadonly<TParams>;
   queryKey?: never;
 };
 
