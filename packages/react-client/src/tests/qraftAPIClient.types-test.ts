@@ -33,6 +33,22 @@ client.files.deleteFiles.useQuery();
 client.files.deleteFiles.useQuery;
 // @ts-expect-error - OK, illegal usage
 client.files.deleteFiles.getInfiniteQueryKey;
+const parameters = {
+  header: { 'x-monite-version': '1.0.0' },
+  query: { id__in: ['1', '2'] },
+} as const;
+client.files.getFiles.fetchQuery({ parameters });
+client.files.getFiles.useQuery(parameters);
+client.files.getFiles.fetchQuery({
+  parameters: {
+    header: { 'x-monite-version': '1.0.0' },
+    query: { id__in: ['1', '2'] },
+  },
+});
+client.files.getFiles.useQuery({
+  header: { 'x-monite-version': '1.0.0' },
+  query: { id__in: ['1', '2'] },
+});
 
 //// APIUtilityClientServices ////
 const utilityClient = qraftAPIClient(services, callbacks);
