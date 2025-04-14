@@ -1,5 +1,6 @@
 import { ServiceOperation } from '@openapi-qraft/plugin/lib/open-api/OpenAPIService';
 import ts from 'typescript';
+import { createOperationCommonTSDoc } from '../../lib/createOperationCommonTSDoc.js';
 import { astToString } from '../astToString.js';
 import { createInfiniteQueryOptionsArgumentExamplePropertyAssignmentNodes } from './createUseInfiniteQueryOperationTSDocExample.js';
 import { createOperationMethodCallExpressionExampleNode } from './lib/createOperationMethodCallExpressionExampleNode.js';
@@ -16,6 +17,7 @@ export const createUseSuspenseInfiniteQueryOperationTSDocExample = (
     'Manages paginated data and provides utilities for fetching additional pages.',
     'It functions similarly to `useInfiniteQuery`, but with added support for React Suspense.',
     '',
+    ...createOperationCommonTSDoc(operation),
     '@see {@link https://openapi-qraft.github.io/openapi-qraft/docs/hooks/useSuspenseInfiniteQuery|`useSuspenseInfiniteQuery(...)` documentation}',
     '',
   ];

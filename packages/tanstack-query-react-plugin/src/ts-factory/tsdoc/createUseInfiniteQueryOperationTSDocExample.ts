@@ -1,6 +1,7 @@
 import { ServiceOperation } from '@openapi-qraft/plugin/lib/open-api/OpenAPIService';
 import camelcase from 'camelcase';
 import ts from 'typescript';
+import { createOperationCommonTSDoc } from '../../lib/createOperationCommonTSDoc.js';
 import { astToString } from '../astToString.js';
 import { createOperationMethodCallExpressionExampleNode } from './lib/createOperationMethodCallExpressionExampleNode.js';
 import { createOperationMethodParametersExampleNodes } from './lib/createOperationMethodParametersExampleNodes.js';
@@ -15,6 +16,7 @@ export const createUseInfiniteQueryOperationTSDocExample = (
     'Performs asynchronous data fetching with support for infinite scrolling scenarios.',
     'Manages paginated data and provides utilities for fetching additional pages.',
     '',
+    ...createOperationCommonTSDoc(operation),
     '@see {@link https://openapi-qraft.github.io/openapi-qraft/docs/hooks/useInfiniteQuery|`useInfiniteQuery(...)` documentation}',
     '',
   ];
