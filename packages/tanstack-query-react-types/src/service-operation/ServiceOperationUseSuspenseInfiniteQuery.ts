@@ -33,7 +33,7 @@ export interface ServiceOperationUseSuspenseInfiniteQuery<
         OperationInfiniteData<TData, TParams>,
         TOperationQueryFnData,
         ServiceOperationInfiniteQueryKey<TSchema, TParams>,
-        PartialParameters<TPageParam>
+        PartialParameters<DeepReadonly<TPageParam>>
       >,
       | 'queryKey'
       | 'getPreviousPageParam'
@@ -42,7 +42,7 @@ export interface ServiceOperationUseSuspenseInfiniteQuery<
     > &
       InfiniteQueryPageParamsOptions<
         TOperationQueryFnData,
-        PartialParameters<TPageParam>
+        PartialParameters<DeepReadonly<TPageParam>>
       >
   ): UseSuspenseInfiniteQueryResult<
     OperationInfiniteData<TData, TParams>,

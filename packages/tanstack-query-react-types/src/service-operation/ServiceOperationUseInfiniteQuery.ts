@@ -41,7 +41,7 @@ export interface ServiceOperationUseInfiniteQuery<
         TError,
         TData,
         ServiceOperationInfiniteQueryKey<TSchema, TParams>,
-        PartialParameters<TPageParam>
+        PartialParameters<DeepReadonly<TPageParam>>
       >,
       | 'queryKey'
       | 'getPreviousPageParam'
@@ -50,7 +50,7 @@ export interface ServiceOperationUseInfiniteQuery<
     > &
       InfiniteQueryPageParamsOptions<
         TQueryFnData,
-        PartialParameters<TPageParam>
+        PartialParameters<DeepReadonly<TPageParam>>
       >
   ): UseInfiniteQueryResult<TData, TError | Error>;
 
@@ -70,7 +70,7 @@ export interface ServiceOperationUseInfiniteQuery<
         TError,
         TData,
         ServiceOperationInfiniteQueryKey<TSchema, TParams>,
-        PartialParameters<TPageParam>
+        PartialParameters<DeepReadonly<TPageParam>>
       >,
       | 'queryKey'
       | 'getPreviousPageParam'
@@ -79,7 +79,7 @@ export interface ServiceOperationUseInfiniteQuery<
     > &
       InfiniteQueryPageParamsOptions<
         TOperationQueryFnData,
-        PartialParameters<TPageParam>
+        PartialParameters<DeepReadonly<TPageParam>>
       >
   ): DefinedUseInfiniteQueryResult<TData, TError | Error>;
 }
