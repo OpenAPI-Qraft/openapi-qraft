@@ -4,6 +4,7 @@ import type {
   FetchQueryOptions,
   QueryFunction,
 } from '@tanstack/query-core';
+import type { AreAllOptional } from './AreAllOptional.js';
 import type { DeepReadonly } from './DeepReadonly.js';
 import type { ServiceOperationQueryKey } from './ServiceOperationKey.js';
 
@@ -48,31 +49,44 @@ type FetchQueryOptionsBase<
   'queryKey' | 'queryFn'
 >;
 
-interface FetchQueryOptionsByQueryKey<
+type FetchQueryOptionsByQueryKey<
   TSchema extends { url: string; method: string },
   TQueryFnData,
-  TParams = {},
+  TParams,
   TError = DefaultError,
-> extends FetchQueryOptionsBase<TSchema, TQueryFnData, TParams, TError> {
+> = FetchQueryOptionsBase<TSchema, TQueryFnData, TParams, TError> &
+  (AreAllOptional<TParams> extends true
+    ? Partial<FetchQueryOptionsQueryKey<TSchema, TParams>>
+    : FetchQueryOptionsQueryKey<TSchema, TParams>);
+
+type FetchQueryOptionsQueryKey<
+  TSchema extends { url: string; method: string },
+  TParams,
+> = {
   /**
    * Fetch Queries by query key
    */
   queryKey: ServiceOperationQueryKey<TSchema, TParams>;
   parameters?: never;
-}
+};
 
-interface FetchQueryOptionsByParameters<
+type FetchQueryOptionsByParameters<
   TSchema extends { url: string; method: string },
   TQueryFnData,
-  TParams = {},
+  TParams,
   TError = DefaultError,
-> extends FetchQueryOptionsBase<TSchema, TQueryFnData, TParams, TError> {
+> = FetchQueryOptionsBase<TSchema, TQueryFnData, TParams, TError> &
+  (AreAllOptional<TParams> extends true
+    ? Partial<FetchQueryOptionsParameters<TParams>>
+    : FetchQueryOptionsParameters<TParams>);
+
+type FetchQueryOptionsParameters<TParams> = {
   /**
    * Fetch Queries by parameters
    */
   parameters: DeepReadonly<TParams>;
   queryKey?: never;
-}
+};
 
 type FetchQueryOptionsQueryFn<
   TSchema extends { url: string; method: string },
