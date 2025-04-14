@@ -1,5 +1,12 @@
 # @openapi-qraft/tanstack-query-react-types
 
+## 2.3.2
+
+### Patch Changes
+
+- 1741d74: Allow the use of fetch\* query methods without optional parameters when appropriate.
+- cae8247: Allow read-only objects to be used as query and body parameters in client methods.
+
 ## 2.3.1
 
 ### Patch Changes
