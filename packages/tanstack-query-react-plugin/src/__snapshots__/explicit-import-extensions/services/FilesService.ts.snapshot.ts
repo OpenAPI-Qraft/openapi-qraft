@@ -51,11 +51,11 @@ export interface FilesService {
          */
         useQuery<TData = GetFilesData>(parameters: ServiceOperationQueryKey<GetFilesSchema, GetFilesParameters> | (DeepReadonly<GetFilesParameters>), options: Omit<DefinedInitialDataOptions<GetFilesData, GetFilesError, TData, ServiceOperationQueryKey<GetFilesSchema, GetFilesParameters>>, "queryKey">): DefinedUseQueryResult<TData, GetFilesError | Error>;
         /** @summary Get a files by ID */
-        fetchInfiniteQuery<TPageParam extends GetFilesParameters>(options: ServiceOperationFetchInfiniteQueryOptions<GetFilesSchema, GetFilesData, GetFilesParameters, TPageParam, GetFilesError>): Promise<OperationInfiniteData<GetFilesData, GetFilesParameters>>;
+        fetchInfiniteQuery<TPageParam extends GetFilesParameters>(options: ServiceOperationFetchInfiniteQueryOptions<GetFilesSchema, GetFilesData, GetFilesParameters, DeepReadonly<TPageParam>, GetFilesError>): Promise<OperationInfiniteData<GetFilesData, GetFilesParameters>>;
         /** @summary Get a files by ID */
-        prefetchInfiniteQuery<TPageParam extends GetFilesParameters>(options: ServiceOperationFetchInfiniteQueryOptions<GetFilesSchema, GetFilesData, GetFilesParameters, TPageParam, GetFilesError>): Promise<void>;
+        prefetchInfiniteQuery<TPageParam extends GetFilesParameters>(options: ServiceOperationFetchInfiniteQueryOptions<GetFilesSchema, GetFilesData, GetFilesParameters, DeepReadonly<TPageParam>, GetFilesError>): Promise<void>;
         /** @summary Get a files by ID */
-        ensureInfiniteQueryData<TPageParam extends GetFilesParameters>(options: ServiceOperationEnsureInfiniteQueryDataOptions<GetFilesSchema, GetFilesData, GetFilesParameters, TPageParam, GetFilesError>): Promise<OperationInfiniteData<GetFilesData, GetFilesParameters>>;
+        ensureInfiniteQueryData<TPageParam extends GetFilesParameters>(options: ServiceOperationEnsureInfiniteQueryDataOptions<GetFilesSchema, GetFilesData, GetFilesParameters, DeepReadonly<TPageParam>, GetFilesError>): Promise<OperationInfiniteData<GetFilesData, GetFilesParameters>>;
         /** @summary Get a files by ID */
         fetchQuery(options: ServiceOperationFetchQueryOptions<GetFilesSchema, GetFilesData, GetFilesParameters, GetFilesError>): Promise<GetFilesData>;
         /** @summary Get a files by ID */
@@ -131,7 +131,7 @@ export interface FilesService {
          * fetchNextPage(); // Fetch the next page
          * ```
          */
-        useInfiniteQuery<TPageParam extends GetFilesParameters, TQueryFnData = GetFilesData, TData = OperationInfiniteData<TQueryFnData, GetFilesParameters>>(parameters: ServiceOperationInfiniteQueryKey<GetFilesSchema, GetFilesParameters> | (DeepReadonly<GetFilesParameters>), options: Omit<UndefinedInitialDataInfiniteOptions<TQueryFnData, GetFilesError, TData, ServiceOperationInfiniteQueryKey<GetFilesSchema, GetFilesParameters>, PartialParameters<TPageParam>>, "queryKey" | "getPreviousPageParam" | "getNextPageParam" | "initialPageParam"> & InfiniteQueryPageParamsOptions<TQueryFnData, PartialParameters<TPageParam>>): UseInfiniteQueryResult<TData, GetFilesError | Error>;
+        useInfiniteQuery<TPageParam extends GetFilesParameters, TQueryFnData = GetFilesData, TData = OperationInfiniteData<TQueryFnData, GetFilesParameters>>(parameters: ServiceOperationInfiniteQueryKey<GetFilesSchema, GetFilesParameters> | (DeepReadonly<GetFilesParameters>), options: Omit<UndefinedInitialDataInfiniteOptions<TQueryFnData, GetFilesError, TData, ServiceOperationInfiniteQueryKey<GetFilesSchema, GetFilesParameters>, PartialParameters<DeepReadonly<TPageParam>>>, "queryKey" | "getPreviousPageParam" | "getNextPageParam" | "initialPageParam"> & InfiniteQueryPageParamsOptions<TQueryFnData, PartialParameters<DeepReadonly<TPageParam>>>): UseInfiniteQueryResult<TData, GetFilesError | Error>;
         /**
          * Performs asynchronous data fetching with support for infinite scrolling scenarios.
          * Manages paginated data and provides utilities for fetching additional pages.
@@ -161,7 +161,7 @@ export interface FilesService {
          * fetchNextPage(); // Fetch the next page
          * ```
          */
-        useInfiniteQuery<TPageParam extends GetFilesParameters, TQueryFnData = GetFilesData, TData = OperationInfiniteData<TQueryFnData, GetFilesParameters>>(parameters: ServiceOperationInfiniteQueryKey<GetFilesSchema, GetFilesParameters> | (DeepReadonly<GetFilesParameters>), options: Omit<DefinedInitialDataInfiniteOptions<TQueryFnData, GetFilesError, TData, ServiceOperationInfiniteQueryKey<GetFilesSchema, GetFilesParameters>, PartialParameters<TPageParam>>, "queryKey" | "getPreviousPageParam" | "getNextPageParam" | "initialPageParam"> & InfiniteQueryPageParamsOptions<GetFilesData, PartialParameters<TPageParam>>): DefinedUseInfiniteQueryResult<TData, GetFilesError | Error>;
+        useInfiniteQuery<TPageParam extends GetFilesParameters, TQueryFnData = GetFilesData, TData = OperationInfiniteData<TQueryFnData, GetFilesParameters>>(parameters: ServiceOperationInfiniteQueryKey<GetFilesSchema, GetFilesParameters> | (DeepReadonly<GetFilesParameters>), options: Omit<DefinedInitialDataInfiniteOptions<TQueryFnData, GetFilesError, TData, ServiceOperationInfiniteQueryKey<GetFilesSchema, GetFilesParameters>, PartialParameters<DeepReadonly<TPageParam>>>, "queryKey" | "getPreviousPageParam" | "getNextPageParam" | "initialPageParam"> & InfiniteQueryPageParamsOptions<GetFilesData, PartialParameters<DeepReadonly<TPageParam>>>): DefinedUseInfiniteQueryResult<TData, GetFilesError | Error>;
         /**
          * Monitors the number of queries currently fetching, matching the provided filters.
          * Useful for creating loading indicators or performing actions based on active requests.
@@ -316,7 +316,7 @@ export interface FilesService {
          * fetchNextPage(); // Fetch the next page
          * ```
          */
-        useSuspenseInfiniteQuery<TPageParam extends GetFilesParameters, TData = GetFilesData>(parameters: ServiceOperationInfiniteQueryKey<GetFilesSchema, GetFilesParameters> | (DeepReadonly<GetFilesParameters>), options: Omit<UseSuspenseInfiniteQueryOptions<GetFilesData, GetFilesError, OperationInfiniteData<TData, GetFilesParameters>, GetFilesData, ServiceOperationInfiniteQueryKey<GetFilesSchema, GetFilesParameters>, PartialParameters<TPageParam>>, "queryKey" | "getPreviousPageParam" | "getNextPageParam" | "initialPageParam"> & InfiniteQueryPageParamsOptions<GetFilesData, PartialParameters<TPageParam>>): UseSuspenseInfiniteQueryResult<OperationInfiniteData<TData, GetFilesParameters>, GetFilesError | Error>;
+        useSuspenseInfiniteQuery<TPageParam extends GetFilesParameters, TData = GetFilesData>(parameters: ServiceOperationInfiniteQueryKey<GetFilesSchema, GetFilesParameters> | (DeepReadonly<GetFilesParameters>), options: Omit<UseSuspenseInfiniteQueryOptions<GetFilesData, GetFilesError, OperationInfiniteData<TData, GetFilesParameters>, GetFilesData, ServiceOperationInfiniteQueryKey<GetFilesSchema, GetFilesParameters>, PartialParameters<DeepReadonly<TPageParam>>>, "queryKey" | "getPreviousPageParam" | "getNextPageParam" | "initialPageParam"> & InfiniteQueryPageParamsOptions<GetFilesData, PartialParameters<DeepReadonly<TPageParam>>>): UseSuspenseInfiniteQueryResult<OperationInfiniteData<TData, GetFilesParameters>, GetFilesError | Error>;
         /**
          * Allows you to execute multiple asynchronous data fetching operations concurrently with Suspense support.
          * Similar to useQueries but integrates with React Suspense for loading states.
@@ -692,17 +692,17 @@ export interface FilesService {
          * @deprecated
          * @summary Get a file list
          */
-        fetchInfiniteQuery<TPageParam extends GetFileListParameters>(options: ServiceOperationFetchInfiniteQueryOptions<GetFileListSchema, GetFileListData, GetFileListParameters, TPageParam, GetFileListError>): Promise<OperationInfiniteData<GetFileListData, GetFileListParameters>>;
+        fetchInfiniteQuery<TPageParam extends GetFileListParameters>(options: ServiceOperationFetchInfiniteQueryOptions<GetFileListSchema, GetFileListData, GetFileListParameters, DeepReadonly<TPageParam>, GetFileListError> | void): Promise<OperationInfiniteData<GetFileListData, GetFileListParameters>>;
         /**
          * @deprecated
          * @summary Get a file list
          */
-        prefetchInfiniteQuery<TPageParam extends GetFileListParameters>(options: ServiceOperationFetchInfiniteQueryOptions<GetFileListSchema, GetFileListData, GetFileListParameters, TPageParam, GetFileListError>): Promise<void>;
+        prefetchInfiniteQuery<TPageParam extends GetFileListParameters>(options: ServiceOperationFetchInfiniteQueryOptions<GetFileListSchema, GetFileListData, GetFileListParameters, DeepReadonly<TPageParam>, GetFileListError> | void): Promise<void>;
         /**
          * @deprecated
          * @summary Get a file list
          */
-        ensureInfiniteQueryData<TPageParam extends GetFileListParameters>(options: ServiceOperationEnsureInfiniteQueryDataOptions<GetFileListSchema, GetFileListData, GetFileListParameters, TPageParam, GetFileListError>): Promise<OperationInfiniteData<GetFileListData, GetFileListParameters>>;
+        ensureInfiniteQueryData<TPageParam extends GetFileListParameters>(options: ServiceOperationEnsureInfiniteQueryDataOptions<GetFileListSchema, GetFileListData, GetFileListParameters, DeepReadonly<TPageParam>, GetFileListError> | void): Promise<OperationInfiniteData<GetFileListData, GetFileListParameters>>;
         /**
          * @deprecated
          * @summary Get a file list
@@ -830,7 +830,7 @@ export interface FilesService {
          * fetchNextPage(); // Fetch the next page
          * ```
          */
-        useInfiniteQuery<TPageParam extends GetFileListParameters, TQueryFnData = GetFileListData, TData = OperationInfiniteData<TQueryFnData, GetFileListParameters>>(parameters: ServiceOperationInfiniteQueryKey<GetFileListSchema, GetFileListParameters> | (DeepReadonly<GetFileListParameters> | void), options: Omit<UndefinedInitialDataInfiniteOptions<TQueryFnData, GetFileListError, TData, ServiceOperationInfiniteQueryKey<GetFileListSchema, GetFileListParameters>, PartialParameters<TPageParam>>, "queryKey" | "getPreviousPageParam" | "getNextPageParam" | "initialPageParam"> & InfiniteQueryPageParamsOptions<TQueryFnData, PartialParameters<TPageParam>>): UseInfiniteQueryResult<TData, GetFileListError | Error>;
+        useInfiniteQuery<TPageParam extends GetFileListParameters, TQueryFnData = GetFileListData, TData = OperationInfiniteData<TQueryFnData, GetFileListParameters>>(parameters: ServiceOperationInfiniteQueryKey<GetFileListSchema, GetFileListParameters> | (DeepReadonly<GetFileListParameters> | void), options: Omit<UndefinedInitialDataInfiniteOptions<TQueryFnData, GetFileListError, TData, ServiceOperationInfiniteQueryKey<GetFileListSchema, GetFileListParameters>, PartialParameters<DeepReadonly<TPageParam>>>, "queryKey" | "getPreviousPageParam" | "getNextPageParam" | "initialPageParam"> & InfiniteQueryPageParamsOptions<TQueryFnData, PartialParameters<DeepReadonly<TPageParam>>>): UseInfiniteQueryResult<TData, GetFileListError | Error>;
         /**
          * Performs asynchronous data fetching with support for infinite scrolling scenarios.
          * Manages paginated data and provides utilities for fetching additional pages.
@@ -858,7 +858,7 @@ export interface FilesService {
          * fetchNextPage(); // Fetch the next page
          * ```
          */
-        useInfiniteQuery<TPageParam extends GetFileListParameters, TQueryFnData = GetFileListData, TData = OperationInfiniteData<TQueryFnData, GetFileListParameters>>(parameters: ServiceOperationInfiniteQueryKey<GetFileListSchema, GetFileListParameters> | (DeepReadonly<GetFileListParameters> | void), options: Omit<DefinedInitialDataInfiniteOptions<TQueryFnData, GetFileListError, TData, ServiceOperationInfiniteQueryKey<GetFileListSchema, GetFileListParameters>, PartialParameters<TPageParam>>, "queryKey" | "getPreviousPageParam" | "getNextPageParam" | "initialPageParam"> & InfiniteQueryPageParamsOptions<GetFileListData, PartialParameters<TPageParam>>): DefinedUseInfiniteQueryResult<TData, GetFileListError | Error>;
+        useInfiniteQuery<TPageParam extends GetFileListParameters, TQueryFnData = GetFileListData, TData = OperationInfiniteData<TQueryFnData, GetFileListParameters>>(parameters: ServiceOperationInfiniteQueryKey<GetFileListSchema, GetFileListParameters> | (DeepReadonly<GetFileListParameters> | void), options: Omit<DefinedInitialDataInfiniteOptions<TQueryFnData, GetFileListError, TData, ServiceOperationInfiniteQueryKey<GetFileListSchema, GetFileListParameters>, PartialParameters<DeepReadonly<TPageParam>>>, "queryKey" | "getPreviousPageParam" | "getNextPageParam" | "initialPageParam"> & InfiniteQueryPageParamsOptions<GetFileListData, PartialParameters<DeepReadonly<TPageParam>>>): DefinedUseInfiniteQueryResult<TData, GetFileListError | Error>;
         /**
          * Monitors the number of queries currently fetching, matching the provided filters.
          * Useful for creating loading indicators or performing actions based on active requests.
@@ -1026,7 +1026,7 @@ export interface FilesService {
          * fetchNextPage(); // Fetch the next page
          * ```
          */
-        useSuspenseInfiniteQuery<TPageParam extends GetFileListParameters, TData = GetFileListData>(parameters: ServiceOperationInfiniteQueryKey<GetFileListSchema, GetFileListParameters> | (DeepReadonly<GetFileListParameters> | void), options: Omit<UseSuspenseInfiniteQueryOptions<GetFileListData, GetFileListError, OperationInfiniteData<TData, GetFileListParameters>, GetFileListData, ServiceOperationInfiniteQueryKey<GetFileListSchema, GetFileListParameters>, PartialParameters<TPageParam>>, "queryKey" | "getPreviousPageParam" | "getNextPageParam" | "initialPageParam"> & InfiniteQueryPageParamsOptions<GetFileListData, PartialParameters<TPageParam>>): UseSuspenseInfiniteQueryResult<OperationInfiniteData<TData, GetFileListParameters>, GetFileListError | Error>;
+        useSuspenseInfiniteQuery<TPageParam extends GetFileListParameters, TData = GetFileListData>(parameters: ServiceOperationInfiniteQueryKey<GetFileListSchema, GetFileListParameters> | (DeepReadonly<GetFileListParameters> | void), options: Omit<UseSuspenseInfiniteQueryOptions<GetFileListData, GetFileListError, OperationInfiniteData<TData, GetFileListParameters>, GetFileListData, ServiceOperationInfiniteQueryKey<GetFileListSchema, GetFileListParameters>, PartialParameters<DeepReadonly<TPageParam>>>, "queryKey" | "getPreviousPageParam" | "getNextPageParam" | "initialPageParam"> & InfiniteQueryPageParamsOptions<GetFileListData, PartialParameters<DeepReadonly<TPageParam>>>): UseSuspenseInfiniteQueryResult<OperationInfiniteData<TData, GetFileListParameters>, GetFileListError | Error>;
         /**
          * Allows you to execute multiple asynchronous data fetching operations concurrently with Suspense support.
          * Similar to useQueries but integrates with React Suspense for loading states.
