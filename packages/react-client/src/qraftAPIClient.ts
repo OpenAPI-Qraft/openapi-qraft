@@ -211,7 +211,13 @@ export function qraftAPIClient<
       }
 
       if (key !== 'schema') return;
-      if (!('schema' in services) && getPath.length !== 2) return;
+      if (
+        getPath.length !== 2 &&
+        !('schema' in services) &&
+        getPath.length !== 1 &&
+        !(services[getPath[0] as never] as OperationsDeclaration<any>)?.schema
+      )
+        return;
 
       const serviceOperation = getByPath(services, getPath);
       if (!isServiceOperation(serviceOperation))
@@ -276,11 +282,15 @@ function extractCallbackDetails(
   applyPath: (string | symbol)[],
   services: UnionServiceOperationsDeclaration<any>
 ) {
-  // client.<service>.<operation>()
+  // client.<service>.<operation>()  [OperationInvokeFn]
+  // <service>.<operation>()         [OperationInvokeFn]
+  // client()                        [OperationInvokeFn]
   // client()
   if (
-    ('schema' in services && applyPath.length === 0) ||
-    applyPath.length === 2
+    (applyPath.length === 2 &&
+      !(services[applyPath[0] as never] as OperationsDeclaration<any>)
+        ?.schema) ||
+    (applyPath.length === 0 && 'schema' in services)
   ) {
     return {
       path: applyPath,
@@ -288,6 +298,7 @@ function extractCallbackDetails(
     };
   } else {
     // client.<service>.<operation>.<method>()
+    // <service>.<operation>.<method>()
     // client.<method>()
     return {
       path: applyPath.slice(0, -1),
@@ -332,14 +343,17 @@ type OperationDeclaration = {
   };
 };
 
-type ServiceDeclaration<Services> = {
-  [service in keyof Services]: {
-    [operation in keyof Services[service]]: OperationDeclaration;
-  };
+type OperationsDeclaration<Operations> = {
+  [operation in keyof Operations]: OperationDeclaration;
+};
+
+type ServicesDeclaration<Services> = {
+  [service in keyof Services]: OperationsDeclaration<Services[service]>;
 };
 
 export type UnionServiceOperationsDeclaration<Services> =
-  | ServiceDeclaration<Services>
+  | ServicesDeclaration<Services>
+  | OperationsDeclaration<Services>
   | OperationDeclaration;
 
 type QueryOperationCallbacks = Extract<
@@ -414,13 +428,17 @@ export type APIDefaultQueryClientServices<
   Services extends UnionServiceOperationsDeclaration<Services>,
 > = Services extends OperationDeclaration
   ? Services[QraftServiceOperationsToken]
-  : Services extends ServiceDeclaration<Services>
+  : Services extends OperationsDeclaration<Services>
     ? {
-        [service in keyof Services]: {
-          [operation in keyof Services[service]]: Services[service][operation][QraftServiceOperationsToken];
-        };
+        [operation in keyof Services]: Services[operation][QraftServiceOperationsToken];
       }
-    : never;
+    : Services extends ServicesDeclaration<Services>
+      ? {
+          [service in keyof Services]: {
+            [operation in keyof Services[service]]: Services[service][operation][QraftServiceOperationsToken];
+          };
+        }
+      : never;
 
 export type APIBasicQueryClientServices<
   Services extends UnionServiceOperationsDeclaration<Services>,
@@ -463,23 +481,37 @@ type ServicesFilteredByCallbacks<
       >
     > &
       OperationInvokeFn<Services[QraftServiceOperationsToken], CallbackList>
-  : Services extends ServiceDeclaration<Services>
+  : Services extends OperationsDeclaration<Services>
     ? {
-        [serviceName in keyof Services]: {
-          [operation in keyof Services[serviceName]]: Pick<
-            Services[serviceName][operation][QraftServiceOperationsToken],
-            Extract<
-              keyof Services[serviceName][operation][QraftServiceOperationsToken],
-              CallbackList | 'schema' | 'types'
-            >
-          > &
-            OperationInvokeFn<
-              Services[serviceName][operation][QraftServiceOperationsToken],
-              CallbackList
-            >;
-        };
+        [operation in keyof Services]: Pick<
+          Services[operation][QraftServiceOperationsToken],
+          Extract<
+            keyof Services[operation][QraftServiceOperationsToken],
+            CallbackList | 'schema' | 'types'
+          >
+        > &
+          OperationInvokeFn<
+            Services[operation][QraftServiceOperationsToken],
+            CallbackList
+          >;
       }
-    : never;
+    : Services extends ServicesDeclaration<Services>
+      ? {
+          [serviceName in keyof Services]: {
+            [operation in keyof Services[serviceName]]: Pick<
+              Services[serviceName][operation][QraftServiceOperationsToken],
+              Extract<
+                keyof Services[serviceName][operation][QraftServiceOperationsToken],
+                CallbackList | 'schema' | 'types'
+              >
+            > &
+              OperationInvokeFn<
+                Services[serviceName][operation][QraftServiceOperationsToken],
+                CallbackList
+              >;
+          };
+        }
+      : never;
 
 type OperationInvokeFn<
   InvokeFn extends (...args: any[]) => any,
@@ -501,16 +533,26 @@ type ServicesFilteredByUtilityCallbacks<
         CallbackList | 'schema' | 'types'
       >
     >
-  : Services extends ServiceDeclaration<Services>
+  : Services extends OperationsDeclaration<Services>
     ? {
-        [serviceName in keyof Services]: {
-          [operation in keyof Services[serviceName]]: Pick<
-            Services[serviceName][operation][QraftServiceOperationsToken],
-            Extract<
-              keyof Services[serviceName][operation][QraftServiceOperationsToken],
-              CallbackList | 'schema' | 'types'
-            >
-          >;
-        };
+        [operation in keyof Services]: Pick<
+          Services[operation][QraftServiceOperationsToken],
+          Extract<
+            keyof Services[operation][QraftServiceOperationsToken],
+            CallbackList | 'schema' | 'types'
+          >
+        >;
       }
-    : never;
+    : Services extends ServicesDeclaration<Services>
+      ? {
+          [serviceName in keyof Services]: {
+            [operation in keyof Services[serviceName]]: Pick<
+              Services[serviceName][operation][QraftServiceOperationsToken],
+              Extract<
+                keyof Services[serviceName][operation][QraftServiceOperationsToken],
+                CallbackList | 'schema' | 'types'
+              >
+            >;
+          };
+        }
+      : never;
