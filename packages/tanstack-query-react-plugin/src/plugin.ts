@@ -40,9 +40,17 @@ export const plugin: QraftCommandPlugin = {
       .addOption(
         new Option(
           '--default-client-callbacks <callbacks...>',
-          'List of default API client methods and hooks that will be available by default. These can be overridden at runtime if needed..'
+          'List of default API client methods and hooks that will be available by default (imported to the generated client). These can be overridden at runtime if needed.'
         )
           .choices(['all', 'none', ...getAllAvailableCallbackNames()])
+          .default(['all'])
+      )
+      .addOption(
+        new Option(
+          '--default-client-services <services...>',
+          'List of default API client services that will be available by default (imported to the generated client). These can be overridden at runtime if needed.'
+        )
+          .choices(['all', 'none'])
           .default(['all'])
       )
       .action(async ({ spinner, output, args, services, schema }, resolve) => {
@@ -64,6 +72,11 @@ export const plugin: QraftCommandPlugin = {
             defaultClientCallbacks: args.defaultClientCallbacks
               .map((callbackName: string) => callbackName.trim())
               .filter(Boolean),
+            defaultClientServices: args.defaultClientServices
+              ? args.defaultClientServices.map((serviceName: string) =>
+                  serviceName.trim()
+                )
+              : undefined,
             operationPredefinedParameters: args.operationPredefinedParameters
               ? createPredefinedParametersGlobs(
                   schema,
@@ -72,6 +85,7 @@ export const plugin: QraftCommandPlugin = {
                   )
                 )
               : undefined, // This value is inherited from the `--operation-predefined-parameters` option
+            createAPIClientFnName: 'createAPIOperationClient2',
           },
         }).then(resolve));
       });
