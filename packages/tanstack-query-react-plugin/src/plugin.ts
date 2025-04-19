@@ -1,3 +1,5 @@
+import type { Ora } from 'ora';
+import process from 'node:process';
 import { fileHeader } from '@openapi-qraft/plugin/lib/fileHeader';
 import {
   createPredefinedParametersGlobs,
@@ -7,6 +9,7 @@ import { QraftCommand } from '@openapi-qraft/plugin/lib/QraftCommand';
 import { QraftCommandPlugin } from '@openapi-qraft/plugin/lib/QraftCommandPlugin';
 import { Option } from 'commander';
 import { generateCode } from './generateCode.js';
+import { getAllAvailableCallbackNames } from './ts-factory/getCallbackNames.js';
 
 export const plugin: QraftCommandPlugin = {
   setupCommand(command: QraftCommand) {
@@ -31,7 +34,25 @@ export const plugin: QraftCommandPlugin = {
           return arg?.toLowerCase() !== 'false';
         }
       )
+      .addOption(
+        new Option(
+          '--default-client-callbacks <callbacks...>',
+          'List of default API client methods and hooks that will be available by default (imported to the generated client). These can be overridden at runtime if needed.'
+        )
+          .choices(['all', 'none', ...getAllAvailableCallbackNames()])
+          .default(['all'])
+      )
+      .addOption(
+        new Option(
+          '--default-client-services <services...>',
+          'List of default API client services that will be available by default (imported to the generated client). These can be overridden at runtime if needed.'
+        )
+          .choices(['all', 'none'])
+          .default(['all'])
+      )
       .action(async ({ spinner, output, args, services, schema }, resolve) => {
+        validateDefaultCallbacks(args.defaultClientCallbacks, spinner);
+
         return void (await generateCode({
           spinner,
           services,
@@ -44,6 +65,14 @@ export const plugin: QraftCommandPlugin = {
             explicitImportExtensions: args.explicitImportExtensions,
             servicesDirName: 'services',
             exportSchemaTypes: args.exportOpenapiTypes,
+            defaultClientCallbacks: args.defaultClientCallbacks
+              .map((callbackName: string) => callbackName.trim())
+              .filter(Boolean),
+            defaultClientServices: args.defaultClientServices
+              ? args.defaultClientServices.map((serviceName: string) =>
+                  serviceName.trim()
+                )
+              : undefined,
             operationPredefinedParameters: args.operationPredefinedParameters
               ? createPredefinedParametersGlobs(
                   schema,
@@ -51,9 +80,27 @@ export const plugin: QraftCommandPlugin = {
                     ...args.operationPredefinedParameters
                   )
                 )
-              : undefined, // inherited from `--operation-predefined-parameters` option
+              : undefined,
+            createAPIClientFnName: 'createAPIOperationClient2',
           },
         }).then(resolve));
       });
   },
 };
+
+function validateDefaultCallbacks(
+  defaultCallbacks: string[],
+  spinner: Ora
+): asserts defaultCallbacks is string[] | ['all'] | ['none'] {
+  if (!defaultCallbacks || defaultCallbacks.length === 0) return;
+
+  const hasSpecialValue = defaultCallbacks.some(
+    (cb) => cb === 'all' || cb === 'none'
+  );
+  if (hasSpecialValue && defaultCallbacks.length > 1) {
+    spinner.fail(
+      `When using "all" or "none" as a callback value, no other callbacks should be specified.`
+    );
+    process.exit(1);
+  }
+}

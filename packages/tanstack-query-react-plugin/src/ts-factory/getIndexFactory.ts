@@ -79,5 +79,20 @@ export const getIndexFactory = ({
       factory.createStringLiteral(`./create-api-client${importExtension}`),
       undefined
     ),
+    factory.createExportDeclaration(
+      undefined,
+      false,
+      factory.createNamedExports([
+        factory.createExportSpecifier(
+          false,
+          undefined,
+          factory.createIdentifier('createAPIOperationClient')
+        ),
+      ]),
+      factory.createStringLiteral(
+        `./create-api-operation-client${importExtension}`
+      ),
+      undefined
+    ),
   ];
 };

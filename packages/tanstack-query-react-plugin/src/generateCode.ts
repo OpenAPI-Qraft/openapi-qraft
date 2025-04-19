@@ -10,6 +10,7 @@ import { astToString } from './ts-factory/astToString.js';
 import { getClientFactory } from './ts-factory/getClientFactory.js';
 import { getCreatePredefinedParametersRequestFnFactory } from './ts-factory/getCreatePredefinedParametersRequestFnFactory.js';
 import { getIndexFactory } from './ts-factory/getIndexFactory.js';
+import { getOperationClientFactory } from './ts-factory/getOperationClientFactory.js';
 import {
   getServiceFactory,
   ServiceImportsFactoryOptions,
@@ -22,6 +23,9 @@ interface OutputOptions extends OutputOptionsBase {
   explicitImportExtensions: '.js' | '.ts' | undefined;
   exportSchemaTypes: boolean | undefined;
   operationPredefinedParameters: Array<PredefinedParametersGlob> | undefined;
+  defaultClientCallbacks: string[] | ['all'] | ['none'] | undefined;
+  defaultClientServices: string[] | ['all'] | ['none'] | undefined;
+  createAPIClientFnName: string;
 }
 
 export const generateCode = async ({
@@ -39,6 +43,7 @@ export const generateCode = async ({
     ...(await generateServices(spinner, services, serviceImports, output)),
     ...(await generateServiceIndex(spinner, services, output)),
     ...(await generateClient(spinner, output)),
+    ...(await generateOperationClient(spinner, output)),
     ...(output.operationPredefinedParameters
       ? await generateCreatePredefinedParametersRequestFn(
           spinner,
@@ -125,11 +130,7 @@ const generateServiceIndex = async (
   ];
 
   try {
-    const code = astToString(
-      getServiceIndexFactory(services, {
-        explicitImportExtensions: output.explicitImportExtensions,
-      })
-    );
+    const code = astToString(getServiceIndexFactory(services, output));
 
     serviceIndexFiles.push({
       file: new URL('index.ts', composeServicesDirPath(output)),
@@ -154,12 +155,7 @@ const generateClient = async (spinner: Ora, output: OutputOptions) => {
   const clientFiles: GeneratorFile[] = [];
 
   try {
-    const code = astToString(
-      getClientFactory({
-        servicesDirName: output.servicesDirName,
-        explicitImportExtensions: output.explicitImportExtensions,
-      })
-    );
+    const code = astToString(getClientFactory(output));
 
     clientFiles.push({
       file: new URL('create-api-client.ts', output.dir),
@@ -174,6 +170,31 @@ const generateClient = async (spinner: Ora, output: OutputOptions) => {
   spinner.succeed(c.green('Client has been generated'));
 
   return clientFiles;
+};
+
+const generateOperationClient = async (spinner: Ora, output: OutputOptions) => {
+  spinner.start('Generating operation client');
+
+  const operationClientFiles: GeneratorFile[] = [];
+
+  try {
+    const code = astToString(getOperationClientFactory(output));
+
+    operationClientFiles.push({
+      file: new URL('create-api-operation-client.ts', output.dir),
+      code: formatFileHeader(output.fileHeader) + code,
+    });
+  } catch (error) {
+    spinner.fail(
+      c.redBright('Error occurred during operation client generation')
+    );
+
+    throw error;
+  }
+
+  spinner.succeed(c.green('Operation client has been generated'));
+
+  return operationClientFiles;
 };
 
 const generateCreatePredefinedParametersRequestFn = async (

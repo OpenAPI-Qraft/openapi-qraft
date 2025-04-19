@@ -6,7 +6,7 @@
 import type { APIBasicClientServices, APIBasicQueryClientServices, APIDefaultQueryClientServices, APIQueryClientServices, APIUtilityClientServices, CreateAPIBasicClientOptions, CreateAPIBasicQueryClientOptions, CreateAPIClientOptions, CreateAPIQueryClientOptions } from "@openapi-qraft/react";
 import * as allCallbacks from "@openapi-qraft/react/callbacks/index";
 import { qraftAPIClient } from "@openapi-qraft/react";
-import { services } from "./services/index.js";
+import { services } from "./services/index";
 export function createAPIClient<Callbacks extends AllCallbacks>(options: CreateAPIQueryClientOptions, callbacks?: Callbacks): APIDefaultQueryClientServices<Services>;
 export function createAPIClient<Callbacks extends Partial<AllCallbacks> = AllCallbacks>(options: CreateAPIBasicQueryClientOptions, callbacks?: Callbacks): APIBasicQueryClientServices<Services, Callbacks>;
 export function createAPIClient<Callbacks extends Partial<AllCallbacks> = AllCallbacks>(options: CreateAPIBasicClientOptions, callbacks?: Callbacks): APIBasicClientServices<Services, Callbacks>;
