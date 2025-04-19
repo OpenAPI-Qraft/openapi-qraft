@@ -7,4 +7,4 @@
  */
 import { main } from './dist/bin.js';
 
-main();
+main(process.argv);

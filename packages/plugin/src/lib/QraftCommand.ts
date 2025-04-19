@@ -1,14 +1,16 @@
-import type { Option } from 'commander';
+import type { ParseOptions } from 'commander';
 import { sep } from 'node:path';
 import process from 'node:process';
 import { pathToFileURL, URL } from 'node:url';
+import { createConfig, getMergedConfig } from '@redocly/openapi-core';
 import c from 'ansi-colors';
-import { Command } from 'commander';
+import { Command, Option } from 'commander';
 import ora, { Ora } from 'ora';
 import { packageVersion } from '../packageVersion.js';
 import { filterDocumentPaths } from './filterDocumentPaths.js';
 import { GeneratorFile } from './GeneratorFile.js';
 import { handleSchemaInput } from './handleSchemaInput.js';
+import { loadRedoclyConfig } from './loadRedoclyConfig.js';
 import { getServices } from './open-api/getServices.js';
 import { OpenAPISchemaType } from './open-api/OpenAPISchemaType.js';
 import { OpenAPIService } from './open-api/OpenAPIService.js';
@@ -23,15 +25,21 @@ import {
   parseOperationNameModifier,
   processOperationNameModifierOption,
 } from './processOperationNameModifierOption.js';
+import { redoclyOption } from './RedoclyConfigCommand.js';
 import { splitCommaSeparatedGlobs } from './splitCommaSeparatedGlobs.js';
 import { writeGeneratorFiles } from './writeGeneratorFiles.js';
 
 export class QraftCommand extends Command {
+  static spinner = ora();
+
   protected readonly cwd: URL;
   protected registeredPluginActions: QraftCommandActionCallback[] = [];
 
-  constructor() {
-    super();
+  /**
+   * @param name - not used
+   */
+  constructor(name?: string) {
+    super(name);
     this.cwd = pathToFileURL(`${process.cwd()}/`);
 
     this.usage('[input] [options]')
@@ -40,13 +48,15 @@ export class QraftCommand extends Command {
         'Input OpenAPI Document file path, URL (json, yml)',
         null
       )
-      .requiredOption(
+      .option(
         '-o, --output-dir <path>',
         'Output directory for generated services'
       )
-      .option(
-        '-rm, --clean',
-        'Clean output directory before generating services'
+      .addOption(
+        new Option(
+          '-rm, --clean',
+          'Clean output directory before generating services'
+        )
       )
       .option(
         '--filter-services <glob-patterns...>',
@@ -54,24 +64,48 @@ export class QraftCommand extends Command {
       )
       .option(
         '--operation-predefined-parameters <patterns...>',
-        'Predefined parameters for services. The specified services parameters will be optional. Eg: "/**:header.x-monite-version,query.x-api-key" or "get /**:header.x-monite-entity-id"'
+        'Predefined parameters for services. The specified services parameters will be optional. Eg: "/**:header.x-monite-version,query.x-api-key" or "get /**:header.x-monite-entity-id"',
+        parseColonSeparatedList
       )
       .option(
         '--operation-name-modifier <patterns...>',
         'Modifies operation names using a pattern. Use the `==>` operator to separate the regular expression (left) and the substitution string (right). For example: "post /**:[A-Za-z]+Id ==> createOne"'
       )
-      .option(
-        '--postfix-services <string>',
-        'Postfix to be added to the generated service name (eg: Service)'
+      .addOption(
+        new Option(
+          '--postfix-services <string>',
+          'Postfix to be added to the generated service name (eg: Service)'
+        )
       )
       .option(
         '--service-name-base <endpoint[<index>] | tags>',
         'Use OpenAPI Operation `endpoint[<index>]` path part (e.g.: "/0/1/2") or `tags` as the base name of the service.',
         'endpoint[0]'
       )
-      .option(
-        '--file-header <string>',
-        'Header to be added to the generated file (eg: /* eslint-disable */)'
+      .addOption(
+        new Option(
+          '--file-header <string>',
+          'Header to be added to the generated file (eg: /* eslint-disable */)'
+        )
+      )
+      .addOption(redoclyOption)
+      .addOption(
+        new Option(
+          '--redocly-api <api_and_optional_config...>',
+          [
+            'Redocly API item and configuration with custom linting rules or plugins.',
+            'If path is not provided, the default Redocly config will be used.',
+            'Note that the "x-openapi-qraft" key is IGNORED event.',
+            'Instead, use the "openapi-qraft redocly" command to parse the redocly config and generate multiple API clients.',
+            'Example: "--redocly my-api@v1", "--redocly my-api@v1 ./my-redocly-config.yaml"',
+          ].join(' ')
+        )
+          .hideHelp()
+          .argParser((value, previous) => {
+            return (Array.isArray(previous) ? previous : [])
+              .concat(value)
+              .slice(0, 2);
+          })
       );
   }
 
@@ -95,15 +129,28 @@ export class QraftCommand extends Command {
       process.exit(0);
     }
 
-    console.info(`✨ ${c.bold(`OpenAPI Qraft ${packageVersion}`)}`);
+    const spinner = QraftCommand.spinner;
 
-    const spinner = ora('Starting ⛏︎').start();
+    spinner.start('Starting ⛏︎');
+
+    const redoc = args.redoclyApi
+      ? getMergedConfig(await loadRedoclyConfig(args.redoclyApi[1], this.cwd))
+      : await createConfig(
+          {
+            rules: {
+              // throw error on duplicate operationIDs
+              'operation-operationId-unique': { severity: 'error' },
+            },
+          },
+          { extends: ['minimal'] }
+        );
 
     const input = handleSchemaInput(inputs[0], this.cwd, spinner);
 
     spinner.text = 'Reading OpenAPI Schema';
+
     let schema = filterDocumentPaths(
-      await readSchema(input),
+      await readSchema(input, redoc),
       splitCommaSeparatedGlobs(args.filterServices)
     );
 
@@ -334,6 +381,35 @@ export class QraftCommand extends Command {
     );
   }
 
+  addOption(option: Option): this {
+    if (
+      this.findSimilarOption({
+        flags: option.flags,
+        mandatory: option.mandatory,
+      })
+    ) {
+      return this;
+    }
+
+    return super.addOption(option);
+  }
+
+  parseAsync(argv?: readonly string[], options?: ParseOptions): Promise<this> {
+    if (options?.from !== 'user') this.logVersion();
+    return super.parseAsync(argv, options);
+  }
+
+  parse(argv?: readonly string[], options?: ParseOptions): this {
+    if (options?.from !== 'user') this.logVersion();
+    return super.parse(argv, options);
+  }
+
+  protected logVersion() {
+    QraftCommand.spinner.info(
+      `✨ ${c.bold(`OpenAPI Qraft ${packageVersion}`)}`
+    );
+  }
+
   protected findSimilarOption(option: { flags: string; mandatory: boolean }) {
     try {
       return findSimilarOption(option, this.options);
@@ -495,4 +571,22 @@ export function splitOptionFlags(flags: string) {
   }
 
   return { shortFlag, longFlag };
+}
+
+function parseColonSeparatedList(value: string, previous: unknown) {
+  if (Array.isArray(previous)) {
+    const previousValue = previous.at(-1);
+
+    if (
+      typeof previousValue === 'string' &&
+      !previousValue.includes(':') &&
+      !value.includes(':')
+    ) {
+      return previous.slice(0, -1).concat(`${previousValue}:${value}`);
+    }
+
+    return previous.concat(value);
+  }
+
+  return [value];
 }
