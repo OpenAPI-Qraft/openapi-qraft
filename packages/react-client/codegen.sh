@@ -25,7 +25,8 @@ yarn exec openapi-qraft \
   --openapi-types-file-name internal-openapi.ts \
   --postfix-services '' \
   --explicit-import-extensions \
-  --default-client-callbacks fetchQuery fetchInfiniteQuery getQueryKey getQueryData setQueryData isMutating getMutationKey \
+  --default-client-services all \
+  --default-client-callbacks all \
   --filter-services '/files/**'
 
 yarn exec prettier --write "src/tests/fixtures/api/**/*.ts" "src/tests/fixtures/internal-api/**/*.ts"

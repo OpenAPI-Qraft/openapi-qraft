@@ -24,6 +24,8 @@ interface OutputOptions extends OutputOptionsBase {
   exportSchemaTypes: boolean | undefined;
   operationPredefinedParameters: Array<PredefinedParametersGlob> | undefined;
   defaultClientCallbacks: string[] | ['all'] | ['none'] | undefined;
+  defaultClientServices: string[] | ['all'] | ['none'] | undefined;
+  createAPIClientFnName: string;
 }
 
 export const generateCode = async ({
@@ -128,11 +130,7 @@ const generateServiceIndex = async (
   ];
 
   try {
-    const code = astToString(
-      getServiceIndexFactory(services, {
-        explicitImportExtensions: output.explicitImportExtensions,
-      })
-    );
+    const code = astToString(getServiceIndexFactory(services, output));
 
     serviceIndexFiles.push({
       file: new URL('index.ts', composeServicesDirPath(output)),
@@ -157,13 +155,7 @@ const generateClient = async (spinner: Ora, output: OutputOptions) => {
   const clientFiles: GeneratorFile[] = [];
 
   try {
-    const code = astToString(
-      getClientFactory({
-        servicesDirName: output.servicesDirName,
-        explicitImportExtensions: output.explicitImportExtensions,
-        defaultClientCallbacks: output.defaultClientCallbacks,
-      })
-    );
+    const code = astToString(getClientFactory(output));
 
     clientFiles.push({
       file: new URL('create-api-client.ts', output.dir),
@@ -186,11 +178,7 @@ const generateOperationClient = async (spinner: Ora, output: OutputOptions) => {
   const operationClientFiles: GeneratorFile[] = [];
 
   try {
-    const code = astToString(
-      getOperationClientFactory({
-        defaultClientCallbacks: output.defaultClientCallbacks,
-      })
-    );
+    const code = astToString(getOperationClientFactory(output));
 
     operationClientFiles.push({
       file: new URL('create-api-operation-client.ts', output.dir),
