@@ -1,0 +1,15 @@
+rules:
+  operation-operationId-unique:
+    severity: 'error'
+
+apis:
+  main:
+    root: https://raw.githubusercontent.com/swagger-api/swagger-petstore/7767363b841961221a38c0be9c6b1066a5120051/src/main/resources/openapi.yaml
+    x-openapi-qraft:
+      output-dir: src/api
+      clean: true
+      openapi-types-import-path: '../schema.d.ts'
+      openapi-types-file-name: schema.d.ts
+      plugin:
+        tanstack-query-react: true
+        openapi-typescript: true
