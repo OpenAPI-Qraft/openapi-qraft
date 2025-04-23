@@ -1,20 +1,12 @@
 import type { Readable } from 'node:stream';
+import type { Config } from '@redocly/openapi-core';
 import type { OpenAPI3 } from 'openapi-typescript';
-import { createConfig } from '@redocly/openapi-core';
 import { validateAndBundle } from 'openapi-typescript/dist/lib/redoc.js';
 
 export const readSchema = async (
-  source: string | URL | OpenAPI3 | Readable | Buffer
+  source: string | URL | OpenAPI3 | Readable | Buffer,
+  redoc: Config
 ) => {
-  const redoc = await createConfig(
-    {
-      rules: {
-        'operation-operationId-unique': { severity: 'error' }, // throw error on duplicate operationIDs
-      },
-    },
-    { extends: ['minimal'] }
-  );
-
   const parsed = await validateAndBundle(source, {
     redoc,
     silent: false,

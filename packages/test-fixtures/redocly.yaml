@@ -1,0 +1,33 @@
+apis:
+  main:
+    root: ./openapi.json
+    x-openapi-qraft:
+      plugin:
+        tanstack-query-react: true
+        openapi-typescript: true
+      output-dir: src/api
+      clean: true
+      explicit-import-extensions: true
+      openapi-types-file-name: openapi.ts
+      filter-services:
+        - '/approval_policies/**'
+        - '/entities/**'
+        - '/files/**'
+        - '!/internal/**'
+      operation-predefined-parameters:
+        '/approval_policies/{approval_policy_id}/**': 'header.x-monite-entity-id'
+        '/entities/{entity_id}/documents': 'header.x-monite-version'
+      operation-name-modifier:
+        - '/files/list:[a-zA-Z]+List ==> findAll'
+  main@internal:
+    root: ./openapi.json
+    x-openapi-qraft:
+      plugin:
+        tanstack-query-react: true
+        openapi-typescript: true
+      output-dir: src/internal-api
+      filter-services:
+        - '/internal/**'
+
+  not-gen:
+    root: ./openapi.json

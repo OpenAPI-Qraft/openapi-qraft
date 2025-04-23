@@ -17,7 +17,7 @@ export function handleSchemaInput(input: unknown, cwd: URL, spinner: Ora) {
      */
     if (process.stdin.isTTY) {
       spinner.fail(
-        'Input file not found or stdin is empty. Please specify `--input` option or pipe OpenAPI Schema to stdin.'
+        'Input file not found or stdin is empty. Please specify `input` argument or pipe OpenAPI Schema to stdin.'
       );
 
       throw new Error('Invalid input.');

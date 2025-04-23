@@ -1,6 +1,7 @@
 import { fileHeader } from '@openapi-qraft/plugin/lib/fileHeader';
 import { formatFileHeader } from '@openapi-qraft/plugin/lib/formatFileHeader';
 import { QraftCommandPlugin } from '@openapi-qraft/plugin/lib/QraftCommandPlugin';
+import c from 'ansi-colors';
 import { CommanderError } from 'commander';
 import { generateSchemaTypes } from './generateSchemaTypes.js';
 import {
@@ -70,7 +71,7 @@ export const plugin: QraftCommandPlugin = {
           silent: true,
         });
 
-        spinner.succeed('OpenAPI Document types generated');
+        spinner.succeed(c.green('OpenAPI Document types generated'));
 
         resolve([
           {

@@ -1,14 +1,32 @@
 #!/usr/bin/env node
 import type { QraftCommandPlugin } from '@openapi-qraft/plugin/lib/QraftCommandPlugin';
-import process from 'node:process';
-import { QraftCommand } from '@openapi-qraft/plugin/lib/QraftCommand';
-import { Option } from 'commander';
+import { QraftCommand } from '@openapi-qraft/plugin';
+import { RedoclyConfigCommand } from '@openapi-qraft/plugin/lib/RedoclyConfigCommand';
+import { Option, ParseOptions } from 'commander';
 import { builtInPlugins } from './builtInPlugins.js';
 
-export async function main() {
+export async function main(
+  processArgv: string[],
+  processArgvParseOptions?: ParseOptions
+) {
+  const redoclyConfigParseResult = await new RedoclyConfigCommand().parseConfig(
+    qraft,
+    processArgv,
+    processArgvParseOptions
+  );
+
+  if (redoclyConfigParseResult?.length) return;
+
+  await qraft(processArgv, processArgvParseOptions);
+}
+
+async function qraft(
+  processArgv: string[],
+  processArgvParseOptions?: ParseOptions
+) {
   const command = new QraftCommand();
 
-  const { argv, plugins } = extractArgvPluginOptions(process.argv);
+  const { argv, plugins } = extractArgvPluginOptions(processArgv);
 
   if (plugins) {
     await setupPlugins(command, plugins);
@@ -22,11 +40,11 @@ export async function main() {
     command.addOption(
       new Option(
         '--plugin <name_1> --plugin <name_2>',
-        `Generator plugins to be used.`
+        `Specifies generator plugins to be used`
       )
         .choices(Object.keys(builtInPlugins))
         .argParser(() => {
-          // Fallback, if plugins parsing went wrong
+          // Fallback if plugins parsing went wrong
           throw new Error(
             'Plugin option must be handled before parsing the command and should not be passed to the commander'
           );
@@ -34,7 +52,7 @@ export async function main() {
     );
   }
 
-  return void (await command.parseAsync(argv));
+  await command.parseAsync(argv, processArgvParseOptions);
 }
 
 async function setupPlugins(command: QraftCommand, plugins: string[]) {
@@ -59,7 +77,7 @@ async function setupPlugins(command: QraftCommand, plugins: string[]) {
 }
 
 /**
- * Add plugin's usage instructions calling `command.usage(...)`
+ * Adds plugin usage instructions by calling `command.usage(...)`
  */
 function addCommandUsageWithPlugins(command: QraftCommand, plugins: string[]) {
   const pluginUsage = plugins.map((plugin) => `--plugin ${plugin}`).join(' ');
@@ -67,8 +85,8 @@ function addCommandUsageWithPlugins(command: QraftCommand, plugins: string[]) {
 }
 
 /**
- * Extracts multiple `--plugin <name>` options from the `argv`
- * and returns the filtered `argv` and the list of plugins.
+ * Extracts multiple `--plugin <name>` options from `argv`
+ * and returns both the filtered `argv` and the extracted plugins list.
  */
 export function extractArgvPluginOptions(argv: string[]) {
   const pluginIndex = argv.indexOf('--plugin');
