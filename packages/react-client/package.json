@@ -11,7 +11,7 @@
     "lint": "eslint",
     "clean": "rimraf dist/",
     "codegen": "openapi-qraft --redocly && yarn _prettify-api",
-    "_prettify-api": "prettier --write 'src/tests/fixtures/{api,queryable-write-operations-api}/**/*.ts'"
+    "_prettify-api": "prettier --write 'src/tests/fixtures/{api,queryable-write-operations-api,files-api}/**/*.ts'"
   },
   "sideEffects": false,
   "dependencies": {
