@@ -23,12 +23,9 @@ import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
 import { qraftAPIClient, requestFn } from '../index.js';
 import { createPredefinedParametersRequestFn } from './fixtures/api/create-predefined-parameters-request-fn.js';
-import {
-  createAPIClient,
-  createAPIOperationClient,
-  services,
-} from './fixtures/api/index.js';
+import { createAPIClient, services } from './fixtures/api/index.js';
 import { getApprovalPoliciesId } from './fixtures/api/services/ApprovalPoliciesService.js';
+import { createInternalReactAPIClient } from './fixtures/files-api/index.js';
 import { filesFindAllResponsePayloadFixtures } from './msw/handlers.js';
 
 const baseUrl = 'https://api.sandbox.monite.com/v1';
@@ -1906,8 +1903,8 @@ describe('Qraft uses "fetchQuery(...) & "prefetchQuery(...)" & "ensureQueryData(
 
   it('throws an error if requestFn is not provided', async () => {
     const qraft = createAPIClient({
-      // @ts-expect-error - incorrect usage case, `requestFn` is not defined
       queryClient: new QueryClient(),
+      // @ts-expect-error - incorrect usage case, `requestFn` is not defined
       requestFn: undefined,
       baseUrl: 'http://any',
     });
@@ -2578,9 +2575,10 @@ describe('Custom Callbacks support', () => {
         queryClient,
       } as const;
 
-      const getApprovalPoliciesIdOperation = createAPIOperationClient(
+      const getApprovalPoliciesIdOperation = createInternalReactAPIClient(
         getApprovalPoliciesId,
-        defaultOptions
+        defaultOptions,
+        { useQuery, getQueryKey }
       );
 
       const queryKey = getApprovalPoliciesIdOperation.getQueryKey({

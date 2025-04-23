@@ -1,4 +1,3 @@
-import { ServiceFactoryOptions } from './getServiceFactory.js';
 import { createServiceOperationCancelQueriesNodes } from './service-operation.generated/ServiceOperationCancelQueries.js';
 import { createServiceOperationFetchInfiniteQueryNodes } from './service-operation.generated/ServiceOperationFetchInfiniteQuery.js';
 import { createServiceOperationFetchQueryNodes } from './service-operation.generated/ServiceOperationFetchQuery.js';
@@ -31,9 +30,11 @@ import { createServiceOperationUseSuspenseQueryNodes } from './service-operation
 /**
  * Creates AST nodes for all query operation methods
  */
-export const createServicesQueryOperationNodes = (
-  options: Pick<ServiceFactoryOptions, 'queryableWriteOperations'>
-) => [
+export const createServicesQueryOperationNodes = ({
+  omitOperationQueryFnNodes,
+}: {
+  omitOperationQueryFnNodes: boolean;
+}) => [
   ...createServiceOperationCancelQueriesNodes(),
   ...createServiceOperationUseQueryNodes(),
   ...createServiceOperationFetchInfiniteQueryNodes(),
@@ -44,9 +45,7 @@ export const createServicesQueryOperationNodes = (
   ...createServiceOperationGetQueryStateNodes(),
   ...createServiceOperationInvalidateQueriesNodes(),
   ...createServiceOperationIsFetchingQueriesNodes(),
-  ...(options.queryableWriteOperations
-    ? []
-    : createServiceOperationQueryFnNodes()),
+  ...(omitOperationQueryFnNodes ? [] : createServiceOperationQueryFnNodes()),
   ...createServiceOperationRefetchQueriesNodes(),
   ...createServiceOperationRemoveQueriesNodes(),
   ...createServiceOperationResetQueriesNodes(),

@@ -8,7 +8,7 @@ type Options = {
   createAPIClientFnName: string;
 };
 
-export const getOperationClientFactory = (options: Options) => {
+export const getCreateAPIClientFactory = (options: Options) => {
   return [
     ...getOperationClientImportsFactory(options),
     ...getCreateOperationClientFunctionFactory(options),

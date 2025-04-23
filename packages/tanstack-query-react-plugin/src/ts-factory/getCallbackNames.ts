@@ -34,7 +34,7 @@ function extractMethodNamesFromInterfaces(nodes: ts.Node[]): string[] {
  */
 export function getAllAvailableCallbackNames(): string[] {
   const queryNodes = createServicesQueryOperationNodes({
-    queryableWriteOperations: false,
+    omitOperationQueryFnNodes: true,
   });
   const mutationNodes = createServicesMutationOperationNodes();
 

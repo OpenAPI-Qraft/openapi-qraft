@@ -5,9 +5,11 @@ import {
 } from '@openapi-qraft/react/callbacks/index';
 import { QueryClient } from '@tanstack/query-core';
 import { describe, expect, it, vi } from 'vitest';
-import { createAPIOperationClient } from './fixtures/api/index.js';
-import { services } from './fixtures/internal-api/index.js';
-import { files, getFileList } from './fixtures/internal-api/services/Files.js';
+import {
+  createInternalReactAPIClient as createAPIOperationClient,
+  services,
+} from './fixtures/files-api/index.js';
+import { files, getFileList } from './fixtures/files-api/services/Files.js';
 
 const defaultOptions = {
   queryClient: new QueryClient(),

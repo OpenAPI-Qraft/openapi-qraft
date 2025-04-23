@@ -5,9 +5,11 @@ import {
 } from '@openapi-qraft/plugin/lib/predefineSchemaParameters';
 import { QraftCommand } from '@openapi-qraft/plugin/lib/QraftCommand';
 import { QraftCommandPlugin } from '@openapi-qraft/plugin/lib/QraftCommandPlugin';
-import { Option } from 'commander';
+import { CommanderError, Option } from 'commander';
 import { generateCode } from './generateCode.js';
+import { parseOptionSubValues } from './lib/parseOptionSubValues.js';
 import { getAllAvailableCallbackNames } from './ts-factory/getCallbackNames.js';
+import { CreateAPIClientFnOptions } from './ts-factory/getIndexFactory.js';
 
 export const plugin: QraftCommandPlugin = {
   setupCommand(command: QraftCommand) {
@@ -39,23 +41,22 @@ export const plugin: QraftCommandPlugin = {
       )
       .addOption(
         new Option(
-          '--default-client-callbacks <callbacks...>',
-          'List of default API client methods and hooks that will be available by default (imported to the generated client). These can be overridden at runtime if needed.'
+          '--create-api-client-fn [name...]',
+          'Name, default callbacks and services of the generated `createAPIClient` function'
         )
-          .choices(['all', 'none', ...getAllAvailableCallbackNames()])
-          .default(['all'])
-      )
-      .addOption(
-        new Option(
-          '--default-client-services <services...>',
-          'List of default API client services that will be available by default (imported to the generated client). These can be overridden at runtime if needed.'
-        )
-          .choices(['all', 'none'])
-          .default(['all'])
+          .argParser(parseCreateApiClientFn)
+          .default([
+            [
+              'createAPIClient',
+              {
+                services: ['all'],
+                callbacks: ['all'],
+                filename: ['create-api-client'],
+              },
+            ],
+          ])
       )
       .action(async ({ spinner, output, args, services, schema }, resolve) => {
-        validateDefaultCallbacks(args.defaultClientCallbacks, spinner);
-
         return void (await generateCode({
           spinner,
           services,
@@ -69,14 +70,6 @@ export const plugin: QraftCommandPlugin = {
             explicitImportExtensions: args.explicitImportExtensions,
             servicesDirName: 'services',
             exportSchemaTypes: args.exportOpenapiTypes,
-            defaultClientCallbacks: args.defaultClientCallbacks
-              .map((callbackName: string) => callbackName.trim())
-              .filter(Boolean),
-            defaultClientServices: args.defaultClientServices
-              ? args.defaultClientServices.map((serviceName: string) =>
-                  serviceName.trim()
-                )
-              : undefined,
             operationPredefinedParameters: args.operationPredefinedParameters
               ? createPredefinedParametersGlobs(
                   schema,
@@ -85,7 +78,9 @@ export const plugin: QraftCommandPlugin = {
                   )
                 )
               : undefined, // This value is inherited from the `--operation-predefined-parameters` option
-            createAPIClientFnName: 'createAPIOperationClient2',
+            createApiClientFn: normalizeCreateApiClientFn(
+              args.createApiClientFn
+            ),
           },
         }).then(resolve));
       });
@@ -96,19 +91,102 @@ function parseBooleanOption(arg: string) {
   return arg?.toLowerCase() !== 'false';
 }
 
-function validateDefaultCallbacks(
-  defaultCallbacks: string[],
-  spinner: Ora
-): asserts defaultCallbacks is string[] | ['all'] | ['none'] {
-  if (!defaultCallbacks || defaultCallbacks.length === 0) return;
-
-  const hasSpecialValue = defaultCallbacks.some(
-    (cb) => cb === 'all' || cb === 'none'
-  );
-  if (hasSpecialValue && defaultCallbacks.length > 1) {
-    spinner.fail(
-      `When using "all" or "none" as a callback value, no other callbacks should be specified.`
-    );
-    process.exit(1);
-  }
+function normalizeCreateApiClientFn(
+  value: CreateAPIClientFnArg[]
+): Array<[functionName: string, value: CreateAPIClientFnOptions]> {
+  return value.map(([functionName, value]) => [
+    functionName,
+    {
+      services: value.services ?? ['all'],
+      callbacks: value.callbacks ?? ['all'],
+      filename: value.filename ?? [functionName],
+    },
+  ]);
 }
+
+function parseCreateApiClientFn(
+  value: string,
+  previous: unknown
+): CreateAPIClientFnArg[] {
+  const nextValue = parseOptionSubValues(
+    value,
+    Array.isArray(previous) ? previous : undefined
+  );
+
+  const lastOptionConfig = nextValue.at(-1)?.[1];
+
+  if (!lastOptionConfig)
+    throw new CommanderError(
+      1,
+      'ERR_INVALID_SUB_OPTION_VALUE',
+      `Invalid sub-option value: ${value}`
+    );
+
+  if (
+    'callbacks' in lastOptionConfig &&
+    Array.isArray(lastOptionConfig.callbacks)
+  ) {
+    const availableCallbackNames = [
+      'all',
+      'none',
+      ...getAllAvailableCallbackNames(),
+    ];
+    const unknownCallback = lastOptionConfig.callbacks.find(
+      (callbackName) => !availableCallbackNames.includes(callbackName)
+    );
+
+    if (unknownCallback) {
+      throw new CommanderError(
+        1,
+        'ERR_UNKNOWN_CALLBACK',
+        `Unknown callback '${unknownCallback}'\n` +
+          `Available callbacks: ${availableCallbackNames.join(', ')}`
+      );
+    }
+  }
+
+  if (
+    'services' in lastOptionConfig &&
+    Array.isArray(lastOptionConfig.services)
+  ) {
+    if (lastOptionConfig.services.length > 1)
+      throw new CommanderError(
+        1,
+        'ERR_MULTIPLE_SERVICES',
+        `Multiple services are not supported`
+      );
+
+    const availableServiceOptions = ['all', 'none'];
+    const unknownServiceOption = lastOptionConfig.services.find(
+      (serviceOption) => !availableServiceOptions.includes(serviceOption)
+    );
+
+    if (unknownServiceOption) {
+      throw new CommanderError(
+        1,
+        'ERR_UNKNOWN_SERVICE_OPTION',
+        `Unknown service option '${unknownServiceOption}'\n` +
+          `Available service options: ${availableServiceOptions.join(', ')}`
+      );
+    }
+  }
+
+  if (
+    'filename' in lastOptionConfig &&
+    Array.isArray(lastOptionConfig.filename)
+  ) {
+    if (lastOptionConfig.filename.length > 1)
+      throw new CommanderError(
+        1,
+        'ERR_MULTIPLE_FILENAMES',
+        `Provide only one filename for the --create-api-client-fn option`
+      );
+  }
+
+  return nextValue;
+}
+
+type CreateAPIClientFnArg = [
+  functionName: string,
+  value: Partial<CreateAPIClientFnOptions>,
+];
