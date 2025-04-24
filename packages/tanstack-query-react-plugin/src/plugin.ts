@@ -11,10 +11,12 @@ import { generateCode } from './generateCode.js';
 export const plugin: QraftCommandPlugin = {
   setupCommand(command: QraftCommand) {
     command
-      .description('Generate TanStack Query React client from OpenAPI Schema')
+      .description(
+        'Generate a TanStack Query React client from OpenAPI Document'
+      )
       .requiredOption(
         '--openapi-types-import-path <path>',
-        'Path to schema types file (.d.ts), eg: "../schema.d.ts"'
+        'Path to schema types file (.d.ts), e.g.: "../schema.d.ts"'
       )
       .addOption(
         new Option(
@@ -26,7 +28,7 @@ export const plugin: QraftCommandPlugin = {
       )
       .option(
         '--export-openapi-types [bool]',
-        'Export the OpenAPI schema types from the generated `./index.ts` file',
+        "Add an export statement of the generated OpenAPI document types from the `./index.ts' file. Useful for sharing types within your project.",
         (arg) => {
           return arg?.toLowerCase() !== 'false';
         }
@@ -51,7 +53,7 @@ export const plugin: QraftCommandPlugin = {
                     ...args.operationPredefinedParameters
                   )
                 )
-              : undefined, // inherited from `--operation-predefined-parameters` option
+              : undefined, // This value is inherited from the `--operation-predefined-parameters` option
           },
         }).then(resolve));
       });
