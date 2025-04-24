@@ -693,46 +693,10 @@ console.log(
 );
 ```
 
-### Authorization and Custom Requests
-
-To override any request, you can provide a custom `request` function to the `QraftContext`.
-
-In the example below, we provide a custom `request` function to the `QraftContext` to handle the authorization token
-using a custom `fetchToken` async function.
-
-```tsx
-import { QraftContext, requestFn } from '@openapi-qraft/react';
-import { fetchToken } from './auth';
-
-function QraftProvider({ children }: { children: React.ReactNode }) {
-  return (
-    <QraftContext.Provider
-      value={{
-        baseUrl: 'https://api.sandbox.monite.com/v1',
-        async requestFn(schema, requestInfo) {
-          const token = await fetchToken();
-
-          return requestFn(schema, {
-            ...requestInfo,
-            /** Specify your predefined Headers **/
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          });
-        },
-      }}
-    >
-      {children}
-    </QraftContext.Provider>
-  );
-}
-```
-
 ## Contributing
 
 Contributions are welcome! If you have suggestions or want to improve `@openapi-qraft/react`, please feel free to submit
-a
-pull request or open an issue.
+a pull request or open an issue.
 
 ## License
 
