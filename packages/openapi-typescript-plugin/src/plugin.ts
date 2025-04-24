@@ -13,11 +13,11 @@ export const plugin: QraftCommandPlugin = {
   setupCommand(command) {
     command
       .description(
-        'Generate TypeScript types from OpenAPI 3.x Document. Based on "openapi-typescript" (https://github.com/drwpow/openapi-typescript/)'
+        'Generate a type-safe TanStack Query client for React from an OpenAPI Document.'
       )
       .option(
         '--openapi-types-file-name <path>',
-        'OpenAPI Schema types file name, eg: "schema.d.ts"',
+        'OpenAPI Schema types file name, e.g.: "schema.d.ts"',
         openapiTypesFileNameOptionParser,
         'schema.ts'
       )
@@ -64,7 +64,7 @@ export const plugin: QraftCommandPlugin = {
         'Enabling this option will export API components as separate type aliases, alongside `components` interface'
       )
       .action(async ({ output, args, spinner, schema }, resolve) => {
-        spinner.text = 'Generating OpenAPI Document Types';
+        spinner.text = 'Generating OpenAPI Document Types...';
 
         const code = await generateSchemaTypes(schema, {
           args,
@@ -84,7 +84,7 @@ export const plugin: QraftCommandPlugin = {
   postSetupCommand(command, plugins) {
     if (!plugins.includes('tanstack-query-react')) return;
 
-    // Makes `--openapi-types-import-path` option to be optional
+    // Makes the `--openapi-types-import-path` option optional
     command.options
       .find((option) => option.attributeName() === 'openapiTypesImportPath')
       ?.makeOptionMandatory(false);
@@ -126,7 +126,7 @@ export const plugin: QraftCommandPlugin = {
         'openapiTypesImportPath'
       );
 
-      // Validate if `--openapi-types-file-name` has a wrong file extension
+      // Validate whether `--openapi-types-file-name` has the correct file extension
       if (
         thisCommand.getOptionValue('explicitImportExtensions') &&
         thisCommand
@@ -138,7 +138,7 @@ export const plugin: QraftCommandPlugin = {
         throw new CommanderError(
           1,
           'ERR_INVALID_OPENAPI_TYPES_FILE_NAME',
-          "When '--explicit-import-extensions' is set, the '--openapi-types-file-name' must end with '.ts', or set '--openapi-types-import-path' to '.d.ts'"
+          "When the '--explicit-import-extensions' option is set, either the '--openapi-types-file-name' must end with '.ts' or you must explicitly set '--openapi-types-import-path' to include '.d.ts'"
         );
       }
 
