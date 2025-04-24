@@ -23,8 +23,7 @@ export default {
     'remark-lint-no-tabs',
     'remark-lint-no-trailing-spaces',
     'remark-heading-id',
-    'remark-validate-links',
-
+    ['remark-validate-links', { root: './docs' }],
     [
       remarkRetext,
       unified()
