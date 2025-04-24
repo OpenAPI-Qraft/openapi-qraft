@@ -150,6 +150,8 @@ describe('RedoclyConfigCommand', () => {
           redoclyConfigPath,
         ]
       )
-    ).rejects.toThrow(/not-existing-api.*not found in Redocly config/i);
+    ).rejects.toThrow(
+      /not-existing-api.*not found in the Redocly configuration/i
+    );
   });
 });

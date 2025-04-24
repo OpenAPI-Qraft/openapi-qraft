@@ -9,15 +9,23 @@ import { maybeEscapeShellArg } from './maybeEscapeShellArg.js';
 import { parseConfigToArgs } from './parseConfigToArgs.js';
 import { QraftCommand } from './QraftCommand.js';
 
+const examples = [
+  'openapi-qraft --redocly',
+  'openapi-qraft my-api@v1 external-api --redocly',
+  'openapi-qraft --redocly ./my-redocly-config.yaml',
+]
+  .map((example) => `"${c.italic.yellow(example)}"`)
+  .join(', ');
+
 export const redoclyOption = new Option(
   '--redocly [config]',
   [
-    `Use Redocly config to generate the API client.`,
-    `If the [config] is not specified, the default Redocly config will be used: [${CONFIG_FILE_NAMES.join(' | ')}].`,
-    'Example: "openapi-qraft --redocly", "openapi-qraft my-api@v1 external-api --redocly", "openapi-qraft --redocly ./my-redocly-config.yaml"',
-  ].join(' ')
+    c.bold(`Use the Redocly configuration to generate multiple API clients`),
+    `If the [config] parameter is not specified, the default Redocly configuration will be used: [${CONFIG_FILE_NAMES.join(' | ')}].`,
+    `For more information about this option, use the command: ${c.italic('--redocly-help')}`,
+    `${c.underline('Examples:')} ${examples}`,
+  ].join('\n')
 );
-
 /**
  * @param name - not used
  */
@@ -33,12 +41,13 @@ export class RedoclyConfigCommand extends Command {
     super(name);
     this.cwd = pathToFileURL(`${process.cwd()}/`);
 
-    this.usage(`<apis...> ${redoclyOption.description}`)
+    this.usage(c.green('<apis...> --redocly <config>'))
       .argument(
         '[apis...]',
-        'Optional Redocly config path to generate the API client. If path is not specified, the default Redocly config will be used.'
+        'Optional list of Redocly APIs for which to generate API clients. If not specified, clients for all APIs will be generated.'
       )
       .allowUnknownOption(true)
+      .helpOption('--redocly-help', 'Display help for the `--redocly` option')
       .addOption(redoclyOption)
       .action(async (apis = [], args) => {
         const redocly = args.redocly;
@@ -47,7 +56,7 @@ export class RedoclyConfigCommand extends Command {
 
         const spinner = QraftCommand.spinner;
 
-        spinner.start('Loading Redocly config ⛏︎');
+        spinner.start('Loading Redocly configuration ⚙︎');
 
         const redoc = await loadRedoclyConfig(redocly || true, this.cwd);
 
@@ -55,7 +64,7 @@ export class RedoclyConfigCommand extends Command {
 
         if (!redocConfigFile) {
           spinner.fail(
-            'No "configFile" found in Redocly config. Please specify the path to the Redocly config file.'
+            'No "configFile" found in the Redocly configuration. Please specify the correct path to the Redocly configuration file.'
           );
           process.exit(1);
         }
@@ -74,17 +83,17 @@ export class RedoclyConfigCommand extends Command {
 
           if (notFoundAPIs.length) {
             spinner.fail(
-              `API${
+              `The specified API${
                 notFoundAPIs.length > 1 ? 's' : ''
-              } ${notFoundAPIs.map(c.red).join(', ')} not found in Redocly config.`
+              } ${notFoundAPIs.map(c.red).join(', ')} ${notFoundAPIs.length > 1 ? 'were' : 'was'} not found in the Redocly configuration.`
             );
 
             throw new CommanderError(
               1,
               'ERR_API_NOT_FOUND',
-              `API${
+              `The specified API${
                 notFoundAPIs.length > 1 ? 's' : ''
-              } ${c.red(notFoundAPIs.join(', '))} not found in Redocly config.`
+              } ${c.red(notFoundAPIs.join(', '))} ${notFoundAPIs.length > 1 ? 'were' : 'was'} not found in the Redocly configuration.`
             );
           }
         }
@@ -134,19 +143,19 @@ export class RedoclyConfigCommand extends Command {
 
     const spinner = QraftCommand.spinner;
 
-    spinner.info('Loading Redocly config ⛏️');
+    spinner.info('Loading Redocly configuration...');
 
     const { errors, results } = await Promise.allSettled(
       redoclyAPIsEntries.map(
         async ([apiName, [openAPIDocument, ...apiProcessArgv]]) => {
           spinner.info(
-            `Generating API client for ${c.magenta(apiName)} using arguments: ` +
+            `Generating API client for ${c.magenta(apiName)} with the following parameters:\n` +
               `${c.green.italic(openAPIDocument)} ` +
               apiProcessArgv
                 .map((arg) =>
                   arg.startsWith('--')
                     ? c.yellow.italic(arg)
-                    : c.cyan.italic(maybeEscapeShellArg(arg))
+                    : c.yellow.italic.underline(maybeEscapeShellArg(arg))
                 )
                 .join(' ')
           );
@@ -174,7 +183,7 @@ export class RedoclyConfigCommand extends Command {
       throw new CommanderError(
         1,
         'ERROR',
-        'Errors occurred during API generation:\n' +
+        'The following errors occurred during API client generation:\n' +
           errors
             .map((error) =>
               error instanceof Error
@@ -186,7 +195,7 @@ export class RedoclyConfigCommand extends Command {
     }
 
     spinner.succeed(
-      c.green(`Successfully generated clients for APIs: `) +
+      c.green(`API clients successfully generated for: `) +
         redoclyAPIsEntries
           .map(([apiName]) => `"${c.magenta(apiName)}"`)
           .join(', ') +
