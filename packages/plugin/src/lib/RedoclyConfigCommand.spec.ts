@@ -31,9 +31,8 @@ describe('RedoclyConfigCommand', () => {
       [
         [
           [
-            "./openapi.json",
-            "--redocly-api",
             "main",
+            "--redocly",
             "../test-fixtures/redocly.yaml",
             "--output-dir",
             "../test-fixtures/src/api",
@@ -65,9 +64,8 @@ describe('RedoclyConfigCommand', () => {
         ],
         [
           [
-            "./openapi.json",
-            "--redocly-api",
             "main@internal",
+            "--redocly",
             "../test-fixtures/redocly.yaml",
             "--output-dir",
             "../test-fixtures/src/internal-api",
@@ -109,9 +107,8 @@ describe('RedoclyConfigCommand', () => {
       [
         [
           [
-            "./openapi.json",
-            "--redocly-api",
             "main@internal",
+            "--redocly",
             "../test-fixtures/redocly.yaml",
             "--output-dir",
             "../test-fixtures/src/internal-api",

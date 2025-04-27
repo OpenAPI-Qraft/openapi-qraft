@@ -9,23 +9,28 @@ import { maybeEscapeShellArg } from './maybeEscapeShellArg.js';
 import { parseConfigToArgs } from './parseConfigToArgs.js';
 import { QraftCommand } from './QraftCommand.js';
 
-const examples = [
-  'openapi-qraft --redocly',
-  'openapi-qraft my-api@v1 external-api --redocly',
-  'openapi-qraft --redocly ./my-redocly-config.yaml',
-]
-  .map((example) => `"${c.italic.yellow(example)}"`)
-  .join(', ');
+export const redoclyOption = (() => {
+  const bin = c.gray.underline('bin');
+  const __redocly = c.yellow('--redocly');
 
-export const redoclyOption = new Option(
-  '--redocly [config]',
-  [
-    c.bold(`Use the Redocly configuration to generate multiple API clients`),
-    `If the [config] parameter is not specified, the default Redocly configuration will be used: [${CONFIG_FILE_NAMES.join(' | ')}].`,
-    `For more information about this option, use the command: ${c.italic('--redocly-help')}`,
-    `${c.underline('Examples:')} ${examples}`,
-  ].join('\n')
-);
+  const examples = [
+    `${bin} ${__redocly}`,
+    `${bin} ${c.green('my-api')} ${__redocly}`,
+    `${bin} ${c.green('my-api@v1 my-api@v2')} ${__redocly}`,
+    `${bin} ${__redocly} ${c.yellow.underline('./my-redocly-config.yaml')}`,
+  ].map((example) => `${c.italic.yellow(example)}`);
+
+  return new Option(
+    '--redocly [config]',
+    [
+      c.bold(`Use the Redocly configuration to generate multiple API clients`),
+      `If the [config] parameter is not specified, the default Redocly configuration will be used: [${CONFIG_FILE_NAMES.join(' | ')}].`,
+      `For more information about this option, use the command: ${c.yellow.italic('--redocly-help')}`,
+      `${c.underline('Examples:')}`,
+      ...examples.map((example) => `${c.gray('$')} ${example}`),
+    ].join('\n')
+  );
+})();
 /**
  * @param name - not used
  */
@@ -41,7 +46,7 @@ export class RedoclyConfigCommand extends Command {
     super(name);
     this.cwd = pathToFileURL(`${process.cwd()}/`);
 
-    this.usage(c.green('<apis...> --redocly <config>'))
+    this.usage(c.green('[apis...] --redocly <config>'))
       .argument(
         '[apis...]',
         'Optional list of Redocly APIs for which to generate API clients. If not specified, clients for all APIs will be generated.'
@@ -101,15 +106,14 @@ export class RedoclyConfigCommand extends Command {
         redocAPIsToQraftEntries.forEach(([apiName, api]) => {
           const {
             ['x-openapi-qraft']: { ['output-dir']: outputDir, ...qraftConfig },
-            root: inputOpenAPIDocument,
           } = api;
 
           const cwd = fileURLToPath(this.cwd);
 
           this.parsedAPIs[apiName] = [
-            inputOpenAPIDocument,
+            apiName,
             ...parseConfigToArgs({
-              'redocly-api': [apiName, relative(cwd, redocConfigFile)],
+              redocly: relative(cwd, redocConfigFile),
               'output-dir': relative(cwd, outputDir),
               ...qraftConfig,
             }),
@@ -150,7 +154,8 @@ export class RedoclyConfigCommand extends Command {
         async ([apiName, [openAPIDocument, ...apiProcessArgv]]) => {
           spinner.info(
             `Generating API client for ${c.magenta(apiName)} with the following parameters:\n` +
-              `${c.green.italic(openAPIDocument)} ` +
+              c.gray.italic('bin ') +
+              `${c.green.italic(openAPIDocument)}` +
               apiProcessArgv
                 .map((arg) =>
                   arg.startsWith('--')
