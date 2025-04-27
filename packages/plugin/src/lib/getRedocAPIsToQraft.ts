@@ -6,7 +6,12 @@ import { Ora } from 'ora';
 
 export const QRAFT_REDOC_CONFIG_KEY = 'x-openapi-qraft';
 
-export function getRedocAPIsToQraft(redoc: Config, cwd: URL, spinner: Ora) {
+export function getRedocAPIsToQraft(
+  redoc: Config,
+  cwd: URL,
+  spinner: Ora,
+  apiName?: string
+) {
   const hasRedoclyApis = Object.keys(redoc?.apis ?? {}).length > 0;
   if (!hasRedoclyApis) {
     throw new CommanderError(
@@ -28,13 +33,15 @@ export function getRedocAPIsToQraft(redoc: Config, cwd: URL, spinner: Ora) {
     : new URL(redoc.configFile, cwd);
 
   const apisToQraftEntries = Object.entries(redoc.apis)
-    .map(([apiName, api]) => {
+    .map(([itemPpiName, api]) => {
+      if (apiName && apiName !== itemPpiName) return;
+
       const qraftConfig =
         QRAFT_REDOC_CONFIG_KEY in api ? api[QRAFT_REDOC_CONFIG_KEY] : undefined;
 
       if (!qraftConfig) {
         return void spinner.warn(
-          `API ${apiName} is missing an \`${QRAFT_REDOC_CONFIG_KEY}\` key. Skipping...`
+          `API ${itemPpiName} is missing an \`${QRAFT_REDOC_CONFIG_KEY}\` key. Skipping...`
         );
       }
 
@@ -42,7 +49,7 @@ export function getRedocAPIsToQraft(redoc: Config, cwd: URL, spinner: Ora) {
         throw new CommanderError(
           1,
           'ERR_MISSING_API_CONFIG',
-          `API ${apiName} is missing an \`${QRAFT_REDOC_CONFIG_KEY}\` key. See https://openapi-qraft.github.io/openapi-qraft/docs/codegen/CLI/redocly-config.`
+          `API ${itemPpiName} is missing an \`${QRAFT_REDOC_CONFIG_KEY}\` key. See https://openapi-qraft.github.io/openapi-qraft/docs/codegen/CLI/redocly-config.`
         );
       }
 
@@ -59,12 +66,12 @@ export function getRedocAPIsToQraft(redoc: Config, cwd: URL, spinner: Ora) {
         throw new CommanderError(
           1,
           'ERR_MISSING_API_OUTPUT',
-          `API ${apiName} is missing an "output-dir" key. See https://openapi-qraft.github.io/openapi-qraft/docs/codegen/CLI/redocly-config.`
+          `API ${itemPpiName} is missing an "output-dir" key. See https://openapi-qraft.github.io/openapi-qraft/docs/codegen/CLI/redocly-config.`
         );
       }
 
       return [
-        apiName,
+        itemPpiName,
         {
           ...api,
           [QRAFT_REDOC_CONFIG_KEY]: {

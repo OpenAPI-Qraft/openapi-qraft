@@ -1,14 +1,14 @@
-import type { ParseOptions } from 'commander';
 import { sep } from 'node:path';
 import process from 'node:process';
 import { pathToFileURL, URL } from 'node:url';
-import { createConfig, getMergedConfig } from '@redocly/openapi-core';
+import { Config, createConfig, getMergedConfig } from '@redocly/openapi-core';
 import c from 'ansi-colors';
-import { Command, Option } from 'commander';
+import { Command, CommanderError, Option, ParseOptions } from 'commander';
 import ora, { Ora } from 'ora';
 import { packageVersion } from '../packageVersion.js';
 import { filterDocumentPaths } from './filterDocumentPaths.js';
 import { GeneratorFile } from './GeneratorFile.js';
+import { getRedocAPIsToQraft } from './getRedocAPIsToQraft.js';
 import { handleSchemaInput } from './handleSchemaInput.js';
 import { loadRedoclyConfig } from './loadRedoclyConfig.js';
 import { getServices } from './open-api/getServices.js';
@@ -88,25 +88,7 @@ export class QraftCommand extends Command {
           'Header to be added to the generated file (eg: /* eslint-disable */)'
         )
       )
-      .addOption(redoclyOption)
-      .addOption(
-        new Option(
-          '--redocly-api <api_and_optional_config...>',
-          [
-            'Redocly API item and configuration with custom linting rules or plugins.',
-            'If path is not provided, the default Redocly configuration will be used.',
-            'Note that the "x-openapi-qraft" key is IGNORED in this context.',
-            'Instead, use the "openapi-qraft redocly" command to parse the Redocly configuration and generate multiple API clients.',
-            'Example: "--redocly my-api@v1", "--redocly my-api@v1 ./my-redocly-config.yaml"',
-          ].join(' ')
-        )
-          .hideHelp()
-          .argParser((value, previous) => {
-            return (Array.isArray(previous) ? previous : [])
-              .concat(value)
-              .slice(0, 2);
-          })
-      );
+      .addOption(redoclyOption);
   }
 
   action(callback: QraftCommandActionCallback): this {
@@ -133,8 +115,11 @@ export class QraftCommand extends Command {
 
     spinner.start('Initializing process...');
 
-    const redoc = args.redoclyApi
-      ? getMergedConfig(await loadRedoclyConfig(args.redoclyApi[1], this.cwd))
+    const redoc = args.redocly
+      ? getMergedConfig(
+          await loadRedoclyConfig(args.redocly, this.cwd),
+          inputs[0]
+        )
       : await createConfig(
           {
             rules: {
@@ -145,7 +130,9 @@ export class QraftCommand extends Command {
           { extends: ['minimal'] }
         );
 
-    const input = handleSchemaInput(inputs[0], this.cwd, spinner);
+    const input = args.redocly
+      ? handleRedoclySchemaInput(redoc, inputs[0], this.cwd, spinner)
+      : handleSchemaInput(inputs[0], this.cwd, spinner);
 
     spinner.text = 'Reading OpenAPI Document...';
 
@@ -591,4 +578,32 @@ function parseColonSeparatedList(value: string, previous: unknown) {
   }
 
   return [value];
+}
+
+function handleRedoclySchemaInput(
+  redoc: Config,
+  inputAPIName: string,
+  cwd: URL,
+  spinner: Ora
+) {
+  if (!inputAPIName) {
+    throw new CommanderError(
+      1,
+      'ERR_MISSING_API',
+      'No API specified. Please specify the API to be generated.'
+    );
+  }
+
+  const api = getRedocAPIsToQraft(redoc, cwd, spinner, inputAPIName)[
+    inputAPIName
+  ];
+
+  if (!api)
+    throw new CommanderError(
+      1,
+      'ERR_MISSING_API',
+      `API not found in Redocly API (${inputAPIName}) found in the Redocly configuration: ${inputAPIName}. Please specify the correct API.`
+    );
+
+  return new URL(api['root'], cwd);
 }

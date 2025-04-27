@@ -12,7 +12,7 @@ import { CommanderError } from 'commander';
  * 'redocly.yaml', 'redocly.yml', '.redocly.yaml', '.redocly.yml'
  */
 export async function loadRedoclyConfig(
-  configPath: null | undefined,
+  configPath: null | undefined | true,
   cwd: URL
 ): Promise<Config>;
 /**
@@ -23,7 +23,7 @@ export async function loadRedoclyConfig(
   cwd: URL
 ): Promise<Config>;
 export async function loadRedoclyConfig(
-  configPath: string | null | undefined,
+  configPath: string | null | undefined | true,
   cwd: URL
 ): Promise<Config> {
   const normalizedConfigPath =
