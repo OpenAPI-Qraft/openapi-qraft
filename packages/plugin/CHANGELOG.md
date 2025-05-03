@@ -1,5 +1,11 @@
 # @openapi-qraft/plugin
 
+## 2.4.0
+
+### Minor Changes
+
+- cc314c3: Added support for Redocly configuration, allowing to generate multiple API clients in a single command.
+
 ## 2.3.2
 
 ## 2.3.1

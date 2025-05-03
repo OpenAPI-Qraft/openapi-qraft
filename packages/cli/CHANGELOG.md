@@ -1,5 +1,18 @@
 # @openapi-qraft/cli
 
+## 2.4.0
+
+### Minor Changes
+
+- cc314c3: Added support for Redocly configuration, allowing to generate multiple API clients in a single command.
+
+### Patch Changes
+
+- Updated dependencies [cc314c3]
+  - @openapi-qraft/plugin@2.4.0
+  - @openapi-qraft/openapi-typescript-plugin@1.2.13
+  - @openapi-qraft/tanstack-query-react-plugin@2.4.0
+
 ## 2.3.2
 
 ### Patch Changes
