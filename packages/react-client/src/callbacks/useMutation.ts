@@ -10,6 +10,7 @@ import type { UseMutationResult } from '@tanstack/react-query';
 import type { CreateAPIQueryClientOptions } from '../qraftAPIClient.js';
 import { useMutation as useMutationBase } from '@tanstack/react-query';
 import { composeMutationKey } from '../lib/composeMutationKey.js';
+import { requestFnResponseRejecter } from '../lib/requestFnResponseRejecter.js';
 import { requestFnResponseResolver } from '../lib/requestFnResponseResolver.js';
 
 export const useMutation: <
@@ -69,7 +70,7 @@ export const useMutation: <
                   baseUrl: qraftOptions.baseUrl,
                   body: bodyPayload as never,
                 })
-                .then(requestFnResponseResolver, requestFnResponseResolver);
+                .then(requestFnResponseResolver, requestFnResponseRejecter);
             }
           : function (parametersAndBodyPayload) {
               const { body, ...parameters } = parametersAndBodyPayload as {
@@ -82,7 +83,7 @@ export const useMutation: <
                   baseUrl: qraftOptions.baseUrl,
                   body,
                 } as never)
-                .then(requestFnResponseResolver, requestFnResponseResolver);
+                .then(requestFnResponseResolver, requestFnResponseRejecter);
             }),
     },
     qraftOptions.queryClient

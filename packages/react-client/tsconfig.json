@@ -4,7 +4,7 @@
     "rootDir": "src",
     "outDir": "dist",
     "baseUrl": ".",
-    "lib": ["ES2019", "DOM", "DOM.Iterable"],
+    "lib": ["ES2019", "DOM", "DOM.Iterable", "ES2022.Error"],
     "jsx": "react",
     "verbatimModuleSyntax": true,
     "paths": {
