@@ -44,6 +44,7 @@ export default defineConfig({
       },
     ],
     coverage: {
+      include: ['src/**/*'],
       exclude: [
         'src/service-operation', // only types
         'src/**/*.type.ts', // only types
