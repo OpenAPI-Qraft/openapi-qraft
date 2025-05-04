@@ -185,9 +185,6 @@ describe('QraftSecureRequestFn', { timeout: 10_000 }, () => {
             queryClient={queryClient}
             securitySchemes={{
               partnerToken: fetchPartnerToken,
-              foo({ isRefreshing }) {
-                return isRefreshing ? '🔄 refreshing' : '⤴️ initial';
-              },
             }}
           >
             {(secureRequestFn) => (
