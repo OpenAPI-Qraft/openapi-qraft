@@ -9,6 +9,7 @@ import type { QueriesResults } from '@tanstack/react-query';
 import type { CreateAPIQueryClientOptions } from '../qraftAPIClient.js';
 import { useQueries as useQueriesTanstack } from '@tanstack/react-query';
 import { composeQueryKey } from '../lib/composeQueryKey.js';
+import { requestFnResponseRejecter } from '../lib/requestFnResponseRejecter.js';
 import { requestFnResponseResolver } from '../lib/requestFnResponseResolver.js';
 
 export const useQueries: (
@@ -56,7 +57,7 @@ export const useQueries: (
                   signal,
                   meta,
                 })
-                .then(requestFnResponseResolver, requestFnResponseResolver);
+                .then(requestFnResponseResolver, requestFnResponseRejecter);
             },
         };
       }),

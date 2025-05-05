@@ -9,6 +9,7 @@ import type { SuspenseQueriesResults } from '@tanstack/react-query';
 import type { CreateAPIQueryClientOptions } from '../qraftAPIClient.js';
 import { useSuspenseQueries as useSuspenseQueriesTanstack } from '@tanstack/react-query';
 import { composeQueryKey } from '../lib/composeQueryKey.js';
+import { requestFnResponseRejecter } from '../lib/requestFnResponseRejecter.js';
 import { requestFnResponseResolver } from '../lib/requestFnResponseResolver.js';
 
 export const useSuspenseQueries: (
@@ -56,7 +57,7 @@ export const useSuspenseQueries: (
                   signal,
                   meta,
                 })
-                .then(requestFnResponseResolver, requestFnResponseResolver);
+                .then(requestFnResponseResolver, requestFnResponseRejecter);
             },
         };
       }),

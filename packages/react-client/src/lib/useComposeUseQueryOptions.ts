@@ -7,6 +7,7 @@ import type { CreateAPIQueryClientOptions } from '../qraftAPIClient.js';
 import type { OperationSchema } from './requestFn.js';
 import { composeInfiniteQueryKey } from './composeInfiniteQueryKey.js';
 import { composeQueryKey } from './composeQueryKey.js';
+import { requestFnResponseRejecter } from './requestFnResponseRejecter.js';
 import { requestFnResponseResolver } from './requestFnResponseResolver.js';
 import { shelfMerge } from './shelfMerge.js';
 
@@ -35,7 +36,7 @@ export function useComposeUseQueryOptions(
           signal,
           meta,
         })
-        .then(requestFnResponseResolver, requestFnResponseResolver);
+        .then(requestFnResponseResolver, requestFnResponseRejecter);
     };
 
   const queryKey = Array.isArray(parameters)
