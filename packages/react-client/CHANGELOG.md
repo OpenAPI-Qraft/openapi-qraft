@@ -1,5 +1,12 @@
 # @openapi-qraft/react
 
+## 2.4.1
+
+### Patch Changes
+
+- 70518c4: Fixed error handling issues with `<QraftSecureRequestFn/>` by implementing dedicated error rejection handling instead of incorrectly using the same resolver for both success and error cases.
+  - @openapi-qraft/tanstack-query-react-types@2.4.1
+
 ## 2.4.0
 
 ### Patch Changes
