@@ -176,8 +176,12 @@ const getServiceInterfaceOperationFactory = (
     undefined,
     factory.createTypeLiteralNode([
       ...replaceGenericTypesWithOperationTypes(
-        reduceAreAllOptionalConditionalTParamsType(
-          operationMethodNodes,
+        reduceAreAllOptionalConditionalTVariablesType(
+          reduceAreAllOptionalConditionalTParamsType(
+            operationMethodNodes,
+            operation,
+            options
+          ),
           operation
         ),
         operation
@@ -789,6 +793,46 @@ function reduceAreAllOptionalConditionalTParamsType<T extends ts.Node>(
           })
         ) {
           if (operation.parameters?.some((parameter) => parameter.required)) {
+            return node.falseType;
+          } else {
+            return node.trueType;
+          }
+        }
+        return ts.visitEachChild(node, visit, context);
+      }
+      return ts.visitNode(rootNode, visit);
+    };
+
+  const result = ts.transform(node, [transformer]);
+
+  return result.transformed as T[];
+}
+
+/**
+ * Replaces `AreAllOptional<TVariables>` with `TVariables | void` if `TVariables` is optional,
+ * and with `TVariables` when `body` is required.
+ */
+function reduceAreAllOptionalConditionalTVariablesType<T extends ts.Node>(
+  node: T[],
+  operation: ServiceOperation
+): T[] {
+  const transformer =
+    (context: ts.TransformationContext) => (rootNode: ts.Node) => {
+      function visit(node: ts.Node): ts.Node {
+        if (
+          ts.isConditionalTypeNode(node) &&
+          ts.isTypeReferenceNode(node.checkType) &&
+          ts.isIdentifier(node.checkType.typeName) &&
+          node.checkType.typeName.text === 'AreAllOptional' &&
+          node.checkType.typeArguments?.every((node) => {
+            return (
+              ts.isTypeReferenceNode(node) &&
+              ts.isIdentifier(node.typeName) &&
+              node.typeName.text === 'TVariables'
+            );
+          })
+        ) {
+          if (operation.requestBody?.required) {
             return node.falseType;
           } else {
             return node.trueType;

@@ -4,7 +4,7 @@
  */
 
 import type { paths } from "../../openapi.js";
-import type { AreAllOptional, DeepReadonly, InvalidateQueryFilters, MutationFiltersByMutationKey, MutationFiltersByParameters, MutationVariables, OperationInfiniteData, PartialParameters, QueryFiltersByParameters, QueryFiltersByQueryKey, QueryFnOptionsByParameters, QueryFnOptionsByQueryKey, RequestFnResponse, ServiceOperationEnsureInfiniteQueryDataOptions, ServiceOperationEnsureQueryDataOptions, ServiceOperationFetchInfiniteQueryOptions, ServiceOperationFetchQueryOptions, ServiceOperationInfiniteQueryKey, ServiceOperationMutationFnOptions, ServiceOperationMutationKey, ServiceOperationQueryKey, ServiceOperationUseMutationOptions, UseQueryOptionsForUseQueries, UseQueryOptionsForUseSuspenseQuery, WithOptional } from "@openapi-qraft/tanstack-query-react-types";
+import type { DeepReadonly, InvalidateQueryFilters, MutationFiltersByMutationKey, MutationFiltersByParameters, MutationVariables, OperationInfiniteData, PartialParameters, QueryFiltersByParameters, QueryFiltersByQueryKey, QueryFnOptionsByParameters, QueryFnOptionsByQueryKey, RequestFnResponse, ServiceOperationEnsureInfiniteQueryDataOptions, ServiceOperationEnsureQueryDataOptions, ServiceOperationFetchInfiniteQueryOptions, ServiceOperationFetchQueryOptions, ServiceOperationInfiniteQueryKey, ServiceOperationMutationFnOptions, ServiceOperationMutationKey, ServiceOperationQueryKey, ServiceOperationUseMutationOptions, UseQueryOptionsForUseQueries, UseQueryOptionsForUseSuspenseQuery, WithOptional } from "@openapi-qraft/tanstack-query-react-types";
 import type { CancelOptions, InfiniteQueryPageParamsOptions, InvalidateOptions, Mutation, MutationState, NoInfer, QueryState, RefetchOptions, ResetOptions, SetDataOptions, Updater } from "@tanstack/query-core";
 import type { DefinedInitialDataInfiniteOptions, DefinedInitialDataOptions, DefinedUseInfiniteQueryResult, DefinedUseQueryResult, UndefinedInitialDataInfiniteOptions, UndefinedInitialDataOptions, UseInfiniteQueryResult, UseMutationResult, UseQueryResult, UseSuspenseInfiniteQueryOptions, UseSuspenseInfiniteQueryResult, UseSuspenseQueryOptions, UseSuspenseQueryResult } from "@tanstack/react-query";
 export interface FilesService {
@@ -426,7 +426,7 @@ export interface FilesService {
          * });
          * ```
          */
-        useMutation<TVariables extends PostFilesBody, TContext = unknown>(parameters: DeepReadonly<PostFilesParameters>, options?: ServiceOperationUseMutationOptions<PostFilesSchema, PostFilesData, PostFilesParameters, TVariables, PostFilesError | Error, TContext>): UseMutationResult<PostFilesData, PostFilesError | Error, AreAllOptional<TVariables> extends true ? TVariables | void : TVariables, TContext>;
+        useMutation<TVariables extends PostFilesBody, TContext = unknown>(parameters: DeepReadonly<PostFilesParameters>, options?: ServiceOperationUseMutationOptions<PostFilesSchema, PostFilesData, PostFilesParameters, TVariables, PostFilesError | Error, TContext>): UseMutationResult<PostFilesData, PostFilesError | Error, TVariables | void, TContext>;
         /**
          * Enables performing asynchronous data mutation operations such as POST, PUT, PATCH, or DELETE requests.
          * Handles loading state, optimistic updates, and error handling.
@@ -534,7 +534,7 @@ export interface FilesService {
          * });
          * ```
          */
-        useMutation<TVariables extends DeleteFilesBody, TContext = unknown>(parameters: DeepReadonly<DeleteFilesParameters>, options?: ServiceOperationUseMutationOptions<DeleteFilesSchema, DeleteFilesData, DeleteFilesParameters, TVariables, DeleteFilesError | Error, TContext>): UseMutationResult<DeleteFilesData, DeleteFilesError | Error, AreAllOptional<TVariables> extends true ? TVariables | void : TVariables, TContext>;
+        useMutation<TVariables extends DeleteFilesBody, TContext = unknown>(parameters: DeepReadonly<DeleteFilesParameters>, options?: ServiceOperationUseMutationOptions<DeleteFilesSchema, DeleteFilesData, DeleteFilesParameters, TVariables, DeleteFilesError | Error, TContext>): UseMutationResult<DeleteFilesData, DeleteFilesError | Error, TVariables | void, TContext>;
         /**
          * Enables performing asynchronous data mutation operations such as POST, PUT, PATCH, or DELETE requests.
          * Handles loading state, optimistic updates, and error handling.
