@@ -178,12 +178,7 @@ export function bodySerializer(
   schema: OperationSchema,
   body: RequestFnInfo['body']
 ) {
-  if (
-    schema.method === 'get' ||
-    schema.method === 'head' ||
-    schema.method === 'options'
-  )
-    return undefined;
+  if (isReadOnlyOperation(schema)) return undefined;
 
   if (body === undefined || body === null) return undefined;
 
@@ -314,3 +309,22 @@ export type {
  * @deprecated use `RequestFnInfo` instead
  */
 export type RequestFnPayload = RequestFnInfo;
+
+function isReadOnlyOperation(operation: {
+  readonly method:
+    | 'get'
+    | 'put'
+    | 'post'
+    | 'patch'
+    | 'delete'
+    | 'options'
+    | 'head'
+    | 'trace';
+}) {
+  return (
+    operation.method === 'get' ||
+    operation.method === 'head' ||
+    operation.method === 'trace' ||
+    operation.method === 'options'
+  );
+}

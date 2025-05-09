@@ -7,14 +7,14 @@ import type { UseSuspenseQueryResult } from '@tanstack/react-query';
 export interface ServiceOperationUseSuspenseQueries<
   TSchema extends { url: string; method: string },
   TOperationQueryFnData,
-  TParams,
+  TQueryParams,
   TError,
 > {
   useSuspenseQueries<
     T extends Array<
       UseQueryOptionsForUseSuspenseQuery<
         TSchema,
-        TParams,
+        TQueryParams,
         TOperationQueryFnData,
         TError
       >

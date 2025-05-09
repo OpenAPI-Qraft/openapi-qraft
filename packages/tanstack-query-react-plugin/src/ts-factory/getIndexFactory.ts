@@ -1,4 +1,4 @@
-import type { ServiceImportsFactoryOptions } from './getServiceFactory.js';
+import type { ServiceFactoryOptions } from './getServiceFactory.js';
 import ts from 'typescript';
 import { maybeResolveImport } from '../lib/maybeResolveImport.js';
 
@@ -9,7 +9,7 @@ export const getIndexFactory = ({
 }: {
   servicesDirName: string;
   explicitImportExtensions: '.js' | '.ts' | undefined;
-} & Partial<Pick<ServiceImportsFactoryOptions, 'openapiTypesImportPath'>>) => {
+} & Partial<Pick<ServiceFactoryOptions, 'openapiTypesImportPath'>>) => {
   const factory = ts.factory;
   const importExtension = explicitImportExtensions ?? '';
 

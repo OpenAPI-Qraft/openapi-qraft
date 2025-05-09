@@ -7,7 +7,7 @@ import type { RefetchOptions } from '@tanstack/query-core';
 export interface ServiceOperationRefetchQueries<
   TSchema extends { url: string; method: string },
   TOperationQueryFnData,
-  TParams,
+  TQueryParams,
   TError,
 > {
   refetchQueries<TInfinite extends boolean = false>(
@@ -16,14 +16,14 @@ export interface ServiceOperationRefetchQueries<
           TSchema,
           TOperationQueryFnData,
           TInfinite,
-          TParams,
+          TQueryParams,
           TError
         >
       | QueryFiltersByQueryKey<
           TSchema,
           TOperationQueryFnData,
           TInfinite,
-          TParams,
+          TQueryParams,
           TError
         >,
     options?: RefetchOptions

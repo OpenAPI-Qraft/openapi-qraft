@@ -26,13 +26,19 @@ export function useComposeUseQueryOptions(
   const queryFn =
     options?.queryFn ??
     function ({ queryKey: [, queryParams], signal, meta, pageParam }) {
+      const { body, ...parameters } = queryParams as {
+        body: BodyInit;
+        parameters: Record<string, unknown>;
+      };
+
       return qraftOptions
         .requestFn(schema, {
           // @ts-expect-error - Too complex to type
           parameters: infinite
-            ? (shelfMerge(2, queryParams, pageParam) as never)
-            : queryParams,
+            ? (shelfMerge(2, parameters, pageParam) as never)
+            : parameters,
           baseUrl: qraftOptions.baseUrl,
+          body,
           signal,
           meta,
         })

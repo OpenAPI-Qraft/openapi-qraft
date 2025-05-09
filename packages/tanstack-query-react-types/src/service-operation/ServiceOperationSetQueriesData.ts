@@ -7,7 +7,7 @@ import type { NoInfer, SetDataOptions, Updater } from '@tanstack/query-core';
 export interface ServiceOperationSetQueriesData<
   TSchema extends { url: string; method: string },
   TOperationQueryFnData,
-  TParams,
+  TQueryParams,
   TError,
 > {
   setQueriesData<TInfinite extends boolean = false>(
@@ -16,14 +16,14 @@ export interface ServiceOperationSetQueriesData<
           TSchema,
           TOperationQueryFnData,
           TInfinite,
-          TParams,
+          TQueryParams,
           TError
         >
       | QueryFiltersByQueryKey<
           TSchema,
           TOperationQueryFnData,
           TInfinite,
-          TParams,
+          TQueryParams,
           TError
         >,
     updater: Updater<

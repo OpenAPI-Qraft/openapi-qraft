@@ -9,60 +9,60 @@ import type {
 export interface ServiceOperationFetchInfiniteQuery<
   TSchema extends { url: string; method: string },
   TOperationQueryFnData,
-  TParams,
+  TQueryParams,
   TError,
 > {
-  fetchInfiniteQuery<TPageParam extends TParams>(
-    options: AreAllOptional<TParams> extends true
+  fetchInfiniteQuery<TPageParam extends TQueryParams>(
+    options: AreAllOptional<TQueryParams> extends true
       ? ServiceOperationFetchInfiniteQueryOptions<
           TSchema,
           TOperationQueryFnData,
-          TParams,
+          TQueryParams,
           DeepReadonly<TPageParam>,
           TError
         > | void
       : ServiceOperationFetchInfiniteQueryOptions<
           TSchema,
           TOperationQueryFnData,
-          TParams,
+          TQueryParams,
           DeepReadonly<TPageParam>,
           TError
         >
-  ): Promise<OperationInfiniteData<TOperationQueryFnData, TParams>>;
+  ): Promise<OperationInfiniteData<TOperationQueryFnData, TQueryParams>>;
 
-  prefetchInfiniteQuery<TPageParam extends TParams>(
-    options: AreAllOptional<TParams> extends true
+  prefetchInfiniteQuery<TPageParam extends TQueryParams>(
+    options: AreAllOptional<TQueryParams> extends true
       ? ServiceOperationFetchInfiniteQueryOptions<
           TSchema,
           TOperationQueryFnData,
-          TParams,
+          TQueryParams,
           DeepReadonly<TPageParam>,
           TError
         > | void
       : ServiceOperationFetchInfiniteQueryOptions<
           TSchema,
           TOperationQueryFnData,
-          TParams,
+          TQueryParams,
           DeepReadonly<TPageParam>,
           TError
         >
   ): Promise<void>;
 
-  ensureInfiniteQueryData<TPageParam extends TParams>(
-    options: AreAllOptional<TParams> extends true
+  ensureInfiniteQueryData<TPageParam extends TQueryParams>(
+    options: AreAllOptional<TQueryParams> extends true
       ? ServiceOperationEnsureInfiniteQueryDataOptions<
           TSchema,
           TOperationQueryFnData,
-          TParams,
+          TQueryParams,
           DeepReadonly<TPageParam>,
           TError
         > | void
       : ServiceOperationEnsureInfiniteQueryDataOptions<
           TSchema,
           TOperationQueryFnData,
-          TParams,
+          TQueryParams,
           DeepReadonly<TPageParam>,
           TError
         >
-  ): Promise<OperationInfiniteData<TOperationQueryFnData, TParams>>;
+  ): Promise<OperationInfiniteData<TOperationQueryFnData, TQueryParams>>;
 }

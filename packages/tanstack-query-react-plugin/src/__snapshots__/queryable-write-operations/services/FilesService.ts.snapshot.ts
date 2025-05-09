@@ -3,7 +3,7 @@
  * Do not make direct changes to the file.
  */
 
-import type { paths } from "../../openapi.js";
+import type { paths } from "../../openapi.d.ts";
 import type { DeepReadonly, InvalidateQueryFilters, MutationFiltersByMutationKey, MutationFiltersByParameters, MutationVariables, OperationInfiniteData, PartialParameters, QueryFiltersByParameters, QueryFiltersByQueryKey, QueryFnOptionsByParameters, QueryFnOptionsByQueryKey, RequestFnResponse, ServiceOperationEnsureInfiniteQueryDataOptions, ServiceOperationEnsureQueryDataOptions, ServiceOperationFetchInfiniteQueryOptions, ServiceOperationFetchQueryOptions, ServiceOperationInfiniteQueryKey, ServiceOperationMutationFnOptions, ServiceOperationMutationKey, ServiceOperationQueryKey, ServiceOperationUseMutationOptions, UseQueryOptionsForUseQueries, UseQueryOptionsForUseSuspenseQuery, WithOptional } from "@openapi-qraft/tanstack-query-react-types";
 import type { CancelOptions, InfiniteQueryPageParamsOptions, InvalidateOptions, Mutation, MutationState, NoInfer, QueryState, RefetchOptions, ResetOptions, SetDataOptions, Updater } from "@tanstack/query-core";
 import type { DefinedInitialDataInfiniteOptions, DefinedInitialDataOptions, DefinedUseInfiniteQueryResult, DefinedUseQueryResult, UndefinedInitialDataInfiniteOptions, UndefinedInitialDataOptions, UseInfiniteQueryResult, UseMutationResult, UseQueryResult, UseSuspenseInfiniteQueryOptions, UseSuspenseInfiniteQueryResult, UseSuspenseQueryOptions, UseSuspenseQueryResult } from "@tanstack/react-query";
@@ -406,7 +406,7 @@ export interface FilesService {
     /** @summary Upload a files by ID */
     postFiles: {
         /** @summary Upload a files by ID */
-        getMutationKey(parameters: DeepReadonly<PostFilesParameters> | void): ServiceOperationMutationKey<PostFilesSchema, PostFilesParameters>;
+        getMutationKey(parameters: DeepReadonly<PostFilesMutationParameters> | void): ServiceOperationMutationKey<PostFilesSchema, PostFilesMutationParameters>;
         /**
          * Enables performing asynchronous data mutation operations such as POST, PUT, PATCH, or DELETE requests.
          * Handles loading state, optimistic updates, and error handling.
@@ -426,7 +426,7 @@ export interface FilesService {
          * });
          * ```
          */
-        useMutation<TVariables extends PostFilesBody, TContext = unknown>(parameters: DeepReadonly<PostFilesParameters>, options?: ServiceOperationUseMutationOptions<PostFilesSchema, PostFilesData, PostFilesParameters, TVariables, PostFilesError | Error, TContext>): UseMutationResult<PostFilesData, PostFilesError | Error, TVariables | void, TContext>;
+        useMutation<TVariables extends PostFilesBody, TContext = unknown>(parameters: DeepReadonly<PostFilesMutationParameters>, options?: ServiceOperationUseMutationOptions<PostFilesSchema, PostFilesData, PostFilesMutationParameters, TVariables, PostFilesError | Error, TContext>): UseMutationResult<PostFilesData, PostFilesError | Error, TVariables | void, TContext>;
         /**
          * Enables performing asynchronous data mutation operations such as POST, PUT, PATCH, or DELETE requests.
          * Handles loading state, optimistic updates, and error handling.
@@ -446,7 +446,7 @@ export interface FilesService {
          * });
          * ```
          */
-        useMutation<TVariables extends MutationVariables<PostFilesBody, PostFilesParameters>, TContext = unknown>(parameters: void, options?: ServiceOperationUseMutationOptions<PostFilesSchema, PostFilesData, PostFilesParameters, TVariables, PostFilesError | Error, TContext>): UseMutationResult<PostFilesData, PostFilesError | Error, TVariables, TContext>;
+        useMutation<TVariables extends MutationVariables<PostFilesBody, PostFilesMutationParameters>, TContext = unknown>(parameters: void, options?: ServiceOperationUseMutationOptions<PostFilesSchema, PostFilesData, PostFilesMutationParameters, TVariables, PostFilesError | Error, TContext>): UseMutationResult<PostFilesData, PostFilesError | Error, TVariables, TContext>;
         /**
          * Returns the count of currently in-progress mutations.
          *
@@ -463,11 +463,11 @@ export interface FilesService {
          * })
          * ```
          */
-        useIsMutating<TContext = unknown>(filters?: MutationFiltersByParameters<PostFilesBody, PostFilesData, PostFilesParameters, PostFilesError | Error, TContext> | MutationFiltersByMutationKey<PostFilesSchema, PostFilesBody, PostFilesData, PostFilesParameters, PostFilesError | Error, TContext>): number;
+        useIsMutating<TContext = unknown>(filters?: MutationFiltersByParameters<PostFilesBody, PostFilesData, PostFilesMutationParameters, PostFilesError | Error, TContext> | MutationFiltersByMutationKey<PostFilesSchema, PostFilesBody, PostFilesData, PostFilesMutationParameters, PostFilesError | Error, TContext>): number;
         /** @summary Upload a files by ID */
-        isMutating<TContext>(filters?: MutationFiltersByParameters<PostFilesBody, PostFilesData, PostFilesParameters, PostFilesError | Error, TContext> | MutationFiltersByMutationKey<PostFilesSchema, PostFilesBody, PostFilesData, PostFilesParameters, PostFilesError | Error, TContext>): number;
+        isMutating<TContext>(filters?: MutationFiltersByParameters<PostFilesBody, PostFilesData, PostFilesMutationParameters, PostFilesError | Error, TContext> | MutationFiltersByMutationKey<PostFilesSchema, PostFilesBody, PostFilesData, PostFilesMutationParameters, PostFilesError | Error, TContext>): number;
         /** @summary Upload a files by ID */
-        (options: ServiceOperationMutationFnOptions<PostFilesBody, PostFilesParameters>, client?: (schema: PostFilesSchema, options: ServiceOperationMutationFnOptions<PostFilesBody, PostFilesParameters>) => Promise<RequestFnResponse<PostFilesData, PostFilesError>>): Promise<RequestFnResponse<PostFilesData, PostFilesError>>;
+        (options: ServiceOperationMutationFnOptions<PostFilesBody, PostFilesMutationParameters>, client?: (schema: PostFilesSchema, options: ServiceOperationMutationFnOptions<PostFilesBody, PostFilesMutationParameters>) => Promise<RequestFnResponse<PostFilesData, PostFilesError>>): Promise<RequestFnResponse<PostFilesData, PostFilesError>>;
         /**
          * Provides access to the current state of a mutation, including its status, any resulting data, and associated errors.
          *
@@ -492,13 +492,261 @@ export interface FilesService {
          * })
          * ```
          */
-        useMutationState<TContext = unknown, TResult = MutationState<PostFilesData, PostFilesError | Error, MutationVariables<PostFilesBody, PostFilesParameters>, TContext>>(options?: {
-            filters?: MutationFiltersByParameters<PostFilesBody, PostFilesData, PostFilesParameters, PostFilesError | Error, TContext> | MutationFiltersByMutationKey<PostFilesSchema, PostFilesBody, PostFilesData, PostFilesParameters, PostFilesError | Error, TContext>;
-            select?: (mutation: Mutation<PostFilesData, PostFilesError | Error, MutationVariables<PostFilesBody, PostFilesParameters>, TContext>) => TResult;
+        useMutationState<TContext = unknown, TResult = MutationState<PostFilesData, PostFilesError | Error, MutationVariables<PostFilesBody, PostFilesMutationParameters>, TContext>>(options?: {
+            filters?: MutationFiltersByParameters<PostFilesBody, PostFilesData, PostFilesMutationParameters, PostFilesError | Error, TContext> | MutationFiltersByMutationKey<PostFilesSchema, PostFilesBody, PostFilesData, PostFilesMutationParameters, PostFilesError | Error, TContext>;
+            select?: (mutation: Mutation<PostFilesData, PostFilesError | Error, MutationVariables<PostFilesBody, PostFilesMutationParameters>, TContext>) => TResult;
         }): Array<TResult>;
+        /** @summary Upload a files by ID */
+        cancelQueries<TInfinite extends boolean = false>(filters?: QueryFiltersByParameters<PostFilesSchema, PostFilesData, TInfinite, PostFilesQueryParameters, PostFilesError> | QueryFiltersByQueryKey<PostFilesSchema, PostFilesData, TInfinite, PostFilesQueryParameters, PostFilesError>, options?: CancelOptions): Promise<void>;
+        /** @summary Upload a files by ID */
+        getQueryKey(parameters: DeepReadonly<PostFilesQueryParameters> | void): ServiceOperationQueryKey<PostFilesSchema, PostFilesQueryParameters>;
+        /**
+         * Performs asynchronous data fetching, manages loading states and error handling.
+         *
+         * @summary Upload a files by ID
+         * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/hooks/useQuery|`useQuery(...)` documentation}
+         * @example Query without parameters
+         * ```ts
+         * const { data, isLoading } = qraft.filesService.postFiles.useQuery()
+         * ```
+         */
+        useQuery<TData = PostFilesData>(parameters: ServiceOperationQueryKey<PostFilesSchema, PostFilesQueryParameters> | (DeepReadonly<PostFilesQueryParameters> | void), options?: Omit<UndefinedInitialDataOptions<PostFilesData, PostFilesError, TData, ServiceOperationQueryKey<PostFilesSchema, PostFilesQueryParameters>>, "queryKey">): UseQueryResult<TData, PostFilesError | Error>;
+        /**
+         * Performs asynchronous data fetching, manages loading states and error handling.
+         *
+         * @summary Upload a files by ID
+         * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/hooks/useQuery|`useQuery(...)` documentation}
+         * @example Query without parameters
+         * ```ts
+         * const { data, isLoading } = qraft.filesService.postFiles.useQuery()
+         * ```
+         */
+        useQuery<TData = PostFilesData>(parameters: ServiceOperationQueryKey<PostFilesSchema, PostFilesQueryParameters> | (DeepReadonly<PostFilesQueryParameters> | void), options: Omit<DefinedInitialDataOptions<PostFilesData, PostFilesError, TData, ServiceOperationQueryKey<PostFilesSchema, PostFilesQueryParameters>>, "queryKey">): DefinedUseQueryResult<TData, PostFilesError | Error>;
+        /** @summary Upload a files by ID */
+        fetchInfiniteQuery<TPageParam extends PostFilesQueryParameters>(options: ServiceOperationFetchInfiniteQueryOptions<PostFilesSchema, PostFilesData, PostFilesQueryParameters, DeepReadonly<TPageParam>, PostFilesError> | void): Promise<OperationInfiniteData<PostFilesData, PostFilesQueryParameters>>;
+        /** @summary Upload a files by ID */
+        prefetchInfiniteQuery<TPageParam extends PostFilesQueryParameters>(options: ServiceOperationFetchInfiniteQueryOptions<PostFilesSchema, PostFilesData, PostFilesQueryParameters, DeepReadonly<TPageParam>, PostFilesError> | void): Promise<void>;
+        /** @summary Upload a files by ID */
+        ensureInfiniteQueryData<TPageParam extends PostFilesQueryParameters>(options: ServiceOperationEnsureInfiniteQueryDataOptions<PostFilesSchema, PostFilesData, PostFilesQueryParameters, DeepReadonly<TPageParam>, PostFilesError> | void): Promise<OperationInfiniteData<PostFilesData, PostFilesQueryParameters>>;
+        /** @summary Upload a files by ID */
+        fetchQuery(options: ServiceOperationFetchQueryOptions<PostFilesSchema, PostFilesData, PostFilesQueryParameters, PostFilesError> | void): Promise<PostFilesData>;
+        /** @summary Upload a files by ID */
+        prefetchQuery(options: ServiceOperationFetchQueryOptions<PostFilesSchema, PostFilesData, PostFilesQueryParameters, PostFilesError> | void): Promise<void>;
+        /** @summary Upload a files by ID */
+        ensureQueryData(options: ServiceOperationEnsureQueryDataOptions<PostFilesSchema, PostFilesData, PostFilesQueryParameters, PostFilesError> | void): Promise<PostFilesData>;
+        /** @summary Upload a files by ID */
+        getInfiniteQueryData(parameters: ServiceOperationInfiniteQueryKey<PostFilesSchema, PostFilesQueryParameters> | (DeepReadonly<PostFilesQueryParameters> | void)): OperationInfiniteData<PostFilesData, PostFilesQueryParameters> | undefined;
+        /** @summary Upload a files by ID */
+        getQueriesData<TInfinite extends boolean = false>(filters?: QueryFiltersByParameters<PostFilesSchema, PostFilesData, TInfinite, PostFilesQueryParameters, PostFilesError> | QueryFiltersByQueryKey<PostFilesSchema, PostFilesData, TInfinite, PostFilesQueryParameters, PostFilesError>): TInfinite extends true ? Array<[
+            queryKey: ServiceOperationInfiniteQueryKey<PostFilesSchema, PostFilesQueryParameters>,
+            data: NoInfer<OperationInfiniteData<PostFilesData, PostFilesQueryParameters>> | undefined
+        ]> : Array<[
+            queryKey: ServiceOperationQueryKey<PostFilesSchema, PostFilesQueryParameters>,
+            data: PostFilesData | undefined
+        ]>;
+        /** @summary Upload a files by ID */
+        getQueryData(parameters: ServiceOperationQueryKey<PostFilesSchema, PostFilesQueryParameters> | (DeepReadonly<PostFilesQueryParameters> | void)): PostFilesData | undefined;
+        /** @summary Upload a files by ID */
+        getQueryState(parameters: ServiceOperationQueryKey<PostFilesSchema, PostFilesQueryParameters> | (DeepReadonly<PostFilesQueryParameters> | void)): QueryState<PostFilesData, PostFilesError> | undefined;
+        /** @summary Upload a files by ID */
+        getInfiniteQueryState(parameters: DeepReadonly<PostFilesQueryParameters> | ServiceOperationInfiniteQueryKey<PostFilesSchema, PostFilesQueryParameters> | void): QueryState<OperationInfiniteData<PostFilesData, PostFilesQueryParameters>, PostFilesError> | undefined;
+        /** @summary Upload a files by ID */
+        invalidateQueries<TInfinite extends boolean = false>(filters?: InvalidateQueryFilters<PostFilesSchema, PostFilesData, TInfinite, PostFilesQueryParameters, PostFilesError>, options?: InvalidateOptions): Promise<void>;
+        /** @summary Upload a files by ID */
+        isFetching<TInfinite extends boolean = false>(filters?: QueryFiltersByParameters<PostFilesSchema, PostFilesData, TInfinite, PostFilesQueryParameters, PostFilesError> | QueryFiltersByQueryKey<PostFilesSchema, PostFilesData, TInfinite, PostFilesQueryParameters, PostFilesError>): number;
+        /** @summary Upload a files by ID */
+        <TMeta extends Record<string, any>, TSignal extends AbortSignal = AbortSignal>(options: QueryFnOptionsByQueryKey<PostFilesSchema, PostFilesQueryParameters, TMeta, TSignal> | (QueryFnOptionsByParameters<PostFilesQueryParameters, TMeta, TSignal> | void), client?: (schema: PostFilesSchema, options: {
+            parameters: PostFilesQueryParameters;
+            signal?: TSignal;
+            meta?: TMeta;
+        }) => Promise<RequestFnResponse<PostFilesData, PostFilesError>>): Promise<RequestFnResponse<PostFilesData, PostFilesError>>;
+        /** @summary Upload a files by ID */
+        refetchQueries<TInfinite extends boolean = false>(filters?: QueryFiltersByParameters<PostFilesSchema, PostFilesData, TInfinite, PostFilesQueryParameters, PostFilesError> | QueryFiltersByQueryKey<PostFilesSchema, PostFilesData, TInfinite, PostFilesQueryParameters, PostFilesError>, options?: RefetchOptions): Promise<void>;
+        /** @summary Upload a files by ID */
+        removeQueries<TInfinite extends boolean = false>(filters?: QueryFiltersByParameters<PostFilesSchema, PostFilesData, TInfinite, PostFilesQueryParameters, PostFilesError> | QueryFiltersByQueryKey<PostFilesSchema, PostFilesData, TInfinite, PostFilesQueryParameters, PostFilesError>): void;
+        /** @summary Upload a files by ID */
+        resetQueries<TInfinite extends boolean = false>(filters?: QueryFiltersByParameters<PostFilesSchema, PostFilesData, TInfinite, PostFilesQueryParameters, PostFilesError> | QueryFiltersByQueryKey<PostFilesSchema, PostFilesData, TInfinite, PostFilesQueryParameters, PostFilesError>, options?: ResetOptions): Promise<void>;
+        /** @summary Upload a files by ID */
+        setInfiniteQueryData(parameters: (DeepReadonly<PostFilesQueryParameters> | undefined) | ServiceOperationInfiniteQueryKey<PostFilesSchema, PostFilesQueryParameters>, updater: Updater<NoInfer<OperationInfiniteData<PostFilesData, PostFilesQueryParameters>> | undefined, NoInfer<DeepReadonly<OperationInfiniteData<PostFilesData, PostFilesQueryParameters>>> | undefined>, options?: SetDataOptions): OperationInfiniteData<PostFilesData, PostFilesQueryParameters> | undefined;
+        /** @summary Upload a files by ID */
+        setQueriesData<TInfinite extends boolean = false>(filters: QueryFiltersByParameters<PostFilesSchema, PostFilesData, TInfinite, PostFilesQueryParameters, PostFilesError> | QueryFiltersByQueryKey<PostFilesSchema, PostFilesData, TInfinite, PostFilesQueryParameters, PostFilesError>, updater: Updater<NoInfer<PostFilesData> | undefined, NoInfer<PostFilesData> | undefined>, options?: SetDataOptions): Array<PostFilesData | undefined>;
+        /** @summary Upload a files by ID */
+        setQueryData(parameters: (DeepReadonly<PostFilesQueryParameters> | undefined) | ServiceOperationQueryKey<PostFilesSchema, PostFilesQueryParameters>, updater: Updater<NoInfer<PostFilesData> | undefined, NoInfer<DeepReadonly<PostFilesData>> | undefined>, options?: SetDataOptions): PostFilesData | undefined;
+        /** @summary Upload a files by ID */
+        getInfiniteQueryKey(parameters: DeepReadonly<PostFilesQueryParameters> | void): ServiceOperationInfiniteQueryKey<PostFilesSchema, PostFilesQueryParameters>;
+        /**
+         * Performs asynchronous data fetching with support for infinite scrolling scenarios.
+         * Manages paginated data and provides utilities for fetching additional pages.
+         *
+         * @summary Upload a files by ID
+         * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/hooks/useInfiniteQuery|`useInfiniteQuery(...)` documentation}
+         *
+         * @example Infinite Query
+         * ```ts
+         * const { data, isLoading, fetchNextPage } = qraft.filesService.postFiles.useInfiniteQuery({}, {
+         *     initialPageParam: {},
+         *     getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) => getNextPageParams(lastPage)
+         * })
+         *
+         * console.log(data);
+         * fetchNextPage(); // Fetch the next page
+         * ```
+         */
+        useInfiniteQuery<TPageParam extends PostFilesQueryParameters, TQueryFnData = PostFilesData, TData = OperationInfiniteData<TQueryFnData, PostFilesQueryParameters>>(parameters: ServiceOperationInfiniteQueryKey<PostFilesSchema, PostFilesQueryParameters> | (DeepReadonly<PostFilesQueryParameters> | void), options: Omit<UndefinedInitialDataInfiniteOptions<TQueryFnData, PostFilesError, TData, ServiceOperationInfiniteQueryKey<PostFilesSchema, PostFilesQueryParameters>, PartialParameters<DeepReadonly<TPageParam>>>, "queryKey" | "getPreviousPageParam" | "getNextPageParam" | "initialPageParam"> & InfiniteQueryPageParamsOptions<TQueryFnData, PartialParameters<DeepReadonly<TPageParam>>>): UseInfiniteQueryResult<TData, PostFilesError | Error>;
+        /**
+         * Performs asynchronous data fetching with support for infinite scrolling scenarios.
+         * Manages paginated data and provides utilities for fetching additional pages.
+         *
+         * @summary Upload a files by ID
+         * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/hooks/useInfiniteQuery|`useInfiniteQuery(...)` documentation}
+         *
+         * @example Infinite Query
+         * ```ts
+         * const { data, isLoading, fetchNextPage } = qraft.filesService.postFiles.useInfiniteQuery({}, {
+         *     initialPageParam: {},
+         *     getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) => getNextPageParams(lastPage)
+         * })
+         *
+         * console.log(data);
+         * fetchNextPage(); // Fetch the next page
+         * ```
+         */
+        useInfiniteQuery<TPageParam extends PostFilesQueryParameters, TQueryFnData = PostFilesData, TData = OperationInfiniteData<TQueryFnData, PostFilesQueryParameters>>(parameters: ServiceOperationInfiniteQueryKey<PostFilesSchema, PostFilesQueryParameters> | (DeepReadonly<PostFilesQueryParameters> | void), options: Omit<DefinedInitialDataInfiniteOptions<TQueryFnData, PostFilesError, TData, ServiceOperationInfiniteQueryKey<PostFilesSchema, PostFilesQueryParameters>, PartialParameters<DeepReadonly<TPageParam>>>, "queryKey" | "getPreviousPageParam" | "getNextPageParam" | "initialPageParam"> & InfiniteQueryPageParamsOptions<PostFilesData, PartialParameters<DeepReadonly<TPageParam>>>): DefinedUseInfiniteQueryResult<TData, PostFilesError | Error>;
+        /**
+         * Monitors the number of queries currently fetching, matching the provided filters.
+         * Useful for creating loading indicators or performing actions based on active requests.
+         *
+         * @summary Upload a files by ID
+         * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/hooks/useIsFetching|`useIsFetching(...)` documentation}
+         * @example Checks the total number of queries fetching from the specified service method,
+         * both normal and infinite. If no parameters are provided, no filtering is applied.
+         * ```ts
+         * const postFilesTotal = qraft.filesService.postFiles.useIsFetching()
+         * ```
+         */
+        useIsFetching<TInfinite extends boolean = false>(filters?: QueryFiltersByParameters<PostFilesSchema, PostFilesData, TInfinite, PostFilesQueryParameters, PostFilesError> | QueryFiltersByQueryKey<PostFilesSchema, PostFilesData, TInfinite, PostFilesQueryParameters, PostFilesError>): number;
+        /**
+         * Allows you to execute multiple asynchronous data fetching operations concurrently. This is especially useful for managing complex data dependencies in parallel.
+         *
+         * @summary Upload a files by ID
+         * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/hooks/useQueries|`useQueries(...)` documentation}
+         * @example Multiple queries. Returns `data`, `error`, `isSuccess` and other properties.
+         * ```ts
+         * const postFilesResults = qraft.filesService.postFiles.useQueries({
+         *     queries: [
+         *         {},
+         *         {}
+         *     ]
+         * });
+         * postFilesResults.forEach(({ isSuccess, data, error }) => console.log({ isSuccess, data, error }));
+         * ```
+         * @example Combined results. Only the data will be returned.
+         * ```ts
+         * const postFilesCombinedResults = qraft.filesService.postFiles.useQueries({
+         *     combine: results => results.map(result => result.data),
+         *     queries: [
+         *         {},
+         *         {}
+         *     ]
+         * });
+         * postFilesCombinedResults.forEach(data => console.log({ data }));
+         * ```
+         */
+        useQueries<T extends Array<UseQueryOptionsForUseQueries<PostFilesSchema, PostFilesQueryParameters, PostFilesData, PostFilesError>>, TCombinedResult = Array<UseQueryResult<PostFilesData, PostFilesError>>>(options: {
+            queries: T;
+            combine?: (results: Array<UseQueryResult<PostFilesData, PostFilesError>>) => TCombinedResult;
+        }): TCombinedResult;
+        /** @summary Upload a files by ID */
+        getQueryKey(parameters: DeepReadonly<PostFilesQueryParameters> | void): ServiceOperationQueryKey<PostFilesSchema, PostFilesQueryParameters>;
+        /**
+         * Performs asynchronous data fetching, manages loading states and error handling.
+         *
+         * @summary Upload a files by ID
+         * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/hooks/useQuery|`useQuery(...)` documentation}
+         * @example Query without parameters
+         * ```ts
+         * const { data, isLoading } = qraft.filesService.postFiles.useQuery()
+         * ```
+         */
+        useQuery<TData = PostFilesData>(parameters: ServiceOperationQueryKey<PostFilesSchema, PostFilesQueryParameters> | (DeepReadonly<PostFilesQueryParameters> | void), options?: Omit<UndefinedInitialDataOptions<PostFilesData, PostFilesError, TData, ServiceOperationQueryKey<PostFilesSchema, PostFilesQueryParameters>>, "queryKey">): UseQueryResult<TData, PostFilesError | Error>;
+        /**
+         * Performs asynchronous data fetching, manages loading states and error handling.
+         *
+         * @summary Upload a files by ID
+         * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/hooks/useQuery|`useQuery(...)` documentation}
+         * @example Query without parameters
+         * ```ts
+         * const { data, isLoading } = qraft.filesService.postFiles.useQuery()
+         * ```
+         */
+        useQuery<TData = PostFilesData>(parameters: ServiceOperationQueryKey<PostFilesSchema, PostFilesQueryParameters> | (DeepReadonly<PostFilesQueryParameters> | void), options: Omit<DefinedInitialDataOptions<PostFilesData, PostFilesError, TData, ServiceOperationQueryKey<PostFilesSchema, PostFilesQueryParameters>>, "queryKey">): DefinedUseQueryResult<TData, PostFilesError | Error>;
+        /**
+         * Performs asynchronous data fetching with support for infinite scrolling scenarios.
+         * Manages paginated data and provides utilities for fetching additional pages.
+         * It functions similarly to `useInfiniteQuery`, but with added support for React Suspense.
+         *
+         * @summary Upload a files by ID
+         * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/hooks/useSuspenseInfiniteQuery|`useSuspenseInfiniteQuery(...)` documentation}
+         *
+         * @example Suspense Infinite Query
+         * ```ts
+         * const { data, isLoading, fetchNextPage } = qraft.filesService.postFiles.useSuspenseInfiniteQuery({}, {
+         *     initialPageParam: {},
+         *     getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) => getNextPageParams(lastPage)
+         * })
+         *
+         * console.log(data);
+         * fetchNextPage(); // Fetch the next page
+         * ```
+         */
+        useSuspenseInfiniteQuery<TPageParam extends PostFilesQueryParameters, TData = PostFilesData>(parameters: ServiceOperationInfiniteQueryKey<PostFilesSchema, PostFilesQueryParameters> | (DeepReadonly<PostFilesQueryParameters> | void), options: Omit<UseSuspenseInfiniteQueryOptions<PostFilesData, PostFilesError, OperationInfiniteData<TData, PostFilesQueryParameters>, PostFilesData, ServiceOperationInfiniteQueryKey<PostFilesSchema, PostFilesQueryParameters>, PartialParameters<DeepReadonly<TPageParam>>>, "queryKey" | "getPreviousPageParam" | "getNextPageParam" | "initialPageParam"> & InfiniteQueryPageParamsOptions<PostFilesData, PartialParameters<DeepReadonly<TPageParam>>>): UseSuspenseInfiniteQueryResult<OperationInfiniteData<TData, PostFilesQueryParameters>, PostFilesError | Error>;
+        /**
+         * Allows you to execute multiple asynchronous data fetching operations concurrently with Suspense support.
+         * Similar to useQueries but integrates with React Suspense for loading states.
+         *
+         * @summary Upload a files by ID
+         * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/hooks/useSuspenseQueries|`useSuspenseQueries(...)` documentation}
+         * @example Basic usage with Suspense
+         * ```ts
+         * const postFilesData = qraft.filesService.postFiles.useSuspenseQueries({
+         *     queries: [
+         *         {},
+         *         {}
+         *     ]
+         * });
+         * postFilesResults.forEach(({ isSuccess, data, error }) => console.log({ isSuccess, data, error }));
+         * ```
+         * @example With data transformation using combine
+         * ```ts
+         * const postFilesCombinedData = qraft.filesService.postFiles.useSuspenseQueries({
+         *     combine: results => results.map(result => result.data),
+         *     queries: [
+         *         {},
+         *         {}
+         *     ]
+         * });
+         * postFilesCombinedData.forEach(data => console.log({ data }));
+         * ```
+         */
+        useSuspenseQueries<T extends Array<UseQueryOptionsForUseSuspenseQuery<PostFilesSchema, PostFilesQueryParameters, PostFilesData, PostFilesError>>, TCombinedResult = Array<UseSuspenseQueryResult<PostFilesData, PostFilesError>>>(options: {
+            queries: T;
+            combine?: (results: Array<WithOptional<UseSuspenseQueryResult<PostFilesData, PostFilesError>, "data">>) => TCombinedResult;
+        }): TCombinedResult;
+        /**
+         * Performs asynchronous data fetching with Suspense support.
+         * Similar to useQuery but integrates with React Suspense for loading states.
+         *
+         * @summary Upload a files by ID
+         * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/hooks/useSuspenseQuery|`useSuspenseQuery(...)` documentation}
+         * @example Suspense Query without parameters
+         * ```ts
+         * const data = qraft.filesService.postFiles.useSuspenseQuery()
+         * ```
+         */
+        useSuspenseQuery<TData = PostFilesData>(parameters: ServiceOperationQueryKey<PostFilesSchema, PostFilesQueryParameters> | (DeepReadonly<PostFilesQueryParameters> | void), options?: Omit<UseSuspenseQueryOptions<PostFilesData, PostFilesError, TData, ServiceOperationQueryKey<PostFilesSchema, PostFilesQueryParameters>>, "queryKey">): UseSuspenseQueryResult<TData, PostFilesError | Error>;
         schema: PostFilesSchema;
         types: {
-            parameters: PostFilesParameters;
+            parameters: PostFilesMutationParameters;
             data: PostFilesData;
             error: PostFilesError;
             body: PostFilesBody;
@@ -619,6 +867,349 @@ export interface FilesService {
             filters?: MutationFiltersByParameters<DeleteFilesBody, DeleteFilesData, DeleteFilesParameters, DeleteFilesError | Error, TContext> | MutationFiltersByMutationKey<DeleteFilesSchema, DeleteFilesBody, DeleteFilesData, DeleteFilesParameters, DeleteFilesError | Error, TContext>;
             select?: (mutation: Mutation<DeleteFilesData, DeleteFilesError | Error, MutationVariables<DeleteFilesBody, DeleteFilesParameters>, TContext>) => TResult;
         }): Array<TResult>;
+        /** @summary Delete all files */
+        cancelQueries<TInfinite extends boolean = false>(filters?: QueryFiltersByParameters<DeleteFilesSchema, DeleteFilesData, TInfinite, DeleteFilesParameters, DeleteFilesError> | QueryFiltersByQueryKey<DeleteFilesSchema, DeleteFilesData, TInfinite, DeleteFilesParameters, DeleteFilesError>, options?: CancelOptions): Promise<void>;
+        /** @summary Delete all files */
+        getQueryKey(parameters: DeepReadonly<DeleteFilesParameters> | void): ServiceOperationQueryKey<DeleteFilesSchema, DeleteFilesParameters>;
+        /**
+         * Performs asynchronous data fetching, manages loading states and error handling.
+         *
+         * @summary Delete all files
+         * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/hooks/useQuery|`useQuery(...)` documentation}
+         * @example Query without parameters
+         * ```ts
+         * const { data, isLoading } = qraft.filesService.deleteFiles.useQuery()
+         * ```
+         * @example Query with parameters
+         * ```ts
+         * const { data, isLoading } = qraft.filesService.deleteFiles.useQuery({
+         *     query: {
+         *         all: all
+         *     }
+         * })
+         * ```
+         */
+        useQuery<TData = DeleteFilesData>(parameters: ServiceOperationQueryKey<DeleteFilesSchema, DeleteFilesParameters> | (DeepReadonly<DeleteFilesParameters> | void), options?: Omit<UndefinedInitialDataOptions<DeleteFilesData, DeleteFilesError, TData, ServiceOperationQueryKey<DeleteFilesSchema, DeleteFilesParameters>>, "queryKey">): UseQueryResult<TData, DeleteFilesError | Error>;
+        /**
+         * Performs asynchronous data fetching, manages loading states and error handling.
+         *
+         * @summary Delete all files
+         * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/hooks/useQuery|`useQuery(...)` documentation}
+         * @example Query without parameters
+         * ```ts
+         * const { data, isLoading } = qraft.filesService.deleteFiles.useQuery()
+         * ```
+         * @example Query with parameters
+         * ```ts
+         * const { data, isLoading } = qraft.filesService.deleteFiles.useQuery({
+         *     query: {
+         *         all: all
+         *     }
+         * })
+         * ```
+         */
+        useQuery<TData = DeleteFilesData>(parameters: ServiceOperationQueryKey<DeleteFilesSchema, DeleteFilesParameters> | (DeepReadonly<DeleteFilesParameters> | void), options: Omit<DefinedInitialDataOptions<DeleteFilesData, DeleteFilesError, TData, ServiceOperationQueryKey<DeleteFilesSchema, DeleteFilesParameters>>, "queryKey">): DefinedUseQueryResult<TData, DeleteFilesError | Error>;
+        /** @summary Delete all files */
+        fetchInfiniteQuery<TPageParam extends DeleteFilesParameters>(options: ServiceOperationFetchInfiniteQueryOptions<DeleteFilesSchema, DeleteFilesData, DeleteFilesParameters, DeepReadonly<TPageParam>, DeleteFilesError> | void): Promise<OperationInfiniteData<DeleteFilesData, DeleteFilesParameters>>;
+        /** @summary Delete all files */
+        prefetchInfiniteQuery<TPageParam extends DeleteFilesParameters>(options: ServiceOperationFetchInfiniteQueryOptions<DeleteFilesSchema, DeleteFilesData, DeleteFilesParameters, DeepReadonly<TPageParam>, DeleteFilesError> | void): Promise<void>;
+        /** @summary Delete all files */
+        ensureInfiniteQueryData<TPageParam extends DeleteFilesParameters>(options: ServiceOperationEnsureInfiniteQueryDataOptions<DeleteFilesSchema, DeleteFilesData, DeleteFilesParameters, DeepReadonly<TPageParam>, DeleteFilesError> | void): Promise<OperationInfiniteData<DeleteFilesData, DeleteFilesParameters>>;
+        /** @summary Delete all files */
+        fetchQuery(options: ServiceOperationFetchQueryOptions<DeleteFilesSchema, DeleteFilesData, DeleteFilesParameters, DeleteFilesError> | void): Promise<DeleteFilesData>;
+        /** @summary Delete all files */
+        prefetchQuery(options: ServiceOperationFetchQueryOptions<DeleteFilesSchema, DeleteFilesData, DeleteFilesParameters, DeleteFilesError> | void): Promise<void>;
+        /** @summary Delete all files */
+        ensureQueryData(options: ServiceOperationEnsureQueryDataOptions<DeleteFilesSchema, DeleteFilesData, DeleteFilesParameters, DeleteFilesError> | void): Promise<DeleteFilesData>;
+        /** @summary Delete all files */
+        getInfiniteQueryData(parameters: ServiceOperationInfiniteQueryKey<DeleteFilesSchema, DeleteFilesParameters> | (DeepReadonly<DeleteFilesParameters> | void)): OperationInfiniteData<DeleteFilesData, DeleteFilesParameters> | undefined;
+        /** @summary Delete all files */
+        getQueriesData<TInfinite extends boolean = false>(filters?: QueryFiltersByParameters<DeleteFilesSchema, DeleteFilesData, TInfinite, DeleteFilesParameters, DeleteFilesError> | QueryFiltersByQueryKey<DeleteFilesSchema, DeleteFilesData, TInfinite, DeleteFilesParameters, DeleteFilesError>): TInfinite extends true ? Array<[
+            queryKey: ServiceOperationInfiniteQueryKey<DeleteFilesSchema, DeleteFilesParameters>,
+            data: NoInfer<OperationInfiniteData<DeleteFilesData, DeleteFilesParameters>> | undefined
+        ]> : Array<[
+            queryKey: ServiceOperationQueryKey<DeleteFilesSchema, DeleteFilesParameters>,
+            data: DeleteFilesData | undefined
+        ]>;
+        /** @summary Delete all files */
+        getQueryData(parameters: ServiceOperationQueryKey<DeleteFilesSchema, DeleteFilesParameters> | (DeepReadonly<DeleteFilesParameters> | void)): DeleteFilesData | undefined;
+        /** @summary Delete all files */
+        getQueryState(parameters: ServiceOperationQueryKey<DeleteFilesSchema, DeleteFilesParameters> | (DeepReadonly<DeleteFilesParameters> | void)): QueryState<DeleteFilesData, DeleteFilesError> | undefined;
+        /** @summary Delete all files */
+        getInfiniteQueryState(parameters: DeepReadonly<DeleteFilesParameters> | ServiceOperationInfiniteQueryKey<DeleteFilesSchema, DeleteFilesParameters> | void): QueryState<OperationInfiniteData<DeleteFilesData, DeleteFilesParameters>, DeleteFilesError> | undefined;
+        /** @summary Delete all files */
+        invalidateQueries<TInfinite extends boolean = false>(filters?: InvalidateQueryFilters<DeleteFilesSchema, DeleteFilesData, TInfinite, DeleteFilesParameters, DeleteFilesError>, options?: InvalidateOptions): Promise<void>;
+        /** @summary Delete all files */
+        isFetching<TInfinite extends boolean = false>(filters?: QueryFiltersByParameters<DeleteFilesSchema, DeleteFilesData, TInfinite, DeleteFilesParameters, DeleteFilesError> | QueryFiltersByQueryKey<DeleteFilesSchema, DeleteFilesData, TInfinite, DeleteFilesParameters, DeleteFilesError>): number;
+        /** @summary Delete all files */
+        <TMeta extends Record<string, any>, TSignal extends AbortSignal = AbortSignal>(options: QueryFnOptionsByQueryKey<DeleteFilesSchema, DeleteFilesParameters, TMeta, TSignal> | (QueryFnOptionsByParameters<DeleteFilesParameters, TMeta, TSignal> | void), client?: (schema: DeleteFilesSchema, options: {
+            parameters: DeleteFilesParameters;
+            signal?: TSignal;
+            meta?: TMeta;
+        }) => Promise<RequestFnResponse<DeleteFilesData, DeleteFilesError>>): Promise<RequestFnResponse<DeleteFilesData, DeleteFilesError>>;
+        /** @summary Delete all files */
+        refetchQueries<TInfinite extends boolean = false>(filters?: QueryFiltersByParameters<DeleteFilesSchema, DeleteFilesData, TInfinite, DeleteFilesParameters, DeleteFilesError> | QueryFiltersByQueryKey<DeleteFilesSchema, DeleteFilesData, TInfinite, DeleteFilesParameters, DeleteFilesError>, options?: RefetchOptions): Promise<void>;
+        /** @summary Delete all files */
+        removeQueries<TInfinite extends boolean = false>(filters?: QueryFiltersByParameters<DeleteFilesSchema, DeleteFilesData, TInfinite, DeleteFilesParameters, DeleteFilesError> | QueryFiltersByQueryKey<DeleteFilesSchema, DeleteFilesData, TInfinite, DeleteFilesParameters, DeleteFilesError>): void;
+        /** @summary Delete all files */
+        resetQueries<TInfinite extends boolean = false>(filters?: QueryFiltersByParameters<DeleteFilesSchema, DeleteFilesData, TInfinite, DeleteFilesParameters, DeleteFilesError> | QueryFiltersByQueryKey<DeleteFilesSchema, DeleteFilesData, TInfinite, DeleteFilesParameters, DeleteFilesError>, options?: ResetOptions): Promise<void>;
+        /** @summary Delete all files */
+        setInfiniteQueryData(parameters: (DeepReadonly<DeleteFilesParameters> | undefined) | ServiceOperationInfiniteQueryKey<DeleteFilesSchema, DeleteFilesParameters>, updater: Updater<NoInfer<OperationInfiniteData<DeleteFilesData, DeleteFilesParameters>> | undefined, NoInfer<DeepReadonly<OperationInfiniteData<DeleteFilesData, DeleteFilesParameters>>> | undefined>, options?: SetDataOptions): OperationInfiniteData<DeleteFilesData, DeleteFilesParameters> | undefined;
+        /** @summary Delete all files */
+        setQueriesData<TInfinite extends boolean = false>(filters: QueryFiltersByParameters<DeleteFilesSchema, DeleteFilesData, TInfinite, DeleteFilesParameters, DeleteFilesError> | QueryFiltersByQueryKey<DeleteFilesSchema, DeleteFilesData, TInfinite, DeleteFilesParameters, DeleteFilesError>, updater: Updater<NoInfer<DeleteFilesData> | undefined, NoInfer<DeleteFilesData> | undefined>, options?: SetDataOptions): Array<DeleteFilesData | undefined>;
+        /** @summary Delete all files */
+        setQueryData(parameters: (DeepReadonly<DeleteFilesParameters> | undefined) | ServiceOperationQueryKey<DeleteFilesSchema, DeleteFilesParameters>, updater: Updater<NoInfer<DeleteFilesData> | undefined, NoInfer<DeepReadonly<DeleteFilesData>> | undefined>, options?: SetDataOptions): DeleteFilesData | undefined;
+        /** @summary Delete all files */
+        getInfiniteQueryKey(parameters: DeepReadonly<DeleteFilesParameters> | void): ServiceOperationInfiniteQueryKey<DeleteFilesSchema, DeleteFilesParameters>;
+        /**
+         * Performs asynchronous data fetching with support for infinite scrolling scenarios.
+         * Manages paginated data and provides utilities for fetching additional pages.
+         *
+         * @summary Delete all files
+         * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/hooks/useInfiniteQuery|`useInfiniteQuery(...)` documentation}
+         *
+         * @example Infinite Query
+         * ```ts
+         * const { data, isLoading, fetchNextPage } = qraft.filesService.deleteFiles.useInfiniteQuery({}, {
+         *     initialPageParam: {
+         *         query: {
+         *             all: initialAll
+         *         }
+         *     },
+         *     getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) => getNextPageParams(lastPage)
+         * })
+         *
+         * console.log(data);
+         * fetchNextPage(); // Fetch the next page
+         * ```
+         */
+        useInfiniteQuery<TPageParam extends DeleteFilesParameters, TQueryFnData = DeleteFilesData, TData = OperationInfiniteData<TQueryFnData, DeleteFilesParameters>>(parameters: ServiceOperationInfiniteQueryKey<DeleteFilesSchema, DeleteFilesParameters> | (DeepReadonly<DeleteFilesParameters> | void), options: Omit<UndefinedInitialDataInfiniteOptions<TQueryFnData, DeleteFilesError, TData, ServiceOperationInfiniteQueryKey<DeleteFilesSchema, DeleteFilesParameters>, PartialParameters<DeepReadonly<TPageParam>>>, "queryKey" | "getPreviousPageParam" | "getNextPageParam" | "initialPageParam"> & InfiniteQueryPageParamsOptions<TQueryFnData, PartialParameters<DeepReadonly<TPageParam>>>): UseInfiniteQueryResult<TData, DeleteFilesError | Error>;
+        /**
+         * Performs asynchronous data fetching with support for infinite scrolling scenarios.
+         * Manages paginated data and provides utilities for fetching additional pages.
+         *
+         * @summary Delete all files
+         * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/hooks/useInfiniteQuery|`useInfiniteQuery(...)` documentation}
+         *
+         * @example Infinite Query
+         * ```ts
+         * const { data, isLoading, fetchNextPage } = qraft.filesService.deleteFiles.useInfiniteQuery({}, {
+         *     initialPageParam: {
+         *         query: {
+         *             all: initialAll
+         *         }
+         *     },
+         *     getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) => getNextPageParams(lastPage)
+         * })
+         *
+         * console.log(data);
+         * fetchNextPage(); // Fetch the next page
+         * ```
+         */
+        useInfiniteQuery<TPageParam extends DeleteFilesParameters, TQueryFnData = DeleteFilesData, TData = OperationInfiniteData<TQueryFnData, DeleteFilesParameters>>(parameters: ServiceOperationInfiniteQueryKey<DeleteFilesSchema, DeleteFilesParameters> | (DeepReadonly<DeleteFilesParameters> | void), options: Omit<DefinedInitialDataInfiniteOptions<TQueryFnData, DeleteFilesError, TData, ServiceOperationInfiniteQueryKey<DeleteFilesSchema, DeleteFilesParameters>, PartialParameters<DeepReadonly<TPageParam>>>, "queryKey" | "getPreviousPageParam" | "getNextPageParam" | "initialPageParam"> & InfiniteQueryPageParamsOptions<DeleteFilesData, PartialParameters<DeepReadonly<TPageParam>>>): DefinedUseInfiniteQueryResult<TData, DeleteFilesError | Error>;
+        /**
+         * Monitors the number of queries currently fetching, matching the provided filters.
+         * Useful for creating loading indicators or performing actions based on active requests.
+         *
+         * @summary Delete all files
+         * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/hooks/useIsFetching|`useIsFetching(...)` documentation}
+         * @example Checks the total number of queries fetching from the specified service method,
+         * both normal and infinite. If no parameters are provided, no filtering is applied.
+         * ```ts
+         * const deleteFilesTotal = qraft.filesService.deleteFiles.useIsFetching()
+         * ```
+         * @example Checks the number of normal queries fetching with the specified parameters.
+         * ```ts
+         * const deleteFilesByParametersTotal = qraft.filesService.deleteFiles.useIsFetching({
+         *     infinite: false,
+         *     parameters: {
+         *         query: {
+         *             all: all
+         *         }
+         *     }
+         * })
+         * ```
+         */
+        useIsFetching<TInfinite extends boolean = false>(filters?: QueryFiltersByParameters<DeleteFilesSchema, DeleteFilesData, TInfinite, DeleteFilesParameters, DeleteFilesError> | QueryFiltersByQueryKey<DeleteFilesSchema, DeleteFilesData, TInfinite, DeleteFilesParameters, DeleteFilesError>): number;
+        /**
+         * Allows you to execute multiple asynchronous data fetching operations concurrently. This is especially useful for managing complex data dependencies in parallel.
+         *
+         * @summary Delete all files
+         * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/hooks/useQueries|`useQueries(...)` documentation}
+         * @example Multiple queries. Returns `data`, `error`, `isSuccess` and other properties.
+         * ```ts
+         * const deleteFilesResults = qraft.filesService.deleteFiles.useQueries({
+         *     queries: [
+         *         {
+         *             query: {
+         *                 all: all1
+         *             }
+         *         },
+         *         {
+         *             query: {
+         *                 all: all2
+         *             }
+         *         }
+         *     ]
+         * });
+         * deleteFilesResults.forEach(({ isSuccess, data, error }) => console.log({ isSuccess, data, error }));
+         * ```
+         * @example Combined results. Only the data will be returned.
+         * ```ts
+         * const deleteFilesCombinedResults = qraft.filesService.deleteFiles.useQueries({
+         *     combine: results => results.map(result => result.data),
+         *     queries: [
+         *         {
+         *             query: {
+         *                 all: all1
+         *             }
+         *         },
+         *         {
+         *             query: {
+         *                 all: all2
+         *             }
+         *         }
+         *     ]
+         * });
+         * deleteFilesCombinedResults.forEach(data => console.log({ data }));
+         * ```
+         */
+        useQueries<T extends Array<UseQueryOptionsForUseQueries<DeleteFilesSchema, DeleteFilesParameters, DeleteFilesData, DeleteFilesError>>, TCombinedResult = Array<UseQueryResult<DeleteFilesData, DeleteFilesError>>>(options: {
+            queries: T;
+            combine?: (results: Array<UseQueryResult<DeleteFilesData, DeleteFilesError>>) => TCombinedResult;
+        }): TCombinedResult;
+        /** @summary Delete all files */
+        getQueryKey(parameters: DeepReadonly<DeleteFilesParameters> | void): ServiceOperationQueryKey<DeleteFilesSchema, DeleteFilesParameters>;
+        /**
+         * Performs asynchronous data fetching, manages loading states and error handling.
+         *
+         * @summary Delete all files
+         * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/hooks/useQuery|`useQuery(...)` documentation}
+         * @example Query without parameters
+         * ```ts
+         * const { data, isLoading } = qraft.filesService.deleteFiles.useQuery()
+         * ```
+         * @example Query with parameters
+         * ```ts
+         * const { data, isLoading } = qraft.filesService.deleteFiles.useQuery({
+         *     query: {
+         *         all: all
+         *     }
+         * })
+         * ```
+         */
+        useQuery<TData = DeleteFilesData>(parameters: ServiceOperationQueryKey<DeleteFilesSchema, DeleteFilesParameters> | (DeepReadonly<DeleteFilesParameters> | void), options?: Omit<UndefinedInitialDataOptions<DeleteFilesData, DeleteFilesError, TData, ServiceOperationQueryKey<DeleteFilesSchema, DeleteFilesParameters>>, "queryKey">): UseQueryResult<TData, DeleteFilesError | Error>;
+        /**
+         * Performs asynchronous data fetching, manages loading states and error handling.
+         *
+         * @summary Delete all files
+         * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/hooks/useQuery|`useQuery(...)` documentation}
+         * @example Query without parameters
+         * ```ts
+         * const { data, isLoading } = qraft.filesService.deleteFiles.useQuery()
+         * ```
+         * @example Query with parameters
+         * ```ts
+         * const { data, isLoading } = qraft.filesService.deleteFiles.useQuery({
+         *     query: {
+         *         all: all
+         *     }
+         * })
+         * ```
+         */
+        useQuery<TData = DeleteFilesData>(parameters: ServiceOperationQueryKey<DeleteFilesSchema, DeleteFilesParameters> | (DeepReadonly<DeleteFilesParameters> | void), options: Omit<DefinedInitialDataOptions<DeleteFilesData, DeleteFilesError, TData, ServiceOperationQueryKey<DeleteFilesSchema, DeleteFilesParameters>>, "queryKey">): DefinedUseQueryResult<TData, DeleteFilesError | Error>;
+        /**
+         * Performs asynchronous data fetching with support for infinite scrolling scenarios.
+         * Manages paginated data and provides utilities for fetching additional pages.
+         * It functions similarly to `useInfiniteQuery`, but with added support for React Suspense.
+         *
+         * @summary Delete all files
+         * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/hooks/useSuspenseInfiniteQuery|`useSuspenseInfiniteQuery(...)` documentation}
+         *
+         * @example Suspense Infinite Query
+         * ```ts
+         * const { data, isLoading, fetchNextPage } = qraft.filesService.deleteFiles.useSuspenseInfiniteQuery({}, {
+         *     initialPageParam: {
+         *         query: {
+         *             all: initialAll
+         *         }
+         *     },
+         *     getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) => getNextPageParams(lastPage)
+         * })
+         *
+         * console.log(data);
+         * fetchNextPage(); // Fetch the next page
+         * ```
+         */
+        useSuspenseInfiniteQuery<TPageParam extends DeleteFilesParameters, TData = DeleteFilesData>(parameters: ServiceOperationInfiniteQueryKey<DeleteFilesSchema, DeleteFilesParameters> | (DeepReadonly<DeleteFilesParameters> | void), options: Omit<UseSuspenseInfiniteQueryOptions<DeleteFilesData, DeleteFilesError, OperationInfiniteData<TData, DeleteFilesParameters>, DeleteFilesData, ServiceOperationInfiniteQueryKey<DeleteFilesSchema, DeleteFilesParameters>, PartialParameters<DeepReadonly<TPageParam>>>, "queryKey" | "getPreviousPageParam" | "getNextPageParam" | "initialPageParam"> & InfiniteQueryPageParamsOptions<DeleteFilesData, PartialParameters<DeepReadonly<TPageParam>>>): UseSuspenseInfiniteQueryResult<OperationInfiniteData<TData, DeleteFilesParameters>, DeleteFilesError | Error>;
+        /**
+         * Allows you to execute multiple asynchronous data fetching operations concurrently with Suspense support.
+         * Similar to useQueries but integrates with React Suspense for loading states.
+         *
+         * @summary Delete all files
+         * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/hooks/useSuspenseQueries|`useSuspenseQueries(...)` documentation}
+         * @example Basic usage with Suspense
+         * ```ts
+         * const deleteFilesData = qraft.filesService.deleteFiles.useSuspenseQueries({
+         *     queries: [
+         *         {
+         *             query: {
+         *                 all: all1
+         *             }
+         *         },
+         *         {
+         *             query: {
+         *                 all: all2
+         *             }
+         *         }
+         *     ]
+         * });
+         * deleteFilesResults.forEach(({ isSuccess, data, error }) => console.log({ isSuccess, data, error }));
+         * ```
+         * @example With data transformation using combine
+         * ```ts
+         * const deleteFilesCombinedData = qraft.filesService.deleteFiles.useSuspenseQueries({
+         *     combine: results => results.map(result => result.data),
+         *     queries: [
+         *         {
+         *             query: {
+         *                 all: all1
+         *             }
+         *         },
+         *         {
+         *             query: {
+         *                 all: all2
+         *             }
+         *         }
+         *     ]
+         * });
+         * deleteFilesCombinedData.forEach(data => console.log({ data }));
+         * ```
+         */
+        useSuspenseQueries<T extends Array<UseQueryOptionsForUseSuspenseQuery<DeleteFilesSchema, DeleteFilesParameters, DeleteFilesData, DeleteFilesError>>, TCombinedResult = Array<UseSuspenseQueryResult<DeleteFilesData, DeleteFilesError>>>(options: {
+            queries: T;
+            combine?: (results: Array<WithOptional<UseSuspenseQueryResult<DeleteFilesData, DeleteFilesError>, "data">>) => TCombinedResult;
+        }): TCombinedResult;
+        /**
+         * Performs asynchronous data fetching with Suspense support.
+         * Similar to useQuery but integrates with React Suspense for loading states.
+         *
+         * @summary Delete all files
+         * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/hooks/useSuspenseQuery|`useSuspenseQuery(...)` documentation}
+         * @example Suspense Query without parameters
+         * ```ts
+         * const data = qraft.filesService.deleteFiles.useSuspenseQuery()
+         * ```
+         * @example Suspense Query with parameters
+         * ```ts
+         * const data = qraft.filesService.deleteFiles.useSuspenseQuery({
+         *     query: {
+         *         all: all
+         *     }
+         * })
+         * ```
+         */
+        useSuspenseQuery<TData = DeleteFilesData>(parameters: ServiceOperationQueryKey<DeleteFilesSchema, DeleteFilesParameters> | (DeepReadonly<DeleteFilesParameters> | void), options?: Omit<UseSuspenseQueryOptions<DeleteFilesData, DeleteFilesError, TData, ServiceOperationQueryKey<DeleteFilesSchema, DeleteFilesParameters>>, "queryKey">): UseSuspenseQueryResult<TData, DeleteFilesError | Error>;
         schema: DeleteFilesSchema;
         types: {
             parameters: DeleteFilesParameters;
@@ -1186,7 +1777,14 @@ type PostFilesSchema = {
         "multipart/form-data"
     ];
 };
-type PostFilesParameters = {
+type PostFilesQueryParameters = {
+    query?: never;
+    header?: never;
+    path?: never;
+} & {
+    body?: PostFilesBody;
+};
+type PostFilesMutationParameters = {
     query?: never;
     header?: never;
     path?: never;

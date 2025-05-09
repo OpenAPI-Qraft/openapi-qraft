@@ -4,7 +4,7 @@
  */
 
 import type { paths } from "../../openapi.js";
-import type { AreAllOptional, DeepReadonly, InvalidateQueryFilters, MutationFiltersByMutationKey, MutationFiltersByParameters, MutationVariables, OperationInfiniteData, PartialParameters, QueryFiltersByParameters, QueryFiltersByQueryKey, QueryFnOptionsByParameters, QueryFnOptionsByQueryKey, RequestFnResponse, ServiceOperationEnsureInfiniteQueryDataOptions, ServiceOperationEnsureQueryDataOptions, ServiceOperationFetchInfiniteQueryOptions, ServiceOperationFetchQueryOptions, ServiceOperationInfiniteQueryKey, ServiceOperationMutationFnOptions, ServiceOperationMutationKey, ServiceOperationQueryKey, ServiceOperationUseMutationOptions, UseQueryOptionsForUseQueries, UseQueryOptionsForUseSuspenseQuery, WithOptional } from "@openapi-qraft/tanstack-query-react-types";
+import type { DeepReadonly, InvalidateQueryFilters, MutationFiltersByMutationKey, MutationFiltersByParameters, MutationVariables, OperationInfiniteData, PartialParameters, QueryFiltersByParameters, QueryFiltersByQueryKey, QueryFnOptionsByParameters, QueryFnOptionsByQueryKey, RequestFnResponse, ServiceOperationEnsureInfiniteQueryDataOptions, ServiceOperationEnsureQueryDataOptions, ServiceOperationFetchInfiniteQueryOptions, ServiceOperationFetchQueryOptions, ServiceOperationInfiniteQueryKey, ServiceOperationMutationFnOptions, ServiceOperationMutationKey, ServiceOperationQueryKey, ServiceOperationUseMutationOptions, UseQueryOptionsForUseQueries, UseQueryOptionsForUseSuspenseQuery, WithOptional } from "@openapi-qraft/tanstack-query-react-types";
 import type { CancelOptions, InfiniteQueryPageParamsOptions, InvalidateOptions, Mutation, MutationState, NoInfer, QueryState, RefetchOptions, ResetOptions, SetDataOptions, Updater } from "@tanstack/query-core";
 import type { DefinedInitialDataInfiniteOptions, DefinedInitialDataOptions, DefinedUseInfiniteQueryResult, DefinedUseQueryResult, UndefinedInitialDataInfiniteOptions, UndefinedInitialDataOptions, UseInfiniteQueryResult, UseMutationResult, UseQueryResult, UseSuspenseInfiniteQueryOptions, UseSuspenseInfiniteQueryResult, UseSuspenseQueryOptions, UseSuspenseQueryResult } from "@tanstack/react-query";
 export interface ApprovalPoliciesService {
@@ -599,7 +599,7 @@ export interface ApprovalPoliciesService {
          * });
          * ```
          */
-        useMutation<TVariables extends DeleteApprovalPoliciesIdBody, TContext = unknown>(parameters: DeepReadonly<DeleteApprovalPoliciesIdParameters>, options?: ServiceOperationUseMutationOptions<DeleteApprovalPoliciesIdSchema, DeleteApprovalPoliciesIdData, DeleteApprovalPoliciesIdParameters, TVariables, DeleteApprovalPoliciesIdError | Error, TContext>): UseMutationResult<DeleteApprovalPoliciesIdData, DeleteApprovalPoliciesIdError | Error, AreAllOptional<TVariables> extends true ? TVariables | void : TVariables, TContext>;
+        useMutation<TVariables extends DeleteApprovalPoliciesIdBody, TContext = unknown>(parameters: DeepReadonly<DeleteApprovalPoliciesIdParameters>, options?: ServiceOperationUseMutationOptions<DeleteApprovalPoliciesIdSchema, DeleteApprovalPoliciesIdData, DeleteApprovalPoliciesIdParameters, TVariables, DeleteApprovalPoliciesIdError | Error, TContext>): UseMutationResult<DeleteApprovalPoliciesIdData, DeleteApprovalPoliciesIdError | Error, TVariables | void, TContext>;
         /**
          * Enables performing asynchronous data mutation operations such as POST, PUT, PATCH, or DELETE requests.
          * Handles loading state, optimistic updates, and error handling.
@@ -780,7 +780,7 @@ export interface ApprovalPoliciesService {
          * });
          * ```
          */
-        useMutation<TVariables extends PatchApprovalPoliciesIdBody, TContext = unknown>(parameters: DeepReadonly<PatchApprovalPoliciesIdParameters>, options?: ServiceOperationUseMutationOptions<PatchApprovalPoliciesIdSchema, PatchApprovalPoliciesIdData, PatchApprovalPoliciesIdParameters, TVariables, PatchApprovalPoliciesIdError | Error, TContext>): UseMutationResult<PatchApprovalPoliciesIdData, PatchApprovalPoliciesIdError | Error, AreAllOptional<TVariables> extends true ? TVariables | void : TVariables, TContext>;
+        useMutation<TVariables extends PatchApprovalPoliciesIdBody, TContext = unknown>(parameters: DeepReadonly<PatchApprovalPoliciesIdParameters>, options?: ServiceOperationUseMutationOptions<PatchApprovalPoliciesIdSchema, PatchApprovalPoliciesIdData, PatchApprovalPoliciesIdParameters, TVariables, PatchApprovalPoliciesIdError | Error, TContext>): UseMutationResult<PatchApprovalPoliciesIdData, PatchApprovalPoliciesIdError | Error, TVariables, TContext>;
         /**
          * Enables performing asynchronous data mutation operations such as POST, PUT, PATCH, or DELETE requests.
          * Handles loading state, optimistic updates, and error handling.
@@ -991,4 +991,4 @@ type PatchApprovalPoliciesIdSchema = {
 type PatchApprovalPoliciesIdParameters = paths["/approval_policies/{approval_policy_id}"]["patch"]["parameters"];
 type PatchApprovalPoliciesIdData = paths["/approval_policies/{approval_policy_id}"]["patch"]["responses"]["200"]["content"]["application/json"];
 type PatchApprovalPoliciesIdError = paths["/approval_policies/{approval_policy_id}"]["patch"]["responses"]["401"]["content"]["application/json"] | paths["/approval_policies/{approval_policy_id}"]["patch"]["responses"]["422"]["content"]["application/json"] | paths["/approval_policies/{approval_policy_id}"]["patch"]["responses"]["default"]["content"]["application/json"];
-type PatchApprovalPoliciesIdBody = NonNullable<paths["/approval_policies/{approval_policy_id}"]["patch"]["requestBody"]>["content"]["application/json"];
+type PatchApprovalPoliciesIdBody = paths["/approval_policies/{approval_policy_id}"]["patch"]["requestBody"]["content"]["application/json"];

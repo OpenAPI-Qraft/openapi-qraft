@@ -7,7 +7,7 @@ export interface ServiceOperationIsMutatingQueries<
   TSchema extends { url: string; method: string },
   TBody,
   TMutationData,
-  TParams,
+  TMutationParams,
   TError,
 > {
   isMutating<TContext>(
@@ -15,7 +15,7 @@ export interface ServiceOperationIsMutatingQueries<
       | MutationFiltersByParameters<
           TBody,
           TMutationData,
-          TParams,
+          TMutationParams,
           TError | Error,
           TContext
         >
@@ -23,7 +23,7 @@ export interface ServiceOperationIsMutatingQueries<
           TSchema,
           TBody,
           TMutationData,
-          TParams,
+          TMutationParams,
           TError | Error,
           TContext
         >

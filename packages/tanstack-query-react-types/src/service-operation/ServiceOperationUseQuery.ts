@@ -13,27 +13,27 @@ import type {
 export interface ServiceOperationUseQuery<
   TSchema extends { url: string; method: string },
   TOperationQueryFnData,
-  TParams,
+  TQueryParams,
   TError,
 > {
   getQueryKey(
-    parameters: AreAllOptional<TParams> extends true
-      ? DeepReadonly<TParams> | void
-      : DeepReadonly<TParams>
-  ): ServiceOperationQueryKey<TSchema, TParams>;
+    parameters: AreAllOptional<TQueryParams> extends true
+      ? DeepReadonly<TQueryParams> | void
+      : DeepReadonly<TQueryParams>
+  ): ServiceOperationQueryKey<TSchema, TQueryParams>;
 
   useQuery<TData = TOperationQueryFnData>(
     parameters:
-      | ServiceOperationQueryKey<TSchema, TParams>
-      | (AreAllOptional<TParams> extends true
-          ? DeepReadonly<TParams> | void
-          : DeepReadonly<TParams>),
+      | ServiceOperationQueryKey<TSchema, TQueryParams>
+      | (AreAllOptional<TQueryParams> extends true
+          ? DeepReadonly<TQueryParams> | void
+          : DeepReadonly<TQueryParams>),
     options?: Omit<
       UndefinedInitialDataOptions<
         TOperationQueryFnData,
         TError,
         TData,
-        ServiceOperationQueryKey<TSchema, TParams>
+        ServiceOperationQueryKey<TSchema, TQueryParams>
       >,
       'queryKey'
     >
@@ -41,16 +41,16 @@ export interface ServiceOperationUseQuery<
 
   useQuery<TData = TOperationQueryFnData>(
     parameters:
-      | ServiceOperationQueryKey<TSchema, TParams>
-      | (AreAllOptional<TParams> extends true
-          ? DeepReadonly<TParams> | void
-          : DeepReadonly<TParams>),
+      | ServiceOperationQueryKey<TSchema, TQueryParams>
+      | (AreAllOptional<TQueryParams> extends true
+          ? DeepReadonly<TQueryParams> | void
+          : DeepReadonly<TQueryParams>),
     options: Omit<
       DefinedInitialDataOptions<
         TOperationQueryFnData,
         TError,
         TData,
-        ServiceOperationQueryKey<TSchema, TParams>
+        ServiceOperationQueryKey<TSchema, TQueryParams>
       >,
       'queryKey'
     >

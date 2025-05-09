@@ -11,21 +11,21 @@ import type {
 export interface ServiceOperationUseSuspenseQuery<
   TSchema extends { url: string; method: string },
   TOperationQueryFnData,
-  TParams,
+  TQueryParams,
   TError,
 > {
   useSuspenseQuery<TData = TOperationQueryFnData>(
     parameters:
-      | ServiceOperationQueryKey<TSchema, TParams>
-      | (AreAllOptional<TParams> extends true
-          ? DeepReadonly<TParams> | void
-          : DeepReadonly<TParams>),
+      | ServiceOperationQueryKey<TSchema, TQueryParams>
+      | (AreAllOptional<TQueryParams> extends true
+          ? DeepReadonly<TQueryParams> | void
+          : DeepReadonly<TQueryParams>),
     options?: Omit<
       UseSuspenseQueryOptions<
         TOperationQueryFnData,
         TError,
         TData,
-        ServiceOperationQueryKey<TSchema, TParams>
+        ServiceOperationQueryKey<TSchema, TQueryParams>
       >,
       'queryKey'
     >

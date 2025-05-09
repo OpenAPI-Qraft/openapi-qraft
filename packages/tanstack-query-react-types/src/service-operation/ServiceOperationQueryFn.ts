@@ -8,7 +8,7 @@ import type {
 export interface ServiceOperationQueryFn<
   TSchema extends { url: string; method: string },
   TOperationQueryFnData,
-  TParams,
+  TQueryParams,
   TError,
 > {
   <
@@ -16,14 +16,14 @@ export interface ServiceOperationQueryFn<
     TSignal extends AbortSignal = AbortSignal,
   >(
     options:
-      | QueryFnOptionsByQueryKey<TSchema, TParams, TMeta, TSignal>
-      | (AreAllOptional<TParams> extends true
-          ? QueryFnOptionsByParameters<TParams, TMeta, TSignal> | void
-          : QueryFnOptionsByParameters<TParams, TMeta, TSignal>),
+      | QueryFnOptionsByQueryKey<TSchema, TQueryParams, TMeta, TSignal>
+      | (AreAllOptional<TQueryParams> extends true
+          ? QueryFnOptionsByParameters<TQueryParams, TMeta, TSignal> | void
+          : QueryFnOptionsByParameters<TQueryParams, TMeta, TSignal>),
     client?: (
       schema: TSchema,
       options: {
-        parameters: TParams;
+        parameters: TQueryParams;
         signal?: TSignal;
         meta?: TMeta;
       }

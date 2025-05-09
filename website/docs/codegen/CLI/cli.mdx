@@ -163,6 +163,8 @@ It is possible to use multiple plugins at the same time. For example, `--plugin 
 
 ### `--plugin openapi-typescript` options
 
+- **`--queryable-write-operations [bool]`**: Enable generation of query hooks (`useQuery`, `useSuspenseQuery`, etc.) for
+  writable HTTP methods like _POST_, _PUT_, _PATCH_. By default, only mutation hooks are generated for writable operations.
 - **`--openapi-types-file-name <path>`**: OpenAPI Schema types file name, e.g., `schema.d.ts` (default: `schema.ts`).
 - **`--enum`**: Export true TypeScript enums instead of unions.
 - **`--enum-values`**: Export enum values as arrays.

@@ -43,6 +43,7 @@ Options:
   --openapi-types-import-path <path>               Path to schema types file (.d.ts), e.g.: "../schema.d.ts"
   --explicit-import-extensions [extension]         All import statements will contain an explicit file extension. Ideal for projects using ECMAScript modules. (choices: ".js", ".ts", preset: ".js")
   --export-openapi-types [bool]                    Add an export statement of the generated OpenAPI document types from the `./index.ts' file. Useful for sharing types within your project. (default: true)
+  --queryable-write-operations [bool]              Enable generation of query hooks (useQuery, useSuspenseQuery, etc.) for writable HTTP methods like POST, PUT, PATCH. By default, only mutation hooks are generated for writable operations.
   --openapi-types-file-name <path>                 OpenAPI Schema types file name, e.g.: "schema.d.ts" (default: "schema.ts")
   --enum                                           Export true TS enums instead of unions
   --enum-values                                    Export enum values as arrays.
@@ -202,6 +203,8 @@ The following plugins are currently supported:
 
 ### `--plugin openapi-typescript` options
 
+- **`--queryable-write-operations [bool]`**: Enable generation of query hooks (`useQuery`, `useSuspenseQuery`, etc.) for
+  writable HTTP methods like _POST_, _PUT_, _PATCH_. By default, only mutation hooks are generated for writable operations.
 - **`--openapi-types-file-name <path>`**: OpenAPI Schema types file name, e.g., `schema.d.ts` (default: `schema.ts`).
 - **`--enum`**: Export true TypeScript enums instead of unions.
 - **`--enum-values`**: Export enum values as arrays.
