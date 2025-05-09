@@ -23,3 +23,16 @@ apis:
         '/entities/{entity_id}/documents': 'header.x-monite-version'
       operation-name-modifier:
         - '/files/list:[a-zA-Z]+List ==> findAll'
+  queryable-write-operations:
+    root: ../test-fixtures/openapi.json
+    x-openapi-qraft:
+      plugin:
+        tanstack-query-react: true
+      output-dir: src/tests/fixtures/queryable-write-operations-api
+      clean: true
+      explicit-import-extensions: true
+      openapi-types-import-path: '../../api/openapi.js'
+      queryable-write-operations: true
+      filter-services:
+        - '/approval_policies/**'
+        - '/files/**'

@@ -8,14 +8,14 @@ import type { NoInfer, SetDataOptions, Updater } from '@tanstack/query-core';
 export interface ServiceOperationSetQueryData<
   TSchema extends { url: string; method: string },
   TOperationQueryFnData,
-  TParams,
+  TQueryParams,
 > {
   setQueryData(
     parameters:
-      | (AreAllOptional<TParams> extends true
-          ? DeepReadonly<TParams> | undefined
-          : DeepReadonly<TParams>)
-      | ServiceOperationQueryKey<TSchema, TParams>,
+      | (AreAllOptional<TQueryParams> extends true
+          ? DeepReadonly<TQueryParams> | undefined
+          : DeepReadonly<TQueryParams>)
+      | ServiceOperationQueryKey<TSchema, TQueryParams>,
     updater: Updater<
       NoInfer<TOperationQueryFnData> | undefined,
       NoInfer<DeepReadonly<TOperationQueryFnData>> | undefined

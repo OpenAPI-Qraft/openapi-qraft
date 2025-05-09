@@ -9,22 +9,24 @@ import type { NoInfer, SetDataOptions, Updater } from '@tanstack/query-core';
 export interface ServiceOperationSetInfiniteQueryData<
   TSchema extends { url: string; method: string },
   TOperationQueryFnData,
-  TParams,
+  TQueryParams,
 > {
   setInfiniteQueryData(
     parameters:
-      | (AreAllOptional<TParams> extends true
-          ? DeepReadonly<TParams> | undefined
-          : DeepReadonly<TParams>)
-      | ServiceOperationInfiniteQueryKey<TSchema, TParams>,
+      | (AreAllOptional<TQueryParams> extends true
+          ? DeepReadonly<TQueryParams> | undefined
+          : DeepReadonly<TQueryParams>)
+      | ServiceOperationInfiniteQueryKey<TSchema, TQueryParams>,
     updater: Updater<
-      | NoInfer<OperationInfiniteData<TOperationQueryFnData, TParams>>
+      | NoInfer<OperationInfiniteData<TOperationQueryFnData, TQueryParams>>
       | undefined,
       | NoInfer<
-          DeepReadonly<OperationInfiniteData<TOperationQueryFnData, TParams>>
+          DeepReadonly<
+            OperationInfiniteData<TOperationQueryFnData, TQueryParams>
+          >
         >
       | undefined
     >,
     options?: SetDataOptions
-  ): OperationInfiniteData<TOperationQueryFnData, TParams> | undefined;
+  ): OperationInfiniteData<TOperationQueryFnData, TQueryParams> | undefined;
 }

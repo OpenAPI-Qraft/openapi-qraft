@@ -7,14 +7,14 @@ export interface ServiceOperationMutationFn<
   TSchema extends { url: string; method: string },
   TBody,
   TMutationData,
-  TParams,
+  TMutationParams,
   TError,
 > {
   (
-    options: ServiceOperationMutationFnOptions<TBody, TParams>,
+    options: ServiceOperationMutationFnOptions<TBody, TMutationParams>,
     client?: (
       schema: TSchema,
-      options: ServiceOperationMutationFnOptions<TBody, TParams>
+      options: ServiceOperationMutationFnOptions<TBody, TMutationParams>
     ) => Promise<RequestFnResponse<TMutationData, TError>>
   ): Promise<RequestFnResponse<TMutationData, TError>>;
 }

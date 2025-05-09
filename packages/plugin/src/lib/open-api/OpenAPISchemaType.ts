@@ -20,6 +20,7 @@ export type OpenAPISchemaType = {
             };
           };
           $ref?: string;
+          required?: boolean;
         };
         responses: {
           [statusCode in number | 'default']: {

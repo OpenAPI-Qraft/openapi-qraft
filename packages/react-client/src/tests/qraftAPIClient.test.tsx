@@ -1191,16 +1191,14 @@ describe('Qraft uses Mutations', () => {
       } = result.current;
 
       expect(mutateNoArgsWithVoidParameters.data).toBeUndefined();
-      expect(mutateNoArgsWithEmptyParameters.data).toEqual({
-        query: {},
-      });
+      expect(mutateNoArgsWithEmptyParameters.data).toEqual({});
       expect(mutateWithPredefinedParameters.data).toEqual({
         query: { all: 'true' },
       });
       expect(mutateWithParameters.data).toEqual({
         query: { all: 'true' },
       });
-      expect(mutateWithEmptyBody.data).toEqual({ query: {} });
+      expect(mutateWithEmptyBody.data).toEqual({});
     });
   });
 

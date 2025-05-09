@@ -12,7 +12,7 @@ import { getCreatePredefinedParametersRequestFnFactory } from './ts-factory/getC
 import { getIndexFactory } from './ts-factory/getIndexFactory.js';
 import {
   getServiceFactory,
-  ServiceImportsFactoryOptions,
+  ServiceFactoryOptions,
 } from './ts-factory/getServiceFactory.js';
 import { getServiceIndexFactory } from './ts-factory/getServiceIndexFactory.js';
 
@@ -32,7 +32,7 @@ export const generateCode = async ({
 }: {
   spinner: Ora;
   services: OpenAPIService[];
-  serviceImports: ServiceImportsFactoryOptions;
+  serviceImports: ServiceFactoryOptions;
   output: OutputOptions;
 }) => {
   return [
@@ -59,7 +59,7 @@ const composeServicesDirPath = (
 const generateServices = async (
   spinner: Ora,
   services: OpenAPIService[],
-  serviceImports: ServiceImportsFactoryOptions,
+  serviceImports: ServiceFactoryOptions,
   output: OutputOptions
 ) => {
   const servicesDir = composeServicesDirPath(output);
@@ -178,7 +178,7 @@ const generateClient = async (spinner: Ora, output: OutputOptions) => {
 
 const generateCreatePredefinedParametersRequestFn = async (
   spinner: Ora,
-  serviceImports: ServiceImportsFactoryOptions,
+  serviceImports: ServiceFactoryOptions,
   output: OutputOptions
 ) => {
   spinner.start('Generating "createPredefinedParametersRequestFn"');
@@ -217,7 +217,7 @@ const generateCreatePredefinedParametersRequestFn = async (
 
 const generateIndex = async (
   spinner: Ora,
-  serviceImports: ServiceImportsFactoryOptions,
+  serviceImports: ServiceFactoryOptions,
   output: OutputOptions
 ) => {
   spinner.start('Generating index');

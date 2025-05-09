@@ -24,7 +24,7 @@ export const handlers = [
       >(request.headers, ['x-', 'Authorization']);
 
       // @ts-expect-error - test invalid parameter
-      if (query.not_existing_approval_policy_query_parameter)
+      if (query?.not_existing_approval_policy_query_parameter)
         throw HttpResponse.error();
 
       if (
@@ -44,6 +44,31 @@ export const handlers = [
         path,
         query,
         header,
+      });
+    }
+  ),
+
+  http.patch<
+    ServiceOperationPath<
+      Services['approvalPolicies']['patchApprovalPoliciesId']
+    >,
+    ServiceOperationRequestBody<
+      Services['approvalPolicies']['patchApprovalPoliciesId']
+    >,
+    ServiceOperationResponseData<
+      Services['approvalPolicies']['patchApprovalPoliciesId']
+    >
+  >(
+    convertPathToMSW(
+      services.approvalPolicies.patchApprovalPoliciesId.schema.url
+    ),
+    async ({ params: { '0': _, ...path }, request }) => {
+      const body = await request.json();
+
+      return HttpResponse.json({
+        name: body.name!,
+        description: body.description!,
+        id: path.approval_policy_id,
       });
     }
   ),
@@ -187,10 +212,12 @@ function getQueryParameters<
       method: string;
     };
   },
->(url: string): ServiceOperationQuery<TService> {
-  return queryString.parse(
+>(url: string): ServiceOperationQuery<TService> | undefined {
+  const parsedParams = queryString.parse(
     url.split('?')[1]
   ) as ServiceOperationQuery<TService>;
+
+  return Object.values(parsedParams as {}).length ? parsedParams : undefined;
 }
 
 function getHeaders<

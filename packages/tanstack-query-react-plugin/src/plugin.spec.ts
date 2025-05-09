@@ -226,4 +226,45 @@ describe('TanStack Query React Client Generation', () => {
       );
     });
   });
+
+  describe('--queryable-write-operations', () => {
+    beforeAll(async () => {
+      const { QraftCommand } = await import(
+        '@openapi-qraft/plugin/lib/QraftCommand'
+      );
+      const { plugin } = await import('./plugin.js');
+      const command = new QraftCommand();
+      plugin.setupCommand(command);
+
+      await command.parseAsync([
+        'dummy-node',
+        'dummy-qraft-bin',
+        openAPIDocumentFixturePath,
+        '--queryable-write-operations',
+        '--clean',
+        '-o',
+        '/mock-fs',
+        '--export-openapi-types',
+        '--explicit-import-extensions',
+        '--openapi-types-import-path',
+        '../../openapi.d.ts',
+      ]);
+    });
+
+    test('generates services', async () => {
+      expect(
+        fs.readFileSync('/mock-fs/services/FilesService.ts', 'utf-8')
+      ).toMatchFileSnapshot(
+        './__snapshots__/queryable-write-operations/services/FilesService.ts.snapshot.ts'
+      );
+    });
+
+    test('generates services2', async () => {
+      expect(
+        fs.readFileSync('/mock-fs/services/ApprovalPoliciesService.ts', 'utf-8')
+      ).toMatchFileSnapshot(
+        './__snapshots__/queryable-write-operations/services/ApprovalPoliciesService.ts.snapshot.ts'
+      );
+    });
+  });
 });

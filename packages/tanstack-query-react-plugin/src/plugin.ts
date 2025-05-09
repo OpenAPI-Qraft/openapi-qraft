@@ -29,9 +29,12 @@ export const plugin: QraftCommandPlugin = {
       .option(
         '--export-openapi-types [bool]',
         "Add an export statement of the generated OpenAPI document types from the `./index.ts' file. Useful for sharing types within your project.",
-        (arg) => {
-          return arg?.toLowerCase() !== 'false';
-        }
+        parseBooleanOption
+      )
+      .option(
+        '--queryable-write-operations [bool]',
+        'Enable generation of query hooks (useQuery, useSuspenseQuery, etc.) for writable HTTP methods like POST, PUT, PATCH. By default, only mutation hooks are generated for writable operations.',
+        parseBooleanOption
       )
       .action(async ({ spinner, output, args, services, schema }, resolve) => {
         return void (await generateCode({
@@ -39,6 +42,7 @@ export const plugin: QraftCommandPlugin = {
           services,
           serviceImports: {
             openapiTypesImportPath: args.openapiTypesImportPath,
+            queryableWriteOperations: args.queryableWriteOperations,
           },
           output: {
             ...output,
@@ -59,3 +63,7 @@ export const plugin: QraftCommandPlugin = {
       });
   },
 };
+
+function parseBooleanOption(arg: string) {
+  return arg?.toLowerCase() !== 'false';
+}

@@ -11,19 +11,19 @@ export interface ServiceOperationUseMutation<
   TSchema extends { url: string; method: string },
   TBody,
   TMutationData,
-  TParams,
+  TMutationParams,
   TError,
 > {
   getMutationKey(
-    parameters: DeepReadonly<TParams> | void
-  ): ServiceOperationMutationKey<TSchema, TParams>;
+    parameters: DeepReadonly<TMutationParams> | void
+  ): ServiceOperationMutationKey<TSchema, TMutationParams>;
 
   useMutation<TVariables extends TBody, TContext = unknown>(
-    parameters: DeepReadonly<TParams>,
+    parameters: DeepReadonly<TMutationParams>,
     options?: ServiceOperationUseMutationOptions<
       TSchema,
       TMutationData,
-      TParams,
+      TMutationParams,
       TVariables,
       TError | Error,
       TContext
@@ -36,14 +36,14 @@ export interface ServiceOperationUseMutation<
   >;
 
   useMutation<
-    TVariables extends MutationVariables<TBody, TParams>,
+    TVariables extends MutationVariables<TBody, TMutationParams>,
     TContext = unknown,
   >(
     parameters: void,
     options?: ServiceOperationUseMutationOptions<
       TSchema,
       TMutationData,
-      TParams,
+      TMutationParams,
       TVariables,
       TError | Error,
       TContext

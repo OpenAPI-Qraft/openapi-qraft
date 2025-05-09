@@ -16,31 +16,31 @@ import type {
 export interface ServiceOperationUseInfiniteQuery<
   TSchema extends { url: string; method: string },
   TOperationQueryFnData,
-  TParams,
+  TQueryParams,
   TError,
 > {
   getInfiniteQueryKey(
-    parameters: AreAllOptional<TParams> extends true
-      ? DeepReadonly<TParams> | void
-      : DeepReadonly<TParams>
-  ): ServiceOperationInfiniteQueryKey<TSchema, TParams>;
+    parameters: AreAllOptional<TQueryParams> extends true
+      ? DeepReadonly<TQueryParams> | void
+      : DeepReadonly<TQueryParams>
+  ): ServiceOperationInfiniteQueryKey<TSchema, TQueryParams>;
 
   useInfiniteQuery<
-    TPageParam extends TParams,
+    TPageParam extends TQueryParams,
     TQueryFnData = TOperationQueryFnData,
-    TData = OperationInfiniteData<TQueryFnData, TParams>,
+    TData = OperationInfiniteData<TQueryFnData, TQueryParams>,
   >(
     parameters:
-      | ServiceOperationInfiniteQueryKey<TSchema, TParams>
-      | (AreAllOptional<TParams> extends true
-          ? DeepReadonly<TParams> | void
-          : DeepReadonly<TParams>),
+      | ServiceOperationInfiniteQueryKey<TSchema, TQueryParams>
+      | (AreAllOptional<TQueryParams> extends true
+          ? DeepReadonly<TQueryParams> | void
+          : DeepReadonly<TQueryParams>),
     options: Omit<
       UndefinedInitialDataInfiniteOptions<
         TQueryFnData,
         TError,
         TData,
-        ServiceOperationInfiniteQueryKey<TSchema, TParams>,
+        ServiceOperationInfiniteQueryKey<TSchema, TQueryParams>,
         PartialParameters<DeepReadonly<TPageParam>>
       >,
       | 'queryKey'
@@ -55,21 +55,21 @@ export interface ServiceOperationUseInfiniteQuery<
   ): UseInfiniteQueryResult<TData, TError | Error>;
 
   useInfiniteQuery<
-    TPageParam extends TParams,
+    TPageParam extends TQueryParams,
     TQueryFnData = TOperationQueryFnData,
-    TData = OperationInfiniteData<TQueryFnData, TParams>,
+    TData = OperationInfiniteData<TQueryFnData, TQueryParams>,
   >(
     parameters:
-      | ServiceOperationInfiniteQueryKey<TSchema, TParams>
-      | (AreAllOptional<TParams> extends true
-          ? DeepReadonly<TParams> | void
-          : DeepReadonly<TParams>),
+      | ServiceOperationInfiniteQueryKey<TSchema, TQueryParams>
+      | (AreAllOptional<TQueryParams> extends true
+          ? DeepReadonly<TQueryParams> | void
+          : DeepReadonly<TQueryParams>),
     options: Omit<
       DefinedInitialDataInfiniteOptions<
         TQueryFnData,
         TError,
         TData,
-        ServiceOperationInfiniteQueryKey<TSchema, TParams>,
+        ServiceOperationInfiniteQueryKey<TSchema, TQueryParams>,
         PartialParameters<DeepReadonly<TPageParam>>
       >,
       | 'queryKey'

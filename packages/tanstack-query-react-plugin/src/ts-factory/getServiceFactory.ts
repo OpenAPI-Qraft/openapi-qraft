@@ -1,3 +1,4 @@
+import { isReadOnlyOperation } from '@openapi-qraft/plugin/lib/isReadOnlyOperation';
 import { ServiceOperation } from '@openapi-qraft/plugin/lib/open-api/OpenAPIService';
 import camelCase from 'camelcase';
 import ts from 'typescript';
@@ -35,8 +36,9 @@ import { createOperationMethodTSDocExample } from './tsdoc/createOperationMethod
 
 const factory = ts.factory;
 
-export type ServiceImportsFactoryOptions = {
+export type ServiceFactoryOptions = {
   openapiTypesImportPath: string;
+  queryableWriteOperations: boolean;
 };
 
 type Service = { typeName: string; variableName: string };
@@ -44,18 +46,18 @@ type Service = { typeName: string; variableName: string };
 export const getServiceFactory = (
   service: Service,
   operations: ServiceOperation[],
-  { openapiTypesImportPath }: ServiceImportsFactoryOptions
+  options: ServiceFactoryOptions
 ) => {
   const mainNodes = [
-    getServiceInterfaceFactory(service, operations),
+    getServiceInterfaceFactory(service, operations, options),
     getServiceVariableFactory(service, operations),
-    ...getOperationsTypes(operations),
+    ...getOperationsTypes(operations, options),
   ];
 
   const importNodes = [
-    getOpenAPISchemaImportsFactory(openapiTypesImportPath),
+    getOpenAPISchemaImportsFactory(options.openapiTypesImportPath),
     ...getServiceOperationImportsFactory(
-      filterUnusedTypes(getModuleTypeImports(operations), mainNodes)
+      filterUnusedTypes(getModuleTypeImports(operations, options), mainNodes)
     ),
   ];
 
@@ -112,7 +114,8 @@ const getServiceOperationImportsFactory = (
 
 const getServiceInterfaceFactory = (
   service: Service,
-  operations: ServiceOperation[]
+  operations: ServiceOperation[],
+  options: Pick<ServiceFactoryOptions, 'queryableWriteOperations'>
 ) => {
   return factory.createInterfaceDeclaration(
     [factory.createToken(ts.SyntaxKind.ExportKeyword)],
@@ -120,19 +123,25 @@ const getServiceInterfaceFactory = (
     undefined,
     undefined,
     operations.map((operation) =>
-      getServiceInterfaceOperationFactory(operation, service)
+      getServiceInterfaceOperationFactory(operation, service, options)
     )
   );
 };
 
 const getServiceInterfaceOperationFactory = (
   operation: ServiceOperation,
-  service: Service
+  service: Service,
+  options: Pick<ServiceFactoryOptions, 'queryableWriteOperations'>
 ) => {
   const operationMethodNodes = getMethodSignatureNodes(
-    operation.method === 'get'
+    isReadOnlyOperation(operation)
       ? createServicesQueryOperationNodes()
-      : createServicesMutationOperationNodes()
+      : options.queryableWriteOperations
+        ? [
+            ...createServicesMutationOperationNodes(),
+            ...createServicesQueryOperationNodes(),
+          ]
+        : createServicesMutationOperationNodes()
   );
 
   operationMethodNodes.forEach((node) => {
@@ -184,7 +193,8 @@ const getServiceInterfaceOperationFactory = (
           ),
           operation
         ),
-        operation
+        operation,
+        options
       ),
       factory.createPropertySignature(
         undefined,
@@ -206,7 +216,11 @@ const getServiceInterfaceOperationFactory = (
               factory.createIdentifier('parameters'),
               undefined,
               factory.createTypeReferenceNode(
-                getOperationParametersTypeName(operation),
+                getOperationParametersTypeName(
+                  operation,
+                  options,
+                  isReadOnlyOperation(operation) ? 'query' : 'mutation'
+                ),
                 undefined
               )
             ),
@@ -228,7 +242,7 @@ const getServiceInterfaceOperationFactory = (
                 undefined
               )
             ),
-            operation.method !== 'get'
+            !isReadOnlyOperation(operation) || operation.requestBody
               ? factory.createPropertySignature(
                   undefined,
                   factory.createIdentifier('body'),
@@ -366,31 +380,36 @@ const getOperationBodyFactory = (operation: ServiceOperation) => {
     ...mediaTypes.map((mediaType) =>
       factory.createIndexedAccessTypeNode(
         factory.createIndexedAccessTypeNode(
-          factory.createTypeReferenceNode(
-            factory.createIdentifier('NonNullable'),
-            [
+          (() => {
+            const requestBodyNode = factory.createIndexedAccessTypeNode(
               factory.createIndexedAccessTypeNode(
                 factory.createIndexedAccessTypeNode(
-                  factory.createIndexedAccessTypeNode(
-                    factory.createTypeReferenceNode(
-                      factory.createIdentifier('paths'),
-                      undefined
-                    ),
-                    factory.createLiteralTypeNode(
-                      factory.createStringLiteral(operation.path)
-                    )
+                  factory.createTypeReferenceNode(
+                    factory.createIdentifier('paths'),
+                    undefined
                   ),
                   factory.createLiteralTypeNode(
-                    factory.createStringLiteral(operation.method)
+                    factory.createStringLiteral(operation.path)
                   )
                 ),
                 factory.createLiteralTypeNode(
-                  factory.createStringLiteral('requestBody')
+                  factory.createStringLiteral(operation.method)
                 )
               ),
-            ]
-          ),
-          // todo::Add optional NonNullable inference, see `POST /entities/{entity_id}/documents`
+              factory.createLiteralTypeNode(
+                factory.createStringLiteral('requestBody')
+              )
+            );
+
+            if (!operation.requestBody?.required) {
+              return factory.createTypeReferenceNode(
+                factory.createIdentifier('NonNullable'),
+                [requestBodyNode]
+              );
+            }
+
+            return requestBodyNode;
+          })(),
           factory.createLiteralTypeNode(factory.createStringLiteral('content'))
         ),
         factory.createLiteralTypeNode(factory.createStringLiteral(mediaType))
@@ -402,39 +421,63 @@ const getOperationBodyFactory = (operation: ServiceOperation) => {
   ]);
 };
 
-const createOperationParametersFactory = (operation: ServiceOperation) => {
-  if (!operation.parameters?.length)
-    return operation.method === 'get'
-      ? factory.createKeywordTypeNode(ts.SyntaxKind.UndefinedKeyword)
-      : // mutation with predefined parameters fallback to an empty object
-        factory.createTypeLiteralNode(
-          ['query', 'header', 'path'].map((name) =>
-            factory.createPropertySignature(
-              undefined,
-              factory.createIdentifier(name),
-              factory.createToken(ts.SyntaxKind.QuestionToken),
-              factory.createKeywordTypeNode(ts.SyntaxKind.NeverKeyword)
-            )
-          )
-        );
+const createOperationParametersFactory = (
+  operation: ServiceOperation,
+  withRequestBody: boolean
+) => {
+  if (isReadOnlyOperation(operation) && !operation.parameters?.length) {
+    return factory.createKeywordTypeNode(ts.SyntaxKind.UndefinedKeyword);
+  }
 
-  return factory.createIndexedAccessTypeNode(
-    factory.createIndexedAccessTypeNode(
-      factory.createIndexedAccessTypeNode(
-        factory.createTypeReferenceNode(
-          factory.createIdentifier('paths'),
-          undefined
+  const parametersNodes = operation.parameters?.length
+    ? factory.createIndexedAccessTypeNode(
+        factory.createIndexedAccessTypeNode(
+          factory.createIndexedAccessTypeNode(
+            factory.createTypeReferenceNode(
+              factory.createIdentifier('paths'),
+              undefined
+            ),
+            factory.createLiteralTypeNode(
+              factory.createStringLiteral(operation.path)
+            )
+          ),
+          factory.createLiteralTypeNode(
+            factory.createStringLiteral(operation.method)
+          )
         ),
-        factory.createLiteralTypeNode(
-          factory.createStringLiteral(operation.path)
+        factory.createLiteralTypeNode(factory.createStringLiteral('parameters'))
+      )
+    : factory.createTypeLiteralNode(
+        ['query', 'header', 'path'].map((name) =>
+          factory.createPropertySignature(
+            undefined,
+            factory.createIdentifier(name),
+            factory.createToken(ts.SyntaxKind.QuestionToken),
+            factory.createKeywordTypeNode(ts.SyntaxKind.NeverKeyword)
+          )
+        )
+      );
+
+  if (!withRequestBody || !operation.requestBody) {
+    return parametersNodes;
+  }
+
+  return factory.createIntersectionTypeNode([
+    parametersNodes,
+    factory.createTypeLiteralNode([
+      factory.createPropertySignature(
+        undefined,
+        factory.createIdentifier('body'),
+        operation.requestBody.required
+          ? undefined
+          : factory.createToken(ts.SyntaxKind.QuestionToken),
+        factory.createTypeReferenceNode(
+          factory.createIdentifier(getOperationBodyTypeName(operation)),
+          undefined
         )
       ),
-      factory.createLiteralTypeNode(
-        factory.createStringLiteral(operation.method)
-      )
-    ),
-    factory.createLiteralTypeNode(factory.createStringLiteral('parameters'))
-  );
+    ]),
+  ]);
 };
 
 const getServiceVariableFactory = (
@@ -464,7 +507,10 @@ const getServiceVariableFactory = (
   );
 };
 
-const getOperationsTypes = (operations: ServiceOperation[]) => {
+const getOperationsTypes = (
+  operations: ServiceOperation[],
+  options: Pick<ServiceFactoryOptions, 'queryableWriteOperations'>
+) => {
   return operations.flatMap((operation) => {
     const nodes = [
       factory.createTypeAliasDeclaration(
@@ -473,12 +519,39 @@ const getOperationsTypes = (operations: ServiceOperation[]) => {
         undefined,
         getOperationSchemaFactory(operation)
       ),
-      factory.createTypeAliasDeclaration(
-        undefined,
-        factory.createIdentifier(getOperationParametersTypeName(operation)),
-        undefined,
-        createOperationParametersFactory(operation)
-      ),
+      ...(isSeparateParametersOperation(operation, options)
+        ? [
+            factory.createTypeAliasDeclaration(
+              undefined,
+              factory.createIdentifier(
+                getOperationParametersTypeName(operation, options, 'query')
+              ),
+              undefined,
+              createOperationParametersFactory(operation, true)
+            ),
+            factory.createTypeAliasDeclaration(
+              undefined,
+              factory.createIdentifier(
+                getOperationParametersTypeName(operation, options, 'mutation')
+              ),
+              undefined,
+              createOperationParametersFactory(operation, false)
+            ),
+          ]
+        : [
+            factory.createTypeAliasDeclaration(
+              undefined,
+              factory.createIdentifier(
+                getOperationParametersTypeName(
+                  operation,
+                  options,
+                  isReadOnlyOperation(operation) ? 'query' : 'mutation'
+                )
+              ),
+              undefined,
+              createOperationParametersFactory(operation, false)
+            ),
+          ]),
       factory.createTypeAliasDeclaration(
         undefined,
         factory.createIdentifier(getOperationDataTypeName(operation)),
@@ -493,7 +566,7 @@ const getOperationsTypes = (operations: ServiceOperation[]) => {
       ),
     ];
 
-    if (operation.method !== 'get') {
+    if (!isReadOnlyOperation(operation) || operation.requestBody) {
       nodes.push(
         factory.createTypeAliasDeclaration(
           undefined,
@@ -511,8 +584,29 @@ const getOperationsTypes = (operations: ServiceOperation[]) => {
 const getOperationSchemaTypeName = (operation: ServiceOperation) =>
   camelCase(`${operation.name}-Schema`, { pascalCase: true });
 
-const getOperationParametersTypeName = (operation: ServiceOperation) =>
-  camelCase(`${operation.name}-Parameters`, { pascalCase: true });
+const getOperationParametersTypeName = (
+  operation: ServiceOperation,
+  options: Pick<ServiceFactoryOptions, 'queryableWriteOperations'>,
+  desiredPrefix: 'query' | 'mutation'
+) => {
+  const operationPurpose = isSeparateParametersOperation(operation, options)
+    ? `-${desiredPrefix}`
+    : '';
+
+  return camelCase(`${operation.name}${operationPurpose}-Parameters`, {
+    pascalCase: true,
+  });
+};
+
+const isSeparateParametersOperation = (
+  operation: ServiceOperation,
+  options: Pick<ServiceFactoryOptions, 'queryableWriteOperations'>
+) =>
+  Boolean(
+    options.queryableWriteOperations &&
+      operation.requestBody &&
+      !isReadOnlyOperation(operation)
+  );
 
 const getOperationDataTypeName = (operation: ServiceOperation) =>
   camelCase(`${operation.name}-Data`, { pascalCase: true });
@@ -678,15 +772,22 @@ const getMethodSignatureNodes = (
 
 /**
  * Returns a list of all the modules that are imported by the operations.
- * @param operations
+ * @param operations The list of service operations to analyze
+ * @param options Options for controlling module imports generation.Options for controlling module imports generation.
  * @returns Record<moduleName, importSpecifierNames[]>
  */
-const getModuleTypeImports = (operations: ServiceOperation[]) => {
+const getModuleTypeImports = (
+  operations: ServiceOperation[],
+  options: Pick<ServiceFactoryOptions, 'queryableWriteOperations'>
+) => {
   const nodes = [
-    ...(operations.some((operation) => operation.method === 'get')
+    ...(operations.some(
+      (operation) =>
+        isReadOnlyOperation(operation) || options.queryableWriteOperations
+    )
       ? createServicesQueryOperationNodes()
       : []),
-    ...(operations.some((operation) => operation.method !== 'get')
+    ...(operations.some((operation) => !isReadOnlyOperation(operation))
       ? createServicesMutationOperationNodes()
       : []),
   ];
@@ -724,12 +825,13 @@ const getModuleTypeImports = (operations: ServiceOperation[]) => {
 /**
  * Replaces generic types with operation types with named types.
  *
- * For example, replaces `TParams` and `TQueryFnData` will be
+ * For example, replaces `TQueryParams` and `TQueryFnData` will be
  * replaced with `GetEntitiesSchemaParameters` and `GetEntitiesSchemaData`.
  */
 function replaceGenericTypesWithOperationTypes<T extends ts.Node>(
   node: T[],
-  operation: ServiceOperation
+  operation: ServiceOperation,
+  options: Pick<ServiceFactoryOptions, 'queryableWriteOperations'>
 ): T[] {
   const transformer =
     (context: ts.TransformationContext) => (rootNode: ts.Node) => {
@@ -739,8 +841,18 @@ function replaceGenericTypesWithOperationTypes<T extends ts.Node>(
 
           if (node.typeName.text === 'TSchema')
             newTypeName = getOperationSchemaTypeName(operation);
-          else if (node.typeName.text === 'TParams')
-            newTypeName = getOperationParametersTypeName(operation);
+          else if (node.typeName.text === 'TQueryParams')
+            newTypeName = getOperationParametersTypeName(
+              operation,
+              options,
+              'query'
+            );
+          else if (node.typeName.text === 'TMutationParams')
+            newTypeName = getOperationParametersTypeName(
+              operation,
+              options,
+              'mutation'
+            );
           else if (
             node.typeName.text === 'TOperationQueryFnData' ||
             node.typeName.text === 'TMutationData'
@@ -769,12 +881,13 @@ function replaceGenericTypesWithOperationTypes<T extends ts.Node>(
 }
 
 /**
- * Replaces `AreAllOptional<TParams>` with `TParams | void` if `TParams` is optional,
- * and  with `TParams` when at least one parameter is required.
+ * Replaces `AreAllOptional<TQueryParams>` with `TQueryParams | void` if `TQueryParams` is optional,
+ * and with `TQueryParams` when at least one parameter or `body` (when --queryable-write-operations enabled) is required.
  */
 function reduceAreAllOptionalConditionalTParamsType<T extends ts.Node>(
   node: T[],
-  operation: ServiceOperation
+  operation: ServiceOperation,
+  options: Pick<ServiceFactoryOptions, 'queryableWriteOperations'>
 ): T[] {
   const transformer =
     (context: ts.TransformationContext) => (rootNode: ts.Node) => {
@@ -788,11 +901,15 @@ function reduceAreAllOptionalConditionalTParamsType<T extends ts.Node>(
             return (
               ts.isTypeReferenceNode(node) &&
               ts.isIdentifier(node.typeName) &&
-              node.typeName.text === 'TParams'
+              node.typeName.text === 'TQueryParams'
             );
           })
         ) {
-          if (operation.parameters?.some((parameter) => parameter.required)) {
+          if (
+            operation.parameters?.some((parameter) => parameter.required) ||
+            (options.queryableWriteOperations &&
+              operation.requestBody?.required)
+          ) {
             return node.falseType;
           } else {
             return node.trueType;

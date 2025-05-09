@@ -4,14 +4,14 @@ import type { UseQueryResult } from '@tanstack/react-query';
 export interface ServiceOperationUseQueries<
   TSchema extends { url: string; method: string },
   TOperationQueryFnData,
-  TParams,
+  TQueryParams,
   TError,
 > {
   useQueries<
     T extends Array<
       UseQueryOptionsForUseQueries<
         TSchema,
-        TParams,
+        TQueryParams,
         TOperationQueryFnData,
         TError
       >

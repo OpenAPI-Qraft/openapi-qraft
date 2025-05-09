@@ -6,7 +6,7 @@ import type {
 export interface ServiceOperationUseIsFetchingQueries<
   TSchema extends { url: string; method: string },
   TOperationQueryFnData,
-  TParams,
+  TQueryParams,
   TError,
 > {
   useIsFetching<TInfinite extends boolean = false>(
@@ -15,14 +15,14 @@ export interface ServiceOperationUseIsFetchingQueries<
           TSchema,
           TOperationQueryFnData,
           TInfinite,
-          TParams,
+          TQueryParams,
           TError
         >
       | QueryFiltersByQueryKey<
           TSchema,
           TOperationQueryFnData,
           TInfinite,
-          TParams,
+          TQueryParams,
           TError
         >
   ): number;

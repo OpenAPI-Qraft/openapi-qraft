@@ -6,7 +6,7 @@ import type {
 export interface ServiceOperationRemoveQueries<
   TSchema extends { url: string; method: string },
   TOperationQueryFnData,
-  TParams,
+  TQueryParams,
   TError,
 > {
   removeQueries<TInfinite extends boolean = false>(
@@ -15,14 +15,14 @@ export interface ServiceOperationRemoveQueries<
           TSchema,
           TOperationQueryFnData,
           TInfinite,
-          TParams,
+          TQueryParams,
           TError
         >
       | QueryFiltersByQueryKey<
           TSchema,
           TOperationQueryFnData,
           TInfinite,
-          TParams,
+          TQueryParams,
           TError
         >
   ): void;

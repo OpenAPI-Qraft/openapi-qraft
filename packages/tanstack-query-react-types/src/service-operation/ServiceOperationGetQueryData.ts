@@ -7,13 +7,13 @@ import type {
 export interface ServiceOperationGetQueryData<
   TSchema extends { url: string; method: string },
   TOperationQueryFnData,
-  TParams,
+  TQueryParams,
 > {
   getQueryData(
     parameters:
-      | ServiceOperationQueryKey<TSchema, TParams>
-      | (AreAllOptional<TParams> extends true
-          ? DeepReadonly<TParams> | void
-          : DeepReadonly<TParams>)
+      | ServiceOperationQueryKey<TSchema, TQueryParams>
+      | (AreAllOptional<TQueryParams> extends true
+          ? DeepReadonly<TQueryParams> | void
+          : DeepReadonly<TQueryParams>)
   ): TOperationQueryFnData | undefined;
 }

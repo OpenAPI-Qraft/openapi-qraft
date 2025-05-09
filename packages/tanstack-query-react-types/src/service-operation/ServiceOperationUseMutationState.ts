@@ -9,7 +9,7 @@ export interface ServiceOperationUseMutationState<
   TSchema extends { url: string; method: string },
   TBody,
   TMutationData,
-  TParams,
+  TMutationParams,
   TError,
 > {
   useMutationState<
@@ -17,7 +17,7 @@ export interface ServiceOperationUseMutationState<
     TResult = MutationState<
       TMutationData,
       TError | Error,
-      MutationVariables<TBody, TParams>,
+      MutationVariables<TBody, TMutationParams>,
       TContext
     >,
   >(options?: {
@@ -25,7 +25,7 @@ export interface ServiceOperationUseMutationState<
       | MutationFiltersByParameters<
           TBody,
           TMutationData,
-          TParams,
+          TMutationParams,
           TError | Error,
           TContext
         >
@@ -33,7 +33,7 @@ export interface ServiceOperationUseMutationState<
           TSchema,
           TBody,
           TMutationData,
-          TParams,
+          TMutationParams,
           TError | Error,
           TContext
         >;
@@ -41,7 +41,7 @@ export interface ServiceOperationUseMutationState<
       mutation: Mutation<
         TMutationData,
         TError | Error,
-        MutationVariables<TBody, TParams>,
+        MutationVariables<TBody, TMutationParams>,
         TContext
       >
     ) => TResult;

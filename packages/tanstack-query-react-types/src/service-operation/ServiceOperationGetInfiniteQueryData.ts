@@ -8,13 +8,13 @@ import type {
 export interface ServiceOperationGetInfiniteQueryData<
   TSchema extends { url: string; method: string },
   TOperationQueryFnData,
-  TParams,
+  TQueryParams,
 > {
   getInfiniteQueryData(
     parameters:
-      | ServiceOperationInfiniteQueryKey<TSchema, TParams>
-      | (AreAllOptional<TParams> extends true
-          ? DeepReadonly<TParams> | void
-          : DeepReadonly<TParams>)
-  ): OperationInfiniteData<TOperationQueryFnData, TParams> | undefined;
+      | ServiceOperationInfiniteQueryKey<TSchema, TQueryParams>
+      | (AreAllOptional<TQueryParams> extends true
+          ? DeepReadonly<TQueryParams> | void
+          : DeepReadonly<TQueryParams>)
+  ): OperationInfiniteData<TOperationQueryFnData, TQueryParams> | undefined;
 }

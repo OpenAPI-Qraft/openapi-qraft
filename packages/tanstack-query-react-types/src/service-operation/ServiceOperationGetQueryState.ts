@@ -10,27 +10,30 @@ import type { QueryState } from '@tanstack/query-core';
 export interface ServiceOperationGetQueryState<
   TSchema extends { url: string; method: string },
   TOperationQueryFnData,
-  TParams,
+  TQueryParams,
   TError,
 > {
   getQueryState(
     parameters:
-      | ServiceOperationQueryKey<TSchema, TParams>
-      | (AreAllOptional<TParams> extends true
-          ? DeepReadonly<TParams> | void
-          : DeepReadonly<TParams>)
+      | ServiceOperationQueryKey<TSchema, TQueryParams>
+      | (AreAllOptional<TQueryParams> extends true
+          ? DeepReadonly<TQueryParams> | void
+          : DeepReadonly<TQueryParams>)
   ): QueryState<TOperationQueryFnData, TError> | undefined;
 
   getInfiniteQueryState(
-    parameters: AreAllOptional<TParams> extends true
+    parameters: AreAllOptional<TQueryParams> extends true
       ?
-          | DeepReadonly<TParams>
-          | ServiceOperationInfiniteQueryKey<TSchema, TParams>
+          | DeepReadonly<TQueryParams>
+          | ServiceOperationInfiniteQueryKey<TSchema, TQueryParams>
           | void
       :
-          | DeepReadonly<TParams>
-          | ServiceOperationInfiniteQueryKey<TSchema, TParams>
+          | DeepReadonly<TQueryParams>
+          | ServiceOperationInfiniteQueryKey<TSchema, TQueryParams>
   ):
-    | QueryState<OperationInfiniteData<TOperationQueryFnData, TParams>, TError>
+    | QueryState<
+        OperationInfiniteData<TOperationQueryFnData, TQueryParams>,
+        TError
+      >
     | undefined;
 }
