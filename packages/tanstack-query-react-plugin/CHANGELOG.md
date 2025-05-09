@@ -1,5 +1,15 @@
 # @openapi-qraft/tanstack-query-react-plugin
 
+## 2.5.0-beta.0
+
+### Minor Changes
+
+- 8b7e980: Added support for generating query hooks for writable HTTP methods via `--queryable-write-operations` option.
+
+### Patch Changes
+
+- @openapi-qraft/plugin@2.5.0-beta.0
+
 ## 2.4.1
 
 ### Patch Changes
