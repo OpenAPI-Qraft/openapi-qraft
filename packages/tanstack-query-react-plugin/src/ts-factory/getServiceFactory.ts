@@ -155,7 +155,8 @@ const getServiceInterfaceOperationFactory = (
         {
           serviceVariableName: service.variableName,
           operationMethodName: node.name.text,
-        }
+        },
+        options
       );
       // Query and Mutation methods (hooks and QueryClient methods)
       ts.addSyntheticLeadingComment(

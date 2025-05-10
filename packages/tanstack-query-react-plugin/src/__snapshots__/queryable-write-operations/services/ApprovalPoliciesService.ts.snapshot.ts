@@ -1449,6 +1449,7 @@ export interface ApprovalPoliciesService {
          * @example Query with parameters
          * ```ts
          * const { data, isLoading } = qraft.approvalPoliciesService.patchApprovalPoliciesId.useQuery({
+         *     body: queryBody,
          *     header: {
          *         "x-monite-version": "2023-06-04",
          *         "x-monite-entity-id": xMoniteEntityId
@@ -1472,6 +1473,7 @@ export interface ApprovalPoliciesService {
          * @example Query with parameters
          * ```ts
          * const { data, isLoading } = qraft.approvalPoliciesService.patchApprovalPoliciesId.useQuery({
+         *     body: queryBody,
          *     header: {
          *         "x-monite-version": "2023-06-04",
          *         "x-monite-entity-id": xMoniteEntityId
@@ -1612,6 +1614,7 @@ export interface ApprovalPoliciesService {
          * @example Infinite Query
          * ```ts
          * const { data, isLoading, fetchNextPage } = qraft.approvalPoliciesService.patchApprovalPoliciesId.useInfiniteQuery({
+         *     body: queryBody,
          *     header: {
          *         "x-monite-version": "2023-06-04",
          *         "x-monite-entity-id": xMoniteEntityId
@@ -1644,6 +1647,7 @@ export interface ApprovalPoliciesService {
          * @example Infinite Query
          * ```ts
          * const { data, isLoading, fetchNextPage } = qraft.approvalPoliciesService.patchApprovalPoliciesId.useInfiniteQuery({
+         *     body: queryBody,
          *     header: {
          *         "x-monite-version": "2023-06-04",
          *         "x-monite-entity-id": xMoniteEntityId
@@ -1682,6 +1686,7 @@ export interface ApprovalPoliciesService {
          * const patchApprovalPoliciesIdByParametersTotal = qraft.approvalPoliciesService.patchApprovalPoliciesId.useIsFetching({
          *     infinite: false,
          *     parameters: {
+         *         body: queryBody,
          *         header: {
          *             "x-monite-version": "2023-06-04",
          *             "x-monite-entity-id": xMoniteEntityId
@@ -1708,6 +1713,7 @@ export interface ApprovalPoliciesService {
          * const patchApprovalPoliciesIdResults = qraft.approvalPoliciesService.patchApprovalPoliciesId.useQueries({
          *     queries: [
          *         {
+         *             body: queryBody1,
          *             header: {
          *                 "x-monite-version": "2023-06-04",
          *                 "x-monite-entity-id": xMoniteEntityId1
@@ -1720,6 +1726,7 @@ export interface ApprovalPoliciesService {
          *             }
          *         },
          *         {
+         *             body: queryBody2,
          *             header: {
          *                 "x-monite-version": "2023-06-04",
          *                 "x-monite-entity-id": xMoniteEntityId2
@@ -1741,6 +1748,7 @@ export interface ApprovalPoliciesService {
          *     combine: results => results.map(result => result.data),
          *     queries: [
          *         {
+         *             body: queryBody1,
          *             header: {
          *                 "x-monite-version": "2023-06-04",
          *                 "x-monite-entity-id": xMoniteEntityId1
@@ -1753,6 +1761,7 @@ export interface ApprovalPoliciesService {
          *             }
          *         },
          *         {
+         *             body: queryBody2,
          *             header: {
          *                 "x-monite-version": "2023-06-04",
          *                 "x-monite-entity-id": xMoniteEntityId2
@@ -1787,6 +1796,7 @@ export interface ApprovalPoliciesService {
          * @example Query with parameters
          * ```ts
          * const { data, isLoading } = qraft.approvalPoliciesService.patchApprovalPoliciesId.useQuery({
+         *     body: queryBody,
          *     header: {
          *         "x-monite-version": "2023-06-04",
          *         "x-monite-entity-id": xMoniteEntityId
@@ -1810,6 +1820,7 @@ export interface ApprovalPoliciesService {
          * @example Query with parameters
          * ```ts
          * const { data, isLoading } = qraft.approvalPoliciesService.patchApprovalPoliciesId.useQuery({
+         *     body: queryBody,
          *     header: {
          *         "x-monite-version": "2023-06-04",
          *         "x-monite-entity-id": xMoniteEntityId
@@ -1836,6 +1847,7 @@ export interface ApprovalPoliciesService {
          * @example Suspense Infinite Query
          * ```ts
          * const { data, isLoading, fetchNextPage } = qraft.approvalPoliciesService.patchApprovalPoliciesId.useSuspenseInfiniteQuery({
+         *     body: queryBody,
          *     header: {
          *         "x-monite-version": "2023-06-04",
          *         "x-monite-entity-id": xMoniteEntityId
@@ -1869,6 +1881,7 @@ export interface ApprovalPoliciesService {
          * const patchApprovalPoliciesIdData = qraft.approvalPoliciesService.patchApprovalPoliciesId.useSuspenseQueries({
          *     queries: [
          *         {
+         *             body: queryBody1,
          *             header: {
          *                 "x-monite-version": "2023-06-04",
          *                 "x-monite-entity-id": xMoniteEntityId1
@@ -1881,6 +1894,7 @@ export interface ApprovalPoliciesService {
          *             }
          *         },
          *         {
+         *             body: queryBody2,
          *             header: {
          *                 "x-monite-version": "2023-06-04",
          *                 "x-monite-entity-id": xMoniteEntityId2
@@ -1902,6 +1916,7 @@ export interface ApprovalPoliciesService {
          *     combine: results => results.map(result => result.data),
          *     queries: [
          *         {
+         *             body: queryBody1,
          *             header: {
          *                 "x-monite-version": "2023-06-04",
          *                 "x-monite-entity-id": xMoniteEntityId1
@@ -1914,6 +1929,7 @@ export interface ApprovalPoliciesService {
          *             }
          *         },
          *         {
+         *             body: queryBody2,
          *             header: {
          *                 "x-monite-version": "2023-06-04",
          *                 "x-monite-entity-id": xMoniteEntityId2
@@ -1944,6 +1960,7 @@ export interface ApprovalPoliciesService {
          * @example Suspense Query with parameters
          * ```ts
          * const data = qraft.approvalPoliciesService.patchApprovalPoliciesId.useSuspenseQuery({
+         *     body: queryBody,
          *     header: {
          *         "x-monite-version": "2023-06-04",
          *         "x-monite-entity-id": xMoniteEntityId

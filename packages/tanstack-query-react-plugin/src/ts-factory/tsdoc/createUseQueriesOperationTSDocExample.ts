@@ -3,12 +3,15 @@ import camelcase from 'camelcase';
 import ts from 'typescript';
 import { createOperationCommonTSDoc } from '../../lib/createOperationCommonTSDoc.js';
 import { astToString } from '../astToString.js';
+import { ServiceFactoryOptions } from '../getServiceFactory.js';
+import { createOperationMethodBodyParametersExampleNode } from './lib/createOperationMethodBodyParametersExampleNode.js';
 import { createOperationMethodCallExpressionExampleNode } from './lib/createOperationMethodCallExpressionExampleNode.js';
 import { createOperationMethodParametersExampleNodes } from './lib/createOperationMethodParametersExampleNodes.js';
 
 export const createUseQueriesOperationTSDocExample = (
   operation: ServiceOperation,
-  serviceVariableName: string
+  serviceVariableName: string,
+  options: Pick<ServiceFactoryOptions, 'queryableWriteOperations'>
 ) => {
   const factory = ts.factory;
 
@@ -40,7 +43,11 @@ export const createUseQueriesOperationTSDocExample = (
                     [
                       factory.createPropertyAssignment(
                         factory.createIdentifier('queries'),
-                        createQueriesArrayExpression(operation, factory)
+                        createQueriesArrayExpression(
+                          operation,
+                          factory,
+                          options
+                        )
                       ),
                     ],
                     true
@@ -89,7 +96,11 @@ export const createUseQueriesOperationTSDocExample = (
                       ),
                       factory.createPropertyAssignment(
                         factory.createIdentifier('queries'),
-                        createQueriesArrayExpression(operation, factory)
+                        createQueriesArrayExpression(
+                          operation,
+                          factory,
+                          options
+                        )
                       ),
                     ],
                     true
@@ -116,20 +127,39 @@ export const createUseQueriesOperationTSDocExample = (
 
 export const createQueriesArrayExpression = (
   operation: ServiceOperation,
-  factory: ts.NodeFactory
+  factory: ts.NodeFactory,
+  {
+    queryableWriteOperations,
+  }: Pick<ServiceFactoryOptions, 'queryableWriteOperations'>
 ): ts.ArrayLiteralExpression => {
   return factory.createArrayLiteralExpression(
     [
       factory.createObjectLiteralExpression(
-        createOperationMethodParametersExampleNodes(operation, (parameter) =>
-          camelcase(`${parameter.name}-1`)
-        ),
+        [
+          queryableWriteOperations &&
+            createOperationMethodBodyParametersExampleNode(
+              operation,
+              'queryBody1'
+            ),
+          ...createOperationMethodParametersExampleNodes(
+            operation,
+            (parameter) => camelcase(`${parameter.name}-1`)
+          ),
+        ].filter((node) => !!node),
         true
       ),
       factory.createObjectLiteralExpression(
-        createOperationMethodParametersExampleNodes(operation, (parameter) =>
-          camelcase(`${parameter.name}-2`)
-        ),
+        [
+          queryableWriteOperations &&
+            createOperationMethodBodyParametersExampleNode(
+              operation,
+              'queryBody2'
+            ),
+          ...createOperationMethodParametersExampleNodes(
+            operation,
+            (parameter) => camelcase(`${parameter.name}-2`)
+          ),
+        ].filter((node) => !!node),
         true
       ),
     ],

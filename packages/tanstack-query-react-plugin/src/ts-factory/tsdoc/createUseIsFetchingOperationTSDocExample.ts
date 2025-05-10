@@ -3,12 +3,17 @@ import camelcase from 'camelcase';
 import ts from 'typescript';
 import { createOperationCommonTSDoc } from '../../lib/createOperationCommonTSDoc.js';
 import { astToString } from '../astToString.js';
+import { ServiceFactoryOptions } from '../getServiceFactory.js';
+import { createOperationMethodBodyParametersExampleNode } from './lib/createOperationMethodBodyParametersExampleNode.js';
 import { createOperationMethodCallExpressionExampleNode } from './lib/createOperationMethodCallExpressionExampleNode.js';
 import { createOperationMethodParametersExampleNodes } from './lib/createOperationMethodParametersExampleNodes.js';
 
 export const createUseIsFetchingOperationTSDocExample = (
   operation: ServiceOperation,
-  serviceVariableName: string
+  serviceVariableName: string,
+  {
+    queryableWriteOperations,
+  }: Pick<ServiceFactoryOptions, 'queryableWriteOperations'>
 ) => {
   const example: string[] = [
     'Monitors the number of queries currently fetching, matching the provided filters.',
@@ -37,7 +42,10 @@ export const createUseIsFetchingOperationTSDocExample = (
     '```',
   ];
 
-  if (operation.parameters?.length) {
+  if (
+    operation.parameters?.length ||
+    (queryableWriteOperations && operation.requestBody)
+  ) {
     const factory = ts.factory;
 
     example.push(
@@ -62,7 +70,15 @@ export const createUseIsFetchingOperationTSDocExample = (
                   factory.createPropertyAssignment(
                     factory.createIdentifier('parameters'),
                     factory.createObjectLiteralExpression(
-                      createOperationMethodParametersExampleNodes(operation),
+                      [
+                        queryableWriteOperations &&
+                          createOperationMethodBodyParametersExampleNode(
+                            operation
+                          ),
+                        ...createOperationMethodParametersExampleNodes(
+                          operation
+                        ),
+                      ].filter((node) => !!node),
                       true
                     )
                   ),

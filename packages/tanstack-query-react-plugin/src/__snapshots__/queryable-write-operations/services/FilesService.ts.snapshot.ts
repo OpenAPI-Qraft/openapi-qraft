@@ -509,6 +509,12 @@ export interface FilesService {
          * ```ts
          * const { data, isLoading } = qraft.filesService.postFiles.useQuery()
          * ```
+         * @example Query with parameters
+         * ```ts
+         * const { data, isLoading } = qraft.filesService.postFiles.useQuery({
+         *     body: queryBody
+         * })
+         * ```
          */
         useQuery<TData = PostFilesData>(parameters: ServiceOperationQueryKey<PostFilesSchema, PostFilesQueryParameters> | (DeepReadonly<PostFilesQueryParameters> | void), options?: Omit<UndefinedInitialDataOptions<PostFilesData, PostFilesError, TData, ServiceOperationQueryKey<PostFilesSchema, PostFilesQueryParameters>>, "queryKey">): UseQueryResult<TData, PostFilesError | Error>;
         /**
@@ -519,6 +525,12 @@ export interface FilesService {
          * @example Query without parameters
          * ```ts
          * const { data, isLoading } = qraft.filesService.postFiles.useQuery()
+         * ```
+         * @example Query with parameters
+         * ```ts
+         * const { data, isLoading } = qraft.filesService.postFiles.useQuery({
+         *     body: queryBody
+         * })
          * ```
          */
         useQuery<TData = PostFilesData>(parameters: ServiceOperationQueryKey<PostFilesSchema, PostFilesQueryParameters> | (DeepReadonly<PostFilesQueryParameters> | void), options: Omit<DefinedInitialDataOptions<PostFilesData, PostFilesError, TData, ServiceOperationQueryKey<PostFilesSchema, PostFilesQueryParameters>>, "queryKey">): DefinedUseQueryResult<TData, PostFilesError | Error>;
@@ -583,7 +595,9 @@ export interface FilesService {
          *
          * @example Infinite Query
          * ```ts
-         * const { data, isLoading, fetchNextPage } = qraft.filesService.postFiles.useInfiniteQuery({}, {
+         * const { data, isLoading, fetchNextPage } = qraft.filesService.postFiles.useInfiniteQuery({
+         *     body: queryBody
+         * }, {
          *     initialPageParam: {},
          *     getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) => getNextPageParams(lastPage)
          * })
@@ -602,7 +616,9 @@ export interface FilesService {
          *
          * @example Infinite Query
          * ```ts
-         * const { data, isLoading, fetchNextPage } = qraft.filesService.postFiles.useInfiniteQuery({}, {
+         * const { data, isLoading, fetchNextPage } = qraft.filesService.postFiles.useInfiniteQuery({
+         *     body: queryBody
+         * }, {
          *     initialPageParam: {},
          *     getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) => getNextPageParams(lastPage)
          * })
@@ -623,6 +639,15 @@ export interface FilesService {
          * ```ts
          * const postFilesTotal = qraft.filesService.postFiles.useIsFetching()
          * ```
+         * @example Checks the number of normal queries fetching with the specified parameters.
+         * ```ts
+         * const postFilesByParametersTotal = qraft.filesService.postFiles.useIsFetching({
+         *     infinite: false,
+         *     parameters: {
+         *         body: queryBody
+         *     }
+         * })
+         * ```
          */
         useIsFetching<TInfinite extends boolean = false>(filters?: QueryFiltersByParameters<PostFilesSchema, PostFilesData, TInfinite, PostFilesQueryParameters, PostFilesError> | QueryFiltersByQueryKey<PostFilesSchema, PostFilesData, TInfinite, PostFilesQueryParameters, PostFilesError>): number;
         /**
@@ -634,8 +659,12 @@ export interface FilesService {
          * ```ts
          * const postFilesResults = qraft.filesService.postFiles.useQueries({
          *     queries: [
-         *         {},
-         *         {}
+         *         {
+         *             body: queryBody1
+         *         },
+         *         {
+         *             body: queryBody2
+         *         }
          *     ]
          * });
          * postFilesResults.forEach(({ isSuccess, data, error }) => console.log({ isSuccess, data, error }));
@@ -645,8 +674,12 @@ export interface FilesService {
          * const postFilesCombinedResults = qraft.filesService.postFiles.useQueries({
          *     combine: results => results.map(result => result.data),
          *     queries: [
-         *         {},
-         *         {}
+         *         {
+         *             body: queryBody1
+         *         },
+         *         {
+         *             body: queryBody2
+         *         }
          *     ]
          * });
          * postFilesCombinedResults.forEach(data => console.log({ data }));
@@ -667,6 +700,12 @@ export interface FilesService {
          * ```ts
          * const { data, isLoading } = qraft.filesService.postFiles.useQuery()
          * ```
+         * @example Query with parameters
+         * ```ts
+         * const { data, isLoading } = qraft.filesService.postFiles.useQuery({
+         *     body: queryBody
+         * })
+         * ```
          */
         useQuery<TData = PostFilesData>(parameters: ServiceOperationQueryKey<PostFilesSchema, PostFilesQueryParameters> | (DeepReadonly<PostFilesQueryParameters> | void), options?: Omit<UndefinedInitialDataOptions<PostFilesData, PostFilesError, TData, ServiceOperationQueryKey<PostFilesSchema, PostFilesQueryParameters>>, "queryKey">): UseQueryResult<TData, PostFilesError | Error>;
         /**
@@ -677,6 +716,12 @@ export interface FilesService {
          * @example Query without parameters
          * ```ts
          * const { data, isLoading } = qraft.filesService.postFiles.useQuery()
+         * ```
+         * @example Query with parameters
+         * ```ts
+         * const { data, isLoading } = qraft.filesService.postFiles.useQuery({
+         *     body: queryBody
+         * })
          * ```
          */
         useQuery<TData = PostFilesData>(parameters: ServiceOperationQueryKey<PostFilesSchema, PostFilesQueryParameters> | (DeepReadonly<PostFilesQueryParameters> | void), options: Omit<DefinedInitialDataOptions<PostFilesData, PostFilesError, TData, ServiceOperationQueryKey<PostFilesSchema, PostFilesQueryParameters>>, "queryKey">): DefinedUseQueryResult<TData, PostFilesError | Error>;
@@ -690,7 +735,9 @@ export interface FilesService {
          *
          * @example Suspense Infinite Query
          * ```ts
-         * const { data, isLoading, fetchNextPage } = qraft.filesService.postFiles.useSuspenseInfiniteQuery({}, {
+         * const { data, isLoading, fetchNextPage } = qraft.filesService.postFiles.useSuspenseInfiniteQuery({
+         *     body: queryBody
+         * }, {
          *     initialPageParam: {},
          *     getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) => getNextPageParams(lastPage)
          * })
@@ -710,8 +757,12 @@ export interface FilesService {
          * ```ts
          * const postFilesData = qraft.filesService.postFiles.useSuspenseQueries({
          *     queries: [
-         *         {},
-         *         {}
+         *         {
+         *             body: queryBody1
+         *         },
+         *         {
+         *             body: queryBody2
+         *         }
          *     ]
          * });
          * postFilesResults.forEach(({ isSuccess, data, error }) => console.log({ isSuccess, data, error }));
@@ -721,8 +772,12 @@ export interface FilesService {
          * const postFilesCombinedData = qraft.filesService.postFiles.useSuspenseQueries({
          *     combine: results => results.map(result => result.data),
          *     queries: [
-         *         {},
-         *         {}
+         *         {
+         *             body: queryBody1
+         *         },
+         *         {
+         *             body: queryBody2
+         *         }
          *     ]
          * });
          * postFilesCombinedData.forEach(data => console.log({ data }));
@@ -741,6 +796,12 @@ export interface FilesService {
          * @example Suspense Query without parameters
          * ```ts
          * const data = qraft.filesService.postFiles.useSuspenseQuery()
+         * ```
+         * @example Suspense Query with parameters
+         * ```ts
+         * const data = qraft.filesService.postFiles.useSuspenseQuery({
+         *     body: queryBody
+         * })
          * ```
          */
         useSuspenseQuery<TData = PostFilesData>(parameters: ServiceOperationQueryKey<PostFilesSchema, PostFilesQueryParameters> | (DeepReadonly<PostFilesQueryParameters> | void), options?: Omit<UseSuspenseQueryOptions<PostFilesData, PostFilesError, TData, ServiceOperationQueryKey<PostFilesSchema, PostFilesQueryParameters>>, "queryKey">): UseSuspenseQueryResult<TData, PostFilesError | Error>;
