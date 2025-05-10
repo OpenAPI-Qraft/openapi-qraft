@@ -36,6 +36,12 @@ const result = api.<service>.<operation>.useSuspenseQuery(
 
 `TData` - the result from the query
 
+:::tip
+By default, `useSuspenseQuery` hooks are only generated for read operations (_GET_ method). If you want to use query
+hooks for write operations (_POST_, _PUT_, _PATCH_ methods), use the `--queryable-write-operations` CLI option
+during code generation.
+:::
+
 ### Example
 
 ```tsx title="src/ApprovalPolicyName.tsx"
