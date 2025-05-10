@@ -138,8 +138,8 @@ const getServiceInterfaceOperationFactory = (
       ? createServicesQueryOperationNodes()
       : options.queryableWriteOperations
         ? [
-            ...createServicesMutationOperationNodes(),
             ...createServicesQueryOperationNodes(),
+            ...createServicesMutationOperationNodes(),
           ]
         : createServicesMutationOperationNodes()
   );

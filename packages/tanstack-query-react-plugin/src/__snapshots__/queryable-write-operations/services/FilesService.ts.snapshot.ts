@@ -406,97 +406,6 @@ export interface FilesService {
     /** @summary Upload a files by ID */
     postFiles: {
         /** @summary Upload a files by ID */
-        getMutationKey(parameters: DeepReadonly<PostFilesMutationParameters> | void): ServiceOperationMutationKey<PostFilesSchema, PostFilesMutationParameters>;
-        /**
-         * Enables performing asynchronous data mutation operations such as POST, PUT, PATCH, or DELETE requests.
-         * Handles loading state, optimistic updates, and error handling.
-         *
-         * @summary Upload a files by ID
-         * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/hooks/useMutation|`useMutation(...)` documentation}
-         * @example Mutation with predefined parameters, e.g., for updating
-         * ```ts
-         * const { mutate, isPending } = qraft.filesService.postFiles.useMutation({})
-         * mutate(body);
-         * ```
-         * @example Mutation without predefined parameters, e.g., for creating
-         * ```ts
-         * const { mutate, isPending } = qraft.filesService.postFiles.useMutation()
-         * mutate({
-         *     body: bodyPayload
-         * });
-         * ```
-         */
-        useMutation<TVariables extends PostFilesBody, TContext = unknown>(parameters: DeepReadonly<PostFilesMutationParameters>, options?: ServiceOperationUseMutationOptions<PostFilesSchema, PostFilesData, PostFilesMutationParameters, TVariables, PostFilesError | Error, TContext>): UseMutationResult<PostFilesData, PostFilesError | Error, TVariables | void, TContext>;
-        /**
-         * Enables performing asynchronous data mutation operations such as POST, PUT, PATCH, or DELETE requests.
-         * Handles loading state, optimistic updates, and error handling.
-         *
-         * @summary Upload a files by ID
-         * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/hooks/useMutation|`useMutation(...)` documentation}
-         * @example Mutation with predefined parameters, e.g., for updating
-         * ```ts
-         * const { mutate, isPending } = qraft.filesService.postFiles.useMutation({})
-         * mutate(body);
-         * ```
-         * @example Mutation without predefined parameters, e.g., for creating
-         * ```ts
-         * const { mutate, isPending } = qraft.filesService.postFiles.useMutation()
-         * mutate({
-         *     body: bodyPayload
-         * });
-         * ```
-         */
-        useMutation<TVariables extends MutationVariables<PostFilesBody, PostFilesMutationParameters>, TContext = unknown>(parameters: void, options?: ServiceOperationUseMutationOptions<PostFilesSchema, PostFilesData, PostFilesMutationParameters, TVariables, PostFilesError | Error, TContext>): UseMutationResult<PostFilesData, PostFilesError | Error, TVariables, TContext>;
-        /**
-         * Returns the count of currently in-progress mutations.
-         *
-         * @summary Upload a files by ID
-         * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/hooks/useIsMutating|`useIsMutating(...)` documentation}
-         * @example Check how many mutations are currently in progress for the specified service method.
-         * ```ts
-         * const postFilesTotal = qraft.filesService.postFiles.useIsMutating()
-         * ```
-         * @example Check how many mutations are currently in progress with the specified parameters.
-         * ```ts
-         * const postFilesTotal = qraft.filesService.postFiles.useIsMutating({
-         *     parameters: {}
-         * })
-         * ```
-         */
-        useIsMutating<TContext = unknown>(filters?: MutationFiltersByParameters<PostFilesBody, PostFilesData, PostFilesMutationParameters, PostFilesError | Error, TContext> | MutationFiltersByMutationKey<PostFilesSchema, PostFilesBody, PostFilesData, PostFilesMutationParameters, PostFilesError | Error, TContext>): number;
-        /** @summary Upload a files by ID */
-        isMutating<TContext>(filters?: MutationFiltersByParameters<PostFilesBody, PostFilesData, PostFilesMutationParameters, PostFilesError | Error, TContext> | MutationFiltersByMutationKey<PostFilesSchema, PostFilesBody, PostFilesData, PostFilesMutationParameters, PostFilesError | Error, TContext>): number;
-        /** @summary Upload a files by ID */
-        (options: ServiceOperationMutationFnOptions<PostFilesBody, PostFilesMutationParameters>, client?: (schema: PostFilesSchema, options: ServiceOperationMutationFnOptions<PostFilesBody, PostFilesMutationParameters>) => Promise<RequestFnResponse<PostFilesData, PostFilesError>>): Promise<RequestFnResponse<PostFilesData, PostFilesError>>;
-        /**
-         * Provides access to the current state of a mutation, including its status, any resulting data, and associated errors.
-         *
-         * @summary Upload a files by ID
-         * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/hooks/useMutationState|`useMutationState(...)` documentation}
-         * @example Get all variables of all running mutations.
-         * ```ts
-         * const postFilesPendingMutationVariables = qraft.filesService.postFiles.useMutationState({
-         *     filters: {
-         *         status: "pending"
-         *     },
-         *     select: mutation => mutation.state.variables
-         * })
-         * ```
-         * @example Get all data for specific mutations via the `parameters`.
-         * ```ts
-         * const postFilesMutationData = qraft.filesService.postFiles.useMutationState({
-         *     filters: {
-         *         parameters: {}
-         *     },
-         *     select: mutation => mutation.state.data
-         * })
-         * ```
-         */
-        useMutationState<TContext = unknown, TResult = MutationState<PostFilesData, PostFilesError | Error, MutationVariables<PostFilesBody, PostFilesMutationParameters>, TContext>>(options?: {
-            filters?: MutationFiltersByParameters<PostFilesBody, PostFilesData, PostFilesMutationParameters, PostFilesError | Error, TContext> | MutationFiltersByMutationKey<PostFilesSchema, PostFilesBody, PostFilesData, PostFilesMutationParameters, PostFilesError | Error, TContext>;
-            select?: (mutation: Mutation<PostFilesData, PostFilesError | Error, MutationVariables<PostFilesBody, PostFilesMutationParameters>, TContext>) => TResult;
-        }): Array<TResult>;
-        /** @summary Upload a files by ID */
         cancelQueries<TInfinite extends boolean = false>(filters?: QueryFiltersByParameters<PostFilesSchema, PostFilesData, TInfinite, PostFilesQueryParameters, PostFilesError> | QueryFiltersByQueryKey<PostFilesSchema, PostFilesData, TInfinite, PostFilesQueryParameters, PostFilesError>, options?: CancelOptions): Promise<void>;
         /** @summary Upload a files by ID */
         getQueryKey(parameters: DeepReadonly<PostFilesQueryParameters> | void): ServiceOperationQueryKey<PostFilesSchema, PostFilesQueryParameters>;
@@ -805,6 +714,97 @@ export interface FilesService {
          * ```
          */
         useSuspenseQuery<TData = PostFilesData>(parameters: ServiceOperationQueryKey<PostFilesSchema, PostFilesQueryParameters> | (DeepReadonly<PostFilesQueryParameters> | void), options?: Omit<UseSuspenseQueryOptions<PostFilesData, PostFilesError, TData, ServiceOperationQueryKey<PostFilesSchema, PostFilesQueryParameters>>, "queryKey">): UseSuspenseQueryResult<TData, PostFilesError | Error>;
+        /** @summary Upload a files by ID */
+        getMutationKey(parameters: DeepReadonly<PostFilesMutationParameters> | void): ServiceOperationMutationKey<PostFilesSchema, PostFilesMutationParameters>;
+        /**
+         * Enables performing asynchronous data mutation operations such as POST, PUT, PATCH, or DELETE requests.
+         * Handles loading state, optimistic updates, and error handling.
+         *
+         * @summary Upload a files by ID
+         * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/hooks/useMutation|`useMutation(...)` documentation}
+         * @example Mutation with predefined parameters, e.g., for updating
+         * ```ts
+         * const { mutate, isPending } = qraft.filesService.postFiles.useMutation({})
+         * mutate(body);
+         * ```
+         * @example Mutation without predefined parameters, e.g., for creating
+         * ```ts
+         * const { mutate, isPending } = qraft.filesService.postFiles.useMutation()
+         * mutate({
+         *     body: bodyPayload
+         * });
+         * ```
+         */
+        useMutation<TVariables extends PostFilesBody, TContext = unknown>(parameters: DeepReadonly<PostFilesMutationParameters>, options?: ServiceOperationUseMutationOptions<PostFilesSchema, PostFilesData, PostFilesMutationParameters, TVariables, PostFilesError | Error, TContext>): UseMutationResult<PostFilesData, PostFilesError | Error, TVariables | void, TContext>;
+        /**
+         * Enables performing asynchronous data mutation operations such as POST, PUT, PATCH, or DELETE requests.
+         * Handles loading state, optimistic updates, and error handling.
+         *
+         * @summary Upload a files by ID
+         * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/hooks/useMutation|`useMutation(...)` documentation}
+         * @example Mutation with predefined parameters, e.g., for updating
+         * ```ts
+         * const { mutate, isPending } = qraft.filesService.postFiles.useMutation({})
+         * mutate(body);
+         * ```
+         * @example Mutation without predefined parameters, e.g., for creating
+         * ```ts
+         * const { mutate, isPending } = qraft.filesService.postFiles.useMutation()
+         * mutate({
+         *     body: bodyPayload
+         * });
+         * ```
+         */
+        useMutation<TVariables extends MutationVariables<PostFilesBody, PostFilesMutationParameters>, TContext = unknown>(parameters: void, options?: ServiceOperationUseMutationOptions<PostFilesSchema, PostFilesData, PostFilesMutationParameters, TVariables, PostFilesError | Error, TContext>): UseMutationResult<PostFilesData, PostFilesError | Error, TVariables, TContext>;
+        /**
+         * Returns the count of currently in-progress mutations.
+         *
+         * @summary Upload a files by ID
+         * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/hooks/useIsMutating|`useIsMutating(...)` documentation}
+         * @example Check how many mutations are currently in progress for the specified service method.
+         * ```ts
+         * const postFilesTotal = qraft.filesService.postFiles.useIsMutating()
+         * ```
+         * @example Check how many mutations are currently in progress with the specified parameters.
+         * ```ts
+         * const postFilesTotal = qraft.filesService.postFiles.useIsMutating({
+         *     parameters: {}
+         * })
+         * ```
+         */
+        useIsMutating<TContext = unknown>(filters?: MutationFiltersByParameters<PostFilesBody, PostFilesData, PostFilesMutationParameters, PostFilesError | Error, TContext> | MutationFiltersByMutationKey<PostFilesSchema, PostFilesBody, PostFilesData, PostFilesMutationParameters, PostFilesError | Error, TContext>): number;
+        /** @summary Upload a files by ID */
+        isMutating<TContext>(filters?: MutationFiltersByParameters<PostFilesBody, PostFilesData, PostFilesMutationParameters, PostFilesError | Error, TContext> | MutationFiltersByMutationKey<PostFilesSchema, PostFilesBody, PostFilesData, PostFilesMutationParameters, PostFilesError | Error, TContext>): number;
+        /** @summary Upload a files by ID */
+        (options: ServiceOperationMutationFnOptions<PostFilesBody, PostFilesMutationParameters>, client?: (schema: PostFilesSchema, options: ServiceOperationMutationFnOptions<PostFilesBody, PostFilesMutationParameters>) => Promise<RequestFnResponse<PostFilesData, PostFilesError>>): Promise<RequestFnResponse<PostFilesData, PostFilesError>>;
+        /**
+         * Provides access to the current state of a mutation, including its status, any resulting data, and associated errors.
+         *
+         * @summary Upload a files by ID
+         * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/hooks/useMutationState|`useMutationState(...)` documentation}
+         * @example Get all variables of all running mutations.
+         * ```ts
+         * const postFilesPendingMutationVariables = qraft.filesService.postFiles.useMutationState({
+         *     filters: {
+         *         status: "pending"
+         *     },
+         *     select: mutation => mutation.state.variables
+         * })
+         * ```
+         * @example Get all data for specific mutations via the `parameters`.
+         * ```ts
+         * const postFilesMutationData = qraft.filesService.postFiles.useMutationState({
+         *     filters: {
+         *         parameters: {}
+         *     },
+         *     select: mutation => mutation.state.data
+         * })
+         * ```
+         */
+        useMutationState<TContext = unknown, TResult = MutationState<PostFilesData, PostFilesError | Error, MutationVariables<PostFilesBody, PostFilesMutationParameters>, TContext>>(options?: {
+            filters?: MutationFiltersByParameters<PostFilesBody, PostFilesData, PostFilesMutationParameters, PostFilesError | Error, TContext> | MutationFiltersByMutationKey<PostFilesSchema, PostFilesBody, PostFilesData, PostFilesMutationParameters, PostFilesError | Error, TContext>;
+            select?: (mutation: Mutation<PostFilesData, PostFilesError | Error, MutationVariables<PostFilesBody, PostFilesMutationParameters>, TContext>) => TResult;
+        }): Array<TResult>;
         schema: PostFilesSchema;
         types: {
             parameters: PostFilesMutationParameters;
@@ -815,119 +815,6 @@ export interface FilesService {
     };
     /** @summary Delete all files */
     deleteFiles: {
-        /** @summary Delete all files */
-        getMutationKey(parameters: DeepReadonly<DeleteFilesParameters> | void): ServiceOperationMutationKey<DeleteFilesSchema, DeleteFilesParameters>;
-        /**
-         * Enables performing asynchronous data mutation operations such as POST, PUT, PATCH, or DELETE requests.
-         * Handles loading state, optimistic updates, and error handling.
-         *
-         * @summary Delete all files
-         * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/hooks/useMutation|`useMutation(...)` documentation}
-         * @example Mutation with predefined parameters, e.g., for updating
-         * ```ts
-         * const { mutate, isPending } = qraft.filesService.deleteFiles.useMutation({
-         *     query: {
-         *         all: all
-         *     }
-         * })
-         * mutate(body);
-         * ```
-         * @example Mutation without predefined parameters, e.g., for creating
-         * ```ts
-         * const { mutate, isPending } = qraft.filesService.deleteFiles.useMutation()
-         * mutate({
-         *     body: bodyPayload,
-         *     query: {
-         *         all: all
-         *     }
-         * });
-         * ```
-         */
-        useMutation<TVariables extends DeleteFilesBody, TContext = unknown>(parameters: DeepReadonly<DeleteFilesParameters>, options?: ServiceOperationUseMutationOptions<DeleteFilesSchema, DeleteFilesData, DeleteFilesParameters, TVariables, DeleteFilesError | Error, TContext>): UseMutationResult<DeleteFilesData, DeleteFilesError | Error, TVariables | void, TContext>;
-        /**
-         * Enables performing asynchronous data mutation operations such as POST, PUT, PATCH, or DELETE requests.
-         * Handles loading state, optimistic updates, and error handling.
-         *
-         * @summary Delete all files
-         * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/hooks/useMutation|`useMutation(...)` documentation}
-         * @example Mutation with predefined parameters, e.g., for updating
-         * ```ts
-         * const { mutate, isPending } = qraft.filesService.deleteFiles.useMutation({
-         *     query: {
-         *         all: all
-         *     }
-         * })
-         * mutate(body);
-         * ```
-         * @example Mutation without predefined parameters, e.g., for creating
-         * ```ts
-         * const { mutate, isPending } = qraft.filesService.deleteFiles.useMutation()
-         * mutate({
-         *     body: bodyPayload,
-         *     query: {
-         *         all: all
-         *     }
-         * });
-         * ```
-         */
-        useMutation<TVariables extends MutationVariables<DeleteFilesBody, DeleteFilesParameters>, TContext = unknown>(parameters: void, options?: ServiceOperationUseMutationOptions<DeleteFilesSchema, DeleteFilesData, DeleteFilesParameters, TVariables, DeleteFilesError | Error, TContext>): UseMutationResult<DeleteFilesData, DeleteFilesError | Error, TVariables, TContext>;
-        /**
-         * Returns the count of currently in-progress mutations.
-         *
-         * @summary Delete all files
-         * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/hooks/useIsMutating|`useIsMutating(...)` documentation}
-         * @example Check how many mutations are currently in progress for the specified service method.
-         * ```ts
-         * const deleteFilesTotal = qraft.filesService.deleteFiles.useIsMutating()
-         * ```
-         * @example Check how many mutations are currently in progress with the specified parameters.
-         * ```ts
-         * const deleteFilesTotal = qraft.filesService.deleteFiles.useIsMutating({
-         *     parameters: {
-         *         query: {
-         *             all: all
-         *         }
-         *     }
-         * })
-         * ```
-         */
-        useIsMutating<TContext = unknown>(filters?: MutationFiltersByParameters<DeleteFilesBody, DeleteFilesData, DeleteFilesParameters, DeleteFilesError | Error, TContext> | MutationFiltersByMutationKey<DeleteFilesSchema, DeleteFilesBody, DeleteFilesData, DeleteFilesParameters, DeleteFilesError | Error, TContext>): number;
-        /** @summary Delete all files */
-        isMutating<TContext>(filters?: MutationFiltersByParameters<DeleteFilesBody, DeleteFilesData, DeleteFilesParameters, DeleteFilesError | Error, TContext> | MutationFiltersByMutationKey<DeleteFilesSchema, DeleteFilesBody, DeleteFilesData, DeleteFilesParameters, DeleteFilesError | Error, TContext>): number;
-        /** @summary Delete all files */
-        (options: ServiceOperationMutationFnOptions<DeleteFilesBody, DeleteFilesParameters>, client?: (schema: DeleteFilesSchema, options: ServiceOperationMutationFnOptions<DeleteFilesBody, DeleteFilesParameters>) => Promise<RequestFnResponse<DeleteFilesData, DeleteFilesError>>): Promise<RequestFnResponse<DeleteFilesData, DeleteFilesError>>;
-        /**
-         * Provides access to the current state of a mutation, including its status, any resulting data, and associated errors.
-         *
-         * @summary Delete all files
-         * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/hooks/useMutationState|`useMutationState(...)` documentation}
-         * @example Get all variables of all running mutations.
-         * ```ts
-         * const deleteFilesPendingMutationVariables = qraft.filesService.deleteFiles.useMutationState({
-         *     filters: {
-         *         status: "pending"
-         *     },
-         *     select: mutation => mutation.state.variables
-         * })
-         * ```
-         * @example Get all data for specific mutations via the `parameters`.
-         * ```ts
-         * const deleteFilesMutationData = qraft.filesService.deleteFiles.useMutationState({
-         *     filters: {
-         *         parameters: {
-         *             query: {
-         *                 all: all
-         *             }
-         *         }
-         *     },
-         *     select: mutation => mutation.state.data
-         * })
-         * ```
-         */
-        useMutationState<TContext = unknown, TResult = MutationState<DeleteFilesData, DeleteFilesError | Error, MutationVariables<DeleteFilesBody, DeleteFilesParameters>, TContext>>(options?: {
-            filters?: MutationFiltersByParameters<DeleteFilesBody, DeleteFilesData, DeleteFilesParameters, DeleteFilesError | Error, TContext> | MutationFiltersByMutationKey<DeleteFilesSchema, DeleteFilesBody, DeleteFilesData, DeleteFilesParameters, DeleteFilesError | Error, TContext>;
-            select?: (mutation: Mutation<DeleteFilesData, DeleteFilesError | Error, MutationVariables<DeleteFilesBody, DeleteFilesParameters>, TContext>) => TResult;
-        }): Array<TResult>;
         /** @summary Delete all files */
         cancelQueries<TInfinite extends boolean = false>(filters?: QueryFiltersByParameters<DeleteFilesSchema, DeleteFilesData, TInfinite, DeleteFilesParameters, DeleteFilesError> | QueryFiltersByQueryKey<DeleteFilesSchema, DeleteFilesData, TInfinite, DeleteFilesParameters, DeleteFilesError>, options?: CancelOptions): Promise<void>;
         /** @summary Delete all files */
@@ -1271,6 +1158,119 @@ export interface FilesService {
          * ```
          */
         useSuspenseQuery<TData = DeleteFilesData>(parameters: ServiceOperationQueryKey<DeleteFilesSchema, DeleteFilesParameters> | (DeepReadonly<DeleteFilesParameters> | void), options?: Omit<UseSuspenseQueryOptions<DeleteFilesData, DeleteFilesError, TData, ServiceOperationQueryKey<DeleteFilesSchema, DeleteFilesParameters>>, "queryKey">): UseSuspenseQueryResult<TData, DeleteFilesError | Error>;
+        /** @summary Delete all files */
+        getMutationKey(parameters: DeepReadonly<DeleteFilesParameters> | void): ServiceOperationMutationKey<DeleteFilesSchema, DeleteFilesParameters>;
+        /**
+         * Enables performing asynchronous data mutation operations such as POST, PUT, PATCH, or DELETE requests.
+         * Handles loading state, optimistic updates, and error handling.
+         *
+         * @summary Delete all files
+         * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/hooks/useMutation|`useMutation(...)` documentation}
+         * @example Mutation with predefined parameters, e.g., for updating
+         * ```ts
+         * const { mutate, isPending } = qraft.filesService.deleteFiles.useMutation({
+         *     query: {
+         *         all: all
+         *     }
+         * })
+         * mutate(body);
+         * ```
+         * @example Mutation without predefined parameters, e.g., for creating
+         * ```ts
+         * const { mutate, isPending } = qraft.filesService.deleteFiles.useMutation()
+         * mutate({
+         *     body: bodyPayload,
+         *     query: {
+         *         all: all
+         *     }
+         * });
+         * ```
+         */
+        useMutation<TVariables extends DeleteFilesBody, TContext = unknown>(parameters: DeepReadonly<DeleteFilesParameters>, options?: ServiceOperationUseMutationOptions<DeleteFilesSchema, DeleteFilesData, DeleteFilesParameters, TVariables, DeleteFilesError | Error, TContext>): UseMutationResult<DeleteFilesData, DeleteFilesError | Error, TVariables | void, TContext>;
+        /**
+         * Enables performing asynchronous data mutation operations such as POST, PUT, PATCH, or DELETE requests.
+         * Handles loading state, optimistic updates, and error handling.
+         *
+         * @summary Delete all files
+         * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/hooks/useMutation|`useMutation(...)` documentation}
+         * @example Mutation with predefined parameters, e.g., for updating
+         * ```ts
+         * const { mutate, isPending } = qraft.filesService.deleteFiles.useMutation({
+         *     query: {
+         *         all: all
+         *     }
+         * })
+         * mutate(body);
+         * ```
+         * @example Mutation without predefined parameters, e.g., for creating
+         * ```ts
+         * const { mutate, isPending } = qraft.filesService.deleteFiles.useMutation()
+         * mutate({
+         *     body: bodyPayload,
+         *     query: {
+         *         all: all
+         *     }
+         * });
+         * ```
+         */
+        useMutation<TVariables extends MutationVariables<DeleteFilesBody, DeleteFilesParameters>, TContext = unknown>(parameters: void, options?: ServiceOperationUseMutationOptions<DeleteFilesSchema, DeleteFilesData, DeleteFilesParameters, TVariables, DeleteFilesError | Error, TContext>): UseMutationResult<DeleteFilesData, DeleteFilesError | Error, TVariables, TContext>;
+        /**
+         * Returns the count of currently in-progress mutations.
+         *
+         * @summary Delete all files
+         * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/hooks/useIsMutating|`useIsMutating(...)` documentation}
+         * @example Check how many mutations are currently in progress for the specified service method.
+         * ```ts
+         * const deleteFilesTotal = qraft.filesService.deleteFiles.useIsMutating()
+         * ```
+         * @example Check how many mutations are currently in progress with the specified parameters.
+         * ```ts
+         * const deleteFilesTotal = qraft.filesService.deleteFiles.useIsMutating({
+         *     parameters: {
+         *         query: {
+         *             all: all
+         *         }
+         *     }
+         * })
+         * ```
+         */
+        useIsMutating<TContext = unknown>(filters?: MutationFiltersByParameters<DeleteFilesBody, DeleteFilesData, DeleteFilesParameters, DeleteFilesError | Error, TContext> | MutationFiltersByMutationKey<DeleteFilesSchema, DeleteFilesBody, DeleteFilesData, DeleteFilesParameters, DeleteFilesError | Error, TContext>): number;
+        /** @summary Delete all files */
+        isMutating<TContext>(filters?: MutationFiltersByParameters<DeleteFilesBody, DeleteFilesData, DeleteFilesParameters, DeleteFilesError | Error, TContext> | MutationFiltersByMutationKey<DeleteFilesSchema, DeleteFilesBody, DeleteFilesData, DeleteFilesParameters, DeleteFilesError | Error, TContext>): number;
+        /** @summary Delete all files */
+        (options: ServiceOperationMutationFnOptions<DeleteFilesBody, DeleteFilesParameters>, client?: (schema: DeleteFilesSchema, options: ServiceOperationMutationFnOptions<DeleteFilesBody, DeleteFilesParameters>) => Promise<RequestFnResponse<DeleteFilesData, DeleteFilesError>>): Promise<RequestFnResponse<DeleteFilesData, DeleteFilesError>>;
+        /**
+         * Provides access to the current state of a mutation, including its status, any resulting data, and associated errors.
+         *
+         * @summary Delete all files
+         * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/hooks/useMutationState|`useMutationState(...)` documentation}
+         * @example Get all variables of all running mutations.
+         * ```ts
+         * const deleteFilesPendingMutationVariables = qraft.filesService.deleteFiles.useMutationState({
+         *     filters: {
+         *         status: "pending"
+         *     },
+         *     select: mutation => mutation.state.variables
+         * })
+         * ```
+         * @example Get all data for specific mutations via the `parameters`.
+         * ```ts
+         * const deleteFilesMutationData = qraft.filesService.deleteFiles.useMutationState({
+         *     filters: {
+         *         parameters: {
+         *             query: {
+         *                 all: all
+         *             }
+         *         }
+         *     },
+         *     select: mutation => mutation.state.data
+         * })
+         * ```
+         */
+        useMutationState<TContext = unknown, TResult = MutationState<DeleteFilesData, DeleteFilesError | Error, MutationVariables<DeleteFilesBody, DeleteFilesParameters>, TContext>>(options?: {
+            filters?: MutationFiltersByParameters<DeleteFilesBody, DeleteFilesData, DeleteFilesParameters, DeleteFilesError | Error, TContext> | MutationFiltersByMutationKey<DeleteFilesSchema, DeleteFilesBody, DeleteFilesData, DeleteFilesParameters, DeleteFilesError | Error, TContext>;
+            select?: (mutation: Mutation<DeleteFilesData, DeleteFilesError | Error, MutationVariables<DeleteFilesBody, DeleteFilesParameters>, TContext>) => TResult;
+        }): Array<TResult>;
         schema: DeleteFilesSchema;
         types: {
             parameters: DeleteFilesParameters;
