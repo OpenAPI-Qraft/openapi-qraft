@@ -44,6 +44,12 @@ Same object as `UseInfiniteQueryResult` object, except that:
 See the TanStack [_useSuspenseInfiniteQuery(...) 🌴_](https://tanstack.com/query/latest/docs/framework/react/reference/useSuspenseInfiniteQuery#:~:text=placeholderData-,Returns,-Same%20object%20as)
 documentation for more details.
 
+:::tip
+By default, `useSuspenseInfiniteQuery` hooks are only generated for read operations (_GET_ method). If you want to use query
+hooks for write operations (_POST_, _PUT_, _PATCH_ methods), use the `--queryable-write-operations` CLI option
+during code generation.
+:::
+
 ### Examples
 
 ```tsx title="src/PostList.tsx"

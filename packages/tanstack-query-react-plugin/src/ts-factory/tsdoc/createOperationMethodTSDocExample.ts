@@ -1,4 +1,5 @@
 import { ServiceOperation } from '@openapi-qraft/plugin/lib/open-api/OpenAPIService';
+import { ServiceFactoryOptions } from '../getServiceFactory.js';
 import { createUseInfiniteQueryOperationTSDocExample } from './createUseInfiniteQueryOperationTSDocExample.js';
 import { createUseIsFetchingOperationTSDocExample } from './createUseIsFetchingOperationTSDocExample.js';
 import { createUseIsMutatingOperationTSDocExample } from './createUseIsMutatingOperationTSDocExample.js';
@@ -18,18 +19,21 @@ export const createOperationMethodTSDocExample = (
   }: {
     serviceVariableName: string;
     operationMethodName: string;
-  }
+  },
+  options: Pick<ServiceFactoryOptions, 'queryableWriteOperations'>
 ) => {
   switch (operationMethodName) {
     case 'useQuery':
       return createUseQueryOperationTSDocExample(
         operation,
-        serviceVariableName
+        serviceVariableName,
+        options
       );
     case 'useSuspenseQuery':
       return createUseSuspenseQueryOperationTSDocExample(
         operation,
-        serviceVariableName
+        serviceVariableName,
+        options
       );
     case 'useMutation':
       return createUseMutationOperationTSDocExample(
@@ -39,17 +43,20 @@ export const createOperationMethodTSDocExample = (
     case 'useInfiniteQuery':
       return createUseInfiniteQueryOperationTSDocExample(
         operation,
-        serviceVariableName
+        serviceVariableName,
+        options
       );
     case 'useSuspenseInfiniteQuery':
       return createUseSuspenseInfiniteQueryOperationTSDocExample(
         operation,
-        serviceVariableName
+        serviceVariableName,
+        options
       );
     case 'useIsFetching':
       return createUseIsFetchingOperationTSDocExample(
         operation,
-        serviceVariableName
+        serviceVariableName,
+        options
       );
     case 'useIsMutating':
       return createUseIsMutatingOperationTSDocExample(
@@ -64,12 +71,14 @@ export const createOperationMethodTSDocExample = (
     case 'useQueries':
       return createUseQueriesOperationTSDocExample(
         operation,
-        serviceVariableName
+        serviceVariableName,
+        options
       );
     case 'useSuspenseQueries':
       return createUseSuspenseQueriesOperationTSDocExample(
         operation,
-        serviceVariableName
+        serviceVariableName,
+        options
       );
     default:
       return undefined;

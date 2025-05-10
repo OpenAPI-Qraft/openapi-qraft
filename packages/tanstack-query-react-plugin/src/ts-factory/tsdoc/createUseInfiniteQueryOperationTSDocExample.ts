@@ -3,12 +3,17 @@ import camelcase from 'camelcase';
 import ts from 'typescript';
 import { createOperationCommonTSDoc } from '../../lib/createOperationCommonTSDoc.js';
 import { astToString } from '../astToString.js';
+import { ServiceFactoryOptions } from '../getServiceFactory.js';
+import { createOperationMethodBodyParametersExampleNode } from './lib/createOperationMethodBodyParametersExampleNode.js';
 import { createOperationMethodCallExpressionExampleNode } from './lib/createOperationMethodCallExpressionExampleNode.js';
 import { createOperationMethodParametersExampleNodes } from './lib/createOperationMethodParametersExampleNodes.js';
 
 export const createUseInfiniteQueryOperationTSDocExample = (
   operation: ServiceOperation,
-  serviceVariableName: string
+  serviceVariableName: string,
+  {
+    queryableWriteOperations,
+  }: Pick<ServiceFactoryOptions, 'queryableWriteOperations'>
 ): string[] => {
   const factory = ts.factory;
 
@@ -36,12 +41,16 @@ export const createUseInfiniteQueryOperationTSDocExample = (
           },
           [
             factory.createObjectLiteralExpression(
-              createOperationMethodParametersExampleNodes({
-                ...operation,
-                parameters: operation.parameters?.filter((parameter) =>
-                  parameter.in === 'query' ? parameter.required : true
-                ),
-              }),
+              [
+                queryableWriteOperations &&
+                  createOperationMethodBodyParametersExampleNode(operation),
+                ...createOperationMethodParametersExampleNodes({
+                  ...operation,
+                  parameters: operation.parameters?.filter((parameter) =>
+                    parameter.in === 'query' ? parameter.required : true
+                  ),
+                }),
+              ].filter((node) => !!node),
               true
             ),
             factory.createObjectLiteralExpression(

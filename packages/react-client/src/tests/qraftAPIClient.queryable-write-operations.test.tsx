@@ -1,3 +1,4 @@
+import type { paths } from './fixtures/api/index.js';
 import { QueryClient } from '@tanstack/query-core';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { renderHook, waitFor } from '@testing-library/react';
@@ -90,5 +91,136 @@ describe('Queryable write operations', () => {
     await waitFor(() => {
       expect(result.current.data).toEqual({ query: { all: 'true' } });
     });
+  });
+
+  it('supports getQueryKey for writable operations', () => {
+    const queryClient = new QueryClient();
+    const qraft = createAPIClient({
+      requestFn,
+      baseUrl,
+      queryClient,
+    });
+
+    const params = {
+      header: {
+        'x-monite-version': '1',
+        'x-monite-entity-id': '2',
+      },
+      path: {
+        approval_policy_id: '2',
+      },
+      body: {
+        name: 'New Name',
+        description: 'New Description',
+      },
+    };
+
+    const queryKey =
+      qraft.approvalPolicies.patchApprovalPoliciesId.getQueryKey(params);
+
+    queryKey satisfies [
+      typeof qraft.approvalPolicies.patchApprovalPoliciesId.schema,
+      paths['/approval_policies/{approval_policy_id}']['patch']['parameters'] & {
+        body: paths['/approval_policies/{approval_policy_id}']['patch']['requestBody']['content']['application/json'];
+      },
+    ];
+
+    // @ts-expect-error - must not be infinite
+    queryKey satisfies [
+      typeof qraft.approvalPolicies.patchApprovalPoliciesId.schema & {
+        infinite: true;
+      },
+      paths['/approval_policies/{approval_policy_id}']['patch']['parameters'] & {
+        body: paths['/approval_policies/{approval_policy_id}']['patch']['requestBody']['content']['application/json'];
+      },
+    ];
+    // @ts-expect-error - must not be never
+    queryKey satisfies never;
+
+    expect(queryKey[1]).toEqual(params);
+  });
+
+  it('supports getInfiniteQueryKey for writable operations', () => {
+    const queryClient = new QueryClient();
+    const qraft = createAPIClient({
+      requestFn,
+      baseUrl,
+      queryClient,
+    });
+
+    const params = {
+      header: {
+        'x-monite-version': '1',
+        'x-monite-entity-id': '2',
+      },
+      path: {
+        approval_policy_id: '2',
+      },
+      body: {
+        name: 'New Name',
+        description: 'New Description',
+      },
+    };
+
+    const infiniteQueryKey =
+      qraft.approvalPolicies.patchApprovalPoliciesId.getInfiniteQueryKey(
+        params
+      );
+
+    infiniteQueryKey satisfies [
+      typeof qraft.approvalPolicies.patchApprovalPoliciesId.schema & {
+        infinite: true;
+      },
+      paths['/approval_policies/{approval_policy_id}']['patch']['parameters'] & {
+        body: paths['/approval_policies/{approval_policy_id}']['patch']['requestBody']['content']['application/json'];
+      },
+    ];
+    // @ts-expect-error - must not be never
+    infiniteQueryKey satisfies never;
+
+    expect(infiniteQueryKey[1]).toEqual(params);
+  });
+
+  it('supports getQueryState for writable operations', () => {
+    const queryClient = new QueryClient();
+    const qraft = createAPIClient({
+      requestFn,
+      baseUrl,
+      queryClient,
+    });
+
+    const params = {
+      header: {
+        'x-monite-version': '1',
+        'x-monite-entity-id': '2',
+      },
+      path: {
+        approval_policy_id: '2',
+      },
+      body: {
+        name: 'New Name',
+        description: 'New Description',
+      },
+    } as const;
+
+    const result = {
+      name: 'John',
+      description: 'Bio',
+      id: '1',
+    } as const;
+
+    qraft.approvalPolicies.patchApprovalPoliciesId.setQueryData(params, result);
+
+    const state =
+      qraft.approvalPolicies.patchApprovalPoliciesId.getQueryState(params);
+
+    expect(state?.fetchStatus).toBeDefined();
+    expect(state?.data).toEqual(result);
+
+    state?.data satisfies
+      | undefined
+      | paths['/approval_policies/{approval_policy_id}']['patch']['responses']['200']['content']['application/json'];
+    // @ts-expect-error - must not be never
+    state?.data satisfies never;
   });
 });

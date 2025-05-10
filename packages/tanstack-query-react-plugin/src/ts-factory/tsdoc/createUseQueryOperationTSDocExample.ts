@@ -2,12 +2,17 @@ import { ServiceOperation } from '@openapi-qraft/plugin/lib/open-api/OpenAPIServ
 import ts from 'typescript';
 import { createOperationCommonTSDoc } from '../../lib/createOperationCommonTSDoc.js';
 import { astToString } from '../astToString.js';
+import { ServiceFactoryOptions } from '../getServiceFactory.js';
+import { createOperationMethodBodyParametersExampleNode } from './lib/createOperationMethodBodyParametersExampleNode.js';
 import { createOperationMethodCallExpressionExampleNode } from './lib/createOperationMethodCallExpressionExampleNode.js';
 import { createOperationMethodParametersExampleNodes } from './lib/createOperationMethodParametersExampleNodes.js';
 
 export const createUseQueryOperationTSDocExample = (
   operation: ServiceOperation,
-  serviceVariableName: string
+  serviceVariableName: string,
+  {
+    queryableWriteOperations,
+  }: Pick<ServiceFactoryOptions, 'queryableWriteOperations'>
 ) => {
   const example: string[] = [
     'Performs asynchronous data fetching, manages loading states and error handling.',
@@ -17,8 +22,8 @@ export const createUseQueryOperationTSDocExample = (
   ];
 
   if (
-    !operation.parameters?.length ||
-    operation.parameters.every((parameter) => !parameter.required)
+    !operation.parameters?.some((parameter) => parameter.required) &&
+    !(queryableWriteOperations && operation.requestBody?.required)
   ) {
     example.push(
       '@example Query without parameters',
@@ -42,7 +47,10 @@ export const createUseQueryOperationTSDocExample = (
     );
   }
 
-  if (operation.parameters?.length) {
+  if (
+    operation.parameters?.length ||
+    (queryableWriteOperations && operation.requestBody)
+  ) {
     const factory = ts.factory;
 
     example.push(
@@ -59,7 +67,11 @@ export const createUseQueryOperationTSDocExample = (
             },
             [
               factory.createObjectLiteralExpression(
-                createOperationMethodParametersExampleNodes(operation),
+                [
+                  queryableWriteOperations &&
+                    createOperationMethodBodyParametersExampleNode(operation),
+                  ...createOperationMethodParametersExampleNodes(operation),
+                ].filter((node) => !!node),
                 true
               ),
             ]

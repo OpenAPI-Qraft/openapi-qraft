@@ -251,7 +251,7 @@ describe('TanStack Query React Client Generation', () => {
       ]);
     });
 
-    test('generates services', async () => {
+    test('generates POST services with an optional `body` in the parameters', async () => {
       expect(
         fs.readFileSync('/mock-fs/services/FilesService.ts', 'utf-8')
       ).toMatchFileSnapshot(
@@ -259,7 +259,7 @@ describe('TanStack Query React Client Generation', () => {
       );
     });
 
-    test('generates services2', async () => {
+    test('generates POST services that require a `body` in the parameters', async () => {
       expect(
         fs.readFileSync('/mock-fs/services/ApprovalPoliciesService.ts', 'utf-8')
       ).toMatchFileSnapshot(

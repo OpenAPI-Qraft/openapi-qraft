@@ -3,6 +3,7 @@ import camelcase from 'camelcase';
 import ts from 'typescript';
 import { createOperationCommonTSDoc } from '../../lib/createOperationCommonTSDoc.js';
 import { astToString } from '../astToString.js';
+import { ServiceFactoryOptions } from '../getServiceFactory.js';
 import {
   createCombinedResultsForEachExpression,
   createCombineFunction,
@@ -13,7 +14,8 @@ import { createOperationMethodCallExpressionExampleNode } from './lib/createOper
 
 export const createUseSuspenseQueriesOperationTSDocExample = (
   operation: ServiceOperation,
-  serviceVariableName: string
+  serviceVariableName: string,
+  options: Pick<ServiceFactoryOptions, 'queryableWriteOperations'>
 ) => {
   const factory = ts.factory;
 
@@ -46,7 +48,11 @@ export const createUseSuspenseQueriesOperationTSDocExample = (
                     [
                       factory.createPropertyAssignment(
                         factory.createIdentifier('queries'),
-                        createQueriesArrayExpression(operation, factory)
+                        createQueriesArrayExpression(
+                          operation,
+                          factory,
+                          options
+                        )
                       ),
                     ],
                     true
@@ -95,7 +101,11 @@ export const createUseSuspenseQueriesOperationTSDocExample = (
                       ),
                       factory.createPropertyAssignment(
                         factory.createIdentifier('queries'),
-                        createQueriesArrayExpression(operation, factory)
+                        createQueriesArrayExpression(
+                          operation,
+                          factory,
+                          options
+                        )
                       ),
                     ],
                     true
