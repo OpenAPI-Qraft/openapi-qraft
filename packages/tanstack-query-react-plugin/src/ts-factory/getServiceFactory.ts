@@ -135,10 +135,12 @@ const getServiceInterfaceOperationFactory = (
 ) => {
   const operationMethodNodes = getMethodSignatureNodes(
     isReadOnlyOperation(operation)
-      ? createServicesQueryOperationNodes(options)
+      ? createServicesQueryOperationNodes({ omitOperationQueryFnNodes: false })
       : options.queryableWriteOperations
         ? [
-            ...createServicesQueryOperationNodes(options),
+            ...createServicesQueryOperationNodes({
+              omitOperationQueryFnNodes: true,
+            }),
             ...createServicesMutationOperationNodes(),
           ]
         : createServicesMutationOperationNodes()
@@ -723,9 +725,11 @@ const getOperationSecuritySchemas = (
     Object.keys(security).map((securitySchemaName) => securitySchemaName)
   );
 
-const createServicesQueryOperationNodes = (
-  options: Pick<ServiceFactoryOptions, 'queryableWriteOperations'>
-) => [
+const createServicesQueryOperationNodes = ({
+  omitOperationQueryFnNodes,
+}: {
+  omitOperationQueryFnNodes: boolean;
+}) => [
   ...createServiceOperationCancelQueriesNodes(),
   ...createServiceOperationUseQueryNodes(),
   ...createServiceOperationFetchInfiniteQueryNodes(),
@@ -736,9 +740,7 @@ const createServicesQueryOperationNodes = (
   ...createServiceOperationGetQueryStateNodes(),
   ...createServiceOperationInvalidateQueriesNodes(),
   ...createServiceOperationIsFetchingQueriesNodes(),
-  ...(options.queryableWriteOperations
-    ? []
-    : createServiceOperationQueryFnNodes()),
+  ...(omitOperationQueryFnNodes ? [] : createServiceOperationQueryFnNodes()),
   ...createServiceOperationRefetchQueriesNodes(),
   ...createServiceOperationRemoveQueriesNodes(),
   ...createServiceOperationResetQueriesNodes(),
@@ -785,17 +787,21 @@ const getModuleTypeImports = (
   operations: ServiceOperation[],
   options: Pick<ServiceFactoryOptions, 'queryableWriteOperations'>
 ) => {
-  const nodes = [
-    ...(operations.some(
-      (operation) =>
-        isReadOnlyOperation(operation) || options.queryableWriteOperations
-    )
-      ? createServicesQueryOperationNodes(options)
-      : []),
-    ...(operations.some((operation) => !isReadOnlyOperation(operation))
-      ? createServicesMutationOperationNodes()
-      : []),
-  ];
+  const nodes = [];
+
+  const hasReadOnlyOperations = operations.some(isReadOnlyOperation);
+
+  if (hasReadOnlyOperations || options.queryableWriteOperations) {
+    nodes.push(
+      ...createServicesQueryOperationNodes({
+        omitOperationQueryFnNodes: !hasReadOnlyOperations,
+      })
+    );
+  }
+
+  if (operations.some((operation) => !isReadOnlyOperation(operation))) {
+    nodes.push(...createServicesMutationOperationNodes());
+  }
 
   return nodes
     .map((node) =>
