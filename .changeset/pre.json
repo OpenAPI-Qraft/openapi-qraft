@@ -17,6 +17,8 @@
     "openapi-qraft-website": "0.0.0"
   },
   "changesets": [
-    "cute-pears-hope"
+    "cute-pears-hope",
+    "fast-llamas-tie",
+    "wild-hotels-start"
   ]
 }

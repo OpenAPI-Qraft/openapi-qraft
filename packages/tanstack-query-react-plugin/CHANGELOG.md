@@ -1,5 +1,12 @@
 # @openapi-qraft/tanstack-query-react-plugin
 
+## 2.5.0-beta.1
+
+### Patch Changes
+
+- 2811346: Fixed generation of `invokeFn` for read-only operations when using `--queryable-write-operations`.
+  - @openapi-qraft/plugin@2.5.0-beta.1
+
 ## 2.5.0-beta.0
 
 ### Minor Changes
