@@ -93,6 +93,65 @@ describe('Queryable write operations', () => {
     });
   });
 
+  it('supports mutation function', async () => {
+    const queryClient = new QueryClient();
+    const qraft = createAPIClient({
+      requestFn,
+      baseUrl,
+      queryClient,
+    });
+
+    const body = {
+      name: 'New Name',
+      description: 'New Description',
+    };
+
+    const result = await qraft.approvalPolicies.patchApprovalPoliciesId({
+      parameters: {
+        header: {
+          'x-monite-version': '1',
+        },
+        path: {
+          approval_policy_id: '2',
+        },
+      },
+      body,
+    });
+
+    await waitFor(() => {
+      expect(result.data).toEqual({
+        id: '2',
+        name: 'New Name',
+        description: 'New Description',
+      });
+    });
+
+    qraft.approvalPolicies.patchApprovalPoliciesId({
+      parameters: {
+        header: {
+          'x-monite-version': '1',
+        },
+        path: {
+          approval_policy_id: '2',
+        },
+        // @ts-expect-error - `body` should not be allowed
+        body,
+      },
+      body,
+    });
+
+    qraft.approvalPolicies.patchApprovalPoliciesId({
+      parameters: {
+        header: {
+          'x-monite-version': '1',
+        },
+        path: {
+          approval_policy_id: '2',
+        },
+      },
+    });
+  });
+
   it('supports getQueryKey for writable operations', () => {
     const queryClient = new QueryClient();
     const qraft = createAPIClient({

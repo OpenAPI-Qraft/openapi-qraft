@@ -4,7 +4,7 @@
  */
 
 import type { paths } from "../../openapi.d.ts";
-import type { DeepReadonly, InvalidateQueryFilters, MutationFiltersByMutationKey, MutationFiltersByParameters, MutationVariables, OperationInfiniteData, PartialParameters, QueryFiltersByParameters, QueryFiltersByQueryKey, QueryFnOptionsByParameters, QueryFnOptionsByQueryKey, RequestFnResponse, ServiceOperationEnsureInfiniteQueryDataOptions, ServiceOperationEnsureQueryDataOptions, ServiceOperationFetchInfiniteQueryOptions, ServiceOperationFetchQueryOptions, ServiceOperationInfiniteQueryKey, ServiceOperationMutationFnOptions, ServiceOperationMutationKey, ServiceOperationQueryKey, ServiceOperationUseMutationOptions, UseQueryOptionsForUseQueries, UseQueryOptionsForUseSuspenseQuery, WithOptional } from "@openapi-qraft/tanstack-query-react-types";
+import type { DeepReadonly, InvalidateQueryFilters, MutationFiltersByMutationKey, MutationFiltersByParameters, MutationVariables, OperationInfiniteData, PartialParameters, QueryFiltersByParameters, QueryFiltersByQueryKey, RequestFnResponse, ServiceOperationEnsureInfiniteQueryDataOptions, ServiceOperationEnsureQueryDataOptions, ServiceOperationFetchInfiniteQueryOptions, ServiceOperationFetchQueryOptions, ServiceOperationInfiniteQueryKey, ServiceOperationMutationFnOptions, ServiceOperationMutationKey, ServiceOperationQueryKey, ServiceOperationUseMutationOptions, UseQueryOptionsForUseQueries, UseQueryOptionsForUseSuspenseQuery, WithOptional } from "@openapi-qraft/tanstack-query-react-types";
 import type { CancelOptions, InfiniteQueryPageParamsOptions, InvalidateOptions, Mutation, MutationState, NoInfer, QueryState, RefetchOptions, ResetOptions, SetDataOptions, Updater } from "@tanstack/query-core";
 import type { DefinedInitialDataInfiniteOptions, DefinedInitialDataOptions, DefinedUseInfiniteQueryResult, DefinedUseQueryResult, UndefinedInitialDataInfiniteOptions, UndefinedInitialDataOptions, UseInfiniteQueryResult, UseMutationResult, UseQueryResult, UseSuspenseInfiniteQueryOptions, UseSuspenseInfiniteQueryResult, UseSuspenseQueryOptions, UseSuspenseQueryResult } from "@tanstack/react-query";
 export interface ApprovalPoliciesService {
@@ -140,15 +140,6 @@ export interface ApprovalPoliciesService {
          * @description Retrieve a specific approval policy.
          */
         isFetching<TInfinite extends boolean = false>(filters?: QueryFiltersByParameters<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdData, TInfinite, GetApprovalPoliciesIdParameters, GetApprovalPoliciesIdError> | QueryFiltersByQueryKey<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdData, TInfinite, GetApprovalPoliciesIdParameters, GetApprovalPoliciesIdError>): number;
-        /**
-         * @summary Get an approval policy by ID
-         * @description Retrieve a specific approval policy.
-         */
-        <TMeta extends Record<string, any>, TSignal extends AbortSignal = AbortSignal>(options: QueryFnOptionsByQueryKey<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdParameters, TMeta, TSignal> | (QueryFnOptionsByParameters<GetApprovalPoliciesIdParameters, TMeta, TSignal>), client?: (schema: GetApprovalPoliciesIdSchema, options: {
-            parameters: GetApprovalPoliciesIdParameters;
-            signal?: TSignal;
-            meta?: TMeta;
-        }) => Promise<RequestFnResponse<GetApprovalPoliciesIdData, GetApprovalPoliciesIdError>>): Promise<RequestFnResponse<GetApprovalPoliciesIdData, GetApprovalPoliciesIdError>>;
         /**
          * @summary Get an approval policy by ID
          * @description Retrieve a specific approval policy.
@@ -557,174 +548,6 @@ export interface ApprovalPoliciesService {
          * @summary Delete an approval policy
          * @description Delete an existing approval policy.
          */
-        getMutationKey(parameters: DeepReadonly<DeleteApprovalPoliciesIdParameters> | void): ServiceOperationMutationKey<DeleteApprovalPoliciesIdSchema, DeleteApprovalPoliciesIdParameters>;
-        /**
-         * Enables performing asynchronous data mutation operations such as POST, PUT, PATCH, or DELETE requests.
-         * Handles loading state, optimistic updates, and error handling.
-         *
-         * @summary Delete an approval policy
-         * @description Delete an existing approval policy.
-         * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/hooks/useMutation|`useMutation(...)` documentation}
-         * @example Mutation with predefined parameters, e.g., for updating
-         * ```ts
-         * const { mutate, isPending } = qraft.approvalPoliciesService.deleteApprovalPoliciesId.useMutation({
-         *     header: {
-         *         "x-monite-version": "2023-06-04",
-         *         "x-monite-entity-id": xMoniteEntityId
-         *     },
-         *     path: {
-         *         approval_policy_id: approvalPolicyId
-         *     },
-         *     query: {
-         *         limit: limit
-         *     }
-         * })
-         * mutate(body);
-         * ```
-         * @example Mutation without predefined parameters, e.g., for creating
-         * ```ts
-         * const { mutate, isPending } = qraft.approvalPoliciesService.deleteApprovalPoliciesId.useMutation()
-         * mutate({
-         *     body: bodyPayload,
-         *     header: {
-         *         "x-monite-version": "2023-06-04",
-         *         "x-monite-entity-id": xMoniteEntityId
-         *     },
-         *     path: {
-         *         approval_policy_id: approvalPolicyId
-         *     },
-         *     query: {
-         *         limit: limit
-         *     }
-         * });
-         * ```
-         */
-        useMutation<TVariables extends DeleteApprovalPoliciesIdBody, TContext = unknown>(parameters: DeepReadonly<DeleteApprovalPoliciesIdParameters>, options?: ServiceOperationUseMutationOptions<DeleteApprovalPoliciesIdSchema, DeleteApprovalPoliciesIdData, DeleteApprovalPoliciesIdParameters, TVariables, DeleteApprovalPoliciesIdError | Error, TContext>): UseMutationResult<DeleteApprovalPoliciesIdData, DeleteApprovalPoliciesIdError | Error, TVariables | void, TContext>;
-        /**
-         * Enables performing asynchronous data mutation operations such as POST, PUT, PATCH, or DELETE requests.
-         * Handles loading state, optimistic updates, and error handling.
-         *
-         * @summary Delete an approval policy
-         * @description Delete an existing approval policy.
-         * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/hooks/useMutation|`useMutation(...)` documentation}
-         * @example Mutation with predefined parameters, e.g., for updating
-         * ```ts
-         * const { mutate, isPending } = qraft.approvalPoliciesService.deleteApprovalPoliciesId.useMutation({
-         *     header: {
-         *         "x-monite-version": "2023-06-04",
-         *         "x-monite-entity-id": xMoniteEntityId
-         *     },
-         *     path: {
-         *         approval_policy_id: approvalPolicyId
-         *     },
-         *     query: {
-         *         limit: limit
-         *     }
-         * })
-         * mutate(body);
-         * ```
-         * @example Mutation without predefined parameters, e.g., for creating
-         * ```ts
-         * const { mutate, isPending } = qraft.approvalPoliciesService.deleteApprovalPoliciesId.useMutation()
-         * mutate({
-         *     body: bodyPayload,
-         *     header: {
-         *         "x-monite-version": "2023-06-04",
-         *         "x-monite-entity-id": xMoniteEntityId
-         *     },
-         *     path: {
-         *         approval_policy_id: approvalPolicyId
-         *     },
-         *     query: {
-         *         limit: limit
-         *     }
-         * });
-         * ```
-         */
-        useMutation<TVariables extends MutationVariables<DeleteApprovalPoliciesIdBody, DeleteApprovalPoliciesIdParameters>, TContext = unknown>(parameters: void, options?: ServiceOperationUseMutationOptions<DeleteApprovalPoliciesIdSchema, DeleteApprovalPoliciesIdData, DeleteApprovalPoliciesIdParameters, TVariables, DeleteApprovalPoliciesIdError | Error, TContext>): UseMutationResult<DeleteApprovalPoliciesIdData, DeleteApprovalPoliciesIdError | Error, TVariables, TContext>;
-        /**
-         * Returns the count of currently in-progress mutations.
-         *
-         * @summary Delete an approval policy
-         * @description Delete an existing approval policy.
-         * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/hooks/useIsMutating|`useIsMutating(...)` documentation}
-         * @example Check how many mutations are currently in progress for the specified service method.
-         * ```ts
-         * const deleteApprovalPoliciesIdTotal = qraft.approvalPoliciesService.deleteApprovalPoliciesId.useIsMutating()
-         * ```
-         * @example Check how many mutations are currently in progress with the specified parameters.
-         * ```ts
-         * const deleteApprovalPoliciesIdTotal = qraft.approvalPoliciesService.deleteApprovalPoliciesId.useIsMutating({
-         *     parameters: {
-         *         header: {
-         *             "x-monite-version": "2023-06-04",
-         *             "x-monite-entity-id": xMoniteEntityId
-         *         },
-         *         path: {
-         *             approval_policy_id: approvalPolicyId
-         *         },
-         *         query: {
-         *             limit: limit
-         *         }
-         *     }
-         * })
-         * ```
-         */
-        useIsMutating<TContext = unknown>(filters?: MutationFiltersByParameters<DeleteApprovalPoliciesIdBody, DeleteApprovalPoliciesIdData, DeleteApprovalPoliciesIdParameters, DeleteApprovalPoliciesIdError | Error, TContext> | MutationFiltersByMutationKey<DeleteApprovalPoliciesIdSchema, DeleteApprovalPoliciesIdBody, DeleteApprovalPoliciesIdData, DeleteApprovalPoliciesIdParameters, DeleteApprovalPoliciesIdError | Error, TContext>): number;
-        /**
-         * @summary Delete an approval policy
-         * @description Delete an existing approval policy.
-         */
-        isMutating<TContext>(filters?: MutationFiltersByParameters<DeleteApprovalPoliciesIdBody, DeleteApprovalPoliciesIdData, DeleteApprovalPoliciesIdParameters, DeleteApprovalPoliciesIdError | Error, TContext> | MutationFiltersByMutationKey<DeleteApprovalPoliciesIdSchema, DeleteApprovalPoliciesIdBody, DeleteApprovalPoliciesIdData, DeleteApprovalPoliciesIdParameters, DeleteApprovalPoliciesIdError | Error, TContext>): number;
-        /**
-         * @summary Delete an approval policy
-         * @description Delete an existing approval policy.
-         */
-        (options: ServiceOperationMutationFnOptions<DeleteApprovalPoliciesIdBody, DeleteApprovalPoliciesIdParameters>, client?: (schema: DeleteApprovalPoliciesIdSchema, options: ServiceOperationMutationFnOptions<DeleteApprovalPoliciesIdBody, DeleteApprovalPoliciesIdParameters>) => Promise<RequestFnResponse<DeleteApprovalPoliciesIdData, DeleteApprovalPoliciesIdError>>): Promise<RequestFnResponse<DeleteApprovalPoliciesIdData, DeleteApprovalPoliciesIdError>>;
-        /**
-         * Provides access to the current state of a mutation, including its status, any resulting data, and associated errors.
-         *
-         * @summary Delete an approval policy
-         * @description Delete an existing approval policy.
-         * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/hooks/useMutationState|`useMutationState(...)` documentation}
-         * @example Get all variables of all running mutations.
-         * ```ts
-         * const deleteApprovalPoliciesIdPendingMutationVariables = qraft.approvalPoliciesService.deleteApprovalPoliciesId.useMutationState({
-         *     filters: {
-         *         status: "pending"
-         *     },
-         *     select: mutation => mutation.state.variables
-         * })
-         * ```
-         * @example Get all data for specific mutations via the `parameters`.
-         * ```ts
-         * const deleteApprovalPoliciesIdMutationData = qraft.approvalPoliciesService.deleteApprovalPoliciesId.useMutationState({
-         *     filters: {
-         *         parameters: {
-         *             header: {
-         *                 "x-monite-version": "2023-06-04",
-         *                 "x-monite-entity-id": xMoniteEntityId
-         *             },
-         *             path: {
-         *                 approval_policy_id: approvalPolicyId
-         *             },
-         *             query: {
-         *                 limit: limit
-         *             }
-         *         }
-         *     },
-         *     select: mutation => mutation.state.data
-         * })
-         * ```
-         */
-        useMutationState<TContext = unknown, TResult = MutationState<DeleteApprovalPoliciesIdData, DeleteApprovalPoliciesIdError | Error, MutationVariables<DeleteApprovalPoliciesIdBody, DeleteApprovalPoliciesIdParameters>, TContext>>(options?: {
-            filters?: MutationFiltersByParameters<DeleteApprovalPoliciesIdBody, DeleteApprovalPoliciesIdData, DeleteApprovalPoliciesIdParameters, DeleteApprovalPoliciesIdError | Error, TContext> | MutationFiltersByMutationKey<DeleteApprovalPoliciesIdSchema, DeleteApprovalPoliciesIdBody, DeleteApprovalPoliciesIdData, DeleteApprovalPoliciesIdParameters, DeleteApprovalPoliciesIdError | Error, TContext>;
-            select?: (mutation: Mutation<DeleteApprovalPoliciesIdData, DeleteApprovalPoliciesIdError | Error, MutationVariables<DeleteApprovalPoliciesIdBody, DeleteApprovalPoliciesIdParameters>, TContext>) => TResult;
-        }): Array<TResult>;
-        /**
-         * @summary Delete an approval policy
-         * @description Delete an existing approval policy.
-         */
         cancelQueries<TInfinite extends boolean = false>(filters?: QueryFiltersByParameters<DeleteApprovalPoliciesIdSchema, DeleteApprovalPoliciesIdData, TInfinite, DeleteApprovalPoliciesIdParameters, DeleteApprovalPoliciesIdError> | QueryFiltersByQueryKey<DeleteApprovalPoliciesIdSchema, DeleteApprovalPoliciesIdData, TInfinite, DeleteApprovalPoliciesIdParameters, DeleteApprovalPoliciesIdError>, options?: CancelOptions): Promise<void>;
         /**
          * @summary Delete an approval policy
@@ -848,15 +671,6 @@ export interface ApprovalPoliciesService {
          * @description Delete an existing approval policy.
          */
         isFetching<TInfinite extends boolean = false>(filters?: QueryFiltersByParameters<DeleteApprovalPoliciesIdSchema, DeleteApprovalPoliciesIdData, TInfinite, DeleteApprovalPoliciesIdParameters, DeleteApprovalPoliciesIdError> | QueryFiltersByQueryKey<DeleteApprovalPoliciesIdSchema, DeleteApprovalPoliciesIdData, TInfinite, DeleteApprovalPoliciesIdParameters, DeleteApprovalPoliciesIdError>): number;
-        /**
-         * @summary Delete an approval policy
-         * @description Delete an existing approval policy.
-         */
-        <TMeta extends Record<string, any>, TSignal extends AbortSignal = AbortSignal>(options: QueryFnOptionsByQueryKey<DeleteApprovalPoliciesIdSchema, DeleteApprovalPoliciesIdParameters, TMeta, TSignal> | (QueryFnOptionsByParameters<DeleteApprovalPoliciesIdParameters, TMeta, TSignal>), client?: (schema: DeleteApprovalPoliciesIdSchema, options: {
-            parameters: DeleteApprovalPoliciesIdParameters;
-            signal?: TSignal;
-            meta?: TMeta;
-        }) => Promise<RequestFnResponse<DeleteApprovalPoliciesIdData, DeleteApprovalPoliciesIdError>>): Promise<RequestFnResponse<DeleteApprovalPoliciesIdData, DeleteApprovalPoliciesIdError>>;
         /**
          * @summary Delete an approval policy
          * @description Delete an existing approval policy.
@@ -1249,34 +1063,21 @@ export interface ApprovalPoliciesService {
          * ```
          */
         useSuspenseQuery<TData = DeleteApprovalPoliciesIdData>(parameters: ServiceOperationQueryKey<DeleteApprovalPoliciesIdSchema, DeleteApprovalPoliciesIdParameters> | (DeepReadonly<DeleteApprovalPoliciesIdParameters>), options?: Omit<UseSuspenseQueryOptions<DeleteApprovalPoliciesIdData, DeleteApprovalPoliciesIdError, TData, ServiceOperationQueryKey<DeleteApprovalPoliciesIdSchema, DeleteApprovalPoliciesIdParameters>>, "queryKey">): UseSuspenseQueryResult<TData, DeleteApprovalPoliciesIdError | Error>;
-        schema: DeleteApprovalPoliciesIdSchema;
-        types: {
-            parameters: DeleteApprovalPoliciesIdParameters;
-            data: DeleteApprovalPoliciesIdData;
-            error: DeleteApprovalPoliciesIdError;
-            body: DeleteApprovalPoliciesIdBody;
-        };
-    };
-    /**
-     * @summary Update an approval policy
-     * @description Update an existing approval policy.
-     */
-    patchApprovalPoliciesId: {
         /**
-         * @summary Update an approval policy
-         * @description Update an existing approval policy.
+         * @summary Delete an approval policy
+         * @description Delete an existing approval policy.
          */
-        getMutationKey(parameters: DeepReadonly<PatchApprovalPoliciesIdMutationParameters> | void): ServiceOperationMutationKey<PatchApprovalPoliciesIdSchema, PatchApprovalPoliciesIdMutationParameters>;
+        getMutationKey(parameters: DeepReadonly<DeleteApprovalPoliciesIdParameters> | void): ServiceOperationMutationKey<DeleteApprovalPoliciesIdSchema, DeleteApprovalPoliciesIdParameters>;
         /**
          * Enables performing asynchronous data mutation operations such as POST, PUT, PATCH, or DELETE requests.
          * Handles loading state, optimistic updates, and error handling.
          *
-         * @summary Update an approval policy
-         * @description Update an existing approval policy.
+         * @summary Delete an approval policy
+         * @description Delete an existing approval policy.
          * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/hooks/useMutation|`useMutation(...)` documentation}
          * @example Mutation with predefined parameters, e.g., for updating
          * ```ts
-         * const { mutate, isPending } = qraft.approvalPoliciesService.patchApprovalPoliciesId.useMutation({
+         * const { mutate, isPending } = qraft.approvalPoliciesService.deleteApprovalPoliciesId.useMutation({
          *     header: {
          *         "x-monite-version": "2023-06-04",
          *         "x-monite-entity-id": xMoniteEntityId
@@ -1292,7 +1093,7 @@ export interface ApprovalPoliciesService {
          * ```
          * @example Mutation without predefined parameters, e.g., for creating
          * ```ts
-         * const { mutate, isPending } = qraft.approvalPoliciesService.patchApprovalPoliciesId.useMutation()
+         * const { mutate, isPending } = qraft.approvalPoliciesService.deleteApprovalPoliciesId.useMutation()
          * mutate({
          *     body: bodyPayload,
          *     header: {
@@ -1308,17 +1109,17 @@ export interface ApprovalPoliciesService {
          * });
          * ```
          */
-        useMutation<TVariables extends PatchApprovalPoliciesIdBody, TContext = unknown>(parameters: DeepReadonly<PatchApprovalPoliciesIdMutationParameters>, options?: ServiceOperationUseMutationOptions<PatchApprovalPoliciesIdSchema, PatchApprovalPoliciesIdData, PatchApprovalPoliciesIdMutationParameters, TVariables, PatchApprovalPoliciesIdError | Error, TContext>): UseMutationResult<PatchApprovalPoliciesIdData, PatchApprovalPoliciesIdError | Error, TVariables, TContext>;
+        useMutation<TVariables extends DeleteApprovalPoliciesIdBody, TContext = unknown>(parameters: DeepReadonly<DeleteApprovalPoliciesIdParameters>, options?: ServiceOperationUseMutationOptions<DeleteApprovalPoliciesIdSchema, DeleteApprovalPoliciesIdData, DeleteApprovalPoliciesIdParameters, TVariables, DeleteApprovalPoliciesIdError | Error, TContext>): UseMutationResult<DeleteApprovalPoliciesIdData, DeleteApprovalPoliciesIdError | Error, TVariables | void, TContext>;
         /**
          * Enables performing asynchronous data mutation operations such as POST, PUT, PATCH, or DELETE requests.
          * Handles loading state, optimistic updates, and error handling.
          *
-         * @summary Update an approval policy
-         * @description Update an existing approval policy.
+         * @summary Delete an approval policy
+         * @description Delete an existing approval policy.
          * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/hooks/useMutation|`useMutation(...)` documentation}
          * @example Mutation with predefined parameters, e.g., for updating
          * ```ts
-         * const { mutate, isPending } = qraft.approvalPoliciesService.patchApprovalPoliciesId.useMutation({
+         * const { mutate, isPending } = qraft.approvalPoliciesService.deleteApprovalPoliciesId.useMutation({
          *     header: {
          *         "x-monite-version": "2023-06-04",
          *         "x-monite-entity-id": xMoniteEntityId
@@ -1334,7 +1135,7 @@ export interface ApprovalPoliciesService {
          * ```
          * @example Mutation without predefined parameters, e.g., for creating
          * ```ts
-         * const { mutate, isPending } = qraft.approvalPoliciesService.patchApprovalPoliciesId.useMutation()
+         * const { mutate, isPending } = qraft.approvalPoliciesService.deleteApprovalPoliciesId.useMutation()
          * mutate({
          *     body: bodyPayload,
          *     header: {
@@ -1350,20 +1151,20 @@ export interface ApprovalPoliciesService {
          * });
          * ```
          */
-        useMutation<TVariables extends MutationVariables<PatchApprovalPoliciesIdBody, PatchApprovalPoliciesIdMutationParameters>, TContext = unknown>(parameters: void, options?: ServiceOperationUseMutationOptions<PatchApprovalPoliciesIdSchema, PatchApprovalPoliciesIdData, PatchApprovalPoliciesIdMutationParameters, TVariables, PatchApprovalPoliciesIdError | Error, TContext>): UseMutationResult<PatchApprovalPoliciesIdData, PatchApprovalPoliciesIdError | Error, TVariables, TContext>;
+        useMutation<TVariables extends MutationVariables<DeleteApprovalPoliciesIdBody, DeleteApprovalPoliciesIdParameters>, TContext = unknown>(parameters: void, options?: ServiceOperationUseMutationOptions<DeleteApprovalPoliciesIdSchema, DeleteApprovalPoliciesIdData, DeleteApprovalPoliciesIdParameters, TVariables, DeleteApprovalPoliciesIdError | Error, TContext>): UseMutationResult<DeleteApprovalPoliciesIdData, DeleteApprovalPoliciesIdError | Error, TVariables, TContext>;
         /**
          * Returns the count of currently in-progress mutations.
          *
-         * @summary Update an approval policy
-         * @description Update an existing approval policy.
+         * @summary Delete an approval policy
+         * @description Delete an existing approval policy.
          * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/hooks/useIsMutating|`useIsMutating(...)` documentation}
          * @example Check how many mutations are currently in progress for the specified service method.
          * ```ts
-         * const patchApprovalPoliciesIdTotal = qraft.approvalPoliciesService.patchApprovalPoliciesId.useIsMutating()
+         * const deleteApprovalPoliciesIdTotal = qraft.approvalPoliciesService.deleteApprovalPoliciesId.useIsMutating()
          * ```
          * @example Check how many mutations are currently in progress with the specified parameters.
          * ```ts
-         * const patchApprovalPoliciesIdTotal = qraft.approvalPoliciesService.patchApprovalPoliciesId.useIsMutating({
+         * const deleteApprovalPoliciesIdTotal = qraft.approvalPoliciesService.deleteApprovalPoliciesId.useIsMutating({
          *     parameters: {
          *         header: {
          *             "x-monite-version": "2023-06-04",
@@ -1379,26 +1180,26 @@ export interface ApprovalPoliciesService {
          * })
          * ```
          */
-        useIsMutating<TContext = unknown>(filters?: MutationFiltersByParameters<PatchApprovalPoliciesIdBody, PatchApprovalPoliciesIdData, PatchApprovalPoliciesIdMutationParameters, PatchApprovalPoliciesIdError | Error, TContext> | MutationFiltersByMutationKey<PatchApprovalPoliciesIdSchema, PatchApprovalPoliciesIdBody, PatchApprovalPoliciesIdData, PatchApprovalPoliciesIdMutationParameters, PatchApprovalPoliciesIdError | Error, TContext>): number;
+        useIsMutating<TContext = unknown>(filters?: MutationFiltersByParameters<DeleteApprovalPoliciesIdBody, DeleteApprovalPoliciesIdData, DeleteApprovalPoliciesIdParameters, DeleteApprovalPoliciesIdError | Error, TContext> | MutationFiltersByMutationKey<DeleteApprovalPoliciesIdSchema, DeleteApprovalPoliciesIdBody, DeleteApprovalPoliciesIdData, DeleteApprovalPoliciesIdParameters, DeleteApprovalPoliciesIdError | Error, TContext>): number;
         /**
-         * @summary Update an approval policy
-         * @description Update an existing approval policy.
+         * @summary Delete an approval policy
+         * @description Delete an existing approval policy.
          */
-        isMutating<TContext>(filters?: MutationFiltersByParameters<PatchApprovalPoliciesIdBody, PatchApprovalPoliciesIdData, PatchApprovalPoliciesIdMutationParameters, PatchApprovalPoliciesIdError | Error, TContext> | MutationFiltersByMutationKey<PatchApprovalPoliciesIdSchema, PatchApprovalPoliciesIdBody, PatchApprovalPoliciesIdData, PatchApprovalPoliciesIdMutationParameters, PatchApprovalPoliciesIdError | Error, TContext>): number;
+        isMutating<TContext>(filters?: MutationFiltersByParameters<DeleteApprovalPoliciesIdBody, DeleteApprovalPoliciesIdData, DeleteApprovalPoliciesIdParameters, DeleteApprovalPoliciesIdError | Error, TContext> | MutationFiltersByMutationKey<DeleteApprovalPoliciesIdSchema, DeleteApprovalPoliciesIdBody, DeleteApprovalPoliciesIdData, DeleteApprovalPoliciesIdParameters, DeleteApprovalPoliciesIdError | Error, TContext>): number;
         /**
-         * @summary Update an approval policy
-         * @description Update an existing approval policy.
+         * @summary Delete an approval policy
+         * @description Delete an existing approval policy.
          */
-        (options: ServiceOperationMutationFnOptions<PatchApprovalPoliciesIdBody, PatchApprovalPoliciesIdMutationParameters>, client?: (schema: PatchApprovalPoliciesIdSchema, options: ServiceOperationMutationFnOptions<PatchApprovalPoliciesIdBody, PatchApprovalPoliciesIdMutationParameters>) => Promise<RequestFnResponse<PatchApprovalPoliciesIdData, PatchApprovalPoliciesIdError>>): Promise<RequestFnResponse<PatchApprovalPoliciesIdData, PatchApprovalPoliciesIdError>>;
+        (options: ServiceOperationMutationFnOptions<DeleteApprovalPoliciesIdBody, DeleteApprovalPoliciesIdParameters>, client?: (schema: DeleteApprovalPoliciesIdSchema, options: ServiceOperationMutationFnOptions<DeleteApprovalPoliciesIdBody, DeleteApprovalPoliciesIdParameters>) => Promise<RequestFnResponse<DeleteApprovalPoliciesIdData, DeleteApprovalPoliciesIdError>>): Promise<RequestFnResponse<DeleteApprovalPoliciesIdData, DeleteApprovalPoliciesIdError>>;
         /**
          * Provides access to the current state of a mutation, including its status, any resulting data, and associated errors.
          *
-         * @summary Update an approval policy
-         * @description Update an existing approval policy.
+         * @summary Delete an approval policy
+         * @description Delete an existing approval policy.
          * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/hooks/useMutationState|`useMutationState(...)` documentation}
          * @example Get all variables of all running mutations.
          * ```ts
-         * const patchApprovalPoliciesIdPendingMutationVariables = qraft.approvalPoliciesService.patchApprovalPoliciesId.useMutationState({
+         * const deleteApprovalPoliciesIdPendingMutationVariables = qraft.approvalPoliciesService.deleteApprovalPoliciesId.useMutationState({
          *     filters: {
          *         status: "pending"
          *     },
@@ -1407,7 +1208,7 @@ export interface ApprovalPoliciesService {
          * ```
          * @example Get all data for specific mutations via the `parameters`.
          * ```ts
-         * const patchApprovalPoliciesIdMutationData = qraft.approvalPoliciesService.patchApprovalPoliciesId.useMutationState({
+         * const deleteApprovalPoliciesIdMutationData = qraft.approvalPoliciesService.deleteApprovalPoliciesId.useMutationState({
          *     filters: {
          *         parameters: {
          *             header: {
@@ -1426,10 +1227,23 @@ export interface ApprovalPoliciesService {
          * })
          * ```
          */
-        useMutationState<TContext = unknown, TResult = MutationState<PatchApprovalPoliciesIdData, PatchApprovalPoliciesIdError | Error, MutationVariables<PatchApprovalPoliciesIdBody, PatchApprovalPoliciesIdMutationParameters>, TContext>>(options?: {
-            filters?: MutationFiltersByParameters<PatchApprovalPoliciesIdBody, PatchApprovalPoliciesIdData, PatchApprovalPoliciesIdMutationParameters, PatchApprovalPoliciesIdError | Error, TContext> | MutationFiltersByMutationKey<PatchApprovalPoliciesIdSchema, PatchApprovalPoliciesIdBody, PatchApprovalPoliciesIdData, PatchApprovalPoliciesIdMutationParameters, PatchApprovalPoliciesIdError | Error, TContext>;
-            select?: (mutation: Mutation<PatchApprovalPoliciesIdData, PatchApprovalPoliciesIdError | Error, MutationVariables<PatchApprovalPoliciesIdBody, PatchApprovalPoliciesIdMutationParameters>, TContext>) => TResult;
+        useMutationState<TContext = unknown, TResult = MutationState<DeleteApprovalPoliciesIdData, DeleteApprovalPoliciesIdError | Error, MutationVariables<DeleteApprovalPoliciesIdBody, DeleteApprovalPoliciesIdParameters>, TContext>>(options?: {
+            filters?: MutationFiltersByParameters<DeleteApprovalPoliciesIdBody, DeleteApprovalPoliciesIdData, DeleteApprovalPoliciesIdParameters, DeleteApprovalPoliciesIdError | Error, TContext> | MutationFiltersByMutationKey<DeleteApprovalPoliciesIdSchema, DeleteApprovalPoliciesIdBody, DeleteApprovalPoliciesIdData, DeleteApprovalPoliciesIdParameters, DeleteApprovalPoliciesIdError | Error, TContext>;
+            select?: (mutation: Mutation<DeleteApprovalPoliciesIdData, DeleteApprovalPoliciesIdError | Error, MutationVariables<DeleteApprovalPoliciesIdBody, DeleteApprovalPoliciesIdParameters>, TContext>) => TResult;
         }): Array<TResult>;
+        schema: DeleteApprovalPoliciesIdSchema;
+        types: {
+            parameters: DeleteApprovalPoliciesIdParameters;
+            data: DeleteApprovalPoliciesIdData;
+            error: DeleteApprovalPoliciesIdError;
+            body: DeleteApprovalPoliciesIdBody;
+        };
+    };
+    /**
+     * @summary Update an approval policy
+     * @description Update an existing approval policy.
+     */
+    patchApprovalPoliciesId: {
         /**
          * @summary Update an approval policy
          * @description Update an existing approval policy.
@@ -1559,15 +1373,6 @@ export interface ApprovalPoliciesService {
          * @description Update an existing approval policy.
          */
         isFetching<TInfinite extends boolean = false>(filters?: QueryFiltersByParameters<PatchApprovalPoliciesIdSchema, PatchApprovalPoliciesIdData, TInfinite, PatchApprovalPoliciesIdQueryParameters, PatchApprovalPoliciesIdError> | QueryFiltersByQueryKey<PatchApprovalPoliciesIdSchema, PatchApprovalPoliciesIdData, TInfinite, PatchApprovalPoliciesIdQueryParameters, PatchApprovalPoliciesIdError>): number;
-        /**
-         * @summary Update an approval policy
-         * @description Update an existing approval policy.
-         */
-        <TMeta extends Record<string, any>, TSignal extends AbortSignal = AbortSignal>(options: QueryFnOptionsByQueryKey<PatchApprovalPoliciesIdSchema, PatchApprovalPoliciesIdQueryParameters, TMeta, TSignal> | (QueryFnOptionsByParameters<PatchApprovalPoliciesIdQueryParameters, TMeta, TSignal>), client?: (schema: PatchApprovalPoliciesIdSchema, options: {
-            parameters: PatchApprovalPoliciesIdQueryParameters;
-            signal?: TSignal;
-            meta?: TMeta;
-        }) => Promise<RequestFnResponse<PatchApprovalPoliciesIdData, PatchApprovalPoliciesIdError>>): Promise<RequestFnResponse<PatchApprovalPoliciesIdData, PatchApprovalPoliciesIdError>>;
         /**
          * @summary Update an approval policy
          * @description Update an existing approval policy.
@@ -1975,6 +1780,174 @@ export interface ApprovalPoliciesService {
          * ```
          */
         useSuspenseQuery<TData = PatchApprovalPoliciesIdData>(parameters: ServiceOperationQueryKey<PatchApprovalPoliciesIdSchema, PatchApprovalPoliciesIdQueryParameters> | (DeepReadonly<PatchApprovalPoliciesIdQueryParameters>), options?: Omit<UseSuspenseQueryOptions<PatchApprovalPoliciesIdData, PatchApprovalPoliciesIdError, TData, ServiceOperationQueryKey<PatchApprovalPoliciesIdSchema, PatchApprovalPoliciesIdQueryParameters>>, "queryKey">): UseSuspenseQueryResult<TData, PatchApprovalPoliciesIdError | Error>;
+        /**
+         * @summary Update an approval policy
+         * @description Update an existing approval policy.
+         */
+        getMutationKey(parameters: DeepReadonly<PatchApprovalPoliciesIdMutationParameters> | void): ServiceOperationMutationKey<PatchApprovalPoliciesIdSchema, PatchApprovalPoliciesIdMutationParameters>;
+        /**
+         * Enables performing asynchronous data mutation operations such as POST, PUT, PATCH, or DELETE requests.
+         * Handles loading state, optimistic updates, and error handling.
+         *
+         * @summary Update an approval policy
+         * @description Update an existing approval policy.
+         * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/hooks/useMutation|`useMutation(...)` documentation}
+         * @example Mutation with predefined parameters, e.g., for updating
+         * ```ts
+         * const { mutate, isPending } = qraft.approvalPoliciesService.patchApprovalPoliciesId.useMutation({
+         *     header: {
+         *         "x-monite-version": "2023-06-04",
+         *         "x-monite-entity-id": xMoniteEntityId
+         *     },
+         *     path: {
+         *         approval_policy_id: approvalPolicyId
+         *     },
+         *     query: {
+         *         limit: limit
+         *     }
+         * })
+         * mutate(body);
+         * ```
+         * @example Mutation without predefined parameters, e.g., for creating
+         * ```ts
+         * const { mutate, isPending } = qraft.approvalPoliciesService.patchApprovalPoliciesId.useMutation()
+         * mutate({
+         *     body: bodyPayload,
+         *     header: {
+         *         "x-monite-version": "2023-06-04",
+         *         "x-monite-entity-id": xMoniteEntityId
+         *     },
+         *     path: {
+         *         approval_policy_id: approvalPolicyId
+         *     },
+         *     query: {
+         *         limit: limit
+         *     }
+         * });
+         * ```
+         */
+        useMutation<TVariables extends PatchApprovalPoliciesIdBody, TContext = unknown>(parameters: DeepReadonly<PatchApprovalPoliciesIdMutationParameters>, options?: ServiceOperationUseMutationOptions<PatchApprovalPoliciesIdSchema, PatchApprovalPoliciesIdData, PatchApprovalPoliciesIdMutationParameters, TVariables, PatchApprovalPoliciesIdError | Error, TContext>): UseMutationResult<PatchApprovalPoliciesIdData, PatchApprovalPoliciesIdError | Error, TVariables, TContext>;
+        /**
+         * Enables performing asynchronous data mutation operations such as POST, PUT, PATCH, or DELETE requests.
+         * Handles loading state, optimistic updates, and error handling.
+         *
+         * @summary Update an approval policy
+         * @description Update an existing approval policy.
+         * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/hooks/useMutation|`useMutation(...)` documentation}
+         * @example Mutation with predefined parameters, e.g., for updating
+         * ```ts
+         * const { mutate, isPending } = qraft.approvalPoliciesService.patchApprovalPoliciesId.useMutation({
+         *     header: {
+         *         "x-monite-version": "2023-06-04",
+         *         "x-monite-entity-id": xMoniteEntityId
+         *     },
+         *     path: {
+         *         approval_policy_id: approvalPolicyId
+         *     },
+         *     query: {
+         *         limit: limit
+         *     }
+         * })
+         * mutate(body);
+         * ```
+         * @example Mutation without predefined parameters, e.g., for creating
+         * ```ts
+         * const { mutate, isPending } = qraft.approvalPoliciesService.patchApprovalPoliciesId.useMutation()
+         * mutate({
+         *     body: bodyPayload,
+         *     header: {
+         *         "x-monite-version": "2023-06-04",
+         *         "x-monite-entity-id": xMoniteEntityId
+         *     },
+         *     path: {
+         *         approval_policy_id: approvalPolicyId
+         *     },
+         *     query: {
+         *         limit: limit
+         *     }
+         * });
+         * ```
+         */
+        useMutation<TVariables extends MutationVariables<PatchApprovalPoliciesIdBody, PatchApprovalPoliciesIdMutationParameters>, TContext = unknown>(parameters: void, options?: ServiceOperationUseMutationOptions<PatchApprovalPoliciesIdSchema, PatchApprovalPoliciesIdData, PatchApprovalPoliciesIdMutationParameters, TVariables, PatchApprovalPoliciesIdError | Error, TContext>): UseMutationResult<PatchApprovalPoliciesIdData, PatchApprovalPoliciesIdError | Error, TVariables, TContext>;
+        /**
+         * Returns the count of currently in-progress mutations.
+         *
+         * @summary Update an approval policy
+         * @description Update an existing approval policy.
+         * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/hooks/useIsMutating|`useIsMutating(...)` documentation}
+         * @example Check how many mutations are currently in progress for the specified service method.
+         * ```ts
+         * const patchApprovalPoliciesIdTotal = qraft.approvalPoliciesService.patchApprovalPoliciesId.useIsMutating()
+         * ```
+         * @example Check how many mutations are currently in progress with the specified parameters.
+         * ```ts
+         * const patchApprovalPoliciesIdTotal = qraft.approvalPoliciesService.patchApprovalPoliciesId.useIsMutating({
+         *     parameters: {
+         *         header: {
+         *             "x-monite-version": "2023-06-04",
+         *             "x-monite-entity-id": xMoniteEntityId
+         *         },
+         *         path: {
+         *             approval_policy_id: approvalPolicyId
+         *         },
+         *         query: {
+         *             limit: limit
+         *         }
+         *     }
+         * })
+         * ```
+         */
+        useIsMutating<TContext = unknown>(filters?: MutationFiltersByParameters<PatchApprovalPoliciesIdBody, PatchApprovalPoliciesIdData, PatchApprovalPoliciesIdMutationParameters, PatchApprovalPoliciesIdError | Error, TContext> | MutationFiltersByMutationKey<PatchApprovalPoliciesIdSchema, PatchApprovalPoliciesIdBody, PatchApprovalPoliciesIdData, PatchApprovalPoliciesIdMutationParameters, PatchApprovalPoliciesIdError | Error, TContext>): number;
+        /**
+         * @summary Update an approval policy
+         * @description Update an existing approval policy.
+         */
+        isMutating<TContext>(filters?: MutationFiltersByParameters<PatchApprovalPoliciesIdBody, PatchApprovalPoliciesIdData, PatchApprovalPoliciesIdMutationParameters, PatchApprovalPoliciesIdError | Error, TContext> | MutationFiltersByMutationKey<PatchApprovalPoliciesIdSchema, PatchApprovalPoliciesIdBody, PatchApprovalPoliciesIdData, PatchApprovalPoliciesIdMutationParameters, PatchApprovalPoliciesIdError | Error, TContext>): number;
+        /**
+         * @summary Update an approval policy
+         * @description Update an existing approval policy.
+         */
+        (options: ServiceOperationMutationFnOptions<PatchApprovalPoliciesIdBody, PatchApprovalPoliciesIdMutationParameters>, client?: (schema: PatchApprovalPoliciesIdSchema, options: ServiceOperationMutationFnOptions<PatchApprovalPoliciesIdBody, PatchApprovalPoliciesIdMutationParameters>) => Promise<RequestFnResponse<PatchApprovalPoliciesIdData, PatchApprovalPoliciesIdError>>): Promise<RequestFnResponse<PatchApprovalPoliciesIdData, PatchApprovalPoliciesIdError>>;
+        /**
+         * Provides access to the current state of a mutation, including its status, any resulting data, and associated errors.
+         *
+         * @summary Update an approval policy
+         * @description Update an existing approval policy.
+         * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/hooks/useMutationState|`useMutationState(...)` documentation}
+         * @example Get all variables of all running mutations.
+         * ```ts
+         * const patchApprovalPoliciesIdPendingMutationVariables = qraft.approvalPoliciesService.patchApprovalPoliciesId.useMutationState({
+         *     filters: {
+         *         status: "pending"
+         *     },
+         *     select: mutation => mutation.state.variables
+         * })
+         * ```
+         * @example Get all data for specific mutations via the `parameters`.
+         * ```ts
+         * const patchApprovalPoliciesIdMutationData = qraft.approvalPoliciesService.patchApprovalPoliciesId.useMutationState({
+         *     filters: {
+         *         parameters: {
+         *             header: {
+         *                 "x-monite-version": "2023-06-04",
+         *                 "x-monite-entity-id": xMoniteEntityId
+         *             },
+         *             path: {
+         *                 approval_policy_id: approvalPolicyId
+         *             },
+         *             query: {
+         *                 limit: limit
+         *             }
+         *         }
+         *     },
+         *     select: mutation => mutation.state.data
+         * })
+         * ```
+         */
+        useMutationState<TContext = unknown, TResult = MutationState<PatchApprovalPoliciesIdData, PatchApprovalPoliciesIdError | Error, MutationVariables<PatchApprovalPoliciesIdBody, PatchApprovalPoliciesIdMutationParameters>, TContext>>(options?: {
+            filters?: MutationFiltersByParameters<PatchApprovalPoliciesIdBody, PatchApprovalPoliciesIdData, PatchApprovalPoliciesIdMutationParameters, PatchApprovalPoliciesIdError | Error, TContext> | MutationFiltersByMutationKey<PatchApprovalPoliciesIdSchema, PatchApprovalPoliciesIdBody, PatchApprovalPoliciesIdData, PatchApprovalPoliciesIdMutationParameters, PatchApprovalPoliciesIdError | Error, TContext>;
+            select?: (mutation: Mutation<PatchApprovalPoliciesIdData, PatchApprovalPoliciesIdError | Error, MutationVariables<PatchApprovalPoliciesIdBody, PatchApprovalPoliciesIdMutationParameters>, TContext>) => TResult;
+        }): Array<TResult>;
         schema: PatchApprovalPoliciesIdSchema;
         types: {
             parameters: PatchApprovalPoliciesIdMutationParameters;
