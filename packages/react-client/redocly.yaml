@@ -13,6 +13,7 @@ apis:
       clean: true
       explicit-import-extensions: true
       openapi-types-file-name: openapi.ts
+      default-client-callbacks: all
       filter-services:
         - '/approval_policies/**'
         - '/entities/**'
