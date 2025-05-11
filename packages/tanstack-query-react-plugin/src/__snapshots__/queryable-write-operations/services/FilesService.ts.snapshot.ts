@@ -4,7 +4,7 @@
  */
 
 import type { paths } from "../../openapi.d.ts";
-import type { DeepReadonly, InvalidateQueryFilters, MutationFiltersByMutationKey, MutationFiltersByParameters, MutationVariables, OperationInfiniteData, PartialParameters, QueryFiltersByParameters, QueryFiltersByQueryKey, RequestFnResponse, ServiceOperationEnsureInfiniteQueryDataOptions, ServiceOperationEnsureQueryDataOptions, ServiceOperationFetchInfiniteQueryOptions, ServiceOperationFetchQueryOptions, ServiceOperationInfiniteQueryKey, ServiceOperationMutationFnOptions, ServiceOperationMutationKey, ServiceOperationQueryKey, ServiceOperationUseMutationOptions, UseQueryOptionsForUseQueries, UseQueryOptionsForUseSuspenseQuery, WithOptional } from "@openapi-qraft/tanstack-query-react-types";
+import type { DeepReadonly, InvalidateQueryFilters, MutationFiltersByMutationKey, MutationFiltersByParameters, MutationVariables, OperationInfiniteData, PartialParameters, QueryFiltersByParameters, QueryFiltersByQueryKey, QueryFnOptionsByParameters, QueryFnOptionsByQueryKey, RequestFnResponse, ServiceOperationEnsureInfiniteQueryDataOptions, ServiceOperationEnsureQueryDataOptions, ServiceOperationFetchInfiniteQueryOptions, ServiceOperationFetchQueryOptions, ServiceOperationInfiniteQueryKey, ServiceOperationMutationFnOptions, ServiceOperationMutationKey, ServiceOperationQueryKey, ServiceOperationUseMutationOptions, UseQueryOptionsForUseQueries, UseQueryOptionsForUseSuspenseQuery, WithOptional } from "@openapi-qraft/tanstack-query-react-types";
 import type { CancelOptions, InfiniteQueryPageParamsOptions, InvalidateOptions, Mutation, MutationState, NoInfer, QueryState, RefetchOptions, ResetOptions, SetDataOptions, Updater } from "@tanstack/query-core";
 import type { DefinedInitialDataInfiniteOptions, DefinedInitialDataOptions, DefinedUseInfiniteQueryResult, DefinedUseQueryResult, UndefinedInitialDataInfiniteOptions, UndefinedInitialDataOptions, UseInfiniteQueryResult, UseMutationResult, UseQueryResult, UseSuspenseInfiniteQueryOptions, UseSuspenseInfiniteQueryResult, UseSuspenseQueryOptions, UseSuspenseQueryResult } from "@tanstack/react-query";
 export interface FilesService {
@@ -82,6 +82,12 @@ export interface FilesService {
         invalidateQueries<TInfinite extends boolean = false>(filters?: InvalidateQueryFilters<GetFilesSchema, GetFilesData, TInfinite, GetFilesParameters, GetFilesError>, options?: InvalidateOptions): Promise<void>;
         /** @summary Get a files by ID */
         isFetching<TInfinite extends boolean = false>(filters?: QueryFiltersByParameters<GetFilesSchema, GetFilesData, TInfinite, GetFilesParameters, GetFilesError> | QueryFiltersByQueryKey<GetFilesSchema, GetFilesData, TInfinite, GetFilesParameters, GetFilesError>): number;
+        /** @summary Get a files by ID */
+        <TMeta extends Record<string, any>, TSignal extends AbortSignal = AbortSignal>(options: QueryFnOptionsByQueryKey<GetFilesSchema, GetFilesParameters, TMeta, TSignal> | (QueryFnOptionsByParameters<GetFilesParameters, TMeta, TSignal>), client?: (schema: GetFilesSchema, options: {
+            parameters: GetFilesParameters;
+            signal?: TSignal;
+            meta?: TMeta;
+        }) => Promise<RequestFnResponse<GetFilesData, GetFilesError>>): Promise<RequestFnResponse<GetFilesData, GetFilesError>>;
         /** @summary Get a files by ID */
         refetchQueries<TInfinite extends boolean = false>(filters?: QueryFiltersByParameters<GetFilesSchema, GetFilesData, TInfinite, GetFilesParameters, GetFilesError> | QueryFiltersByQueryKey<GetFilesSchema, GetFilesData, TInfinite, GetFilesParameters, GetFilesError>, options?: RefetchOptions): Promise<void>;
         /** @summary Get a files by ID */
@@ -1393,6 +1399,15 @@ export interface FilesService {
          * @summary Get a file list
          */
         isFetching<TInfinite extends boolean = false>(filters?: QueryFiltersByParameters<GetFileListSchema, GetFileListData, TInfinite, GetFileListParameters, GetFileListError> | QueryFiltersByQueryKey<GetFileListSchema, GetFileListData, TInfinite, GetFileListParameters, GetFileListError>): number;
+        /**
+         * @deprecated
+         * @summary Get a file list
+         */
+        <TMeta extends Record<string, any>, TSignal extends AbortSignal = AbortSignal>(options: QueryFnOptionsByQueryKey<GetFileListSchema, GetFileListParameters, TMeta, TSignal> | (QueryFnOptionsByParameters<GetFileListParameters, TMeta, TSignal> | void), client?: (schema: GetFileListSchema, options: {
+            parameters: GetFileListParameters;
+            signal?: TSignal;
+            meta?: TMeta;
+        }) => Promise<RequestFnResponse<GetFileListData, GetFileListError>>): Promise<RequestFnResponse<GetFileListData, GetFileListError>>;
         /**
          * @deprecated
          * @summary Get a file list

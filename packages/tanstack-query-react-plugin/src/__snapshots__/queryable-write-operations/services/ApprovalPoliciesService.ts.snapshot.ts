@@ -4,7 +4,7 @@
  */
 
 import type { paths } from "../../openapi.d.ts";
-import type { DeepReadonly, InvalidateQueryFilters, MutationFiltersByMutationKey, MutationFiltersByParameters, MutationVariables, OperationInfiniteData, PartialParameters, QueryFiltersByParameters, QueryFiltersByQueryKey, RequestFnResponse, ServiceOperationEnsureInfiniteQueryDataOptions, ServiceOperationEnsureQueryDataOptions, ServiceOperationFetchInfiniteQueryOptions, ServiceOperationFetchQueryOptions, ServiceOperationInfiniteQueryKey, ServiceOperationMutationFnOptions, ServiceOperationMutationKey, ServiceOperationQueryKey, ServiceOperationUseMutationOptions, UseQueryOptionsForUseQueries, UseQueryOptionsForUseSuspenseQuery, WithOptional } from "@openapi-qraft/tanstack-query-react-types";
+import type { DeepReadonly, InvalidateQueryFilters, MutationFiltersByMutationKey, MutationFiltersByParameters, MutationVariables, OperationInfiniteData, PartialParameters, QueryFiltersByParameters, QueryFiltersByQueryKey, QueryFnOptionsByParameters, QueryFnOptionsByQueryKey, RequestFnResponse, ServiceOperationEnsureInfiniteQueryDataOptions, ServiceOperationEnsureQueryDataOptions, ServiceOperationFetchInfiniteQueryOptions, ServiceOperationFetchQueryOptions, ServiceOperationInfiniteQueryKey, ServiceOperationMutationFnOptions, ServiceOperationMutationKey, ServiceOperationQueryKey, ServiceOperationUseMutationOptions, UseQueryOptionsForUseQueries, UseQueryOptionsForUseSuspenseQuery, WithOptional } from "@openapi-qraft/tanstack-query-react-types";
 import type { CancelOptions, InfiniteQueryPageParamsOptions, InvalidateOptions, Mutation, MutationState, NoInfer, QueryState, RefetchOptions, ResetOptions, SetDataOptions, Updater } from "@tanstack/query-core";
 import type { DefinedInitialDataInfiniteOptions, DefinedInitialDataOptions, DefinedUseInfiniteQueryResult, DefinedUseQueryResult, UndefinedInitialDataInfiniteOptions, UndefinedInitialDataOptions, UseInfiniteQueryResult, UseMutationResult, UseQueryResult, UseSuspenseInfiniteQueryOptions, UseSuspenseInfiniteQueryResult, UseSuspenseQueryOptions, UseSuspenseQueryResult } from "@tanstack/react-query";
 export interface ApprovalPoliciesService {
@@ -140,6 +140,15 @@ export interface ApprovalPoliciesService {
          * @description Retrieve a specific approval policy.
          */
         isFetching<TInfinite extends boolean = false>(filters?: QueryFiltersByParameters<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdData, TInfinite, GetApprovalPoliciesIdParameters, GetApprovalPoliciesIdError> | QueryFiltersByQueryKey<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdData, TInfinite, GetApprovalPoliciesIdParameters, GetApprovalPoliciesIdError>): number;
+        /**
+         * @summary Get an approval policy by ID
+         * @description Retrieve a specific approval policy.
+         */
+        <TMeta extends Record<string, any>, TSignal extends AbortSignal = AbortSignal>(options: QueryFnOptionsByQueryKey<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdParameters, TMeta, TSignal> | (QueryFnOptionsByParameters<GetApprovalPoliciesIdParameters, TMeta, TSignal>), client?: (schema: GetApprovalPoliciesIdSchema, options: {
+            parameters: GetApprovalPoliciesIdParameters;
+            signal?: TSignal;
+            meta?: TMeta;
+        }) => Promise<RequestFnResponse<GetApprovalPoliciesIdData, GetApprovalPoliciesIdError>>): Promise<RequestFnResponse<GetApprovalPoliciesIdData, GetApprovalPoliciesIdError>>;
         /**
          * @summary Get an approval policy by ID
          * @description Retrieve a specific approval policy.
