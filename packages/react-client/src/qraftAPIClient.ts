@@ -1,9 +1,4 @@
-import type {
-  ServiceOperationMutation,
-  ServiceOperationMutationFn,
-  ServiceOperationQuery,
-  ServiceOperationQueryFn,
-} from '@openapi-qraft/tanstack-query-react-types';
+import type { QraftServiceOperationsToken } from '@openapi-qraft/tanstack-query-react-types';
 import type { QueryClient } from '@tanstack/query-core';
 import type * as callbacks from './callbacks/index.js';
 import type * as operationInvokeModule from './callbacks/operationInvokeFn.js';
@@ -42,58 +37,141 @@ export type CreateAPIClientOptions =
   | CreateAPIBasicQueryClientOptions
   | CreateAPIQueryClientOptions;
 
+/**
+ * Creates a QueryClient compatible API Client which contains all operations
+ * such as `useQuery`, `useMutation`.
+ *
+ * @example Fetching data with QueryClient
+ * ```ts
+ * const api = qraftAPIClient(services, callbacks, {
+ *   requestFn: requestFn,
+ *   baseUrl: 'https://api.example.com',
+ *   queryClient: new QueryClient(),
+ * });
+ *
+ * api.service.operation({
+ *   parameters: { path: { id: 1 } },
+ * });
+ * ```
+ */
 export function qraftAPIClient<
-  Services extends ServicesDeclaration<Services>,
-  TCallbacks extends Callbacks,
+  Services extends UnionServiceOperationsDeclaration<Services>,
+  Callbacks extends ServiceMethods,
 >(
-  services: ServiceSchemasDeclaration<Services>,
-  callbacks: TCallbacks,
-  options: CreateAPIBasicClientOptions
-): APIBasicClientServices<Services, TCallbacks>;
-
-export function qraftAPIClient<
-  Services extends ServicesDeclaration<Services>,
-  TCallbacks extends Required<Callbacks>,
->(
-  services: ServiceSchemasDeclaration<Services>,
-  callbacks: TCallbacks,
+  services: Services,
+  callbacks: Callbacks,
   options: CreateAPIQueryClientOptions
-): Services;
+): APIDefaultQueryClientServices<Services>;
 
+/**
+ * Creates a QueryClient compatible API Client which contains all operations
+ * such as `useQuery`, `useMutation`.
+ *
+ * @example Fetching data with QueryClient
+ * ```ts
+ * const api = qraftAPIClient(services, callbacks, {
+ *   requestFn: requestFn,
+ *   baseUrl: 'https://api.example.com',
+ *   queryClient: new QueryClient(),
+ * });
+ *
+ * api.service.operation({
+ *   parameters: { path: { id: 1 } },
+ * });
+ * ```
+ */
 export function qraftAPIClient<
-  Services extends ServicesDeclaration<Services>,
-  TCallbacks extends Callbacks,
+  Services extends UnionServiceOperationsDeclaration<Services>,
+  Callbacks extends PartialServiceMethods,
 >(
-  services: ServiceSchemasDeclaration<Services>,
-  callbacks: TCallbacks,
+  services: Services,
+  callbacks: Callbacks,
+  options: CreateAPIQueryClientOptions
+): APIQueryClientServices<Services, Callbacks>;
+
+/**
+ * Creates a QueryClient compatible API Client which contains
+ * only state management manipulations such as `useIsMutating`,
+ * `setQueryData`, `getQueryData` and `invalidateQueries`.
+ *
+ * @example Invalidating queries with QueryClient
+ * ```ts
+ * const api = qraftAPIClient(services, callbacks, {
+ *   // an instance of QueryClient shared between all clients
+ *   queryClient: sharedQueryClient
+ * });
+ *
+ * api.service.operation.invalidateQueries({
+ *   parameters: { path: { id: 1 } },
+ * });
+ */
+export function qraftAPIClient<
+  Services extends UnionServiceOperationsDeclaration<Services>,
+  Callbacks extends PartialServiceMethods,
+>(
+  services: Services,
+  callbacks: Callbacks,
   options: CreateAPIBasicQueryClientOptions
-): APIBasicQueryClientServices<Services, TCallbacks>;
+): APIBasicQueryClientServices<Services, Callbacks>;
+
+/**
+ * Creates a basic API Client which contains only "fetch" like
+ * operations without any state management using QueryClient.
+ *
+ * @example Fetching data without QueryClient
+ * ```ts
+ * const api = qraftAPIClient(services, callbacks, {
+ *   requestFn: requestFn,
+ *   baseUrl: 'https://api.example.com',
+ * });
+ *
+ * api.service.operation({
+ *   parameters: { path: { id: 1 } },
+ * });
+ * ```
+ */
+export function qraftAPIClient<
+  Services extends UnionServiceOperationsDeclaration<Services>,
+  Callbacks extends PartialServiceMethods,
+>(
+  services: Services,
+  callbacks: Callbacks,
+  options: CreateAPIBasicClientOptions
+): APIBasicClientServices<Services, Callbacks>;
+
+/**
+ * Creates a utility API Client which contains only utility operations
+ * such as `getQueryKey`, `getInfiniteQueryKey` and `getMutationKey`.
+ *
+ * @example Getting query keys with utility client
+ * ```ts
+ * const api = qraftAPIClient(services, callbacks);
+ *
+ * api.service.operation.getQueryKey({
+ *   parameters: { path: { id: 1 } },
+ * });
+ * ```
+ */
+export function qraftAPIClient<
+  Services extends UnionServiceOperationsDeclaration<Services>,
+  Callbacks extends Pick<PartialServiceMethods, UtilityOperationCallbacks>,
+>(
+  services: Services,
+  callbacks: Callbacks
+): APIUtilityClientServices<Services, Callbacks>;
 
 export function qraftAPIClient<
-  Services extends ServicesDeclaration<Services>,
-  TCallbacks extends Callbacks,
+  Services extends UnionServiceOperationsDeclaration<Services>,
+  Callbacks extends PartialServiceMethods,
 >(
-  services: ServiceSchemasDeclaration<Services>,
-  callbacks: TCallbacks,
-  options: CreateAPIQueryClientOptions
-): APIQueryClientServices<Services, TCallbacks>;
-
-export function qraftAPIClient<
-  Services extends ServicesDeclaration<Services>,
-  TCallbacks extends Callbacks,
->(
-  services: ServiceSchemasDeclaration<Services>,
-  callbacks: TCallbacks
-): APIUtilityClientServices<Services, TCallbacks>;
-
-export function qraftAPIClient<
-  Services extends ServicesDeclaration<Services>,
-  TCallbacks extends Callbacks,
->(
-  services: ServiceSchemasDeclaration<Services>,
-  callbacks: TCallbacks,
+  services: Services,
+  callbacks: Callbacks,
   options?: CreateAPIClientOptions
-): APIQueryClientServices<Services, TCallbacks> | Services {
+):
+  | APIQueryClientServices<Services, Callbacks>
+  | APIDefaultQueryClientServices<Services>
+  | APIBasicQueryClientServices<Services, Callbacks>
+  | APIUtilityClientServices<Services, Callbacks> {
   const stringTag = 'QraftAPIClient';
 
   const toString = (path: (symbol | string)[]): string => {
@@ -132,7 +210,14 @@ export function qraftAPIClient<
         return stringTag;
       }
 
-      if (getPath.length !== 2 || key !== 'schema') return; // todo::maybe return callback?
+      if (key !== 'schema') return;
+      if (
+        getPath.length !== 2 &&
+        !('schema' in services) &&
+        getPath.length !== 1 &&
+        !(services[getPath[0] as never] as OperationsDeclaration<any>)?.schema
+      )
+        return;
 
       const serviceOperation = getByPath(services, getPath);
       if (!isServiceOperation(serviceOperation))
@@ -140,7 +225,10 @@ export function qraftAPIClient<
       return serviceOperation.schema;
     },
     function applyCallback(applyPath, args) {
-      const { path, callbackName } = extractCallbackDetails(applyPath);
+      const { path, callbackName } = extractCallbackDetails(
+        applyPath,
+        services
+      );
 
       assertValidCallbackName(callbackName, callbacks);
 
@@ -168,13 +256,16 @@ export function qraftAPIClient<
 }
 
 function assertValidCallbackName<
-  TCallbacks extends Record<string, (...rest: any[]) => unknown>,
+  Callbacks extends Record<string, (...rest: any[]) => unknown>,
 >(
   callbackName: string | number | symbol,
-  callbacks: TCallbacks
-): asserts callbackName is keyof TCallbacks {
+  callbacks: Callbacks
+): asserts callbackName is keyof Callbacks {
   if (!(callbackName in callbacks)) {
-    if ((callbackName as OperationInvokeFnName) === 'operationInvokeFn')
+    if (
+      (callbackName as InvokeOperationCallback) ===
+      ('operationInvokeFn' satisfies InvokeOperationCallback)
+    )
       throw new Error(
         `Callback 'operationInvokeFn' is required for executing 'qraft.<service>.<operation>()', but it is not provided in the 'callbacks' object.`
       );
@@ -186,17 +277,29 @@ function assertValidCallbackName<
 
 /**
  * Extracts Callback details from the applyPath
- * @param applyPath
  */
-function extractCallbackDetails(applyPath: (string | symbol)[]) {
-  // <service>.<operation>()
-  if (applyPath.length === 2) {
+function extractCallbackDetails(
+  applyPath: (string | symbol)[],
+  services: UnionServiceOperationsDeclaration<any>
+) {
+  // client.<service>.<operation>()  [OperationInvokeFn]
+  // <service>.<operation>()         [OperationInvokeFn]
+  // client()                        [OperationInvokeFn]
+  // client()
+  if (
+    (applyPath.length === 2 &&
+      !(services[applyPath[0] as never] as OperationsDeclaration<any>)
+        ?.schema) ||
+    (applyPath.length === 0 && 'schema' in services)
+  ) {
     return {
       path: applyPath,
-      callbackName: 'operationInvokeFn' satisfies OperationInvokeFnName,
+      callbackName: 'operationInvokeFn' satisfies InvokeOperationCallback,
     };
   } else {
+    // client.<service>.<operation>.<method>()
     // <service>.<operation>.<method>()
+    // client.<method>()
     return {
       path: applyPath.slice(0, -1),
       // The last arg is for instance `.useMutation` or `.useQuery()`
@@ -218,57 +321,51 @@ function getByPath(obj: Record<string, unknown>, path: (string | symbol)[]) {
   }, obj);
 }
 
-type Callbacks = Partial<typeof callbacks>;
+type ServiceMethods = typeof callbacks;
 
-type ServicesDeclaration<Services> = {
-  [service in keyof Services]: {
-    [method in keyof Services[service]]: {
-      schema: OperationSchema;
-      types: {
-        parameters?: any;
-        data?: any;
-        error?: any;
-        body?: any;
-      };
-    };
+type PartialServiceMethods = Partial<ServiceMethods>;
+
+type OperationDeclaration = {
+  schema: OperationSchema;
+  [QraftServiceOperationsToken]: Partial<
+    Record<
+      | QueryOperationCallbacks
+      | QueryOperationStateCallbacks
+      | MutationOperationCallbacks
+      | MutationOperationStateCallbacks
+      | UtilityOperationCallbacks,
+      any
+    >
+  > & {
+    types: any;
+    schema: OperationSchema;
+    (...args: any[]): any;
   };
 };
 
-type ServiceSchemasDeclaration<Services extends ServicesDeclaration<Services>> =
-  {
-    [service in keyof Services]: {
-      [method in keyof Services[service]]: {
-        schema: Services[service][method]['schema'];
-      };
-    };
-  };
+type OperationsDeclaration<Operations> = {
+  [operation in keyof Operations]: OperationDeclaration;
+};
+
+type ServicesDeclaration<Services> = {
+  [service in keyof Services]: OperationsDeclaration<Services[service]>;
+};
+
+export type UnionServiceOperationsDeclaration<Services> =
+  | ServicesDeclaration<Services>
+  | OperationsDeclaration<Services>
+  | OperationDeclaration;
 
 type QueryOperationCallbacks = Extract<
-  keyof Callbacks,
-  | 'cancelQueries'
+  keyof ServiceMethods,
   | 'fetchInfiniteQuery'
   | 'fetchQuery'
-  | 'getInfiniteQueryData'
-  | 'getInfiniteQueryKey'
-  | 'getInfiniteQueryState'
-  | 'getQueriesData'
-  | 'getQueryData'
-  | 'getQueryKey'
-  | 'getQueryState'
-  | 'invalidateQueries'
-  | 'isFetching'
   | 'prefetchInfiniteQuery'
   | 'prefetchQuery'
   | 'refetchQueries'
   | 'ensureQueryData'
   | 'ensureInfiniteQueryData'
-  | 'removeQueries'
-  | 'resetQueries'
-  | 'setInfiniteQueryData'
-  | 'setQueriesData'
-  | 'setQueryData'
   | 'useInfiniteQuery'
-  | 'useIsFetching'
   | 'useQueries'
   | 'useQuery'
   | 'useSuspenseInfiniteQuery'
@@ -276,132 +373,186 @@ type QueryOperationCallbacks = Extract<
   | 'useSuspenseQuery'
 >;
 
-type MutationOperationCallbacks = Extract<
-  keyof Callbacks,
-  | 'getMutationKey'
-  | 'isMutating'
-  | 'useIsMutating'
-  | 'useMutation'
-  | 'useMutationState'
+type QueryOperationStateCallbacks = Extract<
+  keyof ServiceMethods,
+  | 'cancelQueries'
+  | 'getInfiniteQueryData'
+  | 'getInfiniteQueryState'
+  | 'getQueriesData'
+  | 'getQueryData'
+  | 'getQueryState'
+  | 'invalidateQueries'
+  | 'isFetching'
+  | 'removeQueries'
+  | 'resetQueries'
+  | 'setInfiniteQueryData'
+  | 'setQueriesData'
+  | 'setQueryData'
+  | 'useIsFetching'
 >;
 
-export type APIQueryClientServices<
-  TServices extends ServicesDeclaration<TServices>,
-  TCallbacks extends Callbacks,
-> = ServicesFilteredByCallbacks<
-  TServices,
-  TCallbacks,
-  QueryOperationCallbacks,
-  MutationOperationCallbacks
+type MutationOperationCallbacks = Extract<keyof ServiceMethods, 'useMutation'>;
+
+type MutationOperationStateCallbacks = Extract<
+  keyof ServiceMethods,
+  'isMutating' | 'useIsMutating' | 'useMutationState'
 >;
 
-export type APIBasicQueryClientServices<
-  TServices extends ServicesDeclaration<TServices>,
-  TCallbacks extends Callbacks,
-> = ServicesFilteredByCallbacks<
-  TServices,
-  Omit<TCallbacks, 'operationInvokeFn'>,
-  Extract<
-    QueryOperationCallbacks,
-    | 'resetQueries'
-    | 'removeQueries'
-    | 'cancelQueries'
-    | 'invalidateQueries'
-    | 'refetchQueries'
-    | 'getQueryKey'
-    | 'getInfiniteQueryState'
-    | 'getInfiniteQueryData'
-    | 'getInfiniteQueryKey'
-    | 'setInfiniteQueryData'
-    | 'getQueriesData'
-    | 'setQueriesData'
-    | 'getQueryState'
-    | 'getQueryData'
-    | 'setQueryData'
-    | 'useIsFetching'
-    | 'isFetching'
-  >,
-  Extract<
-    MutationOperationCallbacks,
-    'getMutationKey' | 'useMutationState' | 'useIsMutating' | 'isMutating'
-  >
->;
-
-export type APIUtilityClientServices<
-  TServices extends ServicesDeclaration<TServices>,
-  TCallbacks extends Callbacks,
-> = ServicesFilteredByCallbacks<
-  TServices,
-  Omit<TCallbacks, 'operationInvokeFn'>,
-  Extract<QueryOperationCallbacks, 'getQueryKey' | 'getInfiniteQueryKey'>,
-  Extract<MutationOperationCallbacks, 'getMutationKey'>
->;
-
-export type APIBasicClientServices<
-  TServices extends ServicesDeclaration<TServices>,
-  TCallbacks extends Callbacks,
-> = ServicesFilteredByCallbacks<
-  TServices,
-  TCallbacks,
-  Extract<QueryOperationCallbacks, 'getQueryKey' | 'getInfiniteQueryKey'>,
-  Extract<MutationOperationCallbacks, 'getMutationKey'>
->;
-
-type ServicesFilteredByCallbacks<
-  TServices extends ServicesDeclaration<TServices>,
-  TCallbacks extends Callbacks,
-  TQueryOperationCallbacks extends QueryOperationCallbacks,
-  TMutationOperationCallbacks extends MutationOperationCallbacks,
-> = {
-  [serviceName in keyof TServices]: {
-    [method in keyof TServices[serviceName]]: TServices[serviceName][method]['schema']['method'] extends
-      | 'get'
-      | 'head'
-      | 'options'
-      ? Pick<
-          ServiceOperationQuery<
-            TServices[serviceName][method]['schema'],
-            TServices[serviceName][method]['types']['data'],
-            TServices[serviceName][method]['types']['parameters'],
-            TServices[serviceName][method]['types']['error']
-          >,
-          | Extract<keyof TCallbacks, TQueryOperationCallbacks>
-          | 'types'
-          | 'schema'
-        > &
-          (OperationInvokeFnName extends keyof TCallbacks
-            ? ServiceOperationQueryFn<
-                TServices[serviceName][method]['schema'],
-                TServices[serviceName][method]['types']['data'],
-                TServices[serviceName][method]['types']['parameters'],
-                TServices[serviceName][method]['types']['error']
-              >
-            : {})
-      : Pick<
-          ServiceOperationMutation<
-            TServices[serviceName][method]['schema'],
-            TServices[serviceName][method]['types']['body'],
-            TServices[serviceName][method]['types']['data'],
-            TServices[serviceName][method]['types']['parameters'],
-            TServices[serviceName][method]['types']['error']
-          >,
-          | Extract<keyof TCallbacks, TMutationOperationCallbacks>
-          | 'types'
-          | 'schema'
-        > &
-          (OperationInvokeFnName extends keyof TCallbacks
-            ? ServiceOperationMutationFn<
-                TServices[serviceName][method]['schema'],
-                TServices[serviceName][method]['types']['body'],
-                TServices[serviceName][method]['types']['data'],
-                TServices[serviceName][method]['types']['parameters'],
-                TServices[serviceName][method]['types']['error']
-              >
-            : {});
-  };
-};
-
-type OperationInvokeFnName = Extract<
+type InvokeOperationCallback = Extract<
   keyof typeof operationInvokeModule,
   'operationInvokeFn'
 >;
+
+type UtilityOperationCallbacks = Extract<
+  keyof ServiceMethods,
+  'getQueryKey' | 'getInfiniteQueryKey' | 'getMutationKey'
+>;
+
+type OperationCallbackList =
+  | QueryOperationCallbacks
+  | QueryOperationStateCallbacks
+  | MutationOperationCallbacks
+  | MutationOperationStateCallbacks
+  | InvokeOperationCallback
+  | UtilityOperationCallbacks;
+
+export type APIQueryClientServices<
+  Services extends UnionServiceOperationsDeclaration<Services>,
+  Callbacks extends PartialServiceMethods,
+> = ServicesFilteredByCallbacks<
+  Services,
+  Extract<keyof Callbacks, OperationCallbackList>
+>;
+
+export type APIDefaultQueryClientServices<
+  Services extends UnionServiceOperationsDeclaration<Services>,
+> = Services extends OperationDeclaration
+  ? Services[QraftServiceOperationsToken]
+  : Services extends OperationsDeclaration<Services>
+    ? {
+        [operation in keyof Services]: Services[operation][QraftServiceOperationsToken];
+      }
+    : Services extends ServicesDeclaration<Services>
+      ? {
+          [service in keyof Services]: {
+            [operation in keyof Services[service]]: Services[service][operation][QraftServiceOperationsToken];
+          };
+        }
+      : never;
+
+export type APIBasicQueryClientServices<
+  Services extends UnionServiceOperationsDeclaration<Services>,
+  Callbacks extends PartialServiceMethods,
+> = ServicesFilteredByCallbacks<
+  Services,
+  Extract<
+    keyof Callbacks,
+    | QueryOperationStateCallbacks
+    | MutationOperationStateCallbacks
+    | UtilityOperationCallbacks
+  >
+>;
+
+export type APIBasicClientServices<
+  Services extends UnionServiceOperationsDeclaration<Services>,
+  Callbacks extends PartialServiceMethods,
+> = ServicesFilteredByCallbacks<
+  Services,
+  Extract<keyof Callbacks, InvokeOperationCallback | UtilityOperationCallbacks>
+>;
+
+export type APIUtilityClientServices<
+  Services extends UnionServiceOperationsDeclaration<Services>,
+  Callbacks extends Pick<PartialServiceMethods, UtilityOperationCallbacks>,
+> = ServicesFilteredByUtilityCallbacks<
+  Services,
+  Extract<keyof Callbacks, UtilityOperationCallbacks>
+>;
+
+type ServicesFilteredByCallbacks<
+  Services extends UnionServiceOperationsDeclaration<Services>,
+  CallbackList extends OperationCallbackList,
+> = Services extends OperationDeclaration
+  ? Pick<
+      Services[QraftServiceOperationsToken],
+      Extract<
+        keyof Services[QraftServiceOperationsToken],
+        CallbackList | 'schema' | 'types'
+      >
+    > &
+      OperationInvokeFn<Services[QraftServiceOperationsToken], CallbackList>
+  : Services extends OperationsDeclaration<Services>
+    ? {
+        [operation in keyof Services]: Pick<
+          Services[operation][QraftServiceOperationsToken],
+          Extract<
+            keyof Services[operation][QraftServiceOperationsToken],
+            CallbackList | 'schema' | 'types'
+          >
+        > &
+          OperationInvokeFn<
+            Services[operation][QraftServiceOperationsToken],
+            CallbackList
+          >;
+      }
+    : Services extends ServicesDeclaration<Services>
+      ? {
+          [serviceName in keyof Services]: {
+            [operation in keyof Services[serviceName]]: Pick<
+              Services[serviceName][operation][QraftServiceOperationsToken],
+              Extract<
+                keyof Services[serviceName][operation][QraftServiceOperationsToken],
+                CallbackList | 'schema' | 'types'
+              >
+            > &
+              OperationInvokeFn<
+                Services[serviceName][operation][QraftServiceOperationsToken],
+                CallbackList
+              >;
+          };
+        }
+      : never;
+
+type OperationInvokeFn<
+  InvokeFn extends (...args: any[]) => any,
+  CallbackList extends OperationCallbackList,
+> = InvokeOperationCallback extends CallbackList
+  ? InvokeFn extends (...args: infer Args) => infer Result
+    ? { (...args: Args): Result }
+    : Record<string, never>
+  : Record<string, never>;
+
+type ServicesFilteredByUtilityCallbacks<
+  Services extends UnionServiceOperationsDeclaration<Services>,
+  CallbackList extends UtilityOperationCallbacks,
+> = Services extends OperationDeclaration
+  ? Pick<
+      Services[QraftServiceOperationsToken],
+      Extract<
+        keyof Services[QraftServiceOperationsToken],
+        CallbackList | 'schema' | 'types'
+      >
+    >
+  : Services extends OperationsDeclaration<Services>
+    ? {
+        [operation in keyof Services]: Pick<
+          Services[operation][QraftServiceOperationsToken],
+          Extract<
+            keyof Services[operation][QraftServiceOperationsToken],
+            CallbackList | 'schema' | 'types'
+          >
+        >;
+      }
+    : Services extends ServicesDeclaration<Services>
+      ? {
+          [serviceName in keyof Services]: {
+            [operation in keyof Services[serviceName]]: Pick<
+              Services[serviceName][operation][QraftServiceOperationsToken],
+              Extract<
+                keyof Services[serviceName][operation][QraftServiceOperationsToken],
+                CallbackList | 'schema' | 'types'
+              >
+            >;
+          };
+        }
+      : never;

@@ -1,11 +1,12 @@
+// @ts-expect-error - must be used "bundler" module resolution
+import * as callbacksIndex from '@openapi-qraft/react/callbacks';
 import * as callbacks from '@openapi-qraft/react/callbacks/index';
 import { useMutation } from '@openapi-qraft/react/callbacks/useMutation';
 import { useQuery } from '@openapi-qraft/react/callbacks/useQuery';
 import {
-  QraftSecureRequestFn,
   createSecureRequestFn,
+  QraftSecureRequestFn,
 } from '@openapi-qraft/react/Unstable_QraftSecureRequestFn';
-
 import { createAPIClient as createAPIClientMjs } from './api';
 
 if (typeof createAPIClientMjs !== 'undefined') {
@@ -19,6 +20,13 @@ if (typeof callbacks !== 'undefined') {
   console.log('Callbacks are imported successfully from esm project.');
 } else {
   console.error('Callbacks are not imported from esm project.');
+  process.exit(1);
+}
+
+if (typeof callbacksIndex !== 'undefined') {
+  console.log('Callbacks index is imported successfully from esm project.');
+} else {
+  console.error('Callbacks index is not imported from esm project.');
   process.exit(1);
 }
 

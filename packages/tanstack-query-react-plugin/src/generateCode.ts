@@ -7,9 +7,12 @@ import { PredefinedParametersGlob } from '@openapi-qraft/plugin/lib/predefineSch
 import c from 'ansi-colors';
 import { Ora } from 'ora';
 import { astToString } from './ts-factory/astToString.js';
-import { getClientFactory } from './ts-factory/getClientFactory.js';
+import { getCreateAPIClientFactory } from './ts-factory/getCreateAPIClientFactory.js';
 import { getCreatePredefinedParametersRequestFnFactory } from './ts-factory/getCreatePredefinedParametersRequestFnFactory.js';
-import { getIndexFactory } from './ts-factory/getIndexFactory.js';
+import {
+  CreateAPIClientFnOptions,
+  getIndexFactory,
+} from './ts-factory/getIndexFactory.js';
 import {
   getServiceFactory,
   ServiceFactoryOptions,
@@ -22,6 +25,9 @@ interface OutputOptions extends OutputOptionsBase {
   explicitImportExtensions: '.js' | '.ts' | undefined;
   exportSchemaTypes: boolean | undefined;
   operationPredefinedParameters: Array<PredefinedParametersGlob> | undefined;
+  createApiClientFn: Array<
+    [functionName: string, value: CreateAPIClientFnOptions]
+  >;
 }
 
 export const generateCode = async ({
@@ -38,7 +44,7 @@ export const generateCode = async ({
   return [
     ...(await generateServices(spinner, services, serviceImports, output)),
     ...(await generateServiceIndex(spinner, services, output)),
-    ...(await generateClient(spinner, output)),
+    ...(await generateOperationClient(spinner, output)),
     ...(output.operationPredefinedParameters
       ? await generateCreatePredefinedParametersRequestFn(
           spinner,
@@ -125,11 +131,7 @@ const generateServiceIndex = async (
   ];
 
   try {
-    const code = astToString(
-      getServiceIndexFactory(services, {
-        explicitImportExtensions: output.explicitImportExtensions,
-      })
-    );
+    const code = astToString(getServiceIndexFactory(services, output));
 
     serviceIndexFiles.push({
       file: new URL('index.ts', composeServicesDirPath(output)),
@@ -148,32 +150,39 @@ const generateServiceIndex = async (
   return serviceIndexFiles;
 };
 
-const generateClient = async (spinner: Ora, output: OutputOptions) => {
-  spinner.start('Generating client');
+const generateOperationClient = async (spinner: Ora, output: OutputOptions) => {
+  spinner.start('Generating operation client');
 
-  const clientFiles: GeneratorFile[] = [];
+  const operationClientFiles: GeneratorFile[] = [];
 
   try {
-    const code = astToString(
-      getClientFactory({
-        servicesDirName: output.servicesDirName,
-        explicitImportExtensions: output.explicitImportExtensions,
-      })
-    );
+    output.createApiClientFn.map(([functionName, value]) => {
+      const code = astToString(
+        getCreateAPIClientFactory({
+          defaultClientCallbacks: value.callbacks,
+          defaultClientServices: value.services,
+          createAPIClientFnName: functionName,
+          servicesDirName: output.servicesDirName,
+          explicitImportExtensions: output.explicitImportExtensions,
+        })
+      );
 
-    clientFiles.push({
-      file: new URL('create-api-client.ts', output.dir),
-      code: formatFileHeader(output.fileHeader) + code,
+      operationClientFiles.push({
+        file: new URL(`${value.filename?.[0] ?? functionName}.ts`, output.dir),
+        code: formatFileHeader(output.fileHeader) + code,
+      });
     });
   } catch (error) {
-    spinner.fail(c.redBright('Error occurred during client generation'));
+    spinner.fail(
+      c.redBright('Error occurred during operation client generation')
+    );
 
     throw error;
   }
 
-  spinner.succeed(c.green('Client has been generated'));
+  spinner.succeed(c.green('Operation client has been generated'));
 
-  return clientFiles;
+  return operationClientFiles;
 };
 
 const generateCreatePredefinedParametersRequestFn = async (
@@ -227,8 +236,7 @@ const generateIndex = async (
   try {
     const code = astToString(
       getIndexFactory({
-        servicesDirName: output.servicesDirName,
-        explicitImportExtensions: output.explicitImportExtensions,
+        ...output,
         openapiTypesImportPath: output.exportSchemaTypes
           ? serviceImports.openapiTypesImportPath
           : undefined,
