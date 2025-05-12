@@ -1,5 +1,15 @@
 # @openapi-qraft/plugin
 
+## 2.5.0-beta.2
+
+### Patch Changes
+
+- ece9c58: Generate types for empty responses
+
+  Now, for both successful and error responses, we generate types for all possible response outcomes.
+  For instance, if a 204 (No Content) response is possible, we now explicitly generate a type for it
+  (represented as `undefined` in the generated code) instead of omitting it.
+
 ## 2.5.0-beta.1
 
 ## 2.5.0-beta.0
