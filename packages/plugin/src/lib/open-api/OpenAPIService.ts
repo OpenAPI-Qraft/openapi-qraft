@@ -23,9 +23,19 @@ export type ServiceOperation = {
   description: string | undefined;
   summary: string | undefined;
   deprecated: boolean | undefined;
-  errors: Record<string, string | undefined>;
+  /**
+   * Contains error response types like 400, 401, 404, 500, etc.
+   * The mapping contains status codes as keys and response types as values.
+   * If the response type is `null`, it typically indicates an error response with no content.
+   */
+  errors: Record<string, string[] | null | undefined>;
   requestBody: OpenAPISchemaType['paths'][string]['post']['requestBody'];
-  success: Record<string, string | undefined>;
+  /**
+   * Contains successful response types like 200, 201, 204, etc.
+   * The mapping contains status codes as keys and response types as values.
+   * If the response type is `null`, it typically indicates a 204-like response with no content.
+   */
+  success: Record<string, string[] | null | undefined>;
   parameters:
     | {
         name: string;

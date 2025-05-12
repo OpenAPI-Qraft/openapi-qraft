@@ -1846,7 +1846,7 @@ type DeleteFilesSchema = {
     url: "/files";
 };
 type DeleteFilesParameters = paths["/files"]["delete"]["parameters"];
-type DeleteFilesData = paths["/files"]["delete"]["responses"]["200"]["content"]["application/json"];
+type DeleteFilesData = paths["/files"]["delete"]["responses"]["200"]["content"]["application/json"] | paths["/files"]["delete"]["responses"]["200"]["content"]["application/octet-stream"] | undefined;
 type DeleteFilesError = paths["/files"]["delete"]["responses"]["default"]["content"]["application/json"];
 type DeleteFilesBody = undefined;
 type GetFileListSchema = {

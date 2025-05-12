@@ -25,10 +25,12 @@ export type OpenAPISchemaType = {
         responses: {
           [statusCode in number | 'default']: {
             description: string;
-            content: {
-              [contentType: string]: {
-                schema: any;
-              };
+            content?: {
+              [contentType: string]:
+                | {
+                    schema: any;
+                  }
+                | { type: string };
             };
           };
         };

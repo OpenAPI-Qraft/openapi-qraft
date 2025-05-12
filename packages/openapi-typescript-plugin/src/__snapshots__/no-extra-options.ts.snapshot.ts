@@ -572,7 +572,15 @@ export interface operations {
                             all?: boolean;
                         };
                     };
+                    "application/octet-stream": unknown;
                 };
+            };
+            /** @description No Content - Operation completed successfully, no data returned */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
             /** @description Internal Server Error */
             default: {

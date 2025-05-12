@@ -10,10 +10,18 @@ exports[`getServices > matches snapshot with "serviceNameBase: endpoint" 1`] = `
         "deprecated": undefined,
         "description": "Update the onboarding documents of an entity.",
         "errors": {
-          "400": "application/json",
-          "401": "application/json",
-          "422": "application/json",
-          "default": "application/json",
+          "400": [
+            "application/json",
+          ],
+          "401": [
+            "application/json",
+          ],
+          "422": [
+            "application/json",
+          ],
+          "default": [
+            "application/json",
+          ],
         },
         "method": "post",
         "name": "postEntitiesIdDocuments",
@@ -67,7 +75,9 @@ exports[`getServices > matches snapshot with "serviceNameBase: endpoint" 1`] = `
           },
         ],
         "success": {
-          "201": "application/json",
+          "201": [
+            "application/json",
+          ],
         },
         "summary": "Update entity onboarding documents",
       },
@@ -83,9 +93,15 @@ exports[`getServices > matches snapshot with "serviceNameBase: endpoint" 1`] = `
         "deprecated": undefined,
         "description": "Retrieve a specific approval policy.",
         "errors": {
-          "401": "application/json",
-          "422": "application/json",
-          "default": "application/json",
+          "401": [
+            "application/json",
+          ],
+          "422": [
+            "application/json",
+          ],
+          "default": [
+            "application/json",
+          ],
         },
         "method": "get",
         "name": "getApprovalPoliciesId",
@@ -141,7 +157,9 @@ exports[`getServices > matches snapshot with "serviceNameBase: endpoint" 1`] = `
           },
         ],
         "success": {
-          "200": "application/json",
+          "200": [
+            "application/json",
+          ],
         },
         "summary": "Get an approval policy by ID",
       },
@@ -149,9 +167,15 @@ exports[`getServices > matches snapshot with "serviceNameBase: endpoint" 1`] = `
         "deprecated": undefined,
         "description": "Delete an existing approval policy.",
         "errors": {
-          "401": "application/json",
-          "422": "application/json",
-          "default": "application/json",
+          "401": [
+            "application/json",
+          ],
+          "422": [
+            "application/json",
+          ],
+          "default": [
+            "application/json",
+          ],
         },
         "method": "delete",
         "name": "deleteApprovalPoliciesId",
@@ -203,7 +227,9 @@ exports[`getServices > matches snapshot with "serviceNameBase: endpoint" 1`] = `
           },
         ],
         "success": {
-          "200": "application/json",
+          "200": [
+            "application/json",
+          ],
         },
         "summary": "Delete an approval policy",
       },
@@ -211,9 +237,15 @@ exports[`getServices > matches snapshot with "serviceNameBase: endpoint" 1`] = `
         "deprecated": undefined,
         "description": "Update an existing approval policy.",
         "errors": {
-          "401": "application/json",
-          "422": "application/json",
-          "default": "application/json",
+          "401": [
+            "application/json",
+          ],
+          "422": [
+            "application/json",
+          ],
+          "default": [
+            "application/json",
+          ],
         },
         "method": "patch",
         "name": "patchApprovalPoliciesId",
@@ -274,7 +306,9 @@ exports[`getServices > matches snapshot with "serviceNameBase: endpoint" 1`] = `
           },
         ],
         "success": {
-          "200": "application/json",
+          "200": [
+            "application/json",
+          ],
         },
         "summary": "Update an approval policy",
       },
@@ -290,9 +324,15 @@ exports[`getServices > matches snapshot with "serviceNameBase: endpoint" 1`] = `
         "deprecated": undefined,
         "description": undefined,
         "errors": {
-          "405": "application/json",
-          "422": "application/json",
-          "default": "application/json",
+          "405": [
+            "application/json",
+          ],
+          "422": [
+            "application/json",
+          ],
+          "default": [
+            "application/json",
+          ],
         },
         "method": "get",
         "name": "getFiles",
@@ -339,7 +379,9 @@ exports[`getServices > matches snapshot with "serviceNameBase: endpoint" 1`] = `
           },
         ],
         "success": {
-          "200": "application/json",
+          "200": [
+            "application/json",
+          ],
         },
         "summary": "Get a files by ID",
       },
@@ -347,7 +389,9 @@ exports[`getServices > matches snapshot with "serviceNameBase: endpoint" 1`] = `
         "deprecated": undefined,
         "description": undefined,
         "errors": {
-          "default": "application/json",
+          "default": [
+            "application/json",
+          ],
         },
         "method": "post",
         "name": "postFiles",
@@ -373,7 +417,9 @@ exports[`getServices > matches snapshot with "serviceNameBase: endpoint" 1`] = `
         },
         "security": undefined,
         "success": {
-          "200": "application/json",
+          "200": [
+            "application/json",
+          ],
         },
         "summary": "Upload a files by ID",
       },
@@ -381,7 +427,9 @@ exports[`getServices > matches snapshot with "serviceNameBase: endpoint" 1`] = `
         "deprecated": undefined,
         "description": undefined,
         "errors": {
-          "default": "application/json",
+          "default": [
+            "application/json",
+          ],
         },
         "method": "delete",
         "name": "deleteFiles",
@@ -399,7 +447,11 @@ exports[`getServices > matches snapshot with "serviceNameBase: endpoint" 1`] = `
         "requestBody": undefined,
         "security": undefined,
         "success": {
-          "200": "application/json",
+          "200": [
+            "application/json",
+            "application/octet-stream",
+          ],
+          "204": null,
         },
         "summary": "Delete all files",
       },
@@ -407,7 +459,9 @@ exports[`getServices > matches snapshot with "serviceNameBase: endpoint" 1`] = `
         "deprecated": true,
         "description": undefined,
         "errors": {
-          "default": "application/json",
+          "default": [
+            "application/json",
+          ],
         },
         "method": "get",
         "name": "getFileList",
@@ -444,7 +498,9 @@ exports[`getServices > matches snapshot with "serviceNameBase: endpoint" 1`] = `
           },
         ],
         "success": {
-          "200": "application/json",
+          "200": [
+            "application/json",
+          ],
         },
         "summary": "Get a file list",
       },
@@ -465,10 +521,18 @@ exports[`getServices > matches snapshot with "serviceNameBase: tags" 1`] = `
         "deprecated": undefined,
         "description": "Update the onboarding documents of an entity.",
         "errors": {
-          "400": "application/json",
-          "401": "application/json",
-          "422": "application/json",
-          "default": "application/json",
+          "400": [
+            "application/json",
+          ],
+          "401": [
+            "application/json",
+          ],
+          "422": [
+            "application/json",
+          ],
+          "default": [
+            "application/json",
+          ],
         },
         "method": "post",
         "name": "postEntitiesIdDocuments",
@@ -522,7 +586,9 @@ exports[`getServices > matches snapshot with "serviceNameBase: tags" 1`] = `
           },
         ],
         "success": {
-          "201": "application/json",
+          "201": [
+            "application/json",
+          ],
         },
         "summary": "Update entity onboarding documents",
       },
@@ -538,9 +604,15 @@ exports[`getServices > matches snapshot with "serviceNameBase: tags" 1`] = `
         "deprecated": undefined,
         "description": "Retrieve a specific approval policy.",
         "errors": {
-          "401": "application/json",
-          "422": "application/json",
-          "default": "application/json",
+          "401": [
+            "application/json",
+          ],
+          "422": [
+            "application/json",
+          ],
+          "default": [
+            "application/json",
+          ],
         },
         "method": "get",
         "name": "getApprovalPoliciesId",
@@ -596,7 +668,9 @@ exports[`getServices > matches snapshot with "serviceNameBase: tags" 1`] = `
           },
         ],
         "success": {
-          "200": "application/json",
+          "200": [
+            "application/json",
+          ],
         },
         "summary": "Get an approval policy by ID",
       },
@@ -604,9 +678,15 @@ exports[`getServices > matches snapshot with "serviceNameBase: tags" 1`] = `
         "deprecated": undefined,
         "description": "Delete an existing approval policy.",
         "errors": {
-          "401": "application/json",
-          "422": "application/json",
-          "default": "application/json",
+          "401": [
+            "application/json",
+          ],
+          "422": [
+            "application/json",
+          ],
+          "default": [
+            "application/json",
+          ],
         },
         "method": "delete",
         "name": "deleteApprovalPoliciesId",
@@ -658,7 +738,9 @@ exports[`getServices > matches snapshot with "serviceNameBase: tags" 1`] = `
           },
         ],
         "success": {
-          "200": "application/json",
+          "200": [
+            "application/json",
+          ],
         },
         "summary": "Delete an approval policy",
       },
@@ -666,9 +748,15 @@ exports[`getServices > matches snapshot with "serviceNameBase: tags" 1`] = `
         "deprecated": undefined,
         "description": "Update an existing approval policy.",
         "errors": {
-          "401": "application/json",
-          "422": "application/json",
-          "default": "application/json",
+          "401": [
+            "application/json",
+          ],
+          "422": [
+            "application/json",
+          ],
+          "default": [
+            "application/json",
+          ],
         },
         "method": "patch",
         "name": "patchApprovalPoliciesId",
@@ -729,7 +817,9 @@ exports[`getServices > matches snapshot with "serviceNameBase: tags" 1`] = `
           },
         ],
         "success": {
-          "200": "application/json",
+          "200": [
+            "application/json",
+          ],
         },
         "summary": "Update an approval policy",
       },
@@ -745,9 +835,15 @@ exports[`getServices > matches snapshot with "serviceNameBase: tags" 1`] = `
         "deprecated": undefined,
         "description": undefined,
         "errors": {
-          "405": "application/json",
-          "422": "application/json",
-          "default": "application/json",
+          "405": [
+            "application/json",
+          ],
+          "422": [
+            "application/json",
+          ],
+          "default": [
+            "application/json",
+          ],
         },
         "method": "get",
         "name": "getFiles",
@@ -794,7 +890,9 @@ exports[`getServices > matches snapshot with "serviceNameBase: tags" 1`] = `
           },
         ],
         "success": {
-          "200": "application/json",
+          "200": [
+            "application/json",
+          ],
         },
         "summary": "Get a files by ID",
       },
@@ -802,7 +900,9 @@ exports[`getServices > matches snapshot with "serviceNameBase: tags" 1`] = `
         "deprecated": undefined,
         "description": undefined,
         "errors": {
-          "default": "application/json",
+          "default": [
+            "application/json",
+          ],
         },
         "method": "post",
         "name": "postFiles",
@@ -828,7 +928,9 @@ exports[`getServices > matches snapshot with "serviceNameBase: tags" 1`] = `
         },
         "security": undefined,
         "success": {
-          "200": "application/json",
+          "200": [
+            "application/json",
+          ],
         },
         "summary": "Upload a files by ID",
       },
@@ -836,7 +938,9 @@ exports[`getServices > matches snapshot with "serviceNameBase: tags" 1`] = `
         "deprecated": undefined,
         "description": undefined,
         "errors": {
-          "default": "application/json",
+          "default": [
+            "application/json",
+          ],
         },
         "method": "delete",
         "name": "deleteFiles",
@@ -854,7 +958,11 @@ exports[`getServices > matches snapshot with "serviceNameBase: tags" 1`] = `
         "requestBody": undefined,
         "security": undefined,
         "success": {
-          "200": "application/json",
+          "200": [
+            "application/json",
+            "application/octet-stream",
+          ],
+          "204": null,
         },
         "summary": "Delete all files",
       },
@@ -862,7 +970,9 @@ exports[`getServices > matches snapshot with "serviceNameBase: tags" 1`] = `
         "deprecated": true,
         "description": undefined,
         "errors": {
-          "default": "application/json",
+          "default": [
+            "application/json",
+          ],
         },
         "method": "get",
         "name": "getFileList",
@@ -899,7 +1009,9 @@ exports[`getServices > matches snapshot with "serviceNameBase: tags" 1`] = `
           },
         ],
         "success": {
-          "200": "application/json",
+          "200": [
+            "application/json",
+          ],
         },
         "summary": "Get a file list",
       },
@@ -920,10 +1032,18 @@ exports[`getServices > matches snapshot with custom \`postfixServices\` 1`] = `
         "deprecated": undefined,
         "description": "Update the onboarding documents of an entity.",
         "errors": {
-          "400": "application/json",
-          "401": "application/json",
-          "422": "application/json",
-          "default": "application/json",
+          "400": [
+            "application/json",
+          ],
+          "401": [
+            "application/json",
+          ],
+          "422": [
+            "application/json",
+          ],
+          "default": [
+            "application/json",
+          ],
         },
         "method": "post",
         "name": "postEntitiesIdDocuments",
@@ -977,7 +1097,9 @@ exports[`getServices > matches snapshot with custom \`postfixServices\` 1`] = `
           },
         ],
         "success": {
-          "201": "application/json",
+          "201": [
+            "application/json",
+          ],
         },
         "summary": "Update entity onboarding documents",
       },
@@ -993,9 +1115,15 @@ exports[`getServices > matches snapshot with custom \`postfixServices\` 1`] = `
         "deprecated": undefined,
         "description": "Retrieve a specific approval policy.",
         "errors": {
-          "401": "application/json",
-          "422": "application/json",
-          "default": "application/json",
+          "401": [
+            "application/json",
+          ],
+          "422": [
+            "application/json",
+          ],
+          "default": [
+            "application/json",
+          ],
         },
         "method": "get",
         "name": "getApprovalPoliciesId",
@@ -1051,7 +1179,9 @@ exports[`getServices > matches snapshot with custom \`postfixServices\` 1`] = `
           },
         ],
         "success": {
-          "200": "application/json",
+          "200": [
+            "application/json",
+          ],
         },
         "summary": "Get an approval policy by ID",
       },
@@ -1059,9 +1189,15 @@ exports[`getServices > matches snapshot with custom \`postfixServices\` 1`] = `
         "deprecated": undefined,
         "description": "Delete an existing approval policy.",
         "errors": {
-          "401": "application/json",
-          "422": "application/json",
-          "default": "application/json",
+          "401": [
+            "application/json",
+          ],
+          "422": [
+            "application/json",
+          ],
+          "default": [
+            "application/json",
+          ],
         },
         "method": "delete",
         "name": "deleteApprovalPoliciesId",
@@ -1113,7 +1249,9 @@ exports[`getServices > matches snapshot with custom \`postfixServices\` 1`] = `
           },
         ],
         "success": {
-          "200": "application/json",
+          "200": [
+            "application/json",
+          ],
         },
         "summary": "Delete an approval policy",
       },
@@ -1121,9 +1259,15 @@ exports[`getServices > matches snapshot with custom \`postfixServices\` 1`] = `
         "deprecated": undefined,
         "description": "Update an existing approval policy.",
         "errors": {
-          "401": "application/json",
-          "422": "application/json",
-          "default": "application/json",
+          "401": [
+            "application/json",
+          ],
+          "422": [
+            "application/json",
+          ],
+          "default": [
+            "application/json",
+          ],
         },
         "method": "patch",
         "name": "patchApprovalPoliciesId",
@@ -1184,7 +1328,9 @@ exports[`getServices > matches snapshot with custom \`postfixServices\` 1`] = `
           },
         ],
         "success": {
-          "200": "application/json",
+          "200": [
+            "application/json",
+          ],
         },
         "summary": "Update an approval policy",
       },
@@ -1200,9 +1346,15 @@ exports[`getServices > matches snapshot with custom \`postfixServices\` 1`] = `
         "deprecated": undefined,
         "description": undefined,
         "errors": {
-          "405": "application/json",
-          "422": "application/json",
-          "default": "application/json",
+          "405": [
+            "application/json",
+          ],
+          "422": [
+            "application/json",
+          ],
+          "default": [
+            "application/json",
+          ],
         },
         "method": "get",
         "name": "getFiles",
@@ -1249,7 +1401,9 @@ exports[`getServices > matches snapshot with custom \`postfixServices\` 1`] = `
           },
         ],
         "success": {
-          "200": "application/json",
+          "200": [
+            "application/json",
+          ],
         },
         "summary": "Get a files by ID",
       },
@@ -1257,7 +1411,9 @@ exports[`getServices > matches snapshot with custom \`postfixServices\` 1`] = `
         "deprecated": undefined,
         "description": undefined,
         "errors": {
-          "default": "application/json",
+          "default": [
+            "application/json",
+          ],
         },
         "method": "post",
         "name": "postFiles",
@@ -1283,7 +1439,9 @@ exports[`getServices > matches snapshot with custom \`postfixServices\` 1`] = `
         },
         "security": undefined,
         "success": {
-          "200": "application/json",
+          "200": [
+            "application/json",
+          ],
         },
         "summary": "Upload a files by ID",
       },
@@ -1291,7 +1449,9 @@ exports[`getServices > matches snapshot with custom \`postfixServices\` 1`] = `
         "deprecated": undefined,
         "description": undefined,
         "errors": {
-          "default": "application/json",
+          "default": [
+            "application/json",
+          ],
         },
         "method": "delete",
         "name": "deleteFiles",
@@ -1309,7 +1469,11 @@ exports[`getServices > matches snapshot with custom \`postfixServices\` 1`] = `
         "requestBody": undefined,
         "security": undefined,
         "success": {
-          "200": "application/json",
+          "200": [
+            "application/json",
+            "application/octet-stream",
+          ],
+          "204": null,
         },
         "summary": "Delete all files",
       },
@@ -1317,7 +1481,9 @@ exports[`getServices > matches snapshot with custom \`postfixServices\` 1`] = `
         "deprecated": true,
         "description": undefined,
         "errors": {
-          "default": "application/json",
+          "default": [
+            "application/json",
+          ],
         },
         "method": "get",
         "name": "getFileList",
@@ -1354,7 +1520,9 @@ exports[`getServices > matches snapshot with custom \`postfixServices\` 1`] = `
           },
         ],
         "success": {
-          "200": "application/json",
+          "200": [
+            "application/json",
+          ],
         },
         "summary": "Get a file list",
       },
@@ -1375,9 +1543,15 @@ exports[`getServices > matches snapshot with custom \`servicesGlob\` 1`] = `
         "deprecated": undefined,
         "description": undefined,
         "errors": {
-          "405": "application/json",
-          "422": "application/json",
-          "default": "application/json",
+          "405": [
+            "application/json",
+          ],
+          "422": [
+            "application/json",
+          ],
+          "default": [
+            "application/json",
+          ],
         },
         "method": "get",
         "name": "getFiles",
@@ -1424,7 +1598,9 @@ exports[`getServices > matches snapshot with custom \`servicesGlob\` 1`] = `
           },
         ],
         "success": {
-          "200": "application/json",
+          "200": [
+            "application/json",
+          ],
         },
         "summary": "Get a files by ID",
       },
@@ -1432,7 +1608,9 @@ exports[`getServices > matches snapshot with custom \`servicesGlob\` 1`] = `
         "deprecated": undefined,
         "description": undefined,
         "errors": {
-          "default": "application/json",
+          "default": [
+            "application/json",
+          ],
         },
         "method": "post",
         "name": "postFiles",
@@ -1458,7 +1636,9 @@ exports[`getServices > matches snapshot with custom \`servicesGlob\` 1`] = `
         },
         "security": undefined,
         "success": {
-          "200": "application/json",
+          "200": [
+            "application/json",
+          ],
         },
         "summary": "Upload a files by ID",
       },
@@ -1466,7 +1646,9 @@ exports[`getServices > matches snapshot with custom \`servicesGlob\` 1`] = `
         "deprecated": undefined,
         "description": undefined,
         "errors": {
-          "default": "application/json",
+          "default": [
+            "application/json",
+          ],
         },
         "method": "delete",
         "name": "deleteFiles",
@@ -1484,7 +1666,11 @@ exports[`getServices > matches snapshot with custom \`servicesGlob\` 1`] = `
         "requestBody": undefined,
         "security": undefined,
         "success": {
-          "200": "application/json",
+          "200": [
+            "application/json",
+            "application/octet-stream",
+          ],
+          "204": null,
         },
         "summary": "Delete all files",
       },
@@ -1492,7 +1678,9 @@ exports[`getServices > matches snapshot with custom \`servicesGlob\` 1`] = `
         "deprecated": true,
         "description": undefined,
         "errors": {
-          "default": "application/json",
+          "default": [
+            "application/json",
+          ],
         },
         "method": "get",
         "name": "getFileList",
@@ -1529,7 +1717,9 @@ exports[`getServices > matches snapshot with custom \`servicesGlob\` 1`] = `
           },
         ],
         "success": {
-          "200": "application/json",
+          "200": [
+            "application/json",
+          ],
         },
         "summary": "Get a file list",
       },
@@ -1550,10 +1740,18 @@ exports[`getServices > matches snapshot with default options 1`] = `
         "deprecated": undefined,
         "description": "Update the onboarding documents of an entity.",
         "errors": {
-          "400": "application/json",
-          "401": "application/json",
-          "422": "application/json",
-          "default": "application/json",
+          "400": [
+            "application/json",
+          ],
+          "401": [
+            "application/json",
+          ],
+          "422": [
+            "application/json",
+          ],
+          "default": [
+            "application/json",
+          ],
         },
         "method": "post",
         "name": "postEntitiesIdDocuments",
@@ -1607,7 +1805,9 @@ exports[`getServices > matches snapshot with default options 1`] = `
           },
         ],
         "success": {
-          "201": "application/json",
+          "201": [
+            "application/json",
+          ],
         },
         "summary": "Update entity onboarding documents",
       },
@@ -1623,9 +1823,15 @@ exports[`getServices > matches snapshot with default options 1`] = `
         "deprecated": undefined,
         "description": "Retrieve a specific approval policy.",
         "errors": {
-          "401": "application/json",
-          "422": "application/json",
-          "default": "application/json",
+          "401": [
+            "application/json",
+          ],
+          "422": [
+            "application/json",
+          ],
+          "default": [
+            "application/json",
+          ],
         },
         "method": "get",
         "name": "getApprovalPoliciesId",
@@ -1681,7 +1887,9 @@ exports[`getServices > matches snapshot with default options 1`] = `
           },
         ],
         "success": {
-          "200": "application/json",
+          "200": [
+            "application/json",
+          ],
         },
         "summary": "Get an approval policy by ID",
       },
@@ -1689,9 +1897,15 @@ exports[`getServices > matches snapshot with default options 1`] = `
         "deprecated": undefined,
         "description": "Delete an existing approval policy.",
         "errors": {
-          "401": "application/json",
-          "422": "application/json",
-          "default": "application/json",
+          "401": [
+            "application/json",
+          ],
+          "422": [
+            "application/json",
+          ],
+          "default": [
+            "application/json",
+          ],
         },
         "method": "delete",
         "name": "deleteApprovalPoliciesId",
@@ -1743,7 +1957,9 @@ exports[`getServices > matches snapshot with default options 1`] = `
           },
         ],
         "success": {
-          "200": "application/json",
+          "200": [
+            "application/json",
+          ],
         },
         "summary": "Delete an approval policy",
       },
@@ -1751,9 +1967,15 @@ exports[`getServices > matches snapshot with default options 1`] = `
         "deprecated": undefined,
         "description": "Update an existing approval policy.",
         "errors": {
-          "401": "application/json",
-          "422": "application/json",
-          "default": "application/json",
+          "401": [
+            "application/json",
+          ],
+          "422": [
+            "application/json",
+          ],
+          "default": [
+            "application/json",
+          ],
         },
         "method": "patch",
         "name": "patchApprovalPoliciesId",
@@ -1814,7 +2036,9 @@ exports[`getServices > matches snapshot with default options 1`] = `
           },
         ],
         "success": {
-          "200": "application/json",
+          "200": [
+            "application/json",
+          ],
         },
         "summary": "Update an approval policy",
       },
@@ -1830,9 +2054,15 @@ exports[`getServices > matches snapshot with default options 1`] = `
         "deprecated": undefined,
         "description": undefined,
         "errors": {
-          "405": "application/json",
-          "422": "application/json",
-          "default": "application/json",
+          "405": [
+            "application/json",
+          ],
+          "422": [
+            "application/json",
+          ],
+          "default": [
+            "application/json",
+          ],
         },
         "method": "get",
         "name": "getFiles",
@@ -1879,7 +2109,9 @@ exports[`getServices > matches snapshot with default options 1`] = `
           },
         ],
         "success": {
-          "200": "application/json",
+          "200": [
+            "application/json",
+          ],
         },
         "summary": "Get a files by ID",
       },
@@ -1887,7 +2119,9 @@ exports[`getServices > matches snapshot with default options 1`] = `
         "deprecated": undefined,
         "description": undefined,
         "errors": {
-          "default": "application/json",
+          "default": [
+            "application/json",
+          ],
         },
         "method": "post",
         "name": "postFiles",
@@ -1913,7 +2147,9 @@ exports[`getServices > matches snapshot with default options 1`] = `
         },
         "security": undefined,
         "success": {
-          "200": "application/json",
+          "200": [
+            "application/json",
+          ],
         },
         "summary": "Upload a files by ID",
       },
@@ -1921,7 +2157,9 @@ exports[`getServices > matches snapshot with default options 1`] = `
         "deprecated": undefined,
         "description": undefined,
         "errors": {
-          "default": "application/json",
+          "default": [
+            "application/json",
+          ],
         },
         "method": "delete",
         "name": "deleteFiles",
@@ -1939,7 +2177,11 @@ exports[`getServices > matches snapshot with default options 1`] = `
         "requestBody": undefined,
         "security": undefined,
         "success": {
-          "200": "application/json",
+          "200": [
+            "application/json",
+            "application/octet-stream",
+          ],
+          "204": null,
         },
         "summary": "Delete all files",
       },
@@ -1947,7 +2189,9 @@ exports[`getServices > matches snapshot with default options 1`] = `
         "deprecated": true,
         "description": undefined,
         "errors": {
-          "default": "application/json",
+          "default": [
+            "application/json",
+          ],
         },
         "method": "get",
         "name": "getFileList",
@@ -1984,7 +2228,9 @@ exports[`getServices > matches snapshot with default options 1`] = `
           },
         ],
         "success": {
-          "200": "application/json",
+          "200": [
+            "application/json",
+          ],
         },
         "summary": "Get a file list",
       },
