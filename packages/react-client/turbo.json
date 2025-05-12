@@ -4,10 +4,12 @@
   "tasks": {
     "typecheck": {
       "cache": true,
-      "dependsOn": [
-        "^build",
-        "build"
-      ]
+      "dependsOn": ["build"]
+    },
+    "test": {
+      "cache": true,
+      "dependsOn": ["build"],
+      "outputs": ["coverage/**"]
     }
   }
 }
