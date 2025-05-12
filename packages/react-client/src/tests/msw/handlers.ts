@@ -375,12 +375,14 @@ type ServiceOperationResponseData<
     error?: infer Error;
   };
 }
-  ? Data | Error
+  ? IfUnknownThenUndefined<Data> | IfUnknownThenUndefined<Error>
   : TService extends {
         types: {
           data?: infer Data;
           error?: infer Error;
         };
       }
-    ? Data | Error
+    ? IfUnknownThenUndefined<Data> | IfUnknownThenUndefined<Error>
     : never;
+
+type IfUnknownThenUndefined<T> = T extends unknown ? undefined : T;

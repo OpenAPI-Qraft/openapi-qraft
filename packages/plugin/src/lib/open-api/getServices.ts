@@ -59,12 +59,13 @@ export const getServices = (
 
       const { success, errors } = Object.entries(
         methodOperation.responses
-      ).reduce(
+      ).reduce<
+        Record<
+          'errors' | 'success',
+          Record<string, string[] | null | undefined>
+        >
+      >(
         (acc, [statusCode, response]) => {
-          if (!response.content || typeof response.content !== 'object') {
-            return acc;
-          }
-
           const statusType =
             statusCode !== 'default' && // See "default" response https://swagger.io/docs/specification/describing-responses/#default
             Number(statusCode) < 400
@@ -79,7 +80,7 @@ export const getServices = (
             },
           };
         },
-        {} as Record<'errors' | 'success', Record<string, string | undefined>>
+        { errors: {}, success: {} }
       );
 
       const serviceFallbackBaseName = 'Default';

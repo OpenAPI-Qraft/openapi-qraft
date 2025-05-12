@@ -591,8 +591,16 @@
                     }
                   }
                 }
+              },
+              "application/octet-stream": {
+                "description": "Successfully deleted file dump",
+                "type": "string",
+                "format": "binary"
               }
             }
+          },
+          "204": {
+            "description": "No Content - Operation completed successfully, no data returned"
           },
           "default": {
             "description": "Internal Server Error",

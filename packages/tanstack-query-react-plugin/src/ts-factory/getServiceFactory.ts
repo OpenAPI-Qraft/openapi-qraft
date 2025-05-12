@@ -335,41 +335,52 @@ const getOperationResponseFactory = (
     return factory.createKeywordTypeNode(ts.SyntaxKind.UnknownKeyword);
 
   return factory.createUnionTypeNode(
-    responses.map(([statusCode, mediaType]) => {
-      if (!mediaType)
-        return factory.createKeywordTypeNode(ts.SyntaxKind.UnknownKeyword);
+    responses
+      .map(([statusCode, mediaType]) => {
+        if (mediaType === null)
+          return factory.createKeywordTypeNode(ts.SyntaxKind.UndefinedKeyword);
 
-      return factory.createIndexedAccessTypeNode(
-        factory.createIndexedAccessTypeNode(
+        if (!mediaType)
+          return factory.createKeywordTypeNode(ts.SyntaxKind.UnknownKeyword);
+
+        return mediaType.map((mediaTypeItem) =>
           factory.createIndexedAccessTypeNode(
             factory.createIndexedAccessTypeNode(
               factory.createIndexedAccessTypeNode(
                 factory.createIndexedAccessTypeNode(
-                  factory.createTypeReferenceNode(
-                    factory.createIdentifier('paths'),
-                    undefined
+                  factory.createIndexedAccessTypeNode(
+                    factory.createIndexedAccessTypeNode(
+                      factory.createTypeReferenceNode(
+                        factory.createIdentifier('paths'),
+                        undefined
+                      ),
+                      factory.createLiteralTypeNode(
+                        factory.createStringLiteral(operation.path)
+                      )
+                    ),
+                    factory.createLiteralTypeNode(
+                      factory.createStringLiteral(operation.method)
+                    )
                   ),
                   factory.createLiteralTypeNode(
-                    factory.createStringLiteral(operation.path)
+                    factory.createStringLiteral('responses')
                   )
                 ),
                 factory.createLiteralTypeNode(
-                  factory.createStringLiteral(operation.method)
+                  factory.createStringLiteral(statusCode)
                 )
               ),
               factory.createLiteralTypeNode(
-                factory.createStringLiteral('responses')
+                factory.createStringLiteral('content')
               )
             ),
             factory.createLiteralTypeNode(
-              factory.createStringLiteral(statusCode)
+              factory.createStringLiteral(mediaTypeItem)
             )
-          ),
-          factory.createLiteralTypeNode(factory.createStringLiteral('content'))
-        ),
-        factory.createLiteralTypeNode(factory.createStringLiteral(mediaType))
-      );
-    })
+          )
+        );
+      })
+      .flat()
   );
 };
 
