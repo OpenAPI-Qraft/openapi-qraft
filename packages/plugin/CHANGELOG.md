@@ -1,5 +1,7 @@
 # @openapi-qraft/plugin
 
+## 2.5.0-beta.3
+
 ## 2.5.0-beta.2
 
 ### Patch Changes
