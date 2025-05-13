@@ -627,6 +627,129 @@ export interface FilesService {
             body: DeleteFilesBody;
         };
     };
+    /** @summary Trash files */
+    trashFiles: {
+        /** @summary Trash files */
+        getMutationKey(parameters: DeepReadonly<TrashFilesParameters> | void): ServiceOperationMutationKey<TrashFilesSchema, TrashFilesParameters>;
+        /**
+         * Enables performing asynchronous data mutation operations such as POST, PUT, PATCH, or DELETE requests.
+         * Handles loading state, optimistic updates, and error handling.
+         *
+         * @summary Trash files
+         * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/hooks/useMutation|`useMutation(...)` documentation}
+         * @example Mutation with predefined parameters, e.g., for updating
+         * ```ts
+         * const { mutate, isPending } = qraft.filesService.trashFiles.useMutation({
+         *     query: {
+         *         pendingOnly: pendingOnly
+         *     }
+         * })
+         * mutate(body);
+         * ```
+         * @example Mutation without predefined parameters, e.g., for creating
+         * ```ts
+         * const { mutate, isPending } = qraft.filesService.trashFiles.useMutation()
+         * mutate({
+         *     body: bodyPayload,
+         *     query: {
+         *         pendingOnly: pendingOnly
+         *     }
+         * });
+         * ```
+         */
+        useMutation<TVariables extends TrashFilesBody, TContext = unknown>(parameters: DeepReadonly<TrashFilesParameters>, options?: ServiceOperationUseMutationOptions<TrashFilesSchema, TrashFilesData, TrashFilesParameters, TVariables, TrashFilesError | Error, TContext>): UseMutationResult<TrashFilesData, TrashFilesError | Error, TVariables | void, TContext>;
+        /**
+         * Enables performing asynchronous data mutation operations such as POST, PUT, PATCH, or DELETE requests.
+         * Handles loading state, optimistic updates, and error handling.
+         *
+         * @summary Trash files
+         * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/hooks/useMutation|`useMutation(...)` documentation}
+         * @example Mutation with predefined parameters, e.g., for updating
+         * ```ts
+         * const { mutate, isPending } = qraft.filesService.trashFiles.useMutation({
+         *     query: {
+         *         pendingOnly: pendingOnly
+         *     }
+         * })
+         * mutate(body);
+         * ```
+         * @example Mutation without predefined parameters, e.g., for creating
+         * ```ts
+         * const { mutate, isPending } = qraft.filesService.trashFiles.useMutation()
+         * mutate({
+         *     body: bodyPayload,
+         *     query: {
+         *         pendingOnly: pendingOnly
+         *     }
+         * });
+         * ```
+         */
+        useMutation<TVariables extends MutationVariables<TrashFilesBody, TrashFilesParameters>, TContext = unknown>(parameters: void, options?: ServiceOperationUseMutationOptions<TrashFilesSchema, TrashFilesData, TrashFilesParameters, TVariables, TrashFilesError | Error, TContext>): UseMutationResult<TrashFilesData, TrashFilesError | Error, TVariables, TContext>;
+        /**
+         * Returns the count of currently in-progress mutations.
+         *
+         * @summary Trash files
+         * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/hooks/useIsMutating|`useIsMutating(...)` documentation}
+         * @example Check how many mutations are currently in progress for the specified service method.
+         * ```ts
+         * const trashFilesTotal = qraft.filesService.trashFiles.useIsMutating()
+         * ```
+         * @example Check how many mutations are currently in progress with the specified parameters.
+         * ```ts
+         * const trashFilesTotal = qraft.filesService.trashFiles.useIsMutating({
+         *     parameters: {
+         *         query: {
+         *             pendingOnly: pendingOnly
+         *         }
+         *     }
+         * })
+         * ```
+         */
+        useIsMutating<TContext = unknown>(filters?: MutationFiltersByParameters<TrashFilesBody, TrashFilesData, TrashFilesParameters, TrashFilesError | Error, TContext> | MutationFiltersByMutationKey<TrashFilesSchema, TrashFilesBody, TrashFilesData, TrashFilesParameters, TrashFilesError | Error, TContext>): number;
+        /** @summary Trash files */
+        isMutating<TContext>(filters?: MutationFiltersByParameters<TrashFilesBody, TrashFilesData, TrashFilesParameters, TrashFilesError | Error, TContext> | MutationFiltersByMutationKey<TrashFilesSchema, TrashFilesBody, TrashFilesData, TrashFilesParameters, TrashFilesError | Error, TContext>): number;
+        /** @summary Trash files */
+        (options: ServiceOperationMutationFnOptions<TrashFilesBody, TrashFilesParameters>, client?: (schema: TrashFilesSchema, options: ServiceOperationMutationFnOptions<TrashFilesBody, TrashFilesParameters>) => Promise<RequestFnResponse<TrashFilesData, TrashFilesError>>): Promise<RequestFnResponse<TrashFilesData, TrashFilesError>>;
+        /**
+         * Provides access to the current state of a mutation, including its status, any resulting data, and associated errors.
+         *
+         * @summary Trash files
+         * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/hooks/useMutationState|`useMutationState(...)` documentation}
+         * @example Get all variables of all running mutations.
+         * ```ts
+         * const trashFilesPendingMutationVariables = qraft.filesService.trashFiles.useMutationState({
+         *     filters: {
+         *         status: "pending"
+         *     },
+         *     select: mutation => mutation.state.variables
+         * })
+         * ```
+         * @example Get all data for specific mutations via the `parameters`.
+         * ```ts
+         * const trashFilesMutationData = qraft.filesService.trashFiles.useMutationState({
+         *     filters: {
+         *         parameters: {
+         *             query: {
+         *                 pendingOnly: pendingOnly
+         *             }
+         *         }
+         *     },
+         *     select: mutation => mutation.state.data
+         * })
+         * ```
+         */
+        useMutationState<TContext = unknown, TResult = MutationState<TrashFilesData, TrashFilesError | Error, MutationVariables<TrashFilesBody, TrashFilesParameters>, TContext>>(options?: {
+            filters?: MutationFiltersByParameters<TrashFilesBody, TrashFilesData, TrashFilesParameters, TrashFilesError | Error, TContext> | MutationFiltersByMutationKey<TrashFilesSchema, TrashFilesBody, TrashFilesData, TrashFilesParameters, TrashFilesError | Error, TContext>;
+            select?: (mutation: Mutation<TrashFilesData, TrashFilesError | Error, MutationVariables<TrashFilesBody, TrashFilesParameters>, TContext>) => TResult;
+        }): Array<TResult>;
+        schema: TrashFilesSchema;
+        types: {
+            parameters: TrashFilesParameters;
+            data: TrashFilesData;
+            error: TrashFilesError;
+            body: TrashFilesBody;
+        };
+    };
     /**
      * @deprecated
      * @summary Get a file list
@@ -1133,6 +1256,10 @@ export const filesService: {
     deleteFiles: {
         schema: DeleteFilesSchema;
     };
+    /** @summary Trash files */
+    trashFiles: {
+        schema: TrashFilesSchema;
+    };
     /**
      * @deprecated
      * @summary Get a file list
@@ -1159,6 +1286,12 @@ export const filesService: {
         schema: {
             method: "delete",
             url: "/files"
+        }
+    },
+    trashFiles: {
+        schema: {
+            method: "delete",
+            url: "/files/trash"
         }
     },
     getFileList: {
@@ -1199,9 +1332,17 @@ type DeleteFilesSchema = {
     url: "/files";
 };
 type DeleteFilesParameters = paths["/files"]["delete"]["parameters"];
-type DeleteFilesData = paths["/files"]["delete"]["responses"]["200"]["content"]["application/json"] | paths["/files"]["delete"]["responses"]["200"]["content"]["application/octet-stream"] | undefined;
+type DeleteFilesData = paths["/files"]["delete"]["responses"]["200"]["content"]["application/json"] | undefined;
 type DeleteFilesError = paths["/files"]["delete"]["responses"]["default"]["content"]["application/json"];
 type DeleteFilesBody = undefined;
+type TrashFilesSchema = {
+    method: "delete";
+    url: "/files/trash";
+};
+type TrashFilesParameters = paths["/files/trash"]["delete"]["parameters"];
+type TrashFilesData = paths["/files/trash"]["delete"]["responses"]["200"]["content"]["application/json"] | paths["/files/trash"]["delete"]["responses"]["200"]["content"]["application/octet-stream"] | undefined;
+type TrashFilesError = paths["/files/trash"]["delete"]["responses"]["default"]["content"]["application/json"];
+type TrashFilesBody = undefined;
 type GetFileListSchema = {
     method: "get";
     url: "/files/list";

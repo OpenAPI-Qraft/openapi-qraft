@@ -571,6 +571,64 @@
             },
             "name": "all",
             "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "type": "boolean"
+            },
+            "name": "pendingOnly",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "query": {
+                      "type": "object",
+                      "properties": {
+                        "all": {
+                          "type": "boolean"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "204": {
+            "description": "No Content - Operation completed successfully, no data returned"
+          },
+          "default": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorSchemaResponse" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/files/trash": {
+      "delete": {
+        "tags": ["Files"],
+        "summary": "Trash files",
+        "operationId": "trash_files",
+        "parameters": [
+          {
+            "required": false,
+            "schema": {
+              "type": "boolean"
+            },
+            "name": "pendingOnly",
+            "in": "query"
           }
         ],
         "responses": {
@@ -600,7 +658,7 @@
             }
           },
           "204": {
-            "description": "No Content - Operation completed successfully, no data returned"
+            "description": "No files trashed"
           },
           "default": {
             "description": "Internal Server Error",

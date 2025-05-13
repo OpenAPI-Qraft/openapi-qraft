@@ -23,6 +23,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/files/trash": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Trash files */
+        delete: operations["trash_files"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/files/list": {
         parameters: {
             query?: never;
@@ -237,6 +254,49 @@ export interface operations {
         parameters: {
             query?: {
                 all?: boolean;
+                pendingOnly?: boolean;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        query?: {
+                            all?: boolean;
+                        };
+                    };
+                };
+            };
+            /** @description No Content - Operation completed successfully, no data returned */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Internal Server Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorSchemaResponse"];
+                };
+            };
+        };
+    };
+    trash_files: {
+        parameters: {
+            query?: {
+                pendingOnly?: boolean;
             };
             header?: never;
             path?: never;
@@ -258,7 +318,7 @@ export interface operations {
                     "application/octet-stream": unknown;
                 };
             };
-            /** @description No Content - Operation completed successfully, no data returned */
+            /** @description No files trashed */
             204: {
                 headers: {
                     [name: string]: unknown;
