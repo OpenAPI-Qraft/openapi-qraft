@@ -2316,7 +2316,7 @@ type DeleteFilesSchema = {
     url: "/files";
 };
 type DeleteFilesParameters = paths["/files"]["delete"]["parameters"];
-type DeleteFilesData = paths["/files"]["delete"]["responses"]["200"]["content"]["application/json"] | undefined;
+type DeleteFilesData = paths["/files"]["delete"]["responses"]["200"]["content"]["application/json"] | null;
 type DeleteFilesError = paths["/files"]["delete"]["responses"]["default"]["content"]["application/json"];
 type DeleteFilesBody = undefined;
 type TrashFilesSchema = {
@@ -2324,7 +2324,7 @@ type TrashFilesSchema = {
     url: "/files/trash";
 };
 type TrashFilesParameters = paths["/files/trash"]["delete"]["parameters"];
-type TrashFilesData = paths["/files/trash"]["delete"]["responses"]["200"]["content"]["application/json"] | paths["/files/trash"]["delete"]["responses"]["200"]["content"]["application/octet-stream"] | undefined;
+type TrashFilesData = paths["/files/trash"]["delete"]["responses"]["200"]["content"]["application/json"] | paths["/files/trash"]["delete"]["responses"]["200"]["content"]["application/octet-stream"] | null;
 type TrashFilesError = paths["/files/trash"]["delete"]["responses"]["default"]["content"]["application/json"];
 type TrashFilesBody = undefined;
 type GetFileListSchema = {

@@ -1202,6 +1202,34 @@ describe('Qraft uses Mutations', () => {
     });
   });
 
+  it('handles useMutations for 204 responses and returns `null` data', async () => {
+    const { qraft, queryClient } = createClient();
+
+    const { result } = renderHook(() => qraft.files.deleteFiles.useMutation(), {
+      wrapper: (props) => <Providers {...props} queryClient={queryClient} />,
+    });
+
+    act(() => {
+      result.current.mutate({ query: { pendingOnly: true } });
+    });
+
+    await waitFor(() => {
+      expect(result.current.data).toEqual(null);
+    });
+
+    result.current.data satisfies
+      | {
+          query?: {
+            all?: boolean;
+          };
+        }
+      | null
+      | undefined;
+
+    // @ts-expect-error - never satisfies never
+    result.current.data satisfies never;
+  });
+
   it('supports useMutation with predefined parameters', async () => {
     const { qraft, queryClient } = createClient();
 

@@ -9,7 +9,7 @@ export async function processResponse<TData, TError>(
 ): Promise<RequestFnResponse<TData, TError>> {
   if (response.status === 204 || response.headers.get('Content-Length') === '0')
     return (
-      response.ok ? { data: {}, response } : { error: {}, response }
+      response.ok ? { data: null, response } : { error: null, response }
     ) as RequestFnResponse<TData, TError>;
 
   const contentType = response.headers.get('Content-Type')?.toLowerCase();

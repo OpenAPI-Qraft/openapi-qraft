@@ -143,6 +143,14 @@ export const handlers = [
       const query = getQueryParameters<Services['files']['deleteFiles']>(
         request.url
       );
+
+      if (query?.pendingOnly) {
+        return new HttpResponse(null, {
+          status: 204,
+          statusText: 'No pending files deleted',
+        });
+      }
+
       return HttpResponse.json({ query });
     }
   ),
