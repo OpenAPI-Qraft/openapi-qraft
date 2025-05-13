@@ -217,6 +217,7 @@ export interface operations {
         parameters: {
             query?: {
                 all?: boolean;
+                pendingOnly?: boolean;
             };
             header?: never;
             path?: never;
@@ -235,7 +236,6 @@ export interface operations {
                             all?: boolean;
                         };
                     };
-                    "application/octet-stream": unknown;
                 };
             };
             /** @description No Content - Operation completed successfully, no data returned */

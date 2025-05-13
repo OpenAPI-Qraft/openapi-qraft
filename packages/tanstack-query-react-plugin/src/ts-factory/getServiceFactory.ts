@@ -338,7 +338,7 @@ const getOperationResponseFactory = (
     responses
       .map(([statusCode, mediaType]) => {
         if (mediaType === null)
-          return factory.createKeywordTypeNode(ts.SyntaxKind.UndefinedKeyword);
+          return factory.createLiteralTypeNode(factory.createNull());
 
         if (!mediaType)
           return factory.createKeywordTypeNode(ts.SyntaxKind.UnknownKeyword);

@@ -442,8 +442,47 @@ exports[`getServices > matches snapshot with "serviceNameBase: endpoint" 1`] = `
               "type": "boolean",
             },
           },
+          {
+            "in": "query",
+            "name": "pendingOnly",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+            },
+          },
         ],
         "path": "/files",
+        "requestBody": undefined,
+        "security": undefined,
+        "success": {
+          "200": [
+            "application/json",
+          ],
+          "204": null,
+        },
+        "summary": "Delete all files",
+      },
+      {
+        "deprecated": undefined,
+        "description": undefined,
+        "errors": {
+          "default": [
+            "application/json",
+          ],
+        },
+        "method": "delete",
+        "name": "trashFiles",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "pendingOnly",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+            },
+          },
+        ],
+        "path": "/files/trash",
         "requestBody": undefined,
         "security": undefined,
         "success": {
@@ -453,7 +492,7 @@ exports[`getServices > matches snapshot with "serviceNameBase: endpoint" 1`] = `
           ],
           "204": null,
         },
-        "summary": "Delete all files",
+        "summary": "Trash files",
       },
       {
         "deprecated": true,
@@ -953,8 +992,47 @@ exports[`getServices > matches snapshot with "serviceNameBase: tags" 1`] = `
               "type": "boolean",
             },
           },
+          {
+            "in": "query",
+            "name": "pendingOnly",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+            },
+          },
         ],
         "path": "/files",
+        "requestBody": undefined,
+        "security": undefined,
+        "success": {
+          "200": [
+            "application/json",
+          ],
+          "204": null,
+        },
+        "summary": "Delete all files",
+      },
+      {
+        "deprecated": undefined,
+        "description": undefined,
+        "errors": {
+          "default": [
+            "application/json",
+          ],
+        },
+        "method": "delete",
+        "name": "trashFiles",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "pendingOnly",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+            },
+          },
+        ],
+        "path": "/files/trash",
         "requestBody": undefined,
         "security": undefined,
         "success": {
@@ -964,7 +1042,7 @@ exports[`getServices > matches snapshot with "serviceNameBase: tags" 1`] = `
           ],
           "204": null,
         },
-        "summary": "Delete all files",
+        "summary": "Trash files",
       },
       {
         "deprecated": true,
@@ -1464,8 +1542,47 @@ exports[`getServices > matches snapshot with custom \`postfixServices\` 1`] = `
               "type": "boolean",
             },
           },
+          {
+            "in": "query",
+            "name": "pendingOnly",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+            },
+          },
         ],
         "path": "/files",
+        "requestBody": undefined,
+        "security": undefined,
+        "success": {
+          "200": [
+            "application/json",
+          ],
+          "204": null,
+        },
+        "summary": "Delete all files",
+      },
+      {
+        "deprecated": undefined,
+        "description": undefined,
+        "errors": {
+          "default": [
+            "application/json",
+          ],
+        },
+        "method": "delete",
+        "name": "trashFiles",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "pendingOnly",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+            },
+          },
+        ],
+        "path": "/files/trash",
         "requestBody": undefined,
         "security": undefined,
         "success": {
@@ -1475,7 +1592,7 @@ exports[`getServices > matches snapshot with custom \`postfixServices\` 1`] = `
           ],
           "204": null,
         },
-        "summary": "Delete all files",
+        "summary": "Trash files",
       },
       {
         "deprecated": true,
@@ -1661,8 +1778,47 @@ exports[`getServices > matches snapshot with custom \`servicesGlob\` 1`] = `
               "type": "boolean",
             },
           },
+          {
+            "in": "query",
+            "name": "pendingOnly",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+            },
+          },
         ],
         "path": "/files",
+        "requestBody": undefined,
+        "security": undefined,
+        "success": {
+          "200": [
+            "application/json",
+          ],
+          "204": null,
+        },
+        "summary": "Delete all files",
+      },
+      {
+        "deprecated": undefined,
+        "description": undefined,
+        "errors": {
+          "default": [
+            "application/json",
+          ],
+        },
+        "method": "delete",
+        "name": "trashFiles",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "pendingOnly",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+            },
+          },
+        ],
+        "path": "/files/trash",
         "requestBody": undefined,
         "security": undefined,
         "success": {
@@ -1672,7 +1828,7 @@ exports[`getServices > matches snapshot with custom \`servicesGlob\` 1`] = `
           ],
           "204": null,
         },
-        "summary": "Delete all files",
+        "summary": "Trash files",
       },
       {
         "deprecated": true,
@@ -2172,8 +2328,47 @@ exports[`getServices > matches snapshot with default options 1`] = `
               "type": "boolean",
             },
           },
+          {
+            "in": "query",
+            "name": "pendingOnly",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+            },
+          },
         ],
         "path": "/files",
+        "requestBody": undefined,
+        "security": undefined,
+        "success": {
+          "200": [
+            "application/json",
+          ],
+          "204": null,
+        },
+        "summary": "Delete all files",
+      },
+      {
+        "deprecated": undefined,
+        "description": undefined,
+        "errors": {
+          "default": [
+            "application/json",
+          ],
+        },
+        "method": "delete",
+        "name": "trashFiles",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "pendingOnly",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+            },
+          },
+        ],
+        "path": "/files/trash",
         "requestBody": undefined,
         "security": undefined,
         "success": {
@@ -2183,7 +2378,7 @@ exports[`getServices > matches snapshot with default options 1`] = `
           ],
           "204": null,
         },
-        "summary": "Delete all files",
+        "summary": "Trash files",
       },
       {
         "deprecated": true,

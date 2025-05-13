@@ -1267,6 +1267,466 @@ export interface FilesService {
             body: DeleteFilesBody;
         };
     };
+    /** @summary Trash files */
+    trashFiles: {
+        /** @summary Trash files */
+        cancelQueries<TInfinite extends boolean = false>(filters?: QueryFiltersByParameters<TrashFilesSchema, TrashFilesData, TInfinite, TrashFilesParameters, TrashFilesError> | QueryFiltersByQueryKey<TrashFilesSchema, TrashFilesData, TInfinite, TrashFilesParameters, TrashFilesError>, options?: CancelOptions): Promise<void>;
+        /** @summary Trash files */
+        getQueryKey(parameters: DeepReadonly<TrashFilesParameters> | void): ServiceOperationQueryKey<TrashFilesSchema, TrashFilesParameters>;
+        /**
+         * Performs asynchronous data fetching, manages loading states and error handling.
+         *
+         * @summary Trash files
+         * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/hooks/useQuery|`useQuery(...)` documentation}
+         * @example Query without parameters
+         * ```ts
+         * const { data, isLoading } = qraft.filesService.trashFiles.useQuery()
+         * ```
+         * @example Query with parameters
+         * ```ts
+         * const { data, isLoading } = qraft.filesService.trashFiles.useQuery({
+         *     query: {
+         *         pendingOnly: pendingOnly
+         *     }
+         * })
+         * ```
+         */
+        useQuery<TData = TrashFilesData>(parameters: ServiceOperationQueryKey<TrashFilesSchema, TrashFilesParameters> | (DeepReadonly<TrashFilesParameters> | void), options?: Omit<UndefinedInitialDataOptions<TrashFilesData, TrashFilesError, TData, ServiceOperationQueryKey<TrashFilesSchema, TrashFilesParameters>>, "queryKey">): UseQueryResult<TData, TrashFilesError | Error>;
+        /**
+         * Performs asynchronous data fetching, manages loading states and error handling.
+         *
+         * @summary Trash files
+         * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/hooks/useQuery|`useQuery(...)` documentation}
+         * @example Query without parameters
+         * ```ts
+         * const { data, isLoading } = qraft.filesService.trashFiles.useQuery()
+         * ```
+         * @example Query with parameters
+         * ```ts
+         * const { data, isLoading } = qraft.filesService.trashFiles.useQuery({
+         *     query: {
+         *         pendingOnly: pendingOnly
+         *     }
+         * })
+         * ```
+         */
+        useQuery<TData = TrashFilesData>(parameters: ServiceOperationQueryKey<TrashFilesSchema, TrashFilesParameters> | (DeepReadonly<TrashFilesParameters> | void), options: Omit<DefinedInitialDataOptions<TrashFilesData, TrashFilesError, TData, ServiceOperationQueryKey<TrashFilesSchema, TrashFilesParameters>>, "queryKey">): DefinedUseQueryResult<TData, TrashFilesError | Error>;
+        /** @summary Trash files */
+        fetchInfiniteQuery<TPageParam extends TrashFilesParameters>(options: ServiceOperationFetchInfiniteQueryOptions<TrashFilesSchema, TrashFilesData, TrashFilesParameters, DeepReadonly<TPageParam>, TrashFilesError> | void): Promise<OperationInfiniteData<TrashFilesData, TrashFilesParameters>>;
+        /** @summary Trash files */
+        prefetchInfiniteQuery<TPageParam extends TrashFilesParameters>(options: ServiceOperationFetchInfiniteQueryOptions<TrashFilesSchema, TrashFilesData, TrashFilesParameters, DeepReadonly<TPageParam>, TrashFilesError> | void): Promise<void>;
+        /** @summary Trash files */
+        ensureInfiniteQueryData<TPageParam extends TrashFilesParameters>(options: ServiceOperationEnsureInfiniteQueryDataOptions<TrashFilesSchema, TrashFilesData, TrashFilesParameters, DeepReadonly<TPageParam>, TrashFilesError> | void): Promise<OperationInfiniteData<TrashFilesData, TrashFilesParameters>>;
+        /** @summary Trash files */
+        fetchQuery(options: ServiceOperationFetchQueryOptions<TrashFilesSchema, TrashFilesData, TrashFilesParameters, TrashFilesError> | void): Promise<TrashFilesData>;
+        /** @summary Trash files */
+        prefetchQuery(options: ServiceOperationFetchQueryOptions<TrashFilesSchema, TrashFilesData, TrashFilesParameters, TrashFilesError> | void): Promise<void>;
+        /** @summary Trash files */
+        ensureQueryData(options: ServiceOperationEnsureQueryDataOptions<TrashFilesSchema, TrashFilesData, TrashFilesParameters, TrashFilesError> | void): Promise<TrashFilesData>;
+        /** @summary Trash files */
+        getInfiniteQueryData(parameters: ServiceOperationInfiniteQueryKey<TrashFilesSchema, TrashFilesParameters> | (DeepReadonly<TrashFilesParameters> | void)): OperationInfiniteData<TrashFilesData, TrashFilesParameters> | undefined;
+        /** @summary Trash files */
+        getQueriesData<TInfinite extends boolean = false>(filters?: QueryFiltersByParameters<TrashFilesSchema, TrashFilesData, TInfinite, TrashFilesParameters, TrashFilesError> | QueryFiltersByQueryKey<TrashFilesSchema, TrashFilesData, TInfinite, TrashFilesParameters, TrashFilesError>): TInfinite extends true ? Array<[
+            queryKey: ServiceOperationInfiniteQueryKey<TrashFilesSchema, TrashFilesParameters>,
+            data: NoInfer<OperationInfiniteData<TrashFilesData, TrashFilesParameters>> | undefined
+        ]> : Array<[
+            queryKey: ServiceOperationQueryKey<TrashFilesSchema, TrashFilesParameters>,
+            data: TrashFilesData | undefined
+        ]>;
+        /** @summary Trash files */
+        getQueryData(parameters: ServiceOperationQueryKey<TrashFilesSchema, TrashFilesParameters> | (DeepReadonly<TrashFilesParameters> | void)): TrashFilesData | undefined;
+        /** @summary Trash files */
+        getQueryState(parameters: ServiceOperationQueryKey<TrashFilesSchema, TrashFilesParameters> | (DeepReadonly<TrashFilesParameters> | void)): QueryState<TrashFilesData, TrashFilesError> | undefined;
+        /** @summary Trash files */
+        getInfiniteQueryState(parameters: DeepReadonly<TrashFilesParameters> | ServiceOperationInfiniteQueryKey<TrashFilesSchema, TrashFilesParameters> | void): QueryState<OperationInfiniteData<TrashFilesData, TrashFilesParameters>, TrashFilesError> | undefined;
+        /** @summary Trash files */
+        invalidateQueries<TInfinite extends boolean = false>(filters?: InvalidateQueryFilters<TrashFilesSchema, TrashFilesData, TInfinite, TrashFilesParameters, TrashFilesError>, options?: InvalidateOptions): Promise<void>;
+        /** @summary Trash files */
+        isFetching<TInfinite extends boolean = false>(filters?: QueryFiltersByParameters<TrashFilesSchema, TrashFilesData, TInfinite, TrashFilesParameters, TrashFilesError> | QueryFiltersByQueryKey<TrashFilesSchema, TrashFilesData, TInfinite, TrashFilesParameters, TrashFilesError>): number;
+        /** @summary Trash files */
+        refetchQueries<TInfinite extends boolean = false>(filters?: QueryFiltersByParameters<TrashFilesSchema, TrashFilesData, TInfinite, TrashFilesParameters, TrashFilesError> | QueryFiltersByQueryKey<TrashFilesSchema, TrashFilesData, TInfinite, TrashFilesParameters, TrashFilesError>, options?: RefetchOptions): Promise<void>;
+        /** @summary Trash files */
+        removeQueries<TInfinite extends boolean = false>(filters?: QueryFiltersByParameters<TrashFilesSchema, TrashFilesData, TInfinite, TrashFilesParameters, TrashFilesError> | QueryFiltersByQueryKey<TrashFilesSchema, TrashFilesData, TInfinite, TrashFilesParameters, TrashFilesError>): void;
+        /** @summary Trash files */
+        resetQueries<TInfinite extends boolean = false>(filters?: QueryFiltersByParameters<TrashFilesSchema, TrashFilesData, TInfinite, TrashFilesParameters, TrashFilesError> | QueryFiltersByQueryKey<TrashFilesSchema, TrashFilesData, TInfinite, TrashFilesParameters, TrashFilesError>, options?: ResetOptions): Promise<void>;
+        /** @summary Trash files */
+        setInfiniteQueryData(parameters: (DeepReadonly<TrashFilesParameters> | undefined) | ServiceOperationInfiniteQueryKey<TrashFilesSchema, TrashFilesParameters>, updater: Updater<NoInfer<OperationInfiniteData<TrashFilesData, TrashFilesParameters>> | undefined, NoInfer<DeepReadonly<OperationInfiniteData<TrashFilesData, TrashFilesParameters>>> | undefined>, options?: SetDataOptions): OperationInfiniteData<TrashFilesData, TrashFilesParameters> | undefined;
+        /** @summary Trash files */
+        setQueriesData<TInfinite extends boolean = false>(filters: QueryFiltersByParameters<TrashFilesSchema, TrashFilesData, TInfinite, TrashFilesParameters, TrashFilesError> | QueryFiltersByQueryKey<TrashFilesSchema, TrashFilesData, TInfinite, TrashFilesParameters, TrashFilesError>, updater: Updater<NoInfer<TrashFilesData> | undefined, NoInfer<TrashFilesData> | undefined>, options?: SetDataOptions): Array<TrashFilesData | undefined>;
+        /** @summary Trash files */
+        setQueryData(parameters: (DeepReadonly<TrashFilesParameters> | undefined) | ServiceOperationQueryKey<TrashFilesSchema, TrashFilesParameters>, updater: Updater<NoInfer<TrashFilesData> | undefined, NoInfer<DeepReadonly<TrashFilesData>> | undefined>, options?: SetDataOptions): TrashFilesData | undefined;
+        /** @summary Trash files */
+        getInfiniteQueryKey(parameters: DeepReadonly<TrashFilesParameters> | void): ServiceOperationInfiniteQueryKey<TrashFilesSchema, TrashFilesParameters>;
+        /**
+         * Performs asynchronous data fetching with support for infinite scrolling scenarios.
+         * Manages paginated data and provides utilities for fetching additional pages.
+         *
+         * @summary Trash files
+         * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/hooks/useInfiniteQuery|`useInfiniteQuery(...)` documentation}
+         *
+         * @example Infinite Query
+         * ```ts
+         * const { data, isLoading, fetchNextPage } = qraft.filesService.trashFiles.useInfiniteQuery({}, {
+         *     initialPageParam: {
+         *         query: {
+         *             pendingOnly: initialPendingOnly
+         *         }
+         *     },
+         *     getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) => getNextPageParams(lastPage)
+         * })
+         *
+         * console.log(data);
+         * fetchNextPage(); // Fetch the next page
+         * ```
+         */
+        useInfiniteQuery<TPageParam extends TrashFilesParameters, TQueryFnData = TrashFilesData, TData = OperationInfiniteData<TQueryFnData, TrashFilesParameters>>(parameters: ServiceOperationInfiniteQueryKey<TrashFilesSchema, TrashFilesParameters> | (DeepReadonly<TrashFilesParameters> | void), options: Omit<UndefinedInitialDataInfiniteOptions<TQueryFnData, TrashFilesError, TData, ServiceOperationInfiniteQueryKey<TrashFilesSchema, TrashFilesParameters>, PartialParameters<DeepReadonly<TPageParam>>>, "queryKey" | "getPreviousPageParam" | "getNextPageParam" | "initialPageParam"> & InfiniteQueryPageParamsOptions<TQueryFnData, PartialParameters<DeepReadonly<TPageParam>>>): UseInfiniteQueryResult<TData, TrashFilesError | Error>;
+        /**
+         * Performs asynchronous data fetching with support for infinite scrolling scenarios.
+         * Manages paginated data and provides utilities for fetching additional pages.
+         *
+         * @summary Trash files
+         * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/hooks/useInfiniteQuery|`useInfiniteQuery(...)` documentation}
+         *
+         * @example Infinite Query
+         * ```ts
+         * const { data, isLoading, fetchNextPage } = qraft.filesService.trashFiles.useInfiniteQuery({}, {
+         *     initialPageParam: {
+         *         query: {
+         *             pendingOnly: initialPendingOnly
+         *         }
+         *     },
+         *     getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) => getNextPageParams(lastPage)
+         * })
+         *
+         * console.log(data);
+         * fetchNextPage(); // Fetch the next page
+         * ```
+         */
+        useInfiniteQuery<TPageParam extends TrashFilesParameters, TQueryFnData = TrashFilesData, TData = OperationInfiniteData<TQueryFnData, TrashFilesParameters>>(parameters: ServiceOperationInfiniteQueryKey<TrashFilesSchema, TrashFilesParameters> | (DeepReadonly<TrashFilesParameters> | void), options: Omit<DefinedInitialDataInfiniteOptions<TQueryFnData, TrashFilesError, TData, ServiceOperationInfiniteQueryKey<TrashFilesSchema, TrashFilesParameters>, PartialParameters<DeepReadonly<TPageParam>>>, "queryKey" | "getPreviousPageParam" | "getNextPageParam" | "initialPageParam"> & InfiniteQueryPageParamsOptions<TrashFilesData, PartialParameters<DeepReadonly<TPageParam>>>): DefinedUseInfiniteQueryResult<TData, TrashFilesError | Error>;
+        /**
+         * Monitors the number of queries currently fetching, matching the provided filters.
+         * Useful for creating loading indicators or performing actions based on active requests.
+         *
+         * @summary Trash files
+         * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/hooks/useIsFetching|`useIsFetching(...)` documentation}
+         * @example Checks the total number of queries fetching from the specified service method,
+         * both normal and infinite. If no parameters are provided, no filtering is applied.
+         * ```ts
+         * const trashFilesTotal = qraft.filesService.trashFiles.useIsFetching()
+         * ```
+         * @example Checks the number of normal queries fetching with the specified parameters.
+         * ```ts
+         * const trashFilesByParametersTotal = qraft.filesService.trashFiles.useIsFetching({
+         *     infinite: false,
+         *     parameters: {
+         *         query: {
+         *             pendingOnly: pendingOnly
+         *         }
+         *     }
+         * })
+         * ```
+         */
+        useIsFetching<TInfinite extends boolean = false>(filters?: QueryFiltersByParameters<TrashFilesSchema, TrashFilesData, TInfinite, TrashFilesParameters, TrashFilesError> | QueryFiltersByQueryKey<TrashFilesSchema, TrashFilesData, TInfinite, TrashFilesParameters, TrashFilesError>): number;
+        /**
+         * Allows you to execute multiple asynchronous data fetching operations concurrently. This is especially useful for managing complex data dependencies in parallel.
+         *
+         * @summary Trash files
+         * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/hooks/useQueries|`useQueries(...)` documentation}
+         * @example Multiple queries. Returns `data`, `error`, `isSuccess` and other properties.
+         * ```ts
+         * const trashFilesResults = qraft.filesService.trashFiles.useQueries({
+         *     queries: [
+         *         {
+         *             query: {
+         *                 pendingOnly: pendingOnly1
+         *             }
+         *         },
+         *         {
+         *             query: {
+         *                 pendingOnly: pendingOnly2
+         *             }
+         *         }
+         *     ]
+         * });
+         * trashFilesResults.forEach(({ isSuccess, data, error }) => console.log({ isSuccess, data, error }));
+         * ```
+         * @example Combined results. Only the data will be returned.
+         * ```ts
+         * const trashFilesCombinedResults = qraft.filesService.trashFiles.useQueries({
+         *     combine: results => results.map(result => result.data),
+         *     queries: [
+         *         {
+         *             query: {
+         *                 pendingOnly: pendingOnly1
+         *             }
+         *         },
+         *         {
+         *             query: {
+         *                 pendingOnly: pendingOnly2
+         *             }
+         *         }
+         *     ]
+         * });
+         * trashFilesCombinedResults.forEach(data => console.log({ data }));
+         * ```
+         */
+        useQueries<T extends Array<UseQueryOptionsForUseQueries<TrashFilesSchema, TrashFilesParameters, TrashFilesData, TrashFilesError>>, TCombinedResult = Array<UseQueryResult<TrashFilesData, TrashFilesError>>>(options: {
+            queries: T;
+            combine?: (results: Array<UseQueryResult<TrashFilesData, TrashFilesError>>) => TCombinedResult;
+        }): TCombinedResult;
+        /** @summary Trash files */
+        getQueryKey(parameters: DeepReadonly<TrashFilesParameters> | void): ServiceOperationQueryKey<TrashFilesSchema, TrashFilesParameters>;
+        /**
+         * Performs asynchronous data fetching, manages loading states and error handling.
+         *
+         * @summary Trash files
+         * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/hooks/useQuery|`useQuery(...)` documentation}
+         * @example Query without parameters
+         * ```ts
+         * const { data, isLoading } = qraft.filesService.trashFiles.useQuery()
+         * ```
+         * @example Query with parameters
+         * ```ts
+         * const { data, isLoading } = qraft.filesService.trashFiles.useQuery({
+         *     query: {
+         *         pendingOnly: pendingOnly
+         *     }
+         * })
+         * ```
+         */
+        useQuery<TData = TrashFilesData>(parameters: ServiceOperationQueryKey<TrashFilesSchema, TrashFilesParameters> | (DeepReadonly<TrashFilesParameters> | void), options?: Omit<UndefinedInitialDataOptions<TrashFilesData, TrashFilesError, TData, ServiceOperationQueryKey<TrashFilesSchema, TrashFilesParameters>>, "queryKey">): UseQueryResult<TData, TrashFilesError | Error>;
+        /**
+         * Performs asynchronous data fetching, manages loading states and error handling.
+         *
+         * @summary Trash files
+         * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/hooks/useQuery|`useQuery(...)` documentation}
+         * @example Query without parameters
+         * ```ts
+         * const { data, isLoading } = qraft.filesService.trashFiles.useQuery()
+         * ```
+         * @example Query with parameters
+         * ```ts
+         * const { data, isLoading } = qraft.filesService.trashFiles.useQuery({
+         *     query: {
+         *         pendingOnly: pendingOnly
+         *     }
+         * })
+         * ```
+         */
+        useQuery<TData = TrashFilesData>(parameters: ServiceOperationQueryKey<TrashFilesSchema, TrashFilesParameters> | (DeepReadonly<TrashFilesParameters> | void), options: Omit<DefinedInitialDataOptions<TrashFilesData, TrashFilesError, TData, ServiceOperationQueryKey<TrashFilesSchema, TrashFilesParameters>>, "queryKey">): DefinedUseQueryResult<TData, TrashFilesError | Error>;
+        /**
+         * Performs asynchronous data fetching with support for infinite scrolling scenarios.
+         * Manages paginated data and provides utilities for fetching additional pages.
+         * It functions similarly to `useInfiniteQuery`, but with added support for React Suspense.
+         *
+         * @summary Trash files
+         * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/hooks/useSuspenseInfiniteQuery|`useSuspenseInfiniteQuery(...)` documentation}
+         *
+         * @example Suspense Infinite Query
+         * ```ts
+         * const { data, isLoading, fetchNextPage } = qraft.filesService.trashFiles.useSuspenseInfiniteQuery({}, {
+         *     initialPageParam: {
+         *         query: {
+         *             pendingOnly: initialPendingOnly
+         *         }
+         *     },
+         *     getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) => getNextPageParams(lastPage)
+         * })
+         *
+         * console.log(data);
+         * fetchNextPage(); // Fetch the next page
+         * ```
+         */
+        useSuspenseInfiniteQuery<TPageParam extends TrashFilesParameters, TData = TrashFilesData>(parameters: ServiceOperationInfiniteQueryKey<TrashFilesSchema, TrashFilesParameters> | (DeepReadonly<TrashFilesParameters> | void), options: Omit<UseSuspenseInfiniteQueryOptions<TrashFilesData, TrashFilesError, OperationInfiniteData<TData, TrashFilesParameters>, TrashFilesData, ServiceOperationInfiniteQueryKey<TrashFilesSchema, TrashFilesParameters>, PartialParameters<DeepReadonly<TPageParam>>>, "queryKey" | "getPreviousPageParam" | "getNextPageParam" | "initialPageParam"> & InfiniteQueryPageParamsOptions<TrashFilesData, PartialParameters<DeepReadonly<TPageParam>>>): UseSuspenseInfiniteQueryResult<OperationInfiniteData<TData, TrashFilesParameters>, TrashFilesError | Error>;
+        /**
+         * Allows you to execute multiple asynchronous data fetching operations concurrently with Suspense support.
+         * Similar to useQueries but integrates with React Suspense for loading states.
+         *
+         * @summary Trash files
+         * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/hooks/useSuspenseQueries|`useSuspenseQueries(...)` documentation}
+         * @example Basic usage with Suspense
+         * ```ts
+         * const trashFilesData = qraft.filesService.trashFiles.useSuspenseQueries({
+         *     queries: [
+         *         {
+         *             query: {
+         *                 pendingOnly: pendingOnly1
+         *             }
+         *         },
+         *         {
+         *             query: {
+         *                 pendingOnly: pendingOnly2
+         *             }
+         *         }
+         *     ]
+         * });
+         * trashFilesResults.forEach(({ isSuccess, data, error }) => console.log({ isSuccess, data, error }));
+         * ```
+         * @example With data transformation using combine
+         * ```ts
+         * const trashFilesCombinedData = qraft.filesService.trashFiles.useSuspenseQueries({
+         *     combine: results => results.map(result => result.data),
+         *     queries: [
+         *         {
+         *             query: {
+         *                 pendingOnly: pendingOnly1
+         *             }
+         *         },
+         *         {
+         *             query: {
+         *                 pendingOnly: pendingOnly2
+         *             }
+         *         }
+         *     ]
+         * });
+         * trashFilesCombinedData.forEach(data => console.log({ data }));
+         * ```
+         */
+        useSuspenseQueries<T extends Array<UseQueryOptionsForUseSuspenseQuery<TrashFilesSchema, TrashFilesParameters, TrashFilesData, TrashFilesError>>, TCombinedResult = Array<UseSuspenseQueryResult<TrashFilesData, TrashFilesError>>>(options: {
+            queries: T;
+            combine?: (results: Array<WithOptional<UseSuspenseQueryResult<TrashFilesData, TrashFilesError>, "data">>) => TCombinedResult;
+        }): TCombinedResult;
+        /**
+         * Performs asynchronous data fetching with Suspense support.
+         * Similar to useQuery but integrates with React Suspense for loading states.
+         *
+         * @summary Trash files
+         * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/hooks/useSuspenseQuery|`useSuspenseQuery(...)` documentation}
+         * @example Suspense Query without parameters
+         * ```ts
+         * const data = qraft.filesService.trashFiles.useSuspenseQuery()
+         * ```
+         * @example Suspense Query with parameters
+         * ```ts
+         * const data = qraft.filesService.trashFiles.useSuspenseQuery({
+         *     query: {
+         *         pendingOnly: pendingOnly
+         *     }
+         * })
+         * ```
+         */
+        useSuspenseQuery<TData = TrashFilesData>(parameters: ServiceOperationQueryKey<TrashFilesSchema, TrashFilesParameters> | (DeepReadonly<TrashFilesParameters> | void), options?: Omit<UseSuspenseQueryOptions<TrashFilesData, TrashFilesError, TData, ServiceOperationQueryKey<TrashFilesSchema, TrashFilesParameters>>, "queryKey">): UseSuspenseQueryResult<TData, TrashFilesError | Error>;
+        /** @summary Trash files */
+        getMutationKey(parameters: DeepReadonly<TrashFilesParameters> | void): ServiceOperationMutationKey<TrashFilesSchema, TrashFilesParameters>;
+        /**
+         * Enables performing asynchronous data mutation operations such as POST, PUT, PATCH, or DELETE requests.
+         * Handles loading state, optimistic updates, and error handling.
+         *
+         * @summary Trash files
+         * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/hooks/useMutation|`useMutation(...)` documentation}
+         * @example Mutation with predefined parameters, e.g., for updating
+         * ```ts
+         * const { mutate, isPending } = qraft.filesService.trashFiles.useMutation({
+         *     query: {
+         *         pendingOnly: pendingOnly
+         *     }
+         * })
+         * mutate(body);
+         * ```
+         * @example Mutation without predefined parameters, e.g., for creating
+         * ```ts
+         * const { mutate, isPending } = qraft.filesService.trashFiles.useMutation()
+         * mutate({
+         *     body: bodyPayload,
+         *     query: {
+         *         pendingOnly: pendingOnly
+         *     }
+         * });
+         * ```
+         */
+        useMutation<TVariables extends TrashFilesBody, TContext = unknown>(parameters: DeepReadonly<TrashFilesParameters>, options?: ServiceOperationUseMutationOptions<TrashFilesSchema, TrashFilesData, TrashFilesParameters, TVariables, TrashFilesError | Error, TContext>): UseMutationResult<TrashFilesData, TrashFilesError | Error, TVariables | void, TContext>;
+        /**
+         * Enables performing asynchronous data mutation operations such as POST, PUT, PATCH, or DELETE requests.
+         * Handles loading state, optimistic updates, and error handling.
+         *
+         * @summary Trash files
+         * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/hooks/useMutation|`useMutation(...)` documentation}
+         * @example Mutation with predefined parameters, e.g., for updating
+         * ```ts
+         * const { mutate, isPending } = qraft.filesService.trashFiles.useMutation({
+         *     query: {
+         *         pendingOnly: pendingOnly
+         *     }
+         * })
+         * mutate(body);
+         * ```
+         * @example Mutation without predefined parameters, e.g., for creating
+         * ```ts
+         * const { mutate, isPending } = qraft.filesService.trashFiles.useMutation()
+         * mutate({
+         *     body: bodyPayload,
+         *     query: {
+         *         pendingOnly: pendingOnly
+         *     }
+         * });
+         * ```
+         */
+        useMutation<TVariables extends MutationVariables<TrashFilesBody, TrashFilesParameters>, TContext = unknown>(parameters: void, options?: ServiceOperationUseMutationOptions<TrashFilesSchema, TrashFilesData, TrashFilesParameters, TVariables, TrashFilesError | Error, TContext>): UseMutationResult<TrashFilesData, TrashFilesError | Error, TVariables, TContext>;
+        /**
+         * Returns the count of currently in-progress mutations.
+         *
+         * @summary Trash files
+         * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/hooks/useIsMutating|`useIsMutating(...)` documentation}
+         * @example Check how many mutations are currently in progress for the specified service method.
+         * ```ts
+         * const trashFilesTotal = qraft.filesService.trashFiles.useIsMutating()
+         * ```
+         * @example Check how many mutations are currently in progress with the specified parameters.
+         * ```ts
+         * const trashFilesTotal = qraft.filesService.trashFiles.useIsMutating({
+         *     parameters: {
+         *         query: {
+         *             pendingOnly: pendingOnly
+         *         }
+         *     }
+         * })
+         * ```
+         */
+        useIsMutating<TContext = unknown>(filters?: MutationFiltersByParameters<TrashFilesBody, TrashFilesData, TrashFilesParameters, TrashFilesError | Error, TContext> | MutationFiltersByMutationKey<TrashFilesSchema, TrashFilesBody, TrashFilesData, TrashFilesParameters, TrashFilesError | Error, TContext>): number;
+        /** @summary Trash files */
+        isMutating<TContext>(filters?: MutationFiltersByParameters<TrashFilesBody, TrashFilesData, TrashFilesParameters, TrashFilesError | Error, TContext> | MutationFiltersByMutationKey<TrashFilesSchema, TrashFilesBody, TrashFilesData, TrashFilesParameters, TrashFilesError | Error, TContext>): number;
+        /** @summary Trash files */
+        (options: ServiceOperationMutationFnOptions<TrashFilesBody, TrashFilesParameters>, client?: (schema: TrashFilesSchema, options: ServiceOperationMutationFnOptions<TrashFilesBody, TrashFilesParameters>) => Promise<RequestFnResponse<TrashFilesData, TrashFilesError>>): Promise<RequestFnResponse<TrashFilesData, TrashFilesError>>;
+        /**
+         * Provides access to the current state of a mutation, including its status, any resulting data, and associated errors.
+         *
+         * @summary Trash files
+         * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/hooks/useMutationState|`useMutationState(...)` documentation}
+         * @example Get all variables of all running mutations.
+         * ```ts
+         * const trashFilesPendingMutationVariables = qraft.filesService.trashFiles.useMutationState({
+         *     filters: {
+         *         status: "pending"
+         *     },
+         *     select: mutation => mutation.state.variables
+         * })
+         * ```
+         * @example Get all data for specific mutations via the `parameters`.
+         * ```ts
+         * const trashFilesMutationData = qraft.filesService.trashFiles.useMutationState({
+         *     filters: {
+         *         parameters: {
+         *             query: {
+         *                 pendingOnly: pendingOnly
+         *             }
+         *         }
+         *     },
+         *     select: mutation => mutation.state.data
+         * })
+         * ```
+         */
+        useMutationState<TContext = unknown, TResult = MutationState<TrashFilesData, TrashFilesError | Error, MutationVariables<TrashFilesBody, TrashFilesParameters>, TContext>>(options?: {
+            filters?: MutationFiltersByParameters<TrashFilesBody, TrashFilesData, TrashFilesParameters, TrashFilesError | Error, TContext> | MutationFiltersByMutationKey<TrashFilesSchema, TrashFilesBody, TrashFilesData, TrashFilesParameters, TrashFilesError | Error, TContext>;
+            select?: (mutation: Mutation<TrashFilesData, TrashFilesError | Error, MutationVariables<TrashFilesBody, TrashFilesParameters>, TContext>) => TResult;
+        }): Array<TResult>;
+        schema: TrashFilesSchema;
+        types: {
+            parameters: TrashFilesParameters;
+            data: TrashFilesData;
+            error: TrashFilesError;
+            body: TrashFilesBody;
+        };
+    };
     /**
      * @deprecated
      * @summary Get a file list
@@ -1773,6 +2233,10 @@ export const filesService: {
     deleteFiles: {
         schema: DeleteFilesSchema;
     };
+    /** @summary Trash files */
+    trashFiles: {
+        schema: TrashFilesSchema;
+    };
     /**
      * @deprecated
      * @summary Get a file list
@@ -1799,6 +2263,12 @@ export const filesService: {
         schema: {
             method: "delete",
             url: "/files"
+        }
+    },
+    trashFiles: {
+        schema: {
+            method: "delete",
+            url: "/files/trash"
         }
     },
     getFileList: {
@@ -1846,9 +2316,17 @@ type DeleteFilesSchema = {
     url: "/files";
 };
 type DeleteFilesParameters = paths["/files"]["delete"]["parameters"];
-type DeleteFilesData = paths["/files"]["delete"]["responses"]["200"]["content"]["application/json"] | paths["/files"]["delete"]["responses"]["200"]["content"]["application/octet-stream"] | undefined;
+type DeleteFilesData = paths["/files"]["delete"]["responses"]["200"]["content"]["application/json"] | null;
 type DeleteFilesError = paths["/files"]["delete"]["responses"]["default"]["content"]["application/json"];
 type DeleteFilesBody = undefined;
+type TrashFilesSchema = {
+    method: "delete";
+    url: "/files/trash";
+};
+type TrashFilesParameters = paths["/files/trash"]["delete"]["parameters"];
+type TrashFilesData = paths["/files/trash"]["delete"]["responses"]["200"]["content"]["application/json"] | paths["/files/trash"]["delete"]["responses"]["200"]["content"]["application/octet-stream"] | null;
+type TrashFilesError = paths["/files/trash"]["delete"]["responses"]["default"]["content"]["application/json"];
+type TrashFilesBody = undefined;
 type GetFileListSchema = {
     method: "get";
     url: "/files/list";
