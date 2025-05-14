@@ -1,5 +1,5 @@
 {
-  "mode": "pre",
+  "mode": "exit",
   "tag": "beta",
   "initialVersions": {
     "@openapi-qraft/e2e": "1.0.0",
@@ -19,8 +19,6 @@
   "changesets": [
     "cute-pears-hope",
     "fast-llamas-tie",
-    "red-mirrors-add",
-    "strong-mugs-fry",
-    "wild-hotels-start"
+    "red-mirrors-add"
   ]
 }
