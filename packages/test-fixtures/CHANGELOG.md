@@ -1,5 +1,11 @@
 # @openapi-qraft/test-fixtures
 
+## 1.1.0
+
+### Minor Changes
+
+- c9afb3b: Generate `null` type and return `null` data for the empty (204) responses instead of an empty object `{}`.
+
 ## 1.1.0-beta.1
 
 ### Minor Changes
