@@ -1,5 +1,16 @@
 # @openapi-qraft/react
 
+## 2.5.0
+
+### Minor Changes
+
+- 8b7e980: Added support for generating query hooks for writable HTTP methods via `--queryable-write-operations` option.
+- c9afb3b: Generate `null` type and return `null` data for the empty (204) responses instead of an empty object `{}`.
+
+### Patch Changes
+
+- @openapi-qraft/tanstack-query-react-types@2.5.0
+
 ## 2.5.0-beta.3
 
 ### Minor Changes
