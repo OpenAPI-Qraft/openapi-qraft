@@ -136,3 +136,38 @@ apis:
       operation-name-modifier:
         - '/files/list:[a-zA-Z]+List ==> findAll'  # Rename all *List operations to findAll
 ```
+
+### Generating Multiple API Client Functions
+
+Qraft allows you to generate multiple _create API client functions_ with different parameters using the `--create-api-client-fn`
+option. This is particularly useful when you need to create specialized clients for different environments or use cases.
+For more information on using options, please explore the [CLI documentation](/codegen/CLI/cli.mdx).
+
+Here's an example of how to configure multiple _create API client functions_:
+
+```yaml
+apis:
+  files:
+    root: ./openapi.json
+    x-openapi-qraft:
+      plugin:
+        tanstack-query-react: true
+        openapi-typescript: true
+      output-dir: src/api
+      # Generate multiple API client functions with different parameters
+      create-api-client-fn:
+        # Node.js API client with all services and callbacks
+        createInternalNodeAPIClient:
+          filename: create-internal-api-client  # Custom filename for the generated function
+          services: all                         # Include all services
+          callbacks: all                        # Include all callbacks
+
+        # React API client with specific callbacks only
+        createReactAPIClient:
+          services: none                        # Don't include any services directly
+          callbacks:                            # Include only specific callbacks
+            - setQueryData
+            - getQueryData
+            - getQueryKey
+            - getInfiniteQueryKey
+```

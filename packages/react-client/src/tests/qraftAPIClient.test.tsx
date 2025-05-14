@@ -20,10 +20,12 @@ import {
 } from '@tanstack/react-query';
 import { act, renderHook, waitFor } from '@testing-library/react';
 import React from 'react';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { qraftAPIClient, requestFn } from '../index.js';
 import { createPredefinedParametersRequestFn } from './fixtures/api/create-predefined-parameters-request-fn.js';
 import { createAPIClient, services } from './fixtures/api/index.js';
+import { getApprovalPoliciesId } from './fixtures/api/services/ApprovalPoliciesService.js';
+import { createInternalReactAPIClient } from './fixtures/files-api/index.js';
 import { filesFindAllResponsePayloadFixtures } from './msw/handlers.js';
 
 const baseUrl = 'https://api.sandbox.monite.com/v1';
@@ -1902,7 +1904,7 @@ describe('Qraft uses "fetchQuery(...) & "prefetchQuery(...)" & "ensureQueryData(
   it('throws an error if requestFn is not provided', async () => {
     const qraft = createAPIClient({
       queryClient: new QueryClient(),
-      // @ts-expect-error - incorrect usage case
+      // @ts-expect-error - incorrect usage case, `requestFn` is not defined
       requestFn: undefined,
       baseUrl: 'http://any',
     });
@@ -2390,15 +2392,11 @@ describe('Custom Callbacks support', () => {
       } as const;
 
       const queryClient = new QueryClient();
-      const qraft = qraftAPIClient<Services, typeof customCallbacks>(
-        services,
-        customCallbacks,
-        {
-          requestFn,
-          baseUrl,
-          queryClient,
-        }
-      );
+      const qraft = qraftAPIClient(services, customCallbacks, {
+        requestFn,
+        baseUrl,
+        queryClient,
+      });
 
       const { result } = renderHook(
         () => qraft.approvalPolicies.getApprovalPoliciesId.useQuery(parameters),
@@ -2420,15 +2418,11 @@ describe('Custom Callbacks support', () => {
 
     it('throws errors callbacks not provided', async () => {
       const noCallbacks = {} as const;
-      const qraft = qraftAPIClient<Services, typeof noCallbacks>(
-        services,
-        noCallbacks,
-        {
-          requestFn,
-          baseUrl,
-          queryClient: new QueryClient(),
-        }
-      );
+      const qraft = qraftAPIClient(services, noCallbacks, {
+        requestFn,
+        baseUrl,
+        queryClient: new QueryClient(),
+      });
 
       expect(() =>
         // @ts-expect-error - `getQueryKey()` callback is not specified
@@ -2455,14 +2449,10 @@ describe('Custom Callbacks support', () => {
       const customCallbacks = {
         operationInvokeFn,
       } as const;
-      const qraft = qraftAPIClient<Services, typeof customCallbacks>(
-        services,
-        customCallbacks,
-        {
-          requestFn,
-          baseUrl,
-        }
-      );
+      const qraft = qraftAPIClient(services, customCallbacks, {
+        requestFn,
+        baseUrl,
+      });
 
       const { data, error } =
         await qraft.approvalPolicies.getApprovalPoliciesId({
@@ -2485,14 +2475,10 @@ describe('Custom Callbacks support', () => {
 
     it('supports POST "operationInvokeFn" if callback provided', async () => {
       const customCallbacks = { operationInvokeFn };
-      const qraft = qraftAPIClient<Services, typeof customCallbacks>(
-        services,
-        customCallbacks,
-        {
-          requestFn,
-          baseUrl,
-        }
-      );
+      const qraft = qraftAPIClient(services, customCallbacks, {
+        requestFn,
+        baseUrl,
+      });
 
       const { data, error } = await qraft.entities.postEntitiesIdDocuments({
         parameters: {
@@ -2557,14 +2543,10 @@ describe('Custom Callbacks support', () => {
         getQueryKey,
       } as const;
 
-      const qraft = qraftAPIClient<Services, typeof customCallbacks>(
-        services,
-        customCallbacks,
-        {
-          requestFn,
-          baseUrl,
-        }
-      );
+      const qraft = qraftAPIClient(services, customCallbacks, {
+        requestFn,
+        baseUrl,
+      });
 
       const queryKey =
         qraft.approvalPolicies.getApprovalPoliciesId.getQueryKey(parameters);
@@ -2584,16 +2566,57 @@ describe('Custom Callbacks support', () => {
       ]);
     });
 
-    it('throws errors callbacks not provided', async () => {
-      const noCallbacks = {} as const;
-      const qraft = qraftAPIClient<Services, typeof noCallbacks>(
-        services,
-        noCallbacks,
+    it('supports single operation calls', async () => {
+      const queryClient = new QueryClient();
+
+      const defaultOptions = {
+        requestFn,
+        baseUrl,
+        queryClient,
+      } as const;
+
+      const getApprovalPoliciesIdOperation = createInternalReactAPIClient(
+        getApprovalPoliciesId,
+        defaultOptions,
+        { useQuery, getQueryKey }
+      );
+
+      const queryKey = getApprovalPoliciesIdOperation.getQueryKey({
+        header: {
+          'x-monite-version': '1.0.0',
+        },
+        path: {
+          approval_policy_id: '1',
+        },
+        query: {
+          items_order: ['asc', 'desc'],
+        },
+      });
+
+      const { result } = renderHook(
+        () => getApprovalPoliciesIdOperation.useQuery(queryKey),
         {
-          requestFn,
-          baseUrl,
+          wrapper: (props) => (
+            <Providers queryClient={queryClient} {...props} />
+          ),
         }
       );
+
+      await waitFor(() => {
+        expect(
+          result.current.data satisfies
+            | Services['approvalPolicies']['getApprovalPoliciesId']['types']['data']
+            | undefined
+        ).toEqual(queryKey[1]);
+      });
+    });
+
+    it('throws errors callbacks not provided', async () => {
+      const noCallbacks = {} as const;
+      const qraft = qraftAPIClient(services, noCallbacks, {
+        requestFn,
+        baseUrl,
+      });
 
       expect(() =>
         // @ts-expect-error - `getQueryKey()` callback is not specified
@@ -4534,30 +4557,28 @@ describe('Qraft is type-safe if client created with "QueryClient" only', () => {
 });
 
 describe('Qraft API Client primitive conversions', () => {
-  let qraft: ReturnType<typeof createAPIClient>;
-
-  beforeEach(() => {
-    qraft = createAPIClient({ queryClient: new QueryClient() });
-  });
-
   describe('Root level conversions', () => {
     it('should handle string conversion', () => {
+      const qraft = createAPIClient({ queryClient: new QueryClient() });
       expect(String(qraft)).toBe(qraft.toString());
       expect(`${qraft}`).toBe(qraft.toString());
     });
 
     it('should handle number conversion', () => {
+      const qraft = createAPIClient({ queryClient: new QueryClient() });
       expect(Number(qraft)).toBeNaN();
       expect(+qraft).toBeNaN();
     });
 
     it('should handle JSON serialization', () => {
+      const qraft = createAPIClient({ queryClient: new QueryClient() });
       expect(JSON.stringify(qraft)).toBe(
         JSON.stringify(JSON.stringify(services))
       );
     });
 
     it('toJSON() returns JSON string', () => {
+      const qraft = createAPIClient({ queryClient: new QueryClient() });
       expect(
         // @ts-expect-error - toJSON() is not a standard method for Qraft API Client
         qraft.toJSON()
@@ -4565,12 +4586,14 @@ describe('Qraft API Client primitive conversions', () => {
     });
 
     it('should handle valueOf()', () => {
+      const qraft = createAPIClient({ queryClient: new QueryClient() });
       const value = qraft.valueOf();
       expect(typeof value).toBe('object');
       expect(value).toBe(services);
     });
 
     it('should handle Symbol.toStringTag', () => {
+      const qraft = createAPIClient({ queryClient: new QueryClient() });
       expect(Object.prototype.toString.call(qraft)).toBe(
         '[object QraftAPIClient]'
       );
@@ -4579,6 +4602,7 @@ describe('Qraft API Client primitive conversions', () => {
 
   describe('Service level conversions', () => {
     it('should handle string conversion', () => {
+      const qraft = createAPIClient({ queryClient: new QueryClient() });
       expect(String(qraft.approvalPolicies)).toBe(
         qraft.approvalPolicies.toString()
       );
@@ -4588,23 +4612,27 @@ describe('Qraft API Client primitive conversions', () => {
     });
 
     it('should handle number conversion', () => {
+      const qraft = createAPIClient({ queryClient: new QueryClient() });
       expect(Number(qraft.approvalPolicies)).toBeNaN();
       expect(+qraft.approvalPolicies).toBeNaN();
     });
 
     it('should handle JSON serialization', () => {
+      const qraft = createAPIClient({ queryClient: new QueryClient() });
       expect(JSON.stringify(qraft.approvalPolicies)).toBe(
         JSON.stringify(JSON.stringify(services.approvalPolicies))
       );
     });
 
     it('should handle valueOf()', () => {
+      const qraft = createAPIClient({ queryClient: new QueryClient() });
       const value = qraft.approvalPolicies.valueOf();
       expect(typeof value).toBe('object');
       expect(value).toBe(qraft.approvalPolicies.valueOf());
     });
 
     it('should handle Symbol.toStringTag', () => {
+      const qraft = createAPIClient({ queryClient: new QueryClient() });
       expect(Object.prototype.toString.call(qraft.approvalPolicies)).toBe(
         '[object QraftAPIClient]'
       );
@@ -4613,16 +4641,19 @@ describe('Qraft API Client primitive conversions', () => {
 
   describe('Operation level conversions', () => {
     it('should handle string conversion', () => {
+      const qraft = createAPIClient({ queryClient: new QueryClient() });
       expect(String(qraft.approvalPolicies.getApprovalPoliciesId)).toBe(
         qraft.approvalPolicies.getApprovalPoliciesId.toString()
       );
     });
 
     it('should handle number conversion', () => {
+      const qraft = createAPIClient({ queryClient: new QueryClient() });
       expect(Number(qraft.approvalPolicies.getApprovalPoliciesId)).toBeNaN();
     });
 
     it('should handle JSON serialization', () => {
+      const qraft = createAPIClient({ queryClient: new QueryClient() });
       expect(JSON.stringify(qraft.approvalPolicies.getApprovalPoliciesId)).toBe(
         JSON.stringify(
           JSON.stringify(services.approvalPolicies.getApprovalPoliciesId)
@@ -4631,11 +4662,13 @@ describe('Qraft API Client primitive conversions', () => {
     });
 
     it('should handle valueOf()', () => {
+      const qraft = createAPIClient({ queryClient: new QueryClient() });
       const value = qraft.approvalPolicies.getApprovalPoliciesId.valueOf();
       expect(typeof value).toBe('object');
     });
 
     it('should handle Symbol.toStringTag', () => {
+      const qraft = createAPIClient({ queryClient: new QueryClient() });
       expect(
         Object.prototype.toString.call(
           qraft.approvalPolicies.getApprovalPoliciesId
@@ -4646,22 +4679,19 @@ describe('Qraft API Client primitive conversions', () => {
 });
 
 describe('Qraft API Client console logging', () => {
-  let qraft: ReturnType<typeof createAPIClient>;
-
-  beforeEach(() => {
-    qraft = createAPIClient({ queryClient: new QueryClient() });
-  });
-
   describe('Individual elements logging', () => {
     it('should log root client without errors', () => {
+      const qraft = createAPIClient({ queryClient: new QueryClient() });
       expect(() => console.log(qraft)).not.toThrow();
     });
 
     it('should log service without errors', () => {
+      const qraft = createAPIClient({ queryClient: new QueryClient() });
       expect(() => console.log(qraft.approvalPolicies)).not.toThrow();
     });
 
     it('should log operation without errors', () => {
+      const qraft = createAPIClient({ queryClient: new QueryClient() });
       expect(() =>
         console.log(qraft.approvalPolicies.getApprovalPoliciesId)
       ).not.toThrow();
@@ -4670,6 +4700,7 @@ describe('Qraft API Client console logging', () => {
 
   describe('Multiple levels mixed logging', () => {
     it('should log multiple client elements without errors', () => {
+      const qraft = createAPIClient({ queryClient: new QueryClient() });
       const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
 
       try {

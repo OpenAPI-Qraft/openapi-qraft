@@ -4,34 +4,10 @@ import camelCase from 'camelcase';
 import ts from 'typescript';
 import { createOperationCommonTSDoc } from '../lib/createOperationCommonTSDoc.js';
 import { filterUnusedTypes } from './filterUnusedTypes.js';
-import { createServiceOperationCancelQueriesNodes } from './service-operation.generated/ServiceOperationCancelQueries.js';
-import { createServiceOperationFetchInfiniteQueryNodes } from './service-operation.generated/ServiceOperationFetchInfiniteQuery.js';
-import { createServiceOperationFetchQueryNodes } from './service-operation.generated/ServiceOperationFetchQuery.js';
-import { createServiceOperationGetInfiniteQueryDataNodes } from './service-operation.generated/ServiceOperationGetInfiniteQueryData.js';
-import { createServiceOperationGetQueriesDataNodes } from './service-operation.generated/ServiceOperationGetQueriesData.js';
-import { createServiceOperationGetQueryDataNodes } from './service-operation.generated/ServiceOperationGetQueryData.js';
-import { createServiceOperationGetQueryStateNodes } from './service-operation.generated/ServiceOperationGetQueryState.js';
-import { createServiceOperationInvalidateQueriesNodes } from './service-operation.generated/ServiceOperationInvalidateQueries.js';
-import { createServiceOperationIsFetchingQueriesNodes } from './service-operation.generated/ServiceOperationIsFetchingQueries.js';
-import { createServiceOperationIsMutatingQueriesNodes } from './service-operation.generated/ServiceOperationIsMutatingQueries.js';
-import { createServiceOperationMutationFnNodes } from './service-operation.generated/ServiceOperationMutationFn.js';
-import { createServiceOperationQueryFnNodes } from './service-operation.generated/ServiceOperationQueryFn.js';
-import { createServiceOperationRefetchQueriesNodes } from './service-operation.generated/ServiceOperationRefetchQueries.js';
-import { createServiceOperationRemoveQueriesNodes } from './service-operation.generated/ServiceOperationRemoveQueries.js';
-import { createServiceOperationResetQueriesNodes } from './service-operation.generated/ServiceOperationResetQueries.js';
-import { createServiceOperationSetInfiniteQueryDataNodes } from './service-operation.generated/ServiceOperationSetInfiniteQueryData.js';
-import { createServiceOperationSetQueriesDataNodes } from './service-operation.generated/ServiceOperationSetQueriesData.js';
-import { createServiceOperationSetQueryDataNodes } from './service-operation.generated/ServiceOperationSetQueryData.js';
-import { createServiceOperationUseInfiniteQueryNodes } from './service-operation.generated/ServiceOperationUseInfiniteQuery.js';
-import { createServiceOperationUseIsFetchingQueriesNodes } from './service-operation.generated/ServiceOperationUseIsFetchingQueries.js';
-import { createServiceOperationUseIsMutatingNodes } from './service-operation.generated/ServiceOperationUseIsMutating.js';
-import { createServiceOperationUseMutationNodes } from './service-operation.generated/ServiceOperationUseMutation.js';
-import { createServiceOperationUseMutationStateNodes } from './service-operation.generated/ServiceOperationUseMutationState.js';
-import { createServiceOperationUseQueriesNodes } from './service-operation.generated/ServiceOperationUseQueries.js';
-import { createServiceOperationUseQueryNodes } from './service-operation.generated/ServiceOperationUseQuery.js';
-import { createServiceOperationUseSuspenseInfiniteQueryNodes } from './service-operation.generated/ServiceOperationUseSuspenseInfiniteQuery.js';
-import { createServiceOperationUseSuspenseQueriesNodes } from './service-operation.generated/ServiceOperationUseSuspenseQueries.js';
-import { createServiceOperationUseSuspenseQueryNodes } from './service-operation.generated/ServiceOperationUseSuspenseQuery.js';
+import {
+  createServicesMutationOperationNodes,
+  createServicesQueryOperationNodes,
+} from './serviceOperationNodes.js';
 import { createOperationMethodTSDocExample } from './tsdoc/createOperationMethodTSDocExample.js';
 
 const factory = ts.factory;
@@ -48,17 +24,33 @@ export const getServiceFactory = (
   operations: ServiceOperation[],
   options: ServiceFactoryOptions
 ) => {
+  const operationVariables = operations.map((operation) =>
+    getServiceOperationVariableFactory(service.typeName, operation)
+  );
+
+  const serviceVariable = getServiceVariableFactory(service, operations);
+
   const mainNodes = [
     getServiceInterfaceFactory(service, operations, options),
-    getServiceVariableFactory(service, operations),
+    ...operationVariables,
+    serviceVariable,
     ...getOperationsTypes(operations, options),
+  ];
+
+  const internalModulesTypeImports = filterUnusedTypes(
+    getModuleTypeImports(operations, options),
+    mainNodes
+  );
+  internalModulesTypeImports['@openapi-qraft/tanstack-query-react-types'] = [
+    ...(internalModulesTypeImports[
+      '@openapi-qraft/tanstack-query-react-types'
+    ] ?? []),
+    'QraftServiceOperationsToken',
   ];
 
   const importNodes = [
     getOpenAPISchemaImportsFactory(options.openapiTypesImportPath),
-    ...getServiceOperationImportsFactory(
-      filterUnusedTypes(getModuleTypeImports(operations, options), mainNodes)
-    ),
+    ...getServiceOperationImportsFactory(internalModulesTypeImports),
   ];
 
   return [...importNodes, ...mainNodes];
@@ -505,14 +497,21 @@ const getServiceVariableFactory = (
         factory.createVariableDeclaration(
           factory.createIdentifier(service.variableName),
           undefined,
-          factory.createTypeLiteralNode(
-            operations.map((operation) =>
-              getServiceVariableTypeFactory(operation)
+          undefined,
+          factory.createAsExpression(
+            factory.createObjectLiteralExpression(
+              operations.map((operation) =>
+                factory.createShorthandPropertyAssignment(
+                  factory.createIdentifier(operation.name),
+                  undefined
+                )
+              ),
+              true
+            ),
+            factory.createTypeReferenceNode(
+              factory.createIdentifier('const'),
+              undefined
             )
-          ),
-          factory.createObjectLiteralExpression(
-            operations.map(getServiceVariablePropertyFactory),
-            true
           )
         ),
       ],
@@ -631,75 +630,103 @@ const getOperationErrorTypeName = (operation: ServiceOperation) =>
 const getOperationBodyTypeName = (operation: ServiceOperation) =>
   camelCase(`${operation.name}-Body`, { pascalCase: true });
 
-const getServiceVariableTypeFactory = (operation: ServiceOperation) => {
-  const node = factory.createPropertySignature(
-    undefined,
-    factory.createIdentifier(operation.name),
-    undefined,
-    factory.createTypeLiteralNode([
-      factory.createPropertySignature(
-        undefined,
-        factory.createIdentifier('schema'),
-        undefined,
-        factory.createTypeReferenceNode(getOperationSchemaTypeName(operation))
-      ),
-    ])
-  );
-
-  addOperationTSDoc(node, operation);
-
-  return node;
-};
-
-const getServiceVariablePropertyFactory = (operation: ServiceOperation) => {
-  return factory.createPropertyAssignment(
-    factory.createIdentifier(operation.name),
-    factory.createObjectLiteralExpression(
+const getServiceOperationVariableFactory = (
+  serviceName: string,
+  operation: ServiceOperation
+) => {
+  const variableNode = factory.createVariableStatement(
+    [factory.createToken(ts.SyntaxKind.ExportKeyword)],
+    factory.createVariableDeclarationList(
       [
-        factory.createPropertyAssignment(
-          factory.createIdentifier('schema'),
-          factory.createObjectLiteralExpression(
-            [
-              factory.createPropertyAssignment(
-                factory.createIdentifier('method'),
-                factory.createStringLiteral(operation.method)
-              ),
-              factory.createPropertyAssignment(
-                factory.createIdentifier('url'),
-                factory.createStringLiteral(operation.path)
-              ),
-              operation.requestBody?.content
-                ? factory.createPropertyAssignment(
-                    factory.createIdentifier('mediaType'),
-                    factory.createArrayLiteralExpression(
-                      Object.keys(operation.requestBody.content).map(
-                        (mediaType) => factory.createStringLiteral(mediaType)
-                      )
-                    )
-                  )
-                : null,
+        factory.createVariableDeclaration(
+          factory.createIdentifier(operation.name),
+          undefined,
+          undefined,
+          factory.createAsExpression(
+            factory.createObjectLiteralExpression(
+              [
+                factory.createPropertyAssignment(
+                  factory.createIdentifier('schema'),
+                  factory.createObjectLiteralExpression(
+                    [
+                      factory.createPropertyAssignment(
+                        factory.createIdentifier('method'),
+                        factory.createStringLiteral(operation.method)
+                      ),
+                      factory.createPropertyAssignment(
+                        factory.createIdentifier('url'),
+                        factory.createStringLiteral(operation.path)
+                      ),
+                      operation.requestBody?.content
+                        ? factory.createPropertyAssignment(
+                            factory.createIdentifier('mediaType'),
+                            factory.createArrayLiteralExpression(
+                              Object.keys(operation.requestBody.content).map(
+                                (mediaType) =>
+                                  factory.createStringLiteral(mediaType)
+                              )
+                            )
+                          )
+                        : null,
 
-              operation.security
-                ? factory.createPropertyAssignment(
-                    factory.createIdentifier('security'),
-                    factory.createArrayLiteralExpression(
-                      getOperationSecuritySchemas(operation.security).map(
-                        (securitySchemaName) =>
-                          factory.createStringLiteral(securitySchemaName)
-                      )
-                    )
+                      operation.security
+                        ? factory.createPropertyAssignment(
+                            factory.createIdentifier('security'),
+                            factory.createArrayLiteralExpression(
+                              getOperationSecuritySchemas(
+                                operation.security
+                              ).map((securitySchemaName) =>
+                                factory.createStringLiteral(securitySchemaName)
+                              )
+                            )
+                          )
+                        : null,
+                    ].filter((node): node is NonNullable<typeof node> =>
+                      Boolean(node)
+                    ),
+                    true
                   )
-                : null,
-            ].filter((node): node is NonNullable<typeof node> => Boolean(node)),
-            true
+                ),
+              ],
+              true
+            ),
+            factory.createTypeLiteralNode([
+              factory.createPropertySignature(
+                undefined,
+                factory.createIdentifier('schema'),
+                undefined,
+                factory.createTypeReferenceNode(
+                  getOperationSchemaTypeName(operation)
+                )
+              ),
+              factory.createPropertySignature(
+                undefined,
+                factory.createComputedPropertyName(
+                  factory.createIdentifier('QraftServiceOperationsToken')
+                ),
+                undefined,
+                factory.createIndexedAccessTypeNode(
+                  factory.createTypeReferenceNode(
+                    factory.createIdentifier(serviceName),
+                    undefined
+                  ),
+                  factory.createLiteralTypeNode(
+                    factory.createStringLiteral(operation.name)
+                  )
+                )
+              ),
+            ])
           )
         ),
       ],
-      true
+      ts.NodeFlags.Const
     )
   );
-};
 
+  addOperationTSDoc(variableNode, operation);
+
+  return variableNode;
+};
 const createMultilineComment = (comment: string[]) => {
   const output = comment.flatMap((line) =>
     line.includes('\n') ? line.split('\n') : line
@@ -735,45 +762,6 @@ const getOperationSecuritySchemas = (
   security.flatMap((security) =>
     Object.keys(security).map((securitySchemaName) => securitySchemaName)
   );
-
-const createServicesQueryOperationNodes = ({
-  omitOperationQueryFnNodes,
-}: {
-  omitOperationQueryFnNodes: boolean;
-}) => [
-  ...createServiceOperationCancelQueriesNodes(),
-  ...createServiceOperationUseQueryNodes(),
-  ...createServiceOperationFetchInfiniteQueryNodes(),
-  ...createServiceOperationFetchQueryNodes(),
-  ...createServiceOperationGetInfiniteQueryDataNodes(),
-  ...createServiceOperationGetQueriesDataNodes(),
-  ...createServiceOperationGetQueryDataNodes(),
-  ...createServiceOperationGetQueryStateNodes(),
-  ...createServiceOperationInvalidateQueriesNodes(),
-  ...createServiceOperationIsFetchingQueriesNodes(),
-  ...(omitOperationQueryFnNodes ? [] : createServiceOperationQueryFnNodes()),
-  ...createServiceOperationRefetchQueriesNodes(),
-  ...createServiceOperationRemoveQueriesNodes(),
-  ...createServiceOperationResetQueriesNodes(),
-  ...createServiceOperationSetInfiniteQueryDataNodes(),
-  ...createServiceOperationSetQueriesDataNodes(),
-  ...createServiceOperationSetQueryDataNodes(),
-  ...createServiceOperationUseInfiniteQueryNodes(),
-  ...createServiceOperationUseIsFetchingQueriesNodes(),
-  ...createServiceOperationUseQueriesNodes(),
-  ...createServiceOperationUseQueryNodes(),
-  ...createServiceOperationUseSuspenseInfiniteQueryNodes(),
-  ...createServiceOperationUseSuspenseQueriesNodes(),
-  ...createServiceOperationUseSuspenseQueryNodes(),
-];
-
-const createServicesMutationOperationNodes = () => [
-  ...createServiceOperationUseMutationNodes(),
-  ...createServiceOperationUseIsMutatingNodes(),
-  ...createServiceOperationIsMutatingQueriesNodes(),
-  ...createServiceOperationMutationFnNodes(),
-  ...createServiceOperationUseMutationStateNodes(),
-];
 
 const getMethodSignatureNodes = (
   nodes: ts.Node[]

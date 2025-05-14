@@ -267,4 +267,158 @@ during code generation.
     });
     ```
   </TabItem>
+  <TabItem value="custom-api-client" label={<span style={{verticalAlign: 'middle'}}>with <code>--create-api-client-fn</code> option</span>}>
+    Using the `--create-api-client-fn` option allows you to customize the API client creation function with specific parameters.
+    You can specify which services and callback functions should be included in the client by default.
+
+    > 💡 When generating multiple API client functions with different parameters, it might be more convenient to use a configuration file
+    > instead of command-line parameters. See the [Redocly configuration documentation](/codegen/CLI/redocly-config.mdx#generating-multiple-api-client-functions)
+    > for more details on how to configure multiple _create API client functions_ in a YAML file.
+
+    #### Example 1: All services but no callbacks by default
+
+    _Generate a client with **all services** but **no callbacks** by default_
+
+    ```bash
+    --create-api-client-fn createServicesOnlyClient services:all callbacks:none
+    ```
+
+    ```tsx title="src/ServicesOnlyClient.tsx"
+    import { createServicesOnlyClient } from './api/create-services-only-client';
+    import { requestFn } from '@openapi-qraft/react';
+    import { useQuery } from '@openapi-qraft/react/callbacks';
+    import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+
+    const queryClient = new QueryClient();
+
+    // Create a client with all services but we need to explicitly specify which callbacks to use
+    const api = createServicesOnlyClient(
+      {
+        requestFn,
+        queryClient,
+        baseUrl: 'https://api.example.com/v1',
+      },
+      // All services are available by default
+      // We only need to specify the callbacks we want to use
+      {
+        // 1️⃣ Specify which callbacks we want to include
+        useQuery,
+      }
+    });
+
+    function UserProfile() {
+      // We can use the useQuery hook because we explicitly enabled it
+      const { data, error, isPending } =
+        api.users.getUserById.useQuery({
+          path: { userId: "123" },
+        });
+
+      if (isPending) return <div>Loading...</div>;
+      if (error) return <div>Error: {error.message}</div>;
+
+      return <div>User name: {data?.name}</div>;
+    }
+    ```
+
+    #### Example 2: Specific callbacks but no services by default
+
+    _Generate a client with **specific callbacks** but **no services** by default_
+
+    ```bash
+    --create-api-client-fn createCallbacksOnlyClient services:none callbacks:useQuery,useMutation
+    ```
+
+    ```tsx title="src/CallbacksOnlyClient.tsx"
+    import { createCallbacksOnlyClient } from './api/create-callbacks-only-client';
+    import { users } from './api/services/Users'; // Import only needed service (‼️)
+    import { requestFn } from '@openapi-qraft/react';
+    import { useSuspenseQuery } from '@openapi-qraft/react/callbacks';
+    import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+
+    const queryClient = new QueryClient();
+
+    // Create a client with useQuery and useMutation callbacks but we need to explicitly specify which services to use
+    const usersAPI = createCallbacksOnlyClient(
+      // 1️⃣ Specify which service (‼️) we want to include
+      users,
+      {
+        requestFn,
+        queryClient,
+        baseUrl: 'https://api.example.com/v1',
+      },
+      // 2️⃣ Specify which callbacks we want to include
+      // ✔︎ useQuery and useMutation callbacks are already included by default
+      {
+        useSuspenseQuery,
+      }
+    );
+
+    function UserProfile() {
+      // 💡 We can use the useQuery hook as it's included by default
+      const { data, error, isPending } =
+        usersAPI.getUserById.useQuery({
+          path: { userId: "123" },
+        });
+
+      // 💎 We can also use the useSuspenseQuery hook because we explicitly enabled it
+      const { data: allUsers } = usersAPI.allUserList.useSuspenseQuery();
+
+      if (isPending) return <div>Loading...</div>;
+      if (error) return <div>Error: {error.message}</div>;
+
+      return (
+        <>
+          <div>User name: {data?.name}</div>
+          <h4>All users:</h4>
+          <ul>{allUsers.map(user => <li key={user.id}>{user.name}</li>)}</ul>
+        </>
+      );
+    }
+    ```
+
+    #### Example 3: Minimal API client (no services, no callbacks by default)
+
+    _Generate a completely minimal client with **nothing included** by default_
+
+    ```bash
+    --create-api-client-fn createMinimalAPIClient services:none callbacks:none
+    ```
+
+    ```tsx title="src/MinimalApiClient.tsx"
+    import { createMinimalAPIClient } from './api/create-minimal-api-client';
+    import { requestFn } from '@openapi-qraft/react';
+    import { getUserById } from './api/services/Users'; // Import only needed operation (❗)
+    import { useQuery } from '@openapi-qraft/react/callbacks';
+    import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+
+    const queryClient = new QueryClient();
+
+    // Create a minimal client by explicitly specifying only the necessary operation (❗) and callbacks
+    const getUserByIdAPI = createMinimalAPIClient(
+      // 1️⃣ Explicitly specify which operation(❗) or service(‼️) we need
+      getUserById, // You could also use `users`, `{ users, files }`.
+      {
+        requestFn,
+        queryClient,
+        baseUrl: 'https://api.example.com/v1',
+      },
+      // 2️⃣ Explicitly specify which callbacks we need
+      {
+        useQuery,
+      }
+    });
+
+    function UserProfile() {
+      const { data, error, isPending } =
+        getUserByIdAPI.useQuery({
+          path: { userId: "123" },
+        });
+
+      if (isPending) return <div>Loading...</div>;
+      if (error) return <div>Error: {error.message}</div>;
+
+      return <div>User name: {data?.name}</div>;
+    }
+    ```
+  </TabItem>
 </Tabs>
