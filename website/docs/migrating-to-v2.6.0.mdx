@@ -1,0 +1,96 @@
+---
+sidebar_position: 151
+sidebar_label: Migrating to v2.6.0
+---
+
+# Migrating to OpenAPI Qraft v2.6.0
+
+This guide outlines the steps required to migrate your project to OpenAPI Qraft v2.6.0.
+This version introduces a minor but important change to improve type inference and simplify the API.
+
+:::info
+Speed up your migration process with our automated [Codemod tool 🪄](#automated-migration-)!
+:::
+
+## Why These Changes Were Necessary
+
+While v2.6.0 is technically a minor version update, it includes a small breaking change that affects a limited number of users who work with low-level APIs. We made this decision for several important reasons:
+
+1. **Enhanced Modularity**: The API client can now be generated in a fully modular way, supporting new options like `--create-api-client-fn` that allow for more customized client generation.
+
+2. **More Precise Type Definitions**: To support these new options, we needed to make the return type from `сreateAPIClient()` function more specific than before.
+
+3. **Simplified Manual Creation**: When creating manually using the `qraftAPIClient()` utility, you no longer need to specify custom types.
+  The `сreateAPIClient()` function now acts as a direct proxy for `qraftAPIClient()`, with some additional code generation features.
+
+4. **Increased Flexibility**: These changes significantly increase the flexibility of the API Client and simplify its maintenance going forward.
+
+With these benefits in mind, we made the difficult decision to introduce this minor breaking change.
+
+## Key Changes
+
+### Removal of Generic Type Parameters from `qraftAPIClient`
+
+- **Change**: Generic type parameters have been removed from `qraftAPIClient` function calls.
+- **Impact**: You no longer need to specify `<Services, Callbacks>` when calling `qraftAPIClient`. The types are now inferred automatically from the arguments.
+
+**Before:**
+```tsx
+const api = qraftAPIClient<Services, Callbacks>(services, callbacks, options);
+```
+
+**After:**
+```tsx
+const api = qraftAPIClient(services, callbacks, options);
+```
+
+### Type Updates Required in Contexts or Variables
+
+- **Change**: Types created by the API client after calling `createAPIClient` may need to be updated.
+- **Impact**: If you're using the return type of `createAPIClient` in contexts or other variables, you'll need to update those types.
+
+**Before:**
+```tsx
+const APIContext = createContext<ReturnType<typeof createAPIClient>>>(null!);
+```
+
+**After:**
+```tsx
+import { type services } from './api';
+import { type APIDefaultQueryClientServices } from '@openapi-qraft/react';
+const APIContext = createContext<APIDefaultQueryClientServices<typeof services>>(null!);
+```
+
+## Migration Steps
+
+1. **Run the Codemod**: Use our automated codemod to remove generic type parameters from `qraftAPIClient` calls.
+2. **Update Context Types**: Update any types in contexts or variables that reference the return type of `createAPIClient`.
+3. **Test Your Application**: Ensure that your application works correctly after the changes.
+
+## Automated Migration 🪄
+
+:::note
+This codemod is primarily needed for users who are writing low-level libraries or manually creating API clients without
+using the generated `createAPIClient` function. Most users who rely on the generated `createAPIClient` function don't need to run this codemod.
+:::
+
+We provide a Codemod script powered by [`jscodeshift`](https://github.com/facebook/jscodeshift)
+to automate most of the migration process.
+
+Run this command in your project root to apply the migrations:
+
+```bash
+npx jscodeshift@latest --extensions=tsx,ts --parser=tsx -t https://raw.githubusercontent.com/OpenAPI-Qraft/openapi-qraft/main/packages/react-client/src/migrate-to-v2.6.0-codemod.ts ./src/
+```
+
+If you're using a custom package name (not `@openapi-qraft/react-client`), you can specify it with the `--packageName` option:
+
+```bash
+npx jscodeshift@latest --extensions=tsx,ts --parser=tsx -t https://raw.githubusercontent.com/OpenAPI-Qraft/openapi-qraft/main/packages/react-client/src/migrate-to-v2.6.0-codemod.ts --packageName='@custom/package' ./src/
+```
+
+This command will transform all `.tsx` and `.ts` files in your `src` directory.
+After running the script, review the changes and make any necessary manual adjustments, especially for context types
+or other variables that use the return type of `createAPIClient`.
+
+Following these steps and utilizing the automated migration tool will help you smoothly transition to OpenAPI Qraft v2.6.0.

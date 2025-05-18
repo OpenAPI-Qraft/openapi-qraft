@@ -2,3 +2,6 @@
 /openapi.ts
 /api
 /queryable-write-operations-api
+/internal-api
+/files-api
+

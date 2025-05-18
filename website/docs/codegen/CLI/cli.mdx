@@ -96,6 +96,34 @@ npx openapi-qraft --plugin tanstack-query-react --plugin openapi-typescript http
 
 - **`--explicit-component-exports`:** Enabling this option will export API components as separate type aliases, alongside `components` interface.
 
+- **`--create-api-client-fn <functionName> [options...]`:** Configure API client creation function. Allows specifying the function name used to create the API client, as well as fine-tuning included services and callbacks.
+  You can specify this option **multiple times** to generate **several different API client** creation functions from a single OpenAPI document - for example,
+  a fully-featured client for Node.js and a lightweight client for React or service workers. _(optional)_
+  See examples on the [`useQuery()`](/hooks/useQuery.mdx#example) documentation page.
+  - **Options:**
+    - `filename:<name>` - filename where the function will be generated (defaults to function name)
+    - `services:[all|none]` - Specify whether the generated API client should include services: either all available services, or no services by default.
+      - `all` - include all available services
+      - `none` - don't include any services by default (they must be specified when calling the function)
+    - `callbacks:[all|none|callback1,callback2,...]` - list of callbacks to be included in the API client by default
+      - `all` - include all available callbacks (useQuery, useMutation, setQueryData, etc.)
+      - `none` - don't include any callbacks by default (they must be specified when calling the function)
+      - `useQuery,useMutation,...` - list of specific callbacks to include
+  - **Examples:**
+    - `--create-api-client-fn createAPIClient services:all callbacks:all` - creates the `createAPIClient()` function that
+      includes all services and all callbacks by default (_default_ behavior)
+    - `--create-api-client-fn createMinimalAPIClient services:none callbacks:none` - creates the `createMinimalAPIClient()`
+    function that generates a **super lightweight 🪶** API client with _zero overhead_ - no default _services_ or _callbacks_ included. Perfect for
+    building a **minimal bundle size** client where you explicitly control which services and callbacks to include.
+    - `--create-api-client-fn createCustomClient filename:create-custom-api services:none callbacks:setQueryData,getQueryData` - creates
+      the `createCustomClient()` function in the `create-custom-api.ts` file with no default services and only `setQueryData()` and `getQueryData()` callbacks
+
+  ::::tip
+  When generating multiple API client functions with different parameters, it might be more convenient to use a configuration file
+  instead of command-line parameters. See the [Redocly configuration documentation](/codegen/CLI/redocly-config.mdx#generating-multiple-api-client-functions)
+  for more details on how to configure multiple _create API client functions_ in a YAML file.
+  ::::
+
 - **`--redocly [config]`:** Use the Redocly configuration to generate multiple API clients. If the `[config]` parameter is not specified, the default Redocly configuration will be used: `[redocly.yaml | redocly.yml | .redocly.yaml | .redocly.yml]`. _(optional)_
   - Examples:
     - `--redocly` - use the default Redocly configuration file

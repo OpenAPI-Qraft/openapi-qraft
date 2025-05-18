@@ -1,0 +1,150 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`migrate-to-v2.6.0-codemod > correctly handles mixed imports > mixed imports fixture 1`] = `
+"// Import from our package
+import { qraftAPIClient } from '@openapi-qraft/react-client';
+// Import another function with the same name from another package
+import { qraftAPIClient as otherClient } from 'other-library';
+
+// This call should be modified (it uses our import)
+const api = qraftAPIClient(services, callbacks, options);
+
+// This call should NOT be modified (it uses another import)
+const otherApi = otherClient<OtherServices, OtherCallbacks>(
+  otherServices,
+  otherCallbacks,
+  otherOptions
+);
+
+interface Services {
+  service1: {
+    operation1: {
+      schema: any;
+    };
+  };
+}
+
+interface Callbacks {
+  operation1: () => void;
+}
+
+interface OtherServices {
+  otherService: {
+    otherOperation: {
+      schema: any;
+    };
+  };
+}
+
+interface OtherCallbacks {
+  otherOperation: () => void;
+}
+"
+`;
+
+exports[`migrate-to-v2.6.0-codemod > does not modify files where qraftAPIClient is imported from another package > other imports fixture 1`] = `
+"// Import from another package, should not be modified
+import { qraftAPIClient } from 'other-library';
+
+// Same identifier but different source
+const api = qraftAPIClient<Services, Callbacks>(services, callbacks, options);
+
+// Local function with the same name
+function qraftAPIClient<T, K>(a: T, b: K, c: any) {
+  return { a, b, c };
+}
+
+// Local function call should not be modified
+const localApi = qraftAPIClient<number, string>(1, "test", {});
+
+interface Services {
+  service1: {
+    operation1: {
+      schema: any;
+    };
+  };
+}
+
+interface Callbacks {
+  operation1: () => void;
+} "
+`;
+
+exports[`migrate-to-v2.6.0-codemod > removes generics from API client > generics fixture 1`] = `
+"import { qraftAPIClient } from '@openapi-qraft/react-client';
+
+const services: Services = {
+  service1: {
+    operation1: {
+      schema: {},
+    },
+  },
+};
+
+const callbacks: Callbacks = {
+  operation1: () => {},
+};
+
+const options = {
+  requestFn: () => Promise.resolve({}),
+  baseUrl: 'https://api.example.com',
+  queryClient: {},
+};
+
+const requestFn = () => Promise.resolve({});
+const baseUrl = 'https://api.example.com';
+const queryClient = {};
+
+const api = qraftAPIClient(services, callbacks, options);
+
+const api2 = qraftAPIClient(services, callbacks, {
+  requestFn,
+  baseUrl,
+  queryClient,
+});
+
+const api3 = qraftAPIClient(services, callbacks, {
+  queryClient,
+});
+
+interface Services {
+  service1: {
+    operation1: {
+      schema: any;
+    };
+  };
+}
+
+interface Callbacks {
+  operation1: () => void;
+}
+"
+`;
+
+exports[`migrate-to-v2.6.0-codemod > supports custom package name option > custom package fixture 1`] = `
+"// Import from custom package (not standard '@openapi-qraft/react-client')
+import { qraftAPIClient } from '@custom/package';
+
+// This call should be modified when correct package name is specified in options
+const api = qraftAPIClient(services, callbacks, options);
+
+// Additional call
+const api2 = qraftAPIClient(services, callbacks, {
+  requestFn,
+  baseUrl,
+  queryClient,
+});
+
+interface Services {
+  service1: {
+    operation1: {
+      schema: any;
+    };
+  };
+}
+
+interface Callbacks {
+  operation1: () => void;
+}
+"
+`;

@@ -267,4 +267,181 @@ describe('TanStack Query React Client Generation', () => {
       );
     });
   });
+
+  describe('--create-api-client-fn creates multiple clients', () => {
+    beforeAll(async () => {
+      const { QraftCommand } = await import(
+        '@openapi-qraft/plugin/lib/QraftCommand'
+      );
+      const { plugin } = await import('./plugin.js');
+      const command = new QraftCommand();
+      plugin.setupCommand(command);
+
+      await command.parseAsync([
+        'dummy-node',
+        'dummy-qraft-bin',
+        openAPIDocumentFixturePath,
+        '--clean',
+        '-o',
+        '/mock-fs',
+        '--openapi-types-import-path',
+        '../../openapi.d.ts',
+        '--create-api-client-fn',
+        'createAPIClient',
+        '--create-api-client-fn',
+        'createAPIOperationClient',
+        'callbacks:useQuery,useMutation',
+        'services:none',
+        'filename:create-api-operation-client',
+      ]);
+    });
+
+    test('create-api-operation-client.ts', async () => {
+      expect(
+        fs.readFileSync('/mock-fs/create-api-operation-client.ts', 'utf-8')
+      ).toMatchFileSnapshot(
+        './__snapshots__/create-api-client-fn/multiple-clients-create-api-operation-client.ts.snapshot.ts'
+      );
+    });
+
+    test('createAPIClient.ts', async () => {
+      expect(
+        fs.readFileSync('/mock-fs/createAPIClient.ts', 'utf-8')
+      ).toMatchFileSnapshot(
+        './__snapshots__/create-api-client-fn/multiple-clients-createAPIClient.ts.snapshot.ts'
+      );
+    });
+  });
+
+  describe('--create-api-client-fn with specific callbacks and custom filename', () => {
+    beforeAll(async () => {
+      const { QraftCommand } = await import(
+        '@openapi-qraft/plugin/lib/QraftCommand'
+      );
+      const { plugin } = await import('./plugin.js');
+      const command = new QraftCommand();
+      plugin.setupCommand(command);
+
+      await command.parseAsync([
+        'dummy-node',
+        'dummy-qraft-bin',
+        openAPIDocumentFixturePath,
+        '--clean',
+        '-o',
+        '/mock-fs',
+        '--openapi-types-import-path',
+        '../../openapi.d.ts',
+        '--create-api-client-fn',
+        'createAPIOperationClient',
+        'callbacks:useQuery,useMutation',
+        'filename:create-api-operation-client',
+      ]);
+    });
+
+    test('create-api-operation-client.ts', async () => {
+      expect(
+        fs.readFileSync('/mock-fs/create-api-operation-client.ts', 'utf-8')
+      ).toMatchFileSnapshot(
+        './__snapshots__/create-api-client-fn/specific-hooks-create-api-operation-client.ts.snapshot.ts'
+      );
+    });
+  });
+
+  describe('--create-api-client-fn with "all" value', () => {
+    beforeAll(async () => {
+      const { QraftCommand } = await import(
+        '@openapi-qraft/plugin/lib/QraftCommand'
+      );
+      const { plugin } = await import('./plugin.js');
+      const command = new QraftCommand();
+      plugin.setupCommand(command);
+
+      await command.parseAsync([
+        'dummy-node',
+        'dummy-qraft-bin',
+        openAPIDocumentFixturePath,
+        '--clean',
+        '-o',
+        '/mock-fs',
+        '--openapi-types-import-path',
+        '../../openapi.d.ts',
+        '--create-api-client-fn',
+        'createAPIClient',
+        'callbacks:all',
+        'services:all',
+      ]);
+    });
+
+    test('createAPIClient.ts', async () => {
+      expect(
+        fs.readFileSync('/mock-fs/createAPIClient.ts', 'utf-8')
+      ).toMatchFileSnapshot(
+        './__snapshots__/create-api-client-fn/all-createAPIClient.ts.snapshot.ts'
+      );
+    });
+  });
+
+  describe('--create-api-client-fn with "none" value', () => {
+    beforeAll(async () => {
+      const { QraftCommand } = await import(
+        '@openapi-qraft/plugin/lib/QraftCommand'
+      );
+      const { plugin } = await import('./plugin.js');
+      const command = new QraftCommand();
+      plugin.setupCommand(command);
+
+      await command.parseAsync([
+        'dummy-node',
+        'dummy-qraft-bin',
+        openAPIDocumentFixturePath,
+        '--clean',
+        '-o',
+        '/mock-fs',
+        '--openapi-types-import-path',
+        '../../openapi.d.ts',
+        '--create-api-client-fn',
+        'createAPIClient',
+        'callbacks:none',
+        'services:none',
+      ]);
+    });
+
+    test('createAPIClient.ts', async () => {
+      expect(
+        fs.readFileSync('/mock-fs/createAPIClient.ts', 'utf-8')
+      ).toMatchFileSnapshot(
+        './__snapshots__/create-api-client-fn/none-createAPIClient.ts.snapshot.ts'
+      );
+    });
+  });
+
+  describe('default behavior (no --create-api-client-fn option)', () => {
+    beforeAll(async () => {
+      const { QraftCommand } = await import(
+        '@openapi-qraft/plugin/lib/QraftCommand'
+      );
+      const { plugin } = await import('./plugin.js');
+      const command = new QraftCommand();
+      plugin.setupCommand(command);
+
+      await command.parseAsync([
+        'dummy-node',
+        'dummy-qraft-bin',
+        openAPIDocumentFixturePath,
+        '--clean',
+        '-o',
+        '/mock-fs',
+        '--openapi-types-import-path',
+        '../../openapi.d.ts',
+      ]);
+    });
+
+    test('create-api-client.ts', async () => {
+      expect(
+        fs.readFileSync('/mock-fs/create-api-client.ts', 'utf-8')
+      ).toMatchFileSnapshot(
+        './__snapshots__/create-api-client-fn/default-create-api-client.ts.snapshot.ts'
+      );
+    });
+  });
 });

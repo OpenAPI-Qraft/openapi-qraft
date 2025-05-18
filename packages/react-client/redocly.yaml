@@ -36,3 +36,25 @@ apis:
       filter-services:
         - '/approval_policies/**'
         - '/files/**'
+  files:
+    root: ../test-fixtures/openapi.json
+    x-openapi-qraft:
+      plugin:
+        tanstack-query-react: true
+        openapi-typescript: true
+      output-dir: src/tests/fixtures/files-api
+      clean: true
+      openapi-types-file-name: internal-openapi.ts
+      postfix-services: ''
+      explicit-import-extensions: true
+      filter-services:
+        - '/files/**'
+        - '/approval_policies/{approval_policy_id}'
+      create-api-client-fn:
+        createInternalNodeAPIClient:
+          filename: create-internal-api-client
+          services: all
+          callbacks: all
+        createInternalReactAPIClient:
+          services: none
+          callbacks: ['setQueryData', 'getQueryData', 'getQueryKey', 'getInfiniteQueryKey']

@@ -106,8 +106,9 @@ describe('configParser', () => {
   it('should parse complex nested structures', () => {
     expect(
       parseConfigToArgs({
-        'api-client': {
+        'create-api-client-fn': {
           createAPIClient: {
+            filename: 'create-api-client',
             services: ['all'],
             callbacks: ['all'],
           },
@@ -118,11 +119,12 @@ describe('configParser', () => {
         },
       })
     ).toEqual([
-      '--api-client',
+      '--create-api-client-fn',
       'createAPIClient',
+      'filename:create-api-client',
       'services:all',
       'callbacks:all',
-      '--api-client',
+      '--create-api-client-fn',
       'createUsersAPIClient',
       'services:users,profile',
       'callbacks:setQueryData,getQueryData,fetchQuery',
