@@ -127,6 +127,7 @@ function parseCreateApiClientFn(
     const availableCallbackNames = [
       'all',
       'none',
+      'operationInvokeFn',
       ...getAllAvailableCallbackNames(),
     ];
     const unknownCallback = lastOptionConfig.callbacks.find(
