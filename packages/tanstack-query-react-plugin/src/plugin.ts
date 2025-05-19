@@ -45,16 +45,7 @@ export const plugin: QraftCommandPlugin = {
           'Name, default callbacks and services of the generated `createAPIClient` function'
         )
           .argParser(parseCreateApiClientFn)
-          .default([
-            [
-              'createAPIClient',
-              {
-                services: ['all'],
-                callbacks: ['all'],
-                filename: ['create-api-client'],
-              },
-            ],
-          ])
+          .default(createApiClientFnDefault)
       )
       .action(async ({ spinner, output, args, services, schema }, resolve) => {
         return void (await generateCode({
@@ -108,6 +99,13 @@ function parseCreateApiClientFn(
   value: string,
   previous: unknown
 ): CreateAPIClientFnArg[] {
+  if (
+    Array.isArray(previous) &&
+    JSON.stringify(previous) === JSON.stringify(createApiClientFnDefault)
+  ) {
+    previous = [];
+  }
+
   const nextValue = parseOptionSubValues(
     value,
     Array.isArray(previous) ? previous : undefined
@@ -129,6 +127,7 @@ function parseCreateApiClientFn(
     const availableCallbackNames = [
       'all',
       'none',
+      'operationInvokeFn',
       ...getAllAvailableCallbackNames(),
     ];
     const unknownCallback = lastOptionConfig.callbacks.find(
@@ -190,3 +189,14 @@ type CreateAPIClientFnArg = [
   functionName: string,
   value: Partial<CreateAPIClientFnOptions>,
 ];
+
+const createApiClientFnDefault = [
+  [
+    'createAPIClient',
+    {
+      services: ['all'],
+      callbacks: ['all'],
+      filename: ['create-api-client'],
+    },
+  ],
+] as const;
