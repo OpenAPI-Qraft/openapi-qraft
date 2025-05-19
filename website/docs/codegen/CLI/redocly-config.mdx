@@ -55,7 +55,7 @@ apis:
 Using the configuration example above, you can generate API clients for both the main and legacy APIs with a single command:
 
 ```bash npm2yarn
-npx @openapi-qraft/cli --redocly
+npx openapi-qraft --redocly
 ```
 
 This command will:
@@ -65,7 +65,7 @@ This command will:
 If your configuration file is located elsewhere, you can specify its path:
 
 ```bash npm2yarn
-npx @openapi-qraft/cli --redocly ./path/to/redocly.yaml
+npx openapi-qraft --redocly ./path/to/redocly.yaml
 ```
 
 #### Generating Specific APIs
@@ -73,7 +73,7 @@ npx @openapi-qraft/cli --redocly ./path/to/redocly.yaml
 You can also generate clients for specific APIs by listing their names:
 
 ```bash npm2yarn
-npx @openapi-qraft/cli legacy --redocly
+npx openapi-qraft legacy --redocly
 ```
 
 This is particularly useful when you want to generate only certain APIs from your configuration.
