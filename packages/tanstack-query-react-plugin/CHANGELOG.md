@@ -1,5 +1,13 @@
 # @openapi-qraft/tanstack-query-react-plugin
 
+## 2.6.1
+
+### Patch Changes
+
+- 8d6385a: Added `operationInvokeFn` as an allowed callback.
+- 64e5860: Do not generate default `createAPIClient` when custom is provided.
+  - @openapi-qraft/plugin@2.6.1
+
 ## 2.6.0
 
 ### Minor Changes
