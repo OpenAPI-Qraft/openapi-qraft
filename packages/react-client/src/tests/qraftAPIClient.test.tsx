@@ -2312,6 +2312,8 @@ describe('Qraft uses Operation Mutation Function', () => {
           verification_document_back: 'back',
           verification_document_front: 'front',
         },
+        signal: new AbortController().signal,
+        meta: { someExtraInfo: 'yep' },
       },
       requestFnSpy
     );
@@ -2335,6 +2337,8 @@ describe('Qraft uses Operation Mutation Function', () => {
           verification_document_back: 'back',
           verification_document_front: 'front',
         },
+        signal: new AbortController().signal,
+        meta: { someExtraInfo: 'yep' },
       }
     );
   });

@@ -10,11 +10,24 @@ export interface ServiceOperationMutationFn<
   TMutationParams,
   TError,
 > {
-  (
-    options: ServiceOperationMutationFnOptions<TBody, TMutationParams>,
+  <
+    TMeta extends Record<string, any>,
+    TSignal extends AbortSignal = AbortSignal,
+  >(
+    options: ServiceOperationMutationFnOptions<
+      TBody,
+      TMutationParams,
+      TMeta,
+      TSignal
+    >,
     client?: (
       schema: TSchema,
-      options: ServiceOperationMutationFnOptions<TBody, TMutationParams>
+      options: ServiceOperationMutationFnOptions<
+        TBody,
+        TMutationParams,
+        TMeta,
+        TSignal
+      >
     ) => Promise<RequestFnResponse<TMutationData, TError>>
   ): Promise<RequestFnResponse<TMutationData, TError>>;
 }
