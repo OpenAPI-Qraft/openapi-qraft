@@ -770,7 +770,7 @@ export interface FilesService {
         /** @summary Upload a files by ID */
         isMutating<TContext>(filters?: MutationFiltersByParameters<PostFilesBody, PostFilesData, PostFilesMutationParameters, PostFilesError | Error, TContext> | MutationFiltersByMutationKey<PostFilesSchema, PostFilesBody, PostFilesData, PostFilesMutationParameters, PostFilesError | Error, TContext>): number;
         /** @summary Upload a files by ID */
-        (options: ServiceOperationMutationFnOptions<PostFilesBody, PostFilesMutationParameters>, client?: (schema: PostFilesSchema, options: ServiceOperationMutationFnOptions<PostFilesBody, PostFilesMutationParameters>) => Promise<RequestFnResponse<PostFilesData, PostFilesError>>): Promise<RequestFnResponse<PostFilesData, PostFilesError>>;
+        <TMeta extends Record<string, any>, TSignal extends AbortSignal = AbortSignal>(options: ServiceOperationMutationFnOptions<PostFilesBody, PostFilesMutationParameters, TMeta, TSignal>, client?: (schema: PostFilesSchema, options: ServiceOperationMutationFnOptions<PostFilesBody, PostFilesMutationParameters, TMeta, TSignal>) => Promise<RequestFnResponse<PostFilesData, PostFilesError>>): Promise<RequestFnResponse<PostFilesData, PostFilesError>>;
         /**
          * Provides access to the current state of a mutation, including its status, any resulting data, and associated errors.
          *
@@ -1226,7 +1226,7 @@ export interface FilesService {
         /** @summary Delete all files */
         isMutating<TContext>(filters?: MutationFiltersByParameters<DeleteFilesBody, DeleteFilesData, DeleteFilesParameters, DeleteFilesError | Error, TContext> | MutationFiltersByMutationKey<DeleteFilesSchema, DeleteFilesBody, DeleteFilesData, DeleteFilesParameters, DeleteFilesError | Error, TContext>): number;
         /** @summary Delete all files */
-        (options: ServiceOperationMutationFnOptions<DeleteFilesBody, DeleteFilesParameters>, client?: (schema: DeleteFilesSchema, options: ServiceOperationMutationFnOptions<DeleteFilesBody, DeleteFilesParameters>) => Promise<RequestFnResponse<DeleteFilesData, DeleteFilesError>>): Promise<RequestFnResponse<DeleteFilesData, DeleteFilesError>>;
+        <TMeta extends Record<string, any>, TSignal extends AbortSignal = AbortSignal>(options: ServiceOperationMutationFnOptions<DeleteFilesBody, DeleteFilesParameters, TMeta, TSignal>, client?: (schema: DeleteFilesSchema, options: ServiceOperationMutationFnOptions<DeleteFilesBody, DeleteFilesParameters, TMeta, TSignal>) => Promise<RequestFnResponse<DeleteFilesData, DeleteFilesError>>): Promise<RequestFnResponse<DeleteFilesData, DeleteFilesError>>;
         /**
          * Provides access to the current state of a mutation, including its status, any resulting data, and associated errors.
          *
@@ -1686,7 +1686,7 @@ export interface FilesService {
         /** @summary Trash files */
         isMutating<TContext>(filters?: MutationFiltersByParameters<TrashFilesBody, TrashFilesData, TrashFilesParameters, TrashFilesError | Error, TContext> | MutationFiltersByMutationKey<TrashFilesSchema, TrashFilesBody, TrashFilesData, TrashFilesParameters, TrashFilesError | Error, TContext>): number;
         /** @summary Trash files */
-        (options: ServiceOperationMutationFnOptions<TrashFilesBody, TrashFilesParameters>, client?: (schema: TrashFilesSchema, options: ServiceOperationMutationFnOptions<TrashFilesBody, TrashFilesParameters>) => Promise<RequestFnResponse<TrashFilesData, TrashFilesError>>): Promise<RequestFnResponse<TrashFilesData, TrashFilesError>>;
+        <TMeta extends Record<string, any>, TSignal extends AbortSignal = AbortSignal>(options: ServiceOperationMutationFnOptions<TrashFilesBody, TrashFilesParameters, TMeta, TSignal>, client?: (schema: TrashFilesSchema, options: ServiceOperationMutationFnOptions<TrashFilesBody, TrashFilesParameters, TMeta, TSignal>) => Promise<RequestFnResponse<TrashFilesData, TrashFilesError>>): Promise<RequestFnResponse<TrashFilesData, TrashFilesError>>;
         /**
          * Provides access to the current state of a mutation, including its status, any resulting data, and associated errors.
          *
