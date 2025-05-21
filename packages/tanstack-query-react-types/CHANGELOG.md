@@ -1,5 +1,11 @@
 # @openapi-qraft/tanstack-query-react-types
 
+## 2.6.2
+
+### Patch Changes
+
+- 41e2181: Added support for `meta` and `signal` for mutating operations.
+
 ## 2.6.2-beta.0
 
 ### Patch Changes
