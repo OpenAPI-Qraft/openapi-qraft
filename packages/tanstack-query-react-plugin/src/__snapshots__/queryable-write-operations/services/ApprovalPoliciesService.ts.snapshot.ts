@@ -1199,7 +1199,7 @@ export interface ApprovalPoliciesService {
          * @summary Delete an approval policy
          * @description Delete an existing approval policy.
          */
-        (options: ServiceOperationMutationFnOptions<DeleteApprovalPoliciesIdBody, DeleteApprovalPoliciesIdParameters>, client?: (schema: DeleteApprovalPoliciesIdSchema, options: ServiceOperationMutationFnOptions<DeleteApprovalPoliciesIdBody, DeleteApprovalPoliciesIdParameters>) => Promise<RequestFnResponse<DeleteApprovalPoliciesIdData, DeleteApprovalPoliciesIdError>>): Promise<RequestFnResponse<DeleteApprovalPoliciesIdData, DeleteApprovalPoliciesIdError>>;
+        <TMeta extends Record<string, any>, TSignal extends AbortSignal = AbortSignal>(options: ServiceOperationMutationFnOptions<DeleteApprovalPoliciesIdBody, DeleteApprovalPoliciesIdParameters, TMeta, TSignal>, client?: (schema: DeleteApprovalPoliciesIdSchema, options: ServiceOperationMutationFnOptions<DeleteApprovalPoliciesIdBody, DeleteApprovalPoliciesIdParameters, TMeta, TSignal>) => Promise<RequestFnResponse<DeleteApprovalPoliciesIdData, DeleteApprovalPoliciesIdError>>): Promise<RequestFnResponse<DeleteApprovalPoliciesIdData, DeleteApprovalPoliciesIdError>>;
         /**
          * Provides access to the current state of a mutation, including its status, any resulting data, and associated errors.
          *
@@ -1916,7 +1916,7 @@ export interface ApprovalPoliciesService {
          * @summary Update an approval policy
          * @description Update an existing approval policy.
          */
-        (options: ServiceOperationMutationFnOptions<PatchApprovalPoliciesIdBody, PatchApprovalPoliciesIdMutationParameters>, client?: (schema: PatchApprovalPoliciesIdSchema, options: ServiceOperationMutationFnOptions<PatchApprovalPoliciesIdBody, PatchApprovalPoliciesIdMutationParameters>) => Promise<RequestFnResponse<PatchApprovalPoliciesIdData, PatchApprovalPoliciesIdError>>): Promise<RequestFnResponse<PatchApprovalPoliciesIdData, PatchApprovalPoliciesIdError>>;
+        <TMeta extends Record<string, any>, TSignal extends AbortSignal = AbortSignal>(options: ServiceOperationMutationFnOptions<PatchApprovalPoliciesIdBody, PatchApprovalPoliciesIdMutationParameters, TMeta, TSignal>, client?: (schema: PatchApprovalPoliciesIdSchema, options: ServiceOperationMutationFnOptions<PatchApprovalPoliciesIdBody, PatchApprovalPoliciesIdMutationParameters, TMeta, TSignal>) => Promise<RequestFnResponse<PatchApprovalPoliciesIdData, PatchApprovalPoliciesIdError>>): Promise<RequestFnResponse<PatchApprovalPoliciesIdData, PatchApprovalPoliciesIdError>>;
         /**
          * Provides access to the current state of a mutation, including its status, any resulting data, and associated errors.
          *
