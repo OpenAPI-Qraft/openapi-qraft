@@ -42,6 +42,8 @@ export async function generateSchemaTypes(
     defaultNonNullable: args.defaultNonNullable,
     emptyObjectsUnknown: args.emptyObjectsUnknown,
     enum: args.enum,
+    enumValues: args.enumValues,
+    dedupeEnums: args.dedupeEnums,
     excludeDeprecated: args.excludeDeprecated,
     exportType: args.exportType,
     immutable: args.immutable,
