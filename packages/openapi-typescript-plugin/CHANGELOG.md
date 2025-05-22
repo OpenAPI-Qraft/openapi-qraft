@@ -1,5 +1,12 @@
 # @openapi-qraft/openapi-typescript
 
+## 1.2.19
+
+### Patch Changes
+
+- 697bb28: Fixed support for `--enum-values` and `--dedupe-enums` options to improve enum handling and reduce duplication.
+  - @openapi-qraft/plugin@2.6.3
+
 ## 1.2.18
 
 ### Patch Changes
