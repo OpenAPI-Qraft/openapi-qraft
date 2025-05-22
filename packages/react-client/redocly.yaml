@@ -11,6 +11,7 @@ apis:
         openapi-typescript: true
       output-dir: src/tests/fixtures/api
       clean: true
+      enum-values: true
       explicit-import-extensions: true
       openapi-types-file-name: openapi.ts
       filter-services:
