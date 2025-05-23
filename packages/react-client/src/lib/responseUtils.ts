@@ -49,12 +49,21 @@ export function resolveResponse<TData, TError>(
   responseToReturn: Response | Error,
   responsePromise?: Promise<TData>
 ): Promise<RequestFnResponse<TData, TError>> {
-  if (!responsePromise)
-    return Promise.reject({
-      error: responseToReturn,
-      response: undefined,
-      data: undefined,
-    });
+  if (!responsePromise) {
+    if (responseToReturn instanceof Response) {
+      return Promise.resolve({
+        error: new Error('Unhandled response without promise to resolve'),
+        response: responseToReturn,
+        data: undefined,
+      });
+    } else {
+      return Promise.resolve({
+        error: responseToReturn,
+        response: undefined,
+        data: undefined,
+      });
+    }
+  }
 
   return responsePromise
     .then(
