@@ -1,6 +1,8 @@
-import type { OpenAPI3 } from 'openapi-typescript/src/types.js';
-import { ParameterObject } from 'openapi-typescript';
-import { ReferenceObject } from 'openapi-typescript/src/types.js';
+import type {
+  OpenAPI3,
+  ParameterObject,
+  ReferenceObject,
+} from 'openapi-typescript';
 import { resolveDocumentLocalRef } from './resolveDocumentLocalRef.js';
 
 export function replaceRefParametersWithComponent(

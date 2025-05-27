@@ -1,9 +1,10 @@
-import type { OpenAPI3 } from 'openapi-typescript/src/types.js';
-import { OperationObject, ParameterObject } from 'openapi-typescript';
+import type { OpenAPI3 } from 'openapi-typescript';
 import {
+  OperationObject,
+  ParameterObject,
   PathItemObject,
   ReferenceObject,
-} from 'openapi-typescript/src/types.js';
+} from 'openapi-typescript';
 import { createServicePathMatch } from './createServicePathMatch.js';
 import { replaceRefParametersWithComponent } from './open-api/replaceRefParametersWithComponent.js';
 import {

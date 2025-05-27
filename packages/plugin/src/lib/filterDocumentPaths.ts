@@ -1,4 +1,4 @@
-import { type OpenAPI3 } from 'openapi-typescript/src/types.js';
+import { type OpenAPI3 } from 'openapi-typescript';
 import { createServicePathMatch } from './createServicePathMatch.js';
 
 /**

@@ -76,3 +76,24 @@ apis:
         createInternalReactAPIClient:
           services: none
           callbacks: ['setQueryData', 'getQueryData', 'getQueryKey', 'getInfiniteQueryKey']
+
+  tonapi:
+    root: openapi-tonapi.yml
+    x-openapi-qraft:
+      plugin:
+        tanstack-query-react: true
+        openapi-typescript: true
+      output-dir: ./src/tests/fixtures/tonapi
+      clean: true
+      explicit-component-exports: true
+      enum-values: true
+      #      filter-services:
+      #        - '**'
+      #        - '!/ton/**'
+      #        - '!/clients/**'
+      create-api-client-fn:
+        createAPIClient:
+          filename: create-api-client
+          services: all
+          callbacks:
+            - operationInvokeFn
