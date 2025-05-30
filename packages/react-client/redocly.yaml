@@ -39,6 +39,14 @@ apis:
       filter-services:
         - '/approval_policies/**'
         - '/files/**'
+      override-import-type:
+        services:
+          '@openapi-qraft/tanstack-query-react-types':
+            OperationError: '../../type-overrides/operation-error.js'
+          '@tanstack/react-query':
+            UseSuspenseQueryOptions: '../../type-overrides/suspense-query.js'
+            UseSuspenseQueryResult: '../../type-overrides/suspense-query.js'
+            UseInfiniteQueryResult: '../../type-overrides/use-infinite-query-result.js'
   files:
     root: ../test-fixtures/openapi.json
     x-openapi-qraft:
