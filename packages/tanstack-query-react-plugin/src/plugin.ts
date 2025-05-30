@@ -1,3 +1,4 @@
+import type { OverrideImportType } from './ts-factory/OverrideImportType.js';
 import { fileHeader } from '@openapi-qraft/plugin/lib/fileHeader';
 import {
   createPredefinedParametersGlobs,
@@ -31,7 +32,7 @@ export const plugin: QraftCommandPlugin = {
       )
       .option(
         '--export-openapi-types [bool]',
-        "Add an export statement of the generated OpenAPI document types from the `./index.ts' file. Useful for sharing types within your project.",
+        "Add an export statement of the generated OpenAPI document types from the `./index.ts' file. Useful for sharing types within your project. Default: true when --plugin openapi-typescript is used.",
         parseBooleanOption
       )
       .option(
@@ -40,21 +41,36 @@ export const plugin: QraftCommandPlugin = {
         parseBooleanOption
       )
       .addOption(
+        (() => {
+          const option = new Option(
+            '--create-api-client-fn <functionName> [options...]',
+            'Configure API client creation function. Allows specifying the function name, included services, and callbacks. Can be specified multiple times to generate several different API client functions from a single OpenAPI document.'
+          )
+            .argParser(parseCreateApiClientFn)
+            .default(createApiClientFnDefault);
+
+          option.defaultValueDescription = 'null';
+
+          return option;
+        })()
+      )
+      .addOption(
         new Option(
-          '--create-api-client-fn [name...]',
-          'Name, default callbacks and services of the generated `createAPIClient` function'
-        )
-          .argParser(parseCreateApiClientFn)
-          .default(createApiClientFnDefault)
+          '--override-import-type <pathname overrides...>',
+          'Override import paths for specific types in generated files. This allows using custom type implementations instead of the default ones. Expected format: filepath originalModule:importTypeName:customImportPath'
+        ).argParser(parseOverrideImportType)
       )
       .action(async ({ spinner, output, args, services, schema }, resolve) => {
         return void (await generateCode({
           spinner,
           services,
-          serviceImports: {
+          serviceOptions: {
             openapiTypesImportPath: args.openapiTypesImportPath,
             queryableWriteOperations: args.queryableWriteOperations,
           },
+          overrideImportType: Array.isArray(args.overrideImportType)
+            ? args.overrideImportType[0]
+            : undefined,
           output: {
             ...output,
             fileHeader: args.fileHeader ?? fileHeader,
@@ -183,6 +199,66 @@ function parseCreateApiClientFn(
   }
 
   return nextValue;
+}
+
+type ParsedOverrideImportTypeOption = [
+  overrides: OverrideImportType,
+  filepath?: string,
+];
+
+function parseOverrideImportType(
+  value: string,
+  previousValue: unknown
+): ParsedOverrideImportTypeOption {
+  const previous = (
+    Array.isArray(previousValue) ? previousValue : [{}]
+  ) as ParsedOverrideImportTypeOption;
+
+  if (!value.includes(':')) {
+    previous.push(value);
+
+    return previous;
+  }
+
+  const importOverrides = value.split(':');
+
+  if (importOverrides.length === 3) {
+    const originalModule = importOverrides[0];
+    const typeName = importOverrides[1];
+    const overrideModule = importOverrides[2];
+
+    if (!originalModule || !typeName || !overrideModule) {
+      throw new CommanderError(
+        1,
+        'ERR_INVALID_IMPORT_TYPE_OVERRIDE',
+        `Invalid import type override: ${value}. Expected format: originalModule:importTypeName:customImportPath`
+      );
+    }
+
+    const filePath = previous[previous.length - 1];
+
+    if (!filePath || typeof filePath !== 'string') {
+      throw new CommanderError(
+        1,
+        'ERR_INVALID_IMPORT_TYPE_OVERRIDE',
+        `Invalid import type override: ${value}. Expected format: filepath originalModule:importTypeName:customImportPath`
+      );
+    }
+
+    const [overrides] = previous;
+    overrides[filePath] = overrides[filePath] ?? {};
+    overrides[filePath][originalModule] =
+      overrides[filePath][originalModule] ?? {};
+    overrides[filePath][originalModule][typeName] = overrideModule;
+
+    return previous;
+  } else {
+    throw new CommanderError(
+      1,
+      'ERR_INVALID_IMPORT_TYPE_OVERRIDE',
+      `Invalid import type override: ${value}. Expected format: filepath namespace:importTypeName:importPath`
+    );
+  }
 }
 
 type CreateAPIClientFnArg = [
