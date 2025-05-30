@@ -2,7 +2,7 @@ import type {
   QueryFiltersByParameters,
   QueryFiltersByQueryKey,
 } from '@openapi-qraft/tanstack-query-react-types';
-import type { ResetOptions } from '@tanstack/query-core';
+import type { ResetOptions } from '@tanstack/react-query';
 
 export interface ServiceOperationResetQueries<
   TSchema extends { url: string; method: string },

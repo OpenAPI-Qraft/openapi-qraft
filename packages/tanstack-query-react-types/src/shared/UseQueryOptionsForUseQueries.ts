@@ -1,5 +1,7 @@
-import type { QueriesPlaceholderDataFunction } from '@tanstack/query-core';
-import type { UseQueryOptions } from '@tanstack/react-query';
+import type {
+  QueriesPlaceholderDataFunction,
+  UseQueryOptions,
+} from '@tanstack/react-query';
 import type { DeepReadonly } from './DeepReadonly.js';
 import type { ServiceOperationQueryKey } from './ServiceOperationKey.js';
 

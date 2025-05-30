@@ -5,7 +5,7 @@ import type {
   ServiceOperationInfiniteQueryKey,
   ServiceOperationQueryKey,
 } from '@openapi-qraft/tanstack-query-react-types';
-import type { QueryState } from '@tanstack/query-core';
+import type { QueryState } from '@tanstack/react-query';
 
 export interface ServiceOperationGetQueryState<
   TSchema extends { url: string; method: string },

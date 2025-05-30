@@ -5,7 +5,7 @@ import type {
   ServiceOperationInfiniteQueryKey,
   ServiceOperationQueryKey,
 } from '@openapi-qraft/tanstack-query-react-types';
-import type { NoInfer } from '@tanstack/query-core';
+import type { NoInfer } from '@tanstack/react-query';
 
 export interface ServiceOperationGetQueriesData<
   TSchema extends { url: string; method: string },

@@ -6,10 +6,10 @@ import type {
   PartialParameters,
   ServiceOperationInfiniteQueryKey,
 } from '@openapi-qraft/tanstack-query-react-types';
-import type { InfiniteQueryPageParamsOptions } from '@tanstack/query-core';
 import type {
   DefinedInitialDataInfiniteOptions,
   DefinedUseInfiniteQueryResult,
+  InfiniteQueryPageParamsOptions,
   UndefinedInitialDataInfiniteOptions,
   UseInfiniteQueryResult,
 } from '@tanstack/react-query';

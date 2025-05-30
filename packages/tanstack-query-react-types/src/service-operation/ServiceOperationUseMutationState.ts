@@ -4,7 +4,7 @@ import type {
   MutationVariables,
   OperationError,
 } from '@openapi-qraft/tanstack-query-react-types';
-import type { Mutation, MutationState } from '@tanstack/query-core';
+import type { Mutation, MutationState } from '@tanstack/react-query';
 
 export interface ServiceOperationUseMutationState<
   TSchema extends { url: string; method: string },
