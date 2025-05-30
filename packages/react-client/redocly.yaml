@@ -1,3 +1,8 @@
+x-openapi-qraft:
+  plugin:
+    tanstack-query-react: true
+    openapi-typescript: true
+
 rules:
   operation-operationId-unique:
     severity: 'error'
@@ -6,9 +11,6 @@ apis:
   main:
     root: ../test-fixtures/openapi.json
     x-openapi-qraft:
-      plugin:
-        tanstack-query-react: true
-        openapi-typescript: true
       output-dir: src/tests/fixtures/api
       clean: true
       enum-values: true
@@ -40,9 +42,6 @@ apis:
   files:
     root: ../test-fixtures/openapi.json
     x-openapi-qraft:
-      plugin:
-        tanstack-query-react: true
-        openapi-typescript: true
       output-dir: src/tests/fixtures/files-api
       clean: true
       openapi-types-file-name: internal-openapi.ts
