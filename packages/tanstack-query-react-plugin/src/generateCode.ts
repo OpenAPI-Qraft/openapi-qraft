@@ -1,3 +1,4 @@
+import type { OverrideImportType } from './ts-factory/OverrideImportType.js';
 import { URL } from 'node:url';
 import { formatFileHeader } from '@openapi-qraft/plugin/lib/formatFileHeader';
 import { GeneratorFile } from '@openapi-qraft/plugin/lib/GeneratorFile';
@@ -33,26 +34,34 @@ interface OutputOptions extends OutputOptionsBase {
 export const generateCode = async ({
   spinner,
   services,
-  serviceImports,
+  serviceOptions,
   output,
+  overrideImportType,
 }: {
   spinner: Ora;
   services: OpenAPIService[];
-  serviceImports: ServiceFactoryOptions;
+  serviceOptions: ServiceFactoryOptions;
   output: OutputOptions;
+  overrideImportType: OverrideImportType | undefined;
 }) => {
   return [
-    ...(await generateServices(spinner, services, serviceImports, output)),
+    ...(await generateServices(
+      spinner,
+      services,
+      serviceOptions,
+      output,
+      overrideImportType
+    )),
     ...(await generateServiceIndex(spinner, services, output)),
     ...(await generateOperationClient(spinner, output)),
     ...(output.operationPredefinedParameters
       ? await generateCreatePredefinedParametersRequestFn(
           spinner,
-          serviceImports,
+          serviceOptions,
           output
         )
       : []),
-    ...(await generateIndex(spinner, serviceImports, output)),
+    ...(await generateIndex(spinner, serviceOptions, output)),
   ];
 };
 
@@ -66,7 +75,8 @@ const generateServices = async (
   spinner: Ora,
   services: OpenAPIService[],
   serviceImports: ServiceFactoryOptions,
-  output: OutputOptions
+  output: OutputOptions,
+  overrideImportType: OverrideImportType | undefined
 ) => {
   const servicesDir = composeServicesDirPath(output);
 
@@ -92,7 +102,8 @@ const generateServices = async (
             variableName,
           },
           operations,
-          serviceImports
+          serviceImports,
+          overrideImportType?.[output.servicesDirName]
         )
       );
 
