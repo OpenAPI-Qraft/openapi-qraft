@@ -2,6 +2,7 @@ import type {
   MutationFiltersByMutationKey,
   MutationFiltersByParameters,
   MutationVariables,
+  OperationError,
 } from '@openapi-qraft/tanstack-query-react-types';
 import type { Mutation, MutationState } from '@tanstack/query-core';
 
@@ -16,7 +17,7 @@ export interface ServiceOperationUseMutationState<
     TContext = unknown,
     TResult = MutationState<
       TMutationData,
-      TError | Error,
+      OperationError<TError>,
       MutationVariables<TBody, TMutationParams>,
       TContext
     >,
@@ -26,7 +27,7 @@ export interface ServiceOperationUseMutationState<
           TBody,
           TMutationData,
           TMutationParams,
-          TError | Error,
+          OperationError<TError>,
           TContext
         >
       | MutationFiltersByMutationKey<
@@ -34,13 +35,13 @@ export interface ServiceOperationUseMutationState<
           TBody,
           TMutationData,
           TMutationParams,
-          TError | Error,
+          OperationError<TError>,
           TContext
         >;
     select?: (
       mutation: Mutation<
         TMutationData,
-        TError | Error,
+        OperationError<TError>,
         MutationVariables<TBody, TMutationParams>,
         TContext
       >

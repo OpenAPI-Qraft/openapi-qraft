@@ -1,3 +1,5 @@
+import type { OperationError } from './OperationError.js';
+
 /**
  * The `RequestFn` is the wrapper on top of the `fetch` function that simplifies
  * the process of making requests to the API using Qraft.
@@ -101,7 +103,7 @@ export type RequestFnResponse<TData, TError> =
       // server error
       data?: undefined;
       response: Response;
-      error: TError | Error;
+      error: OperationError<TError>;
     }
   | {
       // network error

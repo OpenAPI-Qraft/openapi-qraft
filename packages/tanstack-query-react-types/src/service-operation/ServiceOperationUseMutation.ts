@@ -2,6 +2,7 @@ import type {
   AreAllOptional,
   DeepReadonly,
   MutationVariables,
+  OperationError,
   ServiceOperationMutationKey,
   ServiceOperationUseMutationOptions,
 } from '@openapi-qraft/tanstack-query-react-types';
@@ -25,12 +26,12 @@ export interface ServiceOperationUseMutation<
       TMutationData,
       TMutationParams,
       TVariables,
-      TError | Error,
+      OperationError<TError>,
       TContext
     >
   ): UseMutationResult<
     TMutationData,
-    TError | Error,
+    OperationError<TError>,
     AreAllOptional<TVariables> extends true ? TVariables | void : TVariables,
     TContext
   >;
@@ -45,8 +46,13 @@ export interface ServiceOperationUseMutation<
       TMutationData,
       TMutationParams,
       TVariables,
-      TError | Error,
+      OperationError<TError>,
       TContext
     >
-  ): UseMutationResult<TMutationData, TError | Error, TVariables, TContext>;
+  ): UseMutationResult<
+    TMutationData,
+    OperationError<TError>,
+    TVariables,
+    TContext
+  >;
 }

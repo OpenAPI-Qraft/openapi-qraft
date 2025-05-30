@@ -1,6 +1,7 @@
 import type {
   AreAllOptional,
   DeepReadonly,
+  OperationError,
   OperationInfiniteData,
   PartialParameters,
   ServiceOperationInfiniteQueryKey,
@@ -46,6 +47,6 @@ export interface ServiceOperationUseSuspenseInfiniteQuery<
       >
   ): UseSuspenseInfiniteQueryResult<
     OperationInfiniteData<TData, TQueryParams>,
-    TError | Error
+    OperationError<TError>
   >;
 }

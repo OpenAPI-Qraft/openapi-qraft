@@ -1,6 +1,7 @@
 import type {
   AreAllOptional,
   DeepReadonly,
+  OperationError,
   ServiceOperationQueryKey,
 } from '@openapi-qraft/tanstack-query-react-types';
 import type {
@@ -37,7 +38,7 @@ export interface ServiceOperationUseQuery<
       >,
       'queryKey'
     >
-  ): UseQueryResult<TData, TError | Error>;
+  ): UseQueryResult<TData, OperationError<TError>>;
 
   useQuery<TData = TOperationQueryFnData>(
     parameters:
@@ -54,5 +55,5 @@ export interface ServiceOperationUseQuery<
       >,
       'queryKey'
     >
-  ): DefinedUseQueryResult<TData, TError | Error>;
+  ): DefinedUseQueryResult<TData, OperationError<TError>>;
 }
