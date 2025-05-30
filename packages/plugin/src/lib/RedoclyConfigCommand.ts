@@ -166,7 +166,7 @@ export class RedoclyConfigCommand extends Command {
           spinner.info(
             `Generating API client for ${c.magenta(apiName)} with the following parameters:\n` +
               c.gray.italic('bin ') +
-              `${c.green.italic(openAPIDocument)}` +
+              `${c.green.italic(openAPIDocument)} ` +
               apiProcessArgv
                 .map((arg) =>
                   arg.startsWith('--')
