@@ -47,6 +47,9 @@ apis:
             UseSuspenseQueryOptions: '../../type-overrides/suspense-query.js'
             UseSuspenseQueryResult: '../../type-overrides/suspense-query.js'
             UseInfiniteQueryResult: '../../type-overrides/use-infinite-query-result.js'
+        create-api-client:
+          '@openapi-qraft/react':
+            CreateAPIQueryClientOptions: '../type-overrides/create-query-client-options.js'
   files:
     root: ../test-fixtures/openapi.json
     x-openapi-qraft:

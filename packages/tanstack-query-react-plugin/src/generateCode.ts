@@ -53,7 +53,7 @@ export const generateCode = async ({
       overrideImportType
     )),
     ...(await generateServiceIndex(spinner, services, output)),
-    ...(await generateOperationClient(spinner, output)),
+    ...(await generateOperationClient(spinner, output, overrideImportType)),
     ...(output.operationPredefinedParameters
       ? await generateCreatePredefinedParametersRequestFn(
           spinner,
@@ -161,13 +161,19 @@ const generateServiceIndex = async (
   return serviceIndexFiles;
 };
 
-const generateOperationClient = async (spinner: Ora, output: OutputOptions) => {
+const generateOperationClient = async (
+  spinner: Ora,
+  output: OutputOptions,
+  overrideImportType: OverrideImportType | undefined
+) => {
   spinner.start('Generating operation client');
 
   const operationClientFiles: GeneratorFile[] = [];
 
   try {
     output.createApiClientFn.map(([functionName, value]) => {
+      const fileName = value.filename?.[0] ?? functionName;
+
       const code = astToString(
         getCreateAPIClientFactory({
           defaultClientCallbacks: value.callbacks,
@@ -175,11 +181,12 @@ const generateOperationClient = async (spinner: Ora, output: OutputOptions) => {
           createAPIClientFnName: functionName,
           servicesDirName: output.servicesDirName,
           explicitImportExtensions: output.explicitImportExtensions,
+          createAPIClientFnImportTypeOverrides: overrideImportType?.[fileName],
         })
       );
 
       operationClientFiles.push({
-        file: new URL(`${value.filename?.[0] ?? functionName}.ts`, output.dir),
+        file: new URL(`${fileName}.ts`, output.dir),
         code: formatFileHeader(output.fileHeader) + code,
       });
     });
