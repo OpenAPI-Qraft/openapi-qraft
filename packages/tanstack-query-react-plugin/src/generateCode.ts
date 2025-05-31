@@ -58,7 +58,8 @@ export const generateCode = async ({
       ? await generateCreatePredefinedParametersRequestFn(
           spinner,
           serviceOptions,
-          output
+          output,
+          overrideImportType
         )
       : []),
     ...(await generateIndex(spinner, serviceOptions, output)),
@@ -206,23 +207,27 @@ const generateOperationClient = async (
 const generateCreatePredefinedParametersRequestFn = async (
   spinner: Ora,
   serviceImports: ServiceFactoryOptions,
-  output: OutputOptions
+  output: OutputOptions,
+  overrideImportType: OverrideImportType | undefined
 ) => {
   spinner.start('Generating "createPredefinedParametersRequestFn"');
 
   const clientFiles: GeneratorFile[] = [];
 
   try {
+    const filename = 'create-predefined-parameters-request-fn';
+
     const code = astToString(
       getCreatePredefinedParametersRequestFnFactory({
         servicesDirName: output.servicesDirName,
         operationPredefinedParameters: output.operationPredefinedParameters,
         openapiTypesImportPath: serviceImports.openapiTypesImportPath,
+        importTypeOverrides: overrideImportType?.[filename],
       })
     );
 
     clientFiles.push({
-      file: new URL('create-predefined-parameters-request-fn.ts', output.dir),
+      file: new URL(`${filename}.ts`, output.dir),
       code: formatFileHeader(output.fileHeader) + code,
     });
   } catch (error) {

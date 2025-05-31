@@ -39,6 +39,8 @@ apis:
       filter-services:
         - '/approval_policies/**'
         - '/files/**'
+      operation-predefined-parameters:
+        '/approval_policies/**': 'header.x-monite-entity-id'
       override-import-type:
         services:
           '@openapi-qraft/tanstack-query-react-types':
@@ -50,6 +52,11 @@ apis:
         create-api-client:
           '@openapi-qraft/react':
             CreateAPIQueryClientOptions: '../type-overrides/create-query-client-options.js'
+        create-predefined-parameters-request-fn:
+          '@openapi-qraft/react':
+            RequestFn: '../type-overrides/qraft-predefined-parameters.js'
+          '@openapi-qraft/react/qraftPredefinedParametersRequestFn':
+            QraftPredefinedParameterValue: '../type-overrides/qraft-predefined-parameters.js'
   files:
     root: ../test-fixtures/openapi.json
     x-openapi-qraft:

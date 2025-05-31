@@ -1,11 +1,14 @@
+import type { OverrideImportType } from './OverrideImportType.js';
 import { PredefinedParametersGlob } from '@openapi-qraft/plugin/lib/predefineSchemaParameters';
 import ts from 'typescript';
 import { maybeResolveImport } from '../lib/maybeResolveImport.js';
+import { getOverriddenImportDeclarationsFactory } from './getOverriddenImportDeclarationsFactory.js';
 
 type Options = {
   servicesDirName: string;
   operationPredefinedParameters: Array<PredefinedParametersGlob> | undefined;
   openapiTypesImportPath: string | undefined;
+  importTypeOverrides: OverrideImportType[keyof OverrideImportType] | undefined;
 };
 
 export const getCreatePredefinedParametersRequestFnFactory = (
@@ -25,28 +28,53 @@ export const getCreatePredefinedParametersRequestFnFactory = (
 const getCreatePredefinedParametersRequestFnImportsFactory = ({
   servicesDirName,
   openapiTypesImportPath,
+  importTypeOverrides,
 }: Options) => {
   if (!openapiTypesImportPath) return [];
 
   const factory = ts.factory;
 
-  return [
-    factory.createImportDeclaration(
-      undefined,
-      factory.createImportClause(
-        true,
-        undefined,
-        factory.createNamedImports([
+  const qraftImports = {
+    '@openapi-qraft/react': ['RequestFn'],
+    '@openapi-qraft/react/qraftPredefinedParametersRequestFn': [
+      'QraftPredefinedParameterValue',
+    ],
+  };
+
+  const internalImports = Object.entries(qraftImports)
+    .map(([importPath, typeNames]) => {
+      const importSpecifiers = typeNames
+        .filter((typeName) => !importTypeOverrides?.[importPath]?.[typeName])
+        .map((typeName) =>
           factory.createImportSpecifier(
             false,
             undefined,
-            factory.createIdentifier('RequestFn')
-          ),
-        ])
-      ),
-      factory.createStringLiteral('@openapi-qraft/react'),
-      undefined
-    ),
+            factory.createIdentifier(typeName)
+          )
+        );
+
+      if (!importSpecifiers.length) return null;
+
+      return factory.createImportDeclaration(
+        undefined,
+        factory.createImportClause(
+          true,
+          undefined,
+          factory.createNamedImports(importSpecifiers)
+        ),
+        factory.createStringLiteral(importPath),
+        undefined
+      );
+    })
+    .filter((importDeclaration) => !!importDeclaration);
+
+  const overrideImports = importTypeOverrides
+    ? getOverriddenImportDeclarationsFactory(qraftImports, importTypeOverrides)
+    : [];
+
+  return [
+    ...internalImports,
+    ...overrideImports,
     factory.createImportDeclaration(
       undefined,
       factory.createImportClause(
@@ -57,11 +85,6 @@ const getCreatePredefinedParametersRequestFnImportsFactory = ({
             false,
             undefined,
             factory.createIdentifier('qraftPredefinedParametersRequestFn')
-          ),
-          factory.createImportSpecifier(
-            true,
-            undefined,
-            factory.createIdentifier('QraftPredefinedParameterValue')
           ),
         ])
       ),
