@@ -2,8 +2,8 @@ import type {
   DefaultError,
   Mutation,
   MutationStatus,
-} from '@tanstack/query-core';
-import type { UseMutationOptions } from '@tanstack/react-query';
+  UseMutationOptions,
+} from '@tanstack/react-query';
 import type { AreAllOptional } from './AreAllOptional.js';
 import type { DeepReadonly } from './DeepReadonly.js';
 import type { PartialParameters } from './PartialParameters.js';

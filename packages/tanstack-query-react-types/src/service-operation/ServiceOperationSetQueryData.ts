@@ -3,7 +3,7 @@ import type {
   DeepReadonly,
   ServiceOperationQueryKey,
 } from '@openapi-qraft/tanstack-query-react-types';
-import type { NoInfer, SetDataOptions, Updater } from '@tanstack/query-core';
+import type { NoInfer, SetDataOptions, Updater } from '@tanstack/react-query';
 
 export interface ServiceOperationSetQueryData<
   TSchema extends { url: string; method: string },

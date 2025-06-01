@@ -24,6 +24,12 @@ Qraft CLI integrates with Redocly's configuration framework to simplify API clie
 Here's a basic example of a `redocly.yaml` configuration file:
 
 ```yaml
+# Qraft CLI global config
+x-openapi-qraft:
+  plugin:
+    tanstack-query-react: true  # Generate React Query hooks for each API Client
+    openapi-typescript: true    # Generate TypeScript types for each API Client
+
 apis:
   # Main API configuration
   main:
@@ -32,9 +38,6 @@ apis:
     x-openapi-qraft:
       output-dir: src/api  # Output directory for a generated API client
       clean: true          # Clean output directory before generation
-      plugin:
-        tanstack-query-react: true  # Generate React Query hooks
-        openapi-typescript: true    # Generate TypeScript types
 
   # Legacy API configuration
   legacy:
@@ -42,9 +45,6 @@ apis:
     x-openapi-qraft:
       output-dir: src/legacy-api
       clean: true
-      plugin:
-        tanstack-query-react: true
-        openapi-typescript: true
       # Filter services to only include user-related endpoints
       filter-services:
         - '/users/**'
@@ -135,9 +135,22 @@ apis:
       # Transform operation names using regex
       operation-name-modifier:
         - '/files/list:[a-zA-Z]+List ==> findAll'  # Rename all *List operations to findAll
+      # Override the type imports in the generated code with customs
+      override-import-type:
+        services:
+          '@openapi-qraft/tanstack-query-react-types':
+            OperationError: '../../type-overrides/operation-error.js'
+          '@tanstack/react-query':
+            UseQueryResult: '../../type-overrides/use-query-result.js'
+        create-api-client:
+          '@openapi-qraft/react':
+            CreateAPIQueryClientOptions: '../type-overrides/create-query-client-options.js'
+        create-predefined-parameters-request-fn:
+          '@openapi-qraft/react':
+            QraftPredefinedParameterValue: '../type-overrides/predefined-parameter-value.js'
 ```
 
-### Generating Multiple API Client Functions
+### Generating Multiple `createAPIClient()` functions
 
 Qraft allows you to generate multiple _create API client functions_ with different parameters using the `--create-api-client-fn`
 option. This is particularly useful when you need to create specialized clients for different environments or use cases.

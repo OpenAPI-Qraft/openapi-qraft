@@ -227,6 +227,91 @@ describe('TanStack Query React Client Generation', () => {
     });
   });
 
+  describe('--override-import-type <...patterns> --operation-predefined-parameters <...patterns> --create-api-client-fn <...patterns>', () => {
+    beforeAll(async () => {
+      const { QraftCommand } = await import(
+        '@openapi-qraft/plugin/lib/QraftCommand'
+      );
+      const { plugin } = await import('./plugin.js');
+      const command = new QraftCommand();
+      plugin.setupCommand(command);
+
+      await command.parseAsync([
+        'dummy-node',
+        'dummy-qraft-bin',
+        openAPIDocumentFixturePath,
+        '--clean',
+        '-o',
+        '/mock-fs',
+        '--openapi-types-import-path',
+        '../../openapi.d.ts',
+        '--operation-predefined-parameters',
+        '/approval_policies/{approval_policy_id}/**:header.x-monite-entity-id',
+        '/entities/{entity_id}/documents:header.x-monite-version',
+        '--override-import-type',
+        'createAPIClient',
+        '@openapi-qraft/react:CreateAPIQueryClientOptions:../type-overrides/create-query-client-options.js',
+        '--override-import-type',
+        'create-api-operation-client',
+        '@openapi-qraft/react:APIBasicClientServices:../type-overrides/create-query-client-options.js',
+        '--override-import-type',
+        'services',
+        '@openapi-qraft/tanstack-query-react-types:OperationError:../../type-overrides/operation-error.js',
+        '@tanstack/react-query:UseSuspenseQueryOptions:../../type-overrides/suspense-query.js',
+        '@tanstack/react-query:UseSuspenseQueryResult:../../type-overrides/suspense-query.js',
+        '@tanstack/react-query:UseInfiniteQueryResult:../../type-overrides/use-infinite-query-result.js',
+        '--override-import-type',
+        'create-predefined-parameters-request-fn',
+        '@openapi-qraft/react:RequestFn:../type-overrides/qraft-predefined-parameters.js',
+        '@openapi-qraft/react/qraftPredefinedParametersRequestFn:QraftPredefinedParameterValue:../type-overrides/qraft-predefined-parameters.js',
+        '--create-api-client-fn',
+        'createApiClient',
+        '--create-api-client-fn',
+        'createAPIClient',
+        '--create-api-client-fn',
+        'createAPIOperationClient',
+        'callbacks:none',
+        'services:all',
+        'filename:create-api-operation-client',
+      ]);
+    });
+
+    test('create-predefined-parameters-request-fn.ts', async () => {
+      expect(
+        fs.readFileSync(
+          '/mock-fs/create-predefined-parameters-request-fn.ts',
+          'utf-8'
+        )
+      ).toMatchFileSnapshot(
+        './__snapshots__/override-import-type/create-predefined-parameters-request-fn.ts.snapshot.ts'
+      );
+    });
+
+    test('createAPIClient.ts', async () => {
+      expect(
+        fs.readFileSync('/mock-fs/createAPIClient.ts', 'utf-8')
+      ).toMatchFileSnapshot(
+        './__snapshots__/override-import-type/createAPIClient.ts.snapshot.ts'
+      );
+    });
+
+    test('create-api-operation-client.ts', async () => {
+      expect(
+        fs.readFileSync('/mock-fs/create-api-operation-client.ts', 'utf-8')
+      ).toMatchFileSnapshot(
+        './__snapshots__/override-import-type/create-api-operation-client.ts.snapshot.ts'
+      );
+    });
+
+    test('services/ApprovalPoliciesService.ts', async () => {
+      expect(
+        fs.readFileSync('/mock-fs/services/ApprovalPoliciesService.ts', 'utf-8')
+      ).toMatchFileSnapshot(
+        './__snapshots__/override-import-type/services/ApprovalPoliciesService.ts.snapshot.ts'
+      );
+    });
+  });
+
   describe('--queryable-write-operations', () => {
     beforeAll(async () => {
       const { QraftCommand } = await import(

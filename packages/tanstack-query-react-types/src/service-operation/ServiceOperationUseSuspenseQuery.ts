@@ -1,6 +1,7 @@
 import type {
   AreAllOptional,
   DeepReadonly,
+  OperationError,
   ServiceOperationQueryKey,
 } from '@openapi-qraft/tanstack-query-react-types';
 import type {
@@ -29,5 +30,5 @@ export interface ServiceOperationUseSuspenseQuery<
       >,
       'queryKey'
     >
-  ): UseSuspenseQueryResult<TData, TError | Error>;
+  ): UseSuspenseQueryResult<TData, OperationError<TError>>;
 }

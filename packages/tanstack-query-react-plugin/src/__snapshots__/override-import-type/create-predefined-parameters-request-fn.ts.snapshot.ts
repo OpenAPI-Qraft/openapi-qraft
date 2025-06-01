@@ -3,8 +3,8 @@
  * Do not make direct changes to the file.
  */
 
-import type { RequestFn } from "@openapi-qraft/react";
-import type { QraftPredefinedParameterValue } from "@openapi-qraft/react/qraftPredefinedParametersRequestFn";
+import type { RequestFn } from "../type-overrides/qraft-predefined-parameters.js";
+import type { QraftPredefinedParameterValue } from "../type-overrides/qraft-predefined-parameters.js";
 import { qraftPredefinedParametersRequestFn } from "@openapi-qraft/react/qraftPredefinedParametersRequestFn";
 import type { paths } from "./../openapi.d.ts";
 export type ServiceOperationsPredefinedParameters = [

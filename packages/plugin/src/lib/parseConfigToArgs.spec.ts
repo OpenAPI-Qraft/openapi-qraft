@@ -130,4 +130,36 @@ describe('configParser', () => {
       'callbacks:setQueryData,getQueryData,fetchQuery',
     ]);
   });
+
+  it('should parse complex nested mappings', () => {
+    expect(
+      parseConfigToArgs({
+        'override-import-type': {
+          services: {
+            '@openapi-qraft/tanstack-query-react-types': {
+              ResultError: '../ResponseError',
+              ResultSuccess: '../ResultSuccess',
+            },
+            '@openapi-qraft/react': {
+              UseQueryOperation: '../UseQueryOperation',
+            },
+          },
+          'create-client': {
+            '@openapi-qraft/react': {
+              UseQueryOperation: '../UseQueryOperation',
+            },
+          },
+        },
+      })
+    ).toEqual([
+      '--override-import-type',
+      'services',
+      '@openapi-qraft/tanstack-query-react-types:ResultError:../ResponseError',
+      '@openapi-qraft/tanstack-query-react-types:ResultSuccess:../ResultSuccess',
+      '@openapi-qraft/react:UseQueryOperation:../UseQueryOperation',
+      '--override-import-type',
+      'create-client',
+      '@openapi-qraft/react:UseQueryOperation:../UseQueryOperation',
+    ]);
+  });
 });

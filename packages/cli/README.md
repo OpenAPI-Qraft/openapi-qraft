@@ -24,43 +24,55 @@ Usage: openapi-qraft --plugin tanstack-query-react --plugin openapi-typescript [
 Generate a type-safe TanStack Query client for React from an OpenAPI Document.
 
 Arguments:
-  input                                            Input OpenAPI Document file path, URL (json, yml) (default: null)
+  input                                               Input OpenAPI Document file path, URL (json, yml) (default: null)
 
 Options:
-  -o, --output-dir <path>                          Output directory for generated services
-  -rm, --clean                                     Clean output directory before generating services
-  --filter-services <glob-patterns...>             Filter services to be generated using glob patterns. Example: "/user/**,/post/**". For more details, see the NPM `micromatch` package documentation.
-  --operation-predefined-parameters <patterns...>  Predefined parameters for services. The specified service parameters will be optional. Example: "/**:header.x-monite-version,query.x-api-key" or "get /**:header.x-monite-entity-id"
-  --operation-name-modifier <patterns...>          Modifies operation names using a pattern. Use the `==>` operator to separate the regular expression (left) and the substitution string (right). For example: "post /**:[A-Za-z]+Id ==> createOne"
-  --postfix-services <string>                      Postfix to be added to the generated service name (eg: Service)
-  --service-name-base <endpoint[<index>] | tags>   Use OpenAPI Operation `endpoint[<index>]` path part (e.g.: "/0/1/2") or `tags` as the base name of the service. (default: "endpoint[0]")
-  --file-header <string>                           Header to be added to the generated file (eg: /* eslint-disable */)
-  --redocly [config]                               Use the Redocly configuration to generate multiple API clients
-                                                   If the [config] parameter is not specified, the default Redocly configuration will be used: [redocly.yaml | redocly.yml | .redocly.yaml | .redocly.yml].
-                                                   For more information about this option, use the command: --redocly-help
-                                                   Examples: "openapi-qraft --redocly", "openapi-qraft my-api@v1 external-api --redocly", "openapi-qraft --redocly
-                                                   ./my-redocly-config.yaml"
-  --openapi-types-import-path <path>               Path to schema types file (.d.ts), e.g.: "../schema.d.ts"
-  --explicit-import-extensions [extension]         All import statements will contain an explicit file extension. Ideal for projects using ECMAScript modules. (choices: ".js", ".ts", preset: ".js")
-  --export-openapi-types [bool]                    Add an export statement of the generated OpenAPI document types from the `./index.ts' file. Useful for sharing types within your project. (default: true)
-  --queryable-write-operations [bool]              Enable generation of query hooks (useQuery, useSuspenseQuery, etc.) for writable HTTP methods like POST, PUT, PATCH. By default, only mutation hooks are generated for writable operations.
-  --openapi-types-file-name <path>                 OpenAPI Schema types file name, e.g.: "schema.d.ts" (default: "schema.ts")
-  --enum                                           Export true TS enums instead of unions
-  --enum-values                                    Export enum values as arrays.
-  --dedupe-enums                                   Dedupe enum types when `--enum` is set
-  -t, --export-type                                Export top-level `type` instead of `interface`
-  --immutable                                      Generate readonly types
-  --additional-properties                          Treat schema objects as if `additionalProperties: true` is set
-  --empty-objects-unknown                          Generate `unknown` instead of `Record<string, never>` for empty objects
-  --default-non-nullable                           Set to `false` to ignore default values when generating non-nullable types
-  --properties-required-by-default                 Treat schema objects as if `required` is set to all properties by default
-  --array-length                                   Generate tuples using array minItems / maxItems
-  --path-params-as-types                           Convert paths to template literal types
-  --alphabetize                                    Sort object keys alphabetically
-  --exclude-deprecated                             Exclude deprecated types
-  --no-blob-from-binary                            If this option is enabled, binary format fields will not be converted to Blob types, preserving the native representation
-  --explicit-component-exports                     Enabling this option will export API components as separate type aliases, alongside `components` interface
-  -h, --help                                       display help for command
+  -o, --output-dir <path>                             Output directory for generated services
+  -rm, --clean                                        Clean output directory before generating services
+  --filter-services <glob-patterns...>                Filter services to be generated using glob patterns. Example: "/user/**,/post/**". For more details, see the NPM `micromatch` package documentation.
+  --operation-predefined-parameters <patterns...>     Predefined parameters for services. The specified service parameters will be optional. Example: "/**:header.x-monite-version,query.x-api-key" or
+                                                      "get /**:header.x-monite-entity-id"
+  --operation-name-modifier <patterns...>             Modifies operation names using a pattern. Use the `==>` operator to separate the regular expression (left) and the substitution string (right). For
+                                                      example: "post /**:[A-Za-z]+Id ==> createOne"
+  --postfix-services <string>                         Postfix to be added to the generated service name (eg: Service)
+  --service-name-base <endpoint[<index>] | tags>      Use OpenAPI Operation `endpoint[<index>]` path part (e.g.: "/0/1/2") or `tags` as the base name of the service. (default: "endpoint[0]")
+  --file-header <string>                              Header to be added to the generated file (eg: /* eslint-disable */)
+  --redocly [config]                                  Use the Redocly configuration to generate multiple API clients
+                                                      If the [config] parameter is not specified, the default Redocly configuration will be used: [redocly.yaml | redocly.yml | .redocly.yaml |
+                                                      .redocly.yml].
+                                                      For more information about this option, use the command: --redocly-help
+                                                      Examples:
+                                                      $ bin --redocly
+                                                      $ bin my-api --redocly
+                                                      $ bin my-api@v1 my-api@v2 --redocly
+                                                      $ bin --redocly ./my-redocly-config.yaml
+  --openapi-types-import-path <path>                  Path to schema types file (.d.ts), e.g.: "../schema.d.ts"
+  --explicit-import-extensions [extension]            All import statements will contain an explicit file extension. Ideal for projects using ECMAScript modules. (choices: ".js", ".ts", preset: ".js")
+  --export-openapi-types [bool]                       Add an export statement of the generated OpenAPI document types from the `./index.ts' file. Useful for sharing types within your project. Default:
+                                                      true when --plugin openapi-typescript is used. (default: true)
+  --queryable-write-operations [bool]                 Enable generation of query hooks (useQuery, useSuspenseQuery, etc.) for writable HTTP methods like POST, PUT, PATCH. By default, only mutation hooks
+                                                      are generated for writable operations.
+  --create-api-client-fn <functionName> [options...]  Configure API client creation function. Allows specifying the function name, included services, and callbacks. Can be specified multiple times to
+                                                      generate several different API client functions from a single OpenAPI document. (default: null)
+  --override-import-type <pathname overrides...>      Override import paths for specific types in generated files. This allows using custom type implementations instead of the default ones. Expected
+                                                      format: filepath originalModule:importTypeName:customImportPath
+  --openapi-types-file-name <path>                    OpenAPI Schema types file name, e.g.: "schema.d.ts" (default: "schema.ts")
+  --enum                                              Export true TS enums instead of unions
+  --enum-values                                       Export enum values as arrays.
+  --dedupe-enums                                      Dedupe enum types when `--enum` is set
+  -t, --export-type                                   Export top-level `type` instead of `interface`
+  --immutable                                         Generate readonly types
+  --additional-properties                             Treat schema objects as if `additionalProperties: true` is set
+  --empty-objects-unknown                             Generate `unknown` instead of `Record<string, never>` for empty objects
+  --default-non-nullable                              Set to `false` to ignore default values when generating non-nullable types
+  --properties-required-by-default                    Treat schema objects as if `required` is set to all properties by default
+  --array-length                                      Generate tuples using array minItems / maxItems
+  --path-params-as-types                              Convert paths to template literal types
+  --alphabetize                                       Sort object keys alphabetically
+  --exclude-deprecated                                Exclude deprecated types
+  --no-blob-from-binary                               If this option is enabled, binary format fields will not be converted to Blob types, preserving the native representation
+  --explicit-component-exports                        Enabling this option will export API components as separate type aliases, alongside `components` interface
+  -h, --help                                          display help for command
 ```
 
 ## Usage example

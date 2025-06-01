@@ -3,9 +3,12 @@
  * Do not make direct changes to the file.
  */
 
-import type { paths } from "../../openapi.js";
-import type { DeepReadonly, InvalidateQueryFilters, MutationFiltersByMutationKey, MutationFiltersByParameters, MutationVariables, OperationError, OperationInfiniteData, PartialParameters, QueryFiltersByParameters, QueryFiltersByQueryKey, QueryFnOptionsByParameters, QueryFnOptionsByQueryKey, RequestFnResponse, ServiceOperationEnsureInfiniteQueryDataOptions, ServiceOperationEnsureQueryDataOptions, ServiceOperationFetchInfiniteQueryOptions, ServiceOperationFetchQueryOptions, ServiceOperationInfiniteQueryKey, ServiceOperationMutationFnOptions, ServiceOperationMutationKey, ServiceOperationQueryKey, ServiceOperationUseMutationOptions, UseQueryOptionsForUseQueries, UseQueryOptionsForUseSuspenseQuery, WithOptional, QraftServiceOperationsToken } from "@openapi-qraft/tanstack-query-react-types";
-import type { CancelOptions, DefinedInitialDataInfiniteOptions, DefinedInitialDataOptions, DefinedUseInfiniteQueryResult, DefinedUseQueryResult, InfiniteQueryPageParamsOptions, InvalidateOptions, Mutation, MutationState, NoInfer, QueryState, RefetchOptions, ResetOptions, SetDataOptions, UndefinedInitialDataInfiniteOptions, UndefinedInitialDataOptions, Updater, UseInfiniteQueryResult, UseMutationResult, UseQueryResult, UseSuspenseInfiniteQueryOptions, UseSuspenseInfiniteQueryResult, UseSuspenseQueryOptions, UseSuspenseQueryResult } from "@tanstack/react-query";
+import type { paths } from "../../openapi.d.ts";
+import type { DeepReadonly, InvalidateQueryFilters, MutationFiltersByMutationKey, MutationFiltersByParameters, MutationVariables, OperationInfiniteData, PartialParameters, QueryFiltersByParameters, QueryFiltersByQueryKey, QueryFnOptionsByParameters, QueryFnOptionsByQueryKey, RequestFnResponse, ServiceOperationEnsureInfiniteQueryDataOptions, ServiceOperationEnsureQueryDataOptions, ServiceOperationFetchInfiniteQueryOptions, ServiceOperationFetchQueryOptions, ServiceOperationInfiniteQueryKey, ServiceOperationMutationFnOptions, ServiceOperationMutationKey, ServiceOperationQueryKey, ServiceOperationUseMutationOptions, UseQueryOptionsForUseQueries, UseQueryOptionsForUseSuspenseQuery, WithOptional, QraftServiceOperationsToken } from "@openapi-qraft/tanstack-query-react-types";
+import type { CancelOptions, DefinedInitialDataInfiniteOptions, DefinedInitialDataOptions, DefinedUseInfiniteQueryResult, DefinedUseQueryResult, InfiniteQueryPageParamsOptions, InvalidateOptions, Mutation, MutationState, NoInfer, QueryState, RefetchOptions, ResetOptions, SetDataOptions, UndefinedInitialDataInfiniteOptions, UndefinedInitialDataOptions, Updater, UseMutationResult, UseQueryResult, UseSuspenseInfiniteQueryOptions, UseSuspenseInfiniteQueryResult } from "@tanstack/react-query";
+import type { OperationError } from "../../type-overrides/operation-error.js";
+import type { UseInfiniteQueryResult } from "../../type-overrides/use-infinite-query-result.js";
+import type { UseSuspenseQueryOptions, UseSuspenseQueryResult } from "../../type-overrides/suspense-query.js";
 export interface ApprovalPoliciesService {
     /**
      * @summary Get an approval policy by ID
@@ -32,8 +35,7 @@ export interface ApprovalPoliciesService {
          * ```ts
          * const { data, isLoading } = qraft.approvalPoliciesService.getApprovalPoliciesId.useQuery({
          *     header: {
-         *         "x-monite-version": "2023-06-04",
-         *         "x-monite-entity-id": xMoniteEntityId
+         *         "x-monite-version": "2023-06-04"
          *     },
          *     path: {
          *         approval_policy_id: approvalPolicyId
@@ -55,8 +57,7 @@ export interface ApprovalPoliciesService {
          * ```ts
          * const { data, isLoading } = qraft.approvalPoliciesService.getApprovalPoliciesId.useQuery({
          *     header: {
-         *         "x-monite-version": "2023-06-04",
-         *         "x-monite-entity-id": xMoniteEntityId
+         *         "x-monite-version": "2023-06-04"
          *     },
          *     path: {
          *         approval_policy_id: approvalPolicyId
@@ -195,8 +196,7 @@ export interface ApprovalPoliciesService {
          * ```ts
          * const { data, isLoading, fetchNextPage } = qraft.approvalPoliciesService.getApprovalPoliciesId.useInfiniteQuery({
          *     header: {
-         *         "x-monite-version": "2023-06-04",
-         *         "x-monite-entity-id": xMoniteEntityId
+         *         "x-monite-version": "2023-06-04"
          *     },
          *     path: {
          *         approval_policy_id: approvalPolicyId
@@ -227,8 +227,7 @@ export interface ApprovalPoliciesService {
          * ```ts
          * const { data, isLoading, fetchNextPage } = qraft.approvalPoliciesService.getApprovalPoliciesId.useInfiniteQuery({
          *     header: {
-         *         "x-monite-version": "2023-06-04",
-         *         "x-monite-entity-id": xMoniteEntityId
+         *         "x-monite-version": "2023-06-04"
          *     },
          *     path: {
          *         approval_policy_id: approvalPolicyId
@@ -265,8 +264,7 @@ export interface ApprovalPoliciesService {
          *     infinite: false,
          *     parameters: {
          *         header: {
-         *             "x-monite-version": "2023-06-04",
-         *             "x-monite-entity-id": xMoniteEntityId
+         *             "x-monite-version": "2023-06-04"
          *         },
          *         path: {
          *             approval_policy_id: approvalPolicyId
@@ -291,8 +289,7 @@ export interface ApprovalPoliciesService {
          *     queries: [
          *         {
          *             header: {
-         *                 "x-monite-version": "2023-06-04",
-         *                 "x-monite-entity-id": xMoniteEntityId1
+         *                 "x-monite-version": "2023-06-04"
          *             },
          *             path: {
          *                 approval_policy_id: approvalPolicyId1
@@ -303,8 +300,7 @@ export interface ApprovalPoliciesService {
          *         },
          *         {
          *             header: {
-         *                 "x-monite-version": "2023-06-04",
-         *                 "x-monite-entity-id": xMoniteEntityId2
+         *                 "x-monite-version": "2023-06-04"
          *             },
          *             path: {
          *                 approval_policy_id: approvalPolicyId2
@@ -324,8 +320,7 @@ export interface ApprovalPoliciesService {
          *     queries: [
          *         {
          *             header: {
-         *                 "x-monite-version": "2023-06-04",
-         *                 "x-monite-entity-id": xMoniteEntityId1
+         *                 "x-monite-version": "2023-06-04"
          *             },
          *             path: {
          *                 approval_policy_id: approvalPolicyId1
@@ -336,8 +331,7 @@ export interface ApprovalPoliciesService {
          *         },
          *         {
          *             header: {
-         *                 "x-monite-version": "2023-06-04",
-         *                 "x-monite-entity-id": xMoniteEntityId2
+         *                 "x-monite-version": "2023-06-04"
          *             },
          *             path: {
          *                 approval_policy_id: approvalPolicyId2
@@ -370,8 +364,7 @@ export interface ApprovalPoliciesService {
          * ```ts
          * const { data, isLoading } = qraft.approvalPoliciesService.getApprovalPoliciesId.useQuery({
          *     header: {
-         *         "x-monite-version": "2023-06-04",
-         *         "x-monite-entity-id": xMoniteEntityId
+         *         "x-monite-version": "2023-06-04"
          *     },
          *     path: {
          *         approval_policy_id: approvalPolicyId
@@ -393,8 +386,7 @@ export interface ApprovalPoliciesService {
          * ```ts
          * const { data, isLoading } = qraft.approvalPoliciesService.getApprovalPoliciesId.useQuery({
          *     header: {
-         *         "x-monite-version": "2023-06-04",
-         *         "x-monite-entity-id": xMoniteEntityId
+         *         "x-monite-version": "2023-06-04"
          *     },
          *     path: {
          *         approval_policy_id: approvalPolicyId
@@ -419,8 +411,7 @@ export interface ApprovalPoliciesService {
          * ```ts
          * const { data, isLoading, fetchNextPage } = qraft.approvalPoliciesService.getApprovalPoliciesId.useSuspenseInfiniteQuery({
          *     header: {
-         *         "x-monite-version": "2023-06-04",
-         *         "x-monite-entity-id": xMoniteEntityId
+         *         "x-monite-version": "2023-06-04"
          *     },
          *     path: {
          *         approval_policy_id: approvalPolicyId
@@ -452,8 +443,7 @@ export interface ApprovalPoliciesService {
          *     queries: [
          *         {
          *             header: {
-         *                 "x-monite-version": "2023-06-04",
-         *                 "x-monite-entity-id": xMoniteEntityId1
+         *                 "x-monite-version": "2023-06-04"
          *             },
          *             path: {
          *                 approval_policy_id: approvalPolicyId1
@@ -464,8 +454,7 @@ export interface ApprovalPoliciesService {
          *         },
          *         {
          *             header: {
-         *                 "x-monite-version": "2023-06-04",
-         *                 "x-monite-entity-id": xMoniteEntityId2
+         *                 "x-monite-version": "2023-06-04"
          *             },
          *             path: {
          *                 approval_policy_id: approvalPolicyId2
@@ -485,8 +474,7 @@ export interface ApprovalPoliciesService {
          *     queries: [
          *         {
          *             header: {
-         *                 "x-monite-version": "2023-06-04",
-         *                 "x-monite-entity-id": xMoniteEntityId1
+         *                 "x-monite-version": "2023-06-04"
          *             },
          *             path: {
          *                 approval_policy_id: approvalPolicyId1
@@ -497,8 +485,7 @@ export interface ApprovalPoliciesService {
          *         },
          *         {
          *             header: {
-         *                 "x-monite-version": "2023-06-04",
-         *                 "x-monite-entity-id": xMoniteEntityId2
+         *                 "x-monite-version": "2023-06-04"
          *             },
          *             path: {
          *                 approval_policy_id: approvalPolicyId2
@@ -527,8 +514,7 @@ export interface ApprovalPoliciesService {
          * ```ts
          * const data = qraft.approvalPoliciesService.getApprovalPoliciesId.useSuspenseQuery({
          *     header: {
-         *         "x-monite-version": "2023-06-04",
-         *         "x-monite-entity-id": xMoniteEntityId
+         *         "x-monite-version": "2023-06-04"
          *     },
          *     path: {
          *         approval_policy_id: approvalPolicyId
@@ -568,8 +554,7 @@ export interface ApprovalPoliciesService {
          * ```ts
          * const { mutate, isPending } = qraft.approvalPoliciesService.deleteApprovalPoliciesId.useMutation({
          *     header: {
-         *         "x-monite-version": "2023-06-04",
-         *         "x-monite-entity-id": xMoniteEntityId
+         *         "x-monite-version": "2023-06-04"
          *     },
          *     path: {
          *         approval_policy_id: approvalPolicyId
@@ -586,8 +571,7 @@ export interface ApprovalPoliciesService {
          * mutate({
          *     body: bodyPayload,
          *     header: {
-         *         "x-monite-version": "2023-06-04",
-         *         "x-monite-entity-id": xMoniteEntityId
+         *         "x-monite-version": "2023-06-04"
          *     },
          *     path: {
          *         approval_policy_id: approvalPolicyId
@@ -610,8 +594,7 @@ export interface ApprovalPoliciesService {
          * ```ts
          * const { mutate, isPending } = qraft.approvalPoliciesService.deleteApprovalPoliciesId.useMutation({
          *     header: {
-         *         "x-monite-version": "2023-06-04",
-         *         "x-monite-entity-id": xMoniteEntityId
+         *         "x-monite-version": "2023-06-04"
          *     },
          *     path: {
          *         approval_policy_id: approvalPolicyId
@@ -628,8 +611,7 @@ export interface ApprovalPoliciesService {
          * mutate({
          *     body: bodyPayload,
          *     header: {
-         *         "x-monite-version": "2023-06-04",
-         *         "x-monite-entity-id": xMoniteEntityId
+         *         "x-monite-version": "2023-06-04"
          *     },
          *     path: {
          *         approval_policy_id: approvalPolicyId
@@ -656,8 +638,7 @@ export interface ApprovalPoliciesService {
          * const deleteApprovalPoliciesIdTotal = qraft.approvalPoliciesService.deleteApprovalPoliciesId.useIsMutating({
          *     parameters: {
          *         header: {
-         *             "x-monite-version": "2023-06-04",
-         *             "x-monite-entity-id": xMoniteEntityId
+         *             "x-monite-version": "2023-06-04"
          *         },
          *         path: {
          *             approval_policy_id: approvalPolicyId
@@ -701,8 +682,7 @@ export interface ApprovalPoliciesService {
          *     filters: {
          *         parameters: {
          *             header: {
-         *                 "x-monite-version": "2023-06-04",
-         *                 "x-monite-entity-id": xMoniteEntityId
+         *                 "x-monite-version": "2023-06-04"
          *             },
          *             path: {
          *                 approval_policy_id: approvalPolicyId
@@ -749,8 +729,7 @@ export interface ApprovalPoliciesService {
          * ```ts
          * const { mutate, isPending } = qraft.approvalPoliciesService.patchApprovalPoliciesId.useMutation({
          *     header: {
-         *         "x-monite-version": "2023-06-04",
-         *         "x-monite-entity-id": xMoniteEntityId
+         *         "x-monite-version": "2023-06-04"
          *     },
          *     path: {
          *         approval_policy_id: approvalPolicyId
@@ -767,8 +746,7 @@ export interface ApprovalPoliciesService {
          * mutate({
          *     body: bodyPayload,
          *     header: {
-         *         "x-monite-version": "2023-06-04",
-         *         "x-monite-entity-id": xMoniteEntityId
+         *         "x-monite-version": "2023-06-04"
          *     },
          *     path: {
          *         approval_policy_id: approvalPolicyId
@@ -791,8 +769,7 @@ export interface ApprovalPoliciesService {
          * ```ts
          * const { mutate, isPending } = qraft.approvalPoliciesService.patchApprovalPoliciesId.useMutation({
          *     header: {
-         *         "x-monite-version": "2023-06-04",
-         *         "x-monite-entity-id": xMoniteEntityId
+         *         "x-monite-version": "2023-06-04"
          *     },
          *     path: {
          *         approval_policy_id: approvalPolicyId
@@ -809,8 +786,7 @@ export interface ApprovalPoliciesService {
          * mutate({
          *     body: bodyPayload,
          *     header: {
-         *         "x-monite-version": "2023-06-04",
-         *         "x-monite-entity-id": xMoniteEntityId
+         *         "x-monite-version": "2023-06-04"
          *     },
          *     path: {
          *         approval_policy_id: approvalPolicyId
@@ -837,8 +813,7 @@ export interface ApprovalPoliciesService {
          * const patchApprovalPoliciesIdTotal = qraft.approvalPoliciesService.patchApprovalPoliciesId.useIsMutating({
          *     parameters: {
          *         header: {
-         *             "x-monite-version": "2023-06-04",
-         *             "x-monite-entity-id": xMoniteEntityId
+         *             "x-monite-version": "2023-06-04"
          *         },
          *         path: {
          *             approval_policy_id: approvalPolicyId
@@ -882,8 +857,7 @@ export interface ApprovalPoliciesService {
          *     filters: {
          *         parameters: {
          *             header: {
-         *                 "x-monite-version": "2023-06-04",
-         *                 "x-monite-entity-id": xMoniteEntityId
+         *                 "x-monite-version": "2023-06-04"
          *             },
          *             path: {
          *                 approval_policy_id: approvalPolicyId

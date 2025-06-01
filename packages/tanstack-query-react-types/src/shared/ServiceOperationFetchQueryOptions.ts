@@ -3,7 +3,7 @@ import type {
   DefaultError,
   FetchQueryOptions,
   QueryFunction,
-} from '@tanstack/query-core';
+} from '@tanstack/react-query';
 import type { AreAllOptional } from './AreAllOptional.js';
 import type { DeepReadonly } from './DeepReadonly.js';
 import type { ServiceOperationQueryKey } from './ServiceOperationKey.js';

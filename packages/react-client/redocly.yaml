@@ -1,3 +1,8 @@
+x-openapi-qraft:
+  plugin:
+    tanstack-query-react: true
+    openapi-typescript: true
+
 rules:
   operation-operationId-unique:
     severity: 'error'
@@ -6,9 +11,6 @@ apis:
   main:
     root: ../test-fixtures/openapi.json
     x-openapi-qraft:
-      plugin:
-        tanstack-query-react: true
-        openapi-typescript: true
       output-dir: src/tests/fixtures/api
       clean: true
       enum-values: true
@@ -37,12 +39,27 @@ apis:
       filter-services:
         - '/approval_policies/**'
         - '/files/**'
+      operation-predefined-parameters:
+        '/approval_policies/**': 'header.x-monite-entity-id'
+      override-import-type:
+        services:
+          '@openapi-qraft/tanstack-query-react-types':
+            OperationError: '../../type-overrides/operation-error.js'
+          '@tanstack/react-query':
+            UseSuspenseQueryOptions: '../../type-overrides/suspense-query.js'
+            UseSuspenseQueryResult: '../../type-overrides/suspense-query.js'
+            UseInfiniteQueryResult: '../../type-overrides/use-infinite-query-result.js'
+        create-api-client:
+          '@openapi-qraft/react':
+            CreateAPIQueryClientOptions: '../type-overrides/create-query-client-options.js'
+        create-predefined-parameters-request-fn:
+          '@openapi-qraft/react':
+            RequestFn: '../type-overrides/qraft-predefined-parameters.js'
+          '@openapi-qraft/react/qraftPredefinedParametersRequestFn':
+            QraftPredefinedParameterValue: '../type-overrides/qraft-predefined-parameters.js'
   files:
     root: ../test-fixtures/openapi.json
     x-openapi-qraft:
-      plugin:
-        tanstack-query-react: true
-        openapi-typescript: true
       output-dir: src/tests/fixtures/files-api
       clean: true
       openapi-types-file-name: internal-openapi.ts

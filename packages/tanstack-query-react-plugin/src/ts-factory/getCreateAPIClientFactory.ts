@@ -1,4 +1,6 @@
+import type { OverrideImportType } from './OverrideImportType.js';
 import ts from 'typescript';
+import { getOverriddenImportDeclarationsFactory } from './getOverriddenImportDeclarationsFactory.js';
 
 type Options = {
   servicesDirName: string;
@@ -6,6 +8,9 @@ type Options = {
   defaultClientCallbacks: string[] | ['all'] | ['none'] | undefined;
   defaultClientServices: string[] | ['all'] | ['none'] | undefined;
   createAPIClientFnName: string;
+  createAPIClientFnImportTypeOverrides:
+    | OverrideImportType[keyof OverrideImportType]
+    | undefined;
 };
 
 export const getCreateAPIClientFactory = (options: Options) => {
@@ -20,6 +25,7 @@ const getOperationClientImportsFactory = ({
   explicitImportExtensions,
   defaultClientCallbacks,
   defaultClientServices,
+  createAPIClientFnImportTypeOverrides,
 }: Options) => {
   const factory = ts.factory;
 
@@ -35,75 +41,59 @@ const getOperationClientImportsFactory = ({
       (name) => name !== 'all' && name !== 'none'
     ) || [];
 
-  const imports: ts.Statement[] = [
-    factory.createImportDeclaration(
-      undefined,
-      factory.createImportClause(
-        true,
+  const qraftImportTypeOverrides =
+    createAPIClientFnImportTypeOverrides?.['@openapi-qraft/react'];
+
+  const availableQraftImportedTypes = [
+    'APIBasicClientServices',
+    'APIBasicQueryClientServices',
+    'APIDefaultQueryClientServices',
+    !shouldImportAllCallbacks && 'APIQueryClientServices',
+    'APIUtilityClientServices',
+    'CreateAPIBasicClientOptions',
+    'CreateAPIBasicQueryClientOptions',
+    'CreateAPIClientOptions',
+    'CreateAPIQueryClientOptions',
+    !shouldImportAllServices && 'UnionServiceOperationsDeclaration',
+  ].filter((typeName) => typeof typeName === 'string');
+
+  const imports: ts.Statement[] = [];
+
+  const qraftTypesToImport = availableQraftImportedTypes.filter(
+    (typeName) => !qraftImportTypeOverrides?.[typeName]
+  );
+
+  if (qraftTypesToImport.length) {
+    imports.push(
+      factory.createImportDeclaration(
         undefined,
-        factory.createNamedImports(
-          [
-            factory.createImportSpecifier(
-              false,
-              undefined,
-              factory.createIdentifier('APIBasicClientServices')
-            ),
-            factory.createImportSpecifier(
-              false,
-              undefined,
-              factory.createIdentifier('APIBasicQueryClientServices')
-            ),
-            factory.createImportSpecifier(
-              false,
-              undefined,
-              factory.createIdentifier('APIDefaultQueryClientServices')
-            ),
-            shouldImportAllCallbacks
-              ? null
-              : factory.createImportSpecifier(
-                  false,
-                  undefined,
-                  factory.createIdentifier('APIQueryClientServices')
-                ),
-            factory.createImportSpecifier(
-              false,
-              undefined,
-              factory.createIdentifier('APIUtilityClientServices')
-            ),
-            factory.createImportSpecifier(
-              false,
-              undefined,
-              factory.createIdentifier('CreateAPIBasicClientOptions')
-            ),
-            factory.createImportSpecifier(
-              false,
-              undefined,
-              factory.createIdentifier('CreateAPIBasicQueryClientOptions')
-            ),
-            factory.createImportSpecifier(
-              false,
-              undefined,
-              factory.createIdentifier('CreateAPIClientOptions')
-            ),
-            factory.createImportSpecifier(
-              false,
-              undefined,
-              factory.createIdentifier('CreateAPIQueryClientOptions')
-            ),
-            shouldImportAllServices
-              ? null
-              : factory.createImportSpecifier(
-                  false,
-                  undefined,
-                  factory.createIdentifier('UnionServiceOperationsDeclaration')
-                ),
-          ].filter(nonNullable)
-        )
-      ),
-      factory.createStringLiteral('@openapi-qraft/react'),
-      undefined
-    ),
-  ];
+        factory.createImportClause(
+          true,
+          undefined,
+          factory.createNamedImports(
+            qraftTypesToImport.map((name) =>
+              factory.createImportSpecifier(
+                false,
+                undefined,
+                factory.createIdentifier(name)
+              )
+            )
+          )
+        ),
+        factory.createStringLiteral('@openapi-qraft/react'),
+        undefined
+      )
+    );
+  }
+
+  if (qraftImportTypeOverrides) {
+    imports.push(
+      ...getOverriddenImportDeclarationsFactory(
+        { '@openapi-qraft/react': availableQraftImportedTypes },
+        createAPIClientFnImportTypeOverrides
+      )
+    );
+  }
 
   imports.push(
     factory.createImportDeclaration(

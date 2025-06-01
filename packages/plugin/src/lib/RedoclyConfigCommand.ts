@@ -104,8 +104,16 @@ export class RedoclyConfigCommand extends Command {
         }
 
         redocAPIsToQraftEntries.forEach(([apiName, api]) => {
+          const globalQraftConfig =
+            'x-openapi-qraft' in redoc.rawConfig
+              ? redoc.rawConfig['x-openapi-qraft']
+              : undefined;
+
           const {
-            ['x-openapi-qraft']: { ['output-dir']: outputDir, ...qraftConfig },
+            ['x-openapi-qraft']: {
+              ['output-dir']: outputDir,
+              ...apiQraftConfig
+            },
           } = api;
 
           const cwd = fileURLToPath(this.cwd);
@@ -115,7 +123,10 @@ export class RedoclyConfigCommand extends Command {
             ...parseConfigToArgs({
               redocly: relative(cwd, redocConfigFile),
               'output-dir': relative(cwd, outputDir),
-              ...qraftConfig,
+              ...(globalQraftConfig && typeof globalQraftConfig === 'object'
+                ? globalQraftConfig
+                : undefined),
+              ...apiQraftConfig,
             }),
           ];
         });
@@ -155,7 +166,7 @@ export class RedoclyConfigCommand extends Command {
           spinner.info(
             `Generating API client for ${c.magenta(apiName)} with the following parameters:\n` +
               c.gray.italic('bin ') +
-              `${c.green.italic(openAPIDocument)}` +
+              `${c.green.italic(openAPIDocument)} ` +
               apiProcessArgv
                 .map((arg) =>
                   arg.startsWith('--')

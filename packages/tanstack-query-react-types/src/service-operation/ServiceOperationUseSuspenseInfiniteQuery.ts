@@ -1,12 +1,13 @@
 import type {
   AreAllOptional,
   DeepReadonly,
+  OperationError,
   OperationInfiniteData,
   PartialParameters,
   ServiceOperationInfiniteQueryKey,
 } from '@openapi-qraft/tanstack-query-react-types';
-import type { InfiniteQueryPageParamsOptions } from '@tanstack/query-core';
 import type {
+  InfiniteQueryPageParamsOptions,
   UseSuspenseInfiniteQueryOptions,
   UseSuspenseInfiniteQueryResult,
 } from '@tanstack/react-query';
@@ -46,6 +47,6 @@ export interface ServiceOperationUseSuspenseInfiniteQuery<
       >
   ): UseSuspenseInfiniteQueryResult<
     OperationInfiniteData<TData, TQueryParams>,
-    TError | Error
+    OperationError<TError>
   >;
 }

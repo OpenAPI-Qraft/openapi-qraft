@@ -1,3 +1,4 @@
+import type { OverrideImportType } from './ts-factory/OverrideImportType.js';
 import { URL } from 'node:url';
 import { formatFileHeader } from '@openapi-qraft/plugin/lib/formatFileHeader';
 import { GeneratorFile } from '@openapi-qraft/plugin/lib/GeneratorFile';
@@ -33,26 +34,35 @@ interface OutputOptions extends OutputOptionsBase {
 export const generateCode = async ({
   spinner,
   services,
-  serviceImports,
+  serviceOptions,
   output,
+  overrideImportType,
 }: {
   spinner: Ora;
   services: OpenAPIService[];
-  serviceImports: ServiceFactoryOptions;
+  serviceOptions: ServiceFactoryOptions;
   output: OutputOptions;
+  overrideImportType: OverrideImportType | undefined;
 }) => {
   return [
-    ...(await generateServices(spinner, services, serviceImports, output)),
+    ...(await generateServices(
+      spinner,
+      services,
+      serviceOptions,
+      output,
+      overrideImportType
+    )),
     ...(await generateServiceIndex(spinner, services, output)),
-    ...(await generateOperationClient(spinner, output)),
+    ...(await generateOperationClient(spinner, output, overrideImportType)),
     ...(output.operationPredefinedParameters
       ? await generateCreatePredefinedParametersRequestFn(
           spinner,
-          serviceImports,
-          output
+          serviceOptions,
+          output,
+          overrideImportType
         )
       : []),
-    ...(await generateIndex(spinner, serviceImports, output)),
+    ...(await generateIndex(spinner, serviceOptions, output)),
   ];
 };
 
@@ -66,7 +76,8 @@ const generateServices = async (
   spinner: Ora,
   services: OpenAPIService[],
   serviceImports: ServiceFactoryOptions,
-  output: OutputOptions
+  output: OutputOptions,
+  overrideImportType: OverrideImportType | undefined
 ) => {
   const servicesDir = composeServicesDirPath(output);
 
@@ -92,7 +103,8 @@ const generateServices = async (
             variableName,
           },
           operations,
-          serviceImports
+          serviceImports,
+          overrideImportType?.[output.servicesDirName]
         )
       );
 
@@ -150,13 +162,19 @@ const generateServiceIndex = async (
   return serviceIndexFiles;
 };
 
-const generateOperationClient = async (spinner: Ora, output: OutputOptions) => {
+const generateOperationClient = async (
+  spinner: Ora,
+  output: OutputOptions,
+  overrideImportType: OverrideImportType | undefined
+) => {
   spinner.start('Generating operation client');
 
   const operationClientFiles: GeneratorFile[] = [];
 
   try {
     output.createApiClientFn.map(([functionName, value]) => {
+      const fileName = value.filename?.[0] ?? functionName;
+
       const code = astToString(
         getCreateAPIClientFactory({
           defaultClientCallbacks: value.callbacks,
@@ -164,11 +182,12 @@ const generateOperationClient = async (spinner: Ora, output: OutputOptions) => {
           createAPIClientFnName: functionName,
           servicesDirName: output.servicesDirName,
           explicitImportExtensions: output.explicitImportExtensions,
+          createAPIClientFnImportTypeOverrides: overrideImportType?.[fileName],
         })
       );
 
       operationClientFiles.push({
-        file: new URL(`${value.filename?.[0] ?? functionName}.ts`, output.dir),
+        file: new URL(`${fileName}.ts`, output.dir),
         code: formatFileHeader(output.fileHeader) + code,
       });
     });
@@ -188,23 +207,27 @@ const generateOperationClient = async (spinner: Ora, output: OutputOptions) => {
 const generateCreatePredefinedParametersRequestFn = async (
   spinner: Ora,
   serviceImports: ServiceFactoryOptions,
-  output: OutputOptions
+  output: OutputOptions,
+  overrideImportType: OverrideImportType | undefined
 ) => {
   spinner.start('Generating "createPredefinedParametersRequestFn"');
 
   const clientFiles: GeneratorFile[] = [];
 
   try {
+    const filename = 'create-predefined-parameters-request-fn';
+
     const code = astToString(
       getCreatePredefinedParametersRequestFnFactory({
         servicesDirName: output.servicesDirName,
         operationPredefinedParameters: output.operationPredefinedParameters,
         openapiTypesImportPath: serviceImports.openapiTypesImportPath,
+        importTypeOverrides: overrideImportType?.[filename],
       })
     );
 
     clientFiles.push({
-      file: new URL('create-predefined-parameters-request-fn.ts', output.dir),
+      file: new URL(`${filename}.ts`, output.dir),
       code: formatFileHeader(output.fileHeader) + code,
     });
   } catch (error) {

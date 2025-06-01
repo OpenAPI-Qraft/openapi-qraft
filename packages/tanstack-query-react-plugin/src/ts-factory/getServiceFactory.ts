@@ -1,9 +1,11 @@
+import type { OverrideImportType } from './OverrideImportType.js';
 import { isReadOnlyOperation } from '@openapi-qraft/plugin/lib/isReadOnlyOperation';
 import { ServiceOperation } from '@openapi-qraft/plugin/lib/open-api/OpenAPIService';
 import camelCase from 'camelcase';
 import ts from 'typescript';
 import { createOperationCommonTSDoc } from '../lib/createOperationCommonTSDoc.js';
 import { filterUnusedTypes } from './filterUnusedTypes.js';
+import { getOverriddenImportDeclarationsFactory } from './getOverriddenImportDeclarationsFactory.js';
 import {
   createServicesMutationOperationNodes,
   createServicesQueryOperationNodes,
@@ -22,7 +24,10 @@ type Service = { typeName: string; variableName: string };
 export const getServiceFactory = (
   service: Service,
   operations: ServiceOperation[],
-  options: ServiceFactoryOptions
+  options: ServiceFactoryOptions,
+  serviceImportTypeOverrides:
+    | OverrideImportType[keyof OverrideImportType]
+    | undefined
 ) => {
   const operationVariables = operations.map((operation) =>
     getServiceOperationVariableFactory(service.typeName, operation)
@@ -37,20 +42,21 @@ export const getServiceFactory = (
     ...getOperationsTypes(operations, options),
   ];
 
-  const internalModulesTypeImports = filterUnusedTypes(
+  const moduleTypeImports = filterUnusedTypes(
     getModuleTypeImports(operations, options),
     mainNodes
   );
-  internalModulesTypeImports['@openapi-qraft/tanstack-query-react-types'] = [
-    ...(internalModulesTypeImports[
-      '@openapi-qraft/tanstack-query-react-types'
-    ] ?? []),
-    'QraftServiceOperationsToken',
-  ];
+
+  moduleTypeImports['@openapi-qraft/tanstack-query-react-types']?.push(
+    'QraftServiceOperationsToken'
+  );
 
   const importNodes = [
     getOpenAPISchemaImportsFactory(options.openapiTypesImportPath),
-    ...getServiceOperationImportsFactory(internalModulesTypeImports),
+    ...getServiceOperationImportsFactory(
+      moduleTypeImports,
+      serviceImportTypeOverrides
+    ),
   ];
 
   return [...importNodes, ...mainNodes];
@@ -77,19 +83,30 @@ const getOpenAPISchemaImportsFactory = (schemaTypesPath: string) => {
 };
 
 const getServiceOperationImportsFactory = (
-  moduleImports: Record<string, string[]>
+  moduleImports: Record<string, string[]>,
+  serviceImportTypeOverrides:
+    | OverrideImportType[keyof OverrideImportType]
+    | undefined
 ) => {
   const factory = ts.factory;
 
-  return Object.entries(moduleImports).map(
-    ([moduleName, importSpecifierNames]) => {
+  const standardImports = Object.entries(moduleImports)
+    .map(([moduleName, importSpecifierNames]) => {
+      const filteredSpecifiers = serviceImportTypeOverrides?.[moduleName]
+        ? importSpecifierNames.filter(
+            (specifier) => !serviceImportTypeOverrides[moduleName][specifier]
+          )
+        : importSpecifierNames;
+
+      if (!filteredSpecifiers.length) return null;
+
       return factory.createImportDeclaration(
         undefined,
         factory.createImportClause(
           true,
           undefined,
           factory.createNamedImports(
-            importSpecifierNames.map((specifier) =>
+            filteredSpecifiers.map((specifier) =>
               factory.createImportSpecifier(
                 false,
                 undefined,
@@ -100,8 +117,17 @@ const getServiceOperationImportsFactory = (
         ),
         factory.createStringLiteral(moduleName)
       );
-    }
-  );
+    })
+    .filter((importDecl) => !!importDecl);
+
+  const customImports = serviceImportTypeOverrides
+    ? getOverriddenImportDeclarationsFactory(
+        moduleImports,
+        serviceImportTypeOverrides
+      )
+    : [];
+
+  return [...standardImports, ...customImports];
 };
 
 const getServiceInterfaceFactory = (

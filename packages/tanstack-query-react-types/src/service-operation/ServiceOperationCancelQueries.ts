@@ -2,7 +2,7 @@ import type {
   QueryFiltersByParameters,
   QueryFiltersByQueryKey,
 } from '@openapi-qraft/tanstack-query-react-types';
-import type { CancelOptions } from '@tanstack/query-core';
+import type { CancelOptions } from '@tanstack/react-query';
 
 export interface ServiceOperationCancelQueries<
   TSchema extends { url: string; method: string },

@@ -1,4 +1,4 @@
-import type { DefaultError } from '@tanstack/query-core';
+import type { DefaultError } from '@tanstack/react-query';
 import type {
   QueryFiltersByParameters,
   QueryFiltersByQueryKey,

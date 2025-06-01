@@ -16,6 +16,11 @@
       "import": "./dist/esm/index.js",
       "require": "./dist/cjs/index.cjs"
     },
+    "./shared/*": {
+      "types": "./dist/types/shared/*.d.ts",
+      "import": "./dist/esm/shared/*.js",
+      "require": "./dist/cjs/shared/*.cjs"
+    },
     "./package.json": "./package.json"
   },
   "typesVersions": {

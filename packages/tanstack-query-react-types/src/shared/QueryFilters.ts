@@ -1,4 +1,4 @@
-import type { DefaultError, FetchStatus, Query } from '@tanstack/query-core';
+import type { DefaultError, FetchStatus, Query } from '@tanstack/react-query';
 import type { DeepReadonly } from './DeepReadonly.js';
 import type { OperationInfiniteData } from './OperationInfiniteData.js';
 import type { PartialParameters } from './PartialParameters.js';
