@@ -160,6 +160,17 @@ It is possible to use multiple plugins at the same time. For example, `--plugin 
 - **`--operation-generics-import-path <path>`:** Define the path to the operation generics file, allowing for custom
   operation handling _(optional, default: `@openapi-qraft/react`)_.
 - **`--export-openapi-types [bool]`:** Add an export statement of the generated OpenAPI document types from the `./index.ts` file. Useful for sharing types within your project. _(optional, default: `true`, if `--plugin openapi-typescript` is used)_
+- **`--override-import-type <pathname overrides...>`:** Override import paths for specific types in generated files.
+  This allows using custom type implementations instead of the default ones. The option expects a filepath followed by one or more type override definitions in format `originalModule:importTypeName:customImportPath`.
+  Can be specified multiple times to define different overrides. _(optional)_
+  - Examples:
+    - `--override-import-type services @openapi-qraft/tanstack-query-react-types:OperationError:../../type-overrides/operation-error.js` - replaces
+    the import of `OperationError` type from `@openapi-qraft/tanstack-query-react-types` with an import from `../../type-overrides/operation-error.js`
+    in all service files.
+    - `--override-import-type create-api-client @openapi-qraft/react:CreateAPIQueryClientOptions:../type-overrides/create-query-client-options.js` - replaces
+    the import in the `create-api-client.ts` file.
+  - This option is particularly useful when you need to provide custom implementations of library types
+    that better suit your project's needs.
 - **`--create-api-client-fn <functionName> [options...]`:** Configure API client creation function. Allows specifying the function name used to create the API client, as well as fine-tuning included services and callbacks.
   You can specify this option **multiple times** to generate **several different API client** creation functions from a single OpenAPI document - for example,
   a fully-featured client for Node.js and a lightweight client for React or service workers. _(optional)_
@@ -184,10 +195,9 @@ It is possible to use multiple plugins at the same time. For example, `--plugin 
 
   ::::tip
   When generating multiple API client functions with different parameters, it might be more convenient to use a configuration file
-  instead of command-line parameters. See the [Redocly configuration documentation](/codegen/CLI/redocly-config.mdx#generating-multiple-api-client-functions)
+  instead of command-line parameters. See the [Redocly configuration documentation](/codegen/CLI/redocly-config.mdx#generating-multiple-createapiclient-functions)
   for more details on how to configure multiple _create API client functions_ in a YAML file.
   ::::
-
 
 ### `--plugin openapi-typescript` options
 
