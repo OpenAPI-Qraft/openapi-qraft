@@ -59,7 +59,6 @@ export const useMutation: <
     {
       ...options,
       mutationKey,
-      // @ts-expect-error - Too complex to type
       mutationFn:
         options?.mutationFn ??
         (parameters

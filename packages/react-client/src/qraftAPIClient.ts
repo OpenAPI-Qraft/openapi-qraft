@@ -10,10 +10,10 @@ import type {
 import { createRecursiveProxy } from './lib/createRecursiveProxy.js';
 
 export interface CreateAPIBasicClientOptions {
-  requestFn<TData, TError>(
+  requestFn: (
     schema: OperationSchema,
     requestInfo: RequestFnInfo
-  ): Promise<RequestFnResponse<TData, TError>>;
+  ) => Promise<RequestFnResponse<any, any>>;
   baseUrl: string;
 }
 

@@ -1920,7 +1920,6 @@ describe('Qraft uses "fetchQuery(...) & "prefetchQuery(...)" & "ensureQueryData(
     const requestFnSpy = vi.fn(requestFn);
 
     const { qraft } = createClient({
-      // @ts-expect-error - vi.fn types are not correct
       requestFn: requestFnSpy,
     });
 
