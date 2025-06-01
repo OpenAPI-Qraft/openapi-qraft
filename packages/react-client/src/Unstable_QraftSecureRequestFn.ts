@@ -12,31 +12,29 @@ import { QueryClient, useQueries } from '@tanstack/react-query';
 import { createElement, Fragment, useEffect, useMemo } from 'react';
 import { jwtDecode } from './lib/jwt-decode/index.js';
 
-interface QraftSecureRequestFnBaseProps {
-  requestFn<TData, TError>(
-    schema: OperationSchema,
-    requestInfo: RequestFnInfo,
-    options?: RequestFnOptions
-  ): Promise<RequestFnResponse<TData, TError>>;
+type RequestFn = <TData, TError>(
+  schema: OperationSchema,
+  requestInfo: RequestFnInfo,
+  options?: RequestFnOptions
+) => Promise<RequestFnResponse<TData, TError>>;
+
+interface QraftSecureRequestFnBaseProps<TRequestFn extends RequestFn> {
+  requestFn: TRequestFn;
   securitySchemes: SecuritySchemeHandlers<string>;
 }
 
-type RequestFn = QraftSecureRequestFnBaseProps['requestFn'];
-
-export interface QraftSecureRequestFnProps
-  extends QraftSecureRequestFnBaseProps {
-  children(
-    secureRequestFn: QraftSecureRequestFnBaseProps['requestFn']
-  ): ReactNode;
+export interface QraftSecureRequestFnProps<TRequestFn extends RequestFn>
+  extends QraftSecureRequestFnBaseProps<TRequestFn> {
+  children(secureRequestFn: TRequestFn): ReactNode;
   queryClient?: QueryClient;
 }
 
-export function QraftSecureRequestFn({
+export function QraftSecureRequestFn<TRequestFn extends RequestFn>({
   children,
   requestFn,
   securitySchemes,
   queryClient: inQueryClient,
-}: QraftSecureRequestFnProps) {
+}: QraftSecureRequestFnProps<TRequestFn>) {
   const queryClient = useMemo(
     () =>
       inQueryClient ??
@@ -72,13 +70,13 @@ export function QraftSecureRequestFn({
   });
 }
 
-export const useSecuritySchemeAuth = ({
+export const useSecuritySchemeAuth = <TRequestFn extends RequestFn>({
   securitySchemes,
   requestFn,
   queryClient,
-}: QraftSecureRequestFnBaseProps & {
+}: QraftSecureRequestFnBaseProps<TRequestFn> & {
   queryClient: QueryClient;
-}): RequestFn => {
+}): TRequestFn => {
   useQueries(
     {
       queries: Object.entries(securitySchemes).map(([securitySchemeName]) => {
@@ -101,7 +99,7 @@ export const useSecuritySchemeAuth = ({
   return useMemo(
     () => createSecureRequestFn(securitySchemes, requestFn, queryClient),
     [securitySchemes, requestFn, queryClient]
-  );
+  ) as TRequestFn;
 };
 
 /**
@@ -113,11 +111,11 @@ export const useSecuritySchemeAuth = ({
  * @param requestFn Qraft `requestFn`
  * @param queryClient QueryClient instance.
  */
-export function createSecureRequestFn(
+export function createSecureRequestFn<TRequestFn extends RequestFn>(
   securitySchemes: SecuritySchemeHandlers<string>,
-  requestFn: RequestFn,
+  requestFn: TRequestFn,
   queryClient: QueryClient
-): RequestFn {
+): TRequestFn {
   return async function secureRequestFn(
     schema: OperationSchema,
     requestInfo: RequestFnInfo,
@@ -147,7 +145,7 @@ export function createSecureRequestFn(
       ),
       options
     );
-  };
+  } as TRequestFn;
 }
 
 /**
