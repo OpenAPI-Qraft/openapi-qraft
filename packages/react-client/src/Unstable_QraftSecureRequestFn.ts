@@ -174,14 +174,25 @@ async function createSecureRequestInfo(
 ): Promise<RequestFnInfo> {
   const prevSecurityResult = queryClient.getQueryData<SecurityScheme>(queryKey);
 
-  const securityResult = await queryClient.fetchQuery({
-    queryKey,
-    queryFn: ({ signal }) =>
-      handler({
-        signal,
-        isRefreshing: Boolean(prevSecurityResult),
-      }),
-  });
+  const abortQuery = () => queryClient.cancelQueries({ queryKey, exact: true });
+
+  requestInfo.signal?.addEventListener('abort', abortQuery);
+
+  const securityResult = await queryClient
+    .fetchQuery({
+      queryKey,
+      queryFn: ({ signal }) =>
+        handler({
+          signal,
+          isRefreshing: Boolean(prevSecurityResult),
+        }),
+    })
+    .catch((error) => {
+      throw requestInfo.signal?.aborted ? requestInfo.signal.reason : error;
+    })
+    .finally(
+      () => void requestInfo.signal?.removeEventListener('abort', abortQuery)
+    );
 
   if (!shallowEqualObjects(securityResult, prevSecurityResult)) {
     const securityRefreshInterval = getSecurityRefreshInterval(securityResult);
