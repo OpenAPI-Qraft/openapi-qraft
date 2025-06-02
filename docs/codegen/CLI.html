@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="generator" content="Docusaurus v3.7.0">
 <title data-rh="true">OpenAPI Qraft CLI | OpenAPI Qraft</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:url" content="https://openapi-qraft.github.io/openapi-qraft/docs/codegen/CLI"><meta data-rh="true" property="og:locale" content="en"><meta data-rh="true" name="docusaurus_locale" content="en"><meta data-rh="true" name="docsearch:language" content="en"><meta data-rh="true" name="docusaurus_version" content="current"><meta data-rh="true" name="docusaurus_tag" content="docs-default-current"><meta data-rh="true" name="docsearch:version" content="current"><meta data-rh="true" name="docsearch:docusaurus_tag" content="docs-default-current"><meta data-rh="true" property="og:title" content="OpenAPI Qraft CLI | OpenAPI Qraft"><meta data-rh="true" name="description" content="OpenAPI Qraft CLI is a command-line utility that generates API schemas and interfaces for the @openapi-qraft/react."><meta data-rh="true" property="og:description" content="OpenAPI Qraft CLI is a command-line utility that generates API schemas and interfaces for the @openapi-qraft/react."><link data-rh="true" rel="canonical" href="https://openapi-qraft.github.io/openapi-qraft/docs/codegen/CLI"><link data-rh="true" rel="alternate" href="https://openapi-qraft.github.io/openapi-qraft/docs/codegen/CLI" hreflang="en"><link data-rh="true" rel="alternate" href="https://openapi-qraft.github.io/openapi-qraft/docs/codegen/CLI" hreflang="x-default"><link data-rh="true" rel="preconnect" href="https://B42903JOPT-dsn.algolia.net" crossorigin="anonymous"><link rel="search" type="application/opensearchdescription+xml" title="OpenAPI Qraft" href="/openapi-qraft/opensearch.xml"><link rel="stylesheet" href="/openapi-qraft/assets/css/styles.3d83c31e.css">
-<script src="/openapi-qraft/assets/js/runtime~main.6b584c6b.js" defer="defer"></script>
+<script src="/openapi-qraft/assets/js/runtime~main.f093e744.js" defer="defer"></script>
 <script src="/openapi-qraft/assets/js/main.247805fb.js" defer="defer"></script>
 </head>
 <body class="navigation-with-keyboard">
@@ -114,46 +114,6 @@ More than one modifier option can be specified.</li>
 <p><strong><code>--explicit-component-exports</code>:</strong> Enabling this option will export API components as separate type aliases, alongside <code>components</code> interface.</p>
 </li>
 <li>
-<p><strong><code>--create-api-client-fn &lt;functionName&gt; [options...]</code>:</strong> Configure API client creation function. Allows specifying the function name used to create the API client, as well as fine-tuning included services and callbacks.
-You can specify this option <strong>multiple times</strong> to generate <strong>several different API client</strong> creation functions from a single OpenAPI document - for example,
-a fully-featured client for Node.js and a lightweight client for React or service workers. <em>(optional)</em>
-See examples on the <a href="/openapi-qraft/docs/hooks/useQuery#example"><code>useQuery()</code></a> documentation page.</p>
-<ul>
-<li><strong>Options:</strong>
-<ul>
-<li><code>filename:&lt;name&gt;</code> - filename where the function will be generated (defaults to function name)</li>
-<li><code>services:[all|none]</code> - Specify whether the generated API client should include services: either all available services, or no services by default.<!-- -->
-<ul>
-<li><code>all</code> - include all available services</li>
-<li><code>none</code> - don&#x27;t include any services by default (they must be specified when calling the function)</li>
-</ul>
-</li>
-<li><code>callbacks:[all|none|callback1,callback2,...]</code> - list of callbacks to be included in the API client by default<!-- -->
-<ul>
-<li><code>all</code> - include all available callbacks (useQuery, useMutation, setQueryData, etc.)</li>
-<li><code>none</code> - don&#x27;t include any callbacks by default (they must be specified when calling the function)</li>
-<li><code>useQuery,useMutation,...</code> - list of specific callbacks to include</li>
-</ul>
-</li>
-</ul>
-</li>
-<li><strong>Examples:</strong>
-<ul>
-<li><code>--create-api-client-fn createAPIClient services:all callbacks:all</code> - creates the <code>createAPIClient()</code> function that
-includes all services and all callbacks by default (<em>default</em> behavior)</li>
-<li><code>--create-api-client-fn createMinimalAPIClient services:none callbacks:none</code> - creates the <code>createMinimalAPIClient()</code>
-function that generates a <strong>super lightweight 🪶</strong> API client with <em>zero overhead</em> - no default <em>services</em> or <em>callbacks</em> included. Perfect for
-building a <strong>minimal bundle size</strong> client where you explicitly control which services and callbacks to include.</li>
-<li><code>--create-api-client-fn createCustomClient filename:create-custom-api services:none callbacks:setQueryData,getQueryData</code> - creates
-the <code>createCustomClient()</code> function in the <code>create-custom-api.ts</code> file with no default services and only <code>setQueryData()</code> and <code>getQueryData()</code> callbacks</li>
-</ul>
-</li>
-</ul>
-<div class="theme-admonition theme-admonition-tip admonition_WCGJ alert alert--success"><div class="admonitionHeading_GCBg"><span class="admonitionIcon_L39b"><svg viewBox="0 0 12 16"><path fill-rule="evenodd" d="M6.5 0C3.48 0 1 2.19 1 5c0 .92.55 2.25 1 3 1.34 2.25 1.78 2.78 2 4v1h5v-1c.22-1.22.66-1.75 2-4 .45-.75 1-2.08 1-3 0-2.81-2.48-5-5.5-5zm3.64 7.48c-.25.44-.47.8-.67 1.11-.86 1.41-1.25 2.06-1.45 3.23-.02.05-.02.11-.02.17H5c0-.06 0-.13-.02-.17-.2-1.17-.59-1.83-1.45-3.23-.2-.31-.42-.67-.67-1.11C2.44 6.78 2 5.65 2 5c0-2.2 2.02-4 4.5-4 1.22 0 2.36.42 3.22 1.19C10.55 2.94 11 3.94 11 5c0 .66-.44 1.78-.86 2.48zM4 14h5c-.23 1.14-1.3 2-2.5 2s-2.27-.86-2.5-2z"></path></svg></span>tip</div><div class="admonitionContent_pbrs"><p>When generating multiple API client functions with different parameters, it might be more convenient to use a configuration file
-instead of command-line parameters. See the <a href="/openapi-qraft/docs/codegen/CLI/redocly-config#generating-multiple-api-client-functions">Redocly configuration documentation</a>
-for more details on how to configure multiple <em>create API client functions</em> in a YAML file.</p></div></div>
-</li>
-<li>
 <p><strong><code>--redocly [config]</code>:</strong> Use the Redocly configuration to generate multiple API clients. If the <code>[config]</code> parameter is not specified, the default Redocly configuration will be used: <code>[redocly.yaml | redocly.yml | .redocly.yaml | .redocly.yml]</code>. <em>(optional)</em></p>
 <ul>
 <li>Examples:<!-- -->
@@ -252,9 +212,10 @@ comments <em>(optional)</em>.</p>
 It is possible to use multiple plugins at the same time. For example, <code>--plugin tanstack-query-react --plugin openapi-typescript</code> generates Qraft API services &amp; schema types file.</p></div></div>
 <h3 class="anchor anchorWithStickyNavbar_JmGV" id="--plugin-tanstack-query-react-options"><code>--plugin tanstack-query-react</code> options<a href="#--plugin-tanstack-query-react-options" class="hash-link" aria-label="Direct link to --plugin-tanstack-query-react-options" title="Direct link to --plugin-tanstack-query-react-options">​</a></h3>
 <ul>
-<li><strong><code>--openapi-types-import-path &lt;path&gt;</code>:</strong> Set the path to the schema types definition file to ensure consistent type
+<li>
+<p><strong><code>--openapi-types-import-path &lt;path&gt;</code>:</strong> Set the path to the schema types definition file to ensure consistent type
 usage (assumed, you already have <code>schema.d.ts</code> as a result of the <a href="https://github.com/drwpow/openapi-typescript" target="_blank" rel="noopener noreferrer"><code>openapi-typescript</code></a> utility). You also probably
-don&#x27;t need the <del><code>--plugin openapi-typescript</code></del> option in this case.<!-- -->
+don&#x27;t need the <del><code>--plugin openapi-typescript</code></del> option in this case.</p>
 <ul>
 <li>The path is the exact import specifier used in the <em>generated services</em>. It should be <em>relative</em> to the service
 output directory. <em>Optional</em>, if the <code>--plugin openapi-typescript</code> is used. <em>Required</em> otherwise.<!-- -->
@@ -270,9 +231,71 @@ output directory. <em>Optional</em>, if the <code>--plugin openapi-typescript</c
 </li>
 </ul>
 </li>
-<li><strong><code>--operation-generics-import-path &lt;path&gt;</code>:</strong> Define the path to the operation generics file, allowing for custom
-operation handling <em>(optional, default: <code>@openapi-qraft/react</code>)</em>.</li>
-<li><strong><code>--export-openapi-types [bool]</code>:</strong> Add an export statement of the generated OpenAPI document types from the <code>./index.ts</code> file. Useful for sharing types within your project. <em>(optional, default: <code>true</code>, if <code>--plugin openapi-typescript</code> is used)</em></li>
+<li>
+<p><strong><code>--operation-generics-import-path &lt;path&gt;</code>:</strong> Define the path to the operation generics file, allowing for custom
+operation handling <em>(optional, default: <code>@openapi-qraft/react</code>)</em>.</p>
+</li>
+<li>
+<p><strong><code>--export-openapi-types [bool]</code>:</strong> Add an export statement of the generated OpenAPI document types from the <code>./index.ts</code> file. Useful for sharing types within your project. <em>(optional, default: <code>true</code>, if <code>--plugin openapi-typescript</code> is used)</em></p>
+</li>
+<li>
+<p><strong><code>--override-import-type &lt;pathname overrides...&gt;</code>:</strong> Override import paths for specific types in generated files.
+This allows using custom type implementations instead of the default ones. The option expects a filepath followed by one or more type override definitions in format <code>originalModule:importTypeName:customImportPath</code>.
+Can be specified multiple times to define different overrides. <em>(optional)</em></p>
+<ul>
+<li>Examples:<!-- -->
+<ul>
+<li><code>--override-import-type services @openapi-qraft/tanstack-query-react-types:OperationError:../../type-overrides/operation-error.js</code> - replaces
+the import of <code>OperationError</code> type from <code>@openapi-qraft/tanstack-query-react-types</code> with an import from <code>../../type-overrides/operation-error.js</code>
+in all service files.</li>
+<li><code>--override-import-type create-api-client @openapi-qraft/react:CreateAPIQueryClientOptions:../type-overrides/create-query-client-options.js</code> - replaces
+the import in the <code>create-api-client.ts</code> file.</li>
+</ul>
+</li>
+<li>This option is particularly useful when you need to provide custom implementations of library types
+that better suit your project&#x27;s needs.</li>
+</ul>
+</li>
+<li>
+<p><strong><code>--create-api-client-fn &lt;functionName&gt; [options...]</code>:</strong> Configure API client creation function. Allows specifying the function name used to create the API client, as well as fine-tuning included services and callbacks.
+You can specify this option <strong>multiple times</strong> to generate <strong>several different API client</strong> creation functions from a single OpenAPI document - for example,
+a fully-featured client for Node.js and a lightweight client for React or service workers. <em>(optional)</em>
+See examples on the <a href="/openapi-qraft/docs/hooks/useQuery#example"><code>useQuery()</code></a> documentation page.</p>
+<ul>
+<li><strong>Options:</strong>
+<ul>
+<li><code>filename:&lt;name&gt;</code> - filename where the function will be generated (defaults to function name)</li>
+<li><code>services:[all|none]</code> - Specify whether the generated API client should include services: either all available services, or no services by default.<!-- -->
+<ul>
+<li><code>all</code> - include all available services</li>
+<li><code>none</code> - don&#x27;t include any services by default (they must be specified when calling the function)</li>
+</ul>
+</li>
+<li><code>callbacks:[all|none|callback1,callback2,...]</code> - list of callbacks to be included in the API client by default<!-- -->
+<ul>
+<li><code>all</code> - include all available callbacks (useQuery, useMutation, setQueryData, etc.)</li>
+<li><code>none</code> - don&#x27;t include any callbacks by default (they must be specified when calling the function)</li>
+<li><code>useQuery,useMutation,...</code> - list of specific callbacks to include</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><strong>Examples:</strong>
+<ul>
+<li><code>--create-api-client-fn createAPIClient services:all callbacks:all</code> - creates the <code>createAPIClient()</code> function that
+includes all services and all callbacks by default (<em>default</em> behavior)</li>
+<li><code>--create-api-client-fn createMinimalAPIClient services:none callbacks:none</code> - creates the <code>createMinimalAPIClient()</code>
+function that generates a <strong>super lightweight 🪶</strong> API client with <em>zero overhead</em> - no default <em>services</em> or <em>callbacks</em> included. Perfect for
+building a <strong>minimal bundle size</strong> client where you explicitly control which services and callbacks to include.</li>
+<li><code>--create-api-client-fn createCustomClient filename:create-custom-api services:none callbacks:setQueryData,getQueryData</code> - creates
+the <code>createCustomClient()</code> function in the <code>create-custom-api.ts</code> file with no default services and only <code>setQueryData()</code> and <code>getQueryData()</code> callbacks</li>
+</ul>
+</li>
+</ul>
+<div class="theme-admonition theme-admonition-tip admonition_WCGJ alert alert--success"><div class="admonitionHeading_GCBg"><span class="admonitionIcon_L39b"><svg viewBox="0 0 12 16"><path fill-rule="evenodd" d="M6.5 0C3.48 0 1 2.19 1 5c0 .92.55 2.25 1 3 1.34 2.25 1.78 2.78 2 4v1h5v-1c.22-1.22.66-1.75 2-4 .45-.75 1-2.08 1-3 0-2.81-2.48-5-5.5-5zm3.64 7.48c-.25.44-.47.8-.67 1.11-.86 1.41-1.25 2.06-1.45 3.23-.02.05-.02.11-.02.17H5c0-.06 0-.13-.02-.17-.2-1.17-.59-1.83-1.45-3.23-.2-.31-.42-.67-.67-1.11C2.44 6.78 2 5.65 2 5c0-2.2 2.02-4 4.5-4 1.22 0 2.36.42 3.22 1.19C10.55 2.94 11 3.94 11 5c0 .66-.44 1.78-.86 2.48zM4 14h5c-.23 1.14-1.3 2-2.5 2s-2.27-.86-2.5-2z"></path></svg></span>tip</div><div class="admonitionContent_pbrs"><p>When generating multiple API client functions with different parameters, it might be more convenient to use a configuration file
+instead of command-line parameters. See the <a href="/openapi-qraft/docs/codegen/CLI/redocly-config#generating-multiple-createapiclient-functions">Redocly configuration documentation</a>
+for more details on how to configure multiple <em>create API client functions</em> in a YAML file.</p></div></div>
+</li>
 </ul>
 <h3 class="anchor anchorWithStickyNavbar_JmGV" id="--plugin-openapi-typescript-options"><code>--plugin openapi-typescript</code> options<a href="#--plugin-openapi-typescript-options" class="hash-link" aria-label="Direct link to --plugin-openapi-typescript-options" title="Direct link to --plugin-openapi-typescript-options">​</a></h3>
 <ul>
