@@ -1,5 +1,13 @@
 # @openapi-qraft/cli
 
+## 2.7.1
+
+### Patch Changes
+
+- @openapi-qraft/plugin@2.7.1
+- @openapi-qraft/tanstack-query-react-plugin@2.7.1
+- @openapi-qraft/openapi-typescript-plugin@1.2.22
+
 ## 2.7.0
 
 ### Minor Changes
