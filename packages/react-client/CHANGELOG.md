@@ -1,5 +1,18 @@
 # @openapi-qraft/react
 
+## 2.7.0
+
+### Minor Changes
+
+- c990dc0: Updated the generated services to always import types from `@tanstack/react-query` instead of `@tanstack/query-core`.
+  This simplifies the generated code and makes it easier to override types if needed.
+
+### Patch Changes
+
+- 098bab3: Make the type of the input `requestFn` parameter more flexible.
+- 0df9921: Fix the handling of the external abort signal for the `requestInfo` in the `createSecureRequest()` function.
+  - @openapi-qraft/tanstack-query-react-types@2.7.0
+
 ## 2.6.4
 
 ### Patch Changes
