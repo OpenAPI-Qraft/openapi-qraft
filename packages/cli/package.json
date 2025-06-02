@@ -1,6 +1,6 @@
 {
   "name": "@openapi-qraft/cli",
-  "version": "2.7.0",
+  "version": "2.7.1",
   "description": "CLI for generating typed TanStack Query React Hooks and services from OpenAPI Document, improving type safety in React apps",
   "scripts": {
     "build": "tsc --project tsconfig.build.json",

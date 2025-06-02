@@ -1,5 +1,12 @@
 # @openapi-qraft/react
 
+## 2.7.1
+
+### Patch Changes
+
+- e69c2f4: Simplify `requestFn` parameter for the `createSecureRequest()`.
+  - @openapi-qraft/tanstack-query-react-types@2.7.1
+
 ## 2.7.0
 
 ### Minor Changes
