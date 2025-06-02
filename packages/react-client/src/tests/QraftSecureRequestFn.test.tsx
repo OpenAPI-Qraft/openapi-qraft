@@ -618,6 +618,84 @@ describe('QraftSecureRequestFn', { timeout: 10_000 }, () => {
       ],
     ]);
   });
+
+  it('should cancel token fetching when request is aborted', async () => {
+    const abortController = new AbortController();
+
+    const fetchPartnerToken = vi
+      .fn()
+      .mockImplementation(() => new Promise(() => {}));
+
+    const queryClient = new QueryClient();
+
+    const { result } = renderHook(
+      () =>
+        useQraft().entities.postEntitiesIdDocuments({
+          signal: abortController.signal,
+          parameters: mutationParams,
+          body: { verification_document_front: '' },
+        }),
+      {
+        wrapper: (props) => (
+          <QraftSecureRequestFn
+            requestFn={requestFn}
+            queryClient={queryClient}
+            securitySchemes={{
+              partnerToken: fetchPartnerToken,
+            }}
+          >
+            {(secureRequestFn) => (
+              <Providers {...props} requestFn={secureRequestFn} />
+            )}
+          </QraftSecureRequestFn>
+        ),
+      }
+    );
+
+    await vi.advanceTimersByTimeAsync(100);
+    await queryClient.cancelQueries();
+
+    await expect(result.current).rejects.toThrow('CancelledError');
+  });
+
+  it('should cancel token fetching when externally aborted', async () => {
+    const abortController = new AbortController();
+
+    const fetchPartnerToken = vi
+      .fn()
+      .mockImplementation(() => new Promise(() => {}));
+
+    const queryClient = new QueryClient();
+
+    const { result } = renderHook(
+      () =>
+        useQraft().entities.postEntitiesIdDocuments({
+          signal: abortController.signal,
+          parameters: mutationParams,
+          body: { verification_document_front: '' },
+        }),
+      {
+        wrapper: (props) => (
+          <QraftSecureRequestFn
+            requestFn={requestFn}
+            queryClient={queryClient}
+            securitySchemes={{
+              partnerToken: fetchPartnerToken,
+            }}
+          >
+            {(secureRequestFn) => (
+              <Providers {...props} requestFn={secureRequestFn} />
+            )}
+          </QraftSecureRequestFn>
+        ),
+      }
+    );
+
+    await vi.advanceTimersByTimeAsync(100);
+    abortController.abort(new Error('My Custom Abort Error'));
+
+    await expect(result.current).rejects.toThrow('My Custom Abort Error');
+  });
 });
 
 function Providers({
