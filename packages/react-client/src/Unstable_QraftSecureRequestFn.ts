@@ -12,11 +12,11 @@ import { QueryClient, useQueries } from '@tanstack/react-query';
 import { createElement, Fragment, useEffect, useMemo } from 'react';
 import { jwtDecode } from './lib/jwt-decode/index.js';
 
-type RequestFn = <TData, TError>(
+type RequestFn = (
   schema: OperationSchema,
   requestInfo: RequestFnInfo,
   options?: RequestFnOptions
-) => Promise<RequestFnResponse<TData, TError>>;
+) => Promise<RequestFnResponse<any, any>>;
 
 interface QraftSecureRequestFnBaseProps<TRequestFn extends RequestFn> {
   requestFn: TRequestFn;
