@@ -1,5 +1,21 @@
 # @openapi-qraft/tanstack-query-react-plugin
 
+## 2.7.0
+
+### Minor Changes
+
+- 9c1c611: New `--override-import-type` option for the CLI that has been implemented to allow overriding import paths for specific
+  types in generated files
+
+  This feature has been designed to enable using custom type implementations instead of the default ones
+
+- c990dc0: Updated the generated services to always import types from `@tanstack/react-query` instead of `@tanstack/query-core`.
+  This simplifies the generated code and makes it easier to override types if needed.
+
+### Patch Changes
+
+- @openapi-qraft/plugin@2.7.0
+
 ## 2.6.4
 
 ### Patch Changes

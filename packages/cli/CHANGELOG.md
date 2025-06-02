@@ -1,5 +1,22 @@
 # @openapi-qraft/cli
 
+## 2.7.0
+
+### Minor Changes
+
+- 339250c: Global `x-openapi-qraft` configuration has been added to the Redocly config support.
+
+  This feature has been implemented to allow specifying `x-openapi-qraft` options at the global level in the Redocly
+  configuration, rather than repeating the same options for each API client.
+
+### Patch Changes
+
+- Updated dependencies [9c1c611]
+- Updated dependencies [c990dc0]
+  - @openapi-qraft/tanstack-query-react-plugin@2.7.0
+  - @openapi-qraft/plugin@2.7.0
+  - @openapi-qraft/openapi-typescript-plugin@1.2.21
+
 ## 2.6.4
 
 ### Patch Changes
