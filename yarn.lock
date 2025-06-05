@@ -6077,8 +6077,8 @@ __metadata:
     "@openapi-qraft/tanstack-query-react-plugin": "workspace:*"
     "@openapi-qraft/tanstack-query-react-types": "workspace:*"
     "@openapi-qraft/test-fixtures": "workspace:*"
-    "@tanstack/query-core": "npm:^5.66.3"
-    "@tanstack/react-query": "npm:^5.66.3"
+    "@tanstack/query-core": "npm:^5.80.6"
+    "@tanstack/react-query": "npm:^5.80.6"
     "@testing-library/dom": "npm:^10.4.0"
     "@testing-library/react": "npm:^16.2.0"
     "@types/jscodeshift": "npm:^0.11.11"
@@ -6156,8 +6156,8 @@ __metadata:
   dependencies:
     "@openapi-qraft/eslint-config": "workspace:*"
     "@openapi-qraft/rollup-config": "workspace:*"
-    "@tanstack/query-core": "npm:^5.66.3"
-    "@tanstack/react-query": "npm:^5.66.3"
+    "@tanstack/query-core": "npm:^5.80.6"
+    "@tanstack/react-query": "npm:^5.80.6"
     eslint: "npm:^9.24.0"
     rimraf: "npm:^5.0.10"
     rollup: "npm:~4.22.4"
@@ -7019,21 +7019,21 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@tanstack/query-core@npm:5.66.3, @tanstack/query-core@npm:^5.66.3":
-  version: 5.66.3
-  resolution: "@tanstack/query-core@npm:5.66.3"
-  checksum: 10c0/93375becb7e611a0913a833cb5ee6df01adefdcf43c043473fc37f6934590a297a72db2f55cd0d113e48ec85d4ea665be930b9eaf8f4c72f99cb50aa22840602
+"@tanstack/query-core@npm:5.80.6, @tanstack/query-core@npm:^5.80.6":
+  version: 5.80.6
+  resolution: "@tanstack/query-core@npm:5.80.6"
+  checksum: 10c0/ce52d962036bf84845c9dafb654075bbc8eafd9236069b7c234b7f72a30e4e61daf222940d9f28b4359858277cc1e1d08dd1f8e6cc0adac72acc083fc5c0195c
   languageName: node
   linkType: hard
 
-"@tanstack/react-query@npm:^5.66.3":
-  version: 5.66.3
-  resolution: "@tanstack/react-query@npm:5.66.3"
+"@tanstack/react-query@npm:^5.80.6":
+  version: 5.80.6
+  resolution: "@tanstack/react-query@npm:5.80.6"
   dependencies:
-    "@tanstack/query-core": "npm:5.66.3"
+    "@tanstack/query-core": "npm:5.80.6"
   peerDependencies:
     react: ^18 || ^19
-  checksum: 10c0/3a6663d369fd3f55b9c8a906707169ba37d36c54066c300707ce26709aad714c77347df62ac54c504b6cf92e505b134f37681596b7d23a431bfdc20c6cd59b1c
+  checksum: 10c0/ec2dc548ff28d92778e851d64b0c24e3289218b496694c0b7bed1e92b5b96b03f8b047d4a8a04c6924937c56e257d53fbe42e046745da10d9dababe48505f843
   languageName: node
   linkType: hard
 
