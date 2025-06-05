@@ -1,5 +1,7 @@
 # @openapi-qraft/plugin
 
+## 2.7.2
+
 ## 2.7.1
 
 ## 2.7.0
