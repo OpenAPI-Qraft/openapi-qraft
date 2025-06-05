@@ -13,6 +13,7 @@ export type * from './ServiceOperationMutation.js';
 export type * from './ServiceOperationQuery.js';
 export type * from './UseQueryOptionsForUseQueries.js';
 export type * from './UseQueryOptionsForUseSuspenseQuery.js';
+export type * from './UseSuspenseInfiniteQueryOptions.js';
 export type * from './WithOptional.js';
 export type * from './QraftServiceOperationsToken.js';
 export type * from './OperationError.js';

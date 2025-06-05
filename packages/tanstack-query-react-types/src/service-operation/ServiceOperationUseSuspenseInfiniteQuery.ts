@@ -5,10 +5,10 @@ import type {
   OperationInfiniteData,
   PartialParameters,
   ServiceOperationInfiniteQueryKey,
+  UseSuspenseInfiniteQueryOptions,
 } from '@openapi-qraft/tanstack-query-react-types';
 import type {
   InfiniteQueryPageParamsOptions,
-  UseSuspenseInfiniteQueryOptions,
   UseSuspenseInfiniteQueryResult,
 } from '@tanstack/react-query';
 
@@ -32,7 +32,6 @@ export interface ServiceOperationUseSuspenseInfiniteQuery<
         TOperationQueryFnData,
         TError,
         OperationInfiniteData<TData, TQueryParams>,
-        TOperationQueryFnData,
         ServiceOperationInfiniteQueryKey<TSchema, TQueryParams>,
         PartialParameters<DeepReadonly<TPageParam>>
       >,

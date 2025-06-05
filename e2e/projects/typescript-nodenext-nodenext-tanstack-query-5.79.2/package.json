@@ -1,0 +1,26 @@
+{
+  "name": "typescript-nodenext-nodenext-tanstack-query-5-79-2",
+  "description": "This test verifies that the current version of OpenAPI Qraft is compatible with TanStack Query 5.79.2 or earlier, due to the removal of TQueryData for UseSuspenseInfiniteQueryOptions in TanStack Query 5.80.0",
+  "private": true,
+  "version": "1.0.0",
+  "main": "dist/index.js",
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "codegen": "openapi-qraft --plugin tanstack-query-react --plugin openapi-typescript https://raw.githubusercontent.com/swagger-api/swagger-petstore/7767363b841961221a38c0be9c6b1066a5120051/src/main/resources/openapi.yaml --clean -o src/api --openapi-types-import-path '../schema.js' --explicit-import-extensions --openapi-types-file-name schema.ts",
+    "e2e:pre-build": "npm run codegen",
+    "e2e:post-build": "node ./dist/index.js"
+  },
+  "dependencies": {
+    "@openapi-qraft/cli": "latest",
+    "@openapi-qraft/react": "latest",
+    "@tanstack/react-query": "5.79.2",
+    "@tanstack/query-core": "5.79.2",
+    "@types/node": "latest",
+    "typescript": "latest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/OpenAPI-Qraft/openapi-qraft.git"
+  }
+}
