@@ -4686,7 +4686,7 @@ __metadata:
     "@openapi-qraft/openapi-typescript-plugin": "workspace:^"
     "@openapi-qraft/rollup-config": "workspace:*"
     "@openapi-qraft/test-fixtures": "workspace:*"
-    "@tanstack/react-query": "npm:^5.17.3"
+    "@tanstack/react-query": "npm:^5.80.6"
     "@testing-library/jest-dom": "npm:^5.17.0"
     "@testing-library/react": "npm:^13.4.0"
     "@testing-library/user-event": "npm:^14.5.2"
@@ -4704,9 +4704,8 @@ __metadata:
     rollup: "npm:~4.18.0"
     vitest: "npm:^1.4.0"
   peerDependencies:
-    "@tanstack/query-core": ^5.0.0
-    "@tanstack/react-query": ^5.0.0
-    react: ^18.0.0
+    "@tanstack/query-core": ^5.80.0
+    "@tanstack/react-query": ^5.80.0
   languageName: unknown
   linkType: soft
 
@@ -5526,21 +5525,21 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@tanstack/query-core@npm:5.17.8":
-  version: 5.17.8
-  resolution: "@tanstack/query-core@npm:5.17.8"
-  checksum: 10c0/0efda61079f3578e8b19a526f66b79bd51704858b2295eea5f92753bf9c55c8d39617e5761a5c66edfeb272c70ebab67abdd2272734e21a9672dfaecc508b6f6
+"@tanstack/query-core@npm:5.80.6":
+  version: 5.80.6
+  resolution: "@tanstack/query-core@npm:5.80.6"
+  checksum: 10c0/ce52d962036bf84845c9dafb654075bbc8eafd9236069b7c234b7f72a30e4e61daf222940d9f28b4359858277cc1e1d08dd1f8e6cc0adac72acc083fc5c0195c
   languageName: node
   linkType: hard
 
-"@tanstack/react-query@npm:^5.17.3":
-  version: 5.17.8
-  resolution: "@tanstack/react-query@npm:5.17.8"
+"@tanstack/react-query@npm:^5.80.6":
+  version: 5.80.6
+  resolution: "@tanstack/react-query@npm:5.80.6"
   dependencies:
-    "@tanstack/query-core": "npm:5.17.8"
+    "@tanstack/query-core": "npm:5.80.6"
   peerDependencies:
-    react: ^18.0.0
-  checksum: 10c0/9b7c71657ae23aa1f41ea598b68ef2a37bc05fdfafc8264dc4a8c89f6674c4655b1b4a6c70438d438f76ab259ad02e341a10ad16bb95fd439ca77bf450d888bd
+    react: ^18 || ^19
+  checksum: 10c0/ec2dc548ff28d92778e851d64b0c24e3289218b496694c0b7bed1e92b5b96b03f8b047d4a8a04c6924937c56e257d53fbe42e046745da10d9dababe48505f843
   languageName: node
   linkType: hard
 

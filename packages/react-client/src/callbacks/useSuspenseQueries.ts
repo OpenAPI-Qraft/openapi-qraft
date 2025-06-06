@@ -30,6 +30,7 @@ export const useSuspenseQueries: (
   return useSuspenseQueriesTanstack(
     {
       ...options,
+      // @ts-expect-error - New version of @tanstack/react-query accepts queryFn as a symbol
       queries: options.queries.map((queryOptions) => {
         const optionsWithQueryKey =
           'parameters' in queryOptions

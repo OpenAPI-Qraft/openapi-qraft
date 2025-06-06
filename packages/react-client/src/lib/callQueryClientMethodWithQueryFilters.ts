@@ -25,7 +25,6 @@ export function callQueryClientMethodWithQueryFilters<
   // @ts-expect-error - Too complex to type
   return queryClient[queryFilterMethod](
     composeQueryFilters(schema, filters as never),
-    // @ts-expect-error - Argument types are too complex
     ...args.slice(1, -1)
   );
 }
