@@ -1,5 +1,4 @@
 ---
-"@openapi-qraft/openapi-typescript-plugin": patch
 "@openapi-qraft/plugin": patch
 ---
 

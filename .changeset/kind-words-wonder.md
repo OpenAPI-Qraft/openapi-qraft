@@ -1,5 +1,4 @@
 ---
-'@openapi-qraft/tanstack-query-react-types': minor
 '@openapi-qraft/react': minor
 ---
 
