@@ -4,8 +4,7 @@ import type {
   OperationSchema,
   ServiceOperationUseQueries,
 } from '@openapi-qraft/tanstack-query-react-types';
-import type { DefaultError } from '@tanstack/query-core';
-import type { QueriesResults } from '@tanstack/react-query';
+import type { DefaultError, QueriesResults } from '@tanstack/react-query';
 import type { CreateAPIQueryClientOptions } from '../qraftAPIClient.js';
 import { useQueries as useQueriesTanstack } from '@tanstack/react-query';
 import { composeQueryKey } from '../lib/composeQueryKey.js';

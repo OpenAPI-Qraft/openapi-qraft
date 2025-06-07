@@ -2,7 +2,7 @@ import type {
   OperationSchema,
   ServiceOperationGetQueryState,
 } from '@openapi-qraft/tanstack-query-react-types';
-import type { DefaultError } from '@tanstack/query-core';
+import type { DefaultError } from '@tanstack/react-query';
 import type { CreateAPIQueryClientOptions } from '../qraftAPIClient.js';
 import { callQueryClientMethodWithQueryKey } from '../lib/callQueryClientMethodWithQueryKey.js';
 

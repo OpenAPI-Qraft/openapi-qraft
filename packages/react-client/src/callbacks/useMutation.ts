@@ -5,8 +5,7 @@ import type {
   ServiceOperationMutationKey,
   ServiceOperationUseMutation,
 } from '@openapi-qraft/tanstack-query-react-types';
-import type { DefaultError } from '@tanstack/query-core';
-import type { UseMutationResult } from '@tanstack/react-query';
+import type { DefaultError, UseMutationResult } from '@tanstack/react-query';
 import type { CreateAPIQueryClientOptions } from '../qraftAPIClient.js';
 import { useMutation as useMutationBase } from '@tanstack/react-query';
 import { composeMutationKey } from '../lib/composeMutationKey.js';

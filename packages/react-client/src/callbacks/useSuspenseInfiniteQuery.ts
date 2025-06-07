@@ -4,8 +4,11 @@ import type {
   OperationSchema,
   ServiceOperationUseSuspenseInfiniteQuery,
 } from '@openapi-qraft/tanstack-query-react-types';
-import type { DefaultError, InfiniteData } from '@tanstack/query-core';
-import type { UseSuspenseInfiniteQueryResult } from '@tanstack/react-query';
+import type {
+  DefaultError,
+  InfiniteData,
+  UseSuspenseInfiniteQueryResult,
+} from '@tanstack/react-query';
 import type { CreateAPIQueryClientOptions } from '../qraftAPIClient.js';
 import { useSuspenseInfiniteQuery as useSuspenseInfiniteQueryTanstack } from '@tanstack/react-query';
 import { useComposeUseQueryOptions } from '../lib/useComposeUseQueryOptions.js';

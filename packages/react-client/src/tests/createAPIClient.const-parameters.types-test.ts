@@ -1,4 +1,4 @@
-import { QueryClient } from '@tanstack/query-core';
+import { QueryClient } from '@tanstack/react-query';
 import { requestFn } from '../index.js';
 import { createAPIClient } from './fixtures/api/index.js';
 

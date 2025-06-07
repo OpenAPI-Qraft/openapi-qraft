@@ -4,8 +4,10 @@ import type {
   OperationSchema,
   ServiceOperationUseSuspenseQueries,
 } from '@openapi-qraft/tanstack-query-react-types';
-import type { DefaultError } from '@tanstack/query-core';
-import type { SuspenseQueriesResults } from '@tanstack/react-query';
+import type {
+  DefaultError,
+  SuspenseQueriesResults,
+} from '@tanstack/react-query';
 import type { CreateAPIQueryClientOptions } from '../qraftAPIClient.js';
 import { useSuspenseQueries as useSuspenseQueriesTanstack } from '@tanstack/react-query';
 import { composeQueryKey } from '../lib/composeQueryKey.js';

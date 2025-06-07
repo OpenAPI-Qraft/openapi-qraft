@@ -6077,7 +6077,6 @@ __metadata:
     "@openapi-qraft/tanstack-query-react-plugin": "workspace:*"
     "@openapi-qraft/tanstack-query-react-types": "workspace:*"
     "@openapi-qraft/test-fixtures": "workspace:*"
-    "@tanstack/query-core": "npm:^5.80.6"
     "@tanstack/react-query": "npm:^5.80.6"
     "@testing-library/dom": "npm:^10.4.0"
     "@testing-library/react": "npm:^16.2.0"
@@ -6101,8 +6100,7 @@ __metadata:
     typescript: "npm:^5.6.2"
     vitest: "npm:^3.0.5"
   peerDependencies:
-    "@tanstack/query-core": ^5.0.0
-    "@tanstack/react-query": ^5.0.0
+    "@tanstack/react-query": ^5.80.0
     react: ^18 || ^19
   languageName: unknown
   linkType: soft
@@ -6156,15 +6154,13 @@ __metadata:
   dependencies:
     "@openapi-qraft/eslint-config": "workspace:*"
     "@openapi-qraft/rollup-config": "workspace:*"
-    "@tanstack/query-core": "npm:^5.80.6"
     "@tanstack/react-query": "npm:^5.80.6"
     eslint: "npm:^9.24.0"
     rimraf: "npm:^5.0.10"
     rollup: "npm:~4.22.4"
     typescript: "npm:^5.6.2"
   peerDependencies:
-    "@tanstack/query-core": ^5.0.0
-    "@tanstack/react-query": ^5.0.0
+    "@tanstack/react-query": ^5.80.0
     react: ^18 || ^19
   languageName: unknown
   linkType: soft
@@ -7019,7 +7015,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@tanstack/query-core@npm:5.80.6, @tanstack/query-core@npm:^5.80.6":
+"@tanstack/query-core@npm:5.80.6":
   version: 5.80.6
   resolution: "@tanstack/query-core@npm:5.80.6"
   checksum: 10c0/ce52d962036bf84845c9dafb654075bbc8eafd9236069b7c234b7f72a30e4e61daf222940d9f28b4359858277cc1e1d08dd1f8e6cc0adac72acc083fc5c0195c

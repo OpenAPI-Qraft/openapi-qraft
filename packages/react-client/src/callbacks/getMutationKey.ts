@@ -2,7 +2,7 @@ import type {
   OperationSchema,
   ServiceOperationUseMutation,
 } from '@openapi-qraft/tanstack-query-react-types';
-import type { DefaultError } from '@tanstack/query-core';
+import type { DefaultError } from '@tanstack/react-query';
 import type { CreateAPIBasicClientOptions } from '../qraftAPIClient.js';
 import { composeMutationKey } from '../lib/composeMutationKey.js';
 

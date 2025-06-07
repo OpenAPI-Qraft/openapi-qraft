@@ -18,8 +18,7 @@
     "@openapi-qraft/tanstack-query-react-types": "workspace:*"
   },
   "peerDependencies": {
-    "@tanstack/query-core": "^5.0.0",
-    "@tanstack/react-query": "^5.0.0",
+    "@tanstack/react-query": "^5.80.0",
     "react": "^18 || ^19"
   },
   "devDependencies": {
@@ -29,7 +28,6 @@
     "@openapi-qraft/rollup-config": "workspace:*",
     "@openapi-qraft/tanstack-query-react-plugin": "workspace:*",
     "@openapi-qraft/test-fixtures": "workspace:*",
-    "@tanstack/query-core": "^5.80.6",
     "@tanstack/react-query": "^5.80.6",
     "@testing-library/dom": "^10.4.0",
     "@testing-library/react": "^16.2.0",
