@@ -32,7 +32,7 @@ import { writeGeneratorFiles } from './writeGeneratorFiles.js';
 export class QraftCommand extends Command {
   static spinner = ora();
 
-  protected readonly cwd: URL;
+  public readonly cwd: URL;
   protected registeredPluginActions: QraftCommandActionCallback[] = [];
 
   /**
