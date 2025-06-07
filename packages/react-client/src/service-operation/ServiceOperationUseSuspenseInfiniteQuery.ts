@@ -24,7 +24,6 @@ export interface ServiceOperationUseSuspenseInfiniteQuery<
         TQueryFnData,
         TError,
         OperationInfiniteData<TData, TParams>,
-        TQueryFnData,
         ServiceOperationInfiniteQueryKey<TSchema, TParams>,
         PartialParameters<TPageParam>
       >,

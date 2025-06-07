@@ -89,7 +89,7 @@ type FetchInfiniteQueryOptionsBase<
     ServiceOperationQueryKey<TSchema, TParams>,
     TPageParam
   >,
-  'queryKey'
+  'queryKey' | 'initialPageParam'
 > &
   InitialPageParam<PartialParameters<TPageParam>> &
   FetchInfiniteQueryPages<TData, TPageParam>;

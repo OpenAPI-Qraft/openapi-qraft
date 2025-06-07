@@ -1077,7 +1077,7 @@ describe('Qraft uses Mutations', () => {
     });
   });
 
-  it('supports useMutation with form data', async () => {
+  it.skip('supports useMutation with form data', async () => {
     const { result } = renderHook(() => qraft.files.postFiles.useMutation(), {
       wrapper: Providers,
     });

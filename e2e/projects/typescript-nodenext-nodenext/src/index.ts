@@ -2,13 +2,12 @@ import * as callbacks from '@openapi-qraft/react/callbacks/index';
 import { useMutation } from '@openapi-qraft/react/callbacks/useMutation';
 import { useQuery } from '@openapi-qraft/react/callbacks/useQuery';
 import {
-  QraftSecureRequestFn,
   createSecureRequestFn,
+  QraftSecureRequestFn,
 } from '@openapi-qraft/react/Unstable_QraftSecureRequestFn';
-
 import {
-  createAPIClient as createAPIClientMjs,
   components,
+  createAPIClient as createAPIClientMjs,
   paths,
 } from './api/index.js';
 
@@ -59,4 +58,40 @@ if (typeof QraftSecureRequestFn !== 'undefined') {
 } else {
   console.error('QraftSecureRequestFn is not imported from esm project.');
   process.exit(1);
+}
+
+function useTsCheck() {
+  const client = createAPIClientMjs();
+
+  const query = client.pet.findPetsByStatus.useSuspenseInfiniteQuery(
+    {},
+    {
+      initialPageParam: {
+        query: {
+          status: 'sold',
+        },
+      },
+      getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) => {
+        // @ts-expect-error - should not be never or any
+        lastPageParam.query?.status satisfies never;
+        lastPageParam.query?.status satisfies
+          | undefined
+          | 'sold'
+          | 'available'
+          | 'pending';
+
+        return lastPageParam.query?.status === 'sold'
+          ? {
+              query: {
+                status: 'sold',
+              },
+            }
+          : undefined;
+      },
+    }
+  );
+
+  query.data.pages[0] satisfies typeof client.pet.findPetsByStatus.types.data;
+  // @ts-expect-error - should not be never or any
+  query.data.pages[0] satisfies never;
 }
