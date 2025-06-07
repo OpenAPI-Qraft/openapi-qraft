@@ -1,5 +1,11 @@
 # @openapi-qraft/react
 
+## 1.15.0
+
+### Minor Changes
+
+- b871c8b: Update `peerDependency` to `@tanstack/react-query@^5.80.0` due to breaking changes in the `UseSuspenseInfiniteQueryOptions` interface.
+
 ## 1.14.2
 
 ## 1.14.1
