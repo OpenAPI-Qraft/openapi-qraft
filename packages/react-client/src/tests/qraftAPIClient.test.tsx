@@ -107,6 +107,47 @@ describe('Qraft uses singular Query', () => {
     });
   });
 
+  it('supports useQuery with QueryClient from context', async () => {
+    const queryClient = new QueryClient();
+
+    const qraft = createAPIClient({
+      requestFn,
+      baseUrl,
+    });
+
+    const { result } = renderHook(
+      () =>
+        qraft.approvalPolicies.getApprovalPoliciesId.useQuery({
+          header: {
+            'x-monite-version': '1.0.0',
+          },
+          path: {
+            approval_policy_id: '1',
+          },
+          query: {
+            items_order: ['asc', 'desc'],
+          },
+        }),
+      {
+        wrapper: (props) => <Providers queryClient={queryClient} {...props} />,
+      }
+    );
+
+    await waitFor(() => {
+      expect(result.current.data).toEqual({
+        header: {
+          'x-monite-version': '1.0.0',
+        },
+        path: {
+          approval_policy_id: '1',
+        },
+        query: {
+          items_order: ['asc', 'desc'],
+        },
+      });
+    });
+  });
+
   it('supports useQuery with QueryKey', async () => {
     const { qraft, queryClient } = createClient();
 
@@ -1138,6 +1179,54 @@ describe('Qraft uses Mutations', () => {
     });
   });
 
+  it('supports useMutation with QueryClient from context', async () => {
+    const queryClient = new QueryClient();
+    const qraft = createAPIClient({ requestFn, baseUrl });
+
+    const { result } = renderHook(
+      () => qraft.entities.postEntitiesIdDocuments.useMutation(),
+      {
+        wrapper: (props) => <Providers {...props} queryClient={queryClient} />,
+      }
+    );
+
+    act(() => {
+      result.current.mutate({
+        header: {
+          'x-monite-version': '1.0.0',
+        },
+        path: {
+          entity_id: '1',
+        },
+        query: {
+          referer: 'https://example.com',
+        },
+        body: {
+          verification_document_back: 'back',
+          verification_document_front: 'front',
+        },
+      });
+    });
+
+    await waitFor(() => {
+      expect(result.current.data).toEqual({
+        header: {
+          'x-monite-version': '1.0.0',
+        },
+        path: {
+          entity_id: '1',
+        },
+        query: {
+          referer: 'https://example.com',
+        },
+        body: {
+          verification_document_back: 'back',
+          verification_document_front: 'front',
+        },
+      });
+    });
+  });
+
   it('emits an error if useMutation() mutate() requires variables', async () => {
     const { qraft } = createClient();
 
@@ -1440,8 +1529,13 @@ describe('Qraft uses useIsMutating', () => {
     });
 
     const { result: isMutatingResult } = renderHook(
-      () =>
-        qraft.entities.postEntitiesIdDocuments.useIsMutating({ parameters }),
+      () => {
+        const noRequestQraft = createAPIClient();
+
+        return noRequestQraft.entities.postEntitiesIdDocuments.useIsMutating({
+          parameters,
+        });
+      },
       {
         wrapper: (props) => <Providers {...props} queryClient={queryClient} />,
       }
@@ -4491,7 +4585,7 @@ describe('Qraft is type-safe on Query Filters', () => {
 });
 
 describe('Qraft is type-safe if client created without options', () => {
-  it('does not throw an error', () => {
+  it('does not throw an QueryClient error', () => {
     const qraft = createAPIClient();
 
     qraft.approvalPolicies.getApprovalPoliciesId.getQueryKey({
@@ -4501,15 +4595,19 @@ describe('Qraft is type-safe if client created without options', () => {
 
     expect(() =>
       // @ts-expect-error - no options provided (not required, no QueryClient) - must emit an error
-      qraft.approvalPolicies.getApprovalPoliciesId.useQuery({
+      qraft.approvalPolicies.getApprovalPoliciesId.fetchQuery({
         header: { 'x-monite-version': '1.0.0' },
         path: { approval_policy_id: '1' },
       })
     ).toThrow(
       new Error(
-        `'qraft.<service>.<operation>.useQuery()' requires 'queryClient' in 'createAPIClient(...)' options.`
+        `'qraft.<service>.<operation>.fetchQuery()' requires 'queryClient' in 'createAPIClient(...)' options.`
       )
     );
+  });
+
+  it('does not throw an error', () => {
+    const qraft = createAPIClient();
 
     // @ts-expect-error - no required parameters - must emit an error
     qraft.approvalPolicies.getApprovalPoliciesId.getQueryKey();

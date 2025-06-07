@@ -15,7 +15,7 @@ export const useMutationState: <
   TVariables = unknown,
   TContext = unknown,
 >(
-  qraftOptions: CreateAPIQueryClientOptions,
+  qraftOptions: CreateAPIQueryClientOptions | undefined,
   schema: OperationSchema,
   args: Parameters<
     ServiceOperationUseMutationState<
@@ -38,6 +38,6 @@ export const useMutationState: <
       ...options,
       filters: composeMutationFilters(schema, options?.filters),
     } as never,
-    qraftOptions.queryClient
+    qraftOptions?.queryClient
   ) as never;
 };

@@ -118,7 +118,6 @@ apiBasicClient.files.deleteFiles.types.parameters.query;
 apiBasicClient.files.deleteFiles.schema.method satisfies 'delete';
 apiBasicClient.files.deleteFiles.getMutationKey();
 apiBasicClient.files.deleteFiles.getMutationKey({ query: { all: true } });
-// @ts-expect-error - OK, illegal usage
 apiBasicClient.files.deleteFiles.useMutation({ query: { all: true } });
 
 //// APIBasicClientServices - custom callbacks ////
@@ -134,7 +133,7 @@ const apiBasicCustomClient = qraftAPIClient(
   }
 );
 
-// @ts-expect-error - OK, illegal usage
+// @ts-expect-error - OK, no invoke callback provided
 apiBasicCustomClient.filesService.deleteFiles({
   parameters: { query: { all: true } },
 });
@@ -144,7 +143,6 @@ apiBasicCustomClient.filesService.deleteFiles.getMutationKey();
 apiBasicCustomClient.filesService.deleteFiles.getMutationKey({
   query: { all: true },
 });
-// @ts-expect-error - OK, illegal usage
 apiBasicCustomClient.filesService.deleteFiles.useMutation({
   query: { all: true },
 });
@@ -162,3 +160,32 @@ deleteFilesClient.useMutation();
 deleteFilesClient.getMutationKey();
 // @ts-expect-error - OK, illegal usage
 deleteFilesClient.getQueryKey;
+
+const noQueryClientRequestApi = qraftAPIClient(services, callbacks, {
+  requestFn,
+  baseUrl: 'https://api.sandbox.monite.com/v1',
+});
+
+noQueryClientRequestApi.files.getFiles.useQuery(parameters);
+noQueryClientRequestApi.files.getFiles.useIsFetching({ parameters });
+noQueryClientRequestApi.files.getFiles.useQueries({
+  queries: [{ parameters }, { parameters }],
+});
+noQueryClientRequestApi.files.deleteFiles.useMutation({ query: { all: true } });
+noQueryClientRequestApi.files.deleteFiles.useIsMutating();
+noQueryClientRequestApi.files.deleteFiles.useMutationState();
+
+const noQueryClientNoRequestApi = qraftAPIClient(services, callbacks);
+// @ts-expect-error - OK, illegal usage
+noQueryClientNoRequestApi.files.getFiles.useQuery(parameters);
+noQueryClientNoRequestApi.files.getFiles.useIsFetching({ parameters });
+// @ts-expect-error - OK, illegal usage
+noQueryClientNoRequestApi.files.getFiles.useQueries({
+  queries: [{ parameters }, { parameters }],
+});
+// @ts-expect-error - OK, illegal usage
+noQueryClientNoRequestApi.files.deleteFiles.useMutation({
+  query: { all: true },
+});
+noQueryClientNoRequestApi.files.deleteFiles.useIsMutating();
+noQueryClientNoRequestApi.files.deleteFiles.useMutationState();

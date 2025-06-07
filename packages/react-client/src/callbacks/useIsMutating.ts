@@ -15,7 +15,7 @@ export const useIsMutating: <
   TVariables = unknown,
   TContext = unknown,
 >(
-  qraftOptions: CreateAPIQueryClientOptions,
+  qraftOptions: CreateAPIQueryClientOptions | undefined,
   schema: OperationSchema,
   args: Parameters<
     ServiceOperationUseIsMutating<
@@ -35,6 +35,6 @@ export const useIsMutating: <
 
   return useIsMutatingStateTanstack(
     composeMutationFilters(schema, filters) as never,
-    qraftOptions.queryClient
+    qraftOptions?.queryClient
   ) as never;
 };
