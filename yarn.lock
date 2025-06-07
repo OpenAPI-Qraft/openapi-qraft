@@ -4653,6 +4653,8 @@ __metadata:
     rimraf: "npm:^5.0.10"
     typescript: "npm:^5.3.3"
     vitest: "npm:^1.4.0"
+  peerDependencies:
+    commander: ^11.1.0
   languageName: unknown
   linkType: soft
 
@@ -4674,6 +4676,8 @@ __metadata:
     typescript: "npm:^5.3.3"
     vitest: "npm:^1.4.0"
     yaml: "npm:^2.3.4"
+  peerDependencies:
+    commander: ^11.1.0
   languageName: unknown
   linkType: soft
 
