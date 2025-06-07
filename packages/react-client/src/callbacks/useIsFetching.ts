@@ -9,7 +9,7 @@ import { useIsFetching as useIsFetchingTanstack } from '@tanstack/react-query';
 import { composeQueryFilters } from '../lib/composeQueryFilters.js';
 
 export const useIsFetching: <TVariables = unknown>(
-  qraftOptions: CreateAPIQueryClientOptions,
+  qraftOptions: CreateAPIQueryClientOptions | undefined,
   schema: OperationSchema,
   args: Parameters<
     ServiceOperationUseIsFetchingQueries<
@@ -24,6 +24,6 @@ export const useIsFetching: <TVariables = unknown>(
 
   return useIsFetchingTanstack(
     composeQueryFilters(schema, filters as never) as never,
-    qraftOptions.queryClient
+    qraftOptions?.queryClient
   ) as never;
 };

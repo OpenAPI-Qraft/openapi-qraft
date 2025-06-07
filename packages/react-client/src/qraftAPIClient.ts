@@ -115,8 +115,23 @@ export function qraftAPIClient<
 ): APIBasicQueryClientServices<Services, Callbacks>;
 
 /**
- * Creates a basic API Client which contains only "fetch" like
- * operations without any state management using QueryClient.
+ * Creates a basic API Client which contains all hooks and methods
+ * that don't require an explicitly provided QueryClient.
+ * Hooks like `useQuery` and `useMutation` will automatically retrieve
+ * the QueryClient from the `<QueryClientProvider />` context.
+ *
+ * @example Fetching data with QueryClient from context
+ * ```ts
+ * const api = qraftAPIClient(services, callbacks, {
+ *   requestFn: requestFn,
+ *   baseUrl: 'https://api.example.com',
+ * });
+ *
+ * // QueryClient will be retrieved from React context
+ * api.service.operation.useQuery({
+ *   parameters: { path: { id: 1 } },
+ * });
+ * ```
  *
  * @example Fetching data without QueryClient
  * ```ts
@@ -140,8 +155,17 @@ export function qraftAPIClient<
 ): APIBasicClientServices<Services, Callbacks>;
 
 /**
- * Creates a utility API Client which contains only utility operations
- * such as `getQueryKey`, `getInfiniteQueryKey` and `getMutationKey`.
+ * Creates a utility API Client which contains utility operations
+ * such as `getQueryKey`, `getInfiniteQueryKey`, `getMutationKey` and state hooks
+ * like `useIsFetching` and `useMutationData`.
+ *
+ * @example Using state hooks
+ * ```ts
+ * const api = qraftAPIClient(services, callbacks);
+ *
+ * // Check if any query is currently fetching
+ * const isFetching = api.service.operation.useIsFetching();
+ * ```
  *
  * @example Getting query keys with utility client
  * ```ts
@@ -241,7 +265,17 @@ export function qraftAPIClient<
         callbackName !== 'operationInvokeFn' &&
         callbackName !== 'getQueryKey' &&
         callbackName !== 'getMutationKey' &&
-        callbackName !== 'getInfiniteQueryKey'
+        callbackName !== 'getInfiniteQueryKey' &&
+        callbackName !== 'useInfiniteQuery' &&
+        callbackName !== 'useQueries' &&
+        callbackName !== 'useQuery' &&
+        callbackName !== 'useSuspenseInfiniteQuery' &&
+        callbackName !== 'useSuspenseQueries' &&
+        callbackName !== 'useSuspenseQuery' &&
+        callbackName !== 'useIsFetching' &&
+        callbackName !== 'useMutation' &&
+        callbackName !== 'useIsMutating' &&
+        callbackName !== 'useMutationState'
       )
         if (!options || !('queryClient' in options && options.queryClient))
           throw new Error(
@@ -331,7 +365,7 @@ type OperationDeclaration = {
     Record<
       | QueryOperationCallbacks
       | QueryOperationStateCallbacks
-      | MutationOperationCallbacks
+      | MutationOperationHookCallbacks
       | MutationOperationStateCallbacks
       | UtilityOperationCallbacks,
       any
@@ -356,15 +390,8 @@ export type UnionServiceOperationsDeclaration<Services> =
   | OperationsDeclaration<Services>
   | OperationDeclaration;
 
-type QueryOperationCallbacks = Extract<
+type QueryOperationHookCallbacks = Extract<
   keyof ServiceMethods,
-  | 'fetchInfiniteQuery'
-  | 'fetchQuery'
-  | 'prefetchInfiniteQuery'
-  | 'prefetchQuery'
-  | 'refetchQueries'
-  | 'ensureQueryData'
-  | 'ensureInfiniteQueryData'
   | 'useInfiniteQuery'
   | 'useQueries'
   | 'useQuery'
@@ -373,30 +400,56 @@ type QueryOperationCallbacks = Extract<
   | 'useSuspenseQuery'
 >;
 
-type QueryOperationStateCallbacks = Extract<
+type QueryOperationCallbacks =
+  | Extract<
+      keyof ServiceMethods,
+      | 'fetchInfiniteQuery'
+      | 'fetchQuery'
+      | 'prefetchInfiniteQuery'
+      | 'prefetchQuery'
+      | 'refetchQueries'
+      | 'ensureQueryData'
+      | 'ensureInfiniteQueryData'
+    >
+  | QueryOperationHookCallbacks;
+
+type QueryOperationStateHookCallbacks = Extract<
   keyof ServiceMethods,
-  | 'cancelQueries'
-  | 'getInfiniteQueryData'
-  | 'getInfiniteQueryState'
-  | 'getQueriesData'
-  | 'getQueryData'
-  | 'getQueryState'
-  | 'invalidateQueries'
-  | 'isFetching'
-  | 'removeQueries'
-  | 'resetQueries'
-  | 'setInfiniteQueryData'
-  | 'setQueriesData'
-  | 'setQueryData'
-  | 'useIsFetching'
+  'useIsFetching'
 >;
 
-type MutationOperationCallbacks = Extract<keyof ServiceMethods, 'useMutation'>;
+type QueryOperationStateCallbacks =
+  | Extract<
+      keyof ServiceMethods,
+      | 'cancelQueries'
+      | 'getInfiniteQueryData'
+      | 'getInfiniteQueryState'
+      | 'getQueriesData'
+      | 'getQueryData'
+      | 'getQueryState'
+      | 'invalidateQueries'
+      | 'isFetching'
+      | 'removeQueries'
+      | 'resetQueries'
+      | 'setInfiniteQueryData'
+      | 'setQueriesData'
+      | 'setQueryData'
+    >
+  | QueryOperationStateHookCallbacks;
 
-type MutationOperationStateCallbacks = Extract<
+type MutationOperationHookCallbacks = Extract<
   keyof ServiceMethods,
-  'isMutating' | 'useIsMutating' | 'useMutationState'
+  'useMutation'
 >;
+
+type MutationOperationStateHookCallbacks = Extract<
+  keyof ServiceMethods,
+  'useIsMutating' | 'useMutationState'
+>;
+
+type MutationOperationStateCallbacks =
+  | Extract<keyof ServiceMethods, 'isMutating'>
+  | MutationOperationStateHookCallbacks;
 
 type InvokeOperationCallback = Extract<
   keyof typeof operationInvokeModule,
@@ -405,13 +458,17 @@ type InvokeOperationCallback = Extract<
 
 type UtilityOperationCallbacks = Extract<
   keyof ServiceMethods,
-  'getQueryKey' | 'getInfiniteQueryKey' | 'getMutationKey'
+  | 'getQueryKey'
+  | 'getInfiniteQueryKey'
+  | 'getMutationKey'
+  | QueryOperationStateHookCallbacks
+  | MutationOperationStateHookCallbacks
 >;
 
 type OperationCallbackList =
   | QueryOperationCallbacks
   | QueryOperationStateCallbacks
-  | MutationOperationCallbacks
+  | MutationOperationHookCallbacks
   | MutationOperationStateCallbacks
   | InvokeOperationCallback
   | UtilityOperationCallbacks;
@@ -458,7 +515,15 @@ export type APIBasicClientServices<
   Callbacks extends PartialServiceMethods,
 > = ServicesFilteredByCallbacks<
   Services,
-  Extract<keyof Callbacks, InvokeOperationCallback | UtilityOperationCallbacks>
+  Extract<
+    keyof Callbacks,
+    | InvokeOperationCallback
+    | UtilityOperationCallbacks
+    | QueryOperationHookCallbacks
+    | QueryOperationStateHookCallbacks
+    | MutationOperationStateHookCallbacks
+    | MutationOperationHookCallbacks
+  >
 >;
 
 export type APIUtilityClientServices<
