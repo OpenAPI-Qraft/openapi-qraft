@@ -192,7 +192,6 @@ It is possible to use multiple plugins at the same time. For example, `--plugin 
     building a **minimal bundle size** client where you explicitly control which services and callbacks to include.
     - `--create-api-client-fn createCustomClient filename:create-custom-api services:none callbacks:setQueryData,getQueryData` - creates
       the `createCustomClient()` function in the `create-custom-api.ts` file with no default services and only `setQueryData()` and `getQueryData()` callbacks
-- **`--tanstack-query-version [semver]`**: Specify the version of TanStack Query to use. If not provided, it will be automatically detected from your project dependencies.
 
   ::::tip
   When generating multiple API client functions with different parameters, it might be more convenient to use a configuration file
