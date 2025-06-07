@@ -16,7 +16,6 @@ apis:
       enum-values: true
       explicit-import-extensions: true
       openapi-types-file-name: openapi.ts
-      tanstack-query-version: 5.79.2
       filter-services:
         - '/approval_policies/**'
         - '/entities/**'

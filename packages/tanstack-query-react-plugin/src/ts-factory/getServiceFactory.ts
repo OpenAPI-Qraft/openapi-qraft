@@ -4,7 +4,6 @@ import { ServiceOperation } from '@openapi-qraft/plugin/lib/open-api/OpenAPIServ
 import camelCase from 'camelcase';
 import ts from 'typescript';
 import { createOperationCommonTSDoc } from '../lib/createOperationCommonTSDoc.js';
-import { isSemverLessThan } from '../lib/isSemverLessThan.js';
 import { filterUnusedTypes } from './filterUnusedTypes.js';
 import { getOverriddenImportDeclarationsFactory } from './getOverriddenImportDeclarationsFactory.js';
 import {
@@ -18,7 +17,6 @@ const factory = ts.factory;
 export type ServiceFactoryOptions = {
   openapiTypesImportPath: string;
   queryableWriteOperations: boolean;
-  tanstackQueryVersion: string;
 };
 
 type Service = { typeName: string; variableName: string };
@@ -57,8 +55,7 @@ export const getServiceFactory = (
     getOpenAPISchemaImportsFactory(options.openapiTypesImportPath),
     ...getServiceOperationImportsFactory(
       moduleTypeImports,
-      serviceImportTypeOverrides,
-      options.tanstackQueryVersion
+      serviceImportTypeOverrides
     ),
   ];
 
@@ -89,20 +86,9 @@ const getServiceOperationImportsFactory = (
   moduleImports: Record<string, string[]>,
   serviceImportTypeOverrides:
     | OverrideImportType[keyof OverrideImportType]
-    | undefined,
-  tanstackQueryVersion: string
+    | undefined
 ) => {
   const factory = ts.factory;
-  if (isSemverLessThan(tanstackQueryVersion, '5.80.0')) {
-    serviceImportTypeOverrides = {
-      ...serviceImportTypeOverrides,
-      '@tanstack/react-query': {
-        UseSuspenseInfiniteQueryOptions:
-          '@openapi-qraft/tanstack-query-react-types/legacy/Lt_5_80_0_UseSuspenseInfiniteQueryOptions',
-        ...serviceImportTypeOverrides?.['@tanstack/react-query'],
-      },
-    };
-  }
 
   const standardImports = Object.entries(moduleImports)
     .map(([moduleName, importSpecifierNames]) => {

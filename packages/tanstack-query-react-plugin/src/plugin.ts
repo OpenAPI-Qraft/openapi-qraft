@@ -1,6 +1,4 @@
 import type { OverrideImportType } from './ts-factory/OverrideImportType.js';
-import { readFileSync } from 'node:fs';
-import { URL } from 'node:url';
 import { fileHeader } from '@openapi-qraft/plugin/lib/fileHeader';
 import {
   createPredefinedParametersGlobs,
@@ -62,14 +60,6 @@ export const plugin: QraftCommandPlugin = {
           'Override import paths for specific types in generated files. This allows using custom type implementations instead of the default ones. Expected format: filepath originalModule:importTypeName:customImportPath'
         ).argParser(parseOverrideImportType)
       )
-      .addOption(
-        new Option(
-          '--tanstack-query-version [semver]',
-          'TanStack Query version to use (automatically detected if not specified)'
-        )
-          .default(getTanStackQueryVersion(command.cwd))
-          .makeOptionMandatory()
-      )
       .action(async ({ spinner, output, args, services, schema }, resolve) => {
         return void (await generateCode({
           spinner,
@@ -77,7 +67,6 @@ export const plugin: QraftCommandPlugin = {
           serviceOptions: {
             openapiTypesImportPath: args.openapiTypesImportPath,
             queryableWriteOperations: args.queryableWriteOperations,
-            tanstackQueryVersion: args.tanstackQueryVersion,
           },
           overrideImportType: Array.isArray(args.overrideImportType)
             ? args.overrideImportType[0]
@@ -287,22 +276,3 @@ const createApiClientFnDefault = [
     },
   ],
 ] as const;
-
-function getTanStackQueryVersion(cwd: URL): string | void {
-  const packagesToCheck = ['@tanstack/react-query', '@tanstack/query-core'];
-
-  for (const packageName of packagesToCheck) {
-    try {
-      const packageJsonUrl = import.meta.resolve(
-        `${packageName}/package.json`,
-        cwd.href
-      );
-      const packageJsonPath = new URL(packageJsonUrl);
-      const packageJsonContent = readFileSync(packageJsonPath, 'utf-8');
-      const packageJson = JSON.parse(packageJsonContent);
-      return packageJson.version;
-    } catch {
-      continue;
-    }
-  }
-}
