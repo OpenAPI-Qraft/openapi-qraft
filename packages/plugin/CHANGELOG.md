@@ -1,5 +1,11 @@
 # @openapi-qraft/plugin
 
+## 1.15.0
+
+### Patch Changes
+
+- 870d55a: Added Commander to "peerDependencies" where required.
+
 ## 1.14.2
 
 ## 1.14.1
