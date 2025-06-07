@@ -4,3 +4,11 @@ ssh
 ubuntu
 workarounds
 createapiclient
+APITS
+jwt
+npmrc
+npx
+URLTo
+vscode
+OpenAPITSOptions
+TOptions
