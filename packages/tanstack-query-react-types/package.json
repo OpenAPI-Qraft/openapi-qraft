@@ -21,6 +21,11 @@
       "import": "./dist/esm/shared/*.js",
       "require": "./dist/cjs/shared/*.cjs"
     },
+    "./legacy/*": {
+      "types": "./dist/types/legacy/*.d.ts",
+      "import": "./dist/esm/legacy/*.js",
+      "require": "./dist/cjs/legacy/*.cjs"
+    },
     "./package.json": "./package.json"
   },
   "typesVersions": {

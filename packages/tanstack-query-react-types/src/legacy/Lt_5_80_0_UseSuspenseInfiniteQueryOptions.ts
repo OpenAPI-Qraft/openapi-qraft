@@ -8,25 +8,12 @@ export type UseSuspenseInfiniteQueryOptions<
   TQueryKey extends QueryKey = QueryKey,
   TPageParam = unknown,
 > =
+  // @ts-expect-error - TanStack Query prior to 5.80.0 has 6 arguments for the UseSuspenseInfiniteQueryOptions
   UseSuspenseInfiniteQueryOptionsVendor<
     TQueryFnData,
     TError,
     TData,
-    TQueryKey
-  > extends { queryKey: TQueryKey }
-    ? UseSuspenseInfiniteQueryOptionsVendor<
-        TQueryFnData,
-        TError,
-        TData,
-        TQueryKey,
-        TPageParam
-      >
-    : // @ts-expect-error - the compatibility layer with @tanstack/react-query <= 5.79.2
-      UseSuspenseInfiniteQueryOptionsVendor<
-        TQueryFnData,
-        TError,
-        TData,
-        TQueryFnData,
-        TQueryKey,
-        TPageParam
-      >;
+    TQueryFnData,
+    TQueryKey,
+    TPageParam
+  >;
