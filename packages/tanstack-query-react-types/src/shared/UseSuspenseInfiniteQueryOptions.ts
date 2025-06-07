@@ -1,5 +1,8 @@
-import type { DefaultError, QueryKey } from '@tanstack/query-core';
-import type { UseSuspenseInfiniteQueryOptions as UseSuspenseInfiniteQueryOptionsVendor } from '@tanstack/react-query';
+import type {
+  DefaultError,
+  QueryKey,
+  UseSuspenseInfiniteQueryOptions as UseSuspenseInfiniteQueryOptionsVendor,
+} from '@tanstack/react-query';
 
 export type UseSuspenseInfiniteQueryOptions<
   TQueryFnData = unknown,

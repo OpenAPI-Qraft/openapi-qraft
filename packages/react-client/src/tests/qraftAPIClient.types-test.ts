@@ -2,7 +2,7 @@
 
 import { qraftAPIClient, requestFn } from '@openapi-qraft/react';
 import * as callbacks from '@openapi-qraft/react/callbacks/index';
-import { QueryClient } from '@tanstack/query-core';
+import { QueryClient } from '@tanstack/react-query';
 import { services } from './fixtures/api/index.js';
 import {
   deleteFiles,

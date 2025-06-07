@@ -3,7 +3,7 @@ import {
   getInfiniteQueryKey,
   getQueryKey,
 } from '@openapi-qraft/react/callbacks/index';
-import { QueryClient } from '@tanstack/query-core';
+import { QueryClient } from '@tanstack/react-query';
 import { describe, expect, it, vi } from 'vitest';
 import {
   createInternalReactAPIClient as createAPIOperationClient,

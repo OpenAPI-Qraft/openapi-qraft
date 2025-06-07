@@ -1,4 +1,4 @@
-import type { QueryClient } from '@tanstack/query-core';
+import type { QueryClient } from '@tanstack/react-query';
 import type { CreateAPIQueryClientOptions } from '../qraftAPIClient.js';
 import type { OperationSchema, RequestFn } from './requestFn.js';
 import { composeInfiniteQueryKey } from './composeInfiniteQueryKey.js';

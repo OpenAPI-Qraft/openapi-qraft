@@ -2,7 +2,7 @@ import type {
   OperationSchema,
   ServiceOperationUseInfiniteQuery,
 } from '@openapi-qraft/tanstack-query-react-types';
-import type { DefaultError } from '@tanstack/query-core';
+import type { DefaultError } from '@tanstack/react-query';
 import type { CreateAPIBasicClientOptions } from '../qraftAPIClient.js';
 import { composeInfiniteQueryKey } from '../lib/composeInfiniteQueryKey.js';
 

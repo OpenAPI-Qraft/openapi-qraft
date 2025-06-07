@@ -4,8 +4,7 @@ import type {
   OperationSchema,
   ServiceOperationUseIsMutating,
 } from '@openapi-qraft/tanstack-query-react-types';
-import type { DefaultError } from '@tanstack/query-core';
-import type { UseMutationResult } from '@tanstack/react-query';
+import type { DefaultError, UseMutationResult } from '@tanstack/react-query';
 import type { CreateAPIQueryClientOptions } from '../qraftAPIClient.js';
 import { useIsMutating as useIsMutatingStateTanstack } from '@tanstack/react-query';
 import { composeMutationFilters } from '../lib/composeMutationFilters.js';

@@ -1,8 +1,7 @@
 'use client';
 
 import type { ServiceOperationQueryKey } from '@openapi-qraft/tanstack-query-react-types';
-import type { QueryClient } from '@tanstack/query-core';
-import type { UseQueryOptions } from '@tanstack/react-query';
+import type { QueryClient, UseQueryOptions } from '@tanstack/react-query';
 import type { CreateAPIQueryClientOptions } from '../qraftAPIClient.js';
 import type { OperationSchema } from './requestFn.js';
 import { composeInfiniteQueryKey } from './composeInfiniteQueryKey.js';

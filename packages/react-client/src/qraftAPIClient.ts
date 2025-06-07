@@ -1,5 +1,5 @@
 import type { QraftServiceOperationsToken } from '@openapi-qraft/tanstack-query-react-types';
-import type { QueryClient } from '@tanstack/query-core';
+import type { QueryClient } from '@tanstack/react-query';
 import type * as callbacks from './callbacks/index.js';
 import type * as operationInvokeModule from './callbacks/operationInvokeFn.js';
 import type {

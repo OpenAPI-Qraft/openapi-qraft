@@ -1,3 +1,4 @@
+import type { QueryClientConfig } from '@tanstack/react-query';
 import type { ReactNode } from 'react';
 import type { CreateAPIQueryClientOptions } from '../index.js';
 import type {
@@ -11,7 +12,6 @@ import {
   operationInvokeFn,
   useQuery,
 } from '@openapi-qraft/react/callbacks/index';
-import { type QueryClientConfig } from '@tanstack/query-core';
 import {
   hashKey,
   QueryClient,
