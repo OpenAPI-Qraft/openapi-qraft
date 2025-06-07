@@ -72,6 +72,8 @@ Options:
   --exclude-deprecated                                Exclude deprecated types
   --no-blob-from-binary                               If this option is enabled, binary format fields will not be converted to Blob types, preserving the native representation
   --explicit-component-exports                        Enabling this option will export API components as separate type aliases, alongside `components` interface
+  --tanstack-query-version [semver]                   TanStack Query version to use (automatically detected if not specified)
+
   -h, --help                                          display help for command
 ```
 
