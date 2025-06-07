@@ -1,5 +1,11 @@
 # @openapi-qraft/tanstack-query-react-types
 
+## 2.8.0
+
+### Minor Changes
+
+- 6419f64: Update `peerDependency` to `@tanstack/react-query@^5.80.0` due to breaking changes in the `UseSuspenseInfiniteQueryOptions` interface.
+
 ## 2.7.2
 
 ### Patch Changes
