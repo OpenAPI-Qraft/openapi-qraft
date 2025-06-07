@@ -1,5 +1,15 @@
 # @openapi-qraft/react
 
+## 2.9.0
+
+### Minor Changes
+
+- 8f0b86a: Enable all hooks to automatically retrieve the QueryClient from the `<QueryClientProvider />` context instead of requiring it to be passed in explicitly when the API Client created.
+
+### Patch Changes
+
+- @openapi-qraft/tanstack-query-react-types@2.9.0
+
 ## 2.8.0
 
 ### Minor Changes
