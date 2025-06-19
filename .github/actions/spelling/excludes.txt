@@ -94,3 +94,4 @@
 ^packages/tanstack-query-react-plugin/src/ts-factory/service-operation.generated/
 ^website/static/
 ignore$
+^\Qpackages/react-client/src/lib/urlSerializer.test.ts\E$
