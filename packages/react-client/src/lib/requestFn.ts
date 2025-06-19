@@ -100,7 +100,7 @@ export function urlSerializer(
         info.parameters?.path &&
         Object.prototype.hasOwnProperty.call(info.parameters.path, group)
       ) {
-        return encodeURI(String(info.parameters?.path[group]));
+        return encodeURIComponent(String(info.parameters?.path[group]));
       }
       return substring;
     }
@@ -116,37 +116,24 @@ export function urlSerializer(
 }
 
 function getQueryString(params: Record<string, any>): string {
-  const qs: string[] = [];
+  const search = new URLSearchParams();
 
-  const append = (key: string, value: any) => {
-    qs.push(`${encodeURIComponent(key)}=${encodeURIComponent(String(value))}`);
-  };
-
-  const process = (key: string, value: any) => {
-    if (typeof value === 'undefined' || value === null) return;
-
-    if (Array.isArray(value)) {
-      value.forEach((v) => {
-        process(key, v);
-      });
-    } else if (typeof value === 'object') {
-      Object.entries(value).forEach(([k, v]) => {
-        process(`${key}[${k}]`, v);
-      });
-    } else {
-      append(key, value);
+  const walk = (prefix: string, value: any) => {
+    if (value == null) return;
+    if (value instanceof Date)
+      return search.append(prefix, value.toISOString());
+    if (Array.isArray(value)) return value.forEach((v) => walk(prefix, v));
+    if (typeof value === 'object') {
+      return Object.entries(value).forEach(([k, v]) =>
+        walk(`${prefix}[${k}]`, v)
+      );
     }
+    search.append(prefix, String(value));
   };
 
-  Object.entries(params).forEach(([key, value]) => {
-    process(key, value);
-  });
+  Object.entries(params).forEach(([k, v]) => walk(k, v));
 
-  if (qs.length > 0) {
-    return `?${qs.join('&')}`;
-  }
-
-  return '';
+  return search.toString() ? `?${search.toString()}` : '';
 }
 
 export function mergeHeaders(...allHeaders: (HeadersOptions | undefined)[]) {
