@@ -14,6 +14,38 @@ describe('urlSerializer', () => {
     ).toBe('https://api.example.com/users/123/posts/456');
   });
 
+  it('should correctly encode complex characters in path and query parameters', () => {
+    const info = {
+      baseUrl: 'https://api.example.com',
+      parameters: {
+        path: {
+          query: 'hello/world:test@domain.com',
+          category: 'books & magazines',
+        },
+        query: {
+          filter: 'price:$10-$50',
+          tags: ['tag/with/slash', 'tag:with:colon'],
+          special: 'symbols!@#$%^&*()+={}[]|\\:";\'<>?,./~`',
+        },
+      },
+    } as const;
+
+    const result = urlSerializer(
+      { url: '/search/{query}/category/{category}', method: 'get' },
+      info
+    );
+
+    const expectedUrl = new URL(
+      'https://api.example.com/search/hello%2Fworld%3Atest%40domain.com/category/books%20%26%20magazines'
+    );
+    expectedUrl.searchParams.set('filter', info.parameters.query.filter);
+    expectedUrl.searchParams.append('tags', info.parameters.query.tags[0]);
+    expectedUrl.searchParams.append('tags', info.parameters.query.tags[1]);
+    expectedUrl.searchParams.set('special', info.parameters.query.special);
+
+    expect(result).toBe(expectedUrl.toString());
+  });
+
   it('should correctly append query parameters', () => {
     expect(
       urlSerializer(

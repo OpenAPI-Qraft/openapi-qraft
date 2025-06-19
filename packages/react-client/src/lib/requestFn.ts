@@ -100,7 +100,7 @@ export function urlSerializer(
         info.parameters?.path &&
         Object.prototype.hasOwnProperty.call(info.parameters.path, group)
       ) {
-        return encodeURI(String(info.parameters?.path[group]));
+        return encodeURIComponent(String(info.parameters?.path[group]));
       }
       return substring;
     }
