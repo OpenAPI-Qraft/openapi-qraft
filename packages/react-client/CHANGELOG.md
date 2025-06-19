@@ -1,5 +1,16 @@
 # @openapi-qraft/react
 
+## 2.10.0
+
+### Minor Changes
+
+- ea029f5: Refactor `getQueryString` function to use native `URLSearchParams` instead of custom implementation for better maintainability.
+
+### Patch Changes
+
+- 16e68c8: Fix URL serialization using `encodeURIComponent` instead of `encodeURI` to avoid issues with slash serialization in path parameters.
+  - @openapi-qraft/tanstack-query-react-types@2.10.0
+
 ## 2.9.0
 
 ### Minor Changes
