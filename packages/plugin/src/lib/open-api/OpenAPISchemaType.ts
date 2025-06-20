@@ -24,7 +24,8 @@ export type OpenAPISchemaType = {
         };
         responses: {
           [statusCode in number | 'default']: {
-            description: string;
+            $ref?: string;
+            description?: string;
             content?: {
               [contentType: string]:
                 | {

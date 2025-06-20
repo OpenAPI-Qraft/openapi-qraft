@@ -19,7 +19,9 @@ exports[`getServices > matches snapshot with "serviceNameBase: endpoint" 1`] = `
           "422": [
             "application/json",
           ],
-          "default": null,
+          "default": [
+            "application/json",
+          ],
         },
         "method": "post",
         "name": "postEntitiesIdDocuments",
@@ -328,7 +330,9 @@ exports[`getServices > matches snapshot with "serviceNameBase: endpoint" 1`] = `
           "422": [
             "application/json",
           ],
-          "default": null,
+          "default": [
+            "application/json",
+          ],
         },
         "method": "get",
         "name": "getFiles",
@@ -565,7 +569,9 @@ exports[`getServices > matches snapshot with "serviceNameBase: tags" 1`] = `
           "422": [
             "application/json",
           ],
-          "default": null,
+          "default": [
+            "application/json",
+          ],
         },
         "method": "post",
         "name": "postEntitiesIdDocuments",
@@ -874,7 +880,9 @@ exports[`getServices > matches snapshot with "serviceNameBase: tags" 1`] = `
           "422": [
             "application/json",
           ],
-          "default": null,
+          "default": [
+            "application/json",
+          ],
         },
         "method": "get",
         "name": "getFiles",
@@ -1111,7 +1119,9 @@ exports[`getServices > matches snapshot with custom \`postfixServices\` 1`] = `
           "422": [
             "application/json",
           ],
-          "default": null,
+          "default": [
+            "application/json",
+          ],
         },
         "method": "post",
         "name": "postEntitiesIdDocuments",
@@ -1420,7 +1430,9 @@ exports[`getServices > matches snapshot with custom \`postfixServices\` 1`] = `
           "422": [
             "application/json",
           ],
-          "default": null,
+          "default": [
+            "application/json",
+          ],
         },
         "method": "get",
         "name": "getFiles",
@@ -1654,7 +1666,9 @@ exports[`getServices > matches snapshot with custom \`servicesGlob\` 1`] = `
           "422": [
             "application/json",
           ],
-          "default": null,
+          "default": [
+            "application/json",
+          ],
         },
         "method": "get",
         "name": "getFiles",
@@ -1891,7 +1905,9 @@ exports[`getServices > matches snapshot with default options 1`] = `
           "422": [
             "application/json",
           ],
-          "default": null,
+          "default": [
+            "application/json",
+          ],
         },
         "method": "post",
         "name": "postEntitiesIdDocuments",
@@ -2200,7 +2216,9 @@ exports[`getServices > matches snapshot with default options 1`] = `
           "422": [
             "application/json",
           ],
-          "default": null,
+          "default": [
+            "application/json",
+          ],
         },
         "method": "get",
         "name": "getFiles",
