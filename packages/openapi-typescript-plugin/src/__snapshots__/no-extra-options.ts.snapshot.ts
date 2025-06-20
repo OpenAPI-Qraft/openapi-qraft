@@ -174,7 +174,17 @@ export interface components {
             url: string;
         };
     };
-    responses: never;
+    responses: {
+        /** @description Unexpected error */
+        DefaultErrorSchemaResponse: {
+            headers: {
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": components["schemas"]["ErrorSchemaResponse"];
+            };
+        };
+    };
     parameters: {
         IdIn: string[];
         /** @example 2023-06-04 */
@@ -262,15 +272,7 @@ export interface operations {
                     "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
-            /** @description Unexpected error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorSchemaResponse"];
-                };
-            };
+            default: components["responses"]["DefaultErrorSchemaResponse"];
         };
     };
     get_approval_policies_id: {
@@ -514,15 +516,7 @@ export interface operations {
                     "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
-            /** @description Internal Server Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorSchemaResponse"];
-                };
-            };
+            default: components["responses"]["DefaultErrorSchemaResponse"];
         };
     };
     post_files: {

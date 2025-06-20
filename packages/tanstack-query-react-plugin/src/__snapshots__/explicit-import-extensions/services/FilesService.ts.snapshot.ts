@@ -1314,7 +1314,7 @@ type GetFilesSchema = {
 };
 type GetFilesParameters = paths["/files"]["get"]["parameters"];
 type GetFilesData = paths["/files"]["get"]["responses"]["200"]["content"]["application/json"];
-type GetFilesError = paths["/files"]["get"]["responses"]["405"]["content"]["application/json"] | paths["/files"]["get"]["responses"]["422"]["content"]["application/json"] | paths["/files"]["get"]["responses"]["default"]["content"]["application/json"];
+type GetFilesError = paths["/files"]["get"]["responses"]["405"]["content"]["application/json"] | paths["/files"]["get"]["responses"]["422"]["content"]["application/json"] | null;
 type PostFilesSchema = {
     method: "post";
     url: "/files";
