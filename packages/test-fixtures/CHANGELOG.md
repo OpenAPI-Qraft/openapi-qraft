@@ -1,5 +1,11 @@
 # @openapi-qraft/test-fixtures
 
+## 1.1.1
+
+### Patch Changes
+
+- 8f90621: Add support for responses with `$ref` specification.
+
 ## 1.1.0
 
 ### Minor Changes
