@@ -1,5 +1,11 @@
 # @openapi-qraft/tanstack-query-react-types
 
+## 2.10.1
+
+### Patch Changes
+
+- 4618a66: Clarify `RequestFnInfo` type by adding missing `readonly` modifiers for consistency and correctness.
+
 ## 2.10.0
 
 ## 2.9.0

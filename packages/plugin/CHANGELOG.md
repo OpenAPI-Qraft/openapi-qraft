@@ -1,5 +1,11 @@
 # @openapi-qraft/plugin
 
+## 2.10.1
+
+### Patch Changes
+
+- 8f90621: Add support for responses with `$ref` specification.
+
 ## 2.10.0
 
 ## 2.9.0
