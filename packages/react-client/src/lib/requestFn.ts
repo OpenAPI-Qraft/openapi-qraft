@@ -133,7 +133,9 @@ function getQueryString(params: Record<string, any>): string {
 
   Object.entries(params).forEach(([k, v]) => walk(k, v));
 
-  return search.toString() ? `?${search.toString()}` : '';
+  const searchString = search.toString();
+
+  return searchString ? `?${searchString}` : '';
 }
 
 export function mergeHeaders(...allHeaders: (HeadersOptions | undefined)[]) {
