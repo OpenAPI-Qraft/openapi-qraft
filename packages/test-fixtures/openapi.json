@@ -120,12 +120,7 @@
             }
           },
           "default": {
-            "description": "Unexpected error",
-            "content": {
-              "application/json": {
-                "schema": { "$ref": "#/components/schemas/ErrorSchemaResponse" }
-              }
-            }
+            "$ref": "#/components/responses/DefaultErrorSchemaResponse"
           }
         },
         "security": [{ "userToken": [] }, { "partnerToken": [] }]
@@ -493,12 +488,7 @@
             }
           },
           "default": {
-            "description": "Internal Server Error",
-            "content": {
-              "application/json": {
-                "schema": { "$ref": "#/components/schemas/ErrorSchemaResponse" }
-              }
-            }
+            "$ref": "#/components/responses/DefaultErrorSchemaResponse"
           }
         },
         "security": [{ "HTTPBearer": [] }]
@@ -878,6 +868,16 @@
             "schema": {
               "$ref": "#/components/schemas/EntityOnboardingDocuments"
             }
+          }
+        }
+      }
+    },
+    "responses": {
+      "DefaultErrorSchemaResponse": {
+        "description": "Unexpected error",
+        "content": {
+          "application/json": {
+            "schema": { "$ref": "#/components/schemas/ErrorSchemaResponse" }
           }
         }
       }

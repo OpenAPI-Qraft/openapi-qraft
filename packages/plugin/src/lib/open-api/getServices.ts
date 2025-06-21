@@ -66,6 +66,13 @@ export const getServices = (
         >
       >(
         (acc, [statusCode, response]) => {
+          if (response.$ref) {
+            response = resolveDocumentLocalRef(
+              response.$ref,
+              openApiJson
+            ) as typeof response;
+          }
+
           const statusType =
             statusCode !== 'default' && // See "default" response https://swagger.io/docs/specification/describing-responses/#default
             Number(statusCode) < 400
