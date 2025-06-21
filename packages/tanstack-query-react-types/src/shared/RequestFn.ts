@@ -60,7 +60,7 @@ export interface RequestFnInfo
    * Base URL to use for the request
    * @example 'https://api.example.com'
    */
-  baseUrl?: string;
+  readonly baseUrl?: string;
 
   /**
    * OpenAPI parameters
@@ -84,10 +84,10 @@ export interface RequestFnInfo
   /**
    * TanStack Query Meta
    */
-  meta?: Record<string, unknown>;
+  readonly meta?: Record<string, unknown>;
 
   /** An AbortSignal to set request's signal. */
-  signal?: AbortSignal | null;
+  readonly signal?: AbortSignal | null;
 }
 
 /**
