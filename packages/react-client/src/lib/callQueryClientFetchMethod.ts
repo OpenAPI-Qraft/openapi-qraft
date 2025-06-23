@@ -50,11 +50,43 @@ export function callQueryClientMethodWithQueryKey<
     (requestFn
       ? // @ts-expect-error - Too complex union to type
         function ({ queryKey: [, queryParams], signal, meta, pageParam }) {
+          const { body, ...parameters } = queryParams as {
+            body: BodyInit;
+          } & typeof queryParams;
+
           return requestFn(schema, {
             parameters: infinite
-              ? (shelfMerge(2, queryParams, pageParam) as never)
-              : queryParams,
+              ? (shelfMerge(
+                  2,
+                  parameters,
+                  (function omitBodyFromParameters() {
+                    if (
+                      pageParam &&
+                      typeof pageParam === 'object' &&
+                      'body' in pageParam
+                    ) {
+                      const { body: _body, ...pageParameters } = pageParam;
+                      return pageParameters;
+                    }
+
+                    return pageParam;
+                  })()
+                ) as never)
+              : parameters,
             baseUrl,
+            body: infinite
+              ? (function shelfMergeBody() {
+                  if (
+                    pageParam &&
+                    typeof pageParam === 'object' &&
+                    'body' in pageParam
+                  ) {
+                    return shelfMerge(1, body, pageParam.body) as BodyInit;
+                  }
+
+                  return body;
+                })()
+              : body,
             signal,
             meta,
           }).then(requestFnResponseResolver, requestFnResponseRejecter);

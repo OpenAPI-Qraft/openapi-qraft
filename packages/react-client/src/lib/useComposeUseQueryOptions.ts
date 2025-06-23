@@ -34,10 +34,37 @@ export function useComposeUseQueryOptions(
         .requestFn(schema, {
           // @ts-expect-error - Too complex to type
           parameters: infinite
-            ? (shelfMerge(2, parameters, pageParam) as never)
+            ? (shelfMerge(
+                2,
+                parameters,
+                (function omitBodyFromParameters() {
+                  if (
+                    pageParam &&
+                    typeof pageParam === 'object' &&
+                    'body' in pageParam
+                  ) {
+                    const { body: _body, ...pageParameters } = pageParam;
+                    return pageParameters;
+                  }
+
+                  return pageParam;
+                })()
+              ) as never)
             : parameters,
           baseUrl: qraftOptions.baseUrl,
-          body,
+          body: infinite
+            ? (function shelfMergeBody() {
+                if (
+                  pageParam &&
+                  typeof pageParam === 'object' &&
+                  'body' in pageParam
+                ) {
+                  return shelfMerge(1, body, pageParam.body) as BodyInit;
+                }
+
+                return body;
+              })()
+            : body,
           signal,
           meta,
         })
