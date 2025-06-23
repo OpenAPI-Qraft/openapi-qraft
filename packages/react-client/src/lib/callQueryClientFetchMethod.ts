@@ -3,9 +3,9 @@ import type { CreateAPIQueryClientOptions } from '../qraftAPIClient.js';
 import type { OperationSchema, RequestFn } from './requestFn.js';
 import { composeInfiniteQueryKey } from './composeInfiniteQueryKey.js';
 import { composeQueryKey } from './composeQueryKey.js';
+import { prepareRequestFnParameters } from './prepareRequestFnParameters.js';
 import { requestFnResponseRejecter } from './requestFnResponseRejecter.js';
 import { requestFnResponseResolver } from './requestFnResponseResolver.js';
-import { shelfMerge } from './shelfMerge.js';
 
 /**
  * Calls a query client fetch method with parameters and options,
@@ -50,11 +50,16 @@ export function callQueryClientMethodWithQueryKey<
     (requestFn
       ? // @ts-expect-error - Too complex union to type
         function ({ queryKey: [, queryParams], signal, meta, pageParam }) {
+          const { parameters, body } = prepareRequestFnParameters(
+            queryParams,
+            pageParam,
+            infinite
+          );
+
           return requestFn(schema, {
-            parameters: infinite
-              ? (shelfMerge(2, queryParams, pageParam) as never)
-              : queryParams,
+            parameters: parameters as never,
             baseUrl,
+            body,
             signal,
             meta,
           }).then(requestFnResponseResolver, requestFnResponseRejecter);

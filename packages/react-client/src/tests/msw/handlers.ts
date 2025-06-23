@@ -69,6 +69,7 @@ export const handlers = [
         name: body.name!,
         description: body.description!,
         id: path.approval_policy_id,
+        trigger: body.trigger,
       });
     }
   ),

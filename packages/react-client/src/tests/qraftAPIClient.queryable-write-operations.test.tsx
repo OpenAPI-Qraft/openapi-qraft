@@ -9,7 +9,7 @@ import { createAPIClient } from './fixtures/queryable-write-operations-api/index
 const baseUrl = 'https://api.sandbox.monite.com/v1';
 
 describe('Queryable write operations', () => {
-  it('queries writable operations with a specific body', async () => {
+  it('queries writable operations with a specific body for useQuery', async () => {
     const queryClient = new QueryClient();
     const qraft = createAPIClient({
       requestFn,
@@ -44,6 +44,85 @@ describe('Queryable write operations', () => {
         id: '2',
         name: 'New Name',
         description: 'New Description',
+      });
+    });
+  });
+
+  it('queries writable operations with a specific body for fetchQuery', async () => {
+    const queryClient = new QueryClient();
+    const qraft = createAPIClient({
+      requestFn,
+      baseUrl,
+      queryClient,
+    });
+
+    const result =
+      await qraft.approvalPolicies.patchApprovalPoliciesId.fetchQuery({
+        parameters: {
+          header: {
+            'x-monite-version': '1',
+            'x-monite-entity-id': '2',
+          },
+          path: {
+            approval_policy_id: '2',
+          },
+          body: {
+            name: 'New Name',
+            description: 'New Description',
+          },
+        },
+      });
+
+    await waitFor(() => {
+      expect(result).toEqual({
+        id: '2',
+        name: 'New Name',
+        description: 'New Description',
+      });
+    });
+  });
+
+  it('queries writable operations with a specific body for fetchInfiniteQuery', async () => {
+    const queryClient = new QueryClient();
+    const qraft = createAPIClient({
+      requestFn,
+      baseUrl,
+      queryClient,
+    });
+
+    const result =
+      await qraft.approvalPolicies.patchApprovalPoliciesId.fetchInfiniteQuery({
+        parameters: {
+          header: {
+            'x-monite-version': '1',
+            'x-monite-entity-id': '2',
+          },
+          path: {
+            approval_policy_id: '2',
+          },
+          body: {
+            name: 'New Name',
+            description: 'New Description',
+          },
+        },
+        initialPageParam: {
+          body: {
+            trigger: true,
+          },
+        },
+      });
+
+    await waitFor(() => {
+      expect(result).toEqual({
+        pageParams: [{ body: { trigger: true } }],
+        pages: [
+          {
+            id: '2',
+            name: 'New Name',
+            description: 'New Description',
+            trigger: true,
+          },
+        ],
       });
     });
   });
