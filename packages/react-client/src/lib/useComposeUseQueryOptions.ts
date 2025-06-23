@@ -6,9 +6,9 @@ import type { CreateAPIQueryClientOptions } from '../qraftAPIClient.js';
 import type { OperationSchema } from './requestFn.js';
 import { composeInfiniteQueryKey } from './composeInfiniteQueryKey.js';
 import { composeQueryKey } from './composeQueryKey.js';
+import { prepareRequestFnParameters } from './prepareRequestFnParameters.js';
 import { requestFnResponseRejecter } from './requestFnResponseRejecter.js';
 import { requestFnResponseResolver } from './requestFnResponseResolver.js';
-import { shelfMerge } from './shelfMerge.js';
 
 /**
  * Composes the options for useQuery, useInfiniteQuery, useSuspenseQuery, and useSuspenseQueries.
@@ -25,46 +25,17 @@ export function useComposeUseQueryOptions(
   const queryFn =
     options?.queryFn ??
     function ({ queryKey: [, queryParams], signal, meta, pageParam }) {
-      const { body, ...parameters } = queryParams as {
-        body: BodyInit;
-        parameters: Record<string, unknown>;
-      };
+      const { parameters, body } = prepareRequestFnParameters(
+        queryParams,
+        pageParam,
+        infinite
+      );
 
       return qraftOptions
         .requestFn(schema, {
-          // @ts-expect-error - Too complex to type
-          parameters: infinite
-            ? (shelfMerge(
-                2,
-                parameters,
-                (function omitBodyFromParameters() {
-                  if (
-                    pageParam &&
-                    typeof pageParam === 'object' &&
-                    'body' in pageParam
-                  ) {
-                    const { body: _body, ...pageParameters } = pageParam;
-                    return pageParameters;
-                  }
-
-                  return pageParam;
-                })()
-              ) as never)
-            : parameters,
+          parameters: parameters as never,
           baseUrl: qraftOptions.baseUrl,
-          body: infinite
-            ? (function shelfMergeBody() {
-                if (
-                  pageParam &&
-                  typeof pageParam === 'object' &&
-                  'body' in pageParam
-                ) {
-                  return shelfMerge(1, body, pageParam.body) as BodyInit;
-                }
-
-                return body;
-              })()
-            : body,
+          body,
           signal,
           meta,
         })
