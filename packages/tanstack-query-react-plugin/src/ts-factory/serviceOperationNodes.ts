@@ -2,6 +2,7 @@ import { createServiceOperationCancelQueriesNodes } from './service-operation.ge
 import { createServiceOperationFetchInfiniteQueryNodes } from './service-operation.generated/ServiceOperationFetchInfiniteQuery.js';
 import { createServiceOperationFetchQueryNodes } from './service-operation.generated/ServiceOperationFetchQuery.js';
 import { createServiceOperationGetInfiniteQueryDataNodes } from './service-operation.generated/ServiceOperationGetInfiniteQueryData.js';
+import { createServiceOperationGetMutationCacheNodes } from './service-operation.generated/ServiceOperationGetMutationCache.js';
 import { createServiceOperationGetQueriesDataNodes } from './service-operation.generated/ServiceOperationGetQueriesData.js';
 import { createServiceOperationGetQueryDataNodes } from './service-operation.generated/ServiceOperationGetQueryData.js';
 import { createServiceOperationGetQueryStateNodes } from './service-operation.generated/ServiceOperationGetQueryState.js';
@@ -70,4 +71,5 @@ export const createServicesMutationOperationNodes = () => [
   ...createServiceOperationIsMutatingQueriesNodes(),
   ...createServiceOperationMutationFnNodes(),
   ...createServiceOperationUseMutationStateNodes(),
+  ...createServiceOperationGetMutationCacheNodes(),
 ];

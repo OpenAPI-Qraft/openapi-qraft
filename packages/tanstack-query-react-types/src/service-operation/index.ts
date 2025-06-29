@@ -22,6 +22,7 @@ export type * from './ServiceOperationUseIsFetchingQueries.js';
 export type * from './ServiceOperationUseIsMutating.js';
 export type * from './ServiceOperationUseMutation.js';
 export type * from './ServiceOperationUseMutationState.js';
+export type * from './ServiceOperationGetMutationCache.js';
 export type * from './ServiceOperationUseQueries.js';
 export type * from './ServiceOperationUseQuery.js';
 export type * from './ServiceOperationUseSuspenseInfiniteQuery.js';
