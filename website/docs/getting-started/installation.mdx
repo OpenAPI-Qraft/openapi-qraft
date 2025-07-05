@@ -10,8 +10,17 @@ To start using OpenAPI Qraft, you'll need to install two packages:
 
 ```bash npm2yarn
 npm install -D @openapi-qraft/cli
-npm install @openapi-qraft/react
+npm install @openapi-qraft/react @openapi-qraft/tanstack-query-react-types
 ```
+
+:::tip IDE Support
+
+Installing `@openapi-qraft/tanstack-query-react-types` explicitly helps IntelliJ-based IDEs
+(like WebStorm) provide better autocomplete and type inference. Without explicit installation,
+these IDEs may have slower autocomplete and missing TSDoc hints due to how they handle
+package resolution and type inference.
+
+:::
 
 :::info Peer Dependency
 
