@@ -28,6 +28,7 @@ const serviceOperationFiles = [
   'ServiceOperationUseIsMutating.ts',
   'ServiceOperationUseMutation.ts',
   'ServiceOperationUseMutationState.ts',
+  'ServiceOperationGetMutationCache.ts',
   'ServiceOperationUseQueries.ts',
   'ServiceOperationUseQuery.ts',
   'ServiceOperationUseSuspenseInfiniteQuery.ts',
