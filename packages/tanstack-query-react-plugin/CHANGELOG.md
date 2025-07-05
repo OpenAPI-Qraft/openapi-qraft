@@ -1,5 +1,15 @@
 # @openapi-qraft/tanstack-query-react-plugin
 
+## 2.11.0
+
+### Minor Changes
+
+- 56f4ae9: Added `getMutationCache()` method to query client operations.
+
+### Patch Changes
+
+- @openapi-qraft/plugin@2.11.0
+
 ## 2.10.2
 
 ### Patch Changes
