@@ -1,5 +1,11 @@
 # @openapi-qraft/tanstack-query-react-types
 
+## 2.11.0
+
+### Minor Changes
+
+- 56f4ae9: Added `getMutationCache()` method to query client operations.
+
 ## 2.10.2
 
 ## 2.10.1
