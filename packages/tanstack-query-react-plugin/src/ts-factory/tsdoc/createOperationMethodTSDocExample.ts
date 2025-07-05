@@ -1,5 +1,6 @@
 import { ServiceOperation } from '@openapi-qraft/plugin/lib/open-api/OpenAPIService';
 import { ServiceFactoryOptions } from '../getServiceFactory.js';
+import { createGetMutationCacheOperationTSDocExample } from './createGetMutationCacheOperationTSDocExample.js';
 import { createUseInfiniteQueryOperationTSDocExample } from './createUseInfiniteQueryOperationTSDocExample.js';
 import { createUseIsFetchingOperationTSDocExample } from './createUseIsFetchingOperationTSDocExample.js';
 import { createUseIsMutatingOperationTSDocExample } from './createUseIsMutatingOperationTSDocExample.js';
@@ -65,6 +66,11 @@ export const createOperationMethodTSDocExample = (
       );
     case 'useMutationState':
       return createUseMutationStateOperationTSDocExample(
+        operation,
+        serviceVariableName
+      );
+    case 'getMutationCache':
+      return createGetMutationCacheOperationTSDocExample(
         operation,
         serviceVariableName
       );
