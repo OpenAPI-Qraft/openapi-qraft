@@ -5,7 +5,7 @@
 
 import type { paths } from "../../openapi.js";
 import type { DeepReadonly, InvalidateQueryFilters, MutationFiltersByMutationKey, MutationFiltersByParameters, MutationVariables, OperationError, OperationInfiniteData, PartialParameters, QueryFiltersByParameters, QueryFiltersByQueryKey, QueryFnOptionsByParameters, QueryFnOptionsByQueryKey, RequestFnResponse, ServiceOperationEnsureInfiniteQueryDataOptions, ServiceOperationEnsureQueryDataOptions, ServiceOperationFetchInfiniteQueryOptions, ServiceOperationFetchQueryOptions, ServiceOperationInfiniteQueryKey, ServiceOperationMutationFnOptions, ServiceOperationMutationKey, ServiceOperationQueryKey, ServiceOperationUseMutationOptions, UseQueryOptionsForUseQueries, UseQueryOptionsForUseSuspenseQuery, WithOptional, QraftServiceOperationsToken } from "@openapi-qraft/tanstack-query-react-types";
-import type { CancelOptions, DefinedInitialDataInfiniteOptions, DefinedInitialDataOptions, DefinedUseInfiniteQueryResult, DefinedUseQueryResult, InfiniteQueryPageParamsOptions, InvalidateOptions, Mutation, MutationState, NoInfer, QueryState, RefetchOptions, ResetOptions, SetDataOptions, UndefinedInitialDataInfiniteOptions, UndefinedInitialDataOptions, Updater, UseInfiniteQueryResult, UseMutationResult, UseQueryResult, UseSuspenseInfiniteQueryOptions, UseSuspenseInfiniteQueryResult, UseSuspenseQueryOptions, UseSuspenseQueryResult } from "@tanstack/react-query";
+import type { CancelOptions, DefinedInitialDataInfiniteOptions, DefinedInitialDataOptions, DefinedUseInfiniteQueryResult, DefinedUseQueryResult, InfiniteQueryPageParamsOptions, InvalidateOptions, Mutation, MutationCache, MutationState, NoInfer, QueryState, RefetchOptions, ResetOptions, SetDataOptions, UndefinedInitialDataInfiniteOptions, UndefinedInitialDataOptions, Updater, UseInfiniteQueryResult, UseMutationResult, UseQueryResult, UseSuspenseInfiniteQueryOptions, UseSuspenseInfiniteQueryResult, UseSuspenseQueryOptions, UseSuspenseQueryResult } from "@tanstack/react-query";
 export interface FilesService {
     /** @summary Get a files by ID */
     getFiles: {
@@ -495,6 +495,31 @@ export interface FilesService {
             filters?: MutationFiltersByParameters<PostFilesBody, PostFilesData, PostFilesParameters, OperationError<PostFilesError>, TContext> | MutationFiltersByMutationKey<PostFilesSchema, PostFilesBody, PostFilesData, PostFilesParameters, OperationError<PostFilesError>, TContext>;
             select?: (mutation: Mutation<PostFilesData, OperationError<PostFilesError>, MutationVariables<PostFilesBody, PostFilesParameters>, TContext>) => TResult;
         }): Array<TResult>;
+        /**
+         * Returns a `MutationCache` object that provides access to mutation cache operations
+         * for the specific endpoint.
+         *
+         * @summary Upload a files by ID
+         * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/query-client/getMutationCache|`getMutationCache(...)` documentation}
+         *
+         * @example Find a mutation with specific parameters
+         * ```ts
+         * const mutationCache = qraft.filesService.postFiles.getMutationCache();
+         * const mutation = mutationCache.find({
+         *     parameters: {}
+         * });
+         * ```
+         *
+         * @example Find all mutations for the endpoint
+         * ```ts
+         * const mutationCache = qraft.filesService.postFiles.getMutationCache();
+         * const mutations = mutationCache.findAll();
+         * ```
+         */
+        getMutationCache(): Omit<MutationCache, "find" | "findAll"> & {
+            find<TContext = unknown>(filters: MutationFiltersByParameters<PostFilesBody, PostFilesData, PostFilesParameters, OperationError<PostFilesError>, TContext> | MutationFiltersByMutationKey<PostFilesSchema, PostFilesBody, PostFilesData, PostFilesParameters, OperationError<PostFilesError>, TContext>): Mutation<PostFilesData, PostFilesError, MutationVariables<PostFilesBody, PostFilesParameters>, TContext> | undefined;
+            findAll<TContext = unknown>(filters?: MutationFiltersByParameters<PostFilesBody, PostFilesData, PostFilesParameters, OperationError<PostFilesError>, TContext> | MutationFiltersByMutationKey<PostFilesSchema, PostFilesBody, PostFilesData, PostFilesParameters, OperationError<PostFilesError>, TContext>): Array<Mutation<PostFilesData, PostFilesError, MutationVariables<PostFilesBody, PostFilesParameters>, TContext>>;
+        };
         schema: PostFilesSchema;
         types: {
             parameters: PostFilesParameters;
@@ -618,6 +643,35 @@ export interface FilesService {
             filters?: MutationFiltersByParameters<DeleteFilesBody, DeleteFilesData, DeleteFilesParameters, OperationError<DeleteFilesError>, TContext> | MutationFiltersByMutationKey<DeleteFilesSchema, DeleteFilesBody, DeleteFilesData, DeleteFilesParameters, OperationError<DeleteFilesError>, TContext>;
             select?: (mutation: Mutation<DeleteFilesData, OperationError<DeleteFilesError>, MutationVariables<DeleteFilesBody, DeleteFilesParameters>, TContext>) => TResult;
         }): Array<TResult>;
+        /**
+         * Returns a `MutationCache` object that provides access to mutation cache operations
+         * for the specific endpoint.
+         *
+         * @summary Delete all files
+         * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/query-client/getMutationCache|`getMutationCache(...)` documentation}
+         *
+         * @example Find a mutation with specific parameters
+         * ```ts
+         * const mutationCache = qraft.filesService.deleteFiles.getMutationCache();
+         * const mutation = mutationCache.find({
+         *     parameters: {
+         *         query: {
+         *             all: all
+         *         }
+         *     }
+         * });
+         * ```
+         *
+         * @example Find all mutations for the endpoint
+         * ```ts
+         * const mutationCache = qraft.filesService.deleteFiles.getMutationCache();
+         * const mutations = mutationCache.findAll();
+         * ```
+         */
+        getMutationCache(): Omit<MutationCache, "find" | "findAll"> & {
+            find<TContext = unknown>(filters: MutationFiltersByParameters<DeleteFilesBody, DeleteFilesData, DeleteFilesParameters, OperationError<DeleteFilesError>, TContext> | MutationFiltersByMutationKey<DeleteFilesSchema, DeleteFilesBody, DeleteFilesData, DeleteFilesParameters, OperationError<DeleteFilesError>, TContext>): Mutation<DeleteFilesData, DeleteFilesError, MutationVariables<DeleteFilesBody, DeleteFilesParameters>, TContext> | undefined;
+            findAll<TContext = unknown>(filters?: MutationFiltersByParameters<DeleteFilesBody, DeleteFilesData, DeleteFilesParameters, OperationError<DeleteFilesError>, TContext> | MutationFiltersByMutationKey<DeleteFilesSchema, DeleteFilesBody, DeleteFilesData, DeleteFilesParameters, OperationError<DeleteFilesError>, TContext>): Array<Mutation<DeleteFilesData, DeleteFilesError, MutationVariables<DeleteFilesBody, DeleteFilesParameters>, TContext>>;
+        };
         schema: DeleteFilesSchema;
         types: {
             parameters: DeleteFilesParameters;
@@ -741,6 +795,35 @@ export interface FilesService {
             filters?: MutationFiltersByParameters<TrashFilesBody, TrashFilesData, TrashFilesParameters, OperationError<TrashFilesError>, TContext> | MutationFiltersByMutationKey<TrashFilesSchema, TrashFilesBody, TrashFilesData, TrashFilesParameters, OperationError<TrashFilesError>, TContext>;
             select?: (mutation: Mutation<TrashFilesData, OperationError<TrashFilesError>, MutationVariables<TrashFilesBody, TrashFilesParameters>, TContext>) => TResult;
         }): Array<TResult>;
+        /**
+         * Returns a `MutationCache` object that provides access to mutation cache operations
+         * for the specific endpoint.
+         *
+         * @summary Trash files
+         * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/query-client/getMutationCache|`getMutationCache(...)` documentation}
+         *
+         * @example Find a mutation with specific parameters
+         * ```ts
+         * const mutationCache = qraft.filesService.trashFiles.getMutationCache();
+         * const mutation = mutationCache.find({
+         *     parameters: {
+         *         query: {
+         *             pendingOnly: pendingOnly
+         *         }
+         *     }
+         * });
+         * ```
+         *
+         * @example Find all mutations for the endpoint
+         * ```ts
+         * const mutationCache = qraft.filesService.trashFiles.getMutationCache();
+         * const mutations = mutationCache.findAll();
+         * ```
+         */
+        getMutationCache(): Omit<MutationCache, "find" | "findAll"> & {
+            find<TContext = unknown>(filters: MutationFiltersByParameters<TrashFilesBody, TrashFilesData, TrashFilesParameters, OperationError<TrashFilesError>, TContext> | MutationFiltersByMutationKey<TrashFilesSchema, TrashFilesBody, TrashFilesData, TrashFilesParameters, OperationError<TrashFilesError>, TContext>): Mutation<TrashFilesData, TrashFilesError, MutationVariables<TrashFilesBody, TrashFilesParameters>, TContext> | undefined;
+            findAll<TContext = unknown>(filters?: MutationFiltersByParameters<TrashFilesBody, TrashFilesData, TrashFilesParameters, OperationError<TrashFilesError>, TContext> | MutationFiltersByMutationKey<TrashFilesSchema, TrashFilesBody, TrashFilesData, TrashFilesParameters, OperationError<TrashFilesError>, TContext>): Array<Mutation<TrashFilesData, TrashFilesError, MutationVariables<TrashFilesBody, TrashFilesParameters>, TContext>>;
+        };
         schema: TrashFilesSchema;
         types: {
             parameters: TrashFilesParameters;

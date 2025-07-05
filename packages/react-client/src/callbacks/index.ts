@@ -23,6 +23,7 @@ export { removeQueries } from './removeQueries.js';
 export { refetchQueries } from './refetchQueries.js';
 export { isFetching } from './isFetching.js';
 export { isMutating } from './isMutating.js';
+export { getMutationCache } from './getMutationCache.js';
 export { useIsFetching } from './useIsFetching.js';
 export { fetchQuery } from './fetchQuery.js';
 export { prefetchQuery } from './prefetchQuery.js';

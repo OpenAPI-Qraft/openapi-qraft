@@ -13,6 +13,7 @@ export function composeMutationFilters<Filters extends object>(
 ) {
   if (!filters) {
     return {
+      exact: false,
       mutationKey: composeMutationKey(schema, undefined),
     };
   }
@@ -38,7 +39,8 @@ export function composeMutationFilters<Filters extends object>(
   }
 
   return {
-    ...filters,
+    exact: false,
     mutationKey: composeMutationKey(schema, undefined),
+    ...filters,
   };
 }

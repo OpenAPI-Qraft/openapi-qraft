@@ -14,6 +14,7 @@ describe('composeMutationFilters', () => {
     const result = composeMutationFilters(schema, undefined);
 
     expect(result).toEqual({
+      exact: false,
       mutationKey: [schema, {}],
     });
   });
@@ -22,6 +23,7 @@ describe('composeMutationFilters', () => {
     const result = composeMutationFilters(schema, { predicate });
 
     expect(result).toEqual({
+      exact: false,
       mutationKey: [schema, {}],
       predicate,
     });
