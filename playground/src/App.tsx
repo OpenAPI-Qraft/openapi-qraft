@@ -411,7 +411,7 @@ function getErrorMessage(error: unknown) {
   }`;
 }
 
-export const QraftProviders = ({ children }: { children: ReactNode }) => {
+const QraftProviders = ({ children }: { children: ReactNode }) => {
   const [queryClient] = useState(() => new QueryClient());
 
   return (
@@ -466,7 +466,7 @@ function useCreateAPIClient(options?: Partial<QraftClientOptions>) {
 
 type PetStatus = NonNullable<components['schemas']['Pet']['status']>;
 
-export interface APIContextValue {
+interface APIContextValue {
   /**
    * Base URL to use for the request
    * @example 'https://api.example.com'

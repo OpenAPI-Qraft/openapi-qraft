@@ -39,3 +39,6 @@ jobs:
 
       - name: Type Checking
         run: yarn typecheck
+
+      - name: Run Knip
+        run: yarn knip

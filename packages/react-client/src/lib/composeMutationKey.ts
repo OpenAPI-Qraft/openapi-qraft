@@ -28,7 +28,7 @@ export function composeMutationKey<
       ];
 }
 
-export function omitMutationPayload<T>(params: T) {
+function omitMutationPayload<T>(params: T) {
   if (!params || typeof params !== 'object')
     throw new Error('`params` must be object');
 
