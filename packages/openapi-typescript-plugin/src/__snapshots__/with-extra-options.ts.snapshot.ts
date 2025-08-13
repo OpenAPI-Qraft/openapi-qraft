@@ -317,6 +317,10 @@ export interface operations {
                             all?: boolean;
                         };
                     };
+                    /**
+                     * Format: binary
+                     * @description Successfully deleted file dump
+                     */
                     "application/octet-stream": unknown;
                 };
             };
