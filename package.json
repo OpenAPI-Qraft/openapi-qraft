@@ -8,14 +8,17 @@
     "dev:qraft": "turbo run dev --filter '@openapi-qraft/*'",
     "test": "turbo run test --continue --output-logs=new-only",
     "lint": "turbo run lint --continue --output-logs=new-only",
-    "typecheck": "turbo run typecheck --output-logs=new-only"
+    "typecheck": "turbo run typecheck --output-logs=new-only",
+    "knip": "knip"
   },
   "devDependencies": {
     "@changesets/cli": "^2.28.1",
     "@ianvs/prettier-plugin-sort-imports": "^4.3.1",
+    "@types/node": "^24.2.1",
+    "knip": "^5.62.0",
     "prettier": "^3.3.3",
     "turbo": "^2.1.2",
-    "typescript": "^5.6.2"
+    "typescript": "^5.9.2"
   },
   "workspaces": [
     "packages/*",

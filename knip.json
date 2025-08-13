@@ -1,0 +1,92 @@
+{
+  "$schema": "https://unpkg.com/knip@5/schema.json",
+  "ignoreWorkspaces": [
+    "packages/test-fixtures",
+    "packages/eslint-config",
+    "packages/rollup-config",
+    "packages/ts-factory-code-generator",
+    "website",
+    "e2e"
+  ],
+  "workspaces": {
+    ".": {
+      "ignoreDependencies": ["memfs", "@vitest/coverage-v8"]
+    },
+    "packages/cli": {
+      "project": [
+        "src/**/*.{js,cjs,mjs,jsx,ts,cts,mts,tsx}",
+        "!src/**/__snapshots__/**",
+        "!src/tests/**",
+        "!src/**/fixtures/**"
+      ],
+      "ignore": ["src/**/__snapshots__/**", "eslint.config.js"]
+    },
+    "packages/openapi-typescript-plugin": {
+      "project": [
+        "src/**/*.{js,cjs,mjs,jsx,ts,cts,mts,tsx}",
+        "!src/**/__snapshots__/**",
+        "!src/tests/**",
+        "!src/**/fixtures/**"
+      ],
+      "ignore": ["src/**/__snapshots__/**", "eslint.config.js"]
+    },
+    "packages/plugin": {
+      "project": [
+        "src/**/*.{js,cjs,mjs,jsx,ts,cts,mts,tsx}",
+        "!src/**/__snapshots__/**",
+        "!src/tests/**",
+        "!src/**/fixtures/**"
+      ],
+      "ignore": ["src/**/__snapshots__/**", "eslint.config.js"]
+    },
+    "packages/react-client": {
+      "project": [
+        "src/**/*.{js,cjs,mjs,jsx,ts,cts,mts,tsx}",
+        "!src/**/__snapshots__/**",
+        "!src/**/fixtures/**"
+      ],
+      "ignore": [
+        "src/unstable__responseUtils.ts",
+        "src/tests/**",
+        "src/**/fixtures/**",
+        "src/**/__snapshots__/**",
+        "eslint.config.js"
+      ],
+      "entry": [
+        "src/index.ts",
+        "src/Unstable_QraftSecureRequestFn.ts",
+        "src/qraftPredefinedParametersRequestFn.ts",
+        "src/unstable__responseUtils.ts",
+        "src/lib/jwt-decode/index.ts"
+      ],
+      "ignoreDependencies": [
+        "@openapi-qraft/openapi-typescript-plugin",
+        "@openapi-qraft/tanstack-query-react-plugin",
+        "@openapi-qraft/test-fixtures",
+        "global-jsdom"
+      ]
+    },
+    "packages/tanstack-query-react-plugin": {
+      "project": [
+        "src/**/*.{js,cjs,mjs,jsx,ts,cts,mts,tsx}",
+        "!src/**/__snapshots__/**",
+        "!src/tests/**",
+        "!src/**/fixtures/**"
+      ],
+      "ignore": ["src/**/__snapshots__/**", "eslint.config.js"],
+      "ignoreDependencies": ["@openapi-qraft/test-fixtures"]
+    },
+    "packages/tanstack-query-react-types": {
+      "project": [
+        "src/**/*.{js,cjs,mjs,jsx,ts,cts,mts,tsx}",
+        "!src/**/__snapshots__/**",
+        "!src/tests/**",
+        "!src/**/fixtures/**"
+      ],
+      "ignore": ["src/**/__snapshots__/**", "eslint.config.js"]
+    },
+    "playground": {
+      "ignoreDependencies": ["dotenv", "dotenv-expand", "eslint-plugin-react", "@tanstack/react-query"]
+    }
+  }
+}
