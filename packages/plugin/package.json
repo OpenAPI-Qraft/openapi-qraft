@@ -39,8 +39,7 @@
     "commander": "^11.1.0",
     "micromatch": "^4.0.8",
     "openapi-typescript": "^7.4.0",
-    "ora": "^8.1.0",
-    "yaml": "^2.5.1"
+    "ora": "^8.1.0"
   },
   "devDependencies": {
     "@openapi-qraft/eslint-config": "workspace:*",
