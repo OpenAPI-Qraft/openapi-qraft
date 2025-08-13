@@ -36,40 +36,55 @@ export const createServicesQueryOperationNodes = ({
 }: {
   omitOperationQueryFnNodes: boolean;
 }) => [
-  ...createServiceOperationCancelQueriesNodes(),
-  ...createServiceOperationUseQueryNodes(),
-  ...createServiceOperationFetchInfiniteQueryNodes(),
-  ...createServiceOperationFetchQueryNodes(),
-  ...createServiceOperationGetInfiniteQueryDataNodes(),
-  ...createServiceOperationGetQueriesDataNodes(),
-  ...createServiceOperationGetQueryDataNodes(),
-  ...createServiceOperationGetQueryStateNodes(),
-  ...createServiceOperationInvalidateQueriesNodes(),
-  ...createServiceOperationIsFetchingQueriesNodes(),
+  // Core methods
   ...(omitOperationQueryFnNodes ? [] : createServiceOperationQueryFnNodes()),
-  ...createServiceOperationRefetchQueriesNodes(),
-  ...createServiceOperationRemoveQueriesNodes(),
-  ...createServiceOperationResetQueriesNodes(),
-  ...createServiceOperationSetInfiniteQueryDataNodes(),
-  ...createServiceOperationSetQueriesDataNodes(),
-  ...createServiceOperationSetQueryDataNodes(),
+
+  // React hooks
+  ...createServiceOperationUseQueryNodes(),
   ...createServiceOperationUseInfiniteQueryNodes(),
   ...createServiceOperationUseIsFetchingQueriesNodes(),
   ...createServiceOperationUseQueriesNodes(),
-  ...createServiceOperationUseQueryNodes(),
+  ...createServiceOperationUseSuspenseQueryNodes(),
   ...createServiceOperationUseSuspenseInfiniteQueryNodes(),
   ...createServiceOperationUseSuspenseQueriesNodes(),
-  ...createServiceOperationUseSuspenseQueryNodes(),
+
+  // Query client methods
+  ...createServiceOperationFetchQueryNodes(),
+  ...createServiceOperationFetchInfiniteQueryNodes(),
+
+  // Data access methods
+  ...createServiceOperationGetQueryDataNodes(),
+  ...createServiceOperationGetInfiniteQueryDataNodes(),
+  ...createServiceOperationGetQueriesDataNodes(),
+  ...createServiceOperationGetQueryStateNodes(),
+
+  // Data manipulation methods
+  ...createServiceOperationSetQueryDataNodes(),
+  ...createServiceOperationSetInfiniteQueryDataNodes(),
+  ...createServiceOperationSetQueriesDataNodes(),
+
+  // Cache management methods
+  ...createServiceOperationInvalidateQueriesNodes(),
+  ...createServiceOperationRefetchQueriesNodes(),
+  ...createServiceOperationCancelQueriesNodes(),
+  ...createServiceOperationRemoveQueriesNodes(),
+  ...createServiceOperationResetQueriesNodes(),
+  ...createServiceOperationIsFetchingQueriesNodes(),
 ];
 
 /**
  * Creates AST nodes for all mutation operation methods
  */
 export const createServicesMutationOperationNodes = () => [
+  // Core methods
+  ...createServiceOperationMutationFnNodes(),
+
+  // React hooks
   ...createServiceOperationUseMutationNodes(),
   ...createServiceOperationUseIsMutatingNodes(),
-  ...createServiceOperationIsMutatingQueriesNodes(),
-  ...createServiceOperationMutationFnNodes(),
   ...createServiceOperationUseMutationStateNodes(),
+
+  // Cache methods
+  ...createServiceOperationIsMutatingQueriesNodes(),
   ...createServiceOperationGetMutationCacheNodes(),
 ];
