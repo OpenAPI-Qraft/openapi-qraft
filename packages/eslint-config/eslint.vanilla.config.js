@@ -30,6 +30,7 @@ export default [
     files: [
       '**/**.spec.{ts,tsx}',
       '**/**.test.{ts,tsx}',
+      '**/__tests__/**',
       '**/setupTests.ts',
       '**/vitestFsMock.ts',
     ],
