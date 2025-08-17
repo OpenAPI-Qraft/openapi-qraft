@@ -6071,9 +6071,9 @@ __metadata:
     "@typescript-eslint/typescript-estree": "npm:^8.39.1"
     "@typescript-eslint/utils": "npm:^8.37.0"
     "@vitest/coverage-v8": "npm:^3.0.5"
-    combinate: "npm:^1.1.11"
     eslint: "npm:^9.24.0"
     rimraf: "npm:^5.0.10"
+    rollup: "npm:~4.22.4"
     typescript: "npm:^5.6.2"
     vitest: "npm:^3.0.5"
   peerDependencies:
@@ -10584,13 +10584,6 @@ __metadata:
   version: 1.4.0
   resolution: "colorette@npm:1.4.0"
   checksum: 10c0/4955c8f7daafca8ae7081d672e4bd89d553bd5782b5846d5a7e05effe93c2f15f7e9c0cb46f341b59f579a39fcf436241ff79594899d75d5f3460c03d607fe9e
-  languageName: node
-  linkType: hard
-
-"combinate@npm:^1.1.11":
-  version: 1.1.11
-  resolution: "combinate@npm:1.1.11"
-  checksum: 10c0/b81002b498ba134f4660fc18ca568a8cd15095f688473190a2908da3f7a201729d002b7fdfda599435af70c1799a3e4f3560c17f589245c8acbb30dcce8f046b
   languageName: node
   linkType: hard
 

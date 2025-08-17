@@ -27,8 +27,6 @@ Object.assign(plugin.configs, {
     rules: {
       '@openapi-qraft/query/no-rest-destructuring': 'warn',
       '@openapi-qraft/query/no-unstable-deps': 'error',
-      '@openapi-qraft/query/infinite-query-property-order': 'error',
-      '@openapi-qraft/query/mutation-property-order': 'error',
     },
   },
   'flat/recommended': [
@@ -40,8 +38,6 @@ Object.assign(plugin.configs, {
       rules: {
         '@openapi-qraft/query/no-rest-destructuring': 'warn',
         '@openapi-qraft/query/no-unstable-deps': 'error',
-        '@openapi-qraft/query/infinite-query-property-order': 'error',
-        '@openapi-qraft/query/mutation-property-order': 'error',
       },
     },
   ],

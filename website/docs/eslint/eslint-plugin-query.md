@@ -51,7 +51,7 @@ Alternatively, configure only the rules you want to use.
 ### Flat config (`eslint.config.js`)
 
 ```js
-import pluginQraftQuery from '@openapi-qraft/eslint-plugin-query'
+import pluginQraftQuery from '@openapi-qraft/eslint-plugin-query';
 
 export default [
   {
@@ -62,12 +62,10 @@ export default [
       // enable only the rules you need
       '@openapi-qraft/query/no-rest-destructuring': 'warn',
       '@openapi-qraft/query/no-unstable-deps': 'error',
-      '@openapi-qraft/query/infinite-query-property-order': 'warn',
-      '@openapi-qraft/query/mutation-property-order': 'warn',
     },
   },
   // Any other config...
-]
+];
 ```
 
 ### Legacy config (`.eslintrc`)
@@ -79,9 +77,7 @@ export default [
   ],
   "rules": {
     "@openapi-qraft/query/no-rest-destructuring": "warn",
-    "@openapi-qraft/query/no-unstable-deps": "error",
-    "@openapi-qraft/query/infinite-query-property-order": "warn",
-    "@openapi-qraft/query/mutation-property-order": "warn"
+    "@openapi-qraft/query/no-unstable-deps": "error"
   }
 }
 ```
@@ -111,14 +107,6 @@ export default [
         'error',
         { clientNamePattern: '/myQraftClient/i' },
       ],
-      '@openapi-qraft/query/infinite-query-property-order': [
-        'warn',
-        { clientNamePattern: '/myQraftClient/i' },
-      ],
-      '@openapi-qraft/query/mutation-property-order': [
-        'warn',
-        { clientNamePattern: '/myQraftClient/i' },
-      ],
     },
   },
 ]
@@ -143,18 +131,6 @@ export default [
       {
         "clientNamePattern": "/myQraftClient/i"
       }
-    ],
-    "@openapi-qraft/query/infinite-query-property-order": [
-      "warn",
-      {
-        "clientNamePattern": "/myQraftClient/i"
-      }
-    ],
-    "@openapi-qraft/query/mutation-property-order": [
-      "warn",
-      {
-        "clientNamePattern": "/myQraftClient/i"
-      }
     ]
   }
 }
@@ -164,5 +140,3 @@ export default [
 
 - [@openapi-qraft/query/no-rest-destructuring](./no-rest-destructuring.md)
 - [@openapi-qraft/query/no-unstable-deps](./no-unstable-deps.md)
-- [@openapi-qraft/query/infinite-query-property-order](./infinite-query-property-order.md)
-- [@openapi-qraft/query/mutation-property-order](./mutation-property-order.md)
