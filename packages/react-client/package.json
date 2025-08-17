@@ -24,6 +24,7 @@
   "devDependencies": {
     "@openapi-qraft/cli": "workspace:*",
     "@openapi-qraft/eslint-config": "workspace:*",
+    "@openapi-qraft/eslint-plugin-query": "workspace:*",
     "@openapi-qraft/openapi-typescript-plugin": "workspace:^",
     "@openapi-qraft/rollup-config": "workspace:*",
     "@openapi-qraft/tanstack-query-react-plugin": "workspace:*",

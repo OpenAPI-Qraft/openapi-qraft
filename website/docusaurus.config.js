@@ -126,14 +126,6 @@ const config = {
         apiKey: '68a397ed6b627ba01e722c54228bd79f',
         indexName: 'openapi-qraftio',
       },
-      announcementBar: {
-        id: `announcementBar-v2`, // used in `localStorage`
-        content: `️⛏︎ <b>
-          <a href="/openapi-qraft/docs/getting-started/quick-start">
-            OpenAPI Qraft 2
-          </a> is out! 🎉
-        </b>`,
-      },
     }),
 };
 

@@ -1,10 +1,12 @@
 import openAPIQraftConfig from '@openapi-qraft/eslint-config/eslint.vanilla.config';
+import pluginQraftQuery from '@openapi-qraft/eslint-plugin-query';
 import reactCompiler from 'eslint-plugin-react-compiler';
 import globals from 'globals';
 
 export default [
   { ignores: ['src/tests/fixtures/api/**/*'] },
   { languageOptions: { globals: { ...globals.browser, ...globals.node } } },
+  ...pluginQraftQuery.configs['flat/recommended'],
   ...openAPIQraftConfig,
   {
     ignores: [
