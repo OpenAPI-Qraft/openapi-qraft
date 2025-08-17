@@ -1,5 +1,19 @@
 # @openapi-qraft/cli
 
+## 2.12.0
+
+### Minor Changes
+
+- cdc4bf3: Resolve unmet peerDependencies.
+
+### Patch Changes
+
+- Updated dependencies [cdc4bf3]
+- Updated dependencies [5430c32]
+  - @openapi-qraft/tanstack-query-react-plugin@2.12.0
+  - @openapi-qraft/openapi-typescript-plugin@2.12.0
+  - @openapi-qraft/plugin@2.12.0
+
 ## 2.11.0
 
 ### Patch Changes

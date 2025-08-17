@@ -1,5 +1,16 @@
 # @openapi-qraft/openapi-typescript
 
+## 2.12.0
+
+### Minor Changes
+
+- cdc4bf3: Resolve unmet peerDependencies.
+
+### Patch Changes
+
+- Updated dependencies [cdc4bf3]
+  - @openapi-qraft/plugin@2.12.0
+
 ## 1.2.29
 
 ### Patch Changes
