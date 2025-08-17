@@ -1,5 +1,15 @@
 # @openapi-qraft/react
 
+## 2.12.0
+
+### Minor Changes
+
+- cdc4bf3: Resolve unmet peerDependencies.
+
+### Patch Changes
+
+- @openapi-qraft/tanstack-query-react-types@2.12.0
+
 ## 2.11.0
 
 ### Minor Changes

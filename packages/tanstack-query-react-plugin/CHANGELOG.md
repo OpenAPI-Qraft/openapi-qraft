@@ -1,5 +1,17 @@
 # @openapi-qraft/tanstack-query-react-plugin
 
+## 2.12.0
+
+### Minor Changes
+
+- cdc4bf3: Resolve unmet peerDependencies.
+
+### Patch Changes
+
+- 5430c32: Reorder generated service operation methods for better organization.
+- Updated dependencies [cdc4bf3]
+  - @openapi-qraft/plugin@2.12.0
+
 ## 2.11.0
 
 ### Minor Changes

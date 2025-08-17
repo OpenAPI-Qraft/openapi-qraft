@@ -1,5 +1,11 @@
 # @openapi-qraft/plugin
 
+## 2.12.0
+
+### Minor Changes
+
+- cdc4bf3: Resolve unmet peerDependencies.
+
 ## 2.11.0
 
 ## 2.10.2
