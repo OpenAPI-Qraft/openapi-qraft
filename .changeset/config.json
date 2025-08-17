@@ -8,7 +8,8 @@
       "@openapi-qraft/plugin",
       "@openapi-qraft/tanstack-query-react-plugin",
       "@openapi-qraft/react",
-      "@openapi-qraft/tanstack-query-react-types"
+      "@openapi-qraft/tanstack-query-react-types",
+      "@openapi-qraft/eslint-plugin-query"
     ]
   ],
   "linked": [],
