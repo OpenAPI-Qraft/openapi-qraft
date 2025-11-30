@@ -48,7 +48,7 @@
     "@openapi-qraft/test-fixtures": "workspace:*",
     "@openapi-qraft/ts-factory-code-generator": "workspace:*",
     "camelcase": "^8.0.0",
-    "eslint": "^9.24.0",
+    "eslint": "^9.39.1",
     "memfs": "^4.11.1",
     "rimraf": "^6.1.2",
     "vitest": "^3.2.4"
