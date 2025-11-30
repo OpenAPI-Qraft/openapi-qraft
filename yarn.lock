@@ -4100,13 +4100,13 @@ __metadata:
     "@openapi-qraft/eslint-config": "workspace:*"
     "@openapi-qraft/plugin": "workspace:^"
     "@openapi-qraft/test-fixtures": "workspace:*"
-    "@redocly/openapi-core": "npm:^1.16.0"
+    "@redocly/openapi-core": "npm:^1.34.5"
     "@types/node": "npm:^20.16.5"
     ansi-colors: "npm:^4.1.3"
     commander: "npm:^11.1.0"
     eslint: "npm:^9.39.1"
     memfs: "npm:^4.11.1"
-    openapi-typescript: "npm:^7.4.0"
+    openapi-typescript: "npm:^7.10.1"
     rimraf: "npm:^6.1.2"
     typescript: "npm:^5.6.2"
     vitest: "npm:^3.2.4"
@@ -4119,7 +4119,7 @@ __metadata:
   dependencies:
     "@openapi-qraft/eslint-config": "workspace:*"
     "@openapi-qraft/test-fixtures": "workspace:*"
-    "@redocly/openapi-core": "npm:^1.16.0"
+    "@redocly/openapi-core": "npm:^1.34.5"
     "@types/micromatch": "npm:^4.0.9"
     "@types/node": "npm:^20.16.5"
     "@vitest/coverage-v8": "npm:^3.2.4"
@@ -4129,8 +4129,8 @@ __metadata:
     eslint: "npm:^9.39.1"
     memfs: "npm:^4.11.1"
     micromatch: "npm:^4.0.8"
-    openapi-typescript: "npm:^7.4.0"
-    ora: "npm:^8.1.0"
+    openapi-typescript: "npm:^7.10.1"
+    ora: "npm:^8.2.0"
     rimraf: "npm:^6.1.2"
     typescript: "npm:^5.6.2"
     vitest: "npm:^3.2.4"
@@ -4208,7 +4208,7 @@ __metadata:
     commander: "npm:^11.1.0"
     eslint: "npm:^9.39.1"
     memfs: "npm:^4.11.1"
-    ora: "npm:^8.1.0"
+    ora: "npm:^8.2.0"
     rimraf: "npm:^6.1.2"
     typescript: "npm:^5.6.2"
     vitest: "npm:^3.2.4"
@@ -4460,7 +4460,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@redocly/openapi-core@npm:^1.16.0, @redocly/openapi-core@npm:^1.34.5":
+"@redocly/openapi-core@npm:^1.34.5":
   version: 1.34.5
   resolution: "@redocly/openapi-core@npm:1.34.5"
   dependencies:
@@ -15325,21 +15325,21 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"openapi-typescript@npm:^7.4.0":
-  version: 7.9.1
-  resolution: "openapi-typescript@npm:7.9.1"
+"openapi-typescript@npm:^7.10.1":
+  version: 7.10.1
+  resolution: "openapi-typescript@npm:7.10.1"
   dependencies:
     "@redocly/openapi-core": "npm:^1.34.5"
     ansi-colors: "npm:^4.1.3"
     change-case: "npm:^5.4.4"
     parse-json: "npm:^8.3.0"
-    supports-color: "npm:^10.1.0"
+    supports-color: "npm:^10.2.2"
     yargs-parser: "npm:^21.1.1"
   peerDependencies:
     typescript: ^5.x
   bin:
     openapi-typescript: bin/cli.js
-  checksum: 10c0/52db65d211f872e0a34018cca409f388d70d55fa7cd6e07eacbb8ffc873ed78ffa29f95758766e2bd51ef87145aea8b66350638355cac5887f407aba9080d408
+  checksum: 10c0/85d2075c27a3802cca50838d4ead52d6a3443f964b0d1601e82cdea5dc317c62a2452f23caafd11991101c8420f326f2977cda2fa126e517c59f57b73017ccff
   languageName: node
   linkType: hard
 
@@ -15366,9 +15366,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ora@npm:^8.1.0":
-  version: 8.1.0
-  resolution: "ora@npm:8.1.0"
+"ora@npm:^8.2.0":
+  version: 8.2.0
+  resolution: "ora@npm:8.2.0"
   dependencies:
     chalk: "npm:^5.3.0"
     cli-cursor: "npm:^5.0.0"
@@ -15379,7 +15379,7 @@ __metadata:
     stdin-discarder: "npm:^0.2.2"
     string-width: "npm:^7.2.0"
     strip-ansi: "npm:^7.1.0"
-  checksum: 10c0/4ac9a6dd7fe915a354680f33ced21ee96d13d3c5ab0dc00b3c3ba9e3695ed141b1d045222990f5a71a9a91f801042a0b0d32e58dfc5509ff9b81efdd3fcf6339
+  checksum: 10c0/7d9291255db22e293ea164f520b6042a3e906576ab06c9cf408bf9ef5664ba0a9f3bd258baa4ada058cfcc2163ef9b6696d51237a866682ce33295349ba02c3a
   languageName: node
   linkType: hard
 
@@ -20311,10 +20311,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"supports-color@npm:^10.1.0":
-  version: 10.1.0
-  resolution: "supports-color@npm:10.1.0"
-  checksum: 10c0/59db622e372e209c7bc5d1a9641b9767a562796d719b7a5d3c8d5358356897acabd34c2f8c84d27c9e43f0b81f1a20d6e8c2f1a70d8fad99094a86ec4b8c26c8
+"supports-color@npm:^10.2.2":
+  version: 10.2.2
+  resolution: "supports-color@npm:10.2.2"
+  checksum: 10c0/fb28dd7e0cdf80afb3f2a41df5e068d60c8b4f97f7140de2eaed5b42e075d82a0e980b20a2c0efd2b6d73cfacb55555285d8cc719fa0472220715aefeaa1da7c
   languageName: node
   linkType: hard
 
