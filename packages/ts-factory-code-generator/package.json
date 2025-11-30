@@ -36,7 +36,7 @@
   "devDependencies": {
     "@openapi-qraft/eslint-config": "workspace:*",
     "@types/node": "^22.5.5",
-    "eslint": "^9.24.0",
+    "eslint": "^9.39.1",
     "rimraf": "^6.1.2"
   },
   "repository": {
