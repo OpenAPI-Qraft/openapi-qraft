@@ -34,7 +34,7 @@ export interface ApprovalPoliciesService {
          * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/hooks/useQuery|`useQuery(...)` documentation}
          * @example Query with parameters
          * ```ts
-         * const { data, isLoading } = qraft.approvalPoliciesService.getApprovalPoliciesId.useQuery({
+         * const { data, isLoading } = qraft.approvalPolicies.getApprovalPoliciesId.useQuery({
          *     header: {
          *         "x-monite-version": "2023-06-04",
          *         "x-monite-entity-id": xMoniteEntityId
@@ -57,7 +57,7 @@ export interface ApprovalPoliciesService {
          * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/hooks/useQuery|`useQuery(...)` documentation}
          * @example Query with parameters
          * ```ts
-         * const { data, isLoading } = qraft.approvalPoliciesService.getApprovalPoliciesId.useQuery({
+         * const { data, isLoading } = qraft.approvalPolicies.getApprovalPoliciesId.useQuery({
          *     header: {
          *         "x-monite-version": "2023-06-04",
          *         "x-monite-entity-id": xMoniteEntityId
@@ -87,7 +87,7 @@ export interface ApprovalPoliciesService {
          *
          * @example Infinite Query
          * ```ts
-         * const { data, isLoading, fetchNextPage } = qraft.approvalPoliciesService.getApprovalPoliciesId.useInfiniteQuery({
+         * const { data, isLoading, fetchNextPage } = qraft.approvalPolicies.getApprovalPoliciesId.useInfiniteQuery({
          *     header: {
          *         "x-monite-version": "2023-06-04",
          *         "x-monite-entity-id": xMoniteEntityId
@@ -119,7 +119,7 @@ export interface ApprovalPoliciesService {
          *
          * @example Infinite Query
          * ```ts
-         * const { data, isLoading, fetchNextPage } = qraft.approvalPoliciesService.getApprovalPoliciesId.useInfiniteQuery({
+         * const { data, isLoading, fetchNextPage } = qraft.approvalPolicies.getApprovalPoliciesId.useInfiniteQuery({
          *     header: {
          *         "x-monite-version": "2023-06-04",
          *         "x-monite-entity-id": xMoniteEntityId
@@ -151,11 +151,11 @@ export interface ApprovalPoliciesService {
          * @example Checks the total number of queries fetching from the specified service method,
          * both normal and infinite. If no parameters are provided, no filtering is applied.
          * ```ts
-         * const getApprovalPoliciesIdTotal = qraft.approvalPoliciesService.getApprovalPoliciesId.useIsFetching()
+         * const getApprovalPoliciesIdTotal = qraft.approvalPolicies.getApprovalPoliciesId.useIsFetching()
          * ```
          * @example Checks the number of normal queries fetching with the specified parameters.
          * ```ts
-         * const getApprovalPoliciesIdByParametersTotal = qraft.approvalPoliciesService.getApprovalPoliciesId.useIsFetching({
+         * const getApprovalPoliciesIdByParametersTotal = qraft.approvalPolicies.getApprovalPoliciesId.useIsFetching({
          *     infinite: false,
          *     parameters: {
          *         header: {
@@ -181,7 +181,7 @@ export interface ApprovalPoliciesService {
          * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/hooks/useQueries|`useQueries(...)` documentation}
          * @example Multiple queries. Returns `data`, `error`, `isSuccess` and other properties.
          * ```ts
-         * const getApprovalPoliciesIdResults = qraft.approvalPoliciesService.getApprovalPoliciesId.useQueries({
+         * const getApprovalPoliciesIdResults = qraft.approvalPolicies.getApprovalPoliciesId.useQueries({
          *     queries: [
          *         {
          *             header: {
@@ -213,7 +213,7 @@ export interface ApprovalPoliciesService {
          * ```
          * @example Combined results. Only the data will be returned.
          * ```ts
-         * const getApprovalPoliciesIdCombinedResults = qraft.approvalPoliciesService.getApprovalPoliciesId.useQueries({
+         * const getApprovalPoliciesIdCombinedResults = qraft.approvalPolicies.getApprovalPoliciesId.useQueries({
          *     combine: results => results.map(result => result.data),
          *     queries: [
          *         {
@@ -258,7 +258,7 @@ export interface ApprovalPoliciesService {
          * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/hooks/useSuspenseQuery|`useSuspenseQuery(...)` documentation}
          * @example Suspense Query with parameters
          * ```ts
-         * const data = qraft.approvalPoliciesService.getApprovalPoliciesId.useSuspenseQuery({
+         * const data = qraft.approvalPolicies.getApprovalPoliciesId.useSuspenseQuery({
          *     header: {
          *         "x-monite-version": "2023-06-04",
          *         "x-monite-entity-id": xMoniteEntityId
@@ -284,7 +284,7 @@ export interface ApprovalPoliciesService {
          *
          * @example Suspense Infinite Query
          * ```ts
-         * const { data, isLoading, fetchNextPage } = qraft.approvalPoliciesService.getApprovalPoliciesId.useSuspenseInfiniteQuery({
+         * const { data, isLoading, fetchNextPage } = qraft.approvalPolicies.getApprovalPoliciesId.useSuspenseInfiniteQuery({
          *     header: {
          *         "x-monite-version": "2023-06-04",
          *         "x-monite-entity-id": xMoniteEntityId
@@ -315,7 +315,7 @@ export interface ApprovalPoliciesService {
          * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/hooks/useSuspenseQueries|`useSuspenseQueries(...)` documentation}
          * @example Basic usage with Suspense
          * ```ts
-         * const getApprovalPoliciesIdData = qraft.approvalPoliciesService.getApprovalPoliciesId.useSuspenseQueries({
+         * const getApprovalPoliciesIdData = qraft.approvalPolicies.getApprovalPoliciesId.useSuspenseQueries({
          *     queries: [
          *         {
          *             header: {
@@ -347,7 +347,7 @@ export interface ApprovalPoliciesService {
          * ```
          * @example With data transformation using combine
          * ```ts
-         * const getApprovalPoliciesIdCombinedData = qraft.approvalPoliciesService.getApprovalPoliciesId.useSuspenseQueries({
+         * const getApprovalPoliciesIdCombinedData = qraft.approvalPolicies.getApprovalPoliciesId.useSuspenseQueries({
          *     combine: results => results.map(result => result.data),
          *     queries: [
          *         {
@@ -520,7 +520,7 @@ export interface ApprovalPoliciesService {
          * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/hooks/useMutation|`useMutation(...)` documentation}
          * @example Mutation with predefined parameters, e.g., for updating
          * ```ts
-         * const { mutate, isPending } = qraft.approvalPoliciesService.deleteApprovalPoliciesId.useMutation({
+         * const { mutate, isPending } = qraft.approvalPolicies.deleteApprovalPoliciesId.useMutation({
          *     header: {
          *         "x-monite-version": "2023-06-04",
          *         "x-monite-entity-id": xMoniteEntityId
@@ -536,7 +536,7 @@ export interface ApprovalPoliciesService {
          * ```
          * @example Mutation without predefined parameters, e.g., for creating
          * ```ts
-         * const { mutate, isPending } = qraft.approvalPoliciesService.deleteApprovalPoliciesId.useMutation()
+         * const { mutate, isPending } = qraft.approvalPolicies.deleteApprovalPoliciesId.useMutation()
          * mutate({
          *     body: bodyPayload,
          *     header: {
@@ -562,7 +562,7 @@ export interface ApprovalPoliciesService {
          * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/hooks/useMutation|`useMutation(...)` documentation}
          * @example Mutation with predefined parameters, e.g., for updating
          * ```ts
-         * const { mutate, isPending } = qraft.approvalPoliciesService.deleteApprovalPoliciesId.useMutation({
+         * const { mutate, isPending } = qraft.approvalPolicies.deleteApprovalPoliciesId.useMutation({
          *     header: {
          *         "x-monite-version": "2023-06-04",
          *         "x-monite-entity-id": xMoniteEntityId
@@ -578,7 +578,7 @@ export interface ApprovalPoliciesService {
          * ```
          * @example Mutation without predefined parameters, e.g., for creating
          * ```ts
-         * const { mutate, isPending } = qraft.approvalPoliciesService.deleteApprovalPoliciesId.useMutation()
+         * const { mutate, isPending } = qraft.approvalPolicies.deleteApprovalPoliciesId.useMutation()
          * mutate({
          *     body: bodyPayload,
          *     header: {
@@ -603,11 +603,11 @@ export interface ApprovalPoliciesService {
          * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/hooks/useIsMutating|`useIsMutating(...)` documentation}
          * @example Check how many mutations are currently in progress for the specified service method.
          * ```ts
-         * const deleteApprovalPoliciesIdTotal = qraft.approvalPoliciesService.deleteApprovalPoliciesId.useIsMutating()
+         * const deleteApprovalPoliciesIdTotal = qraft.approvalPolicies.deleteApprovalPoliciesId.useIsMutating()
          * ```
          * @example Check how many mutations are currently in progress with the specified parameters.
          * ```ts
-         * const deleteApprovalPoliciesIdTotal = qraft.approvalPoliciesService.deleteApprovalPoliciesId.useIsMutating({
+         * const deleteApprovalPoliciesIdTotal = qraft.approvalPolicies.deleteApprovalPoliciesId.useIsMutating({
          *     parameters: {
          *         header: {
          *             "x-monite-version": "2023-06-04",
@@ -632,7 +632,7 @@ export interface ApprovalPoliciesService {
          * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/hooks/useMutationState|`useMutationState(...)` documentation}
          * @example Get all variables of all running mutations.
          * ```ts
-         * const deleteApprovalPoliciesIdPendingMutationVariables = qraft.approvalPoliciesService.deleteApprovalPoliciesId.useMutationState({
+         * const deleteApprovalPoliciesIdPendingMutationVariables = qraft.approvalPolicies.deleteApprovalPoliciesId.useMutationState({
          *     filters: {
          *         status: "pending"
          *     },
@@ -641,7 +641,7 @@ export interface ApprovalPoliciesService {
          * ```
          * @example Get all data for specific mutations via the `parameters`.
          * ```ts
-         * const deleteApprovalPoliciesIdMutationData = qraft.approvalPoliciesService.deleteApprovalPoliciesId.useMutationState({
+         * const deleteApprovalPoliciesIdMutationData = qraft.approvalPolicies.deleteApprovalPoliciesId.useMutationState({
          *     filters: {
          *         parameters: {
          *             header: {
@@ -679,7 +679,7 @@ export interface ApprovalPoliciesService {
          *
          * @example Find a mutation with specific parameters
          * ```ts
-         * const mutationCache = qraft.approvalPoliciesService.deleteApprovalPoliciesId.getMutationCache();
+         * const mutationCache = qraft.approvalPolicies.deleteApprovalPoliciesId.getMutationCache();
          * const mutation = mutationCache.find({
          *     parameters: {
          *         header: {
@@ -698,7 +698,7 @@ export interface ApprovalPoliciesService {
          *
          * @example Find all mutations for the endpoint
          * ```ts
-         * const mutationCache = qraft.approvalPoliciesService.deleteApprovalPoliciesId.getMutationCache();
+         * const mutationCache = qraft.approvalPolicies.deleteApprovalPoliciesId.getMutationCache();
          * const mutations = mutationCache.findAll();
          * ```
          */
@@ -738,7 +738,7 @@ export interface ApprovalPoliciesService {
          * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/hooks/useMutation|`useMutation(...)` documentation}
          * @example Mutation with predefined parameters, e.g., for updating
          * ```ts
-         * const { mutate, isPending } = qraft.approvalPoliciesService.patchApprovalPoliciesId.useMutation({
+         * const { mutate, isPending } = qraft.approvalPolicies.patchApprovalPoliciesId.useMutation({
          *     header: {
          *         "x-monite-version": "2023-06-04",
          *         "x-monite-entity-id": xMoniteEntityId
@@ -754,7 +754,7 @@ export interface ApprovalPoliciesService {
          * ```
          * @example Mutation without predefined parameters, e.g., for creating
          * ```ts
-         * const { mutate, isPending } = qraft.approvalPoliciesService.patchApprovalPoliciesId.useMutation()
+         * const { mutate, isPending } = qraft.approvalPolicies.patchApprovalPoliciesId.useMutation()
          * mutate({
          *     body: bodyPayload,
          *     header: {
@@ -780,7 +780,7 @@ export interface ApprovalPoliciesService {
          * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/hooks/useMutation|`useMutation(...)` documentation}
          * @example Mutation with predefined parameters, e.g., for updating
          * ```ts
-         * const { mutate, isPending } = qraft.approvalPoliciesService.patchApprovalPoliciesId.useMutation({
+         * const { mutate, isPending } = qraft.approvalPolicies.patchApprovalPoliciesId.useMutation({
          *     header: {
          *         "x-monite-version": "2023-06-04",
          *         "x-monite-entity-id": xMoniteEntityId
@@ -796,7 +796,7 @@ export interface ApprovalPoliciesService {
          * ```
          * @example Mutation without predefined parameters, e.g., for creating
          * ```ts
-         * const { mutate, isPending } = qraft.approvalPoliciesService.patchApprovalPoliciesId.useMutation()
+         * const { mutate, isPending } = qraft.approvalPolicies.patchApprovalPoliciesId.useMutation()
          * mutate({
          *     body: bodyPayload,
          *     header: {
@@ -821,11 +821,11 @@ export interface ApprovalPoliciesService {
          * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/hooks/useIsMutating|`useIsMutating(...)` documentation}
          * @example Check how many mutations are currently in progress for the specified service method.
          * ```ts
-         * const patchApprovalPoliciesIdTotal = qraft.approvalPoliciesService.patchApprovalPoliciesId.useIsMutating()
+         * const patchApprovalPoliciesIdTotal = qraft.approvalPolicies.patchApprovalPoliciesId.useIsMutating()
          * ```
          * @example Check how many mutations are currently in progress with the specified parameters.
          * ```ts
-         * const patchApprovalPoliciesIdTotal = qraft.approvalPoliciesService.patchApprovalPoliciesId.useIsMutating({
+         * const patchApprovalPoliciesIdTotal = qraft.approvalPolicies.patchApprovalPoliciesId.useIsMutating({
          *     parameters: {
          *         header: {
          *             "x-monite-version": "2023-06-04",
@@ -850,7 +850,7 @@ export interface ApprovalPoliciesService {
          * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/hooks/useMutationState|`useMutationState(...)` documentation}
          * @example Get all variables of all running mutations.
          * ```ts
-         * const patchApprovalPoliciesIdPendingMutationVariables = qraft.approvalPoliciesService.patchApprovalPoliciesId.useMutationState({
+         * const patchApprovalPoliciesIdPendingMutationVariables = qraft.approvalPolicies.patchApprovalPoliciesId.useMutationState({
          *     filters: {
          *         status: "pending"
          *     },
@@ -859,7 +859,7 @@ export interface ApprovalPoliciesService {
          * ```
          * @example Get all data for specific mutations via the `parameters`.
          * ```ts
-         * const patchApprovalPoliciesIdMutationData = qraft.approvalPoliciesService.patchApprovalPoliciesId.useMutationState({
+         * const patchApprovalPoliciesIdMutationData = qraft.approvalPolicies.patchApprovalPoliciesId.useMutationState({
          *     filters: {
          *         parameters: {
          *             header: {
@@ -897,7 +897,7 @@ export interface ApprovalPoliciesService {
          *
          * @example Find a mutation with specific parameters
          * ```ts
-         * const mutationCache = qraft.approvalPoliciesService.patchApprovalPoliciesId.getMutationCache();
+         * const mutationCache = qraft.approvalPolicies.patchApprovalPoliciesId.getMutationCache();
          * const mutation = mutationCache.find({
          *     parameters: {
          *         header: {
@@ -916,7 +916,7 @@ export interface ApprovalPoliciesService {
          *
          * @example Find all mutations for the endpoint
          * ```ts
-         * const mutationCache = qraft.approvalPoliciesService.patchApprovalPoliciesId.getMutationCache();
+         * const mutationCache = qraft.approvalPolicies.patchApprovalPoliciesId.getMutationCache();
          * const mutations = mutationCache.findAll();
          * ```
          */

@@ -24,7 +24,7 @@ export interface FilesService {
          * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/hooks/useQuery|`useQuery(...)` documentation}
          * @example Query with parameters
          * ```ts
-         * const { data, isLoading } = qraft.filesService.getFiles.useQuery({
+         * const { data, isLoading } = qraft.files.getFiles.useQuery({
          *     header: {
          *         "x-monite-version": "2023-06-04"
          *     },
@@ -42,7 +42,7 @@ export interface FilesService {
          * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/hooks/useQuery|`useQuery(...)` documentation}
          * @example Query with parameters
          * ```ts
-         * const { data, isLoading } = qraft.filesService.getFiles.useQuery({
+         * const { data, isLoading } = qraft.files.getFiles.useQuery({
          *     header: {
          *         "x-monite-version": "2023-06-04"
          *     },
@@ -64,7 +64,7 @@ export interface FilesService {
          *
          * @example Infinite Query
          * ```ts
-         * const { data, isLoading, fetchNextPage } = qraft.filesService.getFiles.useInfiniteQuery({
+         * const { data, isLoading, fetchNextPage } = qraft.files.getFiles.useInfiniteQuery({
          *     header: {
          *         "x-monite-version": "2023-06-04"
          *     },
@@ -94,7 +94,7 @@ export interface FilesService {
          *
          * @example Infinite Query
          * ```ts
-         * const { data, isLoading, fetchNextPage } = qraft.filesService.getFiles.useInfiniteQuery({
+         * const { data, isLoading, fetchNextPage } = qraft.files.getFiles.useInfiniteQuery({
          *     header: {
          *         "x-monite-version": "2023-06-04"
          *     },
@@ -124,11 +124,11 @@ export interface FilesService {
          * @example Checks the total number of queries fetching from the specified service method,
          * both normal and infinite. If no parameters are provided, no filtering is applied.
          * ```ts
-         * const getFilesTotal = qraft.filesService.getFiles.useIsFetching()
+         * const getFilesTotal = qraft.files.getFiles.useIsFetching()
          * ```
          * @example Checks the number of normal queries fetching with the specified parameters.
          * ```ts
-         * const getFilesByParametersTotal = qraft.filesService.getFiles.useIsFetching({
+         * const getFilesByParametersTotal = qraft.files.getFiles.useIsFetching({
          *     infinite: false,
          *     parameters: {
          *         header: {
@@ -149,7 +149,7 @@ export interface FilesService {
          * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/hooks/useQueries|`useQueries(...)` documentation}
          * @example Multiple queries. Returns `data`, `error`, `isSuccess` and other properties.
          * ```ts
-         * const getFilesResults = qraft.filesService.getFiles.useQueries({
+         * const getFilesResults = qraft.files.getFiles.useQueries({
          *     queries: [
          *         {
          *             header: {
@@ -173,7 +173,7 @@ export interface FilesService {
          * ```
          * @example Combined results. Only the data will be returned.
          * ```ts
-         * const getFilesCombinedResults = qraft.filesService.getFiles.useQueries({
+         * const getFilesCombinedResults = qraft.files.getFiles.useQueries({
          *     combine: results => results.map(result => result.data),
          *     queries: [
          *         {
@@ -209,7 +209,7 @@ export interface FilesService {
          * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/hooks/useSuspenseQuery|`useSuspenseQuery(...)` documentation}
          * @example Suspense Query with parameters
          * ```ts
-         * const data = qraft.filesService.getFiles.useSuspenseQuery({
+         * const data = qraft.files.getFiles.useSuspenseQuery({
          *     header: {
          *         "x-monite-version": "2023-06-04"
          *     },
@@ -230,7 +230,7 @@ export interface FilesService {
          *
          * @example Suspense Infinite Query
          * ```ts
-         * const { data, isLoading, fetchNextPage } = qraft.filesService.getFiles.useSuspenseInfiniteQuery({
+         * const { data, isLoading, fetchNextPage } = qraft.files.getFiles.useSuspenseInfiniteQuery({
          *     header: {
          *         "x-monite-version": "2023-06-04"
          *     },
@@ -259,7 +259,7 @@ export interface FilesService {
          * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/hooks/useSuspenseQueries|`useSuspenseQueries(...)` documentation}
          * @example Basic usage with Suspense
          * ```ts
-         * const getFilesData = qraft.filesService.getFiles.useSuspenseQueries({
+         * const getFilesData = qraft.files.getFiles.useSuspenseQueries({
          *     queries: [
          *         {
          *             header: {
@@ -283,7 +283,7 @@ export interface FilesService {
          * ```
          * @example With data transformation using combine
          * ```ts
-         * const getFilesCombinedData = qraft.filesService.getFiles.useSuspenseQueries({
+         * const getFilesCombinedData = qraft.files.getFiles.useSuspenseQueries({
          *     combine: results => results.map(result => result.data),
          *     queries: [
          *         {
@@ -378,12 +378,12 @@ export interface FilesService {
          * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/hooks/useMutation|`useMutation(...)` documentation}
          * @example Mutation with predefined parameters, e.g., for updating
          * ```ts
-         * const { mutate, isPending } = qraft.filesService.postFiles.useMutation({})
+         * const { mutate, isPending } = qraft.files.postFiles.useMutation({})
          * mutate(body);
          * ```
          * @example Mutation without predefined parameters, e.g., for creating
          * ```ts
-         * const { mutate, isPending } = qraft.filesService.postFiles.useMutation()
+         * const { mutate, isPending } = qraft.files.postFiles.useMutation()
          * mutate({
          *     body: bodyPayload
          * });
@@ -398,12 +398,12 @@ export interface FilesService {
          * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/hooks/useMutation|`useMutation(...)` documentation}
          * @example Mutation with predefined parameters, e.g., for updating
          * ```ts
-         * const { mutate, isPending } = qraft.filesService.postFiles.useMutation({})
+         * const { mutate, isPending } = qraft.files.postFiles.useMutation({})
          * mutate(body);
          * ```
          * @example Mutation without predefined parameters, e.g., for creating
          * ```ts
-         * const { mutate, isPending } = qraft.filesService.postFiles.useMutation()
+         * const { mutate, isPending } = qraft.files.postFiles.useMutation()
          * mutate({
          *     body: bodyPayload
          * });
@@ -417,11 +417,11 @@ export interface FilesService {
          * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/hooks/useIsMutating|`useIsMutating(...)` documentation}
          * @example Check how many mutations are currently in progress for the specified service method.
          * ```ts
-         * const postFilesTotal = qraft.filesService.postFiles.useIsMutating()
+         * const postFilesTotal = qraft.files.postFiles.useIsMutating()
          * ```
          * @example Check how many mutations are currently in progress with the specified parameters.
          * ```ts
-         * const postFilesTotal = qraft.filesService.postFiles.useIsMutating({
+         * const postFilesTotal = qraft.files.postFiles.useIsMutating({
          *     parameters: {}
          * })
          * ```
@@ -434,7 +434,7 @@ export interface FilesService {
          * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/hooks/useMutationState|`useMutationState(...)` documentation}
          * @example Get all variables of all running mutations.
          * ```ts
-         * const postFilesPendingMutationVariables = qraft.filesService.postFiles.useMutationState({
+         * const postFilesPendingMutationVariables = qraft.files.postFiles.useMutationState({
          *     filters: {
          *         status: "pending"
          *     },
@@ -443,7 +443,7 @@ export interface FilesService {
          * ```
          * @example Get all data for specific mutations via the `parameters`.
          * ```ts
-         * const postFilesMutationData = qraft.filesService.postFiles.useMutationState({
+         * const postFilesMutationData = qraft.files.postFiles.useMutationState({
          *     filters: {
          *         parameters: {}
          *     },
@@ -466,7 +466,7 @@ export interface FilesService {
          *
          * @example Find a mutation with specific parameters
          * ```ts
-         * const mutationCache = qraft.filesService.postFiles.getMutationCache();
+         * const mutationCache = qraft.files.postFiles.getMutationCache();
          * const mutation = mutationCache.find({
          *     parameters: {}
          * });
@@ -474,7 +474,7 @@ export interface FilesService {
          *
          * @example Find all mutations for the endpoint
          * ```ts
-         * const mutationCache = qraft.filesService.postFiles.getMutationCache();
+         * const mutationCache = qraft.files.postFiles.getMutationCache();
          * const mutations = mutationCache.findAll();
          * ```
          */
@@ -504,7 +504,7 @@ export interface FilesService {
          * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/hooks/useMutation|`useMutation(...)` documentation}
          * @example Mutation with predefined parameters, e.g., for updating
          * ```ts
-         * const { mutate, isPending } = qraft.filesService.deleteFiles.useMutation({
+         * const { mutate, isPending } = qraft.files.deleteFiles.useMutation({
          *     query: {
          *         all: all
          *     }
@@ -513,7 +513,7 @@ export interface FilesService {
          * ```
          * @example Mutation without predefined parameters, e.g., for creating
          * ```ts
-         * const { mutate, isPending } = qraft.filesService.deleteFiles.useMutation()
+         * const { mutate, isPending } = qraft.files.deleteFiles.useMutation()
          * mutate({
          *     body: bodyPayload,
          *     query: {
@@ -531,7 +531,7 @@ export interface FilesService {
          * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/hooks/useMutation|`useMutation(...)` documentation}
          * @example Mutation with predefined parameters, e.g., for updating
          * ```ts
-         * const { mutate, isPending } = qraft.filesService.deleteFiles.useMutation({
+         * const { mutate, isPending } = qraft.files.deleteFiles.useMutation({
          *     query: {
          *         all: all
          *     }
@@ -540,7 +540,7 @@ export interface FilesService {
          * ```
          * @example Mutation without predefined parameters, e.g., for creating
          * ```ts
-         * const { mutate, isPending } = qraft.filesService.deleteFiles.useMutation()
+         * const { mutate, isPending } = qraft.files.deleteFiles.useMutation()
          * mutate({
          *     body: bodyPayload,
          *     query: {
@@ -557,11 +557,11 @@ export interface FilesService {
          * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/hooks/useIsMutating|`useIsMutating(...)` documentation}
          * @example Check how many mutations are currently in progress for the specified service method.
          * ```ts
-         * const deleteFilesTotal = qraft.filesService.deleteFiles.useIsMutating()
+         * const deleteFilesTotal = qraft.files.deleteFiles.useIsMutating()
          * ```
          * @example Check how many mutations are currently in progress with the specified parameters.
          * ```ts
-         * const deleteFilesTotal = qraft.filesService.deleteFiles.useIsMutating({
+         * const deleteFilesTotal = qraft.files.deleteFiles.useIsMutating({
          *     parameters: {
          *         query: {
          *             all: all
@@ -578,7 +578,7 @@ export interface FilesService {
          * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/hooks/useMutationState|`useMutationState(...)` documentation}
          * @example Get all variables of all running mutations.
          * ```ts
-         * const deleteFilesPendingMutationVariables = qraft.filesService.deleteFiles.useMutationState({
+         * const deleteFilesPendingMutationVariables = qraft.files.deleteFiles.useMutationState({
          *     filters: {
          *         status: "pending"
          *     },
@@ -587,7 +587,7 @@ export interface FilesService {
          * ```
          * @example Get all data for specific mutations via the `parameters`.
          * ```ts
-         * const deleteFilesMutationData = qraft.filesService.deleteFiles.useMutationState({
+         * const deleteFilesMutationData = qraft.files.deleteFiles.useMutationState({
          *     filters: {
          *         parameters: {
          *             query: {
@@ -614,7 +614,7 @@ export interface FilesService {
          *
          * @example Find a mutation with specific parameters
          * ```ts
-         * const mutationCache = qraft.filesService.deleteFiles.getMutationCache();
+         * const mutationCache = qraft.files.deleteFiles.getMutationCache();
          * const mutation = mutationCache.find({
          *     parameters: {
          *         query: {
@@ -626,7 +626,7 @@ export interface FilesService {
          *
          * @example Find all mutations for the endpoint
          * ```ts
-         * const mutationCache = qraft.filesService.deleteFiles.getMutationCache();
+         * const mutationCache = qraft.files.deleteFiles.getMutationCache();
          * const mutations = mutationCache.findAll();
          * ```
          */
@@ -656,7 +656,7 @@ export interface FilesService {
          * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/hooks/useMutation|`useMutation(...)` documentation}
          * @example Mutation with predefined parameters, e.g., for updating
          * ```ts
-         * const { mutate, isPending } = qraft.filesService.trashFiles.useMutation({
+         * const { mutate, isPending } = qraft.files.trashFiles.useMutation({
          *     query: {
          *         pendingOnly: pendingOnly
          *     }
@@ -665,7 +665,7 @@ export interface FilesService {
          * ```
          * @example Mutation without predefined parameters, e.g., for creating
          * ```ts
-         * const { mutate, isPending } = qraft.filesService.trashFiles.useMutation()
+         * const { mutate, isPending } = qraft.files.trashFiles.useMutation()
          * mutate({
          *     body: bodyPayload,
          *     query: {
@@ -683,7 +683,7 @@ export interface FilesService {
          * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/hooks/useMutation|`useMutation(...)` documentation}
          * @example Mutation with predefined parameters, e.g., for updating
          * ```ts
-         * const { mutate, isPending } = qraft.filesService.trashFiles.useMutation({
+         * const { mutate, isPending } = qraft.files.trashFiles.useMutation({
          *     query: {
          *         pendingOnly: pendingOnly
          *     }
@@ -692,7 +692,7 @@ export interface FilesService {
          * ```
          * @example Mutation without predefined parameters, e.g., for creating
          * ```ts
-         * const { mutate, isPending } = qraft.filesService.trashFiles.useMutation()
+         * const { mutate, isPending } = qraft.files.trashFiles.useMutation()
          * mutate({
          *     body: bodyPayload,
          *     query: {
@@ -709,11 +709,11 @@ export interface FilesService {
          * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/hooks/useIsMutating|`useIsMutating(...)` documentation}
          * @example Check how many mutations are currently in progress for the specified service method.
          * ```ts
-         * const trashFilesTotal = qraft.filesService.trashFiles.useIsMutating()
+         * const trashFilesTotal = qraft.files.trashFiles.useIsMutating()
          * ```
          * @example Check how many mutations are currently in progress with the specified parameters.
          * ```ts
-         * const trashFilesTotal = qraft.filesService.trashFiles.useIsMutating({
+         * const trashFilesTotal = qraft.files.trashFiles.useIsMutating({
          *     parameters: {
          *         query: {
          *             pendingOnly: pendingOnly
@@ -730,7 +730,7 @@ export interface FilesService {
          * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/hooks/useMutationState|`useMutationState(...)` documentation}
          * @example Get all variables of all running mutations.
          * ```ts
-         * const trashFilesPendingMutationVariables = qraft.filesService.trashFiles.useMutationState({
+         * const trashFilesPendingMutationVariables = qraft.files.trashFiles.useMutationState({
          *     filters: {
          *         status: "pending"
          *     },
@@ -739,7 +739,7 @@ export interface FilesService {
          * ```
          * @example Get all data for specific mutations via the `parameters`.
          * ```ts
-         * const trashFilesMutationData = qraft.filesService.trashFiles.useMutationState({
+         * const trashFilesMutationData = qraft.files.trashFiles.useMutationState({
          *     filters: {
          *         parameters: {
          *             query: {
@@ -766,7 +766,7 @@ export interface FilesService {
          *
          * @example Find a mutation with specific parameters
          * ```ts
-         * const mutationCache = qraft.filesService.trashFiles.getMutationCache();
+         * const mutationCache = qraft.files.trashFiles.getMutationCache();
          * const mutation = mutationCache.find({
          *     parameters: {
          *         query: {
@@ -778,7 +778,7 @@ export interface FilesService {
          *
          * @example Find all mutations for the endpoint
          * ```ts
-         * const mutationCache = qraft.filesService.trashFiles.getMutationCache();
+         * const mutationCache = qraft.files.trashFiles.getMutationCache();
          * const mutations = mutationCache.findAll();
          * ```
          */
@@ -821,11 +821,11 @@ export interface FilesService {
          * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/hooks/useQuery|`useQuery(...)` documentation}
          * @example Query without parameters
          * ```ts
-         * const { data, isLoading } = qraft.filesService.getFileList.useQuery()
+         * const { data, isLoading } = qraft.files.getFileList.useQuery()
          * ```
          * @example Query with parameters
          * ```ts
-         * const { data, isLoading } = qraft.filesService.getFileList.useQuery({
+         * const { data, isLoading } = qraft.files.getFileList.useQuery({
          *     header: {
          *         "x-monite-version": "2023-06-04"
          *     },
@@ -844,11 +844,11 @@ export interface FilesService {
          * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/hooks/useQuery|`useQuery(...)` documentation}
          * @example Query without parameters
          * ```ts
-         * const { data, isLoading } = qraft.filesService.getFileList.useQuery()
+         * const { data, isLoading } = qraft.files.getFileList.useQuery()
          * ```
          * @example Query with parameters
          * ```ts
-         * const { data, isLoading } = qraft.filesService.getFileList.useQuery({
+         * const { data, isLoading } = qraft.files.getFileList.useQuery({
          *     header: {
          *         "x-monite-version": "2023-06-04"
          *     },
@@ -874,7 +874,7 @@ export interface FilesService {
          *
          * @example Infinite Query
          * ```ts
-         * const { data, isLoading, fetchNextPage } = qraft.filesService.getFileList.useInfiniteQuery({
+         * const { data, isLoading, fetchNextPage } = qraft.files.getFileList.useInfiniteQuery({
          *     header: {
          *         "x-monite-version": "2023-06-04"
          *     }
@@ -902,7 +902,7 @@ export interface FilesService {
          *
          * @example Infinite Query
          * ```ts
-         * const { data, isLoading, fetchNextPage } = qraft.filesService.getFileList.useInfiniteQuery({
+         * const { data, isLoading, fetchNextPage } = qraft.files.getFileList.useInfiniteQuery({
          *     header: {
          *         "x-monite-version": "2023-06-04"
          *     }
@@ -930,11 +930,11 @@ export interface FilesService {
          * @example Checks the total number of queries fetching from the specified service method,
          * both normal and infinite. If no parameters are provided, no filtering is applied.
          * ```ts
-         * const getFileListTotal = qraft.filesService.getFileList.useIsFetching()
+         * const getFileListTotal = qraft.files.getFileList.useIsFetching()
          * ```
          * @example Checks the number of normal queries fetching with the specified parameters.
          * ```ts
-         * const getFileListByParametersTotal = qraft.filesService.getFileList.useIsFetching({
+         * const getFileListByParametersTotal = qraft.files.getFileList.useIsFetching({
          *     infinite: false,
          *     parameters: {
          *         header: {
@@ -956,7 +956,7 @@ export interface FilesService {
          * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/hooks/useQueries|`useQueries(...)` documentation}
          * @example Multiple queries. Returns `data`, `error`, `isSuccess` and other properties.
          * ```ts
-         * const getFileListResults = qraft.filesService.getFileList.useQueries({
+         * const getFileListResults = qraft.files.getFileList.useQueries({
          *     queries: [
          *         {
          *             header: {
@@ -980,7 +980,7 @@ export interface FilesService {
          * ```
          * @example Combined results. Only the data will be returned.
          * ```ts
-         * const getFileListCombinedResults = qraft.filesService.getFileList.useQueries({
+         * const getFileListCombinedResults = qraft.files.getFileList.useQueries({
          *     combine: results => results.map(result => result.data),
          *     queries: [
          *         {
@@ -1017,11 +1017,11 @@ export interface FilesService {
          * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/hooks/useSuspenseQuery|`useSuspenseQuery(...)` documentation}
          * @example Suspense Query without parameters
          * ```ts
-         * const data = qraft.filesService.getFileList.useSuspenseQuery()
+         * const data = qraft.files.getFileList.useSuspenseQuery()
          * ```
          * @example Suspense Query with parameters
          * ```ts
-         * const data = qraft.filesService.getFileList.useSuspenseQuery({
+         * const data = qraft.files.getFileList.useSuspenseQuery({
          *     header: {
          *         "x-monite-version": "2023-06-04"
          *     },
@@ -1043,7 +1043,7 @@ export interface FilesService {
          *
          * @example Suspense Infinite Query
          * ```ts
-         * const { data, isLoading, fetchNextPage } = qraft.filesService.getFileList.useSuspenseInfiniteQuery({
+         * const { data, isLoading, fetchNextPage } = qraft.files.getFileList.useSuspenseInfiniteQuery({
          *     header: {
          *         "x-monite-version": "2023-06-04"
          *     }
@@ -1070,7 +1070,7 @@ export interface FilesService {
          * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/hooks/useSuspenseQueries|`useSuspenseQueries(...)` documentation}
          * @example Basic usage with Suspense
          * ```ts
-         * const getFileListData = qraft.filesService.getFileList.useSuspenseQueries({
+         * const getFileListData = qraft.files.getFileList.useSuspenseQueries({
          *     queries: [
          *         {
          *             header: {
@@ -1094,7 +1094,7 @@ export interface FilesService {
          * ```
          * @example With data transformation using combine
          * ```ts
-         * const getFileListCombinedData = qraft.filesService.getFileList.useSuspenseQueries({
+         * const getFileListCombinedData = qraft.files.getFileList.useSuspenseQueries({
          *     combine: results => results.map(result => result.data),
          *     queries: [
          *         {
