@@ -10,9 +10,8 @@ describe('openapi-typescript types generation', () => {
   );
 
   test('no extra options', async () => {
-    const { QraftCommand } = await import(
-      '@openapi-qraft/plugin/lib/QraftCommand'
-    );
+    const { QraftCommand } =
+      await import('@openapi-qraft/plugin/lib/QraftCommand');
     const { plugin } = await import('./plugin.js');
     const command = new QraftCommand();
     plugin.setupCommand(command);
@@ -31,9 +30,8 @@ describe('openapi-typescript types generation', () => {
   });
 
   test('with extra options', async () => {
-    const { QraftCommand } = await import(
-      '@openapi-qraft/plugin/lib/QraftCommand'
-    );
+    const { QraftCommand } =
+      await import('@openapi-qraft/plugin/lib/QraftCommand');
     const { plugin } = await import('./plugin.js');
     const command = new QraftCommand();
     plugin.setupCommand(command);
@@ -57,9 +55,8 @@ describe('openapi-typescript types generation', () => {
   });
 
   test('with --explicit-component-exports', async () => {
-    const { QraftCommand } = await import(
-      '@openapi-qraft/plugin/lib/QraftCommand'
-    );
+    const { QraftCommand } =
+      await import('@openapi-qraft/plugin/lib/QraftCommand');
     const { plugin } = await import('./plugin.js');
     const command = new QraftCommand();
     plugin.setupCommand(command);
@@ -83,9 +80,8 @@ describe('openapi-typescript types generation', () => {
   });
 
   test('with --explicit-component-exports and --enum', async () => {
-    const { QraftCommand } = await import(
-      '@openapi-qraft/plugin/lib/QraftCommand'
-    );
+    const { QraftCommand } =
+      await import('@openapi-qraft/plugin/lib/QraftCommand');
     const { plugin } = await import('./plugin.js');
     const command = new QraftCommand();
     plugin.setupCommand(command);

@@ -48,8 +48,10 @@ export interface OperationSchema {
   readonly security?: string[];
 }
 
-export interface RequestFnInfo
-  extends Omit<RequestInit, 'headers' | 'method' | 'body' | 'signal'> {
+export interface RequestFnInfo extends Omit<
+  RequestInit,
+  'headers' | 'method' | 'body' | 'signal'
+> {
   /**
    * Request headers
    * @example { 'X-Auth': '123' }

@@ -23,8 +23,9 @@ interface QraftSecureRequestFnBaseProps<TRequestFn extends RequestFn> {
   securitySchemes: SecuritySchemeHandlers<string>;
 }
 
-export interface QraftSecureRequestFnProps<TRequestFn extends RequestFn>
-  extends QraftSecureRequestFnBaseProps<TRequestFn> {
+export interface QraftSecureRequestFnProps<
+  TRequestFn extends RequestFn,
+> extends QraftSecureRequestFnBaseProps<TRequestFn> {
   children(secureRequestFn: TRequestFn): ReactNode;
   queryClient?: QueryClient;
 }

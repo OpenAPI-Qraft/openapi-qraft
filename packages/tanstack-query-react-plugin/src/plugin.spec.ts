@@ -10,9 +10,8 @@ describe('TanStack Query React Client Generation', () => {
 
   describe('--export-openapi-types --explicit-import-extensions --filter-services <blob>', () => {
     beforeAll(async () => {
-      const { QraftCommand } = await import(
-        '@openapi-qraft/plugin/lib/QraftCommand'
-      );
+      const { QraftCommand } =
+        await import('@openapi-qraft/plugin/lib/QraftCommand');
       const { plugin } = await import('./plugin.js');
       const command = new QraftCommand();
       plugin.setupCommand(command);
@@ -74,9 +73,8 @@ describe('TanStack Query React Client Generation', () => {
 
   describe('no "--export-openapi-types"', () => {
     beforeAll(async () => {
-      const { QraftCommand } = await import(
-        '@openapi-qraft/plugin/lib/QraftCommand'
-      );
+      const { QraftCommand } =
+        await import('@openapi-qraft/plugin/lib/QraftCommand');
       const { plugin } = await import('./plugin.js');
       const command = new QraftCommand();
       plugin.setupCommand(command);
@@ -102,9 +100,8 @@ describe('TanStack Query React Client Generation', () => {
 
   describe('--openapi-types-import-path *.d.ts', () => {
     beforeAll(async () => {
-      const { QraftCommand } = await import(
-        '@openapi-qraft/plugin/lib/QraftCommand'
-      );
+      const { QraftCommand } =
+        await import('@openapi-qraft/plugin/lib/QraftCommand');
       const { plugin } = await import('./plugin.js');
       const command = new QraftCommand();
       plugin.setupCommand(command);
@@ -131,9 +128,8 @@ describe('TanStack Query React Client Generation', () => {
 
   describe('--openapi-types-import-path *.ts', () => {
     beforeAll(async () => {
-      const { QraftCommand } = await import(
-        '@openapi-qraft/plugin/lib/QraftCommand'
-      );
+      const { QraftCommand } =
+        await import('@openapi-qraft/plugin/lib/QraftCommand');
       const { plugin } = await import('./plugin.js');
       const command = new QraftCommand();
       plugin.setupCommand(command);
@@ -160,9 +156,8 @@ describe('TanStack Query React Client Generation', () => {
 
   describe('--explicit-import-extensions .ts --openapi-types-import-path ./openapi.d.ts', () => {
     beforeAll(async () => {
-      const { QraftCommand } = await import(
-        '@openapi-qraft/plugin/lib/QraftCommand'
-      );
+      const { QraftCommand } =
+        await import('@openapi-qraft/plugin/lib/QraftCommand');
       const { plugin } = await import('./plugin.js');
       const command = new QraftCommand();
       plugin.setupCommand(command);
@@ -191,9 +186,8 @@ describe('TanStack Query React Client Generation', () => {
 
   describe('--operation-predefined-parameters <...patterns> --explicit-import-extensions --openapi-types-import-path ./openapi.d.ts', () => {
     beforeAll(async () => {
-      const { QraftCommand } = await import(
-        '@openapi-qraft/plugin/lib/QraftCommand'
-      );
+      const { QraftCommand } =
+        await import('@openapi-qraft/plugin/lib/QraftCommand');
       const { plugin } = await import('./plugin.js');
       const command = new QraftCommand();
       plugin.setupCommand(command);
@@ -229,9 +223,8 @@ describe('TanStack Query React Client Generation', () => {
 
   describe('--override-import-type <...patterns> --operation-predefined-parameters <...patterns> --create-api-client-fn <...patterns>', () => {
     beforeAll(async () => {
-      const { QraftCommand } = await import(
-        '@openapi-qraft/plugin/lib/QraftCommand'
-      );
+      const { QraftCommand } =
+        await import('@openapi-qraft/plugin/lib/QraftCommand');
       const { plugin } = await import('./plugin.js');
       const command = new QraftCommand();
       plugin.setupCommand(command);
@@ -314,9 +307,8 @@ describe('TanStack Query React Client Generation', () => {
 
   describe('--queryable-write-operations', () => {
     beforeAll(async () => {
-      const { QraftCommand } = await import(
-        '@openapi-qraft/plugin/lib/QraftCommand'
-      );
+      const { QraftCommand } =
+        await import('@openapi-qraft/plugin/lib/QraftCommand');
       const { plugin } = await import('./plugin.js');
       const command = new QraftCommand();
       plugin.setupCommand(command);
@@ -355,9 +347,8 @@ describe('TanStack Query React Client Generation', () => {
 
   describe('--create-api-client-fn creates multiple clients', () => {
     beforeAll(async () => {
-      const { QraftCommand } = await import(
-        '@openapi-qraft/plugin/lib/QraftCommand'
-      );
+      const { QraftCommand } =
+        await import('@openapi-qraft/plugin/lib/QraftCommand');
       const { plugin } = await import('./plugin.js');
       const command = new QraftCommand();
       plugin.setupCommand(command);
@@ -400,9 +391,8 @@ describe('TanStack Query React Client Generation', () => {
 
   describe('--create-api-client-fn with specific callbacks and custom filename', () => {
     beforeAll(async () => {
-      const { QraftCommand } = await import(
-        '@openapi-qraft/plugin/lib/QraftCommand'
-      );
+      const { QraftCommand } =
+        await import('@openapi-qraft/plugin/lib/QraftCommand');
       const { plugin } = await import('./plugin.js');
       const command = new QraftCommand();
       plugin.setupCommand(command);
@@ -434,9 +424,8 @@ describe('TanStack Query React Client Generation', () => {
 
   describe('--create-api-client-fn with "all" value', () => {
     beforeAll(async () => {
-      const { QraftCommand } = await import(
-        '@openapi-qraft/plugin/lib/QraftCommand'
-      );
+      const { QraftCommand } =
+        await import('@openapi-qraft/plugin/lib/QraftCommand');
       const { plugin } = await import('./plugin.js');
       const command = new QraftCommand();
       plugin.setupCommand(command);
@@ -468,9 +457,8 @@ describe('TanStack Query React Client Generation', () => {
 
   describe('--create-api-client-fn with "none" value', () => {
     beforeAll(async () => {
-      const { QraftCommand } = await import(
-        '@openapi-qraft/plugin/lib/QraftCommand'
-      );
+      const { QraftCommand } =
+        await import('@openapi-qraft/plugin/lib/QraftCommand');
       const { plugin } = await import('./plugin.js');
       const command = new QraftCommand();
       plugin.setupCommand(command);
@@ -502,9 +490,8 @@ describe('TanStack Query React Client Generation', () => {
 
   describe('default behavior (no --create-api-client-fn option)', () => {
     beforeAll(async () => {
-      const { QraftCommand } = await import(
-        '@openapi-qraft/plugin/lib/QraftCommand'
-      );
+      const { QraftCommand } =
+        await import('@openapi-qraft/plugin/lib/QraftCommand');
       const { plugin } = await import('./plugin.js');
       const command = new QraftCommand();
       plugin.setupCommand(command);

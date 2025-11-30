@@ -643,8 +643,8 @@ const isSeparateParametersOperation = (
 ) =>
   Boolean(
     options.queryableWriteOperations &&
-      operation.requestBody &&
-      !isReadOnlyOperation(operation)
+    operation.requestBody &&
+    !isReadOnlyOperation(operation)
   );
 
 const getOperationDataTypeName = (operation: ServiceOperation) =>
