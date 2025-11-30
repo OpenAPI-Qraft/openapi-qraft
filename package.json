@@ -28,6 +28,7 @@
   "resolutions": {
     "ts-morph@npm:^17.0.1": "patch:ts-morph@npm%3A17.0.1#~/.yarn/patches/ts-morph-npm-17.0.1-6097358fba.patch",
     "verdaccio/js-yaml": "4.1.1",
-    "@verdaccio/config/js-yaml": "4.1.1"
+    "@verdaccio/config/js-yaml": "4.1.1",
+    "compression/on-headers": "1.1.0"
   }
 }
