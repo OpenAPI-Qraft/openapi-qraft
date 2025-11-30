@@ -12,7 +12,7 @@
     "serve": "docusaurus serve",
     "write-translations": "docusaurus write-translations",
     "write-heading-ids": "docusaurus write-heading-ids",
-    "lint": "remark . --ext md,mdx --quiet --frail --rc-path .remarkrc.mjs && editorconfig-checker -exclude '\\.(mjs|js|ts|svg)$'"
+    "lint": "remark . --ignore-pattern 'bin/**' --ext md,mdx --quiet --frail --rc-path .remarkrc.mjs && editorconfig-checker -exclude '\\.(mjs|js|ts|svg)$'"
   },
   "dependencies": {
     "@docusaurus/core": "3.9.2",

@@ -4,6 +4,9 @@
 # Production
 /build
 
+# editorconfig-checker bin
+/bin/latest
+
 # Generated files
 .docusaurus
 .cache-loader
