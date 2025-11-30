@@ -4,7 +4,7 @@ set -o errexit
 yarn exec openapi-qraft \
   --plugin tanstack-query-react \
   --plugin openapi-typescript ../test-fixtures/openapi.json \
-  -rm \
+  -c \
   -o src/tests/fixtures/api \
   --openapi-types-file-name openapi.ts \
   --explicit-import-extensions \
@@ -20,7 +20,7 @@ yarn exec openapi-qraft \
 yarn exec openapi-qraft \
   --plugin tanstack-query-react \
   --plugin openapi-typescript ../test-fixtures/openapi.json \
-  -rm \
+  -c \
   -o src/tests/fixtures/internal-api \
   --openapi-types-file-name internal-openapi.ts \
   --postfix-services '' \
