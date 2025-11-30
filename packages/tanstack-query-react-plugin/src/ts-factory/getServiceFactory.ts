@@ -19,7 +19,7 @@ export type ServiceFactoryOptions = {
   queryableWriteOperations: boolean;
 };
 
-type Service = { typeName: string; variableName: string };
+type Service = { name: string; typeName: string; variableName: string };
 
 export const getServiceFactory = (
   service: Service,
@@ -173,7 +173,7 @@ const getServiceInterfaceOperationFactory = (
       const operationCustomTSDoc = createOperationMethodTSDocExample(
         operation,
         {
-          serviceVariableName: service.variableName,
+          serviceVariableName: service.name,
           operationMethodName: node.name.text,
         },
         options

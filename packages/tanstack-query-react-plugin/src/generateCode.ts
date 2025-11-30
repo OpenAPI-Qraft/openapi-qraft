@@ -99,6 +99,7 @@ const generateServices = async (
       const code = astToString(
         getServiceFactory(
           {
+            name,
             typeName,
             variableName,
           },
