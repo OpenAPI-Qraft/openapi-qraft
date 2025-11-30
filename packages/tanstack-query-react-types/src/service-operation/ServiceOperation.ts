@@ -32,7 +32,9 @@ export interface ServiceOperationQuery<
   TData,
   TParams,
   TError,
-> extends ServiceOperationUseQuery<TSchema, TData, TParams, TError>,
+>
+  extends
+    ServiceOperationUseQuery<TSchema, TData, TParams, TError>,
     ServiceOperationUseQueries<TSchema, TData, TParams, TError>,
     ServiceOperationUseSuspenseQueries<TSchema, TData, TParams, TError>,
     ServiceOperationUseInfiniteQuery<TSchema, TData, TParams, TError>,
@@ -69,7 +71,9 @@ export interface ServiceOperationMutation<
   TData,
   TParams,
   TError,
-> extends ServiceOperationUseMutation<TSchema, TBody, TData, TParams, TError>,
+>
+  extends
+    ServiceOperationUseMutation<TSchema, TBody, TData, TParams, TError>,
     ServiceOperationUseIsMutating<TSchema, TBody, TData, TParams, TError>,
     ServiceOperationUseMutationState<TSchema, TBody, TData, TParams, TError>,
     ServiceOperationIsMutatingQueries<TSchema, TBody, TData, TParams, TError>,

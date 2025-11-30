@@ -13,8 +13,8 @@ export interface QueryFnOptionsByParameters<
   TParams,
   TMeta extends Record<string, any>,
   TSignal extends AbortSignal = AbortSignal,
-> extends QueryFnOptionsBase<TMeta, TSignal>,
-    QueryFnBaseUrlOptions {
+>
+  extends QueryFnOptionsBase<TMeta, TSignal>, QueryFnBaseUrlOptions {
   parameters: DeepReadonly<TParams>;
 
   queryKey?: never;
@@ -25,8 +25,8 @@ export interface QueryFnOptionsByQueryKey<
   TParams,
   TMeta extends Record<string, any>,
   TSignal extends AbortSignal = AbortSignal,
-> extends QueryFnOptionsBase<TMeta, TSignal>,
-    QueryFnBaseUrlOptions {
+>
+  extends QueryFnOptionsBase<TMeta, TSignal>, QueryFnBaseUrlOptions {
   queryKey: ServiceOperationQueryKey<TSchema, TParams>;
 
   parameters?: never;

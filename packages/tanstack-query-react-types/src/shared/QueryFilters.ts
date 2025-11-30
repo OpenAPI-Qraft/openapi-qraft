@@ -60,12 +60,12 @@ interface QueryFiltersByExactQueryKey<
   TParams = {},
   TError = DefaultError,
 > extends QueryFiltersByQueryKeyBase<
-    TSchema,
-    TData,
-    TInfinite,
-    TParams,
-    TError
-  > {
+  TSchema,
+  TData,
+  TInfinite,
+  TParams,
+  TError
+> {
   /**
    * Include queries matching this query key
    */
@@ -84,12 +84,12 @@ interface QueryFiltersWeakExactQueryKey<
   TParams = {},
   TError = DefaultError,
 > extends QueryFiltersByQueryKeyBase<
-    TSchema,
-    TData,
-    TInfinite,
-    TParams,
-    TError
-  > {
+  TSchema,
+  TData,
+  TInfinite,
+  TParams,
+  TError
+> {
   /**
    * Include queries matching this query key
    */
@@ -137,12 +137,12 @@ interface QueryFiltersByExactParameters<
   TParams = {},
   TError = DefaultError,
 > extends QueryFiltersByParametersBase<
-    TSchema,
-    TData,
-    TInfinite,
-    TParams,
-    TError
-  > {
+  TSchema,
+  TData,
+  TInfinite,
+  TParams,
+  TError
+> {
   /**
    * Match query key exactly
    */
@@ -161,12 +161,12 @@ interface QueryFiltersByWeakParameters<
   TParams = {},
   TError = DefaultError,
 > extends QueryFiltersByParametersBase<
-    TSchema,
-    TData,
-    TInfinite,
-    TParams,
-    TError
-  > {
+  TSchema,
+  TData,
+  TInfinite,
+  TParams,
+  TError
+> {
   /**
    * Match query key exactly
    */
