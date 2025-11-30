@@ -22,8 +22,7 @@ export interface CreateAPIBasicQueryClientOptions {
 }
 
 export interface CreateAPIQueryClientOptions
-  extends CreateAPIBasicClientOptions,
-    CreateAPIBasicQueryClientOptions {}
+  extends CreateAPIBasicClientOptions, CreateAPIBasicQueryClientOptions {}
 
 /**
  * @deprecated use `CreateAPIClientOptions` instead
