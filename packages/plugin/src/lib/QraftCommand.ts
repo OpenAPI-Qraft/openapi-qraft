@@ -54,7 +54,7 @@ export class QraftCommand extends Command {
       )
       .addOption(
         new Option(
-          '-rm, --clean',
+          '-c, --clean',
           'Clean output directory before generating services'
         )
       )
