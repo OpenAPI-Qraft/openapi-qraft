@@ -1,5 +1,11 @@
 # @openapi-qraft/plugin
 
+## 2.13.0
+
+### Minor Changes
+
+- 58cf835: Update `@redocly/openapi-core`, `openapi-typescript` and `ora`.
+
 ## 2.12.0
 
 ### Minor Changes
@@ -43,13 +49,11 @@
 ### Minor Changes
 
 - c71e7f9: ### Multiple API Client Generation
-
   - Added support for generating multiple custom API client functions for a single OpenAPI specification with the new `--create-api-client-fn` option
   - Improved modularity by allowing the creation of API clients with specific sets of services and callbacks
   - Enhanced type inference by removing generic type parameters from `qraftAPIClient` function, making it more user-friendly
 
   #### Breaking Changes
-
   - Removed generic type parameters from `qraftAPIClient` function - types are now automatically inferred from arguments
   - Updated return type of `createAPIClient` which may require changes to code that references this type in contexts or variables
     - Added a migration guide and codemod script to help users update their code to the new API
@@ -141,13 +145,11 @@
   include all path parts and parameters, and the structure can be customized based on the `--service-name-base` value.
 
   **Breaking Changes:**
-
   - Operation names now include all path parts and parameters by default.
   - `/api/v{api-version}` is no longer automatically removed from the path when generating operation names.
   - The `--service-name-base` option now influences the generated operation names with a new structure.
 
   **Examples:**
-
   - With `--service-name-base=endpoint[0]`:
     `POST /v1/users/{id}` → `api.v1.postUsersId`
   - With `--service-name-base=endpoint[1]`:
@@ -217,13 +219,11 @@
   include all path parts and parameters, and the structure can be customized based on the `--service-name-base` value.
 
   **Breaking Changes:**
-
   - Operation names now include all path parts and parameters by default.
   - `/api/v{api-version}` is no longer automatically removed from the path when generating operation names.
   - The `--service-name-base` option now influences the generated operation names with a new structure.
 
   **Examples:**
-
   - With `--service-name-base=endpoint[0]`:
     `POST /v1/users/{id}` → `api.v1.postUsersId`
   - With `--service-name-base=endpoint[1]`:
