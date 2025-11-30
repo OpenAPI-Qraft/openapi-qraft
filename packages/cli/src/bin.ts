@@ -4,20 +4,23 @@ import { QraftCommand } from '@openapi-qraft/plugin';
 import { RedoclyConfigCommand } from '@openapi-qraft/plugin/lib/RedoclyConfigCommand';
 import { Option, ParseOptions } from 'commander';
 import { builtInPlugins } from './builtInPlugins.js';
+import { handleDeprecatedOptions } from './handleDeprecatedOptions.js';
 
 export async function main(
   processArgv: string[],
   processArgvParseOptions?: ParseOptions
 ) {
+  const argv = handleDeprecatedOptions(processArgv);
+
   const redoclyConfigParseResult = await new RedoclyConfigCommand().parseConfig(
     qraft,
-    processArgv,
+    argv,
     processArgvParseOptions
   );
 
   if (redoclyConfigParseResult?.length) return;
 
-  await qraft(processArgv, processArgvParseOptions);
+  await qraft(argv, processArgvParseOptions);
 }
 
 async function qraft(
