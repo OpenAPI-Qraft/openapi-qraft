@@ -1,5 +1,16 @@
 # @openapi-qraft/openapi-typescript
 
+## 2.13.0
+
+### Minor Changes
+
+- 58cf835: Update `@redocly/openapi-core`, `openapi-typescript` and `ora`.
+
+### Patch Changes
+
+- Updated dependencies [58cf835]
+  - @openapi-qraft/plugin@2.13.0
+
 ## 2.12.0
 
 ### Minor Changes

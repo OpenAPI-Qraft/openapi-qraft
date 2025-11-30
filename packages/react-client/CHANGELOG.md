@@ -1,5 +1,11 @@
 # @openapi-qraft/react
 
+## 2.13.0
+
+### Patch Changes
+
+- @openapi-qraft/tanstack-query-react-types@2.13.0
+
 ## 2.12.0
 
 ### Minor Changes
@@ -125,7 +131,6 @@
   This change modifies the `resolveResponse` function to always return a resolved Promise
   rather than rejecting when no `responsePromise` is provided. This brings the function's
   behavior in line with the `requestFn` pattern, ensuring consistent error handling.
-
   - @openapi-qraft/tanstack-query-react-types@2.6.4
 
 ## 2.6.3
@@ -159,13 +164,11 @@
 ### Minor Changes
 
 - c71e7f9: ### Multiple API Client Generation
-
   - Added support for generating multiple custom API client functions for a single OpenAPI specification with the new `--create-api-client-fn` option
   - Improved modularity by allowing the creation of API clients with specific sets of services and callbacks
   - Enhanced type inference by removing generic type parameters from `qraftAPIClient` function, making it more user-friendly
 
   #### Breaking Changes
-
   - Removed generic type parameters from `qraftAPIClient` function - types are now automatically inferred from arguments
   - Updated return type of `createAPIClient` which may require changes to code that references this type in contexts or variables
     - Added a migration guide and codemod script to help users update their code to the new API
@@ -357,7 +360,6 @@
 
   **Details**:
   This decision was made to streamline the developer experience and to reduce the potential for errors.
-
   - The `QueryClient` is no longer needed for methods like `qraft.<service>.<operation>.getQueryData(...)` and has been
     removed entirely.
     This change was made to simplify the API and avoid potential confusion.
@@ -366,7 +368,6 @@
     This ensures consistent data management throughout the project.
 
   **Impact**:
-
   - All hooks or methods that previously accepted an optional/required `QueryClient` should now rely on the single,
     consistent `QueryClient` associated with the `createAPIClient`.
 
@@ -565,7 +566,6 @@
 
   **Details**:
   This decision was made to streamline the developer experience and to reduce the potential for errors.
-
   - The `QueryClient` is no longer needed for methods like `qraft.<service>.<operation>.getQueryData(...)` and has been
     removed entirely.
     This change was made to simplify the API and avoid potential confusion.
@@ -574,7 +574,6 @@
     This ensures consistent data management throughout the project.
 
   **Impact**:
-
   - All hooks or methods that previously accepted an optional/required `QueryClient` should now rely on the single,
     consistent `QueryClient` associated with the `createAPIClient`.
 

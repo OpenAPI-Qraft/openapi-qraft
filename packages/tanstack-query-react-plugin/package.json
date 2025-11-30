@@ -1,6 +1,6 @@
 {
   "name": "@openapi-qraft/tanstack-query-react-plugin",
-  "version": "2.12.0",
+  "version": "2.13.0",
   "type": "module",
   "scripts": {
     "build": "tsc --project tsconfig.build.json",
