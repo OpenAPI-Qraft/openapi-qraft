@@ -1,0 +1,14 @@
+{
+  "$schema": "https://turbo.build/schema.json",
+  "extends": ["//"],
+  "tasks": {
+    "codegen": {
+      "cache": true,
+      "dependsOn": ["^build"],
+      "outputs": [
+        "src/ts-factory/service-operation.generated/**/*.ts"
+      ],
+      "inputs": ["generate-ts-factory.mjs"]
+    }
+  }
+}
