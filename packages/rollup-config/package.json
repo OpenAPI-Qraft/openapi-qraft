@@ -15,7 +15,7 @@
     "rollup-preserve-directives": "~1.1.1"
   },
   "devDependencies": {
-    "rimraf": "^5.0.10",
+    "rimraf": "^6.1.2",
     "typescript": "^5.6.2"
   },
   "peerDependencies": {

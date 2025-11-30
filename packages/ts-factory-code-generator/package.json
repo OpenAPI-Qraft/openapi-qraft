@@ -37,7 +37,7 @@
     "@openapi-qraft/eslint-config": "workspace:*",
     "@types/node": "^22.5.5",
     "eslint": "^9.24.0",
-    "rimraf": "^5.0.10"
+    "rimraf": "^6.1.2"
   },
   "repository": {
     "type": "git",
