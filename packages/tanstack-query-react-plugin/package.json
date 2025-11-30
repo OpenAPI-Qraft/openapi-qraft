@@ -50,7 +50,7 @@
     "camelcase": "^8.0.0",
     "eslint": "^9.24.0",
     "memfs": "^4.11.1",
-    "rimraf": "^5.0.10",
+    "rimraf": "^6.1.2",
     "vitest": "^3.0.5"
   },
   "files": [

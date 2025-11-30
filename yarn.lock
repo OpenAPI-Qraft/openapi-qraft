@@ -3931,6 +3931,22 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@isaacs/balanced-match@npm:^4.0.1":
+  version: 4.0.1
+  resolution: "@isaacs/balanced-match@npm:4.0.1"
+  checksum: 10c0/7da011805b259ec5c955f01cee903da72ad97c5e6f01ca96197267d3f33103d5b2f8a1af192140f3aa64526c593c8d098ae366c2b11f7f17645d12387c2fd420
+  languageName: node
+  linkType: hard
+
+"@isaacs/brace-expansion@npm:^5.0.0":
+  version: 5.0.0
+  resolution: "@isaacs/brace-expansion@npm:5.0.0"
+  dependencies:
+    "@isaacs/balanced-match": "npm:^4.0.1"
+  checksum: 10c0/b4d4812f4be53afc2c5b6c545001ff7a4659af68d4484804e9d514e183d20269bb81def8682c01a22b17c4d6aed14292c8494f7d2ac664e547101c1a905aa977
+  languageName: node
+  linkType: hard
+
 "@isaacs/cliui@npm:^8.0.2":
   version: 8.0.2
   resolution: "@isaacs/cliui@npm:8.0.2"
@@ -4359,7 +4375,7 @@ __metadata:
     "@types/node": "npm:^20.16.5"
     commander: "npm:^11.1.0"
     eslint: "npm:^9.24.0"
-    rimraf: "npm:^5.0.10"
+    rimraf: "npm:^6.1.2"
     typescript: "npm:^5.6.2"
     vitest: "npm:^3.0.5"
   bin:
@@ -4371,7 +4387,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@openapi-qraft/e2e@workspace:e2e"
   dependencies:
-    rimraf: "npm:^5.0.10"
+    rimraf: "npm:^6.1.2"
     verdaccio: "npm:^5.32.2"
   languageName: unknown
   linkType: soft
@@ -4403,7 +4419,7 @@ __metadata:
     "@typescript-eslint/utils": "npm:^8.37.0"
     "@vitest/coverage-v8": "npm:^3.0.5"
     eslint: "npm:^9.24.0"
-    rimraf: "npm:^5.0.10"
+    rimraf: "npm:^6.1.2"
     rollup: "npm:~4.22.4"
     typescript: "npm:^5.6.2"
     vitest: "npm:^3.0.5"
@@ -4426,7 +4442,7 @@ __metadata:
     eslint: "npm:^9.24.0"
     memfs: "npm:^4.11.1"
     openapi-typescript: "npm:^7.4.0"
-    rimraf: "npm:^5.0.10"
+    rimraf: "npm:^6.1.2"
     typescript: "npm:^5.6.2"
     vitest: "npm:^3.0.5"
   languageName: unknown
@@ -4450,7 +4466,7 @@ __metadata:
     micromatch: "npm:^4.0.8"
     openapi-typescript: "npm:^7.4.0"
     ora: "npm:^8.1.0"
-    rimraf: "npm:^5.0.10"
+    rimraf: "npm:^6.1.2"
     typescript: "npm:^5.6.2"
     vitest: "npm:^3.0.5"
   languageName: unknown
@@ -4486,7 +4502,7 @@ __metadata:
     query-string: "npm:^8.2.0"
     react: "npm:^19.0.0"
     react-dom: "npm:^19.0.0"
-    rimraf: "npm:^5.0.10"
+    rimraf: "npm:^6.1.2"
     rollup: "npm:~4.22.4"
     typescript: "npm:^5.6.2"
     vitest: "npm:^3.0.5"
@@ -4501,7 +4517,7 @@ __metadata:
   resolution: "@openapi-qraft/rollup-config@workspace:packages/rollup-config"
   dependencies:
     "@swc/core": "npm:1.7.26"
-    rimraf: "npm:^5.0.10"
+    rimraf: "npm:^6.1.2"
     rollup-plugin-swc3: "npm:~0.11.2"
     rollup-preserve-directives: "npm:~1.1.1"
     typescript: "npm:^5.6.2"
@@ -4528,7 +4544,7 @@ __metadata:
     eslint: "npm:^9.24.0"
     memfs: "npm:^4.11.1"
     ora: "npm:^8.1.0"
-    rimraf: "npm:^5.0.10"
+    rimraf: "npm:^6.1.2"
     typescript: "npm:^5.6.2"
     vitest: "npm:^3.0.5"
   languageName: unknown
@@ -4542,7 +4558,7 @@ __metadata:
     "@openapi-qraft/rollup-config": "workspace:*"
     "@tanstack/react-query": "npm:^5.80.6"
     eslint: "npm:^9.24.0"
-    rimraf: "npm:^5.0.10"
+    rimraf: "npm:^6.1.2"
     rollup: "npm:~4.22.4"
     typescript: "npm:^5.6.2"
   peerDependencies:
@@ -4564,7 +4580,7 @@ __metadata:
     "@openapi-qraft/eslint-config": "workspace:*"
     "@types/node": "npm:^22.5.5"
     eslint: "npm:^9.24.0"
-    rimraf: "npm:^5.0.10"
+    rimraf: "npm:^6.1.2"
     ts-factory-code-generator-generator: "npm:^0.7.0"
     typescript-5.5.4: "npm:typescript@5.5.4"
   languageName: unknown
@@ -11399,7 +11415,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"glob@npm:^10.0.0, glob@npm:^10.2.2, glob@npm:^10.3.10, glob@npm:^10.3.7, glob@npm:^10.4.1":
+"glob@npm:^10.0.0, glob@npm:^10.2.2, glob@npm:^10.3.10, glob@npm:^10.4.1":
   version: 10.4.5
   resolution: "glob@npm:10.4.5"
   dependencies:
@@ -11412,6 +11428,17 @@ __metadata:
   bin:
     glob: dist/esm/bin.mjs
   checksum: 10c0/19a9759ea77b8e3ca0a43c2f07ecddc2ad46216b786bb8f993c445aee80d345925a21e5280c7b7c6c59e860a0154b84e4b2b60321fea92cd3c56b4a7489f160e
+  languageName: node
+  linkType: hard
+
+"glob@npm:^13.0.0":
+  version: 13.0.0
+  resolution: "glob@npm:13.0.0"
+  dependencies:
+    minimatch: "npm:^10.1.1"
+    minipass: "npm:^7.1.2"
+    path-scurry: "npm:^2.0.0"
+  checksum: 10c0/8e2f5821f3f7c312dd102e23a15b80c79e0837a9872784293ba2e15ec73b3f3749a49a42a31bfcb4e52c84820a474e92331c2eebf18819d20308f5c33876630a
   languageName: node
   linkType: hard
 
@@ -13761,6 +13788,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"lru-cache@npm:^11.0.0":
+  version: 11.2.2
+  resolution: "lru-cache@npm:11.2.2"
+  checksum: 10c0/72d7831bbebc85e2bdefe01047ee5584db69d641c48d7a509e86f66f6ee111b30af7ec3bd68a967d47b69a4b1fa8bbf3872630bd06a63b6735e6f0a5f1c8e83d
+  languageName: node
+  linkType: hard
+
 "lru-cache@npm:^5.1.1":
   version: 5.1.1
   resolution: "lru-cache@npm:5.1.1"
@@ -14881,6 +14915,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"minimatch@npm:^10.1.1":
+  version: 10.1.1
+  resolution: "minimatch@npm:10.1.1"
+  dependencies:
+    "@isaacs/brace-expansion": "npm:^5.0.0"
+  checksum: 10c0/c85d44821c71973d636091fddbfbffe62370f5ee3caf0241c5b60c18cd289e916200acb2361b7e987558cd06896d153e25d505db9fc1e43e6b4b6752e2702902
+  languageName: node
+  linkType: hard
+
 "minimatch@npm:^5.0.1, minimatch@npm:^5.1.0":
   version: 5.1.6
   resolution: "minimatch@npm:5.1.6"
@@ -15889,7 +15932,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"package-json-from-dist@npm:^1.0.0":
+"package-json-from-dist@npm:^1.0.0, package-json-from-dist@npm:^1.0.1":
   version: 1.0.1
   resolution: "package-json-from-dist@npm:1.0.1"
   checksum: 10c0/62ba2785eb655fec084a257af34dbe24292ab74516d6aecef97ef72d4897310bc6898f6c85b5cd22770eaa1ce60d55a0230e150fb6a966e3ecd6c511e23d164b
@@ -16138,6 +16181,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"path-scurry@npm:^2.0.0":
+  version: 2.0.1
+  resolution: "path-scurry@npm:2.0.1"
+  dependencies:
+    lru-cache: "npm:^11.0.0"
+    minipass: "npm:^7.1.2"
+  checksum: 10c0/2a16ed0e81fbc43513e245aa5763354e25e787dab0d539581a6c3f0f967461a159ed6236b2559de23aa5b88e7dc32b469b6c47568833dd142a4b24b4f5cd2620
+  languageName: node
+  linkType: hard
+
 "path-to-regexp@npm:0.1.10":
   version: 0.1.10
   resolution: "path-to-regexp@npm:0.1.10"
@@ -16376,7 +16429,7 @@ __metadata:
     globals: "npm:^16.0.0"
     react: "npm:^19.0.0"
     react-dom: "npm:^19.0.0"
-    rimraf: "npm:^5.0.10"
+    rimraf: "npm:^6.1.2"
     typescript: "npm:^5.6.2"
     typescript-eslint: "npm:^8.24.0"
     vite: "npm:^6.3.4"
@@ -19318,14 +19371,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"rimraf@npm:^5.0.10":
-  version: 5.0.10
-  resolution: "rimraf@npm:5.0.10"
+"rimraf@npm:^6.1.2":
+  version: 6.1.2
+  resolution: "rimraf@npm:6.1.2"
   dependencies:
-    glob: "npm:^10.3.7"
+    glob: "npm:^13.0.0"
+    package-json-from-dist: "npm:^1.0.1"
   bin:
     rimraf: dist/esm/bin.mjs
-  checksum: 10c0/7da4fd0e15118ee05b918359462cfa1e7fe4b1228c7765195a45b55576e8c15b95db513b8466ec89129666f4af45ad978a3057a02139afba1a63512a2d9644cc
+  checksum: 10c0/c11a6a6fad937ada03c12fe688860690df8296d7cd08dbe59e3cc087f44e43573ae26ecbe48e54cb7a6db745b8c81fe5a15b9359233cc21d52d9b5b3330fcc74
   languageName: node
   linkType: hard
 
