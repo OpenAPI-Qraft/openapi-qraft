@@ -43,7 +43,7 @@
     "jscodeshift": "^17.0.0",
     "jsdom": "^26.0.0",
     "msw": "^2.7.0",
-    "prettier": "^3.3.3",
+    "prettier": "^3.7.3",
     "query-string": "^8.2.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
