@@ -1,0 +1,1 @@
+"use strict";(globalThis.webpackChunkopenapi_qraft_website=globalThis.webpackChunkopenapi_qraft_website||[]).push([[9647],{415:(e,a,s)=>{s.r(a),s.d(a,{default:()=>c});s(3696);var r=s(1750),t=s(3237),i=s(8586),n=s(3971),p=s(7978),u=s(2540);function c(e){return(0,u.jsx)(i.e3,{className:(0,r.A)(t.G.wrapper.docsPages),children:(0,u.jsx)(p.A,{children:(0,n.v)(e.route.routes)})})}}}]);

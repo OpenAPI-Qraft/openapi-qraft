@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkopenapi_qraft_website=self.webpackChunkopenapi_qraft_website||[]).push([[8973],{8973:(e,p,s)=>{s.r(p)}}]);
