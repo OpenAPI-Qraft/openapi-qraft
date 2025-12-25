@@ -1,6 +1,9 @@
 import type { OverrideImportType } from './OverrideImportType.js';
+import { createServicePathMatch } from '@openapi-qraft/plugin/lib/createServicePathMatch';
 import { isReadOnlyOperation } from '@openapi-qraft/plugin/lib/isReadOnlyOperation';
 import { ServiceOperation } from '@openapi-qraft/plugin/lib/open-api/OpenAPIService';
+import { parseOperationGlobs } from '@openapi-qraft/plugin/lib/parseOperationGlobs';
+import { splitCommaSeparatedGlobs } from '@openapi-qraft/plugin/lib/splitCommaSeparatedGlobs';
 import camelCase from 'camelcase';
 import ts from 'typescript';
 import { createOperationCommonTSDoc } from '../lib/createOperationCommonTSDoc.js';
@@ -14,9 +17,17 @@ import { createOperationMethodTSDocExample } from './tsdoc/createOperationMethod
 
 const factory = ts.factory;
 
+export type ParametersWrapperConfig = {
+  type: string;
+  import: string;
+};
+
+type UseParametersWrapperOption = Record<string, ParametersWrapperConfig>;
+
 export type ServiceFactoryOptions = {
   openapiTypesImportPath: string;
   queryableWriteOperations: boolean;
+  useParametersWrapper: UseParametersWrapperOption | undefined;
 };
 
 type Service = { name: string; typeName: string; variableName: string };
@@ -35,17 +46,33 @@ export const getServiceFactory = (
 
   const serviceVariable = getServiceVariableFactory(service, operations);
 
+  const operationsTypesResult = getOperationsTypes(operations, options);
+
   const mainNodes = [
     getServiceInterfaceFactory(service, operations, options),
     ...operationVariables,
     serviceVariable,
-    ...getOperationsTypes(operations, options),
+    ...operationsTypesResult.nodes,
   ];
 
   const moduleTypeImports = filterUnusedTypes(
     getModuleTypeImports(operations, options),
     mainNodes
   );
+
+  // Add ParametersWrapper imports
+  for (const [importPath, types] of Object.entries(
+    operationsTypesResult.imports
+  )) {
+    if (!moduleTypeImports[importPath]) {
+      moduleTypeImports[importPath] = [];
+    }
+    for (const type of types) {
+      if (!moduleTypeImports[importPath].includes(type)) {
+        moduleTypeImports[importPath].push(type);
+      }
+    }
+  }
 
   moduleTypeImports['@openapi-qraft/tanstack-query-react-types']?.push(
     'QraftServiceOperationsToken'
@@ -512,6 +539,35 @@ const createOperationParametersFactory = (
   ]);
 };
 
+const createParametersWrapperTypeFactory = (
+  operation: ServiceOperation,
+  wrapperTypeName: string
+) => {
+  return factory.createTypeReferenceNode(
+    factory.createIdentifier(wrapperTypeName),
+    [
+      factory.createTypeReferenceNode(
+        factory.createIdentifier(getOperationSchemaTypeName(operation)),
+        undefined
+      ),
+      factory.createIndexedAccessTypeNode(
+        factory.createIndexedAccessTypeNode(
+          factory.createTypeReferenceNode(
+            factory.createIdentifier('paths'),
+            undefined
+          ),
+          factory.createLiteralTypeNode(
+            factory.createStringLiteral(operation.path)
+          )
+        ),
+        factory.createLiteralTypeNode(
+          factory.createStringLiteral(operation.method)
+        )
+      ),
+    ]
+  );
+};
+
 const getServiceVariableFactory = (
   service: Service,
   operations: ServiceOperation[]
@@ -546,11 +602,82 @@ const getServiceVariableFactory = (
   );
 };
 
+/**
+ * @private
+ * Checks if an operation matches the useParametersWrapper patterns.
+ * @param operation - The operation to check
+ * @param useParametersWrapper - An object with pattern -> config mapping
+ * @returns ParametersWrapperConfig if the operation should use ParametersWrapper, null otherwise
+ */
+export const shouldUseParametersWrapper = (
+  operation: ServiceOperation,
+  useParametersWrapper: UseParametersWrapperOption | undefined
+): ParametersWrapperConfig | null => {
+  if (!useParametersWrapper) return null;
+
+  for (const [pattern, config] of Object.entries(useParametersWrapper)) {
+    const { pathGlobs, methods } = parseOperationGlobs(pattern);
+
+    // Check if method matches
+    if (methods && !methods.includes(operation.method)) continue;
+
+    // Check if path matches
+    const pathGlobsArray = splitCommaSeparatedGlobs(pathGlobs);
+    const isPathMatch = createServicePathMatch(pathGlobsArray);
+    if (!isPathMatch(operation.path)) continue;
+
+    // Operation matches this pattern
+    return config;
+  }
+
+  return null;
+};
+
 const getOperationsTypes = (
   operations: ServiceOperation[],
-  options: Pick<ServiceFactoryOptions, 'queryableWriteOperations'>
-) => {
-  return operations.flatMap((operation) => {
+  options: Pick<
+    ServiceFactoryOptions,
+    'queryableWriteOperations' | 'useParametersWrapper'
+  >
+): { nodes: ts.Node[]; imports: Record<string, string[]> } => {
+  const importsMap: Record<string, string[]> = {};
+
+  const nodes = operations.flatMap((operation) => {
+    const wrapperConfig = shouldUseParametersWrapper(
+      operation,
+      options.useParametersWrapper
+    );
+
+    // Collect imports if wrapper config is provided and has import path
+    if (wrapperConfig?.import) {
+      if (!importsMap[wrapperConfig.import]) {
+        importsMap[wrapperConfig.import] = [];
+      }
+      if (!importsMap[wrapperConfig.import].includes(wrapperConfig.type)) {
+        importsMap[wrapperConfig.import].push(wrapperConfig.type);
+      }
+    }
+
+    const createParametersType = () => {
+      if (wrapperConfig) {
+        return createParametersWrapperTypeFactory(
+          operation,
+          wrapperConfig.type
+        );
+      }
+      return createOperationParametersFactory(operation, false);
+    };
+
+    const createQueryParametersType = () => {
+      if (wrapperConfig) {
+        return createParametersWrapperTypeFactory(
+          operation,
+          wrapperConfig.type
+        );
+      }
+      return createOperationParametersFactory(operation, true);
+    };
+
     const nodes = [
       factory.createTypeAliasDeclaration(
         undefined,
@@ -566,7 +693,7 @@ const getOperationsTypes = (
                 getOperationParametersTypeName(operation, options, 'query')
               ),
               undefined,
-              createOperationParametersFactory(operation, true)
+              createQueryParametersType()
             ),
             factory.createTypeAliasDeclaration(
               undefined,
@@ -574,7 +701,7 @@ const getOperationsTypes = (
                 getOperationParametersTypeName(operation, options, 'mutation')
               ),
               undefined,
-              createOperationParametersFactory(operation, false)
+              createParametersType()
             ),
           ]
         : [
@@ -588,7 +715,7 @@ const getOperationsTypes = (
                 )
               ),
               undefined,
-              createOperationParametersFactory(operation, false)
+              createParametersType()
             ),
           ]),
       factory.createTypeAliasDeclaration(
@@ -618,6 +745,8 @@ const getOperationsTypes = (
 
     return nodes;
   });
+
+  return { nodes, imports: importsMap };
 };
 
 const getOperationSchemaTypeName = (operation: ServiceOperation) =>

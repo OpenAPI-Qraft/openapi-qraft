@@ -76,3 +76,10 @@ apis:
         createInternalReactAPIClient:
           services: none
           callbacks: ['setQueryData', 'getQueryData', 'getQueryKey', 'getInfiniteQueryKey']
+      use-parameters-wrapper:
+        'get /files/**':
+          type: 'ParametersWrapper'
+          import: '../../type-overrides/parameters-wrapper.js'
+        'delete /approval_policies/{approval_policy_id}':
+          type: 'ParametersWrapper'
+          import: '../../type-overrides/parameters-wrapper.js'
