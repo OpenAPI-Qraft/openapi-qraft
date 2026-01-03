@@ -564,6 +564,14 @@ const createParametersWrapperTypeFactory = (
           factory.createStringLiteral(operation.method)
         )
       ),
+      factory.createTypeReferenceNode(
+        factory.createIdentifier(getOperationDataTypeName(operation)),
+        undefined
+      ),
+      factory.createTypeReferenceNode(
+        factory.createIdentifier(getOperationErrorTypeName(operation)),
+        undefined
+      ),
     ]
   );
 };
