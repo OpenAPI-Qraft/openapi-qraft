@@ -345,6 +345,53 @@ describe('TanStack Query React Client Generation', () => {
     });
   });
 
+  describe('--use-parameters-wrapper', () => {
+    beforeAll(async () => {
+      const { QraftCommand } =
+        await import('@openapi-qraft/plugin/lib/QraftCommand');
+      const { plugin } = await import('./plugin.js');
+      const command = new QraftCommand();
+      plugin.setupCommand(command);
+
+      await command.parseAsync([
+        'dummy-node',
+        'dummy-qraft-bin',
+        openAPIDocumentFixturePath,
+        '--clean',
+        '-o',
+        '/mock-fs',
+        '--export-openapi-types',
+        '--explicit-import-extensions',
+        '--openapi-types-import-path',
+        '../../openapi.d.ts',
+        '--use-parameters-wrapper',
+        'get /files/**',
+        'type:ParametersWrapper',
+        'import:../../type-overrides/parameters-wrapper.js',
+        '--use-parameters-wrapper',
+        'delete /approval_policies/{approval_policy_id}',
+        'type:ParametersWrapper',
+        'import:../../type-overrides/parameters-wrapper.js',
+      ]);
+    });
+
+    test('services/FilesService.ts with ParametersWrapper for get /files/**', async () => {
+      expect(
+        fs.readFileSync('/mock-fs/services/FilesService.ts', 'utf-8')
+      ).toMatchFileSnapshot(
+        './__snapshots__/use-parameters-wrapper/services/FilesService.ts.snapshot.ts'
+      );
+    });
+
+    test('services/ApprovalPoliciesService.ts with ParametersWrapper for delete operation', async () => {
+      expect(
+        fs.readFileSync('/mock-fs/services/ApprovalPoliciesService.ts', 'utf-8')
+      ).toMatchFileSnapshot(
+        './__snapshots__/use-parameters-wrapper/services/ApprovalPoliciesService.ts.snapshot.ts'
+      );
+    });
+  });
+
   describe('--create-api-client-fn creates multiple clients', () => {
     beforeAll(async () => {
       const { QraftCommand } =
