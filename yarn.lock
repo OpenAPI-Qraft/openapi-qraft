@@ -1591,7 +1591,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/runtime@npm:^7.1.2, @babel/runtime@npm:^7.10.3, @babel/runtime@npm:^7.12.13, @babel/runtime@npm:^7.12.5, @babel/runtime@npm:^7.25.9, @babel/runtime@npm:^7.5.5":
+"@babel/runtime@npm:^7.1.2, @babel/runtime@npm:^7.10.3, @babel/runtime@npm:^7.12.13, @babel/runtime@npm:^7.12.5, @babel/runtime@npm:^7.18.3, @babel/runtime@npm:^7.25.9, @babel/runtime@npm:^7.5.5":
   version: 7.28.4
   resolution: "@babel/runtime@npm:7.28.4"
   checksum: 10c0/792ce7af9750fb9b93879cc9d1db175701c4689da890e6ced242ea0207c9da411ccf16dc04e689cc01158b28d7898c40d75598f4559109f761c12ce01e959bf7
@@ -4101,7 +4101,7 @@ __metadata:
     "@openapi-qraft/eslint-config": "workspace:*"
     "@openapi-qraft/plugin": "workspace:^"
     "@openapi-qraft/test-fixtures": "workspace:*"
-    "@redocly/openapi-core": "npm:^1.34.5"
+    "@redocly/openapi-core": "npm:^2.14.3"
     "@types/node": "npm:^20.16.5"
     ansi-colors: "npm:^4.1.3"
     commander: "npm:^14.0.2"
@@ -4120,7 +4120,7 @@ __metadata:
   dependencies:
     "@openapi-qraft/eslint-config": "workspace:*"
     "@openapi-qraft/test-fixtures": "workspace:*"
-    "@redocly/openapi-core": "npm:^1.34.5"
+    "@redocly/openapi-core": "npm:^2.14.3"
     "@types/micromatch": "npm:^4.0.9"
     "@types/node": "npm:^20.16.5"
     "@vitest/coverage-v8": "npm:^3.2.4"
@@ -4454,10 +4454,31 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@redocly/ajv@npm:^8.17.1":
+  version: 8.17.1
+  resolution: "@redocly/ajv@npm:8.17.1"
+  dependencies:
+    fast-deep-equal: "npm:^3.1.3"
+    fast-uri: "npm:^3.0.1"
+    json-schema-traverse: "npm:^1.0.0"
+    require-from-string: "npm:^2.0.2"
+  checksum: 10c0/f6fd7fc0455ab1f465fd1138b5e33732c177b357b992fa0a474902aff749aef3353d1c9785203870b460aad0752276751eaa6dfa5b57f357e6de7ac926684061
+  languageName: node
+  linkType: hard
+
 "@redocly/config@npm:^0.22.0":
   version: 0.22.2
   resolution: "@redocly/config@npm:0.22.2"
   checksum: 10c0/625e947e7939e2d59bd83f516af5a581411167e3fc83adf7322bddf9bc69038fc601ed4ee8abae44d298ed367a16a1a09e7cdbe8b5dde172b4ce53c88d8717f4
+  languageName: node
+  linkType: hard
+
+"@redocly/config@npm:^0.41.1":
+  version: 0.41.1
+  resolution: "@redocly/config@npm:0.41.1"
+  dependencies:
+    json-schema-to-ts: "npm:2.7.2"
+  checksum: 10c0/8814c9f3e295d8ac980645ea5aba337228344bacb1b2b4636d88b6c22a893fa65f5fdb13233cfefbf19479ce1765cbc89ccb56c72eeee6dce2730ac29a2b15de
   languageName: node
   linkType: hard
 
@@ -4475,6 +4496,23 @@ __metadata:
     pluralize: "npm:^8.0.0"
     yaml-ast-parser: "npm:0.0.43"
   checksum: 10c0/e75ca28d9a7ad3dcb4879e958f2f064aa6d00dc8a52377fbed5a4fec48fa7892056c33dae7996ced9c613b347b400a4610c1c50d4910eb951e40222dbb154085
+  languageName: node
+  linkType: hard
+
+"@redocly/openapi-core@npm:^2.14.3":
+  version: 2.14.3
+  resolution: "@redocly/openapi-core@npm:2.14.3"
+  dependencies:
+    "@redocly/ajv": "npm:^8.17.1"
+    "@redocly/config": "npm:^0.41.1"
+    ajv-formats: "npm:^3.0.1"
+    colorette: "npm:^1.2.0"
+    js-levenshtein: "npm:^1.1.6"
+    js-yaml: "npm:^4.1.0"
+    picomatch: "npm:^4.0.3"
+    pluralize: "npm:^8.0.0"
+    yaml-ast-parser: "npm:0.0.43"
+  checksum: 10c0/d335e79271587a4a510bdc35d7ed1c9f850ec0dd9bcd7bfc0fac8ef9fbefe2cef2a27e338b32ac29cc85c98c1dbeb28cb5f1407a6d2f4785212e97df1fdf20b4
   languageName: node
   linkType: hard
 
@@ -7001,6 +7039,20 @@ __metadata:
     ajv:
       optional: true
   checksum: 10c0/e43ba22e91b6a48d96224b83d260d3a3a561b42d391f8d3c6d2c1559f9aa5b253bfb306bc94bbeca1d967c014e15a6efe9a207309e95b3eaae07fcbcdc2af662
+  languageName: node
+  linkType: hard
+
+"ajv-formats@npm:^3.0.1":
+  version: 3.0.1
+  resolution: "ajv-formats@npm:3.0.1"
+  dependencies:
+    ajv: "npm:^8.0.0"
+  peerDependencies:
+    ajv: ^8.0.0
+  peerDependenciesMeta:
+    ajv:
+      optional: true
+  checksum: 10c0/168d6bca1ea9f163b41c8147bae537e67bd963357a5488a1eaf3abe8baa8eec806d4e45f15b10767e6020679315c7e1e5e6803088dfb84efa2b4e9353b83dd0a
   languageName: node
   linkType: hard
 
@@ -12933,6 +12985,17 @@ __metadata:
   version: 3.0.2
   resolution: "json-parse-even-better-errors@npm:3.0.2"
   checksum: 10c0/147f12b005768abe9fab78d2521ce2b7e1381a118413d634a40e6d907d7d10f5e9a05e47141e96d6853af7cc36d2c834d0a014251be48791e037ff2f13d2b94b
+  languageName: node
+  linkType: hard
+
+"json-schema-to-ts@npm:2.7.2":
+  version: 2.7.2
+  resolution: "json-schema-to-ts@npm:2.7.2"
+  dependencies:
+    "@babel/runtime": "npm:^7.18.3"
+    "@types/json-schema": "npm:^7.0.9"
+    ts-algebra: "npm:^1.2.0"
+  checksum: 10c0/e9d7841fead4f48913735ee8b047a78b2b90539b070ef2ba14cd379a2d653e46ffee136bdfe0396daef1e20f8fdfc5437d13c15ef6d8586d61fb78eb3322875a
   languageName: node
   linkType: hard
 
@@ -20709,6 +20772,13 @@ __metadata:
   version: 2.2.0
   resolution: "trough@npm:2.2.0"
   checksum: 10c0/58b671fc970e7867a48514168894396dd94e6d9d6456aca427cc299c004fe67f35ed7172a36449086b2edde10e78a71a284ec0076809add6834fb8f857ccb9b0
+  languageName: node
+  linkType: hard
+
+"ts-algebra@npm:^1.2.0":
+  version: 1.2.2
+  resolution: "ts-algebra@npm:1.2.2"
+  checksum: 10c0/dabfb7fad18b3bb56ed6b14404c2d9d7d41f181df599d50ad6643c6ff1afc459524969d80898183f9e5c66378163799991bfac799790899034ae8cfc99904c74
   languageName: node
   linkType: hard
 
