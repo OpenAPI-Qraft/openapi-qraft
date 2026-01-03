@@ -14,8 +14,12 @@ export type Services = {
     approvalPolicies: ApprovalPoliciesService;
     files: FilesService;
 };
-export const services = {
+export const services: {
+    entities: typeof entitiesService;
+    approvalPolicies: typeof approvalPoliciesService;
+    files: typeof filesService;
+} = {
     entities: entitiesService,
     approvalPolicies: approvalPoliciesService,
     files: filesService
-} as const;
+};
