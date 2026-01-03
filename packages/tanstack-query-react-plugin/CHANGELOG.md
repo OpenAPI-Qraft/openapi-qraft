@@ -1,5 +1,15 @@
 # @openapi-qraft/tanstack-query-react-plugin
 
+## 2.14.0
+
+### Minor Changes
+
+- 3a7f9e1: Fix TS4023 error in services index export by using explicit `typeof` type annotation instead of `as const` assertion.
+
+### Patch Changes
+
+- @openapi-qraft/plugin@2.14.0
+
 ## 2.13.0
 
 ### Minor Changes
