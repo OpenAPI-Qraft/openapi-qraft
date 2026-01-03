@@ -22,12 +22,12 @@ export type ParametersWrapperConfig = {
   import: string;
 };
 
-type UseParametersWrapperOption = Record<string, ParametersWrapperConfig>;
+type OperationParametersTypeOption = Record<string, ParametersWrapperConfig>;
 
 export type ServiceFactoryOptions = {
   openapiTypesImportPath: string;
   queryableWriteOperations: boolean;
-  useParametersWrapper: UseParametersWrapperOption | undefined;
+  operationParametersType: OperationParametersTypeOption | undefined;
 };
 
 type Service = { name: string; typeName: string; variableName: string };
@@ -612,18 +612,18 @@ const getServiceVariableFactory = (
 
 /**
  * @private
- * Checks if an operation matches the useParametersWrapper patterns.
+ * Checks if an operation matches the operationParametersType patterns.
  * @param operation - The operation to check
- * @param useParametersWrapper - An object with pattern -> config mapping
+ * @param operationParametersType - An object with pattern -> config mapping
  * @returns ParametersWrapperConfig if the operation should use ParametersWrapper, null otherwise
  */
 export const shouldUseParametersWrapper = (
   operation: ServiceOperation,
-  useParametersWrapper: UseParametersWrapperOption | undefined
+  operationParametersType: OperationParametersTypeOption | undefined
 ): ParametersWrapperConfig | null => {
-  if (!useParametersWrapper) return null;
+  if (!operationParametersType) return null;
 
-  for (const [pattern, config] of Object.entries(useParametersWrapper)) {
+  for (const [pattern, config] of Object.entries(operationParametersType)) {
     const { pathGlobs, methods } = parseOperationGlobs(pattern);
 
     // Check if method matches
@@ -645,7 +645,7 @@ const getOperationsTypes = (
   operations: ServiceOperation[],
   options: Pick<
     ServiceFactoryOptions,
-    'queryableWriteOperations' | 'useParametersWrapper'
+    'queryableWriteOperations' | 'operationParametersType'
   >
 ): { nodes: ts.Node[]; imports: Record<string, string[]> } => {
   const importsMap: Record<string, string[]> = {};
@@ -653,7 +653,7 @@ const getOperationsTypes = (
   const nodes = operations.flatMap((operation) => {
     const wrapperConfig = shouldUseParametersWrapper(
       operation,
-      options.useParametersWrapper
+      options.operationParametersType
     );
 
     // Collect imports if wrapper config is provided and has import path
