@@ -171,6 +171,24 @@ It is possible to use multiple plugins at the same time. For example, `--plugin 
     the import in the `create-api-client.ts` file.
   - This option is particularly useful when you need to provide custom implementations of library types
     that better suit your project's needs.
+- **`--use-parameters-wrapper <parameters wrappers...>`:** Configure custom ParametersWrapper types for specific operation patterns. This allows you to use custom type
+  implementations for operation parameters instead of the default generated types. The option expects a pattern followed by `type:TypeName` and `import:ImportPath`.
+  Can be specified multiple times for different patterns. _(optional)_
+  - **Format:** `<pattern> type:<TypeName> import:<ImportPath>`
+  - The `ParametersWrapper` type receives four generic parameters:
+    - `TSchema` - The operation schema (method, url)
+    - `TOperation` - The operation type from OpenAPI paths
+    - `TData` - The response data type
+    - `TError` - The error type
+  - **Pattern syntax:**
+    - `<method> <path glob>` - Match operations by HTTP method and path pattern
+    - `<path glob>` - Match operations by path pattern only (all methods)
+    - Supports glob patterns (wildcards) for flexible matching
+  - **Examples:**
+    - `--use-parameters-wrapper 'get /files/**' 'type:ReadParametersWrapper' 'import:../../type-overrides/parameters-wrapper.js'` - Use ParametersWrapper for all GET operations under `/files/**`
+    - `--use-parameters-wrapper 'delete /approval_policies/{approval_policy_id}' 'type:DeleteParametersWrapper' 'import:../../type-overrides/parameters-wrapper.js'` - Use ParametersWrapper for a specific DELETE operation
+    - `--use-parameters-wrapper 'post,put /api/**' 'type:WriteParametersWrapper' 'import:../types/WriteParametersWrapper.js'` - Use WriteParametersWrapper for POST and PUT operations under `/api/**`
+  - This option is particularly useful when you need to provide custom parameter handling logic or transform parameters before they are used in API calls.
 - **`--create-api-client-fn <functionName> [options...]`:** Configure API client creation function. Allows specifying the function name used to create the API client, as well as fine-tuning included services and callbacks.
   You can specify this option **multiple times** to generate **several different API client** creation functions from a single OpenAPI document - for example,
   a fully-featured client for Node.js and a lightweight client for React or service workers. _(optional)_
