@@ -47,21 +47,27 @@ const getServiceIndexVariableFactory = (services: OpenAPIService[]) => {
         factory.createVariableDeclaration(
           factory.createIdentifier('services'),
           undefined,
-          undefined,
-          factory.createAsExpression(
-            factory.createObjectLiteralExpression(
-              services.map(({ name, variableName }) =>
-                factory.createPropertyAssignment(
-                  factory.createIdentifier(name),
-                  factory.createIdentifier(variableName)
+          factory.createTypeLiteralNode(
+            services.map(({ name, variableName }) =>
+              factory.createPropertySignature(
+                undefined,
+                factory.createIdentifier(name),
+                undefined,
+                factory.createTypeQueryNode(
+                  factory.createIdentifier(variableName),
+                  undefined
                 )
-              ),
-              true
-            ),
-            factory.createTypeReferenceNode(
-              factory.createIdentifier('const'),
-              undefined
+              )
             )
+          ),
+          factory.createObjectLiteralExpression(
+            services.map(({ name, variableName }) =>
+              factory.createPropertyAssignment(
+                factory.createIdentifier(name),
+                factory.createIdentifier(variableName)
+              )
+            ),
+            true
           )
         ),
       ],
