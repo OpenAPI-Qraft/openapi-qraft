@@ -178,6 +178,10 @@ It is possible to use multiple plugins at the same time. For example, `--plugin 
     - `TOperation` - The operation type from OpenAPI paths
     - `TData` - The response data type
     - `TError` - The error type
+  - **Note:** Generic parameters `TSchema`, `TData`, and `TError` may appear unused in the type body, but they are required
+    for proper type inference and are passed by the code generator.
+    If your linter flags them as unused, you can disable the rule for your type definition file
+    using `/* eslint-disable @typescript-eslint/no-unused-vars */` or configure ESLint to ignore this specific file.
   - **Pattern syntax:**
     - `<method> <path glob>` - Match operations by HTTP method and path pattern
     - `<path glob>` - Match operations by path pattern only (all methods)
