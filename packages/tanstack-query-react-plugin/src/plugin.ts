@@ -62,9 +62,9 @@ export const plugin: QraftCommandPlugin = {
       )
       .addOption(
         new Option(
-          '--use-parameters-wrapper <parameters wrappers...>',
+          '--operation-parameters-type <parameters types...>',
           'Configure ParametersWrapper types for specific operation patterns. Expected format: pattern type:TypeName import:ImportPath. Can be specified multiple times for different patterns.'
-        ).argParser(parseUseParametersWrapper)
+        ).argParser(parseOperationParametersType)
       )
       .action(async ({ spinner, output, args, services, schema }, resolve) => {
         return void (await generateCode({
@@ -73,8 +73,8 @@ export const plugin: QraftCommandPlugin = {
           serviceOptions: {
             openapiTypesImportPath: args.openapiTypesImportPath,
             queryableWriteOperations: args.queryableWriteOperations,
-            useParametersWrapper: Array.isArray(args.useParametersWrapper)
-              ? args.useParametersWrapper[0]
+            operationParametersType: Array.isArray(args.operationParametersType)
+              ? args.operationParametersType[0]
               : undefined,
           },
           overrideImportType: Array.isArray(args.overrideImportType)
@@ -270,18 +270,18 @@ function parseOverrideImportType(
   }
 }
 
-type ParsedUseParametersWrapperOption = [
+type ParsedOperationParametersTypeOption = [
   result: Record<string, { type: string; import: string }>,
   currentPattern?: string,
 ];
 
-function parseUseParametersWrapper(
+function parseOperationParametersType(
   value: string,
   previousValue: unknown
-): ParsedUseParametersWrapperOption {
+): ParsedOperationParametersTypeOption {
   const previous = (
     Array.isArray(previousValue) ? previousValue : [{}, undefined]
-  ) as ParsedUseParametersWrapperOption;
+  ) as ParsedOperationParametersTypeOption;
 
   const [result, currentPattern] = previous;
 
@@ -299,8 +299,8 @@ function parseUseParametersWrapper(
   if (!currentPattern) {
     throw new CommanderError(
       1,
-      'ERR_INVALID_USE_PARAMETERS_WRAPPER',
-      `Invalid use-parameters-wrapper value: ${value}. Expected pattern first, then type:TypeName and import:ImportPath`
+      'ERR_INVALID_OPERATION_PARAMETERS_TYPE',
+      `Invalid operation-parameters-type value: ${value}. Expected pattern first, then type:TypeName and import:ImportPath`
     );
   }
 
@@ -310,8 +310,8 @@ function parseUseParametersWrapper(
     if (!typeName) {
       throw new CommanderError(
         1,
-        'ERR_INVALID_USE_PARAMETERS_WRAPPER',
-        `Invalid use-parameters-wrapper value: ${value}. Type name cannot be empty`
+        'ERR_INVALID_OPERATION_PARAMETERS_TYPE',
+        `Invalid operation-parameters-type value: ${value}. Type name cannot be empty`
       );
     }
     result[currentPattern].type = typeName;
@@ -320,16 +320,16 @@ function parseUseParametersWrapper(
     if (!importPath) {
       throw new CommanderError(
         1,
-        'ERR_INVALID_USE_PARAMETERS_WRAPPER',
-        `Invalid use-parameters-wrapper value: ${value}. Import path cannot be empty`
+        'ERR_INVALID_OPERATION_PARAMETERS_TYPE',
+        `Invalid operation-parameters-type value: ${value}. Import path cannot be empty`
       );
     }
     result[currentPattern].import = importPath;
   } else {
     throw new CommanderError(
       1,
-      'ERR_INVALID_USE_PARAMETERS_WRAPPER',
-      `Invalid use-parameters-wrapper value: ${value}. Expected format: type:TypeName or import:ImportPath`
+      'ERR_INVALID_OPERATION_PARAMETERS_TYPE',
+      `Invalid operation-parameters-type value: ${value}. Expected format: type:TypeName or import:ImportPath`
     );
   }
 
