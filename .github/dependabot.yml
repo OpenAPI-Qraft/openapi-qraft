@@ -2,5 +2,7 @@ version: 2
 updates:
   - package-ecosystem: "npm"
     directory: "/"
+    schedule:
+      interval: "weekly"
     exclude-paths:
       - "e2e/projects/**"
