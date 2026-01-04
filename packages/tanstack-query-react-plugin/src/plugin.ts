@@ -62,7 +62,7 @@ export const plugin: QraftCommandPlugin = {
       )
       .addOption(
         new Option(
-          '--operation-parameters-type <parameters types...>',
+          '--operation-parameters-type-wrapper <parameters wrappers...>',
           'Configure ParametersWrapper types for specific operation patterns. Expected format: pattern type:TypeName import:ImportPath. Can be specified multiple times for different patterns.'
         ).argParser(parseOperationParametersType)
       )
@@ -73,8 +73,10 @@ export const plugin: QraftCommandPlugin = {
           serviceOptions: {
             openapiTypesImportPath: args.openapiTypesImportPath,
             queryableWriteOperations: args.queryableWriteOperations,
-            operationParametersType: Array.isArray(args.operationParametersType)
-              ? args.operationParametersType[0]
+            operationParametersTypeWrapper: Array.isArray(
+              args.operationParametersTypeWrapper
+            )
+              ? args.operationParametersTypeWrapper[0]
               : undefined,
           },
           overrideImportType: Array.isArray(args.overrideImportType)
@@ -299,8 +301,8 @@ function parseOperationParametersType(
   if (!currentPattern) {
     throw new CommanderError(
       1,
-      'ERR_INVALID_OPERATION_PARAMETERS_TYPE',
-      `Invalid operation-parameters-type value: ${value}. Expected pattern first, then type:TypeName and import:ImportPath`
+      'ERR_INVALID_OPERATION_PARAMETERS_TYPE_WRAPPER',
+      `Invalid operation-parameters-type-wrapper value: ${value}. Expected pattern first, then type:TypeName and import:ImportPath`
     );
   }
 
@@ -310,8 +312,8 @@ function parseOperationParametersType(
     if (!typeName) {
       throw new CommanderError(
         1,
-        'ERR_INVALID_OPERATION_PARAMETERS_TYPE',
-        `Invalid operation-parameters-type value: ${value}. Type name cannot be empty`
+        'ERR_INVALID_OPERATION_PARAMETERS_TYPE_WRAPPER',
+        `Invalid operation-parameters-type-wrapper value: ${value}. Type name cannot be empty`
       );
     }
     result[currentPattern].type = typeName;
@@ -320,16 +322,16 @@ function parseOperationParametersType(
     if (!importPath) {
       throw new CommanderError(
         1,
-        'ERR_INVALID_OPERATION_PARAMETERS_TYPE',
-        `Invalid operation-parameters-type value: ${value}. Import path cannot be empty`
+        'ERR_INVALID_OPERATION_PARAMETERS_TYPE_WRAPPER',
+        `Invalid operation-parameters-type-wrapper value: ${value}. Import path cannot be empty`
       );
     }
     result[currentPattern].import = importPath;
   } else {
     throw new CommanderError(
       1,
-      'ERR_INVALID_OPERATION_PARAMETERS_TYPE',
-      `Invalid operation-parameters-type value: ${value}. Expected format: type:TypeName or import:ImportPath`
+      'ERR_INVALID_OPERATION_PARAMETERS_TYPE_WRAPPER',
+      `Invalid operation-parameters-type-wrapper value: ${value}. Expected format: type:TypeName or import:ImportPath`
     );
   }
 

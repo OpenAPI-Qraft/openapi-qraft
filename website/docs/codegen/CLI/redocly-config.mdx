@@ -136,7 +136,7 @@ apis:
       operation-name-modifier:
         - '/files/list:[a-zA-Z]+List ==> findAll'  # Rename all *List operations to findAll
       # Configure custom ParametersWrapper types for specific operations
-      operation-parameters-type:
+      operation-parameters-type-wrapper:
         'get /files/**':
           type: 'ReadParametersWrapper'
           import: '../../type-overrides/parameters-wrapper.js'

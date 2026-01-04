@@ -20,19 +20,19 @@ describe('shouldUseParametersWrapper(...)', () => {
     security: undefined,
   });
 
-  test('returns null when operationParametersType is undefined', () => {
+  test('returns null when operationParametersTypeWrapper is undefined', () => {
     const operation = createMockOperation('get', '/api/users');
     expect(shouldUseParametersWrapper(operation, undefined)).toBeNull();
   });
 
-  test('returns null when operationParametersType is empty object', () => {
+  test('returns null when operationParametersTypeWrapper is empty object', () => {
     const operation = createMockOperation('get', '/api/users');
     expect(shouldUseParametersWrapper(operation, {})).toBeNull();
   });
 
   test('returns config when pattern matches path without method', () => {
     const operation = createMockOperation('get', '/api/users');
-    const operationParametersType = {
+    const operationParametersTypeWrapper = {
       '/api/**': {
         type: 'ParametersWrapper',
         import: '../types/ParametersWrapper',
@@ -41,7 +41,7 @@ describe('shouldUseParametersWrapper(...)', () => {
 
     const result = shouldUseParametersWrapper(
       operation,
-      operationParametersType
+      operationParametersTypeWrapper
     );
     expect(result).toEqual({
       type: 'ParametersWrapper',
@@ -51,7 +51,7 @@ describe('shouldUseParametersWrapper(...)', () => {
 
   test('returns config when pattern matches path with method', () => {
     const operation = createMockOperation('post', '/api/users');
-    const operationParametersType = {
+    const operationParametersTypeWrapper = {
       'post /api/**': {
         type: 'WriteParametersWrapper',
         import: '../types/WriteParametersWrapper',
@@ -60,7 +60,7 @@ describe('shouldUseParametersWrapper(...)', () => {
 
     const result = shouldUseParametersWrapper(
       operation,
-      operationParametersType
+      operationParametersTypeWrapper
     );
     expect(result).toEqual({
       type: 'WriteParametersWrapper',
@@ -70,7 +70,7 @@ describe('shouldUseParametersWrapper(...)', () => {
 
   test('returns null when method does not match', () => {
     const operation = createMockOperation('get', '/api/users');
-    const operationParametersType = {
+    const operationParametersTypeWrapper = {
       'post /api/**': {
         type: 'WriteParametersWrapper',
         import: '../types/WriteParametersWrapper',
@@ -78,13 +78,13 @@ describe('shouldUseParametersWrapper(...)', () => {
     };
 
     expect(
-      shouldUseParametersWrapper(operation, operationParametersType)
+      shouldUseParametersWrapper(operation, operationParametersTypeWrapper)
     ).toBeNull();
   });
 
   test('returns null when path does not match', () => {
     const operation = createMockOperation('post', '/api/users');
-    const operationParametersType = {
+    const operationParametersTypeWrapper = {
       'post /api/admin/**': {
         type: 'AdminParametersWrapper',
         import: '../types/AdminParametersWrapper',
@@ -92,13 +92,13 @@ describe('shouldUseParametersWrapper(...)', () => {
     };
 
     expect(
-      shouldUseParametersWrapper(operation, operationParametersType)
+      shouldUseParametersWrapper(operation, operationParametersTypeWrapper)
     ).toBeNull();
   });
 
   test('returns config when pattern matches with multiple methods', () => {
     const operation = createMockOperation('put', '/api/users');
-    const operationParametersType = {
+    const operationParametersTypeWrapper = {
       'post,put /api/**': {
         type: 'WriteParametersWrapper',
         import: '../types/WriteParametersWrapper',
@@ -107,7 +107,7 @@ describe('shouldUseParametersWrapper(...)', () => {
 
     const result = shouldUseParametersWrapper(
       operation,
-      operationParametersType
+      operationParametersTypeWrapper
     );
     expect(result).toEqual({
       type: 'WriteParametersWrapper',
@@ -117,7 +117,7 @@ describe('shouldUseParametersWrapper(...)', () => {
 
   test('returns config for first matching pattern', () => {
     const operation = createMockOperation('get', '/api/users');
-    const operationParametersType = {
+    const operationParametersTypeWrapper = {
       '/api/admin/**': {
         type: 'AdminParametersWrapper',
         import: '../types/AdminParametersWrapper',
@@ -130,7 +130,7 @@ describe('shouldUseParametersWrapper(...)', () => {
 
     const result = shouldUseParametersWrapper(
       operation,
-      operationParametersType
+      operationParametersTypeWrapper
     );
     // Should match the first pattern that matches
     expect(result).toEqual({
@@ -141,7 +141,7 @@ describe('shouldUseParametersWrapper(...)', () => {
 
   test('returns null when path matches but method does not match in multiple method pattern', () => {
     const operation = createMockOperation('delete', '/api/users');
-    const operationParametersType = {
+    const operationParametersTypeWrapper = {
       'post,put /api/**': {
         type: 'WriteParametersWrapper',
         import: '../types/WriteParametersWrapper',
@@ -149,7 +149,7 @@ describe('shouldUseParametersWrapper(...)', () => {
     };
 
     expect(
-      shouldUseParametersWrapper(operation, operationParametersType)
+      shouldUseParametersWrapper(operation, operationParametersTypeWrapper)
     ).toBeNull();
   });
 
@@ -158,7 +158,7 @@ describe('shouldUseParametersWrapper(...)', () => {
       'delete',
       '/approval_policies/{approval_policy_id}'
     );
-    const operationParametersType = {
+    const operationParametersTypeWrapper = {
       'delete /approval_policies/{approval_policy_id}': {
         type: 'ParametersWrapper',
         import: '../../type-overrides/parameters-wrapper.js',
@@ -167,7 +167,7 @@ describe('shouldUseParametersWrapper(...)', () => {
 
     const result = shouldUseParametersWrapper(
       operation,
-      operationParametersType
+      operationParametersTypeWrapper
     );
     expect(result).toEqual({
       type: 'ParametersWrapper',
@@ -177,7 +177,7 @@ describe('shouldUseParametersWrapper(...)', () => {
 
   test('handles patterns with wildcards in path', () => {
     const operation = createMockOperation('get', '/api/users/123');
-    const operationParametersType = {
+    const operationParametersTypeWrapper = {
       'get /api/users/*': {
         type: 'UserParametersWrapper',
         import: '../types/UserParametersWrapper',
@@ -186,7 +186,7 @@ describe('shouldUseParametersWrapper(...)', () => {
 
     const result = shouldUseParametersWrapper(
       operation,
-      operationParametersType
+      operationParametersTypeWrapper
     );
     expect(result).toEqual({
       type: 'UserParametersWrapper',
@@ -196,7 +196,7 @@ describe('shouldUseParametersWrapper(...)', () => {
 
   test('returns null for exact path mismatch', () => {
     const operation = createMockOperation('get', '/api/users');
-    const operationParametersType = {
+    const operationParametersTypeWrapper = {
       'get /api/posts': {
         type: 'PostParametersWrapper',
         import: '../types/PostParametersWrapper',
@@ -204,7 +204,7 @@ describe('shouldUseParametersWrapper(...)', () => {
     };
 
     expect(
-      shouldUseParametersWrapper(operation, operationParametersType)
+      shouldUseParametersWrapper(operation, operationParametersTypeWrapper)
     ).toBeNull();
   });
 });
