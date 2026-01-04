@@ -60,6 +60,12 @@ export const plugin: QraftCommandPlugin = {
           'Override import paths for specific types in generated files. This allows using custom type implementations instead of the default ones. Expected format: filepath originalModule:importTypeName:customImportPath'
         ).argParser(parseOverrideImportType)
       )
+      .addOption(
+        new Option(
+          '--operation-parameters-type-wrapper <parameters wrappers...>',
+          'Configure ParametersWrapper types for specific operation patterns. Expected format: pattern type:TypeName import:ImportPath. Can be specified multiple times for different patterns.'
+        ).argParser(parseOperationParametersType)
+      )
       .action(async ({ spinner, output, args, services, schema }, resolve) => {
         return void (await generateCode({
           spinner,
@@ -67,6 +73,11 @@ export const plugin: QraftCommandPlugin = {
           serviceOptions: {
             openapiTypesImportPath: args.openapiTypesImportPath,
             queryableWriteOperations: args.queryableWriteOperations,
+            operationParametersTypeWrapper: Array.isArray(
+              args.operationParametersTypeWrapper
+            )
+              ? args.operationParametersTypeWrapper[0]
+              : undefined,
           },
           overrideImportType: Array.isArray(args.overrideImportType)
             ? args.overrideImportType[0]
@@ -259,6 +270,77 @@ function parseOverrideImportType(
       `Invalid import type override: ${value}. Expected format: filepath namespace:importTypeName:importPath`
     );
   }
+}
+
+type ParsedOperationParametersTypeOption = [
+  result: Record<string, { type: string; import: string }>,
+  currentPattern?: string,
+];
+
+function parseOperationParametersType(
+  value: string,
+  previousValue: unknown
+): ParsedOperationParametersTypeOption {
+  const previous = (
+    Array.isArray(previousValue) ? previousValue : [{}, undefined]
+  ) as ParsedOperationParametersTypeOption;
+
+  const [result, currentPattern] = previous;
+
+  // If value doesn't contain ':', it's a pattern (first argument for a new entry)
+  if (!value.includes(':')) {
+    // Initialize a new entry with empty type and import
+    if (!result[value]) {
+      result[value] = { type: '', import: '' };
+    }
+    // Set this as the current pattern
+    return [result, value];
+  }
+
+  // If we don't have a current pattern, we can't process type/import
+  if (!currentPattern) {
+    throw new CommanderError(
+      1,
+      'ERR_INVALID_OPERATION_PARAMETERS_TYPE_WRAPPER',
+      `Invalid operation-parameters-type-wrapper value: ${value}. Expected pattern first, then type:TypeName and import:ImportPath`
+    );
+  }
+
+  // Parse type:TypeName or import:ImportPath
+  if (value.startsWith('type:')) {
+    const typeName = value.slice(5);
+    if (!typeName) {
+      throw new CommanderError(
+        1,
+        'ERR_INVALID_OPERATION_PARAMETERS_TYPE_WRAPPER',
+        `Invalid operation-parameters-type-wrapper value: ${value}. Type name cannot be empty`
+      );
+    }
+    result[currentPattern].type = typeName;
+  } else if (value.startsWith('import:')) {
+    const importPath = value.slice(7);
+    if (!importPath) {
+      throw new CommanderError(
+        1,
+        'ERR_INVALID_OPERATION_PARAMETERS_TYPE_WRAPPER',
+        `Invalid operation-parameters-type-wrapper value: ${value}. Import path cannot be empty`
+      );
+    }
+    result[currentPattern].import = importPath;
+  } else {
+    throw new CommanderError(
+      1,
+      'ERR_INVALID_OPERATION_PARAMETERS_TYPE_WRAPPER',
+      `Invalid operation-parameters-type-wrapper value: ${value}. Expected format: type:TypeName or import:ImportPath`
+    );
+  }
+
+  // If both type and import are set, clear current pattern
+  if (result[currentPattern].type && result[currentPattern].import) {
+    return [result, undefined];
+  }
+
+  return [result, currentPattern];
 }
 
 type CreateAPIClientFnArg = [
