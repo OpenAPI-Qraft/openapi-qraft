@@ -209,8 +209,6 @@ The following plugins are currently supported:
       - `--openapi-types-import-path ../openapi.d.ts`
       - `--openapi-types-import-path '@/api/openapi.d.ts'`
       - `--openapi-types-import-path '@external-package-types'`
-- **`--operation-generics-import-path <path>`:** Define the path to the operation generics file, allowing for custom
-  operation handling _(optional, default: `@openapi-qraft/react`)_.
 - **`--export-openapi-types [bool]`:** Add an export statement of the generated OpenAPI document types from the `./index.ts` file. Useful for sharing types within your project. _(optional, default: `true`, if `--plugin openapi-typescript` is used)_
 
 ### `--plugin openapi-typescript` options
