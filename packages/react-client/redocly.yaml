@@ -76,7 +76,7 @@ apis:
         createInternalReactAPIClient:
           services: none
           callbacks: ['setQueryData', 'getQueryData', 'getQueryKey', 'getInfiniteQueryKey']
-      operation-parameters-type:
+      operation-parameters-type-wrapper:
         'get /files/**':
           type: 'ParametersWrapper'
           import: '../../type-overrides/parameters-wrapper.js'
