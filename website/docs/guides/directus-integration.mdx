@@ -1,0 +1,528 @@
+---
+sidebar_position: 1
+---
+
+# Directus Integration Guide
+
+This guide will walk you through integrating OpenAPI Qraft with [Directus](https://directus.io/), a headless CMS platform.
+You'll learn how to generate a type-safe API client that leverages Directus's powerful query parameter system, including filters,
+sorting, field selection, and metadata options, all with full TypeScript type safety.
+
+## Introduction
+
+Directus provides a comprehensive REST API with a sophisticated query parameter system that includes:
+
+- **Filters**: Complex filtering with operators like `_eq`, `_in`, `_null`, and many more (see [Directus Query Parameters - Filter](https://directus.io/docs/guides/connect/query-parameters#filter))
+- **Field selection**: Choose which fields to return, including nested relational fields with dot notation
+- **Sorting**: Sort results by one or more fields, ascending or descending
+- **Pagination**: Control results with `limit`, `offset`, and `page` parameters
+- **Metadata**: Request additional metadata like `filter_count` or `total_count` for efficient counting
+- **Search**: Full-text search across string and text fields
+- **Aggregation**: Perform calculations with aggregate functions
+- And many more advanced features
+
+The key feature of this integration is that **all of these Directus query parameters are fully typed** when using the generated API client.
+Instead of working with generic query strings or untyped objects, you get:
+
+- Full TypeScript autocomplete for Directus query syntax
+- Type-safe filter operators and field names
+- Compile-time validation of query structure
+- Seamless integration with Directus SDK's `Query` type
+
+## Prerequisites
+
+Before starting, ensure you have:
+
+- A working Directus instance (local or remote)
+- OpenAPI specification file from your Directus instance
+
+### Installing Required Packages
+
+Install the necessary packages for code generation and runtime:
+
+```bash npm2yarn
+npm install -D @openapi-qraft/cli
+npm install @openapi-qraft/react @openapi-qraft/tanstack-query-react-types @directus/sdk
+npm install @tanstack/react-query
+```
+
+:::info
+
+For more details on installation, see the [Installation guide](/getting-started/installation.mdx).
+
+:::
+
+## Creating the Configuration
+
+The recommended approach is to use a Redocly configuration file (`apis.yaml` or `redocly.yaml`) to manage
+your API client generation. This allows you to centralize settings and easily manage multiple APIs.
+
+### Configuration File Structure
+§
+Create an `apis.yaml` file in your project root (or wherever you prefer to store your configuration):
+
+```yaml
+# OpenAPI Qraft configuration
+# Global plugins configuration
+x-openapi-qraft:
+  plugin:
+    tanstack-query-react: true
+    openapi-typescript: true
+
+apis:
+  # Directus API configuration
+  directus:
+    root: src/api/directus/openapi.json
+    x-openapi-qraft:
+      output-dir: src/api/directus
+      clean: true
+      # Filter services to exclude utils endpoints
+      filter-services:
+        - '/**'
+        - '!/utils/**'
+      # Configure custom ParametersWrapper types for specific operations
+      # You can apply these wrappers to any Directus endpoints (items, users, files, etc.)
+      # Patterns don't need to specify HTTP methods - they apply to all methods
+      # If you need to target a specific method, you can use: 'get /items/*' or 'post /items/*'
+      operation-parameters-type-wrapper:
+        # For operations that return arrays (covers first-level paths like /items, /users, etc.)
+        # The '/*,!/fields' pattern means: all first-level paths except /fields
+        '/*,!/fields':
+          type: 'ItemsQueryParametersWrapper'
+          import: './types'
+        # For operations that return a single item (e.g., /items/collection/{id})
+        # The '/*/{id},!/fields/{id}' pattern means: all second-level paths with {id} except /fields/{id}
+        '/*/{id},!/fields/{id}':
+          type: 'SingleItemsQueryParametersWrapper'
+          import: './types'
+        # You can also specify specific endpoints for nested paths if needed
+        '/items/*':
+          type: 'ItemsQueryParametersWrapper'
+          import: './types'
+        '/items/*/{id}':
+          type: 'SingleItemsQueryParametersWrapper'
+          import: './types'
+```
+
+### Configuration Options Explained
+
+- **`root`**: Path to your Directus OpenAPI specification file
+- **`output-dir`**: Directory where generated files will be placed
+- **`clean`**: Automatically clean the output directory before generation
+- **`filter-services`**: Glob patterns to include/exclude specific endpoints
+- **`operation-parameters-type-wrapper`**: Configure custom parameter types for specific operations.
+  For Directus integration, this is particularly important for operations that use query parameters
+  (like `/items/*`, `/users`, etc.), where Directus's powerful query parameters (filters, sorting, field selection, metadata, etc.)
+  need to be properly typed using Directus SDK's `Query` and `QueryItem` types instead of generic OpenAPI parameter types.
+  Patterns don't need to specify HTTP methods - they apply to all methods. You can use negative patterns (e.g., `'/*,!/fields'`)
+  to exclude specific endpoints from the wrapper.
+
+:::tip
+
+For more information about Redocly configuration options, see the [Redocly config support](/codegen/CLI/redocly-config.mdx) documentation.
+
+:::
+
+## Creating a Custom ParametersWrapper Type
+
+Directus uses a sophisticated query system that requires custom parameter handling. To properly type Directus queries, you'll need to create a custom `ParametersWrapper` type.
+
+### Type Definition
+
+Create a file `src/api/directus/types.ts` with the following content:
+
+```typescript
+import type { Query, QueryItem } from '@directus/sdk';
+
+import { components } from './schema';
+
+// For operations that return an array of items (e.g., /items/collection, /users)
+export type ItemsQueryParametersWrapper<
+  TSchema,
+  TOperation extends { parameters: { query?: any } },
+  TData,
+  TError,
+> = TOperation['parameters'] extends { query?: { fields?: any } }
+  ? TData extends { data?: any[] }
+    ? Merge<
+        TOperation['parameters'],
+        {
+          query?: QueryItems<TData>;
+        }
+      >
+    : TOperation['parameters']
+  : TOperation['parameters'];
+
+// For operations that return a single item (e.g., /items/collection/{id})
+export type SingleItemsQueryParametersWrapper<
+  TSchema,
+  TOperation extends { parameters: { query?: Record<string, any> } },
+  TData,
+  TError,
+> = TData extends { data?: any }
+  ? NonNullable<TOperation['parameters']['query']> extends {
+      fields?: string[];
+      meta?: string;
+      version?: string;
+    }
+    ? NonNullable<NonNullable<TOperation['parameters']['query']>['version']> extends string
+      ? Merge<
+          TOperation['parameters'],
+          {
+            query?: Pick<QuerySingleItems<TData>, 'fields' | 'meta' | 'version'>;
+          }
+        >
+      : Merge<
+          TOperation['parameters'],
+          {
+            query?: Pick<QuerySingleItems<TData>, 'fields' | 'meta'>;
+          }
+        >
+    : TOperation['parameters']
+  : TOperation['parameters'];
+
+type Merge<A extends Record<string, any>, B extends Record<string, any>> = Omit<A, keyof B> & B;
+
+type QuerySingleItems<Item extends { data?: any }> = QueryItem<
+  Schema,
+  NonNullable<Item['data']>
+> & {
+  meta?: Meta;
+};
+
+type QueryItems<Item extends { data?: any }> = Query<Schema, NonNullable<Item['data']>[number]> & {
+  meta?: Meta;
+};
+
+type Meta = 'filter_count' | 'total_count';
+
+type Schema = {
+  [key in keyof components['schemas']]: components['schemas'][key][];
+};
+```
+
+### Understanding the Types
+
+Both wrapper types accept four generic parameters:
+
+- **`TSchema`**: The operation schema containing method and URL information (automatically provided by the code generator)
+- **`TOperation`**: The operation type from OpenAPI paths, containing the original parameters definition
+- **`TData`**: The response data type, used to infer the item type for Directus queries
+- **`TError`**: The error type (automatically provided by the code generator)
+
+**When to use each type:**
+
+- **`ItemsQueryParametersWrapper`**: Use for operations that return an array of items (e.g., `/items/collection`, `/users`). The type intelligently checks if the operation has query parameters with `fields`, and if the response is an array, it merges the original parameters with Directus `Query` type for proper typing.
+- **`SingleItemsQueryParametersWrapper`**: Use for operations that return a single item (e.g., `/items/collection/{id}`). The type checks for `fields`, `meta`, and `version` parameters and conditionally applies Directus `QueryItem` type with appropriate field selection.
+
+### How It Works
+
+1.  **`Omit<TOperation['parameters'], 'query'>`**: Removes the default `query` parameter from the operation's parameters
+2.  **Custom `query` property**: Replaces it with Directus's `Query` type from `@directus/sdk`, which provides:
+    - Type-safe field selection
+    - Filtering capabilities
+    - Sorting options
+    - Pagination controls
+3.  **`meta` parameter**: Adds support for Directus's metadata options (`filter_count`, `total_count`) for efficient counting operations
+
+:::note
+
+The generic parameters `TSchema`, `TData`, and `TError` may appear unused in the type body, but they are required
+for proper type inference and are passed by the code generator. If your linter flags them as unused, you can disable the rule for this file using:
+
+```typescript
+/* eslint-disable @typescript-eslint/no-unused-vars */
+```
+
+:::
+
+## Generating the API Client
+
+Once your configuration is set up, you can generate the API client using the Qraft CLI.
+
+### Using Redocly Configuration
+
+The simplest approach is to use the Redocly configuration file:
+
+```bash npm2yarn
+npx openapi-qraft directus --redocly apis.yaml
+```
+
+This command will:
+1. Read the configuration from `apis.yaml`
+2. Generate TypeScript types from the OpenAPI specification
+3. Generate React Query hooks for all configured endpoints
+4. Apply the custom `ItemsQueryParametersWrapper` and `SingleItemsQueryParametersWrapper` types where specified
+
+### Adding a Script to package.json
+
+For convenience, add a script to your `package.json`:
+
+```json
+{
+  "scripts": {
+    "generate-api-client:directus": "openapi-qraft directus --redocly apis.yaml"
+  }
+}
+```
+
+Then run:
+
+```bash npm2yarn
+npm run generate-api-client:directus
+```
+
+### Alternative: Using CLI Options Directly
+
+If you prefer not to use a configuration file, you can specify options directly:
+
+```bash npm2yarn
+npx openapi-qraft \
+  --plugin tanstack-query-react \
+  --plugin openapi-typescript \
+  --output-dir src/api/directus \
+  --clean \
+  --filter-services '/**' '!/utils/**' \
+  --operation-parameters-type-wrapper '/*,!/fields' 'type:ItemsQueryParametersWrapper' 'import:./types' \
+  --operation-parameters-type-wrapper '/*/{id},!/fields/{id}' 'type:SingleItemsQueryParametersWrapper' 'import:./types' \
+  ./src/api/directus/openapi.json
+```
+
+:::info
+
+For a complete list of CLI options, see the [CLI documentation](/codegen/CLI/cli.mdx).
+
+:::
+
+## Creating a Custom requestFn for Directus
+
+While OpenAPI Qraft provides a default `requestFn` that works with most APIs,
+Directus has built-in functionality in its SDK for correctly processing complex query parameters.
+The Directus SDK handles sophisticated query parameters (filters, field selection, etc.)
+reliably through its REST transport, ensuring proper encoding and processing of all Directus-specific query syntax.
+
+To properly integrate Directus with OpenAPI Qraft, you'll need to create a custom `requestFn` that:
+
+- Uses Directus SDK's REST client to handle query parameters correctly
+- Intercepts the raw HTTP response to allow Qraft to process it
+- Maintains compatibility with Qraft's response handling and error processing
+
+### Creating the requestFn File
+
+Create a file `src/api/directus/requestFn.ts` with the following implementation:
+
+```typescript
+import type { HttpMethod } from '@directus/sdk';
+import type { OperationSchema, RequestFnInfo, RequestFnResponse } from '@openapi-qraft/react';
+import { rest } from '@directus/sdk';
+import { bodySerializer, mergeHeaders, urlSerializer } from '@openapi-qraft/react';
+import { processResponse, resolveResponse } from '@openapi-qraft/react/unstable__responseUtils';
+
+export function directusRequestFn<TData, TError>(
+  requestSchema: OperationSchema,
+  requestInfo: RequestFnInfo
+): Promise<RequestFnResponse<TData, TError>> {
+  // Build the URL path (e.g., /items/artworks/{id}) with path parameters substituted
+  // baseUrl is empty here because it will be used when creating the Directus client below
+  // query parameters are undefined because we only need the path here; query params will be handled by Directus SDK separately
+  const path = urlSerializer(requestSchema, {
+    ...requestInfo,
+    baseUrl: '', // Will be used when creating the Directus client
+    parameters: { ...requestInfo.parameters, query: undefined }, // Only path parameters, query handled separately
+  });
+
+  let response: Response;
+
+  /**
+   * Custom fetch wrapper that intercepts the actual response.
+   *
+   * The Directus REST client requires fetch to return a Response object, but if we return
+   * the actual response, Directus SDK will attempt to parse it using its internal mechanism.
+   * To avoid this and let Qraft handle response processing instead, we:
+   * 1. Store the real response in the local `response` variable
+   * 2. Return an empty Response object to satisfy Directus SDK requirements
+   *
+   * The actual response is then used later via `processResponse(response)` and
+   * `resolveResponse` for proper error handling using Qraft's internal utilities.
+   */
+  const fetch = (input: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
+    return globalThis.fetch(input, {
+        ...init,
+        // Include cookies in requests for Directus cookie-based authentication
+        // This ensures that authentication cookies are sent with each request
+        credentials: 'include'
+      }).then(fetchResponse => {
+      response = fetchResponse;
+      return new Response();
+    });
+  };
+
+  // Initialize Directus REST client with custom fetch wrapper
+  const client = rest()({
+    url: new URL(requestInfo.baseUrl ?? ''),
+    with(createExtension) {
+      return {
+        ...this,
+        ...createExtension(this),
+      };
+    },
+    globals: {
+      fetch,
+      WebSocket: globalThis.WebSocket,
+      URL: globalThis.URL,
+      logger: globalThis.console,
+    },
+  });
+
+  // Serialize request body if present
+  const bodyInfo = requestInfo.body ? bodySerializer(requestSchema, requestInfo.body) : undefined;
+
+  // Merge headers from parameters, body, and request info
+  const headers = mergeHeaders(
+    requestInfo.parameters?.header,
+    bodyInfo?.headers,
+    requestInfo.headers
+  );
+
+  // Execute the request through Directus SDK
+  return (
+    client
+      .request(() => ({
+        path,
+        method: requestSchema.method.toUpperCase() as HttpMethod,
+        // Pass query parameters to Directus SDK for proper processing
+        params: requestInfo.parameters?.query,
+        headers: Object.fromEntries(headers),
+        body: bodyInfo?.body as FormData,
+      }))
+      // The result from client.request() is ignored because Directus SDK has already
+      // processed the JSON internally. We use the intercepted raw response instead
+      // and process it ourselves using Qraft's processResponse utility.
+      .then(() => processResponse<TData, TError>(response))
+      .catch(resolveResponse as typeof resolveResponse<TData, TError>)
+  );
+}
+```
+
+### Why This Is Necessary
+
+Directus uses a sophisticated query parameter system that includes:
+- Complex filter syntax (e.g., `filter[field][_eq]=value`)
+- Nested relational queries
+
+The Directus SDK's REST client knows how to properly encode these parameters,
+but the standard `requestFn` from OpenAPI Qraft would treat them as simple URL query strings,
+which could lead to incorrect encoding or missing functionality.
+
+## Using the Generated Client in React
+
+After generation, you can use the generated API client in your React application. Here's a complete example:
+
+```tsx title="src/components/FavoritesCount.tsx"
+import { createAPIClient } from '../api/directus';
+import { directusRequestFn } from '../api/directus/requestFn';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { useState } from 'react';
+
+const queryClient = new QueryClient();
+
+// Initialize the API client with custom Directus requestFn
+const api = createAPIClient({
+  requestFn: directusRequestFn,
+  queryClient,
+  baseUrl: 'https://your-directus-instance.com',
+});
+
+function FavoritesCount({ isAuthenticated }: { isAuthenticated: boolean }) {
+  const { data: count, isPending, error } = api.items.readItemsFavorites.useQuery(
+    {
+      query: {
+        limit: 0,
+        meta: 'filter_count',
+        fields: ['*', { picture: [{ file: ['*'] }] }],
+        filter: {
+          artwork: {
+            _nnull: true,
+          },
+        },
+      },
+    },
+    {
+      select: (data) => data?.meta?.filter_count ?? 0,
+      enabled: Boolean(isAuthenticated),
+    }
+  );
+
+  if (isPending) return <div>Loading...</div>;
+  if (error) return <div>Error: {error.message}</div>;
+
+  return <div>Favorites count: {count}</div>;
+}
+
+export default function App() {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  return (
+    <QueryClientProvider client={queryClient}>
+      <button onClick={() => setIsAuthenticated(!isAuthenticated)}>
+        Toggle Auth
+      </button>
+      <FavoritesCount isAuthenticated={isAuthenticated} />
+    </QueryClientProvider>
+  );
+}
+```
+
+### Key Features Demonstrated
+
+1. **Type-safe Directus queries**: The `query` parameter is fully typed with Directus's query syntax
+2. **Metadata support**: Using `meta: 'filter_count'` to get efficient count results
+3. **Data transformation**: Using `select` to extract the count from the response
+4. **Conditional fetching**: Using `enabled` to control when the query executes
+5. **Error handling**: Proper handling of loading and error states
+
+## Additional Configuration
+
+### Obtaining the OpenAPI Specification
+
+To get the OpenAPI specification from your Directus instance, you can use a script:
+
+```json
+{
+  "scripts": {
+    "download-api-client:directus": "curl --fail --silent --show-error -o ./src/api/directus/openapi.json 'http://localhost:8055/server/specs/oas?access_token=admin' && prettier --write ./src/api/directus/openapi.json"
+  }
+}
+```
+
+Replace `http://localhost:8055` with your Directus instance URL and adjust the access token as needed.
+
+### Multiple APIs
+
+If you're managing multiple APIs (e.g., Directus, Hono, and others), you can configure them all in the same `apis.yaml` file:
+
+```yaml
+x-openapi-qraft:
+  plugin:
+    tanstack-query-react: true
+    openapi-typescript: true
+
+apis:
+  directus:
+    root: src/api/directus/openapi.json
+    x-openapi-qraft:
+      output-dir: src/api/directus
+      # ... Directus-specific configuration
+
+  hono:
+    root: ./src/hono/openapi.json
+    x-openapi-qraft:
+      output-dir: src/hono
+      # ... Hono-specific configuration
+```
+
+## Next Steps
+
+- Learn more about [Redocly configuration](/codegen/CLI/redocly-config.mdx)
+- Explore [CLI options](/codegen/CLI/cli.mdx) for advanced customization, including the `--operation-parameters-type-wrapper` option
+- Check out the [Quick Start guide](/getting-started/quick-start.mdx) for general usage patterns
