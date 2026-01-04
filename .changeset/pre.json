@@ -1,0 +1,21 @@
+{
+  "mode": "pre",
+  "tag": "beta",
+  "initialVersions": {
+    "@openapi-qraft/e2e": "1.0.0",
+    "@openapi-qraft/cli": "2.14.0",
+    "@openapi-qraft/eslint-config": "1.0.1",
+    "@openapi-qraft/eslint-plugin-query": "2.14.0",
+    "@openapi-qraft/openapi-typescript-plugin": "2.14.0",
+    "@openapi-qraft/plugin": "2.14.0",
+    "@openapi-qraft/react": "2.14.0",
+    "@openapi-qraft/rollup-config": "1.1.1",
+    "@openapi-qraft/tanstack-query-react-plugin": "2.14.0",
+    "@openapi-qraft/tanstack-query-react-types": "2.14.0",
+    "@openapi-qraft/test-fixtures": "1.1.1",
+    "@openapi-qraft/ts-factory-code-generator": "1.0.2",
+    "playground": "0.0.14",
+    "openapi-qraft-website": "0.0.0"
+  },
+  "changesets": []
+}
