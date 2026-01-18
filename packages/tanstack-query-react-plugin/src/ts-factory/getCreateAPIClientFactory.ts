@@ -1090,6 +1090,31 @@ const getCreateOperationClientFunctionFactory = ({
             ),
             undefined
           ),
+          factory.createIfStatement(
+            factory.createBinaryExpression(
+              factory.createStringLiteral('Provider'),
+              factory.createToken(ts.SyntaxKind.InKeyword),
+              factory.createIdentifier(
+                shouldImportAllCallbacks ? 'options' : 'callbacksOrOptions'
+              )
+            ),
+            factory.createReturnStatement(
+              factory.createCallExpression(
+                factory.createIdentifier('qraftAPIClient'),
+                undefined,
+                [
+                  factory.createIdentifier('services'),
+                  factory.createIdentifier(
+                    shouldImportAllCallbacks ? 'allCallbacks' : 'callbacks'
+                  ),
+                  factory.createIdentifier(
+                    shouldImportAllCallbacks ? 'options' : 'callbacksOrOptions'
+                  ),
+                ]
+              )
+            ),
+            undefined
+          ),
           factory.createReturnStatement(
             factory.createCallExpression(
               factory.createIdentifier('qraftAPIClient'),
