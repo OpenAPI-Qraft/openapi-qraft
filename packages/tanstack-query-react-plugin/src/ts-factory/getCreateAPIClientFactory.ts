@@ -889,15 +889,6 @@ const getCreateOperationClientFunctionFactory = ({
                 factory.createIdentifier('CreateAPIClientOptions'),
                 undefined
               ),
-              factory.createTypeReferenceNode(
-                factory.createIdentifier('Context'),
-                [
-                  factory.createTypeReferenceNode(
-                    factory.createIdentifier('CreateAPIQueryClientOptions'),
-                    undefined
-                  ),
-                ]
-              ),
               shouldImportAllCallbacks
                 ? null
                 : factory.createTypeReferenceNode(
