@@ -1,5 +1,6 @@
 import type { QraftServiceOperationsToken } from '@openapi-qraft/tanstack-query-react-types';
 import type { QueryClient } from '@tanstack/react-query';
+import type { Context } from 'react';
 import type * as callbacks from './callbacks/index.js';
 import type * as operationInvokeModule from './callbacks/operationInvokeFn.js';
 import type {
@@ -7,6 +8,7 @@ import type {
   RequestFnInfo,
   RequestFnResponse,
 } from './lib/requestFn.js';
+import { useContext } from 'react';
 import { createRecursiveProxy } from './lib/createRecursiveProxy.js';
 
 export interface CreateAPIBasicClientOptions {
@@ -29,12 +31,14 @@ export interface CreateAPIQueryClientOptions
  */
 export type QraftClientOptions =
   | CreateAPIBasicClientOptions
-  | CreateAPIQueryClientOptions;
+  | CreateAPIQueryClientOptions
+  | Context<CreateAPIQueryClientOptions>;
 
 export type CreateAPIClientOptions =
   | CreateAPIBasicClientOptions
   | CreateAPIBasicQueryClientOptions
-  | CreateAPIQueryClientOptions;
+  | CreateAPIQueryClientOptions
+  | Context<CreateAPIQueryClientOptions>;
 
 /**
  * Creates a QueryClient compatible API Client which contains all operations
@@ -61,6 +65,29 @@ export function qraftAPIClient<
   callbacks: Callbacks,
   options: CreateAPIQueryClientOptions
 ): APIDefaultQueryClientServices<Services>;
+
+/**
+ * It creates a QueryClient-compatible API client that contains all the hooks
+ * (useQuery, useMutation) and utilities for non-context operations,
+ * such as, and `getQueryKey`.
+ *
+ * @example Fetching data with QueryClient
+ * ```ts
+ * const api = qraftAPIClient(services, callbacks, context);
+ *
+ * api.service.operation.useQuery({
+ *   parameters: { path: { id: 1 } },
+ * });
+ * ```
+ */
+export function qraftAPIClient<
+  Services extends UnionServiceOperationsDeclaration<Services>,
+  Callbacks extends PartialServiceMethods,
+>(
+  services: Services,
+  callbacks: Callbacks,
+  options: Context<CreateAPIQueryClientOptions>
+): APIQueryClientHookServices<Services, Callbacks>;
 
 /**
  * Creates a QueryClient compatible API Client which contains all operations
@@ -194,7 +221,8 @@ export function qraftAPIClient<
   | APIQueryClientServices<Services, Callbacks>
   | APIDefaultQueryClientServices<Services>
   | APIBasicQueryClientServices<Services, Callbacks>
-  | APIUtilityClientServices<Services, Callbacks> {
+  | APIUtilityClientServices<Services, Callbacks>
+  | APIQueryClientHookServices<Services, Callbacks> {
   const stringTag = 'QraftAPIClient';
 
   const toString = (path: (symbol | string)[]): string => {
@@ -260,26 +288,41 @@ export function qraftAPIClient<
       if (!isServiceOperation(serviceOperation))
         throw new Error(`Service operation not found: ${path.join('.')}`);
 
+      const hookList = [
+        'useInfiniteQuery',
+        'useQueries',
+        'useQuery',
+        'useSuspenseInfiniteQuery',
+        'useSuspenseQueries',
+        'useSuspenseQuery',
+        'useIsFetching',
+        'useMutation',
+        'useIsMutating',
+        'useMutationState',
+      ] as const;
+
       if (
         callbackName !== 'operationInvokeFn' &&
         callbackName !== 'getQueryKey' &&
         callbackName !== 'getMutationKey' &&
         callbackName !== 'getInfiniteQueryKey' &&
-        callbackName !== 'useInfiniteQuery' &&
-        callbackName !== 'useQueries' &&
-        callbackName !== 'useQuery' &&
-        callbackName !== 'useSuspenseInfiniteQuery' &&
-        callbackName !== 'useSuspenseQueries' &&
-        callbackName !== 'useSuspenseQuery' &&
-        callbackName !== 'useIsFetching' &&
-        callbackName !== 'useMutation' &&
-        callbackName !== 'useIsMutating' &&
-        callbackName !== 'useMutationState'
+        !hookList.includes(callbackName as (typeof hookList)[number])
       )
         if (!options || !('queryClient' in options && options.queryClient))
           throw new Error(
             `'qraft.<service>.<operation>.${String(callbackName)}()' requires 'queryClient' in 'createAPIClient(...)' options.`
           );
+
+      if (
+        options &&
+        'Provider' in options &&
+        'Consumer' in options &&
+        hookList.includes(callbackName as (typeof hookList)[number])
+      ) {
+        options = useContext(options);
+
+        if (!options) throw new Error('No API Client context found');
+      }
 
       // @ts-expect-error - Too complex union type
       return callbacks[callbackName](options, serviceOperation.schema, args);
@@ -472,12 +515,25 @@ type OperationCallbackList =
   | InvokeOperationCallback
   | UtilityOperationCallbacks;
 
+type HookOperationCallbackList =
+  | UtilityOperationCallbacks
+  | QueryOperationHookCallbacks
+  | MutationOperationHookCallbacks;
+
 export type APIQueryClientServices<
   Services extends UnionServiceOperationsDeclaration<Services>,
   Callbacks extends PartialServiceMethods,
 > = ServicesFilteredByCallbacks<
   Services,
   Extract<keyof Callbacks, OperationCallbackList>
+>;
+
+export type APIQueryClientHookServices<
+  Services extends UnionServiceOperationsDeclaration<Services>,
+  Callbacks extends PartialServiceMethods,
+> = ServicesFilteredByCallbacks<
+  Services,
+  Extract<keyof Callbacks, HookOperationCallbackList>
 >;
 
 export type APIDefaultQueryClientServices<
