@@ -447,8 +447,12 @@ const QraftProviders = ({ children }: { children: ReactNode }) => {
 function useCreateAPIClient(options?: Partial<QraftClientOptions>) {
   const apiContextValue = useContext(APIContext);
 
-  const requestFn = options?.requestFn ?? apiContextValue?.requestFn;
-  const baseUrl = options?.baseUrl ?? apiContextValue?.baseUrl;
+  const requestFn =
+    (options && 'requestFn' in options && options?.requestFn) ??
+    apiContextValue?.requestFn;
+  const baseUrl =
+    (options && 'baseUrl' in options && options?.baseUrl) ??
+    apiContextValue?.baseUrl;
   const queryClient = useQueryClient(
     options && 'queryClient' in options ? options?.queryClient : undefined
   );
