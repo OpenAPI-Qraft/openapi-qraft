@@ -37,6 +37,35 @@ export interface ServiceOperationUseInfiniteQuery<
           ? DeepReadonly<TQueryParams> | void
           : DeepReadonly<TQueryParams>),
     options: Omit<
+      DefinedInitialDataInfiniteOptions<
+        TQueryFnData,
+        TError,
+        TData,
+        ServiceOperationInfiniteQueryKey<TSchema, TQueryParams>,
+        PartialParameters<DeepReadonly<TPageParam>>
+      >,
+      | 'queryKey'
+      | 'getPreviousPageParam'
+      | 'getNextPageParam'
+      | 'initialPageParam'
+    > &
+      InfiniteQueryPageParamsOptions<
+        TQueryFnData,
+        PartialParameters<DeepReadonly<TPageParam>>
+      >
+  ): DefinedUseInfiniteQueryResult<TData, OperationError<TError>>;
+
+  useInfiniteQuery<
+    TPageParam extends TQueryParams,
+    TQueryFnData = TOperationQueryFnData,
+    TData = OperationInfiniteData<TQueryFnData, TQueryParams>,
+  >(
+    parameters:
+      | ServiceOperationInfiniteQueryKey<TSchema, TQueryParams>
+      | (AreAllOptional<TQueryParams> extends true
+          ? DeepReadonly<TQueryParams> | void
+          : DeepReadonly<TQueryParams>),
+    options: Omit<
       UndefinedInitialDataInfiniteOptions<
         TQueryFnData,
         TError,
@@ -54,33 +83,4 @@ export interface ServiceOperationUseInfiniteQuery<
         PartialParameters<DeepReadonly<TPageParam>>
       >
   ): UseInfiniteQueryResult<TData, OperationError<TError>>;
-
-  useInfiniteQuery<
-    TPageParam extends TQueryParams,
-    TQueryFnData = TOperationQueryFnData,
-    TData = OperationInfiniteData<TQueryFnData, TQueryParams>,
-  >(
-    parameters:
-      | ServiceOperationInfiniteQueryKey<TSchema, TQueryParams>
-      | (AreAllOptional<TQueryParams> extends true
-          ? DeepReadonly<TQueryParams> | void
-          : DeepReadonly<TQueryParams>),
-    options: Omit<
-      DefinedInitialDataInfiniteOptions<
-        TQueryFnData,
-        TError,
-        TData,
-        ServiceOperationInfiniteQueryKey<TSchema, TQueryParams>,
-        PartialParameters<DeepReadonly<TPageParam>>
-      >,
-      | 'queryKey'
-      | 'getPreviousPageParam'
-      | 'getNextPageParam'
-      | 'initialPageParam'
-    > &
-      InfiniteQueryPageParamsOptions<
-        TOperationQueryFnData,
-        PartialParameters<DeepReadonly<TPageParam>>
-      >
-  ): DefinedUseInfiniteQueryResult<TData, OperationError<TError>>;
 }

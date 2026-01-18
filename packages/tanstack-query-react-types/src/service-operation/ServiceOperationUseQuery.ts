@@ -29,23 +29,6 @@ export interface ServiceOperationUseQuery<
       | (AreAllOptional<TQueryParams> extends true
           ? DeepReadonly<TQueryParams> | void
           : DeepReadonly<TQueryParams>),
-    options?: Omit<
-      UndefinedInitialDataOptions<
-        TOperationQueryFnData,
-        TError,
-        TData,
-        ServiceOperationQueryKey<TSchema, TQueryParams>
-      >,
-      'queryKey'
-    >
-  ): UseQueryResult<TData, OperationError<TError>>;
-
-  useQuery<TData = TOperationQueryFnData>(
-    parameters:
-      | ServiceOperationQueryKey<TSchema, TQueryParams>
-      | (AreAllOptional<TQueryParams> extends true
-          ? DeepReadonly<TQueryParams> | void
-          : DeepReadonly<TQueryParams>),
     options: Omit<
       DefinedInitialDataOptions<
         TOperationQueryFnData,
@@ -56,4 +39,21 @@ export interface ServiceOperationUseQuery<
       'queryKey'
     >
   ): DefinedUseQueryResult<TData, OperationError<TError>>;
+
+  useQuery<TData = TOperationQueryFnData>(
+    parameters:
+      | ServiceOperationQueryKey<TSchema, TQueryParams>
+      | (AreAllOptional<TQueryParams> extends true
+          ? DeepReadonly<TQueryParams> | void
+          : DeepReadonly<TQueryParams>),
+    options?: Omit<
+      UndefinedInitialDataOptions<
+        TOperationQueryFnData,
+        TError,
+        TData,
+        ServiceOperationQueryKey<TSchema, TQueryParams>
+      >,
+      'queryKey'
+    >
+  ): UseQueryResult<TData, OperationError<TError>>;
 }

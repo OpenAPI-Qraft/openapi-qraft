@@ -48,7 +48,7 @@ export interface ApprovalPoliciesService {
          * })
          * ```
          */
-        useQuery<TData = GetApprovalPoliciesIdData>(parameters: ServiceOperationQueryKey<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdParameters> | (DeepReadonly<GetApprovalPoliciesIdParameters>), options?: Omit<UndefinedInitialDataOptions<GetApprovalPoliciesIdData, GetApprovalPoliciesIdError, TData, ServiceOperationQueryKey<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdParameters>>, "queryKey">): UseQueryResult<TData, OperationError<GetApprovalPoliciesIdError>>;
+        useQuery<TData = GetApprovalPoliciesIdData>(parameters: ServiceOperationQueryKey<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdParameters> | (DeepReadonly<GetApprovalPoliciesIdParameters>), options: Omit<DefinedInitialDataOptions<GetApprovalPoliciesIdData, GetApprovalPoliciesIdError, TData, ServiceOperationQueryKey<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdParameters>>, "queryKey">): DefinedUseQueryResult<TData, OperationError<GetApprovalPoliciesIdError>>;
         /**
          * Performs asynchronous data fetching, manages loading states and error handling.
          *
@@ -71,7 +71,7 @@ export interface ApprovalPoliciesService {
          * })
          * ```
          */
-        useQuery<TData = GetApprovalPoliciesIdData>(parameters: ServiceOperationQueryKey<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdParameters> | (DeepReadonly<GetApprovalPoliciesIdParameters>), options: Omit<DefinedInitialDataOptions<GetApprovalPoliciesIdData, GetApprovalPoliciesIdError, TData, ServiceOperationQueryKey<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdParameters>>, "queryKey">): DefinedUseQueryResult<TData, OperationError<GetApprovalPoliciesIdError>>;
+        useQuery<TData = GetApprovalPoliciesIdData>(parameters: ServiceOperationQueryKey<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdParameters> | (DeepReadonly<GetApprovalPoliciesIdParameters>), options?: Omit<UndefinedInitialDataOptions<GetApprovalPoliciesIdData, GetApprovalPoliciesIdError, TData, ServiceOperationQueryKey<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdParameters>>, "queryKey">): UseQueryResult<TData, OperationError<GetApprovalPoliciesIdError>>;
         /**
          * @summary Get an approval policy by ID
          * @description Retrieve a specific approval policy.
@@ -108,7 +108,7 @@ export interface ApprovalPoliciesService {
          * fetchNextPage(); // Fetch the next page
          * ```
          */
-        useInfiniteQuery<TPageParam extends GetApprovalPoliciesIdParameters, TQueryFnData = GetApprovalPoliciesIdData, TData = OperationInfiniteData<TQueryFnData, GetApprovalPoliciesIdParameters>>(parameters: ServiceOperationInfiniteQueryKey<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdParameters> | (DeepReadonly<GetApprovalPoliciesIdParameters>), options: Omit<UndefinedInitialDataInfiniteOptions<TQueryFnData, GetApprovalPoliciesIdError, TData, ServiceOperationInfiniteQueryKey<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdParameters>, PartialParameters<DeepReadonly<TPageParam>>>, "queryKey" | "getPreviousPageParam" | "getNextPageParam" | "initialPageParam"> & InfiniteQueryPageParamsOptions<TQueryFnData, PartialParameters<DeepReadonly<TPageParam>>>): UseInfiniteQueryResult<TData, OperationError<GetApprovalPoliciesIdError>>;
+        useInfiniteQuery<TPageParam extends GetApprovalPoliciesIdParameters, TQueryFnData = GetApprovalPoliciesIdData, TData = OperationInfiniteData<TQueryFnData, GetApprovalPoliciesIdParameters>>(parameters: ServiceOperationInfiniteQueryKey<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdParameters> | (DeepReadonly<GetApprovalPoliciesIdParameters>), options: Omit<DefinedInitialDataInfiniteOptions<TQueryFnData, GetApprovalPoliciesIdError, TData, ServiceOperationInfiniteQueryKey<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdParameters>, PartialParameters<DeepReadonly<TPageParam>>>, "queryKey" | "getPreviousPageParam" | "getNextPageParam" | "initialPageParam"> & InfiniteQueryPageParamsOptions<TQueryFnData, PartialParameters<DeepReadonly<TPageParam>>>): DefinedUseInfiniteQueryResult<TData, OperationError<GetApprovalPoliciesIdError>>;
         /**
          * Performs asynchronous data fetching with support for infinite scrolling scenarios.
          * Manages paginated data and provides utilities for fetching additional pages.
@@ -140,7 +140,7 @@ export interface ApprovalPoliciesService {
          * fetchNextPage(); // Fetch the next page
          * ```
          */
-        useInfiniteQuery<TPageParam extends GetApprovalPoliciesIdParameters, TQueryFnData = GetApprovalPoliciesIdData, TData = OperationInfiniteData<TQueryFnData, GetApprovalPoliciesIdParameters>>(parameters: ServiceOperationInfiniteQueryKey<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdParameters> | (DeepReadonly<GetApprovalPoliciesIdParameters>), options: Omit<DefinedInitialDataInfiniteOptions<TQueryFnData, GetApprovalPoliciesIdError, TData, ServiceOperationInfiniteQueryKey<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdParameters>, PartialParameters<DeepReadonly<TPageParam>>>, "queryKey" | "getPreviousPageParam" | "getNextPageParam" | "initialPageParam"> & InfiniteQueryPageParamsOptions<GetApprovalPoliciesIdData, PartialParameters<DeepReadonly<TPageParam>>>): DefinedUseInfiniteQueryResult<TData, OperationError<GetApprovalPoliciesIdError>>;
+        useInfiniteQuery<TPageParam extends GetApprovalPoliciesIdParameters, TQueryFnData = GetApprovalPoliciesIdData, TData = OperationInfiniteData<TQueryFnData, GetApprovalPoliciesIdParameters>>(parameters: ServiceOperationInfiniteQueryKey<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdParameters> | (DeepReadonly<GetApprovalPoliciesIdParameters>), options: Omit<UndefinedInitialDataInfiniteOptions<TQueryFnData, GetApprovalPoliciesIdError, TData, ServiceOperationInfiniteQueryKey<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdParameters>, PartialParameters<DeepReadonly<TPageParam>>>, "queryKey" | "getPreviousPageParam" | "getNextPageParam" | "initialPageParam"> & InfiniteQueryPageParamsOptions<TQueryFnData, PartialParameters<DeepReadonly<TPageParam>>>): UseInfiniteQueryResult<TData, OperationError<GetApprovalPoliciesIdError>>;
         /**
          * Monitors the number of queries currently fetching, matching the provided filters.
          * Useful for creating loading indicators or performing actions based on active requests.
@@ -528,7 +528,7 @@ export interface ApprovalPoliciesService {
          * })
          * ```
          */
-        useQuery<TData = DeleteApprovalPoliciesIdData>(parameters: ServiceOperationQueryKey<DeleteApprovalPoliciesIdSchema, DeleteApprovalPoliciesIdParameters> | (DeepReadonly<DeleteApprovalPoliciesIdParameters>), options?: Omit<UndefinedInitialDataOptions<DeleteApprovalPoliciesIdData, DeleteApprovalPoliciesIdError, TData, ServiceOperationQueryKey<DeleteApprovalPoliciesIdSchema, DeleteApprovalPoliciesIdParameters>>, "queryKey">): UseQueryResult<TData, OperationError<DeleteApprovalPoliciesIdError>>;
+        useQuery<TData = DeleteApprovalPoliciesIdData>(parameters: ServiceOperationQueryKey<DeleteApprovalPoliciesIdSchema, DeleteApprovalPoliciesIdParameters> | (DeepReadonly<DeleteApprovalPoliciesIdParameters>), options: Omit<DefinedInitialDataOptions<DeleteApprovalPoliciesIdData, DeleteApprovalPoliciesIdError, TData, ServiceOperationQueryKey<DeleteApprovalPoliciesIdSchema, DeleteApprovalPoliciesIdParameters>>, "queryKey">): DefinedUseQueryResult<TData, OperationError<DeleteApprovalPoliciesIdError>>;
         /**
          * Performs asynchronous data fetching, manages loading states and error handling.
          *
@@ -551,7 +551,7 @@ export interface ApprovalPoliciesService {
          * })
          * ```
          */
-        useQuery<TData = DeleteApprovalPoliciesIdData>(parameters: ServiceOperationQueryKey<DeleteApprovalPoliciesIdSchema, DeleteApprovalPoliciesIdParameters> | (DeepReadonly<DeleteApprovalPoliciesIdParameters>), options: Omit<DefinedInitialDataOptions<DeleteApprovalPoliciesIdData, DeleteApprovalPoliciesIdError, TData, ServiceOperationQueryKey<DeleteApprovalPoliciesIdSchema, DeleteApprovalPoliciesIdParameters>>, "queryKey">): DefinedUseQueryResult<TData, OperationError<DeleteApprovalPoliciesIdError>>;
+        useQuery<TData = DeleteApprovalPoliciesIdData>(parameters: ServiceOperationQueryKey<DeleteApprovalPoliciesIdSchema, DeleteApprovalPoliciesIdParameters> | (DeepReadonly<DeleteApprovalPoliciesIdParameters>), options?: Omit<UndefinedInitialDataOptions<DeleteApprovalPoliciesIdData, DeleteApprovalPoliciesIdError, TData, ServiceOperationQueryKey<DeleteApprovalPoliciesIdSchema, DeleteApprovalPoliciesIdParameters>>, "queryKey">): UseQueryResult<TData, OperationError<DeleteApprovalPoliciesIdError>>;
         /**
          * @summary Delete an approval policy
          * @description Delete an existing approval policy.
@@ -588,7 +588,7 @@ export interface ApprovalPoliciesService {
          * fetchNextPage(); // Fetch the next page
          * ```
          */
-        useInfiniteQuery<TPageParam extends DeleteApprovalPoliciesIdParameters, TQueryFnData = DeleteApprovalPoliciesIdData, TData = OperationInfiniteData<TQueryFnData, DeleteApprovalPoliciesIdParameters>>(parameters: ServiceOperationInfiniteQueryKey<DeleteApprovalPoliciesIdSchema, DeleteApprovalPoliciesIdParameters> | (DeepReadonly<DeleteApprovalPoliciesIdParameters>), options: Omit<UndefinedInitialDataInfiniteOptions<TQueryFnData, DeleteApprovalPoliciesIdError, TData, ServiceOperationInfiniteQueryKey<DeleteApprovalPoliciesIdSchema, DeleteApprovalPoliciesIdParameters>, PartialParameters<DeepReadonly<TPageParam>>>, "queryKey" | "getPreviousPageParam" | "getNextPageParam" | "initialPageParam"> & InfiniteQueryPageParamsOptions<TQueryFnData, PartialParameters<DeepReadonly<TPageParam>>>): UseInfiniteQueryResult<TData, OperationError<DeleteApprovalPoliciesIdError>>;
+        useInfiniteQuery<TPageParam extends DeleteApprovalPoliciesIdParameters, TQueryFnData = DeleteApprovalPoliciesIdData, TData = OperationInfiniteData<TQueryFnData, DeleteApprovalPoliciesIdParameters>>(parameters: ServiceOperationInfiniteQueryKey<DeleteApprovalPoliciesIdSchema, DeleteApprovalPoliciesIdParameters> | (DeepReadonly<DeleteApprovalPoliciesIdParameters>), options: Omit<DefinedInitialDataInfiniteOptions<TQueryFnData, DeleteApprovalPoliciesIdError, TData, ServiceOperationInfiniteQueryKey<DeleteApprovalPoliciesIdSchema, DeleteApprovalPoliciesIdParameters>, PartialParameters<DeepReadonly<TPageParam>>>, "queryKey" | "getPreviousPageParam" | "getNextPageParam" | "initialPageParam"> & InfiniteQueryPageParamsOptions<TQueryFnData, PartialParameters<DeepReadonly<TPageParam>>>): DefinedUseInfiniteQueryResult<TData, OperationError<DeleteApprovalPoliciesIdError>>;
         /**
          * Performs asynchronous data fetching with support for infinite scrolling scenarios.
          * Manages paginated data and provides utilities for fetching additional pages.
@@ -620,7 +620,7 @@ export interface ApprovalPoliciesService {
          * fetchNextPage(); // Fetch the next page
          * ```
          */
-        useInfiniteQuery<TPageParam extends DeleteApprovalPoliciesIdParameters, TQueryFnData = DeleteApprovalPoliciesIdData, TData = OperationInfiniteData<TQueryFnData, DeleteApprovalPoliciesIdParameters>>(parameters: ServiceOperationInfiniteQueryKey<DeleteApprovalPoliciesIdSchema, DeleteApprovalPoliciesIdParameters> | (DeepReadonly<DeleteApprovalPoliciesIdParameters>), options: Omit<DefinedInitialDataInfiniteOptions<TQueryFnData, DeleteApprovalPoliciesIdError, TData, ServiceOperationInfiniteQueryKey<DeleteApprovalPoliciesIdSchema, DeleteApprovalPoliciesIdParameters>, PartialParameters<DeepReadonly<TPageParam>>>, "queryKey" | "getPreviousPageParam" | "getNextPageParam" | "initialPageParam"> & InfiniteQueryPageParamsOptions<DeleteApprovalPoliciesIdData, PartialParameters<DeepReadonly<TPageParam>>>): DefinedUseInfiniteQueryResult<TData, OperationError<DeleteApprovalPoliciesIdError>>;
+        useInfiniteQuery<TPageParam extends DeleteApprovalPoliciesIdParameters, TQueryFnData = DeleteApprovalPoliciesIdData, TData = OperationInfiniteData<TQueryFnData, DeleteApprovalPoliciesIdParameters>>(parameters: ServiceOperationInfiniteQueryKey<DeleteApprovalPoliciesIdSchema, DeleteApprovalPoliciesIdParameters> | (DeepReadonly<DeleteApprovalPoliciesIdParameters>), options: Omit<UndefinedInitialDataInfiniteOptions<TQueryFnData, DeleteApprovalPoliciesIdError, TData, ServiceOperationInfiniteQueryKey<DeleteApprovalPoliciesIdSchema, DeleteApprovalPoliciesIdParameters>, PartialParameters<DeepReadonly<TPageParam>>>, "queryKey" | "getPreviousPageParam" | "getNextPageParam" | "initialPageParam"> & InfiniteQueryPageParamsOptions<TQueryFnData, PartialParameters<DeepReadonly<TPageParam>>>): UseInfiniteQueryResult<TData, OperationError<DeleteApprovalPoliciesIdError>>;
         /**
          * Monitors the number of queries currently fetching, matching the provided filters.
          * Useful for creating loading indicators or performing actions based on active requests.
@@ -1215,7 +1215,7 @@ export interface ApprovalPoliciesService {
          * })
          * ```
          */
-        useQuery<TData = PatchApprovalPoliciesIdData>(parameters: ServiceOperationQueryKey<PatchApprovalPoliciesIdSchema, PatchApprovalPoliciesIdQueryParameters> | (DeepReadonly<PatchApprovalPoliciesIdQueryParameters>), options?: Omit<UndefinedInitialDataOptions<PatchApprovalPoliciesIdData, PatchApprovalPoliciesIdError, TData, ServiceOperationQueryKey<PatchApprovalPoliciesIdSchema, PatchApprovalPoliciesIdQueryParameters>>, "queryKey">): UseQueryResult<TData, OperationError<PatchApprovalPoliciesIdError>>;
+        useQuery<TData = PatchApprovalPoliciesIdData>(parameters: ServiceOperationQueryKey<PatchApprovalPoliciesIdSchema, PatchApprovalPoliciesIdQueryParameters> | (DeepReadonly<PatchApprovalPoliciesIdQueryParameters>), options: Omit<DefinedInitialDataOptions<PatchApprovalPoliciesIdData, PatchApprovalPoliciesIdError, TData, ServiceOperationQueryKey<PatchApprovalPoliciesIdSchema, PatchApprovalPoliciesIdQueryParameters>>, "queryKey">): DefinedUseQueryResult<TData, OperationError<PatchApprovalPoliciesIdError>>;
         /**
          * Performs asynchronous data fetching, manages loading states and error handling.
          *
@@ -1239,7 +1239,7 @@ export interface ApprovalPoliciesService {
          * })
          * ```
          */
-        useQuery<TData = PatchApprovalPoliciesIdData>(parameters: ServiceOperationQueryKey<PatchApprovalPoliciesIdSchema, PatchApprovalPoliciesIdQueryParameters> | (DeepReadonly<PatchApprovalPoliciesIdQueryParameters>), options: Omit<DefinedInitialDataOptions<PatchApprovalPoliciesIdData, PatchApprovalPoliciesIdError, TData, ServiceOperationQueryKey<PatchApprovalPoliciesIdSchema, PatchApprovalPoliciesIdQueryParameters>>, "queryKey">): DefinedUseQueryResult<TData, OperationError<PatchApprovalPoliciesIdError>>;
+        useQuery<TData = PatchApprovalPoliciesIdData>(parameters: ServiceOperationQueryKey<PatchApprovalPoliciesIdSchema, PatchApprovalPoliciesIdQueryParameters> | (DeepReadonly<PatchApprovalPoliciesIdQueryParameters>), options?: Omit<UndefinedInitialDataOptions<PatchApprovalPoliciesIdData, PatchApprovalPoliciesIdError, TData, ServiceOperationQueryKey<PatchApprovalPoliciesIdSchema, PatchApprovalPoliciesIdQueryParameters>>, "queryKey">): UseQueryResult<TData, OperationError<PatchApprovalPoliciesIdError>>;
         /**
          * @summary Update an approval policy
          * @description Update an existing approval policy.
@@ -1277,7 +1277,7 @@ export interface ApprovalPoliciesService {
          * fetchNextPage(); // Fetch the next page
          * ```
          */
-        useInfiniteQuery<TPageParam extends PatchApprovalPoliciesIdQueryParameters, TQueryFnData = PatchApprovalPoliciesIdData, TData = OperationInfiniteData<TQueryFnData, PatchApprovalPoliciesIdQueryParameters>>(parameters: ServiceOperationInfiniteQueryKey<PatchApprovalPoliciesIdSchema, PatchApprovalPoliciesIdQueryParameters> | (DeepReadonly<PatchApprovalPoliciesIdQueryParameters>), options: Omit<UndefinedInitialDataInfiniteOptions<TQueryFnData, PatchApprovalPoliciesIdError, TData, ServiceOperationInfiniteQueryKey<PatchApprovalPoliciesIdSchema, PatchApprovalPoliciesIdQueryParameters>, PartialParameters<DeepReadonly<TPageParam>>>, "queryKey" | "getPreviousPageParam" | "getNextPageParam" | "initialPageParam"> & InfiniteQueryPageParamsOptions<TQueryFnData, PartialParameters<DeepReadonly<TPageParam>>>): UseInfiniteQueryResult<TData, OperationError<PatchApprovalPoliciesIdError>>;
+        useInfiniteQuery<TPageParam extends PatchApprovalPoliciesIdQueryParameters, TQueryFnData = PatchApprovalPoliciesIdData, TData = OperationInfiniteData<TQueryFnData, PatchApprovalPoliciesIdQueryParameters>>(parameters: ServiceOperationInfiniteQueryKey<PatchApprovalPoliciesIdSchema, PatchApprovalPoliciesIdQueryParameters> | (DeepReadonly<PatchApprovalPoliciesIdQueryParameters>), options: Omit<DefinedInitialDataInfiniteOptions<TQueryFnData, PatchApprovalPoliciesIdError, TData, ServiceOperationInfiniteQueryKey<PatchApprovalPoliciesIdSchema, PatchApprovalPoliciesIdQueryParameters>, PartialParameters<DeepReadonly<TPageParam>>>, "queryKey" | "getPreviousPageParam" | "getNextPageParam" | "initialPageParam"> & InfiniteQueryPageParamsOptions<TQueryFnData, PartialParameters<DeepReadonly<TPageParam>>>): DefinedUseInfiniteQueryResult<TData, OperationError<PatchApprovalPoliciesIdError>>;
         /**
          * Performs asynchronous data fetching with support for infinite scrolling scenarios.
          * Manages paginated data and provides utilities for fetching additional pages.
@@ -1310,7 +1310,7 @@ export interface ApprovalPoliciesService {
          * fetchNextPage(); // Fetch the next page
          * ```
          */
-        useInfiniteQuery<TPageParam extends PatchApprovalPoliciesIdQueryParameters, TQueryFnData = PatchApprovalPoliciesIdData, TData = OperationInfiniteData<TQueryFnData, PatchApprovalPoliciesIdQueryParameters>>(parameters: ServiceOperationInfiniteQueryKey<PatchApprovalPoliciesIdSchema, PatchApprovalPoliciesIdQueryParameters> | (DeepReadonly<PatchApprovalPoliciesIdQueryParameters>), options: Omit<DefinedInitialDataInfiniteOptions<TQueryFnData, PatchApprovalPoliciesIdError, TData, ServiceOperationInfiniteQueryKey<PatchApprovalPoliciesIdSchema, PatchApprovalPoliciesIdQueryParameters>, PartialParameters<DeepReadonly<TPageParam>>>, "queryKey" | "getPreviousPageParam" | "getNextPageParam" | "initialPageParam"> & InfiniteQueryPageParamsOptions<PatchApprovalPoliciesIdData, PartialParameters<DeepReadonly<TPageParam>>>): DefinedUseInfiniteQueryResult<TData, OperationError<PatchApprovalPoliciesIdError>>;
+        useInfiniteQuery<TPageParam extends PatchApprovalPoliciesIdQueryParameters, TQueryFnData = PatchApprovalPoliciesIdData, TData = OperationInfiniteData<TQueryFnData, PatchApprovalPoliciesIdQueryParameters>>(parameters: ServiceOperationInfiniteQueryKey<PatchApprovalPoliciesIdSchema, PatchApprovalPoliciesIdQueryParameters> | (DeepReadonly<PatchApprovalPoliciesIdQueryParameters>), options: Omit<UndefinedInitialDataInfiniteOptions<TQueryFnData, PatchApprovalPoliciesIdError, TData, ServiceOperationInfiniteQueryKey<PatchApprovalPoliciesIdSchema, PatchApprovalPoliciesIdQueryParameters>, PartialParameters<DeepReadonly<TPageParam>>>, "queryKey" | "getPreviousPageParam" | "getNextPageParam" | "initialPageParam"> & InfiniteQueryPageParamsOptions<TQueryFnData, PartialParameters<DeepReadonly<TPageParam>>>): UseInfiniteQueryResult<TData, OperationError<PatchApprovalPoliciesIdError>>;
         /**
          * Monitors the number of queries currently fetching, matching the provided filters.
          * Useful for creating loading indicators or performing actions based on active requests.
