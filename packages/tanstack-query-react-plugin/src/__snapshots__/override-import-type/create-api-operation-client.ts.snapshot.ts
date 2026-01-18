@@ -16,12 +16,14 @@ export function createAPIOperationClient<Callbacks extends Partial<AllCallbacks>
 export function createAPIOperationClient<Callbacks extends Partial<AllCallbacks> = DefaultCallbacks>(options: CreateAPIBasicQueryClientOptions, callbacks: Callbacks): APIBasicQueryClientServices<Services, DefaultCallbacks>;
 export function createAPIOperationClient<Callbacks extends Partial<AllCallbacks> = DefaultCallbacks>(options: CreateAPIBasicClientOptions, callbacks: Callbacks): APIBasicClientServices<Services, DefaultCallbacks>;
 export function createAPIOperationClient<Callbacks extends Partial<AllCallbacks> = DefaultCallbacks>(callbacks: Callbacks): APIUtilityClientServices<Services, Callbacks>;
-export function createAPIOperationClient<Callbacks extends Partial<AllCallbacks> = DefaultCallbacks>(callbacksOrOptions: CreateAPIClientOptions | Context<CreateAPIQueryClientOptions> | Callbacks, callbacks: Callbacks = defaultCallbacks as Callbacks): APIDefaultQueryClientServices<Services> | APIQueryClientServices<Services, Callbacks> | APIQueryClientHookServices<Services, Callbacks> | APIBasicQueryClientServices<Services, Callbacks> | APIBasicClientServices<Services, Callbacks> | APIUtilityClientServices<Services, Callbacks> {
+export function createAPIOperationClient<Callbacks extends Partial<AllCallbacks> = DefaultCallbacks>(callbacksOrOptions: CreateAPIClientOptions | Context<CreateAPIQueryClientOptions> | Callbacks, callbacks: Callbacks = defaultCallbacks as Callbacks): APIDefaultQueryClientServices<Services> | APIQueryClientServices<Services, Callbacks> | APIBasicQueryClientServices<Services, Callbacks> | APIBasicClientServices<Services, Callbacks> | APIUtilityClientServices<Services, Callbacks> {
     if (!callbacksOrOptions)
         return qraftAPIClient(services, callbacks);
     if ("requestFn" in callbacksOrOptions)
         return qraftAPIClient(services, callbacks, callbacksOrOptions);
     if ("queryClient" in callbacksOrOptions)
+        return qraftAPIClient(services, callbacks, callbacksOrOptions);
+    if ("Provider" in callbacksOrOptions)
         return qraftAPIClient(services, callbacks, callbacksOrOptions);
     return qraftAPIClient(services, callbacksOrOptions ?? callbacks);
 }
