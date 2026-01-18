@@ -13,7 +13,7 @@ export function createAPIClient(options: Context<CreateAPIQueryClientOptions>): 
 export function createAPIClient(options: CreateAPIBasicQueryClientOptions): APIBasicQueryClientServices<Services, AllCallbacks>;
 export function createAPIClient(options: CreateAPIBasicClientOptions): APIBasicClientServices<Services, AllCallbacks>;
 export function createAPIClient(): APIUtilityClientServices<Services, AllCallbacks>;
-export function createAPIClient(options?: CreateAPIClientOptions | Context<CreateAPIQueryClientOptions>): APIDefaultQueryClientServices<Services> | APIBasicQueryClientServices<Services, AllCallbacks> | APIBasicClientServices<Services, AllCallbacks> | APIUtilityClientServices<Services, AllCallbacks> {
+export function createAPIClient(options?: CreateAPIClientOptions): APIDefaultQueryClientServices<Services> | APIQueryClientHookServices<Services, AllCallbacks> | APIBasicQueryClientServices<Services, AllCallbacks> | APIBasicClientServices<Services, AllCallbacks> | APIUtilityClientServices<Services, AllCallbacks> {
     if (!options)
         return qraftAPIClient(services, allCallbacks);
     if ("requestFn" in options)
