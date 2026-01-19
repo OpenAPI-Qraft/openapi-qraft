@@ -5,7 +5,7 @@ export {
   type CreateAPIBasicClientOptions,
   type CreateAPIQueryClientOptions,
   type APIQueryClientServices,
-  type APIQueryClientHookServices,
+  type APIContextQueryClientServices,
   type APIDefaultQueryClientServices,
   type APIBasicQueryClientServices,
   type APIBasicClientServices,

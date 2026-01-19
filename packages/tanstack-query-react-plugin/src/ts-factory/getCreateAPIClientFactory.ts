@@ -48,7 +48,7 @@ const getOperationClientImportsFactory = ({
     'APIBasicClientServices',
     'APIBasicQueryClientServices',
     'APIDefaultQueryClientServices',
-    'APIQueryClientHookServices',
+    'APIContextQueryClientServices',
     !shouldImportAllCallbacks && 'APIQueryClientServices',
     'APIUtilityClientServices',
     'CreateAPIBasicClientOptions',
@@ -410,7 +410,7 @@ const getCreateOperationClientFunctionFactory = ({
             ),
       ].filter(nonNullable),
       factory.createTypeReferenceNode(
-        factory.createIdentifier('APIQueryClientHookServices'),
+        factory.createIdentifier('APIContextQueryClientServices'),
         [
           factory.createTypeReferenceNode(
             factory.createIdentifier('Services'),
@@ -947,7 +947,7 @@ const getCreateOperationClientFunctionFactory = ({
                 ]
               ),
           factory.createTypeReferenceNode(
-            factory.createIdentifier('APIQueryClientHookServices'),
+            factory.createIdentifier('APIContextQueryClientServices'),
             [
               factory.createTypeReferenceNode(
                 factory.createIdentifier('Services'),

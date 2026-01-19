@@ -87,7 +87,7 @@ export function qraftAPIClient<
   services: Services,
   callbacks: Callbacks,
   options: Context<CreateAPIQueryClientOptions>
-): APIQueryClientHookServices<Services, Callbacks>;
+): APIContextQueryClientServices<Services, Callbacks>;
 
 /**
  * Creates a QueryClient compatible API Client which contains all operations
@@ -222,7 +222,7 @@ export function qraftAPIClient<
   | APIDefaultQueryClientServices<Services>
   | APIBasicQueryClientServices<Services, Callbacks>
   | APIUtilityClientServices<Services, Callbacks>
-  | APIQueryClientHookServices<Services, Callbacks> {
+  | APIContextQueryClientServices<Services, Callbacks> {
   const stringTag = 'QraftAPIClient';
 
   const toString = (path: (symbol | string)[]): string => {
@@ -528,7 +528,7 @@ export type APIQueryClientServices<
   Extract<keyof Callbacks, OperationCallbackList>
 >;
 
-export type APIQueryClientHookServices<
+export type APIContextQueryClientServices<
   Services extends UnionServiceOperationsDeclaration<Services>,
   Callbacks extends PartialServiceMethods,
 > = ServicesFilteredByCallbacks<
