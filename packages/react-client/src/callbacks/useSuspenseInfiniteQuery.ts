@@ -33,8 +33,13 @@ export const useSuspenseInfiniteQuery: <
   schema,
   args
 ) => {
-  return useSuspenseInfiniteQueryTanstack(
+  // @ts-expect-error - Too complex to type
+  const [queryOptions, queryClient] = useComposeUseQueryOptions(
+    qraftOptions,
+    schema,
     // @ts-expect-error - Too complex to type
-    ...useComposeUseQueryOptions(qraftOptions, schema, args, true)
-  ) as never;
+    args,
+    true
+  );
+  return useSuspenseInfiniteQueryTanstack(queryOptions, queryClient) as never;
 };

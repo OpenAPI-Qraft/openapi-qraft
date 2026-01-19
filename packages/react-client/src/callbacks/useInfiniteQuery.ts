@@ -29,8 +29,14 @@ export const useInfiniteQuery: <
     >['useInfiniteQuery']
   >
 ) => UseInfiniteQueryResult<TData, TError> = (qraftOptions, schema, args) => {
-  return useInfiniteQueryBase(
+  // @ts-expect-error - Too complex to type...
+  const [queryOptions, queryClient] = useComposeUseQueryOptions(
+    qraftOptions,
+    schema,
     // @ts-expect-error - Too complex to type...
-    ...useComposeUseQueryOptions(qraftOptions, schema, args, true)
-  ) as never;
+    args,
+    true
+  );
+
+  return useInfiniteQueryBase(queryOptions, queryClient) as never;
 };
