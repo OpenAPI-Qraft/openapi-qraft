@@ -31,14 +31,12 @@ export interface CreateAPIQueryClientOptions
  */
 export type QraftClientOptions =
   | CreateAPIBasicClientOptions
-  | CreateAPIQueryClientOptions
-  | Context<CreateAPIQueryClientOptions>;
+  | CreateAPIQueryClientOptions;
 
 export type CreateAPIClientOptions =
   | CreateAPIBasicClientOptions
   | CreateAPIBasicQueryClientOptions
-  | CreateAPIQueryClientOptions
-  | Context<CreateAPIQueryClientOptions>;
+  | CreateAPIQueryClientOptions;
 
 /**
  * Creates a QueryClient compatible API Client which contains all operations
@@ -63,7 +61,7 @@ export function qraftAPIClient<
 >(
   services: Services,
   callbacks: Callbacks,
-  options: CreateAPIQueryClientOptions
+  options: CreateAPIQueryClientOptions | Context<CreateAPIQueryClientOptions>
 ): APIDefaultQueryClientServices<Services>;
 
 /**
@@ -216,7 +214,7 @@ export function qraftAPIClient<
 >(
   services: Services,
   callbacks: Callbacks,
-  options?: CreateAPIClientOptions
+  options?: CreateAPIClientOptions | Context<CreateAPIQueryClientOptions>
 ):
   | APIQueryClientServices<Services, Callbacks>
   | APIDefaultQueryClientServices<Services>
