@@ -1,9 +1,17 @@
 'use client';
 
-import type { ServiceOperationQueryKey } from '@openapi-qraft/tanstack-query-react-types';
-import type { QueryClient, UseQueryOptions } from '@tanstack/react-query';
+import type {
+  ServiceOperationInfiniteQueryKey,
+  ServiceOperationQueryKey,
+} from '@openapi-qraft/tanstack-query-react-types';
+import type {
+  QueryClient,
+  QueryFunctionContext,
+  UseQueryOptions,
+} from '@tanstack/react-query';
 import type { CreateAPIQueryClientOptions } from '../qraftAPIClient.js';
 import type { OperationSchema } from './requestFn.js';
+import { useMemo } from 'react';
 import { composeInfiniteQueryKey } from './composeInfiniteQueryKey.js';
 import { composeQueryKey } from './composeQueryKey.js';
 import { prepareRequestFnParameters } from './prepareRequestFnParameters.js';
@@ -22,33 +30,52 @@ export function useComposeUseQueryOptions(
 ): never {
   const [parameters, options] = args;
 
-  const queryFn =
-    options?.queryFn ??
-    function ({ queryKey: [, queryParams], signal, meta, pageParam }) {
-      const { parameters, body } = prepareRequestFnParameters(
-        queryParams,
-        pageParam,
-        infinite
-      );
+  const queryFn = useMemo(
+    () =>
+      options?.queryFn ??
+      qraftQueryFn.bind(null, qraftOptions.requestFn, qraftOptions.baseUrl),
+    [qraftOptions.requestFn, qraftOptions.baseUrl, options?.queryFn]
+  );
 
-      return qraftOptions
-        .requestFn(schema, {
-          parameters: parameters as never,
-          baseUrl: qraftOptions.baseUrl,
-          body,
-          signal,
-          meta,
-        })
-        .then(requestFnResponseResolver, requestFnResponseRejecter);
-    };
-
-  const queryKey = Array.isArray(parameters)
-    ? (parameters as ServiceOperationQueryKey<OperationSchema, unknown>)
-    : infinite
-      ? composeInfiniteQueryKey(schema, parameters)
-      : composeQueryKey(schema, parameters);
+  const queryKey = useMemo(
+    () =>
+      Array.isArray(parameters)
+        ? (parameters as ServiceOperationQueryKey<OperationSchema, unknown>)
+        : infinite
+          ? composeInfiniteQueryKey(schema, parameters)
+          : composeQueryKey(schema, parameters),
+    [schema, parameters, infinite]
+  );
 
   return [{ ...options, queryFn, queryKey }, qraftOptions.queryClient] as never;
+}
+
+function qraftQueryFn(
+  requestFn: CreateAPIQueryClientOptions['requestFn'],
+  baseUrl: CreateAPIQueryClientOptions['baseUrl'],
+  {
+    queryKey: [schema, queryParams],
+    signal,
+    meta,
+    pageParam,
+  }: QueryFunctionContext<
+    | ServiceOperationQueryKey<OperationSchema, unknown>
+    | ServiceOperationInfiniteQueryKey<OperationSchema, unknown>
+  >
+) {
+  const { parameters, body } = prepareRequestFnParameters(
+    queryParams,
+    pageParam,
+    Boolean('infinite' in schema && schema.infinite)
+  );
+
+  return requestFn(schema, {
+    parameters: parameters as never,
+    baseUrl,
+    body,
+    signal,
+    meta,
+  }).then(requestFnResponseResolver, requestFnResponseRejecter);
 }
 
 type UseQueryOptionsArgs = [
