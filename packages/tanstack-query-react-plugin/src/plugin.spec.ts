@@ -563,4 +563,51 @@ describe('TanStack Query React Client Generation', () => {
       );
     });
   });
+
+  describe('--create-api-client-fn with context option', () => {
+    beforeAll(async () => {
+      const { QraftCommand } =
+        await import('@openapi-qraft/plugin/lib/QraftCommand');
+      const { plugin } = await import('./plugin.js');
+      const command = new QraftCommand();
+      plugin.setupCommand(command);
+
+      await command.parseAsync([
+        'dummy-node',
+        'dummy-qraft-bin',
+        openAPIDocumentFixturePath,
+        '--clean',
+        '-o',
+        '/mock-fs',
+        '--openapi-types-import-path',
+        '../../openapi.d.ts',
+        '--create-api-client-fn',
+        'createAPIClient',
+        'callbacks:useQuery,useMutation',
+        'context:APIClientContext',
+      ]);
+    });
+
+    test('APIClientContext.ts', async () => {
+      expect(
+        fs.readFileSync('/mock-fs/APIClientContext.ts', 'utf-8')
+      ).toMatchFileSnapshot(
+        './__snapshots__/create-api-client-fn/context-APIClientContext.ts.snapshot.ts'
+      );
+    });
+
+    test('createAPIClient.ts', async () => {
+      expect(
+        fs.readFileSync('/mock-fs/createAPIClient.ts', 'utf-8')
+      ).toMatchFileSnapshot(
+        './__snapshots__/create-api-client-fn/context-createAPIClient.ts.snapshot.ts'
+      );
+    });
+
+    test('index.ts exports context', async () => {
+      expect(fs.readFileSync('/mock-fs/index.ts', 'utf-8')).toMatchFileSnapshot(
+        './__snapshots__/create-api-client-fn/context-index.ts.snapshot.ts'
+      );
+    });
+  });
 });
