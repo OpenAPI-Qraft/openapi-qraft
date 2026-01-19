@@ -30,7 +30,7 @@ jobs:
         run: yarn install --immutable
 
       - name: Build
-        run: yarn build
+        run: yarn build --filter "@openapi-qraft/*" --force
 
       - name: Create dummy npmrc # Prevent creation of '.npmrc' by 'changesets-gitlab' with the 'NPM_TOKEN'
         run: touch ".npmrc"
