@@ -11,6 +11,7 @@ type Options = {
   createAPIClientFnImportTypeOverrides:
     | OverrideImportType[keyof OverrideImportType]
     | undefined;
+  contextName: string | undefined;
 };
 
 export const getCreateAPIClientFactory = (options: Options) => {
@@ -26,6 +27,7 @@ const getOperationClientImportsFactory = ({
   defaultClientCallbacks,
   defaultClientServices,
   createAPIClientFnImportTypeOverrides,
+  contextName,
 }: Options) => {
   const factory = ts.factory;
 
@@ -48,9 +50,9 @@ const getOperationClientImportsFactory = ({
     'APIBasicClientServices',
     'APIBasicQueryClientServices',
     'APIDefaultQueryClientServices',
-    'APIContextQueryClientServices',
+    contextName && 'APIContextQueryClientServices',
     !shouldImportAllCallbacks && 'APIQueryClientServices',
-    'APIUtilityClientServices',
+    !contextName && 'APIUtilityClientServices',
     'CreateAPIBasicClientOptions',
     'CreateAPIBasicQueryClientOptions',
     'CreateAPIClientOptions',
@@ -96,24 +98,28 @@ const getOperationClientImportsFactory = ({
     );
   }
 
-  imports.push(
-    factory.createImportDeclaration(
-      undefined,
-      factory.createImportClause(
-        true,
+  if (contextName) {
+    imports.push(
+      factory.createImportDeclaration(
         undefined,
-        factory.createNamedImports([
-          factory.createImportSpecifier(
-            false,
-            undefined,
-            factory.createIdentifier('Context')
-          ),
-        ])
-      ),
-      factory.createStringLiteral('react'),
-      undefined
-    )
-  );
+        factory.createImportClause(
+          false,
+          undefined,
+          factory.createNamedImports([
+            factory.createImportSpecifier(
+              false,
+              undefined,
+              factory.createIdentifier(contextName)
+            ),
+          ])
+        ),
+        factory.createStringLiteral(
+          `./${contextName}${explicitImportExtensions ?? ''}`
+        ),
+        undefined
+      )
+    );
+  }
 
   imports.push(
     factory.createImportDeclaration(
@@ -233,6 +239,7 @@ const getCreateOperationClientFunctionFactory = ({
   defaultClientCallbacks,
   defaultClientServices,
   createAPIClientFnName,
+  contextName,
 }: Options) => {
   const factory = ts.factory;
 
@@ -317,109 +324,6 @@ const getCreateOperationClientFunctionFactory = ({
         [
           factory.createTypeReferenceNode(
             factory.createIdentifier('Services'),
-            undefined
-          ),
-        ]
-      ),
-      undefined
-    ),
-    factory.createFunctionDeclaration(
-      [factory.createToken(ts.SyntaxKind.ExportKeyword)],
-      undefined,
-      factory.createIdentifier(createAPIClientFnName),
-      [
-        shouldImportAllServices
-          ? null
-          : factory.createTypeParameterDeclaration(
-              undefined,
-              factory.createIdentifier('Services'),
-              factory.createTypeReferenceNode(
-                factory.createIdentifier('UnionServiceOperationsDeclaration'),
-                [
-                  factory.createTypeReferenceNode(
-                    factory.createIdentifier('Services'),
-                    undefined
-                  ),
-                ]
-              ),
-              undefined
-            ),
-        shouldImportAllCallbacks
-          ? null
-          : factory.createTypeParameterDeclaration(
-              undefined,
-              factory.createIdentifier('Callbacks'),
-              factory.createTypeReferenceNode(
-                factory.createIdentifier('Partial'),
-                [
-                  factory.createTypeReferenceNode(
-                    factory.createIdentifier('AllCallbacks'),
-                    undefined
-                  ),
-                ]
-              ),
-              factory.createTypeReferenceNode(
-                factory.createIdentifier(
-                  shouldImportAllCallbacks ? 'AllCallbacks' : 'DefaultCallbacks'
-                ),
-                undefined
-              )
-            ),
-      ].filter(nonNullable),
-      [
-        shouldImportAllServices
-          ? null
-          : factory.createParameterDeclaration(
-              undefined,
-              undefined,
-              factory.createIdentifier('services'),
-              undefined,
-              factory.createTypeReferenceNode(
-                factory.createIdentifier('Services'),
-                undefined
-              ),
-              undefined
-            ),
-        factory.createParameterDeclaration(
-          undefined,
-          undefined,
-          factory.createIdentifier('options'),
-          undefined,
-          factory.createTypeReferenceNode(factory.createIdentifier('Context'), [
-            factory.createTypeReferenceNode(
-              factory.createIdentifier('CreateAPIQueryClientOptions'),
-              undefined
-            ),
-          ]),
-          undefined
-        ),
-        shouldImportAllCallbacks
-          ? null
-          : factory.createParameterDeclaration(
-              undefined,
-              undefined,
-              factory.createIdentifier('callbacks'),
-              shouldImportAllCallbacks || clientCallbacks.length
-                ? factory.createToken(ts.SyntaxKind.QuestionToken)
-                : undefined,
-              factory.createTypeReferenceNode(
-                factory.createIdentifier('Callbacks'),
-                undefined
-              ),
-              undefined
-            ),
-      ].filter(nonNullable),
-      factory.createTypeReferenceNode(
-        factory.createIdentifier('APIContextQueryClientServices'),
-        [
-          factory.createTypeReferenceNode(
-            factory.createIdentifier('Services'),
-            undefined
-          ),
-          factory.createTypeReferenceNode(
-            factory.createIdentifier(
-              shouldImportAllCallbacks ? 'AllCallbacks' : 'Callbacks'
-            ),
             undefined
           ),
         ]
@@ -801,7 +705,11 @@ const getCreateOperationClientFunctionFactory = ({
             ),
       ].filter(nonNullable),
       factory.createTypeReferenceNode(
-        factory.createIdentifier('APIUtilityClientServices'),
+        factory.createIdentifier(
+          contextName
+            ? 'APIContextQueryClientServices'
+            : 'APIUtilityClientServices'
+        ),
         [
           factory.createTypeReferenceNode(
             factory.createIdentifier('Services'),
@@ -946,21 +854,23 @@ const getCreateOperationClientFunctionFactory = ({
                   ),
                 ]
               ),
-          factory.createTypeReferenceNode(
-            factory.createIdentifier('APIContextQueryClientServices'),
-            [
-              factory.createTypeReferenceNode(
-                factory.createIdentifier('Services'),
-                undefined
-              ),
-              factory.createTypeReferenceNode(
-                factory.createIdentifier(
-                  shouldImportAllCallbacks ? 'AllCallbacks' : 'Callbacks'
-                ),
-                undefined
-              ),
-            ]
-          ),
+          contextName
+            ? factory.createTypeReferenceNode(
+                factory.createIdentifier('APIContextQueryClientServices'),
+                [
+                  factory.createTypeReferenceNode(
+                    factory.createIdentifier('Services'),
+                    undefined
+                  ),
+                  factory.createTypeReferenceNode(
+                    factory.createIdentifier(
+                      shouldImportAllCallbacks ? 'AllCallbacks' : 'Callbacks'
+                    ),
+                    undefined
+                  ),
+                ]
+              )
+            : null,
           factory.createTypeReferenceNode(
             factory.createIdentifier('APIBasicQueryClientServices'),
             [
@@ -991,118 +901,97 @@ const getCreateOperationClientFunctionFactory = ({
               ),
             ]
           ),
-          factory.createTypeReferenceNode(
-            factory.createIdentifier('APIUtilityClientServices'),
-            [
-              factory.createTypeReferenceNode(
-                factory.createIdentifier('Services'),
-                undefined
+          contextName
+            ? null
+            : factory.createTypeReferenceNode(
+                factory.createIdentifier('APIUtilityClientServices'),
+                [
+                  factory.createTypeReferenceNode(
+                    factory.createIdentifier('Services'),
+                    undefined
+                  ),
+                  factory.createTypeReferenceNode(
+                    factory.createIdentifier(
+                      shouldImportAllCallbacks ? 'AllCallbacks' : 'Callbacks'
+                    ),
+                    undefined
+                  ),
+                ]
               ),
-              factory.createTypeReferenceNode(
-                factory.createIdentifier(
-                  shouldImportAllCallbacks ? 'AllCallbacks' : 'Callbacks'
-                ),
-                undefined
-              ),
-            ]
-          ),
         ].filter(nonNullable)
       ),
       factory.createBlock(
         [
           factory.createIfStatement(
-            factory.createPrefixUnaryExpression(
-              ts.SyntaxKind.ExclamationToken,
-              factory.createIdentifier(
-                shouldImportAllCallbacks ? 'options' : 'callbacksOrOptions'
-              )
+            factory.createIdentifier(
+              shouldImportAllCallbacks ? 'options' : 'callbacksOrOptions'
             ),
-            factory.createReturnStatement(
-              factory.createCallExpression(
-                factory.createIdentifier('qraftAPIClient'),
-                undefined,
-                [
-                  factory.createIdentifier('services'),
-                  factory.createIdentifier(
-                    shouldImportAllCallbacks ? 'allCallbacks' : 'callbacks'
+            factory.createBlock(
+              [
+                factory.createIfStatement(
+                  factory.createBinaryExpression(
+                    factory.createStringLiteral('requestFn'),
+                    factory.createToken(ts.SyntaxKind.InKeyword),
+                    factory.createIdentifier(
+                      shouldImportAllCallbacks
+                        ? 'options'
+                        : 'callbacksOrOptions'
+                    )
                   ),
-                ]
-              )
-            ),
-            undefined
-          ),
-          factory.createIfStatement(
-            factory.createBinaryExpression(
-              factory.createStringLiteral('requestFn'),
-              factory.createToken(ts.SyntaxKind.InKeyword),
-              factory.createIdentifier(
-                shouldImportAllCallbacks ? 'options' : 'callbacksOrOptions'
-              )
-            ),
-            factory.createReturnStatement(
-              factory.createCallExpression(
-                factory.createIdentifier('qraftAPIClient'),
-                undefined,
-                [
-                  factory.createIdentifier('services'),
-                  factory.createIdentifier(
-                    shouldImportAllCallbacks ? 'allCallbacks' : 'callbacks'
+                  factory.createReturnStatement(
+                    factory.createCallExpression(
+                      factory.createIdentifier('qraftAPIClient'),
+                      undefined,
+                      [
+                        factory.createIdentifier('services'),
+                        factory.createIdentifier(
+                          shouldImportAllCallbacks
+                            ? 'allCallbacks'
+                            : 'callbacks'
+                        ),
+                        factory.createIdentifier(
+                          shouldImportAllCallbacks
+                            ? 'options'
+                            : 'callbacksOrOptions'
+                        ),
+                      ]
+                    )
                   ),
-                  factory.createIdentifier(
-                    shouldImportAllCallbacks ? 'options' : 'callbacksOrOptions'
+                  undefined
+                ),
+                factory.createIfStatement(
+                  factory.createBinaryExpression(
+                    factory.createStringLiteral('queryClient'),
+                    factory.createToken(ts.SyntaxKind.InKeyword),
+                    factory.createIdentifier(
+                      shouldImportAllCallbacks
+                        ? 'options'
+                        : 'callbacksOrOptions'
+                    )
                   ),
-                ]
-              )
-            ),
-            undefined
-          ),
-          factory.createIfStatement(
-            factory.createBinaryExpression(
-              factory.createStringLiteral('queryClient'),
-              factory.createToken(ts.SyntaxKind.InKeyword),
-              factory.createIdentifier(
-                shouldImportAllCallbacks ? 'options' : 'callbacksOrOptions'
-              )
-            ),
-            factory.createReturnStatement(
-              factory.createCallExpression(
-                factory.createIdentifier('qraftAPIClient'),
-                undefined,
-                [
-                  factory.createIdentifier('services'),
-                  factory.createIdentifier(
-                    shouldImportAllCallbacks ? 'allCallbacks' : 'callbacks'
+                  factory.createReturnStatement(
+                    factory.createCallExpression(
+                      factory.createIdentifier('qraftAPIClient'),
+                      undefined,
+                      [
+                        factory.createIdentifier('services'),
+                        factory.createIdentifier(
+                          shouldImportAllCallbacks
+                            ? 'allCallbacks'
+                            : 'callbacks'
+                        ),
+                        factory.createIdentifier(
+                          shouldImportAllCallbacks
+                            ? 'options'
+                            : 'callbacksOrOptions'
+                        ),
+                      ]
+                    )
                   ),
-                  factory.createIdentifier(
-                    shouldImportAllCallbacks ? 'options' : 'callbacksOrOptions'
-                  ),
-                ]
-              )
-            ),
-            undefined
-          ),
-          factory.createIfStatement(
-            factory.createBinaryExpression(
-              factory.createStringLiteral('Provider'),
-              factory.createToken(ts.SyntaxKind.InKeyword),
-              factory.createIdentifier(
-                shouldImportAllCallbacks ? 'options' : 'callbacksOrOptions'
-              )
-            ),
-            factory.createReturnStatement(
-              factory.createCallExpression(
-                factory.createIdentifier('qraftAPIClient'),
-                undefined,
-                [
-                  factory.createIdentifier('services'),
-                  factory.createIdentifier(
-                    shouldImportAllCallbacks ? 'allCallbacks' : 'callbacks'
-                  ),
-                  factory.createIdentifier(
-                    shouldImportAllCallbacks ? 'options' : 'callbacksOrOptions'
-                  ),
-                ]
-              )
+                  undefined
+                ),
+              ],
+              true
             ),
             undefined
           ),
@@ -1117,10 +1006,9 @@ const getCreateOperationClientFunctionFactory = ({
                   : factory.createBinaryExpression(
                       factory.createIdentifier('callbacksOrOptions'),
                       factory.createToken(ts.SyntaxKind.QuestionQuestionToken),
-                      factory.createIdentifier(
-                        shouldImportAllCallbacks ? 'allCallbacks' : 'callbacks'
-                      )
+                      factory.createIdentifier('callbacks')
                     ),
+                ...(contextName ? [factory.createIdentifier(contextName)] : []),
               ]
             )
           ),

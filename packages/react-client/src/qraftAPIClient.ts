@@ -61,7 +61,9 @@ export function qraftAPIClient<
 >(
   services: Services,
   callbacks: Callbacks,
-  options: CreateAPIQueryClientOptions | Context<CreateAPIQueryClientOptions>
+  options:
+    | CreateAPIQueryClientOptions
+    | Context<CreateAPIQueryClientOptions | undefined>
 ): APIDefaultQueryClientServices<Services>;
 
 /**
@@ -84,7 +86,7 @@ export function qraftAPIClient<
 >(
   services: Services,
   callbacks: Callbacks,
-  options: Context<CreateAPIQueryClientOptions>
+  options: Context<CreateAPIQueryClientOptions | undefined>
 ): APIContextQueryClientServices<Services, Callbacks>;
 
 /**
@@ -214,7 +216,9 @@ export function qraftAPIClient<
 >(
   services: Services,
   callbacks: Callbacks,
-  options?: CreateAPIClientOptions | Context<CreateAPIQueryClientOptions>
+  options?:
+    | CreateAPIClientOptions
+    | Context<CreateAPIQueryClientOptions | undefined>
 ):
   | APIQueryClientServices<Services, Callbacks>
   | APIDefaultQueryClientServices<Services>

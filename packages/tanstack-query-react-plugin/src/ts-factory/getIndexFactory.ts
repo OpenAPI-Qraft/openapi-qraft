@@ -87,6 +87,25 @@ export const getIndexFactory = ({
         undefined
       )
     ),
+    ...createApiClientFn
+      .filter(([, value]) => value.context?.[0])
+      .map(([, value]) =>
+        factory.createExportDeclaration(
+          undefined,
+          false,
+          factory.createNamedExports([
+            factory.createExportSpecifier(
+              false,
+              undefined,
+              factory.createIdentifier(value.context![0])
+            ),
+          ]),
+          factory.createStringLiteral(
+            `./${value.context![0]}${importExtension}`
+          ),
+          undefined
+        )
+      ),
   ];
 };
 
@@ -94,4 +113,5 @@ export type CreateAPIClientFnOptions = {
   services: ['all' | 'none'];
   callbacks: ['all' | 'none'] | string[];
   filename: [string];
+  context?: [string];
 };
