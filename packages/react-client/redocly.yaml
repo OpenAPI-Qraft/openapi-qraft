@@ -75,8 +75,11 @@ apis:
           callbacks: all
         createInternalReactAPIClient:
           services: none
+          context: InternalReactAPIClientContext
           callbacks:
             [
+              'useQuery',
+              'useMutation',
               'setQueryData',
               'getQueryData',
               'getQueryKey',
