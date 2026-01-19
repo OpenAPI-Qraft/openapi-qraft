@@ -52,3 +52,11 @@ jobs:
 
       - name: Build E2E Projects
         run: TEST_PROJECTS_DIR=${{ runner.temp }}/projects yarn run "e2e:build-projects"
+
+      - name: Upload E2E Project API Clients
+        uses: actions/upload-artifact@v4
+        if: ${{ always() }}
+        with:
+          name: e2e-projects-api-clients
+          path: |
+            ${{ runner.temp }}/projects/**/src
