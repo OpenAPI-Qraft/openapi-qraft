@@ -5,7 +5,6 @@ export {
   type CreateAPIBasicClientOptions,
   type CreateAPIQueryClientOptions,
   type APIQueryClientServices,
-  type APIContextQueryClientServices,
   type APIDefaultQueryClientServices,
   type APIBasicQueryClientServices,
   type APIBasicClientServices,
@@ -13,6 +12,10 @@ export {
   type UnionServiceOperationsDeclaration,
   type QraftClientOptions,
 } from './qraftAPIClient.js';
+export {
+  qraftReactAPIClient,
+  type APIContextQueryClientServices,
+} from './qraftReactAPIClient.js';
 export {
   requestFn,
   baseRequestFn,
