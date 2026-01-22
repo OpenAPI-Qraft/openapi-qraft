@@ -24,13 +24,13 @@ jobs:
         uses: actions/setup-node@v4
         with:
           cache: 'yarn'
-          node-version: 20.12.2
+          node-version: 22.22.0
 
       - name: Install Dependencies
         run: yarn install --immutable
 
       - name: Build
-        run: yarn build
+        run: yarn build --filter "@openapi-qraft/*" --force
 
       - name: Create dummy npmrc # Prevent creation of '.npmrc' by 'changesets-gitlab' with the 'NPM_TOKEN'
         run: touch ".npmrc"

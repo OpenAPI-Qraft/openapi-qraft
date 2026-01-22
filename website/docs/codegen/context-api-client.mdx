@@ -1,0 +1,509 @@
+---
+sidebar_position: 21
+sidebar_label: Context-based API Client
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# Context-based API Client
+
+The `context:` option in `--create-api-client-fn` generates an API client that retrieves `queryClient`, `requestFn`,
+and `baseUrl` from a React Context at render time. This approach enables creating the API client **outside of React components**,
+making hooks static and fully compatible with React Compiler.
+
+## Why Use Context-based API Client?
+
+### React Compiler Compatibility
+
+When you create an API client inside a component, the hooks become dynamic
+and **cannot be optimized by React Compiler**:
+
+```tsx title="❌ Not compatible with React Compiler"
+function MyComponent() {
+  const api = createAPIClient({ queryClient, requestFn, baseUrl });
+
+  // Dynamic hook - React Compiler cannot optimize this
+  const { data } = api.pets.getPets.useQuery();
+}
+```
+
+With the `context:` option, you create the API client **outside the component**, and hooks read their
+options from React Context during render:
+
+```tsx title="✅ Compatible with React Compiler"
+// Created outside the component - hooks are static
+const api = createAPIClient();
+
+function MyComponent() {
+  // Static hook - React Compiler can optimize this
+  const { data } = api.pets.getPets.useQuery();
+}
+```
+
+### Benefits
+
+- **React Compiler optimization** - Static hooks can be automatically memoized
+- **Cleaner component code** - No need to create API client inside components
+- **Multiple API versions** - Easy to manage different API clients with separate Contexts
+- **Flexible configuration** - Change `queryClient`, `requestFn`, or `baseUrl` dynamically via Context
+
+## Configuration
+
+### CLI Option
+
+Use the `context:<ContextName>` option with `--create-api-client-fn`:
+
+```bash npm2yarn
+npx openapi-qraft \
+  --plugin tanstack-query-react \
+  --plugin openapi-typescript \
+  https://petstore3.swagger.io/api/v3/openapi.json \
+  -o src/api \
+  --create-api-client-fn createAPIClient context:APIClientContext
+```
+
+You can combine `context:` with other options:
+
+```bash
+--create-api-client-fn createAPIClient \
+  filename:create-api-client \
+  context:APIClientContext \
+  callbacks:useQuery,useMutation,setQueryData,getQueryData
+```
+
+### Redocly Configuration
+
+In your `redocly.yaml`, add the `context` option under `create-api-client-fn`:
+
+```yaml title="redocly.yaml"
+apis:
+  main:
+    root: ./openapi.json
+    x-openapi-qraft:
+      plugin:
+        tanstack-query-react: true
+        openapi-typescript: true
+      output-dir: src/api
+      create-api-client-fn:
+        createAPIClient:
+          context: APIClientContext
+          callbacks:
+            - useQuery
+            - useMutation
+            - setQueryData
+            - getQueryData
+            - getQueryKey
+            - getInfiniteQueryKey
+```
+
+For multiple API clients with different contexts:
+
+```yaml title="redocly.yaml"
+apis:
+  main:
+    root: ./openapi.json
+    x-openapi-qraft:
+      output-dir: src/api
+      create-api-client-fn:
+        # Full-featured client for Node.js (without context)
+        createNodeAPIClient:
+          filename: create-node-api-client
+          services: all
+          callbacks: all
+
+        # React client with Context support
+        createReactAPIClient:
+          filename: create-react-api-client
+          context: ReactAPIClientContext
+          callbacks:
+            - useQuery
+            - useMutation
+```
+
+## Usage Patterns
+
+### Pattern 1: Basic Setup
+
+The most common pattern - create the API client outside the component and provide options via Context:
+
+```tsx title="src/App.tsx"
+import { createAPIClient, APIClientContext } from './api';
+import { requestFn } from '@openapi-qraft/react';
+import { QueryClient } from '@tanstack/react-query';
+import { useState, useEffect, type ReactNode } from 'react';
+
+// ⬇︎ Create API client OUTSIDE of the component
+const api = createAPIClient();
+
+function APIProvider({ children }: { children: ReactNode }) {
+  const [queryClient] = useState(() => new QueryClient());
+
+  useEffect(() => {
+    queryClient.mount();
+    return () => queryClient.unmount();
+  }, [queryClient]);
+
+  return (
+    <APIClientContext.Provider
+      value={{
+        requestFn,
+        queryClient,
+        baseUrl: 'https://petstore3.swagger.io/api/v3',
+      }}
+    >
+      {children}
+    </APIClientContext.Provider>
+  );
+}
+
+function PetList() {
+  // ⬇︎ Hooks read options from Context automatically
+  const { data, isPending } = api.pet.findPetsByStatus.useQuery({
+    query: { status: 'available' },
+  });
+
+  if (isPending) return <div>Loading...</div>;
+  return <ul>{data?.map(pet => <li key={pet.id}>{pet.name}</li>)}</ul>;
+}
+
+export default function App() {
+  return (
+    <APIProvider>
+      <PetList />
+    </APIProvider>
+  );
+}
+```
+
+### Pattern 2: With QraftSecureRequestFn
+
+For APIs that require authentication, use `QraftSecureRequestFn` to inject security headers:
+
+```tsx title="src/App.tsx"
+import { createAPIClient, APIClientContext } from './api';
+import { requestFn } from '@openapi-qraft/react';
+import { QraftSecureRequestFn } from '@openapi-qraft/react/Unstable_QraftSecureRequestFn';
+import { QueryClient } from '@tanstack/react-query';
+import { useState, useEffect, type ReactNode } from 'react';
+
+const api = createAPIClient();
+
+function APIProvider({ children }: { children: ReactNode }) {
+  const [queryClient] = useState(() => new QueryClient());
+
+  useEffect(() => {
+    queryClient.mount();
+    return () => queryClient.unmount();
+  }, [queryClient]);
+
+  return (
+    <QraftSecureRequestFn
+      requestFn={requestFn}
+      securitySchemes={{
+        api_key: () => ({
+          in: 'header',
+          name: 'api_key',
+          value: 'your-api-key',
+        }),
+        oauth2: async () => ({
+          in: 'header',
+          name: 'Authorization',
+          value: `Bearer ${await getAccessToken()}`,
+        }),
+      }}
+    >
+      {(secureRequestFn) => (
+        <APIClientContext.Provider
+          value={{
+            requestFn: secureRequestFn,
+            queryClient,
+            baseUrl: 'https://api.example.com/v1',
+          }}
+        >
+          {children}
+        </APIClientContext.Provider>
+      )}
+    </QraftSecureRequestFn>
+  );
+}
+```
+
+### Pattern 3: Using Context in Callbacks
+
+When you need to access the API client inside mutation callbacks (e.g., for optimistic updates),
+you can use `useContext` to get options and create a new client instance:
+
+```tsx title="src/PetUpdateForm.tsx"
+import { createAPIClient, APIClientContext } from './api';
+import { useContext } from 'react';
+
+const api = createAPIClient();
+
+function PetUpdateForm({ petId }: { petId: number }) {
+  // ⬇︎ Get context value to create API client in callbacks
+  const apiContext = useContext(APIClientContext);
+
+  const petParams = { path: { petId } };
+
+  const { mutate } = api.pet.updatePet.useMutation(undefined, {
+    async onMutate(variables) {
+      // ⬇︎ Create a new client instance with context options
+      const apiClient = createAPIClient(apiContext!);
+
+      // Cancel outgoing queries
+      await apiClient.pet.getPetById.cancelQueries({ parameters: petParams });
+
+      // Snapshot previous value
+      const prevPet = apiClient.pet.getPetById.getQueryData(petParams);
+
+      // Optimistically update
+      apiClient.pet.getPetById.setQueryData(petParams, (old) => ({
+        ...old,
+        ...variables.body,
+      }));
+
+      return { prevPet };
+    },
+
+    async onError(_error, _variables, context) {
+      // Rollback on error
+      if (context?.prevPet) {
+        createAPIClient(apiContext!).pet.getPetById.setQueryData(
+          petParams,
+          context.prevPet
+        );
+      }
+    },
+
+    async onSuccess() {
+      // Invalidate related queries
+      await createAPIClient(apiContext!).pet.findPetsByStatus.invalidateQueries();
+    },
+  });
+
+  return (
+    <form onSubmit={(e) => {
+      e.preventDefault();
+      mutate({ body: { id: petId, name: 'Updated Name', photoUrls: [] } });
+    }}>
+      <button type="submit">Update Pet</button>
+    </form>
+  );
+}
+```
+
+### Pattern 4: Multiple API Versions
+
+When working with multiple API versions, each can have its own Context:
+
+```tsx title="src/MultipleAPIsApp.tsx"
+import {
+  createAPIClient as createAPIClientV1,
+  APIClientContextV1,
+} from './api-v1';
+import {
+  createAPIClient as createAPIClientV2,
+  APIClientContextV2,
+} from './api-v2';
+import { requestFn } from '@openapi-qraft/react';
+import { QueryClient } from '@tanstack/react-query';
+import { useState, useEffect, type ReactNode } from 'react';
+
+// Create both clients outside components
+const apiV1 = createAPIClientV1();
+const apiV2 = createAPIClientV2();
+
+function MultiAPIProvider({ children }: { children: ReactNode }) {
+  const [queryClientV1] = useState(() => new QueryClient());
+  const [queryClientV2] = useState(() => new QueryClient());
+
+  useEffect(() => {
+    queryClientV1.mount();
+    queryClientV2.mount();
+    return () => {
+      queryClientV1.unmount();
+      queryClientV2.unmount();
+    };
+  }, [queryClientV1, queryClientV2]);
+
+  return (
+    <APIClientContextV1.Provider
+      value={{ requestFn, queryClient: queryClientV1, baseUrl: 'https://api.example.com/v1' }}
+    >
+      <APIClientContextV2.Provider
+        value={{ requestFn, queryClient: queryClientV2, baseUrl: 'https://api.example.com/v2' }}
+      >
+        {children}
+      </APIClientContextV2.Provider>
+    </APIClientContextV1.Provider>
+  );
+}
+
+function Dashboard() {
+  // Use both API versions in the same component
+  const { data: legacyUsers } = apiV1.users.getUsers.useQuery();
+  const { data: newUsers } = apiV2.users.getUsers.useQuery();
+
+  return (
+    <div>
+      <h2>Legacy API Users: {legacyUsers?.length}</h2>
+      <h2>New API Users: {newUsers?.length}</h2>
+    </div>
+  );
+}
+```
+
+## Complete Example
+
+Here's a complete example demonstrating all the patterns together:
+
+```tsx title="src/App.tsx"
+import { requestFn } from '@openapi-qraft/react';
+import { QraftSecureRequestFn } from '@openapi-qraft/react/Unstable_QraftSecureRequestFn';
+import { QueryClient } from '@tanstack/react-query';
+import { useContext, useEffect, useState, type ReactNode } from 'react';
+import {
+  createAPIClient,
+  APIClientContext,
+  type Services,
+} from './api';
+
+// ⬇︎ Create API client OUTSIDE of any component
+const api = createAPIClient();
+
+// ──────────────────────────────────────────────────────────────────────────────
+// Provider Component
+// ──────────────────────────────────────────────────────────────────────────────
+
+function QraftProvider({ children }: { children: ReactNode }) {
+  const [queryClient] = useState(() => new QueryClient());
+
+  useEffect(() => {
+    queryClient.mount();
+    return () => queryClient.unmount();
+  }, [queryClient]);
+
+  return (
+    <QraftSecureRequestFn
+      requestFn={requestFn}
+      securitySchemes={{
+        api_key: () => ({
+          in: 'header',
+          name: 'api_key',
+          value: 'special-key',
+        }),
+      }}
+    >
+      {(secureRequestFn) => (
+        <APIClientContext.Provider
+          value={{
+            baseUrl: 'https://petstore3.swagger.io/api/v3',
+            requestFn: secureRequestFn,
+            queryClient,
+          }}
+        >
+          {children}
+        </APIClientContext.Provider>
+      )}
+    </QraftSecureRequestFn>
+  );
+}
+
+// ──────────────────────────────────────────────────────────────────────────────
+// Components using the API client
+// ──────────────────────────────────────────────────────────────────────────────
+
+function PetList() {
+  const { data, error, isPending } = api.pet.findPetsByStatus.useQuery({
+    query: { status: 'available' },
+  });
+
+  if (error) return <div>Error: {error.message}</div>;
+  if (isPending) return <div>Loading...</div>;
+
+  return (
+    <ul>
+      {data?.map((pet) => (
+        <li key={pet.id}>{pet.name} - {pet.status}</li>
+      ))}
+    </ul>
+  );
+}
+
+function PetForm({ petId }: { petId: number }) {
+  const apiContext = useContext(APIClientContext);
+  const petParams = { path: { petId } };
+
+  const { data: pet, isPending: isLoading } = api.pet.getPetById.useQuery(petParams);
+
+  const { mutate, isPending } = api.pet.updatePet.useMutation(undefined, {
+    async onMutate(variables) {
+      const apiClient = createAPIClient(apiContext!);
+      await apiClient.pet.getPetById.cancelQueries({ parameters: petParams });
+      const prevPet = apiClient.pet.getPetById.getQueryData(petParams);
+      apiClient.pet.getPetById.setQueryData(petParams, (old) => ({
+        ...old,
+        ...variables.body,
+      }));
+      return { prevPet };
+    },
+    async onError(_err, _vars, context) {
+      if (context?.prevPet) {
+        createAPIClient(apiContext!).pet.getPetById.setQueryData(
+          petParams,
+          context.prevPet
+        );
+      }
+    },
+    async onSuccess() {
+      await createAPIClient(apiContext!).pet.findPetsByStatus.invalidateQueries();
+    },
+  });
+
+  if (isLoading) return <div>Loading pet...</div>;
+  if (!pet) return <div>Pet not found</div>;
+
+  return (
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+        const formData = new FormData(e.currentTarget);
+        mutate({
+          body: {
+            id: pet.id,
+            name: formData.get('name') as string,
+            status: pet.status,
+            photoUrls: pet.photoUrls,
+          },
+        });
+      }}
+    >
+      <input name="name" defaultValue={pet.name} disabled={isPending} />
+      <button type="submit" disabled={isPending}>
+        {isPending ? 'Updating...' : 'Update'}
+      </button>
+    </form>
+  );
+}
+
+// ──────────────────────────────────────────────────────────────────────────────
+// App Entry Point
+// ──────────────────────────────────────────────────────────────────────────────
+
+export default function App() {
+  return (
+    <QraftProvider>
+      <h1>Pet Store</h1>
+      <PetList />
+      <PetForm petId={1} />
+    </QraftProvider>
+  );
+}
+```
+
+## See Also
+
+- [createAPIClient()](/codegen/create-api-client-function.mdx) - Basic API client configuration
+- [CLI Options](/codegen/CLI/cli.mdx) - All available CLI options
+- [Redocly Config](/codegen/CLI/redocly-config.mdx) - Configuration file reference

@@ -3,11 +3,12 @@
 import type {
   OperationSchema,
   ServiceOperationMutationKey,
-  ServiceOperationUseMutation,
+  ServiceOperationUseMutationOptions,
 } from '@openapi-qraft/tanstack-query-react-types';
 import type { DefaultError, UseMutationResult } from '@tanstack/react-query';
 import type { CreateAPIQueryClientOptions } from '../qraftAPIClient.js';
 import { useMutation as useMutationBase } from '@tanstack/react-query';
+import { useMemo } from 'react';
 import { composeMutationKey } from '../lib/composeMutationKey.js';
 import { requestFnResponseRejecter } from '../lib/requestFnResponseRejecter.js';
 import { requestFnResponseResolver } from '../lib/requestFnResponseResolver.js';
@@ -20,15 +21,10 @@ export const useMutation: <
 >(
   qraftOptions: CreateAPIQueryClientOptions,
   schema: OperationSchema,
-  args: Parameters<
-    ServiceOperationUseMutation<
-      OperationSchema,
-      object | undefined,
-      TVariables,
-      TData,
-      DefaultError
-    >['useMutation']
-  >
+  args: [
+    parameters?: unknown,
+    options?: ServiceOperationUseMutationOptions<any, any, any, any, any>,
+  ]
 ) => UseMutationResult<TData, TError, TVariables, TContext> = (
   qraftOptions,
   schema,
@@ -36,54 +32,73 @@ export const useMutation: <
 ) => {
   const [parameters, options] = args;
 
-  if (
-    parameters &&
-    typeof parameters === 'object' &&
-    options &&
-    'mutationKey' in options
-  )
-    throw new Error(
-      `'useMutation': parameters and 'options.mutationKey' cannot be used together`
-    );
-
-  const mutationKey =
+  const optionsMutationKey =
     options && 'mutationKey' in options
       ? (options.mutationKey as ServiceOperationMutationKey<
           typeof schema,
           unknown
         >)
-      : composeMutationKey(schema, parameters);
+      : undefined;
+
+  if (parameters && typeof parameters === 'object' && optionsMutationKey)
+    throw new Error(
+      `'useMutation': parameters and 'options.mutationKey' cannot be used together`
+    );
+
+  const mutationKey = useMemo(
+    () => optionsMutationKey ?? composeMutationKey(schema, parameters),
+    [optionsMutationKey, schema, parameters]
+  );
 
   return useMutationBase(
     {
       ...options,
       mutationKey,
-      mutationFn:
-        options?.mutationFn ??
-        (parameters
-          ? function (bodyPayload) {
-              return qraftOptions
-                .requestFn(schema, {
-                  parameters,
-                  baseUrl: qraftOptions.baseUrl,
-                  body: bodyPayload as never,
-                })
-                .then(requestFnResponseResolver, requestFnResponseRejecter);
-            }
-          : function (parametersAndBodyPayload) {
-              const { body, ...parameters } = parametersAndBodyPayload as {
-                body: unknown;
-              };
-
-              return qraftOptions
-                .requestFn(schema, {
-                  parameters,
-                  baseUrl: qraftOptions.baseUrl,
-                  body,
-                } as never)
-                .then(requestFnResponseResolver, requestFnResponseRejecter);
-            }),
+      mutationFn: useMemo(
+        () =>
+          options?.mutationFn ??
+          qraftMutationFn.bind(
+            null,
+            qraftOptions.requestFn,
+            qraftOptions.baseUrl,
+            schema,
+            parameters
+          ),
+        [
+          options?.mutationFn,
+          qraftOptions.requestFn,
+          qraftOptions.baseUrl,
+          schema,
+          parameters,
+        ]
+      ),
     },
     qraftOptions.queryClient
   ) as never;
 };
+
+function qraftMutationFn(
+  requestFn: CreateAPIQueryClientOptions['requestFn'],
+  baseUrl: CreateAPIQueryClientOptions['baseUrl'],
+  schema: OperationSchema,
+  parameters: unknown,
+  mutationVariables: unknown
+) {
+  if (parameters) {
+    return requestFn(schema, {
+      parameters,
+      baseUrl,
+      body: mutationVariables as never,
+    }).then(requestFnResponseResolver, requestFnResponseRejecter);
+  }
+
+  const { body, ...mutationParameters } = mutationVariables as {
+    body: unknown;
+  };
+
+  return requestFn(schema, {
+    parameters: mutationParameters,
+    baseUrl,
+    body,
+  } as never).then(requestFnResponseResolver, requestFnResponseRejecter);
+}

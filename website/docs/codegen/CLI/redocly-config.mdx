@@ -192,3 +192,48 @@ apis:
             - getQueryKey
             - getInfiniteQueryKey
 ```
+
+#### Using Context for React Compiler Compatibility
+
+The `context` option generates a React Context that provides `queryClient`, `requestFn`, and `baseUrl` to the API client.
+This allows you to create the client **outside of React components**, making hooks static and compatible with React Compiler.
+
+```yaml
+apis:
+  main:
+    root: ./openapi.json
+    x-openapi-qraft:
+      plugin:
+        tanstack-query-react: true
+        openapi-typescript: true
+      output-dir: src/api
+      create-api-client-fn:
+        # React API client with Context support
+        createAPIClient:
+          context: APIClientContext           # Generate APIClientContext React Context
+          callbacks:
+            - useQuery
+            - useMutation
+            - setQueryData
+            - getQueryData
+            - getQueryKey
+            - getInfiniteQueryKey
+```
+
+With this configuration, you can create the API client outside of components:
+
+```tsx
+import { createAPIClient, APIClientContext } from './api';
+
+// Create outside component - hooks are static and React Compiler compatible
+const api = createAPIClient();
+
+function MyComponent() {
+  // Hooks read queryClient, requestFn, baseUrl from APIClientContext
+  const { data } = api.pets.getPets.useQuery();
+  return <div>{data?.length} pets</div>;
+}
+```
+
+For detailed documentation on using Context-based API clients, see the
+[Context-based API Client](/codegen/context-api-client.mdx) documentation.
