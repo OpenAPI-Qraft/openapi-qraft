@@ -6,7 +6,7 @@
 import type { APIBasicClientServices, APIBasicQueryClientServices, APIDefaultQueryClientServices, APIContextQueryClientServices, APIQueryClientServices, CreateAPIBasicClientOptions, CreateAPIBasicQueryClientOptions, CreateAPIClientOptions, CreateAPIQueryClientOptions } from "@openapi-qraft/react";
 import { APIClientContext } from "./APIClientContext";
 import type * as allCallbacks from "@openapi-qraft/react/callbacks/index";
-import { qraftAPIClient } from "@openapi-qraft/react";
+import { qraftAPIClient, qraftReactAPIClient } from "@openapi-qraft/react";
 import { useQuery, useMutation } from "@openapi-qraft/react/callbacks/index";
 const defaultCallbacks = {
     useQuery,
@@ -25,7 +25,7 @@ export function createAPIClient<Callbacks extends Partial<AllCallbacks> = Defaul
         if ("queryClient" in callbacksOrOptions)
             return qraftAPIClient(services, callbacks, callbacksOrOptions);
     }
-    return qraftAPIClient(services, callbacksOrOptions ?? callbacks, APIClientContext);
+    return qraftReactAPIClient(services, callbacksOrOptions ?? callbacks, APIClientContext);
 }
 type DefaultCallbacks = typeof defaultCallbacks;
 type AllCallbacks = typeof allCallbacks;
