@@ -1,0 +1,11 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "rootDir": "src",
+    "outDir": "dist",
+    "baseUrl": ".",
+    "resolveJsonModule": true
+  },
+  "include": ["src/**/*", "augmentation/**/*"],
+  "exclude": ["src/__snapshots__/**/*"]
+}

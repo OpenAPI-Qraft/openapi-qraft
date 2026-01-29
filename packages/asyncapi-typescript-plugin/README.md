@@ -1,0 +1,1 @@
+# asyncapi-typescript-plugin

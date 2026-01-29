@@ -17,5 +17,10 @@
   "access": "public",
   "baseBranch": "origin/main",
   "updateInternalDependencies": "patch",
-  "ignore": ["@openapi-qraft/e2e", "playground", "openapi-qraft-website"]
+  "ignore": [
+    "@openapi-qraft/e2e",
+    "playground",
+    "openapi-qraft-website",
+    "@qraft/asyncapi-typescript-plugin"
+  ]
 }
