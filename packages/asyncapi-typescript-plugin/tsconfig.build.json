@@ -6,5 +6,10 @@
     "declarationMap": true,
     "resolveJsonModule": false
   },
-  "exclude": ["src/**/*.spec.ts", "src/**/*.test.ts", "src/tmp/**", "src/__snapshots__/**/*"]
+  "exclude": [
+    "src/**/*.spec.ts",
+    "src/**/*.test.ts",
+    "src/tmp/**",
+    "src/__snapshots__/**/*"
+  ]
 }
