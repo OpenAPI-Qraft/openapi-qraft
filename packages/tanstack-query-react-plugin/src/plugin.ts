@@ -1,5 +1,5 @@
 import type { OverrideImportType } from './ts-factory/OverrideImportType.js';
-import { fileHeader } from '@openapi-qraft/plugin/lib/fileHeader';
+import { fileHeader } from '@qraft/plugin/lib/fileHeader';
 import {
   createPredefinedParametersGlobs,
   parseOperationPredefinedParametersOption,

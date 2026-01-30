@@ -1,9 +1,9 @@
 import type { OverrideImportType } from './ts-factory/OverrideImportType.js';
 import { URL } from 'node:url';
-import { formatFileHeader } from '@openapi-qraft/plugin/lib/formatFileHeader';
-import { GeneratorFile } from '@openapi-qraft/plugin/lib/GeneratorFile';
+import { formatFileHeader } from '@qraft/plugin/lib/formatFileHeader';
+import { GeneratorFile } from '@qraft/plugin/lib/GeneratorFile';
+import { OutputOptions as OutputOptionsBase } from '@qraft/plugin/lib/OutputOptions';
 import { OpenAPIService } from '@openapi-qraft/plugin/lib/open-api/OpenAPIService';
-import { OutputOptions as OutputOptionsBase } from '@openapi-qraft/plugin/lib/OutputOptions';
 import { PredefinedParametersGlob } from '@openapi-qraft/plugin/lib/predefineSchemaParameters';
 import c from 'ansi-colors';
 import { Ora } from 'ora';
