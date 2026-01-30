@@ -1,4 +1,4 @@
-import '@openapi-qraft/plugin/lib/vitestFsMock';
+import './vitestFsMock.js';
 import { createRequire } from 'node:module';
 import { dirname } from 'node:path';
 import { describe, expect, test } from 'vitest';
