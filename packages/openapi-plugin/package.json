@@ -33,6 +33,7 @@
     }
   },
   "dependencies": {
+    "@qraft/plugin": "workspace:*",
     "@redocly/openapi-core": "^1.34.5",
     "ansi-colors": "^4.1.3",
     "camelcase": "^8.0.0",
