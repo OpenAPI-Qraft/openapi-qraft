@@ -4114,9 +4114,9 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@openapi-qraft/plugin@workspace:*, @openapi-qraft/plugin@workspace:^, @openapi-qraft/plugin@workspace:packages/plugin":
+"@openapi-qraft/plugin@workspace:*, @openapi-qraft/plugin@workspace:^, @openapi-qraft/plugin@workspace:packages/openapi-plugin":
   version: 0.0.0-use.local
-  resolution: "@openapi-qraft/plugin@workspace:packages/plugin"
+  resolution: "@openapi-qraft/plugin@workspace:packages/openapi-plugin"
   dependencies:
     "@openapi-qraft/eslint-config": "workspace:*"
     "@openapi-qraft/test-fixtures": "workspace:*"
