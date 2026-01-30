@@ -1,0 +1,57 @@
+---
+description: OpenAPI Qraft project conventions - architecture, TypeScript, and testing standards
+alwaysApply: true
+---
+
+# OpenAPI Qraft Project Conventions
+
+## Project Overview
+
+OpenAPI Qraft is a monorepo that generates type-safe TanStack Query React hooks from OpenAPI documents.
+
+### Key Packages
+
+- `@openapi-qraft/cli` - CLI tool for code generation
+- `@openapi-qraft/react` - Runtime library with Proxy-based API client
+- `@openapi-qraft/plugin` - Core plugin infrastructure and OpenAPI processing
+- `@openapi-qraft/tanstack-query-react-plugin` - Service generator plugin
+- `@openapi-qraft/openapi-typescript-plugin` - TypeScript types generator
+- `@openapi-qraft/tanstack-query-react-types` - Shared type definitions
+
+## Architecture
+
+- **Monorepo**: Yarn 4 workspaces + Turbo for builds
+- **Module System**: ESM (`"type": "module"` in package.json)
+- **Bundling**: Rollup with SWC for runtime packages
+- **Internal Dependencies**: Use `workspace:*` for inter-package dependencies
+
+## TypeScript Conventions
+
+- **Strict Mode**: All packages use strict TypeScript
+- **Node Imports**: Use `node:` prefix for built-in modules (e.g., `import { sep } from 'node:path'`)
+- **Local Imports**: Use `.js` extension for local imports (e.g., `import { foo } from './foo.js'`)
+- **Import Order**: Managed by Prettier plugin - do not manually reorder
+- **React Imports**: Do NOT import default React (use named imports like `{ useState }`)
+
+## Testing
+
+- **Framework**: Vitest
+- **Test Location**: Either `*.test.ts` next to source or in `tests/` folder
+- **HTTP Mocking**: MSW (Mock Service Worker) for React client tests
+- **Test Naming**: Use English for test names and descriptions
+
+## Code Style
+
+- **Formatter**: Prettier with single quotes and ES5 trailing commas
+- **Comments**: Do not add comments unless explicitly requested
+- **Language**: English for all code, tests, and commit messages
+
+## Commands
+
+```bash
+yarn build        # Build all packages
+yarn test         # Run tests
+yarn lint         # Run linting
+yarn typecheck    # Type checking
+yarn dev          # Development mode
+```
