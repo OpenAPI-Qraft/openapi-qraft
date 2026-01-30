@@ -39,6 +39,15 @@
       ],
       "ignore": ["src/**/__snapshots__/**", "eslint.config.js"]
     },
+    "packages/plugin": {
+      "project": [
+        "src/**/*.{js,cjs,mjs,jsx,ts,cts,mts,tsx}",
+        "!src/**/__snapshots__/**",
+        "!src/tests/**",
+        "!src/**/fixtures/**"
+      ],
+      "ignore": ["src/**/__snapshots__/**", "eslint.config.js"]
+    },
     "packages/react-client": {
       "project": [
         "src/**/*.{js,cjs,mjs,jsx,ts,cts,mts,tsx}",
