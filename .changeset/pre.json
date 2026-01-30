@@ -18,6 +18,7 @@
     "openapi-qraft-website": "0.0.0"
   },
   "changesets": [
+    "deep-boxes-tan",
     "short-suits-shine"
   ]
 }
