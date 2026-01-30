@@ -4563,6 +4563,19 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@qraft/cli-utils@workspace:packages/cli-utils":
+  version: 0.0.0-use.local
+  resolution: "@qraft/cli-utils@workspace:packages/cli-utils"
+  dependencies:
+    "@openapi-qraft/eslint-config": "workspace:*"
+    "@types/node": "npm:^20.16.5"
+    eslint: "npm:^9.39.1"
+    rimraf: "npm:^6.1.2"
+    typescript: "npm:^5.6.2"
+    vitest: "npm:^3.2.4"
+  languageName: unknown
+  linkType: soft
+
 "@qraft/cli@workspace:packages/cli":
   version: 0.0.0-use.local
   resolution: "@qraft/cli@workspace:packages/cli"
@@ -4593,7 +4606,7 @@ __metadata:
     "@qraft/asyncapi-typescript-plugin":
       optional: true
   bin:
-    openapi-qraft: ./bin.mjs
+    qraft: ./bin.mjs
   languageName: unknown
   linkType: soft
 
