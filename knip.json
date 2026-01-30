@@ -12,7 +12,7 @@
     ".": {
       "ignoreDependencies": ["memfs", "@vitest/coverage-v8"]
     },
-    "packages/cli": {
+    "packages/openapi-cli": {
       "project": [
         "src/**/*.{js,cjs,mjs,jsx,ts,cts,mts,tsx}",
         "!src/**/__snapshots__/**",

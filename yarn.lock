@@ -4029,9 +4029,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@openapi-qraft/cli@workspace:*, @openapi-qraft/cli@workspace:packages/cli, @openapi-qraft/cli@workspace:~":
+"@openapi-qraft/cli@workspace:*, @openapi-qraft/cli@workspace:packages/openapi-cli, @openapi-qraft/cli@workspace:~":
   version: 0.0.0-use.local
-  resolution: "@openapi-qraft/cli@workspace:packages/cli"
+  resolution: "@openapi-qraft/cli@workspace:packages/openapi-cli"
   dependencies:
     "@openapi-qraft/eslint-config": "workspace:*"
     "@openapi-qraft/openapi-typescript-plugin": "workspace:*"
