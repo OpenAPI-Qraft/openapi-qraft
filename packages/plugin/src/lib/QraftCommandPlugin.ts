@@ -1,7 +1,7 @@
-import { QraftCommand } from './QraftCommand.js';
+import { QraftCommand, QraftCommandActionOptions } from './QraftCommand.js';
 
 export interface QraftCommandPlugin<
-  TCommand extends QraftCommand = QraftCommand,
+  TCommand extends QraftCommand<any> = QraftCommand<QraftCommandActionOptions>,
 > {
   setupCommand(command: TCommand): void | Promise<void>;
 
