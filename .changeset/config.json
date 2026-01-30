@@ -6,6 +6,7 @@
     [
       "@openapi-qraft/cli",
       "@openapi-qraft/plugin",
+      "@qraft/plugin",
       "@openapi-qraft/tanstack-query-react-plugin",
       "@openapi-qraft/openapi-typescript-plugin",
       "@openapi-qraft/react",
