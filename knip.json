@@ -30,7 +30,7 @@
       ],
       "ignore": ["src/**/__snapshots__/**", "eslint.config.js"]
     },
-    "packages/plugin": {
+    "packages/openapi-plugin": {
       "project": [
         "src/**/*.{js,cjs,mjs,jsx,ts,cts,mts,tsx}",
         "!src/**/__snapshots__/**",
@@ -93,7 +93,12 @@
       "ignore": ["rollup.config.mjs", "eslint.config.js"]
     },
     "playground": {
-      "ignoreDependencies": ["dotenv", "dotenv-expand", "eslint-plugin-react", "@tanstack/react-query"]
+      "ignoreDependencies": [
+        "dotenv",
+        "dotenv-expand",
+        "eslint-plugin-react",
+        "@tanstack/react-query"
+      ]
     }
   }
 }

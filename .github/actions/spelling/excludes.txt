@@ -95,3 +95,4 @@
 ^website/static/
 ignore$
 ^\Qpackages/react-client/src/lib/urlSerializer.test.ts\E$
+^\Qcontext7.json\E$
