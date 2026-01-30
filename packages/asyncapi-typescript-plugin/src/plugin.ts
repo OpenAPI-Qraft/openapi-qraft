@@ -1,11 +1,12 @@
-import { fileHeader } from '@openapi-qraft/plugin/lib/fileHeader';
-import { formatFileHeader } from '@openapi-qraft/plugin/lib/formatFileHeader';
-import { QraftCommandPlugin } from '@openapi-qraft/plugin/lib/QraftCommandPlugin';
+import { fileHeader } from '@qraft/plugin/lib/fileHeader';
+import { formatFileHeader } from '@qraft/plugin/lib/formatFileHeader';
+import { QraftCommandPlugin } from '@qraft/plugin/lib/QraftCommandPlugin';
 import c from 'ansi-colors';
 import { CommanderError } from 'commander';
 import { generateSchemaTypes } from './generateSchemaTypes.js';
+import { QraftCommand } from './QraftCommand.js';
 
-export const plugin: QraftCommandPlugin = {
+export const plugin: QraftCommandPlugin<QraftCommand> = {
   setupCommand(command) {
     command
       .description('Generate TypeScript types from an AsyncAPI Document.')
