@@ -1,12 +1,13 @@
 import process from 'node:process';
 import { URL } from 'node:url';
-import { Config, createConfig, getMergedConfig } from '@redocly/openapi-core';
 import {
   normalizeOutputDirPath,
-  QraftCommand as QraftCommandBase,
   QraftCommandActionOptions,
+  QraftCommand as QraftCommandBase,
   splitOptionFlags,
 } from '@qraft/plugin';
+import { redoclyOption } from '@qraft/plugin/lib/RedoclyConfigCommand';
+import { Config, createConfig, getMergedConfig } from '@redocly/openapi-core';
 import c from 'ansi-colors';
 import { CommanderError, Option } from 'commander';
 import { Ora } from 'ora';
@@ -28,7 +29,6 @@ import {
   parseOperationNameModifier,
   processOperationNameModifierOption,
 } from './processOperationNameModifierOption.js';
-import { redoclyOption } from './RedoclyConfigCommand.js';
 import { splitCommaSeparatedGlobs } from './splitCommaSeparatedGlobs.js';
 
 export { splitOptionFlags };
@@ -222,15 +222,16 @@ export class QraftCommand extends QraftCommandBase<OpenAPIQraftCommandActionOpti
   }
 }
 
-export interface OpenAPIQraftCommandActionOptions
-  extends QraftCommandActionOptions {
+export interface OpenAPIQraftCommandActionOptions extends QraftCommandActionOptions {
   services: OpenAPIService[];
   schema: OpenAPISchemaType;
 }
 
 export type QraftCommandActionCallback = (
   options: OpenAPIQraftCommandActionOptions,
-  resolve: (files: import('@qraft/plugin/lib/GeneratorFile').GeneratorFile[]) => void
+  resolve: (
+    files: import('@qraft/plugin/lib/GeneratorFile').GeneratorFile[]
+  ) => void
 ) => Promise<void>;
 
 function parseColonSeparatedList(value: string, previous: unknown) {
