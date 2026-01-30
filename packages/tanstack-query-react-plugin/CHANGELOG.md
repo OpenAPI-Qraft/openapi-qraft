@@ -1,5 +1,12 @@
 # @openapi-qraft/tanstack-query-react-plugin
 
+## 2.15.0-beta.1
+
+### Patch Changes
+
+- 7074f50: Fix incorrect overload order in `ServiceOperationUseQuery` and `ServiceOperationUseInfiniteQuery` interfaces. The overloads were swapped, causing TypeScript to incorrectly infer return types. Now the first overload correctly handles cases with `initialData` (returns `DefinedUseQueryResult`), and the second handles cases without it (returns `UseQueryResult`).
+  - @openapi-qraft/plugin@2.15.0-beta.1
+
 ## 2.15.0-beta.0
 
 ### Minor Changes
