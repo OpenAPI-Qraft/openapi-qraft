@@ -1,0 +1,23 @@
+import {
+  QraftCommandActionOptions,
+  QraftCommand as QraftCommandBase,
+} from '@qraft/plugin';
+import c from 'ansi-colors';
+
+export class QraftCommand extends QraftCommandBase<AsyncAPIQraftCommandActionOptions> {
+  constructor(name?: string) {
+    super(name);
+
+    this.usage('[input] [options]').argument(
+      '[input]',
+      'Input AsyncAPI Document file path, URL (json, yml)',
+      null
+    );
+  }
+
+  protected override logVersion() {
+    QraftCommand.spinner.info(`✨ ${c.bold('AsyncAPI Qraft')}`);
+  }
+}
+
+export interface AsyncAPIQraftCommandActionOptions extends QraftCommandActionOptions {}
