@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import type { QraftCommandPlugin } from '@openapi-qraft/plugin/lib/QraftCommandPlugin';
 import { QraftCommand } from '@openapi-qraft/plugin';
-import { RedoclyConfigCommand } from '@openapi-qraft/plugin/lib/RedoclyConfigCommand';
+import { RedoclyConfigCommand } from '@qraft/plugin/lib/RedoclyConfigCommand';
 import { Option, ParseOptions } from 'commander';
 import { builtInPlugins } from './builtInPlugins.js';
 import { handleDeprecatedOptions } from './handleDeprecatedOptions.js';

@@ -1,13 +1,13 @@
 import { relative } from 'node:path';
 import { fileURLToPath, pathToFileURL, URL } from 'node:url';
-import { getRedocAPIsToQraft } from '@openapi-qraft/plugin/lib/getRedocAPIsToQraft';
-import { loadRedoclyConfig } from '@openapi-qraft/plugin/lib/loadRedoclyConfig';
-import { maybeEscapeShellArg } from '@openapi-qraft/plugin/lib/maybeEscapeShellArg';
-import { parseConfigToArgs } from '@openapi-qraft/plugin/lib/parseConfigToArgs';
-import { QraftCommand } from '@openapi-qraft/plugin/lib/QraftCommand';
 import { CONFIG_FILE_NAMES } from '@redocly/openapi-core';
 import c from 'ansi-colors';
 import { Command, CommanderError, Option, ParseOptions } from 'commander';
+import { getRedocAPIsToQraft } from './getRedocAPIsToQraft.js';
+import { loadRedoclyConfig } from './loadRedoclyConfig.js';
+import { maybeEscapeShellArg } from './maybeEscapeShellArg.js';
+import { parseConfigToArgs } from './parseConfigToArgs.js';
+import { QraftCommand } from './QraftCommand.js';
 
 export const redoclyOption = (() => {
   const bin = c.gray.underline('bin');

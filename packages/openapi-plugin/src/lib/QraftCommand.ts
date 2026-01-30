@@ -6,6 +6,8 @@ import {
   QraftCommand as QraftCommandBase,
   splitOptionFlags,
 } from '@qraft/plugin';
+import { getRedocAPIsToQraft } from '@qraft/plugin/lib/getRedocAPIsToQraft';
+import { loadRedoclyConfig } from '@qraft/plugin/lib/loadRedoclyConfig';
 import { redoclyOption } from '@qraft/plugin/lib/RedoclyConfigCommand';
 import { Config, createConfig, getMergedConfig } from '@redocly/openapi-core';
 import c from 'ansi-colors';
@@ -13,9 +15,7 @@ import { CommanderError, Option } from 'commander';
 import { Ora } from 'ora';
 import { packageVersion } from '../packageVersion.js';
 import { filterDocumentPaths } from './filterDocumentPaths.js';
-import { getRedocAPIsToQraft } from './getRedocAPIsToQraft.js';
 import { handleSchemaInput } from './handleSchemaInput.js';
-import { loadRedoclyConfig } from './loadRedoclyConfig.js';
 import { getServices } from './open-api/getServices.js';
 import { OpenAPISchemaType } from './open-api/OpenAPISchemaType.js';
 import { OpenAPIService } from './open-api/OpenAPIService.js';
