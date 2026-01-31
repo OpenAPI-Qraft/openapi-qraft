@@ -1,7 +1,7 @@
 {
   "name": "@qraft/cli-utils",
   "version": "1.0.0",
-  "description": "todo::add description and check others",
+  "description": "Shared CLI utilities for Qraft code generation tools",
   "scripts": {
     "build": "tsc --project tsconfig.build.json",
     "dev": "yarn build --watch --noEmitOnError false",
@@ -11,6 +11,9 @@
     "clean": "rimraf dist/"
   },
   "type": "module",
+  "dependencies": {
+    "@qraft/plugin": "workspace:*"
+  },
   "devDependencies": {
     "@openapi-qraft/eslint-config": "workspace:*",
     "@types/node": "^20.16.5",
@@ -27,10 +30,14 @@
     "!src/**/*.test.*",
     "!src/**/*.spec.*"
   ],
-  "module": "dist/bin.js",
-  "types": "dist/bin.d.ts",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
   "exports": {
     "./package.json": "./package.json",
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
     "./*": {
       "types": "./dist/*.d.ts",
       "import": "./dist/*.js"
