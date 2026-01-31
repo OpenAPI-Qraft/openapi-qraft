@@ -1,7 +1,7 @@
 {
   "name": "@qraft/cli",
   "version": "1.0.0",
-  "description": "todo::add description and check others",
+  "description": "CLI tool for generating type-safe code from OpenAPI and AsyncAPI specifications",
   "scripts": {
     "build": "tsc --project tsconfig.build.json",
     "dev": "yarn build --watch --noEmitOnError false",
@@ -39,6 +39,7 @@
     }
   },
   "dependencies": {
+    "@qraft/cli-utils": "workspace:*",
     "ansi-colors": "^4.1.3",
     "commander": "^14.0.2"
   },
