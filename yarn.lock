@@ -4602,7 +4602,6 @@ __metadata:
     "@openapi-qraft/tanstack-query-react-plugin": "workspace:*"
     "@qraft/asyncapi-plugin": "workspace:*"
     "@qraft/asyncapi-typescript-plugin": "workspace:*"
-    "@qraft/plugin": "workspace:*"
   peerDependenciesMeta:
     "@openapi-qraft/openapi-typescript-plugin":
       optional: true
@@ -4613,8 +4612,6 @@ __metadata:
     "@qraft/asyncapi-plugin":
       optional: true
     "@qraft/asyncapi-typescript-plugin":
-      optional: true
-    "@qraft/plugin":
       optional: true
   bin:
     qraft: ./bin.mjs

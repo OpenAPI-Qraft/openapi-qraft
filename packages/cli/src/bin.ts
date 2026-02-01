@@ -1,5 +1,10 @@
 #!/usr/bin/env node
 import type { ParseOptions } from 'commander';
+import {
+  ASYNCAPI_QRAFT_REDOC_CONFIG_KEY,
+  OPENAPI_QRAFT_REDOC_CONFIG_KEY,
+  RedoclyConfigCommand,
+} from '@qraft/plugin/lib/RedoclyConfigCommand';
 import c from 'ansi-colors';
 import { Command } from 'commander';
 import { packageVersion } from './packageVersion.js';
@@ -72,22 +77,27 @@ async function processRedoclyConfig(
   processArgv: string[],
   processArgvParseOptions?: ParseOptions
 ): Promise<unknown[] | undefined> {
-  const {
-    RedoclyConfigCommand,
-    OPENAPI_QRAFT_REDOC_CONFIG_KEY,
-    ASYNCAPI_QRAFT_REDOC_CONFIG_KEY,
-  } = await import('@qraft/plugin/lib/RedoclyConfigCommand');
-
-  const { qraftOpenapi } = await import('./commands/openapi.js');
-  const { qraftAsyncapi } = await import('./commands/asyncapi.js');
-
   const openapiResults = await new RedoclyConfigCommand(undefined, {
     configKey: OPENAPI_QRAFT_REDOC_CONFIG_KEY,
-  }).parseConfig(qraftOpenapi, processArgv, processArgvParseOptions);
+  }).parseConfig(
+    async (processArgv: string[], processArgvParseOptions?: ParseOptions) => {
+      const { qraftOpenapi } = await import('./commands/openapi.js');
+      return qraftOpenapi(processArgv, processArgvParseOptions);
+    },
+    processArgv,
+    processArgvParseOptions
+  );
 
   const asyncapiResults = await new RedoclyConfigCommand(undefined, {
     configKey: ASYNCAPI_QRAFT_REDOC_CONFIG_KEY,
-  }).parseConfig(qraftAsyncapi, processArgv, processArgvParseOptions);
+  }).parseConfig(
+    async (processArgv: string[], processArgvParseOptions?: ParseOptions) => {
+      const { qraftAsyncapi } = await import('./commands/asyncapi.js');
+      return qraftAsyncapi(processArgv, processArgvParseOptions);
+    },
+    processArgv,
+    processArgvParseOptions
+  );
 
   const allResults = [...(openapiResults ?? []), ...(asyncapiResults ?? [])];
   return allResults.length ? allResults : undefined;

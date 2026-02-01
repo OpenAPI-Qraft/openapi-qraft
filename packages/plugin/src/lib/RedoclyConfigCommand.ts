@@ -186,7 +186,7 @@ export class RedoclyConfigCommand extends Command {
           spinner.text = '';
           spinner.start();
 
-          return callbackFn([openAPIDocument, ...apiProcessArgv], {
+          return await callbackFn([openAPIDocument, ...apiProcessArgv], {
             from: 'user',
           });
         }
@@ -233,7 +233,7 @@ export class RedoclyConfigCommand extends Command {
 type CallbackFn<T> = (
   processArgv: string[],
   processArgvParseOptions?: ParseOptions
-) => T;
+) => T | Promise<T>;
 
 type RedoclyQraftAPIs = {
   [apiName: string]: string[];
