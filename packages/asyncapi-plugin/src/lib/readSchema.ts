@@ -1,4 +1,5 @@
 import type { Readable } from 'node:stream';
+import { fileURLToPath } from 'node:url';
 import type { AsyncAPIDocumentInterface } from '@asyncapi/parser';
 import { fromFile, fromURL, Parser } from '@asyncapi/parser';
 
@@ -23,13 +24,17 @@ export async function readSchema(
   };
   let rawSchemaSource: string | undefined;
 
-  if (
-    source instanceof URL ||
-    (typeof source === 'string' &&
-      (source.startsWith('http://') || source.startsWith('https://')))
+  if (source instanceof URL) {
+    if (source.protocol === 'file:') {
+      parseResult = await fromFile(parser, fileURLToPath(source)).parse();
+    } else {
+      parseResult = await fromURL(parser, source.toString()).parse();
+    }
+  } else if (
+    typeof source === 'string' &&
+    (source.startsWith('http://') || source.startsWith('https://'))
   ) {
-    const url = source instanceof URL ? source.toString() : source;
-    parseResult = await fromURL(parser, url).parse();
+    parseResult = await fromURL(parser, source).parse();
   } else if (typeof source === 'string') {
     parseResult = await fromFile(parser, source).parse();
   } else {
