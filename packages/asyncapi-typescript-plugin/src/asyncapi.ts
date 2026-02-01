@@ -2,7 +2,6 @@ import type { AsyncAPIDocumentInterface } from '@asyncapi/parser';
 import type ts from 'typescript';
 import type { AsyncAPIContext, AsyncAPITSOptions } from './types.js';
 import { performance } from 'node:perf_hooks';
-import { fromFile, fromURL, Parser } from '@asyncapi/parser';
 import { debug } from 'openapi-typescript/dist/lib/utils.js';
 import transformAsyncAPISchema from './transform/index.js';
 
@@ -15,6 +14,11 @@ export const COMMENT_HEADER = `/**
  */
 
 `;
+
+export interface AsyncAPITSInput {
+  document: AsyncAPIDocumentInterface;
+  rawSchema: Record<string, unknown>;
+}
 
 function resolveRef<T>(
   schema: Record<string, unknown>,
@@ -38,67 +42,11 @@ function resolveRef<T>(
   return current as T;
 }
 
-export default async function asyncapiTS(
-  source: string | URL | Record<string, unknown>,
+export default function asyncapiTS(
+  input: AsyncAPITSInput,
   options: AsyncAPITSOptions = {}
-): Promise<ts.Node[]> {
-  if (!source) {
-    throw new Error(
-      'Empty schema. Please specify a URL, file path, or AsyncAPI document object'
-    );
-  }
-
-  const parser = new Parser();
-  let parseResult: {
-    document: AsyncAPIDocumentInterface | undefined;
-    diagnostics: unknown[];
-  };
-
-  const parseStartT = performance.now();
-
-  if (
-    source instanceof URL ||
-    (typeof source === 'string' &&
-      (source.startsWith('http://') || source.startsWith('https://')))
-  ) {
-    const url = source instanceof URL ? source.toString() : source;
-    parseResult = await fromURL(parser, url).parse();
-  } else if (
-    typeof source === 'string' &&
-    !source.trim().startsWith('{') &&
-    !source.includes('asyncapi:')
-  ) {
-    parseResult = await fromFile(parser, source).parse();
-  } else {
-    const sourceString =
-      typeof source === 'string' ? source : JSON.stringify(source);
-    parseResult = await parser.parse(sourceString);
-  }
-
-  debug(
-    'Parsed AsyncAPI document',
-    'asyncapi',
-    performance.now() - parseStartT
-  );
-
-  const { document, diagnostics } = parseResult;
-
-  if (!document) {
-    const errors = (diagnostics as Array<{ message?: string }>)
-      .filter((d) => d.message)
-      .map((d) => d.message)
-      .join('\n');
-    throw new Error(
-      `Failed to parse AsyncAPI document:\n${errors || 'Unknown error'}`
-    );
-  }
-
-  const rawSchema =
-    typeof source === 'string'
-      ? source.trim().startsWith('{')
-        ? JSON.parse(source)
-        : document.json()
-      : source;
+): ts.Node[] {
+  const { document, rawSchema } = input;
 
   const ctx: AsyncAPIContext = {
     alphabetize: options.alphabetize ?? false,
@@ -121,9 +69,9 @@ export default async function asyncapiTS(
         : undefined,
     injectFooter: [],
     document,
-    rawSchema: rawSchema as Record<string, unknown>,
+    rawSchema,
     resolve<T>($ref: string): T | undefined {
-      return resolveRef<T>(rawSchema as Record<string, unknown>, $ref);
+      return resolveRef<T>(rawSchema, $ref);
     },
   };
 
