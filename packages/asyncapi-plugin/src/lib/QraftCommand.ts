@@ -4,6 +4,7 @@ import {
   QraftCommandOptions,
 } from '@qraft/plugin';
 import c from 'ansi-colors';
+import { packageVersion } from '../packageVersion.js';
 
 export class QraftCommand extends QraftCommandBase<AsyncAPIQraftCommandActionOptions> {
   constructor(name?: string, options?: QraftCommandOptions) {
@@ -17,7 +18,9 @@ export class QraftCommand extends QraftCommandBase<AsyncAPIQraftCommandActionOpt
   }
 
   protected override logVersion() {
-    QraftCommand.spinner.info(`✨ ${c.bold('AsyncAPI Qraft')}`);
+    QraftCommand.spinner.info(
+      `✨ ${c.bold(`AsyncAPI Qraft ${packageVersion}`)}`
+    );
   }
 }
 
