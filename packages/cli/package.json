@@ -46,6 +46,11 @@
   },
   "devDependencies": {
     "@openapi-qraft/eslint-config": "workspace:*",
+    "@openapi-qraft/openapi-typescript-plugin": "workspace:*",
+    "@openapi-qraft/plugin": "workspace:*",
+    "@openapi-qraft/tanstack-query-react-plugin": "workspace:*",
+    "@qraft/asyncapi-plugin": "workspace:*",
+    "@qraft/asyncapi-typescript-plugin": "workspace:*",
     "@types/node": "^20.16.5",
     "eslint": "^9.39.1",
     "rimraf": "^6.1.2",

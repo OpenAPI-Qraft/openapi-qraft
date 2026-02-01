@@ -4520,7 +4520,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@qraft/asyncapi-plugin@workspace:^, @qraft/asyncapi-plugin@workspace:packages/asyncapi-plugin":
+"@qraft/asyncapi-plugin@workspace:*, @qraft/asyncapi-plugin@workspace:^, @qraft/asyncapi-plugin@workspace:packages/asyncapi-plugin":
   version: 0.0.0-use.local
   resolution: "@qraft/asyncapi-plugin@workspace:packages/asyncapi-plugin"
   dependencies:
@@ -4545,7 +4545,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@qraft/asyncapi-typescript-plugin@workspace:packages/asyncapi-typescript-plugin":
+"@qraft/asyncapi-typescript-plugin@workspace:*, @qraft/asyncapi-typescript-plugin@workspace:packages/asyncapi-typescript-plugin":
   version: 0.0.0-use.local
   resolution: "@qraft/asyncapi-typescript-plugin@workspace:packages/asyncapi-typescript-plugin"
   dependencies:
@@ -4586,6 +4586,11 @@ __metadata:
   resolution: "@qraft/cli@workspace:packages/cli"
   dependencies:
     "@openapi-qraft/eslint-config": "workspace:*"
+    "@openapi-qraft/openapi-typescript-plugin": "workspace:*"
+    "@openapi-qraft/plugin": "workspace:*"
+    "@openapi-qraft/tanstack-query-react-plugin": "workspace:*"
+    "@qraft/asyncapi-plugin": "workspace:*"
+    "@qraft/asyncapi-typescript-plugin": "workspace:*"
     "@qraft/cli-utils": "workspace:*"
     "@types/node": "npm:^20.16.5"
     ansi-colors: "npm:^4.1.3"
