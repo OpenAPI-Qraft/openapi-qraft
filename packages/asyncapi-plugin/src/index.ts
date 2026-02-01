@@ -1,3 +1,4 @@
+export type { AsyncAPIDocumentInterface } from '@asyncapi/parser';
 export {
   QraftCommand,
   type AsyncAPIQraftCommandActionOptions,

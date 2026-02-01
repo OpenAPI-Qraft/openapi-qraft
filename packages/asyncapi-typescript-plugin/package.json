@@ -34,7 +34,6 @@
     }
   },
   "dependencies": {
-    "@asyncapi/parser": "^3.4.0",
     "@qraft/asyncapi-plugin": "workspace:^",
     "@qraft/cli-utils": "workspace:*",
     "@qraft/plugin": "workspace:^",

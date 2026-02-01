@@ -1,4 +1,4 @@
-import type { AsyncAPIDocumentInterface } from '@asyncapi/parser';
+import type { AsyncAPIDocumentInterface } from '@qraft/asyncapi-plugin';
 import type ts from 'typescript';
 
 export interface AsyncAPITSOptions {

@@ -1,4 +1,4 @@
-import type { AsyncAPIDocumentInterface } from '@asyncapi/parser';
+import type { AsyncAPIDocumentInterface } from '@qraft/asyncapi-plugin';
 import type ts from 'typescript';
 import type { AsyncAPIContext, AsyncAPITSOptions } from './types.js';
 import { performance } from 'node:perf_hooks';
