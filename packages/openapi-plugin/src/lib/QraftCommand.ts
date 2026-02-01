@@ -72,9 +72,6 @@ export class QraftCommand extends QraftCommandBase<OpenAPIQraftCommandActionOpti
   }
 
   async actionCallback(...actionArgs: any[]): Promise<void> {
-    const inputs = actionArgs.filter(
-      (arg) => typeof arg === 'string'
-    ) as string[];
     const args = actionArgs.find(
       (arg) => arg && typeof arg === 'object'
     ) as Record<string, any>;
