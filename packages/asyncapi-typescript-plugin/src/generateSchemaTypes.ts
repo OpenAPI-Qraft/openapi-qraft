@@ -1,5 +1,6 @@
+import type { AsyncAPITSInput } from './asyncapi.js';
 import type { AsyncAPITSOptions } from './types.js';
-import asyncapiTS, { type AsyncAPITSInput, astToString } from './asyncapi.js';
+import asyncapiTS, { astToString } from './asyncapi.js';
 
 export function generateSchemaTypes(
   input: AsyncAPITSInput,

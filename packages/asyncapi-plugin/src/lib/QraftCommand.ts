@@ -55,8 +55,7 @@ export class QraftCommand extends QraftCommandBase<AsyncAPIQraftCommandActionOpt
   }
 }
 
-export interface AsyncAPIQraftCommandActionOptions
-  extends QraftCommandActionOptions {
+export interface AsyncAPIQraftCommandActionOptions extends QraftCommandActionOptions {
   document: AsyncAPIDocumentInterface;
   rawSchema: Record<string, unknown>;
 }

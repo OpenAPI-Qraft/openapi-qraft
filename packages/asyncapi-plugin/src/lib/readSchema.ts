@@ -1,6 +1,6 @@
 import type { Readable } from 'node:stream';
-import { fileURLToPath } from 'node:url';
 import type { AsyncAPIDocumentInterface } from '@asyncapi/parser';
+import { fileURLToPath } from 'node:url';
 import { fromFile, fromURL, Parser } from '@asyncapi/parser';
 
 export interface AsyncAPISchemaResult {
