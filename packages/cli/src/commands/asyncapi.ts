@@ -1,11 +1,11 @@
 import type { ParseOptions } from 'commander';
 import {
   addCommandUsageWithPlugins,
+  createFileHeader,
   extractArgvPluginOptions,
   hasHelpOption,
   setupPlugins,
 } from '@qraft/cli-utils';
-import { createFileHeader } from '@qraft/plugin/lib/fileHeader';
 import { Option } from 'commander';
 import { asyncApiBuiltInPlugins } from '../builtInPlugins.js';
 

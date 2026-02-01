@@ -1,5 +1,5 @@
-import { formatFileHeader } from '@qraft/plugin/lib/formatFileHeader';
 import { QraftCommandPlugin } from '@openapi-qraft/plugin/lib/QraftCommandPlugin';
+import { formatFileHeader } from '@qraft/plugin/lib/formatFileHeader';
 import c from 'ansi-colors';
 import { CommanderError } from 'commander';
 import { generateSchemaTypes } from './generateSchemaTypes.js';

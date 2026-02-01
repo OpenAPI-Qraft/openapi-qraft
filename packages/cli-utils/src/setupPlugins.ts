@@ -31,7 +31,8 @@ export async function setupPlugins<T extends string>({
       throw new Error(`Unknown plugin: '${pluginName}'`);
 
     pluginList.push(
-      (await builtInPlugins[pluginName as keyof typeof builtInPlugins]()).default
+      (await builtInPlugins[pluginName as keyof typeof builtInPlugins]())
+        .default
     );
 
     addUsage?.(command, plugins);

@@ -1,13 +1,14 @@
 #!/usr/bin/env node
+import type { ParseOptions } from 'commander';
 import { QraftCommand } from '@openapi-qraft/plugin';
 import {
   addCommandUsageWithPlugins,
+  createFileHeader,
   extractArgvPluginOptions,
   setupPlugins,
 } from '@qraft/cli-utils';
-import { createFileHeader } from '@qraft/plugin/lib/fileHeader';
 import { RedoclyConfigCommand } from '@qraft/plugin/lib/RedoclyConfigCommand';
-import { Option, type ParseOptions } from 'commander';
+import { Option } from 'commander';
 import { builtInPlugins } from './builtInPlugins.js';
 import { handleDeprecatedOptions } from './handleDeprecatedOptions.js';
 
@@ -48,7 +49,9 @@ async function qraft(
   } else {
     await setupPlugins({
       command,
-      plugins: ['tanstack-query-react'] satisfies (keyof typeof builtInPlugins)[],
+      plugins: [
+        'tanstack-query-react',
+      ] satisfies (keyof typeof builtInPlugins)[],
       builtInPlugins,
       addUsage: addCommandUsageWithPlugins,
     });

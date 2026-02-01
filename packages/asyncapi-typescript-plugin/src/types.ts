@@ -1,7 +1,4 @@
-import type {
-  AsyncAPIDocumentInterface,
-  SchemaInterface,
-} from '@asyncapi/parser';
+import type { AsyncAPIDocumentInterface } from '@asyncapi/parser';
 import type ts from 'typescript';
 
 export interface AsyncAPITSOptions {

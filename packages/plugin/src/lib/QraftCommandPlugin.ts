@@ -5,8 +5,5 @@ export interface QraftCommandPlugin<
 > {
   setupCommand(command: TCommand): void | Promise<void>;
 
-  postSetupCommand?(
-    command: TCommand,
-    plugins: string[]
-  ): void | Promise<void>;
+  postSetupCommand?(command: TCommand, plugins: string[]): void | Promise<void>;
 }

@@ -35,6 +35,7 @@
   },
   "dependencies": {
     "@openapi-qraft/plugin": "workspace:^",
+    "@qraft/cli-utils": "workspace:*",
     "@qraft/plugin": "workspace:^",
     "@redocly/openapi-core": "^1.34.5",
     "ansi-colors": "^4.1.3",

@@ -1,7 +1,7 @@
 import '@qraft/test-utils/vitestFsMock';
-import { createFileHeader } from '@qraft/plugin/lib/fileHeader';
 import fs from 'node:fs';
 import { createRequire } from 'node:module';
+import { createFileHeader } from '@qraft/cli-utils';
 import { beforeAll, describe, expect, test } from 'vitest';
 
 describe('TanStack Query React Client Generation', () => {

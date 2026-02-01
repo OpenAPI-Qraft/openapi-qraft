@@ -20,7 +20,6 @@ import {
   tsLiteral,
   tsModifiers,
   tsNullable,
-  tsOmit,
   tsPropertyIndex,
   tsRecord,
   tsUnion,

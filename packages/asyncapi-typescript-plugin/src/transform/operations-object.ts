@@ -9,7 +9,6 @@ import {
   tsLiteral,
   tsModifiers,
   tsPropertyIndex,
-  tsUnion,
 } from 'openapi-typescript/dist/lib/ts.js';
 import { getEntries } from 'openapi-typescript/dist/lib/utils.js';
 import ts from 'typescript';

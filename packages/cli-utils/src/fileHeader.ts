@@ -6,6 +6,3 @@ export function createFileHeader(cliName: string): string {
 
 `;
 }
-
-// @deprecated Use createFileHeader instead.
-export const fileHeader = createFileHeader('@openapi-qraft/cli');

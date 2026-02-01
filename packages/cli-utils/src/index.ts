@@ -9,3 +9,4 @@ export {
 } from './setupPlugins.js';
 export { addCommandUsageWithPlugins } from './addCommandUsageWithPlugins.js';
 export { hasHelpOption } from './hasHelpOption.js';
+export { createFileHeader } from './fileHeader.js';

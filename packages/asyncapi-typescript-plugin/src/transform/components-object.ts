@@ -33,8 +33,6 @@ import transformMessageObject, {
 import transformSchemaObject from './schema-object.js';
 import { transformServerObject } from './servers-object.js';
 
-type ComponentTransforms = 'schemas' | 'messages' | 'parameters';
-
 export default function transformComponentsObject(
   ctx: AsyncAPIContext
 ): ts.TypeNode {
