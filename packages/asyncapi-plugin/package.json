@@ -6,7 +6,6 @@
   "scripts": {
     "build": "tsc --project tsconfig.build.json",
     "dev": "yarn build --watch --noEmitOnError false",
-    "test": "vitest run --coverage",
     "typecheck": "tsc --noEmit",
     "lint": "eslint",
     "clean": "rimraf dist/",
