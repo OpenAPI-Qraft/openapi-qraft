@@ -1,24 +1,19 @@
-import {
-  OperationSchema,
-  QraftClientOptions,
-  requestFn,
-  RequestFnPayload,
-  RequestFnResponse,
-} from '@openapi-qraft/react';
+import { requestFn } from '@openapi-qraft/react';
 import { QraftSecureRequestFn } from '@openapi-qraft/react/Unstable_QraftSecureRequestFn';
-import {
-  QueryClient,
-  QueryClientProvider,
-  useQueryClient,
-} from '@tanstack/react-query';
+import { QueryClient } from '@tanstack/react-query';
 import {
   ComponentProps,
-  createContext,
   ReactNode,
   useContext,
+  useEffect,
   useState,
 } from 'react';
-import { components, createAPIClient, Services } from './api';
+import {
+  components,
+  createPlaygroundAPIClient,
+  PlaygroundAPIClientContext,
+  Services,
+} from './api';
 
 function AppComponent() {
   const [petIdToEdit, setPetIdToEditToEdit] = useState<number | null>(null);
@@ -98,6 +93,8 @@ function PetListFilter({
   );
 }
 
+const qraft = createPlaygroundAPIClient();
+
 function PetList({
   petsFilter,
   onEdit,
@@ -105,7 +102,6 @@ function PetList({
   petsFilter: PetsFilter;
   onEdit: (petId: number) => void;
 }) {
-  const qraft = useCreateAPIClient();
   const { data, error, isPending } = qraft.pet.findPetsByStatus.useQuery({
     query: { status: petsFilter.status },
   });
@@ -188,7 +184,7 @@ function PetUpdateForm({
   onUpdate: () => void;
   onReset: () => void;
 }) {
-  const qraft = useCreateAPIClient();
+  const qraftContext = usePlaygroundAPIClientContext();
 
   const petParameters: typeof qraft.pet.getPetById.types.parameters = {
     path: { petId },
@@ -202,11 +198,14 @@ function PetUpdateForm({
 
   const { isPending, mutate } = qraft.pet.updatePet.useMutation(undefined, {
     async onMutate(variables) {
-      await qraft.pet.getPetById.cancelQueries({ parameters: petParameters });
+      const miniQraft = createPlaygroundAPIClient(qraftContext);
+      await miniQraft.pet.getPetById.cancelQueries({
+        parameters: petParameters,
+      });
 
-      const prevPet = qraft.pet.getPetById.getQueryData(petParameters);
+      const prevPet = miniQraft.pet.getPetById.getQueryData(petParameters);
 
-      qraft.pet.getPetById.setQueryData(petParameters, (oldData) => ({
+      miniQraft.pet.getPetById.setQueryData(petParameters, (oldData) => ({
         ...oldData,
         ...variables.body,
       }));
@@ -215,12 +214,16 @@ function PetUpdateForm({
     },
     async onError(_error, _variables, context) {
       if (context?.prevPet) {
-        qraft.pet.getPetById.setQueryData(petParameters, context.prevPet);
+        createPlaygroundAPIClient(qraftContext).pet.getPetById.setQueryData(
+          petParameters,
+          context.prevPet
+        );
       }
     },
     async onSuccess(updatedPet) {
-      qraft.pet.getPetById.setQueryData(petParameters, updatedPet);
-      await qraft.pet.findPetsByStatus.invalidateQueries();
+      const miniQraft = createPlaygroundAPIClient(qraftContext);
+      miniQraft.pet.getPetById.setQueryData(petParameters, updatedPet);
+      await miniQraft.pet.findPetsByStatus.invalidateQueries();
       onUpdate();
     },
   });
@@ -292,11 +295,13 @@ function PetCreateForm({
   onCreate: (pet: components['schemas']['Pet']) => void;
   onReset: () => void;
 }) {
-  const qraft = useCreateAPIClient();
+  const qraftContext = usePlaygroundAPIClientContext();
 
   const { isPending, mutate, error } = qraft.pet.addPet.useMutation(undefined, {
     async onSuccess(createdPet) {
-      await qraft.pet.findPetsByStatus.invalidateQueries();
+      await createPlaygroundAPIClient(
+        qraftContext
+      ).pet.findPetsByStatus.invalidateQueries();
       if (!createdPet)
         throw new Error('createdPet not found in addPet.onSuccess');
       onCreate(createdPet);
@@ -414,6 +419,12 @@ function getErrorMessage(error: unknown) {
 const QraftProviders = ({ children }: { children: ReactNode }) => {
   const [queryClient] = useState(() => new QueryClient());
 
+  useEffect(() => {
+    queryClient.mount();
+
+    return queryClient.unmount();
+  }, [queryClient]);
+
   return (
     <QraftSecureRequestFn
       requestFn={requestFn}
@@ -429,63 +440,25 @@ const QraftProviders = ({ children }: { children: ReactNode }) => {
       }}
     >
       {(secureRequestFn) => (
-        <QueryClientProvider client={queryClient}>
-          <APIContext.Provider
-            value={{
-              baseUrl: 'https://petstore3.swagger.io/api/v3',
-              requestFn: secureRequestFn,
-            }}
-          >
-            {children}
-          </APIContext.Provider>
-        </QueryClientProvider>
+        <PlaygroundAPIClientContext.Provider
+          value={{
+            baseUrl: 'https://petstore3.swagger.io/api/v3',
+            requestFn: secureRequestFn,
+            queryClient,
+          }}
+        >
+          {children}
+        </PlaygroundAPIClientContext.Provider>
       )}
     </QraftSecureRequestFn>
   );
 };
 
-function useCreateAPIClient(options?: Partial<QraftClientOptions>) {
-  const apiContextValue = useContext(APIContext);
-
-  const requestFn = options?.requestFn ?? apiContextValue?.requestFn;
-  const baseUrl = options?.baseUrl ?? apiContextValue?.baseUrl;
-  const queryClient = useQueryClient(
-    options && 'queryClient' in options ? options?.queryClient : undefined
-  );
-
-  if (!requestFn)
-    throw new Error('requestFn not found in APIContext or options');
-  if (!baseUrl) throw new Error('baseUrl not found in APIContext or options');
-
-  return createAPIClient({
-    requestFn,
-    baseUrl,
-    queryClient,
-  });
+function usePlaygroundAPIClientContext() {
+  return useContext(PlaygroundAPIClientContext)!;
 }
 
 type PetStatus = NonNullable<components['schemas']['Pet']['status']>;
-
-interface APIContextValue {
-  /**
-   * Base URL to use for the request
-   * @example 'https://api.example.com'
-   */
-  baseUrl?: string;
-
-  /**
-   * The `requestFn` will be invoked with every request.
-   */
-  requestFn<TData, TError>(
-    requestSchema: OperationSchema,
-    requestInfo: RequestFnPayload
-  ): Promise<RequestFnResponse<TData, TError>>;
-
-  /** The QueryClient to use in Hooks */
-  queryClient?: QueryClient;
-}
-
-const APIContext = createContext<APIContextValue | undefined>(undefined);
 
 function assertPetStatus(
   petStatusToCreate: unknown

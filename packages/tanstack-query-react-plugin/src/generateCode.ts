@@ -8,6 +8,7 @@ import { PredefinedParametersGlob } from '@openapi-qraft/plugin/lib/predefineSch
 import c from 'ansi-colors';
 import { Ora } from 'ora';
 import { astToString } from './ts-factory/astToString.js';
+import { getContextFactory } from './ts-factory/getContextFactory.js';
 import { getCreateAPIClientFactory } from './ts-factory/getCreateAPIClientFactory.js';
 import { getCreatePredefinedParametersRequestFnFactory } from './ts-factory/getCreatePredefinedParametersRequestFnFactory.js';
 import {
@@ -53,6 +54,7 @@ export const generateCode = async ({
       overrideImportType
     )),
     ...(await generateServiceIndex(spinner, services, output)),
+    ...(await generateContext(spinner, output)),
     ...(await generateOperationClient(spinner, output, overrideImportType)),
     ...(output.operationPredefinedParameters
       ? await generateCreatePredefinedParametersRequestFn(
@@ -175,6 +177,7 @@ const generateOperationClient = async (
   try {
     output.createApiClientFn.map(([functionName, value]) => {
       const fileName = value.filename?.[0] ?? functionName;
+      const contextName = value.context?.[0];
 
       const code = astToString(
         getCreateAPIClientFactory({
@@ -184,6 +187,7 @@ const generateOperationClient = async (
           servicesDirName: output.servicesDirName,
           explicitImportExtensions: output.explicitImportExtensions,
           createAPIClientFnImportTypeOverrides: overrideImportType?.[fileName],
+          contextName,
         })
       );
 
@@ -203,6 +207,39 @@ const generateOperationClient = async (
   spinner.succeed(c.green('Operation client has been generated'));
 
   return operationClientFiles;
+};
+
+const generateContext = async (spinner: Ora, output: OutputOptions) => {
+  const contextFiles: GeneratorFile[] = [];
+
+  const contextsToGenerate = output.createApiClientFn
+    .filter(([, value]) => value.context?.[0])
+    .map(([, value]) => value.context![0]);
+
+  if (contextsToGenerate.length === 0) {
+    return contextFiles;
+  }
+
+  spinner.start('Generating context');
+
+  try {
+    for (const contextName of contextsToGenerate) {
+      const code = astToString(getContextFactory({ contextName }));
+
+      contextFiles.push({
+        file: new URL(`${contextName}.ts`, output.dir),
+        code: formatFileHeader(output.fileHeader) + code,
+      });
+    }
+  } catch (error) {
+    spinner.fail(c.redBright('Error occurred during context generation'));
+
+    throw error;
+  }
+
+  spinner.succeed(c.green('Context has been generated'));
+
+  return contextFiles;
 };
 
 const generateCreatePredefinedParametersRequestFn = async (

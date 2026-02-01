@@ -118,6 +118,7 @@ function normalizeCreateApiClientFn(
       services: value.services ?? ['all'],
       callbacks: value.callbacks ?? ['all'],
       filename: value.filename ?? [functionName],
+      context: value.context,
     },
   ]);
 }
@@ -207,6 +208,27 @@ function parseCreateApiClientFn(
         'ERR_MULTIPLE_FILENAMES',
         `Provide only one filename for the --create-api-client-fn option`
       );
+  }
+
+  if (
+    'context' in lastOptionConfig &&
+    Array.isArray(lastOptionConfig.context)
+  ) {
+    if (lastOptionConfig.context.length > 1)
+      throw new CommanderError(
+        1,
+        'ERR_MULTIPLE_CONTEXTS',
+        `Provide only one context name for the --create-api-client-fn option`
+      );
+
+    const contextName = lastOptionConfig.context[0];
+    if (contextName && !/^[a-zA-Z_$][a-zA-Z0-9_$]*$/.test(contextName)) {
+      throw new CommanderError(
+        1,
+        'ERR_INVALID_CONTEXT_NAME',
+        `Invalid context name '${contextName}'. Context name must be a valid JavaScript identifier.`
+      );
+    }
   }
 
   return nextValue;

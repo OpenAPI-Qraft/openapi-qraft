@@ -22,25 +22,24 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Copy Playground for E2E Tests
+        run: |
+          mkdir -p "$TEST_PROJECTS_DIR"
+          cp -a e2e/projects/. "$TEST_PROJECTS_DIR/"
+        env:
+          TEST_PROJECTS_DIR: "${{ runner.temp }}/projects"
+
       - name: Setup Node.js 20.x
         uses: actions/setup-node@v4
         with:
           cache: 'yarn'
-          node-version: 20.12.2
+          node-version: 22.22.0
 
       - name: Install Dependencies
         run: yarn install --immutable
 
       - name: Build
-        run: yarn build --filter "@openapi-qraft/*"
-
-      - name: Copy Playground for E2E Tests
-        run: |
-          mkdir -p "$TEST_PROJECTS_DIR"
-          cp -r playground "$TEST_PROJECTS_DIR"
-          cp -a e2e/projects/. "$TEST_PROJECTS_DIR/"
-        env:
-          TEST_PROJECTS_DIR: "${{ runner.temp }}/projects"
+        run: yarn build --filter "@openapi-qraft/*" --force
 
       - name: Remove Verdaccio Storage
         run: rm -rf e2e/verdaccio-storage
@@ -53,3 +52,11 @@ jobs:
 
       - name: Build E2E Projects
         run: TEST_PROJECTS_DIR=${{ runner.temp }}/projects yarn run "e2e:build-projects"
+
+      - name: Upload E2E Project API Clients
+        uses: actions/upload-artifact@v4
+        if: ${{ always() }}
+        with:
+          name: e2e-projects-api-clients
+          path: |
+            ${{ runner.temp }}/projects/**/src

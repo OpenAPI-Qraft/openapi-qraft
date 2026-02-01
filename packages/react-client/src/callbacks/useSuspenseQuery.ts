@@ -25,8 +25,13 @@ export const useSuspenseQuery: <
     >['useSuspenseQuery']
   >
 ) => UseQueryResult<TData, TError> = (qraftOptions, schema, args) => {
-  return useSuspenseQueryTanstack(
+  // @ts-expect-error - Too complex to type
+  const [queryOptions, queryClient] = useComposeUseQueryOptions(
+    qraftOptions,
+    schema,
     // @ts-expect-error - Too complex to type
-    ...useComposeUseQueryOptions(qraftOptions, schema, args, false)
-  ) as never;
+    args,
+    false
+  );
+  return useSuspenseQueryTanstack(queryOptions, queryClient) as never;
 };

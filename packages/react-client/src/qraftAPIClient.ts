@@ -55,32 +55,6 @@ export type CreateAPIClientOptions =
  */
 export function qraftAPIClient<
   Services extends UnionServiceOperationsDeclaration<Services>,
-  Callbacks extends ServiceMethods,
->(
-  services: Services,
-  callbacks: Callbacks,
-  options: CreateAPIQueryClientOptions
-): APIDefaultQueryClientServices<Services>;
-
-/**
- * Creates a QueryClient compatible API Client which contains all operations
- * such as `useQuery`, `useMutation`.
- *
- * @example Fetching data with QueryClient
- * ```ts
- * const api = qraftAPIClient(services, callbacks, {
- *   requestFn: requestFn,
- *   baseUrl: 'https://api.example.com',
- *   queryClient: new QueryClient(),
- * });
- *
- * api.service.operation({
- *   parameters: { path: { id: 1 } },
- * });
- * ```
- */
-export function qraftAPIClient<
-  Services extends UnionServiceOperationsDeclaration<Services>,
   Callbacks extends PartialServiceMethods,
 >(
   services: Services,
@@ -389,7 +363,7 @@ export type UnionServiceOperationsDeclaration<Services> =
   | OperationsDeclaration<Services>
   | OperationDeclaration;
 
-type QueryOperationHookCallbacks = Extract<
+export type QueryOperationHookCallbacks = Extract<
   keyof ServiceMethods,
   | 'useInfiniteQuery'
   | 'useQueries'
@@ -436,7 +410,7 @@ type QueryOperationStateCallbacks =
     >
   | QueryOperationStateHookCallbacks;
 
-type MutationOperationHookCallbacks = Extract<
+export type MutationOperationHookCallbacks = Extract<
   keyof ServiceMethods,
   'useMutation'
 >;
@@ -455,7 +429,7 @@ type InvokeOperationCallback = Extract<
   'operationInvokeFn'
 >;
 
-type UtilityOperationCallbacks = Extract<
+export type UtilityOperationCallbacks = Extract<
   keyof ServiceMethods,
   | 'getQueryKey'
   | 'getInfiniteQueryKey'
@@ -533,7 +507,7 @@ export type APIUtilityClientServices<
   Extract<keyof Callbacks, UtilityOperationCallbacks>
 >;
 
-type ServicesFilteredByCallbacks<
+export type ServicesFilteredByCallbacks<
   Services extends UnionServiceOperationsDeclaration<Services>,
   CallbackList extends OperationCallbackList,
 > = Services extends OperationDeclaration

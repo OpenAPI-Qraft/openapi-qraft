@@ -206,6 +206,10 @@ It is possible to use multiple plugins at the same time. For example, `--plugin 
       - `all` - include all available callbacks (useQuery, useMutation, setQueryData, etc.)
       - `none` - don't include any callbacks by default (they must be specified when calling the function)
       - `useQuery,useMutation,...` - list of specific callbacks to include
+    - `context:<ContextName>` - Generate a React Context that provides `queryClient`, `requestFn`, and `baseUrl` to the API client.
+      When the API client is created without options, it reads these values from the Context at render time.
+      This enables creating the client **outside of React components**, making hooks static and compatible with React Compiler.
+      See [Context-based API Client](/codegen/context-api-client.mdx) for detailed documentation.
   - **Examples:**
     - `--create-api-client-fn createAPIClient services:all callbacks:all` - creates the `createAPIClient()` function that
       includes all services and all callbacks by default (_default_ behavior)
@@ -214,6 +218,9 @@ It is possible to use multiple plugins at the same time. For example, `--plugin 
     building a **minimal bundle size** client where you explicitly control which services and callbacks to include.
     - `--create-api-client-fn createCustomClient filename:create-custom-api services:none callbacks:setQueryData,getQueryData` - creates
       the `createCustomClient()` function in the `create-custom-api.ts` file with no default services and only `setQueryData()` and `getQueryData()` callbacks
+    - `--create-api-client-fn createAPIClient context:APIClientContext callbacks:useQuery,useMutation` - creates
+      the `createAPIClient()` function with a generated `APIClientContext` React Context. When called without options,
+      the client reads `queryClient`, `requestFn`, and `baseUrl` from the Context
 
   ::::tip
   When generating multiple API client functions with different parameters, it might be more convenient to use a configuration file

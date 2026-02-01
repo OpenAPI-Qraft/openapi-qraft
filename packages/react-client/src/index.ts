@@ -13,6 +13,10 @@ export {
   type QraftClientOptions,
 } from './qraftAPIClient.js';
 export {
+  qraftReactAPIClient,
+  type APIContextQueryClientServices,
+} from './qraftReactAPIClient.js';
+export {
   requestFn,
   baseRequestFn,
   urlSerializer,
@@ -26,3 +30,4 @@ export {
   type OperationSchema,
   type RequestFnPayload,
 } from './lib/requestFn.js';
+export { memoizeFunctionCall } from './lib/memoizeFunctionCall.js';
