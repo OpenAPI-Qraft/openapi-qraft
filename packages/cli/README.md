@@ -26,6 +26,9 @@ qraft openapi --plugin openapi-typescript ./openapi.yaml -o ./src/types
 
 # Generate both services and types
 qraft openapi --plugin tanstack-query-react --plugin openapi-typescript ./openapi.yaml -o ./src/api
+
+# Generate from Redocly config
+qraft openapi --redocly
 ```
 
 ### `qraft asyncapi`
@@ -42,6 +45,60 @@ Generate code from AsyncAPI specification.
 ```bash
 # Generate TypeScript types from AsyncAPI
 qraft asyncapi --plugin asyncapi-typescript ./asyncapi.yaml -o ./src/types
+
+# Generate from Redocly config
+qraft asyncapi --redocly
+```
+
+## Redocly Config Support
+
+The CLI supports using a Redocly configuration file (`redocly.yaml`) to generate API clients. This allows you to define multiple API entry points and configure generation options in a single file.
+
+### Configuration Keys
+
+- `x-openapi-qraft` - Configuration for OpenAPI generation
+- `x-asyncapi-qraft` - Configuration for AsyncAPI generation
+
+### Usage
+
+```bash
+# Generate from default redocly.yaml (both OpenAPI and AsyncAPI)
+qraft --redocly
+
+# Generate from specific config file
+qraft --redocly ./path/to/redocly.yaml
+
+# Generate specific APIs
+qraft my-api@v1 --redocly
+
+# Generate only OpenAPI from Redocly config
+qraft openapi --redocly
+
+# Generate only AsyncAPI from Redocly config
+qraft asyncapi --redocly
+```
+
+### Example Configuration
+
+```yaml
+# redocly.yaml
+apis:
+  main:
+    root: ./openapi.json
+    x-openapi-qraft:
+      plugin:
+        tanstack-query-react: true
+        openapi-typescript: true
+      output-dir: src/api
+      clean: true
+
+  events:
+    root: ./asyncapi.json
+    x-asyncapi-qraft:
+      plugin:
+        asyncapi-typescript: true
+      output-dir: src/events
+      clean: true
 ```
 
 ## Options
@@ -51,4 +108,5 @@ All options from the underlying plugins are supported. Use `--help` to see avail
 ```bash
 qraft openapi --help
 qraft asyncapi --help
+qraft openapi --redocly-help
 ```

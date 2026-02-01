@@ -20,7 +20,8 @@
     "@openapi-qraft/plugin": "workspace:*",
     "@openapi-qraft/tanstack-query-react-plugin": "workspace:*",
     "@qraft/asyncapi-plugin": "workspace:*",
-    "@qraft/asyncapi-typescript-plugin": "workspace:*"
+    "@qraft/asyncapi-typescript-plugin": "workspace:*",
+    "@qraft/plugin": "workspace:*"
   },
   "peerDependenciesMeta": {
     "@openapi-qraft/openapi-typescript-plugin": {
@@ -37,6 +38,9 @@
     },
     "@qraft/asyncapi-typescript-plugin": {
       "optional": true
+    },
+    "@qraft/plugin": {
+      "optional": true
     }
   },
   "dependencies": {
@@ -51,6 +55,7 @@
     "@openapi-qraft/tanstack-query-react-plugin": "workspace:*",
     "@qraft/asyncapi-plugin": "workspace:*",
     "@qraft/asyncapi-typescript-plugin": "workspace:*",
+    "@qraft/plugin": "workspace:*",
     "@types/node": "^20.16.5",
     "eslint": "^9.39.1",
     "rimraf": "^6.1.2",

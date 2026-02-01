@@ -4,12 +4,14 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import { CommanderError } from 'commander';
 import { Ora } from 'ora';
 
-export const QRAFT_REDOC_CONFIG_KEY = 'x-openapi-qraft';
+export const OPENAPI_QRAFT_REDOC_CONFIG_KEY = 'x-openapi-qraft';
+export const ASYNCAPI_QRAFT_REDOC_CONFIG_KEY = 'x-asyncapi-qraft';
 
 export function getRedocAPIsToQraft(
   redoc: Config,
   cwd: URL,
   spinner: Ora,
+  configKey: string = OPENAPI_QRAFT_REDOC_CONFIG_KEY,
   apiName?: string
 ) {
   const hasRedoclyApis = Object.keys(redoc?.apis ?? {}).length > 0;
@@ -37,11 +39,13 @@ export function getRedocAPIsToQraft(
       if (apiName && apiName !== itemPpiName) return;
 
       const qraftConfig =
-        QRAFT_REDOC_CONFIG_KEY in api ? api[QRAFT_REDOC_CONFIG_KEY] : undefined;
+        configKey in api
+          ? (api as Record<string, unknown>)[configKey]
+          : undefined;
 
       if (!qraftConfig) {
         return void spinner.warn(
-          `API ${itemPpiName} is missing an \`${QRAFT_REDOC_CONFIG_KEY}\` key. Skipping...`
+          `API ${itemPpiName} is missing an \`${configKey}\` key. Skipping...`
         );
       }
 
@@ -49,7 +53,7 @@ export function getRedocAPIsToQraft(
         throw new CommanderError(
           1,
           'ERR_MISSING_API_CONFIG',
-          `API ${itemPpiName} is missing an \`${QRAFT_REDOC_CONFIG_KEY}\` key. See https://openapi-qraft.github.io/openapi-qraft/docs/codegen/CLI/redocly-config.`
+          `API ${itemPpiName} is missing an \`${configKey}\` key. See https://openapi-qraft.github.io/openapi-qraft/docs/codegen/CLI/redocly-config.`
         );
       }
 
@@ -74,7 +78,7 @@ export function getRedocAPIsToQraft(
         itemPpiName,
         {
           ...api,
-          [QRAFT_REDOC_CONFIG_KEY]: {
+          [configKey]: {
             ...qraftConfigRest,
             ['output-dir']: fileURLToPath(new URL(outputPath, configRoot)),
           },

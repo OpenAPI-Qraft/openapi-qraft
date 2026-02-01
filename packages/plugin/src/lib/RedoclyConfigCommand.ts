@@ -3,11 +3,17 @@ import { fileURLToPath, pathToFileURL, URL } from 'node:url';
 import { CONFIG_FILE_NAMES } from '@redocly/openapi-core';
 import c from 'ansi-colors';
 import { Command, CommanderError, Option, ParseOptions } from 'commander';
-import { getRedocAPIsToQraft } from './getRedocAPIsToQraft.js';
+import {
+  ASYNCAPI_QRAFT_REDOC_CONFIG_KEY,
+  getRedocAPIsToQraft,
+  OPENAPI_QRAFT_REDOC_CONFIG_KEY,
+} from './getRedocAPIsToQraft.js';
 import { loadRedoclyConfig } from './loadRedoclyConfig.js';
 import { maybeEscapeShellArg } from './maybeEscapeShellArg.js';
 import { parseConfigToArgs } from './parseConfigToArgs.js';
 import { QraftCommand } from './QraftCommand.js';
+
+export { ASYNCAPI_QRAFT_REDOC_CONFIG_KEY, OPENAPI_QRAFT_REDOC_CONFIG_KEY };
 
 export const redoclyOption = (() => {
   const bin = c.gray.underline('bin');
@@ -31,20 +37,23 @@ export const redoclyOption = (() => {
     ].join('\n')
   );
 })();
-/**
- * @param name - not used
- */
+export interface RedoclyConfigCommandOptions {
+  configKey?: string;
+}
+
 export class RedoclyConfigCommand extends Command {
   protected readonly cwd: URL;
+  protected readonly configKey: string;
 
   /**
    * Redocly API item and QraftCommand arguments
    */
   protected parsedAPIs: RedoclyQraftAPIs = {};
 
-  constructor(name?: string) {
+  constructor(name?: string, options?: RedoclyConfigCommandOptions) {
     super(name);
     this.cwd = pathToFileURL(`${process.cwd()}/`);
+    this.configKey = options?.configKey ?? OPENAPI_QRAFT_REDOC_CONFIG_KEY;
 
     this.usage(c.green('[apis...] --redocly <config>'))
       .argument(
@@ -75,7 +84,7 @@ export class RedoclyConfigCommand extends Command {
         }
 
         const redocAPIsToQraftEntries = Object.entries(
-          getRedocAPIsToQraft(redoc, this.cwd, spinner)
+          getRedocAPIsToQraft(redoc, this.cwd, spinner, this.configKey)
         ).filter(([apiName]) => !apis.length || apis.includes(apiName));
 
         if (apis.length) {
@@ -105,16 +114,15 @@ export class RedoclyConfigCommand extends Command {
 
         redocAPIsToQraftEntries.forEach(([apiName, api]) => {
           const globalQraftConfig =
-            'x-openapi-qraft' in redoc.rawConfig
-              ? redoc.rawConfig['x-openapi-qraft']
+            this.configKey in redoc.rawConfig
+              ? (redoc.rawConfig as Record<string, unknown>)[this.configKey]
               : undefined;
 
-          const {
-            ['x-openapi-qraft']: {
-              ['output-dir']: outputDir,
-              ...apiQraftConfig
-            },
-          } = api;
+          const apiQraftConfigWithOutput = (api as Record<string, unknown>)[
+            this.configKey
+          ] as { ['output-dir']: string };
+          const { ['output-dir']: outputDir, ...apiQraftConfig } =
+            apiQraftConfigWithOutput;
 
           const cwd = fileURLToPath(this.cwd);
 

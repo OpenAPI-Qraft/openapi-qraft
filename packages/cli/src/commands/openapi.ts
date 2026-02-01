@@ -13,6 +13,24 @@ export async function qraftOpenapi(
   processArgv: string[],
   processArgvParseOptions?: ParseOptions
 ) {
+  const { RedoclyConfigCommand } =
+    await import('@qraft/plugin/lib/RedoclyConfigCommand');
+
+  const redoclyConfigParseResult = await new RedoclyConfigCommand().parseConfig(
+    runOpenapi,
+    processArgv,
+    processArgvParseOptions
+  );
+
+  if (redoclyConfigParseResult?.length) return;
+
+  await runOpenapi(processArgv, processArgvParseOptions);
+}
+
+async function runOpenapi(
+  processArgv: string[],
+  processArgvParseOptions?: ParseOptions
+) {
   const { QraftCommand } = await import('@openapi-qraft/plugin');
 
   const command = new QraftCommand('qraft openapi', {

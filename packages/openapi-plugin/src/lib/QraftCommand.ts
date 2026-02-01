@@ -7,7 +7,10 @@ import {
   QraftCommandOptions,
   splitOptionFlags,
 } from '@qraft/plugin';
-import { getRedocAPIsToQraft } from '@qraft/plugin/lib/getRedocAPIsToQraft';
+import {
+  getRedocAPIsToQraft,
+  OPENAPI_QRAFT_REDOC_CONFIG_KEY,
+} from '@qraft/plugin/lib/getRedocAPIsToQraft';
 import { loadRedoclyConfig } from '@qraft/plugin/lib/loadRedoclyConfig';
 import { redoclyOption } from '@qraft/plugin/lib/RedoclyConfigCommand';
 import { Config, createConfig, getMergedConfig } from '@redocly/openapi-core';
@@ -264,9 +267,13 @@ function handleRedoclySchemaInput(
     );
   }
 
-  const api = getRedocAPIsToQraft(redoc, cwd, spinner, inputAPIName)[
+  const api = getRedocAPIsToQraft(
+    redoc,
+    cwd,
+    spinner,
+    OPENAPI_QRAFT_REDOC_CONFIG_KEY,
     inputAPIName
-  ];
+  )[inputAPIName];
 
   if (!api)
     throw new CommanderError(
