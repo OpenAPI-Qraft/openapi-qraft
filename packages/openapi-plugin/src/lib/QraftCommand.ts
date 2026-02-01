@@ -39,7 +39,7 @@ export class QraftCommand extends QraftCommandBase<OpenAPIQraftCommandActionOpti
 
     this.usage('[input] [options]')
       .argument(
-        '[input]',
+        '[input]', // todo::why now required with <input>?
         'Input OpenAPI Document file path, URL (json, yml)',
         null
       )
