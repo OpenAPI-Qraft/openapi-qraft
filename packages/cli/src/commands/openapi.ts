@@ -2,6 +2,7 @@ import type { ParseOptions } from 'commander';
 import {
   addCommandUsageWithPlugins,
   extractArgvPluginOptions,
+  hasHelpOption,
   setupPlugins,
 } from '@qraft/cli-utils';
 import { Option } from 'commander';
@@ -37,6 +38,12 @@ export async function qraftOpenapi(
           );
         })
     );
+
+    if (!hasHelpOption(argv)) {
+      throw new Error(
+        `Plugin must be explicitly specified for openapi command. Available plugins: ${Object.keys(openApiBuiltInPlugins).join(', ')}`
+      );
+    }
   }
 
   await command.parseAsync(argv, processArgvParseOptions);

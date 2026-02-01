@@ -2,6 +2,7 @@
 import type { ParseOptions } from 'commander';
 import c from 'ansi-colors';
 import { Command } from 'commander';
+import { packageVersion } from './packageVersion.js';
 
 export async function main(
   processArgv: string[],
@@ -14,8 +15,7 @@ export async function main(
     .description(
       'Generate type-safe code from OpenAPI and AsyncAPI specifications'
     )
-    .helpOption(false)
-    .version('1.0.0');
+    .version(packageVersion);
 
   program
     .command('openapi')
@@ -26,7 +26,8 @@ export async function main(
       const subcommandArgv = extractSubcommandArgv(processArgv, 'openapi');
       const { qraftOpenapi } = await import('./commands/openapi.js');
       await qraftOpenapi(subcommandArgv, processArgvParseOptions);
-    });
+    })
+    .helpOption(false); // The command handles the help independently
 
   program
     .command('asyncapi')
@@ -37,14 +38,15 @@ export async function main(
       const subcommandArgv = extractSubcommandArgv(processArgv, 'asyncapi');
       const { qraftAsyncapi } = await import('./commands/asyncapi.js');
       await qraftAsyncapi(subcommandArgv, processArgvParseOptions);
-    });
+    })
+    .helpOption(false); // The command handles the help independently
 
   program.addHelpText(
     'after',
     `
 ${c.bold('Examples:')}
   ${c.dim('# Generate React Query hooks from OpenAPI')}
-  $ qraft openapi ./openapi.yaml -o ./src/api
+  $ qraft openapi --plugin tanstack-query-react ./openapi.yaml -o ./src/api
 
   ${c.dim('# Generate TypeScript types from OpenAPI')}
   $ qraft openapi --plugin openapi-typescript ./openapi.yaml -o ./src/types

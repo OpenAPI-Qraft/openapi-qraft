@@ -1,9 +1,11 @@
+import type { ParseOptions } from 'commander';
 import {
   addCommandUsageWithPlugins,
   extractArgvPluginOptions,
+  hasHelpOption,
   setupPlugins,
 } from '@qraft/cli-utils';
-import { Option, type ParseOptions } from 'commander';
+import { Option } from 'commander';
 import { asyncApiBuiltInPlugins } from '../builtInPlugins.js';
 
 export async function qraftAsyncapi(
@@ -12,7 +14,7 @@ export async function qraftAsyncapi(
 ) {
   const { QraftCommand } = await import('@qraft/asyncapi-plugin');
 
-  const command = new QraftCommand();
+  const command = new QraftCommand('qraft asyncapi');
 
   const { argv, plugins } = extractArgvPluginOptions(processArgv);
 
@@ -37,9 +39,11 @@ export async function qraftAsyncapi(
         })
     );
 
-    throw new Error(
-      `Plugin must be explicitly specified for asyncapi command. Available plugins: ${Object.keys(asyncApiBuiltInPlugins).join(', ')}`
-    );
+    if (!hasHelpOption(argv)) {
+      throw new Error(
+        `Plugin must be explicitly specified for asyncapi command. Available plugins: ${Object.keys(asyncApiBuiltInPlugins).join(', ')}`
+      );
+    }
   }
 
   await command.parseAsync(argv, processArgvParseOptions);

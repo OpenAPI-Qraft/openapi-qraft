@@ -9,7 +9,7 @@ export class QraftCommand extends QraftCommandBase<AsyncAPIQraftCommandActionOpt
     super(name);
 
     this.usage('[input] [options]').argument(
-      '[input]',
+      '[input]', // todo::hwy not make it required?
       'Input AsyncAPI Document file path, URL (json, yml)',
       null
     );

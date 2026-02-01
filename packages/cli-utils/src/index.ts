@@ -8,3 +8,4 @@ export {
   type SetupPluginsOptions,
 } from './setupPlugins.js';
 export { addCommandUsageWithPlugins } from './addCommandUsageWithPlugins.js';
+export { hasHelpOption } from './hasHelpOption.js';
