@@ -1,0 +1,503 @@
+export interface servers {
+    "events-test": {
+        host: "test-events.example.com";
+        protocol: "ws";
+        description: "Test WebSocket server for events (lighting measurements)";
+    };
+    "events-prod": {
+        host: "prod-events.example.com";
+        protocol: "wss";
+        description: "Production WebSocket server for events (lighting measurements) secured with TLS";
+    };
+    "commands-test": {
+        host: "test-commands.example.com";
+        protocol: "ws";
+        description: "Test WebSocket server for commands (turn on/off, dim)";
+    };
+    "commands-prod": {
+        host: "prod-commands.example.com";
+        protocol: "wss";
+        description: "Production WebSocket server for commands (turn on/off, dim) secured with TLS";
+    };
+}
+export interface channels {
+    lightingMeasured: {
+        address: "/events/streetlights/{streetlightId}/lighting/measured";
+        messages: {
+            lightMeasured: unknown;
+            lightMeasuredResponse: unknown;
+        };
+        parameters: {
+            streetlightId: unknown;
+        };
+    };
+    lightTurnOn: {
+        address: "/commands/streetlights/{streetlightId}/turn/on";
+        messages: {
+            turnOn: unknown;
+            turnOnResponse: unknown;
+        };
+        parameters: {
+            streetlightId: unknown;
+        };
+    };
+    lightTurnOff: {
+        address: "/commands/streetlights/{streetlightId}/turn/off";
+        messages: {
+            turnOff: unknown;
+            turnOffResponse: unknown;
+        };
+        parameters: {
+            streetlightId: unknown;
+        };
+    };
+    lightsDim: {
+        address: "/commands/streetlights/{streetlightId}/dim";
+        messages: {
+            dimLight: unknown;
+            dimLightResponse: unknown;
+        };
+        parameters: {
+            streetlightId: unknown;
+        };
+    };
+    lightTurnOnDynamicReply: {
+        address: null;
+        messages: {
+            turnOnDynamicResponse: unknown;
+        };
+    };
+    lightTurnOffDynamicReply: {
+        address: null;
+        messages: {
+            turnOffDynamicResponse: unknown;
+        };
+    };
+    lightsDimDynamicReply: {
+        address: null;
+        messages: {
+            dimDynamicResponse: unknown;
+        };
+    };
+    heartbeat: {
+        address: "/system/heartbeat";
+        messages: {
+            heartbeat: unknown;
+        };
+    };
+}
+export interface operations {
+    sendLightMeasurement: {
+        action: "send";
+        summary: "Server sends environmental lighting conditions of a particular streetlight to subscribers.";
+    };
+    receiveLightMeasurement: {
+        action: "receive";
+        summary: "Server receives light measurement data from a sensor and responds with acknowledgment.";
+    };
+    sendLightMeasurementForAnalytics: {
+        action: "send";
+        summary: "Server sends light measurement data for analytics processing.";
+    };
+    sendLightMeasurementWithAck: {
+        action: "send";
+        summary: "Server sends light measurement data and expects acknowledgment from the client.";
+    };
+    sendTurnOnWithDynamicReply: {
+        action: "send";
+        reply: {
+            address: {
+                location: "$message.header#/replyTo";
+                description: "Reply address extracted from message header replyTo field";
+            };
+        };
+        summary: "Server sends turn on command and expects response on a dynamic address from message header.";
+    };
+    receiveTurnOn: {
+        action: "receive";
+        reply: {
+            address: {
+                location: "$message.header#/replyTo";
+                description: "Reply address extracted from message header replyTo field";
+            };
+        };
+        summary: "Server receives command to turn on a streetlight and responds with execution result.";
+    };
+    receiveTurnOff: {
+        action: "receive";
+        reply: {
+            address: {
+                location: "$message.header#/replyTo";
+                description: "Inline reply address extracted from message header";
+            };
+        };
+        summary: "Server receives command to turn off a streetlight and responds with execution result.";
+    };
+    receiveDimLight: {
+        action: "receive";
+        reply: {
+            address: {
+                location: "$message.payload#/responseAddress";
+                description: "Reply address extracted from message payload responseAddress field";
+            };
+        };
+        summary: "Server receives command to dim a streetlight and responds with execution result.";
+    };
+    sendHeartbeat: {
+        action: "send";
+        summary: "Server periodically sends heartbeat messages to all connected clients to verify connection health.";
+    };
+    receiveHeartbeat: {
+        action: "receive";
+        summary: "Server receives heartbeat messages from clients to confirm they are still connected.";
+    };
+}
+export interface components {
+    schemas: {
+        lightMeasuredPayload: {
+            /** @description Light intensity measured in lumens. */
+            lumens?: number;
+            /**
+             * Format: date-time
+             * @description Date and time when the message was sent.
+             */
+            sentAt?: string;
+        };
+        measurementResponsePayload: {
+            /** @description Indicates whether the measurement was successfully received. */
+            received?: boolean;
+            /**
+             * Format: date-time
+             * @description Date and time when the message was sent.
+             */
+            processedAt?: string;
+        };
+        turnOnOffPayload: {
+            /**
+             * @description Whether to turn on or off the light.
+             * @enum {string}
+             */
+            command?: "on" | "off";
+            /**
+             * Format: date-time
+             * @description Date and time when the message was sent.
+             */
+            sentAt?: string;
+        };
+        dimLightPayload: {
+            /** @description Percentage to which the light should be dimmed to. */
+            percentage?: number;
+            /**
+             * Format: date-time
+             * @description Date and time when the message was sent.
+             */
+            sentAt?: string;
+        };
+        commandResponsePayload: {
+            /** @description Indicates whether the command was executed successfully. */
+            success?: boolean;
+            /** @description Human-readable message about the command execution result. */
+            message?: string;
+            /**
+             * Format: date-time
+             * @description Date and time when the message was sent.
+             */
+            executedAt?: string;
+        };
+        /**
+         * Format: date-time
+         * @description Date and time when the message was sent.
+         */
+        sentAt: string;
+        dynamicCommandResponsePayload: {
+            /** @description Indicates whether the command was executed successfully. */
+            success: boolean;
+            /** @description Human-readable message about the command execution result. */
+            message?: string;
+            /**
+             * Format: date-time
+             * @description Date and time when the message was sent.
+             */
+            executedAt?: string;
+            /** @description The dynamic address where this response was sent. */
+            dynamicAddress?: string;
+        };
+        heartbeatPayload: {
+            /**
+             * Format: date-time
+             * @description Date and time when the message was sent.
+             */
+            timestamp: string;
+            /** @description Server timestamp in milliseconds since Unix epoch. */
+            serverTime?: number;
+            /** @description Monotonically increasing sequence number for heartbeat messages. */
+            sequenceNumber: number;
+        };
+    };
+    messages: {
+        /**
+         * Light measured
+         * Inform about environmental lighting conditions of a particular streetlight.
+         */
+        lightMeasured: {
+            name: "lightMeasured";
+            payload?: {
+                /** @description Light intensity measured in lumens. */
+                lumens?: number;
+                /**
+                 * Format: date-time
+                 * @description Date and time when the message was sent.
+                 */
+                sentAt?: string;
+            };
+            headers: {
+                "my-app-header"?: number;
+                /** @description Address to reply to */
+                replyTo?: string;
+                /** @description Correlation identifier for request/reply matching. */
+                reqid: string;
+            };
+            contentType: "application/json";
+            correlationId: {
+                location: "$message.header#/reqid";
+                description: "Correlation ID.";
+            };
+        };
+        /**
+         * Light measurement acknowledgment
+         * Acknowledgment response for received light measurement data.
+         */
+        lightMeasuredResponse: {
+            name: "lightMeasuredResponse";
+            payload?: {
+                /** @description Indicates whether the measurement was successfully received. */
+                received?: boolean;
+                /**
+                 * Format: date-time
+                 * @description Date and time when the message was sent.
+                 */
+                processedAt?: string;
+            };
+            headers?: {
+                "my-app-header"?: number;
+                /** @description Address to reply to */
+                replyTo?: string;
+                /** @description Correlation identifier for request/reply matching. */
+                reqid?: string;
+            };
+            contentType: "application/json";
+            correlationId: {
+                location: "$message.header#/reqid";
+                description: "Correlation ID.";
+            };
+        };
+        /**
+         * Turn on/off
+         * Command a particular streetlight to turn the lights on or off.
+         */
+        turnOnOff: {
+            name: "turnOnOff";
+            payload?: {
+                /**
+                 * @description Whether to turn on or off the light.
+                 * @enum {string}
+                 */
+                command?: "on" | "off";
+                /**
+                 * Format: date-time
+                 * @description Date and time when the message was sent.
+                 */
+                sentAt?: string;
+            };
+            headers: {
+                "my-app-header"?: number;
+                /** @description Address to reply to */
+                replyTo?: string;
+                /** @description Correlation identifier for request/reply matching. */
+                reqid: string;
+            };
+            correlationId: {
+                location: "$message.header#/reqid";
+                description: "Correlation ID.";
+            };
+        };
+        /**
+         * Dim light
+         * Command a particular streetlight to dim the lights.
+         */
+        dimLight: {
+            name: "dimLight";
+            payload?: {
+                /** @description Percentage to which the light should be dimmed to. */
+                percentage?: number;
+                /**
+                 * Format: date-time
+                 * @description Date and time when the message was sent.
+                 */
+                sentAt?: string;
+            };
+            headers: {
+                "my-app-header"?: number;
+                /** @description Address to reply to */
+                replyTo?: string;
+                /** @description Correlation identifier for request/reply matching. */
+                reqid: string;
+            };
+            correlationId: {
+                location: "$message.header#/reqid";
+                description: "Correlation ID.";
+            };
+        };
+        /**
+         * Command response
+         * Response to a command execution with status and details.
+         */
+        commandResponse: {
+            name: "commandResponse";
+            payload?: {
+                /** @description Indicates whether the command was executed successfully. */
+                success?: boolean;
+                /** @description Human-readable message about the command execution result. */
+                message?: string;
+                /**
+                 * Format: date-time
+                 * @description Date and time when the message was sent.
+                 */
+                executedAt?: string;
+            };
+            headers?: {
+                "my-app-header"?: number;
+                /** @description Address to reply to */
+                replyTo?: string;
+            };
+            contentType: "application/json";
+        };
+        /**
+         * Dynamic command response
+         * Response sent to a dynamically determined address.
+         */
+        dynamicCommandResponse: {
+            name: "dynamicCommandResponse";
+            payload: {
+                /** @description Indicates whether the command was executed successfully. */
+                success: boolean;
+                /** @description Human-readable message about the command execution result. */
+                message?: string;
+                /**
+                 * Format: date-time
+                 * @description Date and time when the message was sent.
+                 */
+                executedAt?: string;
+                /** @description The dynamic address where this response was sent. */
+                dynamicAddress?: string;
+            };
+            headers?: {
+                /** @description Address to reply to */
+                replyTo?: string;
+                /** @description Correlation identifier for request/reply matching. */
+                reqid?: string;
+            };
+            contentType: "application/json";
+            correlationId: {
+                location: "$message.header#/reqid";
+                description: "Request ID.";
+            };
+        };
+        /**
+         * Server heartbeat
+         * Periodic heartbeat message sent by the server to verify connection health.
+         */
+        heartbeat: {
+            name: "heartbeat";
+            payload: {
+                /**
+                 * Format: date-time
+                 * @description Date and time when the message was sent.
+                 */
+                timestamp: string;
+                /** @description Server timestamp in milliseconds since Unix epoch. */
+                serverTime?: number;
+                /** @description Monotonically increasing sequence number for heartbeat messages. */
+                sequenceNumber: number;
+            };
+            headers?: {
+                "my-app-header"?: number;
+                /** @description Address to reply to */
+                replyTo?: string;
+            };
+            contentType: "application/json";
+        };
+    };
+    parameters: {
+        /** @description The ID of the streetlight. */
+        streetlightId: {
+            description: "The ID of the streetlight.";
+            location: "$message.payload#/item/id";
+        };
+    };
+    securitySchemes: {
+        bearerAuth: {
+            type: "http";
+            description: "Bearer token authentication";
+        };
+    };
+    servers: {
+        "events-test": {
+            host: "test-events.example.com";
+            protocol: "ws";
+            description: "Test WebSocket server for events (lighting measurements)";
+        };
+        "commands-prod": {
+            host: "prod-commands.example.com";
+            protocol: "wss";
+            description: "Production WebSocket server for commands (turn on/off, dim) secured with TLS";
+        };
+    };
+    messageTraits: {
+        correlationId: {
+            correlationId: {
+                location: "$message.header#/reqid";
+                description: "Correlation ID for request-reply matching, extracted from message header.";
+            };
+        };
+        commonHeaders: {
+            headers?: {
+                "my-app-header"?: number;
+                /** @description Address to reply to */
+                replyTo?: string;
+            };
+        };
+        optionalReplyHeaders: {
+            headers?: {
+                /** @description Address to reply to */
+                replyTo?: string;
+                /** @description Correlation identifier for request/reply matching. */
+                reqid?: string;
+            };
+        };
+    };
+    operationTraits: {
+        websocket: {
+            bindings: unknown;
+        };
+    };
+    replyAddresses: {
+        /** @description Reply address extracted from message header replyTo field */
+        turnOnReplyAddress: {
+            location: "$message.header#/replyTo";
+            description: "Reply address extracted from message header replyTo field";
+        };
+        /** @description Reply address extracted from message payload responseAddress field */
+        dimLightReplyAddress: {
+            location: "$message.payload#/responseAddress";
+            description: "Reply address extracted from message payload responseAddress field";
+        };
+    };
+    correlationIds: {
+        /** @description Request ID. */
+        reqid: {
+            location: "$message.header#/reqid";
+            description: "Request ID.";
+        };
+    };
+}

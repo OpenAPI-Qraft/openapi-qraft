@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
-import { extractArgvPluginOptions } from './bin.js';
+import { extractArgvPluginOptions } from './extractArgvPluginOptions.js';
 
-describe('bin', () => {
+describe('extractArgvPluginOptions', () => {
   describe('extractArgvPluginOptions(...)', () => {
     it('returns single plugin', () => {
       expect(

@@ -5,10 +5,12 @@
   "packageManager": "yarn@4.0.2",
   "exports": {
     "./openapi.json": "./openapi.json",
+    "./asyncapi.json": "./asyncapi.json",
     "./package.json": "./package.json"
   },
   "files": [
-    "openapi.json"
+    "openapi.json",
+    "asyncapi.json"
   ],
   "repository": {
     "type": "git",
