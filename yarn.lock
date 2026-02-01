@@ -4627,9 +4627,22 @@ __metadata:
     camelcase: "npm:^8.0.0"
     commander: "npm:^14.0.2"
     eslint: "npm:^9.39.1"
-    memfs: "npm:^4.11.1"
     micromatch: "npm:^4.0.8"
     ora: "npm:^8.2.0"
+    rimraf: "npm:^6.1.2"
+    typescript: "npm:^5.6.2"
+    vitest: "npm:^3.2.4"
+  languageName: unknown
+  linkType: soft
+
+"@qraft/test-utils@workspace:packages/test-utils":
+  version: 0.0.0-use.local
+  resolution: "@qraft/test-utils@workspace:packages/test-utils"
+  dependencies:
+    "@openapi-qraft/eslint-config": "workspace:*"
+    "@types/node": "npm:^20.16.5"
+    eslint: "npm:^9.39.1"
+    memfs: "npm:^4.11.1"
     rimraf: "npm:^6.1.2"
     typescript: "npm:^5.6.2"
     vitest: "npm:^3.2.4"

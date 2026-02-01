@@ -47,7 +47,6 @@
     "@types/node": "^20.16.5",
     "@vitest/coverage-v8": "^3.2.4",
     "eslint": "^9.39.1",
-    "memfs": "^4.11.1",
     "rimraf": "^6.1.2",
     "typescript": "^5.6.2",
     "vitest": "^3.2.4"
