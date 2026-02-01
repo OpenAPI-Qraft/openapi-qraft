@@ -22,6 +22,7 @@
     "@openapi-qraft/e2e",
     "playground",
     "openapi-qraft-website",
-    "@qraft/asyncapi-typescript-plugin"
+    "@qraft/asyncapi-typescript-plugin",
+    "@qraft/test-utils"
   ]
 }

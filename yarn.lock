@@ -4175,6 +4175,7 @@ __metadata:
     "@openapi-qraft/plugin": "workspace:^"
     "@openapi-qraft/test-fixtures": "workspace:*"
     "@qraft/plugin": "workspace:^"
+    "@qraft/test-utils": "workspace:*"
     "@redocly/openapi-core": "npm:^1.34.5"
     "@types/node": "npm:^20.16.5"
     ansi-colors: "npm:^4.1.3"
@@ -4280,6 +4281,7 @@ __metadata:
     "@openapi-qraft/test-fixtures": "workspace:*"
     "@openapi-qraft/ts-factory-code-generator": "workspace:*"
     "@qraft/plugin": "workspace:^"
+    "@qraft/test-utils": "workspace:*"
     ansi-colors: "npm:^4.1.3"
     camelcase: "npm:^8.0.0"
     commander: "npm:^14.0.2"
@@ -4619,6 +4621,7 @@ __metadata:
   dependencies:
     "@openapi-qraft/eslint-config": "workspace:*"
     "@openapi-qraft/test-fixtures": "workspace:*"
+    "@qraft/test-utils": "workspace:*"
     "@redocly/openapi-core": "npm:^1.34.5"
     "@types/micromatch": "npm:^4.0.9"
     "@types/node": "npm:^20.16.5"
@@ -4635,7 +4638,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@qraft/test-utils@workspace:packages/test-utils":
+"@qraft/test-utils@workspace:*, @qraft/test-utils@workspace:packages/test-utils":
   version: 0.0.0-use.local
   resolution: "@qraft/test-utils@workspace:packages/test-utils"
   dependencies:

@@ -1,4 +1,4 @@
-import './vitestFsMock.js';
+import '@qraft/test-utils/vitestFsMock';
 import { createRequire } from 'node:module';
 import { dirname } from 'node:path';
 import { describe, expect, test } from 'vitest';

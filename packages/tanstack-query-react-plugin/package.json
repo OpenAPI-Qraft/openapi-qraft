@@ -48,6 +48,7 @@
     "@openapi-qraft/tanstack-query-react-types": "workspace:*",
     "@openapi-qraft/test-fixtures": "workspace:*",
     "@openapi-qraft/ts-factory-code-generator": "workspace:*",
+    "@qraft/test-utils": "workspace:*",
     "camelcase": "^8.0.0",
     "eslint": "^9.39.1",
     "memfs": "^4.11.1",

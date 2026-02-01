@@ -43,6 +43,7 @@
   "devDependencies": {
     "@openapi-qraft/eslint-config": "workspace:*",
     "@openapi-qraft/test-fixtures": "workspace:*",
+    "@qraft/test-utils": "workspace:*",
     "@types/micromatch": "^4.0.9",
     "@types/node": "^20.16.5",
     "@vitest/coverage-v8": "^3.2.4",
