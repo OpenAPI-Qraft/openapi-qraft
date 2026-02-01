@@ -6,7 +6,11 @@
     [
       "@openapi-qraft/cli",
       "@openapi-qraft/plugin",
+      "@qraft/cli",
+      "@qraft/asyncapi-plugin",
       "@qraft/plugin",
+      "@qraft/asyncapi-typescript-plugin",
+      "@qraft/test-utils",
       "@openapi-qraft/tanstack-query-react-plugin",
       "@openapi-qraft/openapi-typescript-plugin",
       "@openapi-qraft/react",
@@ -18,11 +22,5 @@
   "access": "public",
   "baseBranch": "origin/main",
   "updateInternalDependencies": "patch",
-  "ignore": [
-    "@openapi-qraft/e2e",
-    "playground",
-    "openapi-qraft-website",
-    "@qraft/asyncapi-typescript-plugin",
-    "@qraft/test-utils"
-  ]
+  "ignore": ["@openapi-qraft/e2e", "playground", "openapi-qraft-website"]
 }
