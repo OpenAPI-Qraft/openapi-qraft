@@ -1,5 +1,6 @@
 import type { AsyncAPIDocumentInterface } from '@asyncapi/parser';
 import {
+  handleSchemaInput,
   normalizeOutputDirPath,
   QraftCommandActionOptions,
   QraftCommand as QraftCommandBase,
@@ -7,7 +8,6 @@ import {
 } from '@qraft/plugin';
 import c from 'ansi-colors';
 import { packageVersion } from '../packageVersion.js';
-import { handleSchemaInput } from './handleSchemaInput.js';
 import { readSchema } from './readSchema.js';
 
 export class QraftCommand extends QraftCommandBase<AsyncAPIQraftCommandActionOptions> {
@@ -27,7 +27,12 @@ export class QraftCommand extends QraftCommandBase<AsyncAPIQraftCommandActionOpt
   ): Promise<AsyncAPIQraftCommandActionOptions> {
     const spinner = QraftCommand.spinner;
 
-    const input = handleSchemaInput(inputs[0], this.cwd, spinner);
+    const input = handleSchemaInput(
+      inputs[0],
+      this.cwd,
+      spinner,
+      'AsyncAPI Document'
+    );
 
     spinner.text = 'Reading AsyncAPI Document...';
 

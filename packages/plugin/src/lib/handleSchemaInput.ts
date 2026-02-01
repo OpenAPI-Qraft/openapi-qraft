@@ -6,7 +6,12 @@ import { URL } from 'node:url';
  * Validates Schema's `input` and return `Readable` stream or `URL`
  * @throws {Error} if input is invalid
  */
-export function handleSchemaInput(input: unknown, cwd: URL, spinner: Ora) {
+export function handleSchemaInput(
+  input: unknown,
+  cwd: URL,
+  spinner: Ora,
+  schemaName: string
+) {
   if (!input) {
     /**
      * Handle `stdin`, if no input file is provided
@@ -17,7 +22,7 @@ export function handleSchemaInput(input: unknown, cwd: URL, spinner: Ora) {
      */
     if (process.stdin.isTTY) {
       spinner.fail(
-        'Input file not found or stdin is empty. Please specify `input` argument or pipe OpenAPI Schema to stdin.'
+        `Input file not found or stdin is empty. Please specify \`input\` argument or pipe ${schemaName} to stdin.`
       );
 
       throw new Error('Invalid input.');

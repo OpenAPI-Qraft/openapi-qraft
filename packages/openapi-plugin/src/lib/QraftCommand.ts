@@ -1,6 +1,7 @@
 import process from 'node:process';
 import { URL } from 'node:url';
 import {
+  handleSchemaInput,
   normalizeOutputDirPath,
   QraftCommandActionOptions,
   QraftCommand as QraftCommandBase,
@@ -19,7 +20,6 @@ import { CommanderError, Option } from 'commander';
 import { Ora } from 'ora';
 import { packageVersion } from '../packageVersion.js';
 import { filterDocumentPaths } from './filterDocumentPaths.js';
-import { handleSchemaInput } from './handleSchemaInput.js';
 import { getServices } from './open-api/getServices.js';
 import { OpenAPISchemaType } from './open-api/OpenAPISchemaType.js';
 import { OpenAPIService } from './open-api/OpenAPIService.js';
@@ -111,7 +111,7 @@ export class QraftCommand extends QraftCommandBase<OpenAPIQraftCommandActionOpti
 
     const input = args.redocly
       ? handleRedoclySchemaInput(redoc, inputs[0], this.cwd, spinner)
-      : handleSchemaInput(inputs[0], this.cwd, spinner);
+      : handleSchemaInput(inputs[0], this.cwd, spinner, 'OpenAPI Document');
 
     spinner.text = 'Reading OpenAPI Document...';
 

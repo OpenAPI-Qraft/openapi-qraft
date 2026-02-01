@@ -3,6 +3,7 @@ export {
   QraftCommand,
   splitOptionFlags,
 } from './lib/QraftCommand.js';
+export { handleSchemaInput } from './lib/handleSchemaInput.js';
 export type {
   QraftCommandActionCallback,
   QraftCommandActionOptions,
