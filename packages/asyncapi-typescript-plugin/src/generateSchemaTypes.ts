@@ -1,8 +1,8 @@
 import type { AsyncAPITSOptions } from './types.js';
-import asyncapiTS, { astToString } from './asyncapi.js';
+import asyncapiTS, { type AsyncAPITSInput, astToString } from './asyncapi.js';
 
-export async function generateSchemaTypes(
-  schema: string | URL | Record<string, unknown>,
+export function generateSchemaTypes(
+  input: AsyncAPITSInput,
   {
     silent,
     args,
@@ -10,8 +10,8 @@ export async function generateSchemaTypes(
     silent: boolean;
     args: Omit<AsyncAPITSOptions, 'silent' | 'transform' | 'postTransform'>;
   }
-): Promise<string> {
-  const ast = await asyncapiTS(schema, {
+): string {
+  const ast = asyncapiTS(input, {
     ...args,
     silent,
   });

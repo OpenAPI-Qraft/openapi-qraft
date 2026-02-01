@@ -41,13 +41,16 @@ export const plugin: QraftCommandPlugin<QraftCommand> = {
       )
       .option('--alphabetize', 'Sort object keys alphabetically')
       .option('--exclude-deprecated', 'Exclude deprecated fields from types')
-      .action(async ({ output, args, spinner, inputs }, resolve) => {
+      .action(async ({ output, args, spinner, document, rawSchema }, resolve) => {
         spinner.text = 'Generating AsyncAPI Document Types...';
 
-        const code = await generateSchemaTypes(inputs[0], {
-          args,
-          silent: true,
-        });
+        const code = generateSchemaTypes(
+          { document, rawSchema },
+          {
+            args,
+            silent: true,
+          }
+        );
 
         spinner.succeed(c.green('AsyncAPI Document types generated'));
 
