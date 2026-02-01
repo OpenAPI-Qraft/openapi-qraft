@@ -1,6 +1,7 @@
+import '@qraft/test-utils/vitestFsMock';
+import fs from 'node:fs';
 import { createRequire } from 'node:module';
 import { describe, expect, it, test } from 'vitest';
-import { generateSchemaTypes } from './generateSchemaTypes.js';
 import { asyncapiTypesFileNameOptionParser } from './plugin.js';
 
 describe('asyncapi-typescript types generation', () => {
@@ -9,14 +10,103 @@ describe('asyncapi-typescript types generation', () => {
   );
 
   test('no extra options', async () => {
-    const result = await generateSchemaTypes(asyncAPIDocumentFixturePath, {
-      silent: true,
-      args: {},
-    });
+    const { QraftCommand } = await import('@qraft/asyncapi-plugin');
+    const { plugin } = await import('./plugin.js');
+    const command = new QraftCommand();
+    plugin.setupCommand(command);
 
-    await expect(result).toMatchFileSnapshot(
-      './__snapshots__/no-extra-options.ts.snapshot.ts'
-    );
+    await command.parseAsync([
+      'dummy-node',
+      'dummy-qraft-bin',
+      asyncAPIDocumentFixturePath,
+      '-o',
+      '/mock-fs',
+    ]);
+
+    await expect(
+      fs.readFileSync('/mock-fs/schema.ts', 'utf-8')
+    ).toMatchFileSnapshot('./__snapshots__/no-extra-options.ts.snapshot.ts');
+  });
+
+  test('with --asyncapi-types-file-name', async () => {
+    const { QraftCommand } = await import('@qraft/asyncapi-plugin');
+    const { plugin } = await import('./plugin.js');
+    const command = new QraftCommand();
+    plugin.setupCommand(command);
+
+    await command.parseAsync([
+      'dummy-node',
+      'dummy-qraft-bin',
+      asyncAPIDocumentFixturePath,
+      '-o',
+      '/mock-fs',
+      '--asyncapi-types-file-name',
+      'asyncapi.ts',
+    ]);
+
+    await expect(
+      fs.readFileSync('/mock-fs/asyncapi.ts', 'utf-8')
+    ).toMatchFileSnapshot('./__snapshots__/with-asyncapi-types-file-name.ts.snapshot.ts');
+  });
+
+  test('with --enum', async () => {
+    const { QraftCommand } = await import('@qraft/asyncapi-plugin');
+    const { plugin } = await import('./plugin.js');
+    const command = new QraftCommand();
+    plugin.setupCommand(command);
+
+    await command.parseAsync([
+      'dummy-node',
+      'dummy-qraft-bin',
+      asyncAPIDocumentFixturePath,
+      '-o',
+      '/mock-fs',
+      '--enum',
+    ]);
+
+    await expect(
+      fs.readFileSync('/mock-fs/schema.ts', 'utf-8')
+    ).toMatchFileSnapshot('./__snapshots__/with-enum.ts.snapshot.ts');
+  });
+
+  test('with --enum-values', async () => {
+    const { QraftCommand } = await import('@qraft/asyncapi-plugin');
+    const { plugin } = await import('./plugin.js');
+    const command = new QraftCommand();
+    plugin.setupCommand(command);
+
+    await command.parseAsync([
+      'dummy-node',
+      'dummy-qraft-bin',
+      asyncAPIDocumentFixturePath,
+      '-o',
+      '/mock-fs',
+      '--enum-values',
+    ]);
+
+    await expect(
+      fs.readFileSync('/mock-fs/schema.ts', 'utf-8')
+    ).toMatchFileSnapshot('./__snapshots__/with-enum-values.ts.snapshot.ts');
+  });
+
+  test('with --immutable', async () => {
+    const { QraftCommand } = await import('@qraft/asyncapi-plugin');
+    const { plugin } = await import('./plugin.js');
+    const command = new QraftCommand();
+    plugin.setupCommand(command);
+
+    await command.parseAsync([
+      'dummy-node',
+      'dummy-qraft-bin',
+      asyncAPIDocumentFixturePath,
+      '-o',
+      '/mock-fs',
+      '--immutable',
+    ]);
+
+    await expect(
+      fs.readFileSync('/mock-fs/schema.ts', 'utf-8')
+    ).toMatchFileSnapshot('./__snapshots__/with-immutable.ts.snapshot.ts');
   });
 });
 

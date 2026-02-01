@@ -4553,6 +4553,7 @@ __metadata:
     "@openapi-qraft/eslint-config": "workspace:*"
     "@openapi-qraft/test-fixtures": "workspace:*"
     "@qraft/asyncapi-plugin": "workspace:^"
+    "@qraft/test-utils": "workspace:*"
     "@redocly/openapi-core": "npm:^1.34.5"
     "@types/node": "npm:^20.16.5"
     ansi-colors: "npm:^4.1.3"

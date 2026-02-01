@@ -182,7 +182,7 @@ export interface components {
              * @description Whether to turn on or off the light.
              * @enum {string}
              */
-            command?: "on" | "off";
+            command?: TurnOnOffPayloadCommand;
             /**
              * Format: date-time
              * @description Date and time when the message was sent.
@@ -307,7 +307,7 @@ export interface components {
                  * @description Whether to turn on or off the light.
                  * @enum {string}
                  */
-                command?: "on" | "off";
+                command?: ComponentsMessagesTurnOnOffPayloadCommand;
                 /**
                  * Format: date-time
                  * @description Date and time when the message was sent.
@@ -505,4 +505,12 @@ export interface components {
             description: "Request ID.";
         };
     };
+}
+export enum TurnOnOffPayloadCommand {
+    on = "on",
+    off = "off"
+}
+export enum ComponentsMessagesTurnOnOffPayloadCommand {
+    on = "on",
+    off = "off"
 }

@@ -45,6 +45,7 @@
   "devDependencies": {
     "@openapi-qraft/eslint-config": "workspace:*",
     "@openapi-qraft/test-fixtures": "workspace:*",
+    "@qraft/test-utils": "workspace:*",
     "@types/node": "^20.16.5",
     "eslint": "^9.39.1",
     "memfs": "^4.11.1",

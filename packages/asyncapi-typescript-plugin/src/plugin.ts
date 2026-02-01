@@ -12,9 +12,9 @@ export const plugin: QraftCommandPlugin<QraftCommand> = {
       .description('Generate TypeScript types from an AsyncAPI Document.')
       .option(
         '--asyncapi-types-file-name <path>',
-        'AsyncAPI Schema types file name, e.g.: "asyncapi.d.ts"',
+        'AsyncAPI Schema types file name, e.g.: "schema.d.ts"',
         asyncapiTypesFileNameOptionParser,
-        'asyncapi.ts'
+        'schema.ts'
       )
       .option('--enum', 'Export true TS enums instead of unions')
       .option('--enum-values', 'Export enum values as arrays.')

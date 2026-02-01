@@ -506,3 +506,10 @@ export interface components {
         };
     };
 }
+type ReadonlyArray<T> = [
+    Exclude<T, undefined>
+] extends [
+    unknown[]
+] ? Readonly<Exclude<T, undefined>> : Readonly<Exclude<T, undefined>[]>;
+export const turnOnOffPayloadCommandValues: ReadonlyArray<components["schemas"]["turnOnOffPayload"]["command"]> = ["on", "off"];
+export const componentsMessagesTurnOnOffPayloadCommandValues: ReadonlyArray<components["messages"]["turnOnOff"]["payload"]["command"]> = ["on", "off"];
