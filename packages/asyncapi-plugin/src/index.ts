@@ -1,2 +1,6 @@
-export { QraftCommand } from './lib/QraftCommand.js';
+export {
+  QraftCommand,
+  type AsyncAPIQraftCommandActionOptions,
+} from './lib/QraftCommand.js';
 export { type QraftCommandPlugin } from './lib/QraftCommandPlugin.js';
+export { type AsyncAPISchemaResult } from './lib/readSchema.js';
