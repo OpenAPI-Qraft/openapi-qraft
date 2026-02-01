@@ -1,4 +1,3 @@
-import { fileHeader } from '@qraft/plugin/lib/fileHeader';
 import { formatFileHeader } from '@qraft/plugin/lib/formatFileHeader';
 import { QraftCommandPlugin } from '@openapi-qraft/plugin/lib/QraftCommandPlugin';
 import c from 'ansi-colors';
@@ -76,7 +75,7 @@ export const plugin: QraftCommandPlugin = {
         resolve([
           {
             file: new URL(args.openapiTypesFileName, output.dir),
-            code: formatFileHeader(args.fileHeader ?? fileHeader) + code,
+            code: formatFileHeader(args.fileHeader) + code,
           },
         ]);
       });

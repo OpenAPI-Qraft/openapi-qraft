@@ -5,6 +5,7 @@ import {
   hasHelpOption,
   setupPlugins,
 } from '@qraft/cli-utils';
+import { createFileHeader } from '@qraft/plugin/lib/fileHeader';
 import { Option } from 'commander';
 import { asyncApiBuiltInPlugins } from '../builtInPlugins.js';
 
@@ -14,7 +15,9 @@ export async function qraftAsyncapi(
 ) {
   const { QraftCommand } = await import('@qraft/asyncapi-plugin');
 
-  const command = new QraftCommand('qraft asyncapi');
+  const command = new QraftCommand('qraft asyncapi', {
+    defaultFileHeader: createFileHeader('@qraft/cli'),
+  });
 
   const { argv, plugins } = extractArgvPluginOptions(processArgv);
 

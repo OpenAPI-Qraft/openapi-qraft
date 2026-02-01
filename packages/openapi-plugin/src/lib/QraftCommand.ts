@@ -4,6 +4,7 @@ import {
   normalizeOutputDirPath,
   QraftCommandActionOptions,
   QraftCommand as QraftCommandBase,
+  QraftCommandOptions,
   splitOptionFlags,
 } from '@qraft/plugin';
 import { getRedocAPIsToQraft } from '@qraft/plugin/lib/getRedocAPIsToQraft';
@@ -34,8 +35,8 @@ import { splitCommaSeparatedGlobs } from './splitCommaSeparatedGlobs.js';
 export { splitOptionFlags };
 
 export class QraftCommand extends QraftCommandBase<OpenAPIQraftCommandActionOptions> {
-  constructor(name?: string) {
-    super(name);
+  constructor(name?: string, options?: QraftCommandOptions) {
+    super(name, options);
 
     this.usage('[input] [options]')
       .argument(

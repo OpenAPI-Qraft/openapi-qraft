@@ -5,6 +5,7 @@ import {
   extractArgvPluginOptions,
   setupPlugins,
 } from '@qraft/cli-utils';
+import { createFileHeader } from '@qraft/plugin/lib/fileHeader';
 import { RedoclyConfigCommand } from '@qraft/plugin/lib/RedoclyConfigCommand';
 import { Option, type ParseOptions } from 'commander';
 import { builtInPlugins } from './builtInPlugins.js';
@@ -31,7 +32,9 @@ async function qraft(
   processArgv: string[],
   processArgvParseOptions?: ParseOptions
 ) {
-  const command = new QraftCommand();
+  const command = new QraftCommand(undefined, {
+    defaultFileHeader: createFileHeader('@openapi-qraft/cli'),
+  });
 
   const { argv, plugins } = extractArgvPluginOptions(processArgv);
 

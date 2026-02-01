@@ -5,6 +5,7 @@ import {
   hasHelpOption,
   setupPlugins,
 } from '@qraft/cli-utils';
+import { createFileHeader } from '@qraft/plugin/lib/fileHeader';
 import { Option } from 'commander';
 import { openApiBuiltInPlugins } from '../builtInPlugins.js';
 
@@ -14,7 +15,9 @@ export async function qraftOpenapi(
 ) {
   const { QraftCommand } = await import('@openapi-qraft/plugin');
 
-  const command = new QraftCommand('qraft openapi');
+  const command = new QraftCommand('qraft openapi', {
+    defaultFileHeader: createFileHeader('@qraft/cli'),
+  });
 
   const { argv, plugins } = extractArgvPluginOptions(processArgv);
 

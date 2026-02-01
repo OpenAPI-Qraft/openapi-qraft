@@ -8,6 +8,10 @@ import { GeneratorFile } from './GeneratorFile.js';
 import { OutputOptions } from './OutputOptions.js';
 import { writeGeneratorFiles } from './writeGeneratorFiles.js';
 
+export interface QraftCommandOptions {
+  defaultFileHeader?: string;
+}
+
 export class QraftCommand<
   TActionOptions extends QraftCommandActionOptions = QraftCommandActionOptions,
 > extends Command {
@@ -17,7 +21,7 @@ export class QraftCommand<
   protected registeredPluginActions: QraftCommandActionCallback<TActionOptions>[] =
     [];
 
-  constructor(name?: string) {
+  constructor(name?: string, options?: QraftCommandOptions) {
     super(name);
     this.cwd = pathToFileURL(`${process.cwd()}/`);
 
@@ -35,7 +39,7 @@ export class QraftCommand<
         new Option(
           '--file-header <string>',
           'Header to be added to the generated file (eg: /* eslint-disable */)'
-        )
+        ).default(options?.defaultFileHeader ?? '')
       );
   }
 

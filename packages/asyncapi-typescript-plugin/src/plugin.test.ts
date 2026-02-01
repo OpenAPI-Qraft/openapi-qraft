@@ -1,4 +1,5 @@
 import '@qraft/test-utils/vitestFsMock';
+import { createFileHeader } from '@qraft/plugin/lib/fileHeader';
 import fs from 'node:fs';
 import { createRequire } from 'node:module';
 import { describe, expect, it, test } from 'vitest';
@@ -12,7 +13,9 @@ describe('asyncapi-typescript types generation', () => {
   test('no extra options', async () => {
     const { QraftCommand } = await import('@qraft/asyncapi-plugin');
     const { plugin } = await import('./plugin.js');
-    const command = new QraftCommand();
+    const command = new QraftCommand(undefined, {
+      defaultFileHeader: createFileHeader('@qraft/cli'),
+    });
     plugin.setupCommand(command);
 
     await command.parseAsync([
@@ -31,7 +34,9 @@ describe('asyncapi-typescript types generation', () => {
   test('with --asyncapi-types-file-name', async () => {
     const { QraftCommand } = await import('@qraft/asyncapi-plugin');
     const { plugin } = await import('./plugin.js');
-    const command = new QraftCommand();
+    const command = new QraftCommand(undefined, {
+      defaultFileHeader: createFileHeader('@qraft/cli'),
+    });
     plugin.setupCommand(command);
 
     await command.parseAsync([
@@ -52,7 +57,9 @@ describe('asyncapi-typescript types generation', () => {
   test('with --enum', async () => {
     const { QraftCommand } = await import('@qraft/asyncapi-plugin');
     const { plugin } = await import('./plugin.js');
-    const command = new QraftCommand();
+    const command = new QraftCommand(undefined, {
+      defaultFileHeader: createFileHeader('@qraft/cli'),
+    });
     plugin.setupCommand(command);
 
     await command.parseAsync([
@@ -72,7 +79,9 @@ describe('asyncapi-typescript types generation', () => {
   test('with --enum-values', async () => {
     const { QraftCommand } = await import('@qraft/asyncapi-plugin');
     const { plugin } = await import('./plugin.js');
-    const command = new QraftCommand();
+    const command = new QraftCommand(undefined, {
+      defaultFileHeader: createFileHeader('@qraft/cli'),
+    });
     plugin.setupCommand(command);
 
     await command.parseAsync([
@@ -92,7 +101,9 @@ describe('asyncapi-typescript types generation', () => {
   test('with --immutable', async () => {
     const { QraftCommand } = await import('@qraft/asyncapi-plugin');
     const { plugin } = await import('./plugin.js');
-    const command = new QraftCommand();
+    const command = new QraftCommand(undefined, {
+      defaultFileHeader: createFileHeader('@qraft/cli'),
+    });
     plugin.setupCommand(command);
 
     await command.parseAsync([

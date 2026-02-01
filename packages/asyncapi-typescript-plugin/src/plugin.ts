@@ -1,5 +1,4 @@
 import { QraftCommand } from '@qraft/asyncapi-plugin';
-import { fileHeader } from '@qraft/plugin/lib/fileHeader';
 import { formatFileHeader } from '@qraft/plugin/lib/formatFileHeader';
 import { QraftCommandPlugin } from '@qraft/plugin/lib/QraftCommandPlugin';
 import c from 'ansi-colors';
@@ -55,7 +54,7 @@ export const plugin: QraftCommandPlugin<QraftCommand> = {
         resolve([
           {
             file: new URL(args.asyncapiTypesFileName, output.dir),
-            code: formatFileHeader(args.fileHeader ?? fileHeader) + code,
+            code: formatFileHeader(args.fileHeader) + code,
           },
         ]);
       });

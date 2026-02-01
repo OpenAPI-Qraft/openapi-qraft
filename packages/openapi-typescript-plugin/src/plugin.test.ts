@@ -1,4 +1,5 @@
 import '@qraft/test-utils/vitestFsMock';
+import { createFileHeader } from '@qraft/plugin/lib/fileHeader';
 import fs from 'node:fs';
 import { createRequire } from 'node:module';
 import { describe, expect, it, test } from 'vitest';
@@ -13,7 +14,9 @@ describe('openapi-typescript types generation', () => {
     const { QraftCommand } =
       await import('@openapi-qraft/plugin/lib/QraftCommand');
     const { plugin } = await import('./plugin.js');
-    const command = new QraftCommand();
+    const command = new QraftCommand(undefined, {
+      defaultFileHeader: createFileHeader('@openapi-qraft/cli'),
+    });
     plugin.setupCommand(command);
 
     await command.parseAsync([
@@ -33,7 +36,9 @@ describe('openapi-typescript types generation', () => {
     const { QraftCommand } =
       await import('@openapi-qraft/plugin/lib/QraftCommand');
     const { plugin } = await import('./plugin.js');
-    const command = new QraftCommand();
+    const command = new QraftCommand(undefined, {
+      defaultFileHeader: createFileHeader('@openapi-qraft/cli'),
+    });
     plugin.setupCommand(command);
 
     await command.parseAsync([
@@ -58,7 +63,9 @@ describe('openapi-typescript types generation', () => {
     const { QraftCommand } =
       await import('@openapi-qraft/plugin/lib/QraftCommand');
     const { plugin } = await import('./plugin.js');
-    const command = new QraftCommand();
+    const command = new QraftCommand(undefined, {
+      defaultFileHeader: createFileHeader('@openapi-qraft/cli'),
+    });
     plugin.setupCommand(command);
 
     await command.parseAsync([
@@ -83,7 +90,9 @@ describe('openapi-typescript types generation', () => {
     const { QraftCommand } =
       await import('@openapi-qraft/plugin/lib/QraftCommand');
     const { plugin } = await import('./plugin.js');
-    const command = new QraftCommand();
+    const command = new QraftCommand(undefined, {
+      defaultFileHeader: createFileHeader('@openapi-qraft/cli'),
+    });
     plugin.setupCommand(command);
 
     await command.parseAsync([
