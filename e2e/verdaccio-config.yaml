@@ -76,6 +76,11 @@ packages:
     unpublish: $anonymous
 #    proxy: npmjs
 
+  '@qraft/*':
+    access: $all
+    publish: $anonymous
+    unpublish: $anonymous
+
   '**':
     # allow all users (including non-authenticated users) to read and
     # publish all packages

@@ -1,0 +1,25 @@
+{
+  "name": "typescript-nodenext-qraft-cli-unified",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "codegen": "qraft --redocly redocly.yaml",
+    "e2e:pre-build": "npm run codegen",
+    "e2e:post-build": "echo 'Build completed'"
+  },
+  "dependencies": {
+    "@qraft/cli": "latest",
+    "@qraft/asyncapi-typescript-plugin": "latest",
+    "@openapi-qraft/openapi-typescript-plugin": "latest",
+    "@openapi-qraft/tanstack-query-react-plugin": "latest",
+    "@openapi-qraft/react": "latest",
+    "@types/node": "latest",
+    "typescript": "latest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/OpenAPI-Qraft/openapi-qraft.git"
+  }
+}

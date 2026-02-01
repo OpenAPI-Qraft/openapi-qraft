@@ -1,0 +1,895 @@
+{
+  "asyncapi": "3.0.0",
+  "info": {
+    "title": "Streetlights WebSocket API (Server Perspective)",
+    "version": "1.0.0",
+    "description": "The Smartylighting Streetlights API allows you to remotely manage the city\nlights.\n### Check out its awesome features:\n\n* Turn a specific streetlight on/off 🌃  \n* Dim a specific streetlight 😎\n* Receive real-time information about environmental lighting conditions 📈\n\nThis document describes the server-side operations. Operations with action 'receive' expect messages from clients, and 'reply' indicates what the server will respond with.",
+    "license": {
+      "name": "Apache 2.0",
+      "url": "https://www.apache.org/licenses/LICENSE-2.0"
+    }
+  },
+  "defaultContentType": "application/json",
+  "servers": {
+    "events-test": {
+      "$ref": "#/components/servers/events-test"
+    },
+    "events-prod": {
+      "host": "prod-events.example.com",
+      "protocol": "wss",
+      "description": "Production WebSocket server for events (lighting measurements) secured with TLS",
+      "security": [
+        {
+          "$ref": "#/components/securitySchemes/bearerAuth"
+        }
+      ],
+      "tags": [
+        {
+          "name": "env:prod",
+          "description": "Production environment"
+        },
+        {
+          "name": "kind:events",
+          "description": "Events server"
+        }
+      ]
+    },
+    "commands-test": {
+      "host": "test-commands.example.com",
+      "protocol": "ws",
+      "description": "Test WebSocket server for commands (turn on/off, dim)",
+      "security": [],
+      "tags": [
+        {
+          "name": "env:test",
+          "description": "Test environment"
+        },
+        {
+          "name": "kind:commands",
+          "description": "Commands server"
+        }
+      ]
+    },
+    "commands-prod": {
+      "$ref": "#/components/servers/commands-prod"
+    }
+  },
+  "channels": {
+    "lightingMeasured": {
+      "address": "/events/streetlights/{streetlightId}/lighting/measured",
+      "messages": {
+        "lightMeasured": {
+          "$ref": "#/components/messages/lightMeasured"
+        },
+        "lightMeasuredResponse": {
+          "$ref": "#/components/messages/lightMeasuredResponse"
+        }
+      },
+      "description": "The WebSocket path on which measured values may be sent and received.",
+      "parameters": {
+        "streetlightId": {
+          "$ref": "#/components/parameters/streetlightId"
+        }
+      },
+      "servers": [
+        {
+          "$ref": "#/servers/events-test"
+        },
+        {
+          "$ref": "#/servers/events-prod"
+        }
+      ]
+    },
+    "lightTurnOn": {
+      "address": "/commands/streetlights/{streetlightId}/turn/on",
+      "messages": {
+        "turnOn": {
+          "$ref": "#/components/messages/turnOnOff"
+        },
+        "turnOnResponse": {
+          "$ref": "#/components/messages/commandResponse"
+        }
+      },
+      "parameters": {
+        "streetlightId": {
+          "$ref": "#/components/parameters/streetlightId"
+        }
+      },
+      "servers": [
+        {
+          "$ref": "#/servers/commands-test"
+        },
+        {
+          "$ref": "#/servers/commands-prod"
+        }
+      ]
+    },
+    "lightTurnOff": {
+      "address": "/commands/streetlights/{streetlightId}/turn/off",
+      "messages": {
+        "turnOff": {
+          "$ref": "#/components/messages/turnOnOff"
+        },
+        "turnOffResponse": {
+          "$ref": "#/components/messages/commandResponse"
+        }
+      },
+      "parameters": {
+        "streetlightId": {
+          "$ref": "#/components/parameters/streetlightId"
+        }
+      },
+      "servers": [
+        {
+          "$ref": "#/servers/commands-test"
+        },
+        {
+          "$ref": "#/servers/commands-prod"
+        }
+      ]
+    },
+    "lightsDim": {
+      "address": "/commands/streetlights/{streetlightId}/dim",
+      "messages": {
+        "dimLight": {
+          "$ref": "#/components/messages/dimLight"
+        },
+        "dimLightResponse": {
+          "$ref": "#/components/messages/commandResponse"
+        }
+      },
+      "parameters": {
+        "streetlightId": {
+          "$ref": "#/components/parameters/streetlightId"
+        }
+      },
+      "servers": [
+        {
+          "$ref": "#/servers/commands-test"
+        },
+        {
+          "$ref": "#/servers/commands-prod"
+        }
+      ]
+    },
+    "lightTurnOnDynamicReply": {
+      "address": null,
+      "description": "Dynamic reply channel for turn on command. Address is determined at runtime from message header.",
+      "messages": {
+        "turnOnDynamicResponse": {
+          "$ref": "#/components/messages/dynamicCommandResponse"
+        }
+      },
+      "servers": [
+        {
+          "$ref": "#/servers/commands-test"
+        },
+        {
+          "$ref": "#/servers/commands-prod"
+        }
+      ]
+    },
+    "lightTurnOffDynamicReply": {
+      "address": null,
+      "description": "Dynamic reply channel for turn off command. Address is determined at runtime from message header.",
+      "messages": {
+        "turnOffDynamicResponse": {
+          "$ref": "#/components/messages/dynamicCommandResponse"
+        }
+      },
+      "servers": [
+        {
+          "$ref": "#/servers/commands-test"
+        },
+        {
+          "$ref": "#/servers/commands-prod"
+        }
+      ]
+    },
+    "lightsDimDynamicReply": {
+      "address": null,
+      "description": "Dynamic reply channel for dim command. Address is determined at runtime from message payload.",
+      "messages": {
+        "dimDynamicResponse": {
+          "$ref": "#/components/messages/dynamicCommandResponse"
+        }
+      },
+      "servers": [
+        {
+          "$ref": "#/servers/commands-test"
+        },
+        {
+          "$ref": "#/servers/commands-prod"
+        }
+      ]
+    },
+    "heartbeat": {
+      "address": "/system/heartbeat",
+      "description": "Channel for server heartbeat messages to keep connections alive and monitor client connectivity.",
+      "messages": {
+        "heartbeat": {
+          "$ref": "#/components/messages/heartbeat"
+        }
+      },
+      "servers": [
+        {
+          "$ref": "#/servers/events-test"
+        },
+        {
+          "$ref": "#/servers/events-prod"
+        },
+        {
+          "$ref": "#/servers/commands-test"
+        },
+        {
+          "$ref": "#/servers/commands-prod"
+        }
+      ]
+    }
+  },
+  "operations": {
+    "sendLightMeasurement": {
+      "action": "send",
+      "channel": {
+        "$ref": "#/channels/lightingMeasured"
+      },
+      "summary": "Server sends environmental lighting conditions of a particular streetlight to subscribers.",
+      "traits": [
+        {
+          "$ref": "#/components/operationTraits/websocket"
+        }
+      ],
+      "messages": [
+        {
+          "$ref": "#/channels/lightingMeasured/messages/lightMeasured"
+        }
+      ]
+    },
+    "receiveLightMeasurement": {
+      "action": "receive",
+      "channel": {
+        "$ref": "#/channels/lightingMeasured"
+      },
+      "summary": "Server receives light measurement data from a sensor and responds with acknowledgment.",
+      "traits": [
+        {
+          "$ref": "#/components/operationTraits/websocket"
+        }
+      ],
+      "messages": [
+        {
+          "$ref": "#/channels/lightingMeasured/messages/lightMeasured"
+        }
+      ],
+      "reply": {
+        "channel": {
+          "$ref": "#/channels/lightingMeasured"
+        },
+        "messages": [
+          {
+            "$ref": "#/channels/lightingMeasured/messages/lightMeasuredResponse"
+          }
+        ]
+      }
+    },
+    "sendLightMeasurementForAnalytics": {
+      "action": "send",
+      "channel": {
+        "$ref": "#/channels/lightingMeasured"
+      },
+      "summary": "Server sends light measurement data for analytics processing.",
+      "traits": [
+        {
+          "$ref": "#/components/operationTraits/websocket"
+        }
+      ],
+      "messages": [
+        {
+          "$ref": "#/channels/lightingMeasured/messages/lightMeasured"
+        }
+      ]
+    },
+    "sendLightMeasurementWithAck": {
+      "action": "send",
+      "channel": {
+        "$ref": "#/channels/lightingMeasured"
+      },
+      "summary": "Server sends light measurement data and expects acknowledgment from the client.",
+      "traits": [
+        {
+          "$ref": "#/components/operationTraits/websocket"
+        }
+      ],
+      "messages": [
+        {
+          "$ref": "#/channels/lightingMeasured/messages/lightMeasured"
+        }
+      ],
+      "reply": {
+        "messages": [
+          {
+            "$ref": "#/channels/lightingMeasured/messages/lightMeasuredResponse"
+          }
+        ]
+      }
+    },
+    "sendTurnOnWithDynamicReply": {
+      "action": "send",
+      "channel": {
+        "$ref": "#/channels/lightTurnOn"
+      },
+      "summary": "Server sends turn on command and expects response on a dynamic address from message header.",
+      "traits": [
+        {
+          "$ref": "#/components/operationTraits/websocket"
+        }
+      ],
+      "messages": [
+        {
+          "$ref": "#/channels/lightTurnOn/messages/turnOn"
+        }
+      ],
+      "reply": {
+        "address": {
+          "$ref": "#/components/replyAddresses/turnOnReplyAddress"
+        },
+        "channel": {
+          "$ref": "#/channels/lightTurnOnDynamicReply"
+        },
+        "messages": [
+          {
+            "$ref": "#/channels/lightTurnOnDynamicReply/messages/turnOnDynamicResponse"
+          }
+        ]
+      }
+    },
+    "receiveTurnOn": {
+      "action": "receive",
+      "channel": {
+        "$ref": "#/channels/lightTurnOn"
+      },
+      "summary": "Server receives command to turn on a streetlight and responds with execution result.",
+      "traits": [
+        {
+          "$ref": "#/components/operationTraits/websocket"
+        }
+      ],
+      "messages": [
+        {
+          "$ref": "#/channels/lightTurnOn/messages/turnOn"
+        }
+      ],
+      "reply": {
+        "address": {
+          "$ref": "#/components/replyAddresses/turnOnReplyAddress"
+        },
+        "channel": {
+          "$ref": "#/channels/lightTurnOnDynamicReply"
+        },
+        "messages": [
+          {
+            "$ref": "#/channels/lightTurnOnDynamicReply/messages/turnOnDynamicResponse"
+          }
+        ]
+      }
+    },
+    "receiveTurnOff": {
+      "action": "receive",
+      "channel": {
+        "$ref": "#/channels/lightTurnOff"
+      },
+      "summary": "Server receives command to turn off a streetlight and responds with execution result.",
+      "traits": [
+        {
+          "$ref": "#/components/operationTraits/websocket"
+        }
+      ],
+      "messages": [
+        {
+          "$ref": "#/channels/lightTurnOff/messages/turnOff"
+        }
+      ],
+      "reply": {
+        "address": {
+          "location": "$message.header#/replyTo",
+          "description": "Inline reply address extracted from message header"
+        },
+        "channel": {
+          "$ref": "#/channels/lightTurnOffDynamicReply"
+        },
+        "messages": [
+          {
+            "$ref": "#/channels/lightTurnOffDynamicReply/messages/turnOffDynamicResponse"
+          }
+        ]
+      }
+    },
+    "receiveDimLight": {
+      "action": "receive",
+      "channel": {
+        "$ref": "#/channels/lightsDim"
+      },
+      "summary": "Server receives command to dim a streetlight and responds with execution result.",
+      "traits": [
+        {
+          "$ref": "#/components/operationTraits/websocket"
+        }
+      ],
+      "messages": [
+        {
+          "$ref": "#/channels/lightsDim/messages/dimLight"
+        }
+      ],
+      "reply": {
+        "address": {
+          "$ref": "#/components/replyAddresses/dimLightReplyAddress"
+        },
+        "channel": {
+          "$ref": "#/channels/lightsDimDynamicReply"
+        },
+        "messages": [
+          {
+            "$ref": "#/channels/lightsDimDynamicReply/messages/dimDynamicResponse"
+          }
+        ]
+      }
+    },
+    "sendHeartbeat": {
+      "action": "send",
+      "channel": {
+        "$ref": "#/channels/heartbeat"
+      },
+      "summary": "Server periodically sends heartbeat messages to all connected clients to verify connection health.",
+      "traits": [
+        {
+          "$ref": "#/components/operationTraits/websocket"
+        }
+      ],
+      "messages": [
+        {
+          "$ref": "#/channels/heartbeat/messages/heartbeat"
+        }
+      ]
+    },
+    "receiveHeartbeat": {
+      "action": "receive",
+      "channel": {
+        "$ref": "#/channels/heartbeat"
+      },
+      "summary": "Server receives heartbeat messages from clients to confirm they are still connected.",
+      "traits": [
+        {
+          "$ref": "#/components/operationTraits/websocket"
+        }
+      ],
+      "messages": [
+        {
+          "$ref": "#/channels/heartbeat/messages/heartbeat"
+        }
+      ]
+    }
+  },
+  "components": {
+    "messages": {
+      "lightMeasured": {
+        "name": "lightMeasured",
+        "title": "Light measured",
+        "summary": "Inform about environmental lighting conditions of a particular streetlight.",
+        "contentType": "application/json",
+        "traits": [
+          {
+            "$ref": "#/components/messageTraits/commonHeaders"
+          }
+        ],
+        "headers": {
+          "type": "object",
+          "properties": {
+            "my-app-header": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 100
+            },
+            "replyTo": {
+              "type": "string",
+              "description": "Address to reply to"
+            },
+            "reqid": {
+              "type": "string",
+              "description": "Correlation identifier for request/reply matching."
+            }
+          },
+          "required": ["reqid"]
+        },
+        "correlationId": {
+          "description": "Correlation ID.",
+          "location": "$message.header#/reqid"
+        },
+        "payload": {
+          "$ref": "#/components/schemas/lightMeasuredPayload"
+        }
+      },
+      "lightMeasuredResponse": {
+        "name": "lightMeasuredResponse",
+        "title": "Light measurement acknowledgment",
+        "summary": "Acknowledgment response for received light measurement data.",
+        "contentType": "application/json",
+        "traits": [
+          {
+            "$ref": "#/components/messageTraits/commonHeaders"
+          },
+          {
+            "$ref": "#/components/messageTraits/optionalReplyHeaders"
+          }
+        ],
+        "correlationId": {
+          "description": "Correlation ID.",
+          "location": "$message.header#/reqid"
+        },
+        "payload": {
+          "$ref": "#/components/schemas/measurementResponsePayload"
+        }
+      },
+      "turnOnOff": {
+        "name": "turnOnOff",
+        "title": "Turn on/off",
+        "summary": "Command a particular streetlight to turn the lights on or off.",
+        "traits": [
+          {
+            "$ref": "#/components/messageTraits/commonHeaders"
+          }
+        ],
+        "headers": {
+          "type": "object",
+          "properties": {
+            "my-app-header": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 100
+            },
+            "replyTo": {
+              "type": "string",
+              "description": "Address to reply to"
+            },
+            "reqid": {
+              "type": "string",
+              "description": "Correlation identifier for request/reply matching."
+            }
+          },
+          "required": ["reqid"]
+        },
+        "correlationId": {
+          "description": "Correlation ID.",
+          "location": "$message.header#/reqid"
+        },
+        "payload": {
+          "$ref": "#/components/schemas/turnOnOffPayload"
+        }
+      },
+      "dimLight": {
+        "name": "dimLight",
+        "title": "Dim light",
+        "summary": "Command a particular streetlight to dim the lights.",
+        "traits": [
+          {
+            "$ref": "#/components/messageTraits/commonHeaders"
+          }
+        ],
+        "headers": {
+          "type": "object",
+          "properties": {
+            "my-app-header": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 100
+            },
+            "replyTo": {
+              "type": "string",
+              "description": "Address to reply to"
+            },
+            "reqid": {
+              "type": "string",
+              "description": "Correlation identifier for request/reply matching."
+            }
+          },
+          "required": ["reqid"]
+        },
+        "correlationId": {
+          "description": "Correlation ID.",
+          "location": "$message.header#/reqid"
+        },
+        "payload": {
+          "$ref": "#/components/schemas/dimLightPayload"
+        }
+      },
+      "commandResponse": {
+        "name": "commandResponse",
+        "title": "Command response",
+        "summary": "Response to a command execution with status and details.",
+        "contentType": "application/json",
+        "traits": [
+          {
+            "$ref": "#/components/messageTraits/commonHeaders"
+          }
+        ],
+        "payload": {
+          "$ref": "#/components/schemas/commandResponsePayload"
+        }
+      },
+      "dynamicCommandResponse": {
+        "name": "dynamicCommandResponse",
+        "title": "Dynamic command response",
+        "summary": "Response sent to a dynamically determined address.",
+        "contentType": "application/json",
+        "traits": [
+          {
+            "$ref": "#/components/messageTraits/optionalReplyHeaders"
+          }
+        ],
+        "correlationId": {
+          "$ref": "#/components/correlationIds/reqid"
+        },
+        "payload": {
+          "$ref": "#/components/schemas/dynamicCommandResponsePayload"
+        }
+      },
+      "heartbeat": {
+        "name": "heartbeat",
+        "title": "Server heartbeat",
+        "summary": "Periodic heartbeat message sent by the server to verify connection health.",
+        "contentType": "application/json",
+        "traits": [
+          {
+            "$ref": "#/components/messageTraits/commonHeaders"
+          }
+        ],
+        "payload": {
+          "$ref": "#/components/schemas/heartbeatPayload"
+        }
+      }
+    },
+    "correlationIds": {
+      "reqid": {
+        "description": "Request ID.",
+        "location": "$message.header#/reqid"
+      }
+    },
+    "schemas": {
+      "lightMeasuredPayload": {
+        "type": "object",
+        "properties": {
+          "lumens": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Light intensity measured in lumens."
+          },
+          "sentAt": {
+            "$ref": "#/components/schemas/sentAt"
+          }
+        }
+      },
+      "measurementResponsePayload": {
+        "type": "object",
+        "properties": {
+          "received": {
+            "type": "boolean",
+            "description": "Indicates whether the measurement was successfully received."
+          },
+          "processedAt": {
+            "$ref": "#/components/schemas/sentAt"
+          }
+        }
+      },
+      "turnOnOffPayload": {
+        "type": "object",
+        "properties": {
+          "command": {
+            "type": "string",
+            "enum": [
+              "on",
+              "off"
+            ],
+            "description": "Whether to turn on or off the light."
+          },
+          "sentAt": {
+            "$ref": "#/components/schemas/sentAt"
+          }
+        }
+      },
+      "dimLightPayload": {
+        "type": "object",
+        "properties": {
+          "percentage": {
+            "type": "integer",
+            "description": "Percentage to which the light should be dimmed to.",
+            "minimum": 0,
+            "maximum": 100
+          },
+          "sentAt": {
+            "$ref": "#/components/schemas/sentAt"
+          }
+        }
+      },
+      "commandResponsePayload": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "description": "Indicates whether the command was executed successfully."
+          },
+          "message": {
+            "type": "string",
+            "description": "Human-readable message about the command execution result."
+          },
+          "executedAt": {
+            "$ref": "#/components/schemas/sentAt"
+          }
+        }
+      },
+      "sentAt": {
+        "type": "string",
+        "format": "date-time",
+        "description": "Date and time when the message was sent."
+      },
+      "dynamicCommandResponsePayload": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "description": "Indicates whether the command was executed successfully."
+          },
+          "message": {
+            "type": "string",
+            "description": "Human-readable message about the command execution result."
+          },
+          "executedAt": {
+            "$ref": "#/components/schemas/sentAt"
+          },
+          "dynamicAddress": {
+            "type": "string",
+            "description": "The dynamic address where this response was sent."
+          }
+        },
+        "required": ["success"]
+      },
+      "heartbeatPayload": {
+        "type": "object",
+        "properties": {
+          "timestamp": {
+            "$ref": "#/components/schemas/sentAt"
+          },
+          "serverTime": {
+            "type": "integer",
+            "description": "Server timestamp in milliseconds since Unix epoch."
+          },
+          "sequenceNumber": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Monotonically increasing sequence number for heartbeat messages."
+          }
+        },
+        "required": ["timestamp", "sequenceNumber"]
+      }
+    },
+    "servers": {
+      "events-test": {
+        "host": "test-events.example.com",
+        "protocol": "ws",
+        "description": "Test WebSocket server for events (lighting measurements)",
+        "security": [],
+        "tags": [
+          {
+            "name": "env:test",
+            "description": "Test environment"
+          },
+          {
+            "name": "kind:events",
+            "description": "Events server"
+          }
+        ]
+      },
+      "commands-prod": {
+        "host": "prod-commands.example.com",
+        "protocol": "wss",
+        "description": "Production WebSocket server for commands (turn on/off, dim) secured with TLS",
+        "security": [
+          {
+            "$ref": "#/components/securitySchemes/bearerAuth"
+          }
+        ],
+        "tags": [
+          {
+            "name": "env:prod",
+            "description": "Production environment"
+          },
+          {
+            "name": "kind:commands",
+            "description": "Commands server"
+          }
+        ]
+      }
+    },
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "description": "Bearer token authentication"
+      }
+    },
+    "parameters": {
+      "streetlightId": {
+        "description": "The ID of the streetlight.",
+        "location": "$message.payload#/item/id"
+      }
+    },
+    "messageTraits": {
+      "correlationId": {
+        "correlationId": {
+          "location": "$message.header#/reqid",
+          "description": "Correlation ID for request-reply matching, extracted from message header."
+        }
+      },
+      "commonHeaders": {
+        "headers": {
+          "type": "object",
+          "properties": {
+            "my-app-header": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 100
+            },
+            "replyTo": {
+              "type": "string",
+              "description": "Address to reply to"
+            }
+          }
+        }
+      },
+      "optionalReplyHeaders": {
+        "headers": {
+          "type": "object",
+          "properties": {
+            "replyTo": {
+              "type": "string",
+              "description": "Address to reply to"
+            },
+            "reqid": {
+              "type": "string",
+              "description": "Correlation identifier for request/reply matching."
+            }
+          }
+        }
+      }
+    },
+    "operationTraits": {
+      "websocket": {
+        "bindings": {
+          "ws": {
+            "method": "GET",
+            "query": {
+              "type": "object",
+              "properties": {
+                "clientId": {
+                  "type": "string",
+                  "enum": [
+                    "my-app-id"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "replyAddresses": {
+      "turnOnReplyAddress": {
+        "location": "$message.header#/replyTo",
+        "description": "Reply address extracted from message header replyTo field"
+      },
+      "dimLightReplyAddress": {
+        "location": "$message.payload#/responseAddress",
+        "description": "Reply address extracted from message payload responseAddress field"
+      }
+    }
+  }
+}
