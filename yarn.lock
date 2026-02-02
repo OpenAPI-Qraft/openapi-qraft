@@ -4549,6 +4549,7 @@ __metadata:
     ora: "npm:^8.2.0"
     rimraf: "npm:^6.1.2"
     rollup: "npm:~4.22.5"
+    rollup-plugin-rename-node-modules: "npm:^1.3.1"
     typescript: "npm:^5.6.2"
   languageName: unknown
   linkType: soft
@@ -10844,7 +10845,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"estree-walker@npm:^2.0.2":
+"estree-walker@npm:^2.0.1, estree-walker@npm:^2.0.2":
   version: 2.0.2
   resolution: "estree-walker@npm:2.0.2"
   checksum: 10c0/53a6c54e2019b8c914dc395890153ffdc2322781acf4bd7d1a32d7aedc1710807bdcd866ac133903d5629ec601fbb50abe8c2e5553c7f5a0afdd9b6af6c945af
@@ -14198,6 +14199,15 @@ __metadata:
   bin:
     lz-string: bin/bin.js
   checksum: 10c0/36128e4de34791838abe979b19927c26e67201ca5acf00880377af7d765b38d1c60847e01c5ec61b1a260c48029084ab3893a3925fd6e48a04011364b089991b
+  languageName: node
+  linkType: hard
+
+"magic-string@npm:^0.25.7":
+  version: 0.25.9
+  resolution: "magic-string@npm:0.25.9"
+  dependencies:
+    sourcemap-codec: "npm:^1.4.8"
+  checksum: 10c0/37f5e01a7e8b19a072091f0b45ff127cda676232d373ce2c551a162dd4053c575ec048b9cbb4587a1f03adb6c5d0fd0dd49e8ab070cd2c83a4992b2182d9cb56
   languageName: node
   linkType: hard
 
@@ -19820,6 +19830,18 @@ __metadata:
   languageName: node
   linkType: hard
 
+"rollup-plugin-rename-node-modules@npm:^1.3.1":
+  version: 1.3.1
+  resolution: "rollup-plugin-rename-node-modules@npm:1.3.1"
+  dependencies:
+    estree-walker: "npm:^2.0.1"
+    magic-string: "npm:^0.25.7"
+  peerDependencies:
+    rollup: ^2.28.2
+  checksum: 10c0/ab0f57b6924e3676794671309f5b9f1f92325ea7e54815d97f83af99b056f8b4ba437b01d71931280952f78cd85cf6958974d88e74674aef0e116ace26835d96
+  languageName: node
+  linkType: hard
+
 "rollup-plugin-swc3@npm:~0.12.1":
   version: 0.12.1
   resolution: "rollup-plugin-swc3@npm:0.12.1"
@@ -20642,6 +20664,13 @@ __metadata:
   version: 0.7.6
   resolution: "source-map@npm:0.7.6"
   checksum: 10c0/59f6f05538539b274ba771d2e9e32f6c65451982510564438e048bc1352f019c6efcdc6dd07909b1968144941c14015c2c7d4369fb7c4d7d53ae769716dcc16c
+  languageName: node
+  linkType: hard
+
+"sourcemap-codec@npm:^1.4.8":
+  version: 1.4.8
+  resolution: "sourcemap-codec@npm:1.4.8"
+  checksum: 10c0/f099279fdaae070ff156df7414bbe39aad69cdd615454947ed3e19136bfdfcb4544952685ee73f56e17038f4578091e12b17b283ed8ac013882916594d95b9e6
   languageName: node
   linkType: hard
 
