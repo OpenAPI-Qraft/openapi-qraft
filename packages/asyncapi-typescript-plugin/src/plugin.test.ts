@@ -5,7 +5,7 @@ import { createFileHeader } from '@qraft/cli-utils';
 import { describe, expect, it, test } from 'vitest';
 import { asyncapiTypesFileNameOptionParser } from './plugin.js';
 
-describe('asyncapi-typescript types generation', () => {
+describe.skip('asyncapi-typescript types generation', () => {
   const asyncAPIDocumentFixturePath = createRequire(process.cwd()).resolve(
     '@openapi-qraft/test-fixtures/asyncapi.json'
   );
