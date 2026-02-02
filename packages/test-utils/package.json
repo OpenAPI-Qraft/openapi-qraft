@@ -1,7 +1,7 @@
 {
   "name": "@qraft/test-utils",
   "private": true,
-  "version": "1.0.0",
+  "version": "0.0.0",
   "description": "Shared Test utilities for Qraft code generation tools",
   "scripts": {
     "build": "tsc --project tsconfig.build.json",
