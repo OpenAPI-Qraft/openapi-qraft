@@ -4,6 +4,8 @@ CLI tool for generating type-safe code from OpenAPI and AsyncAPI specifications.
 
 ## Installation
 
+**Requirements:** Node.js >= 20.19.6
+
 ```bash
 npm install -g @qraft/cli
 ```
