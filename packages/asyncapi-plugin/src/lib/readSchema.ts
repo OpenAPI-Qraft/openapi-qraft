@@ -1,9 +1,11 @@
 import type { Readable } from 'node:stream';
 // eslint-disable-next-line import-x/no-extraneous-dependencies
 import type { AsyncAPIDocumentInterface } from '@asyncapi/parser';
+import fs from 'node:fs';
 import { fileURLToPath } from 'node:url';
 // eslint-disable-next-line import-x/no-extraneous-dependencies
-import { fromFile, fromURL, Parser } from '@asyncapi/parser';
+import { Parser } from '@asyncapi/parser';
+import { load } from 'js-yaml';
 
 export interface AsyncAPISchemaResult {
   document: AsyncAPIDocumentInterface;
@@ -28,17 +30,21 @@ export async function readSchema(
 
   if (source instanceof URL) {
     if (source.protocol === 'file:') {
-      parseResult = await fromFile(parser, fileURLToPath(source)).parse();
+      rawSchemaSource = fs.readFileSync(fileURLToPath(source), 'utf-8');
+      parseResult = await parser.parse(rawSchemaSource);
     } else {
-      parseResult = await fromURL(parser, source.toString()).parse();
+      rawSchemaSource = await fetchContent(source.toString());
+      parseResult = await parser.parse(rawSchemaSource);
     }
   } else if (
     typeof source === 'string' &&
     (source.startsWith('http://') || source.startsWith('https://'))
   ) {
-    parseResult = await fromURL(parser, source).parse();
+    rawSchemaSource = await fetchContent(source);
+    parseResult = await parser.parse(rawSchemaSource);
   } else if (typeof source === 'string') {
-    parseResult = await fromFile(parser, source).parse();
+    rawSchemaSource = fs.readFileSync(source, 'utf-8');
+    parseResult = await parser.parse(rawSchemaSource);
   } else {
     rawSchemaSource = await streamToString(source);
     parseResult = await parser.parse(rawSchemaSource);
@@ -57,16 +63,35 @@ export async function readSchema(
   }
 
   const rawSchema = rawSchemaSource
-    ? (JSON.parse(rawSchemaSource) as Record<string, unknown>)
+    ? parseRawSchema(rawSchemaSource)
     : (document.json() as Record<string, unknown>);
 
   return { document, rawSchema };
 }
 
-async function streamToString(stream: Readable): Promise<string> {
-  const chunks: Buffer[] = [];
-  for await (const chunk of stream) {
-    chunks.push(Buffer.from(chunk));
+function parseRawSchema(content: string): Record<string, unknown> {
+  const trimmed = content.trim();
+  if (trimmed[0] === '{' || trimmed[0] === '[') {
+    return JSON.parse(trimmed);
   }
-  return Buffer.concat(chunks).toString('utf-8');
+  return load(trimmed) as Record<string, unknown>;
+}
+
+async function fetchContent(url: string): Promise<string> {
+  const response = await fetch(url);
+  if (!response.ok) {
+    throw new Error(
+      `Failed to fetch ${url}: ${response.status} ${response.statusText}`
+    );
+  }
+  return response.text();
+}
+
+async function streamToString(stream: Readable): Promise<string> {
+  let result = '';
+  stream.setEncoding('utf-8');
+  for await (const chunk of stream) {
+    result += chunk;
+  }
+  return result;
 }

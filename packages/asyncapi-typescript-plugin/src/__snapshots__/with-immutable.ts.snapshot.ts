@@ -4,11 +4,7 @@
  */
 
 export interface servers {
-    readonly "events-test": {
-        readonly host: "test-events.example.com";
-        readonly protocol: "ws";
-        readonly description: "Test WebSocket server for events (lighting measurements)";
-    };
+    readonly "events-test": components["servers"]["events-test"];
     readonly "events-prod": {
         readonly host: "prod-events.example.com";
         readonly protocol: "wss";
@@ -19,141 +15,229 @@ export interface servers {
         readonly protocol: "ws";
         readonly description: "Test WebSocket server for commands (turn on/off, dim)";
     };
-    readonly "commands-prod": {
-        readonly host: "prod-commands.example.com";
-        readonly protocol: "wss";
-        readonly description: "Production WebSocket server for commands (turn on/off, dim) secured with TLS";
-    };
+    readonly "commands-prod": components["servers"]["commands-prod"];
 }
 export interface channels {
     readonly lightingMeasured: {
         readonly address: "/events/streetlights/{streetlightId}/lighting/measured";
         readonly messages: {
-            readonly lightMeasured: unknown;
-            readonly lightMeasuredResponse: unknown;
+            readonly lightMeasured: components["messages"]["lightMeasured"];
+            readonly lightMeasuredResponse: components["messages"]["lightMeasuredResponse"];
         };
         readonly parameters: {
-            readonly streetlightId: unknown;
+            readonly streetlightId: components["parameters"]["streetlightId"];
         };
+        readonly servers: [
+            servers["events-test"],
+            servers["events-prod"]
+        ];
     };
     readonly lightTurnOn: {
         readonly address: "/commands/streetlights/{streetlightId}/turn/on";
         readonly messages: {
-            readonly turnOn: unknown;
-            readonly turnOnResponse: unknown;
+            readonly turnOn: components["messages"]["turnOnOff"];
+            readonly turnOnResponse: components["messages"]["commandResponse"];
         };
         readonly parameters: {
-            readonly streetlightId: unknown;
+            readonly streetlightId: components["parameters"]["streetlightId"];
         };
+        readonly servers: [
+            servers["commands-test"],
+            servers["commands-prod"]
+        ];
     };
     readonly lightTurnOff: {
         readonly address: "/commands/streetlights/{streetlightId}/turn/off";
         readonly messages: {
-            readonly turnOff: unknown;
-            readonly turnOffResponse: unknown;
+            readonly turnOff: components["messages"]["turnOnOff"];
+            readonly turnOffResponse: components["messages"]["commandResponse"];
         };
         readonly parameters: {
-            readonly streetlightId: unknown;
+            readonly streetlightId: components["parameters"]["streetlightId"];
         };
+        readonly servers: [
+            servers["commands-test"],
+            servers["commands-prod"]
+        ];
     };
     readonly lightsDim: {
         readonly address: "/commands/streetlights/{streetlightId}/dim";
         readonly messages: {
-            readonly dimLight: unknown;
-            readonly dimLightResponse: unknown;
+            readonly dimLight: components["messages"]["dimLight"];
+            readonly dimLightResponse: components["messages"]["commandResponse"];
         };
         readonly parameters: {
-            readonly streetlightId: unknown;
+            readonly streetlightId: components["parameters"]["streetlightId"];
         };
+        readonly servers: [
+            servers["commands-test"],
+            servers["commands-prod"]
+        ];
     };
     readonly lightTurnOnDynamicReply: {
         readonly address: null;
         readonly messages: {
-            readonly turnOnDynamicResponse: unknown;
+            readonly turnOnDynamicResponse: components["messages"]["dynamicCommandResponse"];
         };
+        readonly servers: [
+            servers["commands-test"],
+            servers["commands-prod"]
+        ];
     };
     readonly lightTurnOffDynamicReply: {
         readonly address: null;
         readonly messages: {
-            readonly turnOffDynamicResponse: unknown;
+            readonly turnOffDynamicResponse: components["messages"]["dynamicCommandResponse"];
         };
+        readonly servers: [
+            servers["commands-test"],
+            servers["commands-prod"]
+        ];
     };
     readonly lightsDimDynamicReply: {
         readonly address: null;
         readonly messages: {
-            readonly dimDynamicResponse: unknown;
+            readonly dimDynamicResponse: components["messages"]["dynamicCommandResponse"];
         };
+        readonly servers: [
+            servers["commands-test"],
+            servers["commands-prod"]
+        ];
     };
     readonly heartbeat: {
         readonly address: "/system/heartbeat";
         readonly messages: {
-            readonly heartbeat: unknown;
+            readonly heartbeat: components["messages"]["heartbeat"];
         };
+        readonly servers: [
+            servers["events-test"],
+            servers["events-prod"],
+            servers["commands-test"],
+            servers["commands-prod"]
+        ];
     };
 }
 export interface operations {
     readonly sendLightMeasurement: {
         readonly action: "send";
+        readonly channel: channels["lightingMeasured"];
+        readonly messages: [
+            channels["lightingMeasured"]["messages"]["lightMeasured"]
+        ];
         readonly summary: "Server sends environmental lighting conditions of a particular streetlight to subscribers.";
     };
     readonly receiveLightMeasurement: {
         readonly action: "receive";
+        readonly channel: channels["lightingMeasured"];
+        readonly messages: [
+            channels["lightingMeasured"]["messages"]["lightMeasured"]
+        ];
+        readonly reply: {
+            readonly channel: channels["lightingMeasured"];
+            readonly messages: [
+                channels["lightingMeasured"]["messages"]["lightMeasuredResponse"]
+            ];
+        };
         readonly summary: "Server receives light measurement data from a sensor and responds with acknowledgment.";
     };
     readonly sendLightMeasurementForAnalytics: {
         readonly action: "send";
+        readonly channel: channels["lightingMeasured"];
+        readonly messages: [
+            channels["lightingMeasured"]["messages"]["lightMeasured"]
+        ];
         readonly summary: "Server sends light measurement data for analytics processing.";
     };
     readonly sendLightMeasurementWithAck: {
         readonly action: "send";
+        readonly channel: channels["lightingMeasured"];
+        readonly messages: [
+            channels["lightingMeasured"]["messages"]["lightMeasured"]
+        ];
+        readonly reply: {
+            readonly messages: [
+                channels["lightingMeasured"]["messages"]["lightMeasuredResponse"]
+            ];
+        };
         readonly summary: "Server sends light measurement data and expects acknowledgment from the client.";
     };
     readonly sendTurnOnWithDynamicReply: {
         readonly action: "send";
+        readonly channel: channels["lightTurnOn"];
+        readonly messages: [
+            channels["lightTurnOn"]["messages"]["turnOn"]
+        ];
         readonly reply: {
-            readonly address: {
-                readonly location: "$message.header#/replyTo";
-                readonly description: "Reply address extracted from message header replyTo field";
-            };
+            readonly address: components["replyAddresses"]["turnOnReplyAddress"];
+            readonly channel: channels["lightTurnOnDynamicReply"];
+            readonly messages: [
+                channels["lightTurnOnDynamicReply"]["messages"]["turnOnDynamicResponse"]
+            ];
         };
         readonly summary: "Server sends turn on command and expects response on a dynamic address from message header.";
     };
     readonly receiveTurnOn: {
         readonly action: "receive";
+        readonly channel: channels["lightTurnOn"];
+        readonly messages: [
+            channels["lightTurnOn"]["messages"]["turnOn"]
+        ];
         readonly reply: {
-            readonly address: {
-                readonly location: "$message.header#/replyTo";
-                readonly description: "Reply address extracted from message header replyTo field";
-            };
+            readonly address: components["replyAddresses"]["turnOnReplyAddress"];
+            readonly channel: channels["lightTurnOnDynamicReply"];
+            readonly messages: [
+                channels["lightTurnOnDynamicReply"]["messages"]["turnOnDynamicResponse"]
+            ];
         };
         readonly summary: "Server receives command to turn on a streetlight and responds with execution result.";
     };
     readonly receiveTurnOff: {
         readonly action: "receive";
+        readonly channel: channels["lightTurnOff"];
+        readonly messages: [
+            channels["lightTurnOff"]["messages"]["turnOff"]
+        ];
         readonly reply: {
             readonly address: {
                 readonly location: "$message.header#/replyTo";
                 readonly description: "Inline reply address extracted from message header";
             };
+            readonly channel: channels["lightTurnOffDynamicReply"];
+            readonly messages: [
+                channels["lightTurnOffDynamicReply"]["messages"]["turnOffDynamicResponse"]
+            ];
         };
         readonly summary: "Server receives command to turn off a streetlight and responds with execution result.";
     };
     readonly receiveDimLight: {
         readonly action: "receive";
+        readonly channel: channels["lightsDim"];
+        readonly messages: [
+            channels["lightsDim"]["messages"]["dimLight"]
+        ];
         readonly reply: {
-            readonly address: {
-                readonly location: "$message.payload#/responseAddress";
-                readonly description: "Reply address extracted from message payload responseAddress field";
-            };
+            readonly address: components["replyAddresses"]["dimLightReplyAddress"];
+            readonly channel: channels["lightsDimDynamicReply"];
+            readonly messages: [
+                channels["lightsDimDynamicReply"]["messages"]["dimDynamicResponse"]
+            ];
         };
         readonly summary: "Server receives command to dim a streetlight and responds with execution result.";
     };
     readonly sendHeartbeat: {
         readonly action: "send";
+        readonly channel: channels["heartbeat"];
+        readonly messages: [
+            channels["heartbeat"]["messages"]["heartbeat"]
+        ];
         readonly summary: "Server periodically sends heartbeat messages to all connected clients to verify connection health.";
     };
     readonly receiveHeartbeat: {
         readonly action: "receive";
+        readonly channel: channels["heartbeat"];
+        readonly messages: [
+            channels["heartbeat"]["messages"]["heartbeat"]
+        ];
         readonly summary: "Server receives heartbeat messages from clients to confirm they are still connected.";
     };
 }
@@ -162,20 +246,12 @@ export interface components {
         readonly lightMeasuredPayload: {
             /** @description Light intensity measured in lumens. */
             readonly lumens?: number;
-            /**
-             * Format: date-time
-             * @description Date and time when the message was sent.
-             */
-            readonly sentAt?: string;
+            readonly sentAt?: components["schemas"]["sentAt"];
         };
         readonly measurementResponsePayload: {
             /** @description Indicates whether the measurement was successfully received. */
             readonly received?: boolean;
-            /**
-             * Format: date-time
-             * @description Date and time when the message was sent.
-             */
-            readonly processedAt?: string;
+            readonly processedAt?: components["schemas"]["sentAt"];
         };
         readonly turnOnOffPayload: {
             /**
@@ -183,31 +259,19 @@ export interface components {
              * @enum {string}
              */
             readonly command?: "on" | "off";
-            /**
-             * Format: date-time
-             * @description Date and time when the message was sent.
-             */
-            readonly sentAt?: string;
+            readonly sentAt?: components["schemas"]["sentAt"];
         };
         readonly dimLightPayload: {
             /** @description Percentage to which the light should be dimmed to. */
             readonly percentage?: number;
-            /**
-             * Format: date-time
-             * @description Date and time when the message was sent.
-             */
-            readonly sentAt?: string;
+            readonly sentAt?: components["schemas"]["sentAt"];
         };
         readonly commandResponsePayload: {
             /** @description Indicates whether the command was executed successfully. */
             readonly success?: boolean;
             /** @description Human-readable message about the command execution result. */
             readonly message?: string;
-            /**
-             * Format: date-time
-             * @description Date and time when the message was sent.
-             */
-            readonly executedAt?: string;
+            readonly executedAt?: components["schemas"]["sentAt"];
         };
         /**
          * Format: date-time
@@ -219,20 +283,12 @@ export interface components {
             readonly success: boolean;
             /** @description Human-readable message about the command execution result. */
             readonly message?: string;
-            /**
-             * Format: date-time
-             * @description Date and time when the message was sent.
-             */
-            readonly executedAt?: string;
+            readonly executedAt?: components["schemas"]["sentAt"];
             /** @description The dynamic address where this response was sent. */
             readonly dynamicAddress?: string;
         };
         readonly heartbeatPayload: {
-            /**
-             * Format: date-time
-             * @description Date and time when the message was sent.
-             */
-            readonly timestamp: string;
+            readonly timestamp: components["schemas"]["sentAt"];
             /** @description Server timestamp in milliseconds since Unix epoch. */
             readonly serverTime?: number;
             /** @description Monotonically increasing sequence number for heartbeat messages. */
@@ -246,15 +302,7 @@ export interface components {
          */
         readonly lightMeasured: {
             readonly name: "lightMeasured";
-            readonly payload?: {
-                /** @description Light intensity measured in lumens. */
-                readonly lumens?: number;
-                /**
-                 * Format: date-time
-                 * @description Date and time when the message was sent.
-                 */
-                readonly sentAt?: string;
-            };
+            readonly payload?: components["schemas"]["lightMeasuredPayload"];
             readonly headers: {
                 readonly "my-app-header"?: number;
                 /** @description Address to reply to */
@@ -274,22 +322,8 @@ export interface components {
          */
         readonly lightMeasuredResponse: {
             readonly name: "lightMeasuredResponse";
-            readonly payload?: {
-                /** @description Indicates whether the measurement was successfully received. */
-                readonly received?: boolean;
-                /**
-                 * Format: date-time
-                 * @description Date and time when the message was sent.
-                 */
-                readonly processedAt?: string;
-            };
-            readonly headers?: {
-                readonly "my-app-header"?: number;
-                /** @description Address to reply to */
-                readonly replyTo?: string;
-                /** @description Correlation identifier for request/reply matching. */
-                readonly reqid?: string;
-            };
+            readonly payload?: components["schemas"]["measurementResponsePayload"];
+            readonly headers?: components["messageTraits"]["optionalReplyHeaders"]["headers"];
             readonly contentType: "application/json";
             readonly correlationId: {
                 readonly location: "$message.header#/reqid";
@@ -302,18 +336,7 @@ export interface components {
          */
         readonly turnOnOff: {
             readonly name: "turnOnOff";
-            readonly payload?: {
-                /**
-                 * @description Whether to turn on or off the light.
-                 * @enum {string}
-                 */
-                readonly command?: "on" | "off";
-                /**
-                 * Format: date-time
-                 * @description Date and time when the message was sent.
-                 */
-                readonly sentAt?: string;
-            };
+            readonly payload?: components["schemas"]["turnOnOffPayload"];
             readonly headers: {
                 readonly "my-app-header"?: number;
                 /** @description Address to reply to */
@@ -332,15 +355,7 @@ export interface components {
          */
         readonly dimLight: {
             readonly name: "dimLight";
-            readonly payload?: {
-                /** @description Percentage to which the light should be dimmed to. */
-                readonly percentage?: number;
-                /**
-                 * Format: date-time
-                 * @description Date and time when the message was sent.
-                 */
-                readonly sentAt?: string;
-            };
+            readonly payload?: components["schemas"]["dimLightPayload"];
             readonly headers: {
                 readonly "my-app-header"?: number;
                 /** @description Address to reply to */
@@ -359,22 +374,8 @@ export interface components {
          */
         readonly commandResponse: {
             readonly name: "commandResponse";
-            readonly payload?: {
-                /** @description Indicates whether the command was executed successfully. */
-                readonly success?: boolean;
-                /** @description Human-readable message about the command execution result. */
-                readonly message?: string;
-                /**
-                 * Format: date-time
-                 * @description Date and time when the message was sent.
-                 */
-                readonly executedAt?: string;
-            };
-            readonly headers?: {
-                readonly "my-app-header"?: number;
-                /** @description Address to reply to */
-                readonly replyTo?: string;
-            };
+            readonly payload?: components["schemas"]["commandResponsePayload"];
+            readonly headers?: components["messageTraits"]["commonHeaders"]["headers"];
             readonly contentType: "application/json";
         };
         /**
@@ -383,30 +384,10 @@ export interface components {
          */
         readonly dynamicCommandResponse: {
             readonly name: "dynamicCommandResponse";
-            readonly payload: {
-                /** @description Indicates whether the command was executed successfully. */
-                readonly success: boolean;
-                /** @description Human-readable message about the command execution result. */
-                readonly message?: string;
-                /**
-                 * Format: date-time
-                 * @description Date and time when the message was sent.
-                 */
-                readonly executedAt?: string;
-                /** @description The dynamic address where this response was sent. */
-                readonly dynamicAddress?: string;
-            };
-            readonly headers?: {
-                /** @description Address to reply to */
-                readonly replyTo?: string;
-                /** @description Correlation identifier for request/reply matching. */
-                readonly reqid?: string;
-            };
+            readonly payload: components["schemas"]["dynamicCommandResponsePayload"];
+            readonly headers?: components["messageTraits"]["optionalReplyHeaders"]["headers"];
             readonly contentType: "application/json";
-            readonly correlationId: {
-                readonly location: "$message.header#/reqid";
-                readonly description: "Request ID.";
-            };
+            readonly correlationId: components["correlationIds"]["reqid"];
         };
         /**
          * Server heartbeat
@@ -414,22 +395,8 @@ export interface components {
          */
         readonly heartbeat: {
             readonly name: "heartbeat";
-            readonly payload: {
-                /**
-                 * Format: date-time
-                 * @description Date and time when the message was sent.
-                 */
-                readonly timestamp: string;
-                /** @description Server timestamp in milliseconds since Unix epoch. */
-                readonly serverTime?: number;
-                /** @description Monotonically increasing sequence number for heartbeat messages. */
-                readonly sequenceNumber: number;
-            };
-            readonly headers?: {
-                readonly "my-app-header"?: number;
-                /** @description Address to reply to */
-                readonly replyTo?: string;
-            };
+            readonly payload: components["schemas"]["heartbeatPayload"];
+            readonly headers?: components["messageTraits"]["commonHeaders"]["headers"];
             readonly contentType: "application/json";
         };
     };

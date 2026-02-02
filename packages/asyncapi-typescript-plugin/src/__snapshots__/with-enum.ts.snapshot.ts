@@ -4,11 +4,7 @@
  */
 
 export interface servers {
-    "events-test": {
-        host: "test-events.example.com";
-        protocol: "ws";
-        description: "Test WebSocket server for events (lighting measurements)";
-    };
+    "events-test": components["servers"]["events-test"];
     "events-prod": {
         host: "prod-events.example.com";
         protocol: "wss";
@@ -19,141 +15,229 @@ export interface servers {
         protocol: "ws";
         description: "Test WebSocket server for commands (turn on/off, dim)";
     };
-    "commands-prod": {
-        host: "prod-commands.example.com";
-        protocol: "wss";
-        description: "Production WebSocket server for commands (turn on/off, dim) secured with TLS";
-    };
+    "commands-prod": components["servers"]["commands-prod"];
 }
 export interface channels {
     lightingMeasured: {
         address: "/events/streetlights/{streetlightId}/lighting/measured";
         messages: {
-            lightMeasured: unknown;
-            lightMeasuredResponse: unknown;
+            lightMeasured: components["messages"]["lightMeasured"];
+            lightMeasuredResponse: components["messages"]["lightMeasuredResponse"];
         };
         parameters: {
-            streetlightId: unknown;
+            streetlightId: components["parameters"]["streetlightId"];
         };
+        servers: [
+            servers["events-test"],
+            servers["events-prod"]
+        ];
     };
     lightTurnOn: {
         address: "/commands/streetlights/{streetlightId}/turn/on";
         messages: {
-            turnOn: unknown;
-            turnOnResponse: unknown;
+            turnOn: components["messages"]["turnOnOff"];
+            turnOnResponse: components["messages"]["commandResponse"];
         };
         parameters: {
-            streetlightId: unknown;
+            streetlightId: components["parameters"]["streetlightId"];
         };
+        servers: [
+            servers["commands-test"],
+            servers["commands-prod"]
+        ];
     };
     lightTurnOff: {
         address: "/commands/streetlights/{streetlightId}/turn/off";
         messages: {
-            turnOff: unknown;
-            turnOffResponse: unknown;
+            turnOff: components["messages"]["turnOnOff"];
+            turnOffResponse: components["messages"]["commandResponse"];
         };
         parameters: {
-            streetlightId: unknown;
+            streetlightId: components["parameters"]["streetlightId"];
         };
+        servers: [
+            servers["commands-test"],
+            servers["commands-prod"]
+        ];
     };
     lightsDim: {
         address: "/commands/streetlights/{streetlightId}/dim";
         messages: {
-            dimLight: unknown;
-            dimLightResponse: unknown;
+            dimLight: components["messages"]["dimLight"];
+            dimLightResponse: components["messages"]["commandResponse"];
         };
         parameters: {
-            streetlightId: unknown;
+            streetlightId: components["parameters"]["streetlightId"];
         };
+        servers: [
+            servers["commands-test"],
+            servers["commands-prod"]
+        ];
     };
     lightTurnOnDynamicReply: {
         address: null;
         messages: {
-            turnOnDynamicResponse: unknown;
+            turnOnDynamicResponse: components["messages"]["dynamicCommandResponse"];
         };
+        servers: [
+            servers["commands-test"],
+            servers["commands-prod"]
+        ];
     };
     lightTurnOffDynamicReply: {
         address: null;
         messages: {
-            turnOffDynamicResponse: unknown;
+            turnOffDynamicResponse: components["messages"]["dynamicCommandResponse"];
         };
+        servers: [
+            servers["commands-test"],
+            servers["commands-prod"]
+        ];
     };
     lightsDimDynamicReply: {
         address: null;
         messages: {
-            dimDynamicResponse: unknown;
+            dimDynamicResponse: components["messages"]["dynamicCommandResponse"];
         };
+        servers: [
+            servers["commands-test"],
+            servers["commands-prod"]
+        ];
     };
     heartbeat: {
         address: "/system/heartbeat";
         messages: {
-            heartbeat: unknown;
+            heartbeat: components["messages"]["heartbeat"];
         };
+        servers: [
+            servers["events-test"],
+            servers["events-prod"],
+            servers["commands-test"],
+            servers["commands-prod"]
+        ];
     };
 }
 export interface operations {
     sendLightMeasurement: {
         action: "send";
+        channel: channels["lightingMeasured"];
+        messages: [
+            channels["lightingMeasured"]["messages"]["lightMeasured"]
+        ];
         summary: "Server sends environmental lighting conditions of a particular streetlight to subscribers.";
     };
     receiveLightMeasurement: {
         action: "receive";
+        channel: channels["lightingMeasured"];
+        messages: [
+            channels["lightingMeasured"]["messages"]["lightMeasured"]
+        ];
+        reply: {
+            channel: channels["lightingMeasured"];
+            messages: [
+                channels["lightingMeasured"]["messages"]["lightMeasuredResponse"]
+            ];
+        };
         summary: "Server receives light measurement data from a sensor and responds with acknowledgment.";
     };
     sendLightMeasurementForAnalytics: {
         action: "send";
+        channel: channels["lightingMeasured"];
+        messages: [
+            channels["lightingMeasured"]["messages"]["lightMeasured"]
+        ];
         summary: "Server sends light measurement data for analytics processing.";
     };
     sendLightMeasurementWithAck: {
         action: "send";
+        channel: channels["lightingMeasured"];
+        messages: [
+            channels["lightingMeasured"]["messages"]["lightMeasured"]
+        ];
+        reply: {
+            messages: [
+                channels["lightingMeasured"]["messages"]["lightMeasuredResponse"]
+            ];
+        };
         summary: "Server sends light measurement data and expects acknowledgment from the client.";
     };
     sendTurnOnWithDynamicReply: {
         action: "send";
+        channel: channels["lightTurnOn"];
+        messages: [
+            channels["lightTurnOn"]["messages"]["turnOn"]
+        ];
         reply: {
-            address: {
-                location: "$message.header#/replyTo";
-                description: "Reply address extracted from message header replyTo field";
-            };
+            address: components["replyAddresses"]["turnOnReplyAddress"];
+            channel: channels["lightTurnOnDynamicReply"];
+            messages: [
+                channels["lightTurnOnDynamicReply"]["messages"]["turnOnDynamicResponse"]
+            ];
         };
         summary: "Server sends turn on command and expects response on a dynamic address from message header.";
     };
     receiveTurnOn: {
         action: "receive";
+        channel: channels["lightTurnOn"];
+        messages: [
+            channels["lightTurnOn"]["messages"]["turnOn"]
+        ];
         reply: {
-            address: {
-                location: "$message.header#/replyTo";
-                description: "Reply address extracted from message header replyTo field";
-            };
+            address: components["replyAddresses"]["turnOnReplyAddress"];
+            channel: channels["lightTurnOnDynamicReply"];
+            messages: [
+                channels["lightTurnOnDynamicReply"]["messages"]["turnOnDynamicResponse"]
+            ];
         };
         summary: "Server receives command to turn on a streetlight and responds with execution result.";
     };
     receiveTurnOff: {
         action: "receive";
+        channel: channels["lightTurnOff"];
+        messages: [
+            channels["lightTurnOff"]["messages"]["turnOff"]
+        ];
         reply: {
             address: {
                 location: "$message.header#/replyTo";
                 description: "Inline reply address extracted from message header";
             };
+            channel: channels["lightTurnOffDynamicReply"];
+            messages: [
+                channels["lightTurnOffDynamicReply"]["messages"]["turnOffDynamicResponse"]
+            ];
         };
         summary: "Server receives command to turn off a streetlight and responds with execution result.";
     };
     receiveDimLight: {
         action: "receive";
+        channel: channels["lightsDim"];
+        messages: [
+            channels["lightsDim"]["messages"]["dimLight"]
+        ];
         reply: {
-            address: {
-                location: "$message.payload#/responseAddress";
-                description: "Reply address extracted from message payload responseAddress field";
-            };
+            address: components["replyAddresses"]["dimLightReplyAddress"];
+            channel: channels["lightsDimDynamicReply"];
+            messages: [
+                channels["lightsDimDynamicReply"]["messages"]["dimDynamicResponse"]
+            ];
         };
         summary: "Server receives command to dim a streetlight and responds with execution result.";
     };
     sendHeartbeat: {
         action: "send";
+        channel: channels["heartbeat"];
+        messages: [
+            channels["heartbeat"]["messages"]["heartbeat"]
+        ];
         summary: "Server periodically sends heartbeat messages to all connected clients to verify connection health.";
     };
     receiveHeartbeat: {
         action: "receive";
+        channel: channels["heartbeat"];
+        messages: [
+            channels["heartbeat"]["messages"]["heartbeat"]
+        ];
         summary: "Server receives heartbeat messages from clients to confirm they are still connected.";
     };
 }
@@ -162,20 +246,12 @@ export interface components {
         lightMeasuredPayload: {
             /** @description Light intensity measured in lumens. */
             lumens?: number;
-            /**
-             * Format: date-time
-             * @description Date and time when the message was sent.
-             */
-            sentAt?: string;
+            sentAt?: components["schemas"]["sentAt"];
         };
         measurementResponsePayload: {
             /** @description Indicates whether the measurement was successfully received. */
             received?: boolean;
-            /**
-             * Format: date-time
-             * @description Date and time when the message was sent.
-             */
-            processedAt?: string;
+            processedAt?: components["schemas"]["sentAt"];
         };
         turnOnOffPayload: {
             /**
@@ -183,31 +259,19 @@ export interface components {
              * @enum {string}
              */
             command?: TurnOnOffPayloadCommand;
-            /**
-             * Format: date-time
-             * @description Date and time when the message was sent.
-             */
-            sentAt?: string;
+            sentAt?: components["schemas"]["sentAt"];
         };
         dimLightPayload: {
             /** @description Percentage to which the light should be dimmed to. */
             percentage?: number;
-            /**
-             * Format: date-time
-             * @description Date and time when the message was sent.
-             */
-            sentAt?: string;
+            sentAt?: components["schemas"]["sentAt"];
         };
         commandResponsePayload: {
             /** @description Indicates whether the command was executed successfully. */
             success?: boolean;
             /** @description Human-readable message about the command execution result. */
             message?: string;
-            /**
-             * Format: date-time
-             * @description Date and time when the message was sent.
-             */
-            executedAt?: string;
+            executedAt?: components["schemas"]["sentAt"];
         };
         /**
          * Format: date-time
@@ -219,20 +283,12 @@ export interface components {
             success: boolean;
             /** @description Human-readable message about the command execution result. */
             message?: string;
-            /**
-             * Format: date-time
-             * @description Date and time when the message was sent.
-             */
-            executedAt?: string;
+            executedAt?: components["schemas"]["sentAt"];
             /** @description The dynamic address where this response was sent. */
             dynamicAddress?: string;
         };
         heartbeatPayload: {
-            /**
-             * Format: date-time
-             * @description Date and time when the message was sent.
-             */
-            timestamp: string;
+            timestamp: components["schemas"]["sentAt"];
             /** @description Server timestamp in milliseconds since Unix epoch. */
             serverTime?: number;
             /** @description Monotonically increasing sequence number for heartbeat messages. */
@@ -246,15 +302,7 @@ export interface components {
          */
         lightMeasured: {
             name: "lightMeasured";
-            payload?: {
-                /** @description Light intensity measured in lumens. */
-                lumens?: number;
-                /**
-                 * Format: date-time
-                 * @description Date and time when the message was sent.
-                 */
-                sentAt?: string;
-            };
+            payload?: components["schemas"]["lightMeasuredPayload"];
             headers: {
                 "my-app-header"?: number;
                 /** @description Address to reply to */
@@ -274,22 +322,8 @@ export interface components {
          */
         lightMeasuredResponse: {
             name: "lightMeasuredResponse";
-            payload?: {
-                /** @description Indicates whether the measurement was successfully received. */
-                received?: boolean;
-                /**
-                 * Format: date-time
-                 * @description Date and time when the message was sent.
-                 */
-                processedAt?: string;
-            };
-            headers?: {
-                "my-app-header"?: number;
-                /** @description Address to reply to */
-                replyTo?: string;
-                /** @description Correlation identifier for request/reply matching. */
-                reqid?: string;
-            };
+            payload?: components["schemas"]["measurementResponsePayload"];
+            headers?: components["messageTraits"]["optionalReplyHeaders"]["headers"];
             contentType: "application/json";
             correlationId: {
                 location: "$message.header#/reqid";
@@ -302,18 +336,7 @@ export interface components {
          */
         turnOnOff: {
             name: "turnOnOff";
-            payload?: {
-                /**
-                 * @description Whether to turn on or off the light.
-                 * @enum {string}
-                 */
-                command?: ComponentsMessagesTurnOnOffPayloadCommand;
-                /**
-                 * Format: date-time
-                 * @description Date and time when the message was sent.
-                 */
-                sentAt?: string;
-            };
+            payload?: components["schemas"]["turnOnOffPayload"];
             headers: {
                 "my-app-header"?: number;
                 /** @description Address to reply to */
@@ -332,15 +355,7 @@ export interface components {
          */
         dimLight: {
             name: "dimLight";
-            payload?: {
-                /** @description Percentage to which the light should be dimmed to. */
-                percentage?: number;
-                /**
-                 * Format: date-time
-                 * @description Date and time when the message was sent.
-                 */
-                sentAt?: string;
-            };
+            payload?: components["schemas"]["dimLightPayload"];
             headers: {
                 "my-app-header"?: number;
                 /** @description Address to reply to */
@@ -359,22 +374,8 @@ export interface components {
          */
         commandResponse: {
             name: "commandResponse";
-            payload?: {
-                /** @description Indicates whether the command was executed successfully. */
-                success?: boolean;
-                /** @description Human-readable message about the command execution result. */
-                message?: string;
-                /**
-                 * Format: date-time
-                 * @description Date and time when the message was sent.
-                 */
-                executedAt?: string;
-            };
-            headers?: {
-                "my-app-header"?: number;
-                /** @description Address to reply to */
-                replyTo?: string;
-            };
+            payload?: components["schemas"]["commandResponsePayload"];
+            headers?: components["messageTraits"]["commonHeaders"]["headers"];
             contentType: "application/json";
         };
         /**
@@ -383,30 +384,10 @@ export interface components {
          */
         dynamicCommandResponse: {
             name: "dynamicCommandResponse";
-            payload: {
-                /** @description Indicates whether the command was executed successfully. */
-                success: boolean;
-                /** @description Human-readable message about the command execution result. */
-                message?: string;
-                /**
-                 * Format: date-time
-                 * @description Date and time when the message was sent.
-                 */
-                executedAt?: string;
-                /** @description The dynamic address where this response was sent. */
-                dynamicAddress?: string;
-            };
-            headers?: {
-                /** @description Address to reply to */
-                replyTo?: string;
-                /** @description Correlation identifier for request/reply matching. */
-                reqid?: string;
-            };
+            payload: components["schemas"]["dynamicCommandResponsePayload"];
+            headers?: components["messageTraits"]["optionalReplyHeaders"]["headers"];
             contentType: "application/json";
-            correlationId: {
-                location: "$message.header#/reqid";
-                description: "Request ID.";
-            };
+            correlationId: components["correlationIds"]["reqid"];
         };
         /**
          * Server heartbeat
@@ -414,22 +395,8 @@ export interface components {
          */
         heartbeat: {
             name: "heartbeat";
-            payload: {
-                /**
-                 * Format: date-time
-                 * @description Date and time when the message was sent.
-                 */
-                timestamp: string;
-                /** @description Server timestamp in milliseconds since Unix epoch. */
-                serverTime?: number;
-                /** @description Monotonically increasing sequence number for heartbeat messages. */
-                sequenceNumber: number;
-            };
-            headers?: {
-                "my-app-header"?: number;
-                /** @description Address to reply to */
-                replyTo?: string;
-            };
+            payload: components["schemas"]["heartbeatPayload"];
+            headers?: components["messageTraits"]["commonHeaders"]["headers"];
             contentType: "application/json";
         };
     };
@@ -507,10 +474,6 @@ export interface components {
     };
 }
 export enum TurnOnOffPayloadCommand {
-    on = "on",
-    off = "off"
-}
-export enum ComponentsMessagesTurnOnOffPayloadCommand {
     on = "on",
     off = "off"
 }
