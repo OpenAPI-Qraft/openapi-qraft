@@ -35,8 +35,8 @@ export function getRedocAPIsToQraft(
     : new URL(redoc.configFile, cwd);
 
   const apisToQraftEntries = Object.entries(redoc.apis)
-    .map(([itemPpiName, api]) => {
-      if (apiName && apiName !== itemPpiName) return;
+    .map(([itemApiName, api]) => {
+      if (apiName && apiName !== itemApiName) return;
 
       const qraftConfig =
         configKey in api
@@ -45,7 +45,7 @@ export function getRedocAPIsToQraft(
 
       if (!qraftConfig) {
         return void spinner.warn(
-          `API ${itemPpiName} is missing an \`${configKey}\` key. Skipping...`
+          `API ${itemApiName} is missing an \`${configKey}\` key. Skipping...`
         );
       }
 
@@ -53,7 +53,7 @@ export function getRedocAPIsToQraft(
         throw new CommanderError(
           1,
           'ERR_MISSING_API_CONFIG',
-          `API ${itemPpiName} is missing an \`${configKey}\` key. See https://openapi-qraft.github.io/openapi-qraft/docs/codegen/CLI/redocly-config.`
+          `API ${itemApiName} is missing an \`${configKey}\` key. See https://openapi-qraft.github.io/openapi-qraft/docs/codegen/CLI/redocly-config.`
         );
       }
 
@@ -70,14 +70,15 @@ export function getRedocAPIsToQraft(
         throw new CommanderError(
           1,
           'ERR_MISSING_API_OUTPUT',
-          `API ${itemPpiName} is missing an "output-dir" key. See https://openapi-qraft.github.io/openapi-qraft/docs/codegen/CLI/redocly-config.`
+          `API ${itemApiName} is missing an "output-dir" key. See https://openapi-qraft.github.io/openapi-qraft/docs/codegen/CLI/redocly-config.`
         );
       }
 
       return [
-        itemPpiName,
+        itemApiName,
         {
           ...api,
+          root: new URL(api.root, configRoot),
           [configKey]: {
             ...qraftConfigRest,
             ['output-dir']: fileURLToPath(new URL(outputPath, configRoot)),
