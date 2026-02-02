@@ -7,7 +7,10 @@ import {
   extractArgvPluginOptions,
   setupPlugins,
 } from '@qraft/cli-utils';
-import { RedoclyConfigCommand } from '@qraft/plugin/lib/RedoclyConfigCommand';
+import {
+  OPENAPI_QRAFT_REDOC_CONFIG_KEY,
+  RedoclyConfigCommand,
+} from '@qraft/plugin/lib/RedoclyConfigCommand';
 import { Option } from 'commander';
 import { builtInPlugins } from './builtInPlugins.js';
 import { handleDeprecatedOptions } from './handleDeprecatedOptions.js';
@@ -18,11 +21,9 @@ export async function main(
 ) {
   const argv = handleDeprecatedOptions(processArgv);
 
-  const redoclyConfigParseResult = await new RedoclyConfigCommand().parseConfig(
-    qraft,
-    argv,
-    processArgvParseOptions
-  );
+  const redoclyConfigParseResult = await new RedoclyConfigCommand(undefined, {
+    configKey: OPENAPI_QRAFT_REDOC_CONFIG_KEY,
+  }).parseConfig(qraft, argv, processArgvParseOptions);
 
   if (redoclyConfigParseResult?.length) return;
 

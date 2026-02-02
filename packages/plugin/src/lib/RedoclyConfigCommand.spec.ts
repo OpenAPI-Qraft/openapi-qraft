@@ -12,9 +12,12 @@ describe('RedoclyConfigCommand', () => {
     ) + '/redocly.yaml';
 
   test('processes only x-openapi-qraft options', async () => {
-    const { RedoclyConfigCommand } = await import('./RedoclyConfigCommand.js');
+    const { RedoclyConfigCommand, OPENAPI_QRAFT_REDOC_CONFIG_KEY } =
+      await import('./RedoclyConfigCommand.js');
 
-    const command = new RedoclyConfigCommand();
+    const command = new RedoclyConfigCommand(undefined, {
+      configKey: OPENAPI_QRAFT_REDOC_CONFIG_KEY,
+    });
 
     await expect(
       command.parseConfig(
@@ -85,9 +88,12 @@ describe('RedoclyConfigCommand', () => {
   });
 
   test('processes specific API entry', async () => {
-    const { RedoclyConfigCommand } = await import('./RedoclyConfigCommand.js');
+    const { RedoclyConfigCommand, OPENAPI_QRAFT_REDOC_CONFIG_KEY } =
+      await import('./RedoclyConfigCommand.js');
 
-    const command = new RedoclyConfigCommand();
+    const command = new RedoclyConfigCommand(undefined, {
+      configKey: OPENAPI_QRAFT_REDOC_CONFIG_KEY,
+    });
 
     await expect(
       command.parseConfig(
@@ -128,9 +134,12 @@ describe('RedoclyConfigCommand', () => {
   });
 
   test('fails when specific API entry is provided but not found', async () => {
-    const { RedoclyConfigCommand } = await import('./RedoclyConfigCommand.js');
+    const { RedoclyConfigCommand, OPENAPI_QRAFT_REDOC_CONFIG_KEY } =
+      await import('./RedoclyConfigCommand.js');
 
-    const command = new RedoclyConfigCommand();
+    const command = new RedoclyConfigCommand(undefined, {
+      configKey: OPENAPI_QRAFT_REDOC_CONFIG_KEY,
+    });
 
     await expect(
       command.parseConfig(

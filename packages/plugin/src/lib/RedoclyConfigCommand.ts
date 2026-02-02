@@ -41,7 +41,7 @@ export function createRedoclyOption() {
 }
 
 export interface RedoclyConfigCommandOptions {
-  configKey?: string;
+  configKey: string;
 }
 
 export class RedoclyConfigCommand extends Command {
@@ -53,10 +53,10 @@ export class RedoclyConfigCommand extends Command {
    */
   protected parsedAPIs: RedoclyQraftAPIs = {};
 
-  constructor(name?: string, options?: RedoclyConfigCommandOptions) {
+  constructor(name: string | undefined, options: RedoclyConfigCommandOptions) {
     super(name);
     this.cwd = pathToFileURL(`${process.cwd()}/`);
-    this.configKey = options?.configKey ?? OPENAPI_QRAFT_REDOC_CONFIG_KEY;
+    this.configKey = options.configKey;
 
     this.usage(c.green('[apis...] --redocly <config>'))
       .argument(
