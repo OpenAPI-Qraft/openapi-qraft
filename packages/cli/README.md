@@ -63,13 +63,13 @@ The CLI supports using a Redocly configuration file (`redocly.yaml`) to generate
 
 ```bash
 # Generate from default redocly.yaml (both OpenAPI and AsyncAPI)
-qraft --redocly
+qraft redocly
 
 # Generate from specific config file
-qraft --redocly ./path/to/redocly.yaml
+qraft redocly --redocly ./path/to/redocly.yaml
 
 # Generate specific APIs
-qraft my-api@v1 --redocly
+qraft redocly my-api@v1
 
 # Generate only OpenAPI from Redocly config
 qraft openapi --redocly
@@ -108,5 +108,5 @@ All options from the underlying plugins are supported. Use `--help` to see avail
 ```bash
 qraft openapi --help
 qraft asyncapi --help
-qraft openapi --redocly-help
+qraft redocly --help
 ```

@@ -20,13 +20,14 @@ describe('CLI binary help output', () => {
       Generate type-safe code from OpenAPI and AsyncAPI specifications
 
       Options:
-        -V, --version   output the version number
-        -h, --help      display help for command
+        -V, --version                output the version number
+        -h, --help                   display help for command
 
       Commands:
-        openapi         Generate code from OpenAPI specification
-        asyncapi        Generate code from AsyncAPI specification
-        help [command]  display help for command
+        openapi                      Generate code from OpenAPI specification
+        asyncapi                     Generate code from AsyncAPI specification
+        redocly [options] [apis...]  Generate from Redocly config (both OpenAPI and
+                                     AsyncAPI)
 
       Examples:
         # Generate React Query hooks from OpenAPI
@@ -39,7 +40,13 @@ describe('CLI binary help output', () => {
         $ qraft asyncapi --plugin asyncapi-typescript ./asyncapi.yaml -o ./src/types
 
         # Generate from Redocly config (both OpenAPI and AsyncAPI)
-        $ qraft --redocly"
+        $ qraft redocly
+
+        # Generate specific APIs from Redocly config
+        $ qraft redocly openapi-main asyncapi-main
+
+        # Generate from custom Redocly config path
+        $ qraft redocly --redocly ./custom-redocly.yaml"
     `);
   });
 

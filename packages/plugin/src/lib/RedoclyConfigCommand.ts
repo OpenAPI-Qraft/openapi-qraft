@@ -15,7 +15,9 @@ import { QraftCommand } from './QraftCommand.js';
 
 export { ASYNCAPI_QRAFT_REDOC_CONFIG_KEY, OPENAPI_QRAFT_REDOC_CONFIG_KEY };
 
-export const redoclyOption = (() => {
+export const redoclyOption = createRedoclyOption();
+
+export function createRedoclyOption() {
   const bin = c.gray.underline('bin');
   const __redocly = c.yellow('--redocly');
 
@@ -36,7 +38,8 @@ export const redoclyOption = (() => {
       ...examples.map((example) => `${c.gray('$')} ${example}`),
     ].join('\n')
   );
-})();
+}
+
 export interface RedoclyConfigCommandOptions {
   configKey?: string;
 }

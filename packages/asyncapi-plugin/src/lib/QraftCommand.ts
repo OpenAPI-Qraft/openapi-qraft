@@ -12,7 +12,7 @@ import {
   getRedocAPIsToQraft,
 } from '@qraft/plugin/lib/getRedocAPIsToQraft';
 import { loadRedoclyConfig } from '@qraft/plugin/lib/loadRedoclyConfig';
-import { redoclyOption } from '@qraft/plugin/lib/RedoclyConfigCommand';
+import { createRedoclyOption } from '@qraft/plugin/lib/RedoclyConfigCommand';
 import c from 'ansi-colors';
 import { CommanderError } from 'commander';
 import { Ora } from 'ora';
@@ -29,7 +29,7 @@ export class QraftCommand extends QraftCommandBase<AsyncAPIQraftCommandActionOpt
         'Input AsyncAPI Document file path, URL (json, yml)',
         null
       )
-      .addOption(redoclyOption);
+      .addOption(createRedoclyOption());
   }
 
   protected override async prepareActionOptions(

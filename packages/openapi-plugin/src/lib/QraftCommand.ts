@@ -13,7 +13,7 @@ import {
   OPENAPI_QRAFT_REDOC_CONFIG_KEY,
 } from '@qraft/plugin/lib/getRedocAPIsToQraft';
 import { loadRedoclyConfig } from '@qraft/plugin/lib/loadRedoclyConfig';
-import { redoclyOption } from '@qraft/plugin/lib/RedoclyConfigCommand';
+import { createRedoclyOption } from '@qraft/plugin/lib/RedoclyConfigCommand';
 import { Config, createConfig, getMergedConfig } from '@redocly/openapi-core';
 import c from 'ansi-colors';
 import { CommanderError, Option } from 'commander';
@@ -71,7 +71,7 @@ export class QraftCommand extends QraftCommandBase<OpenAPIQraftCommandActionOpti
         'Use OpenAPI Operation `endpoint[<index>]` path part (e.g.: "/0/1/2") or `tags` as the base name of the service.',
         'endpoint[0]'
       )
-      .addOption(redoclyOption);
+      .addOption(createRedoclyOption());
   }
 
   async actionCallback(...actionArgs: any[]): Promise<void> {

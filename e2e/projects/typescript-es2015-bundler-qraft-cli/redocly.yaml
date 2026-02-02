@@ -12,5 +12,6 @@ apis:
     x-asyncapi-qraft:
       plugin:
         asyncapi-typescript: true
+      asyncapi-types-file-name: asyncapi.ts
       output-dir: src/asyncapi-redocly
       clean: true

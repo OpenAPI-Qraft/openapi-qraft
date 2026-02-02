@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "build": "tsc",
-    "codegen": "qraft --redocly redocly.yaml",
+    "codegen": "qraft redocly --redocly redocly.yaml",
     "e2e:pre-build": "npm run codegen",
     "e2e:post-build": "echo 'Build completed'"
   },

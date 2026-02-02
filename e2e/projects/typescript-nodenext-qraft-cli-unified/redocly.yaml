@@ -5,6 +5,7 @@ apis:
       plugin:
         tanstack-query-react: true
         openapi-typescript: true
+      explicit-import-extensions: true
       output-dir: src/openapi
       clean: true
 

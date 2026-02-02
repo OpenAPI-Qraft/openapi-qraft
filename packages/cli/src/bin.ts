@@ -3,22 +3,21 @@ import type { ParseOptions } from 'commander';
 import {
   ASYNCAPI_QRAFT_REDOC_CONFIG_KEY,
   OPENAPI_QRAFT_REDOC_CONFIG_KEY,
+} from '@qraft/plugin/lib/getRedocAPIsToQraft';
+import {
+  createRedoclyOption,
   RedoclyConfigCommand,
 } from '@qraft/plugin/lib/RedoclyConfigCommand';
 import c from 'ansi-colors';
 import { Command } from 'commander';
+import { runAsyncAPI } from './commands/runAsyncAPI.js';
+import { runOpenAPI } from './commands/runOpenAPI.js';
 import { packageVersion } from './packageVersion.js';
 
 export async function main(
   processArgv: string[],
   processArgvParseOptions?: ParseOptions
 ) {
-  const redoclyResults = await processRedoclyConfig(
-    processArgv,
-    processArgvParseOptions
-  );
-  if (redoclyResults?.length) return;
-
   const program = new Command();
 
   program
@@ -26,6 +25,8 @@ export async function main(
     .description(
       'Generate type-safe code from OpenAPI and AsyncAPI specifications'
     )
+    // todo::maybe add "<bin> help <command>" handling
+    .helpCommand(false)
     .version(packageVersion);
 
   program
@@ -52,6 +53,26 @@ export async function main(
     })
     .helpOption(false); // The command handles the help independently
 
+  program
+    .command('redocly')
+    .description('Generate from Redocly config (both OpenAPI and AsyncAPI)')
+    .argument(
+      '[apis...]',
+      'Selective API names from Redocly config to generate'
+    )
+    .addOption(createRedoclyOption())
+    .action(async (apis: string[], options: { redocly: string | boolean }) => {
+      const redoclyArgv = buildRedoclyArgv(apis, options.redocly);
+
+      await new RedoclyConfigCommand(undefined, {
+        configKey: OPENAPI_QRAFT_REDOC_CONFIG_KEY,
+      }).parseConfig(runOpenAPI, redoclyArgv, { from: 'user' });
+
+      await new RedoclyConfigCommand(undefined, {
+        configKey: ASYNCAPI_QRAFT_REDOC_CONFIG_KEY,
+      }).parseConfig(runAsyncAPI, redoclyArgv, { from: 'user' });
+    });
+
   program.addHelpText(
     'after',
     `
@@ -66,41 +87,32 @@ ${c.bold('Examples:')}
   $ qraft asyncapi --plugin asyncapi-typescript ./asyncapi.yaml -o ./src/types
 
   ${c.dim('# Generate from Redocly config (both OpenAPI and AsyncAPI)')}
-  $ qraft --redocly
+  $ qraft redocly
+
+  ${c.dim('# Generate specific APIs from Redocly config')}
+  $ qraft redocly openapi-main asyncapi-main
+
+  ${c.dim('# Generate from custom Redocly config path')}
+  $ qraft redocly --redocly ./custom-redocly.yaml
 `
   );
 
   await program.parseAsync(processArgv, processArgvParseOptions);
 }
 
-async function processRedoclyConfig(
-  processArgv: string[],
-  processArgvParseOptions?: ParseOptions
-): Promise<unknown[] | undefined> {
-  const openapiResults = await new RedoclyConfigCommand(undefined, {
-    configKey: OPENAPI_QRAFT_REDOC_CONFIG_KEY,
-  }).parseConfig(
-    async (processArgv: string[], processArgvParseOptions?: ParseOptions) => {
-      const { qraftOpenapi } = await import('./commands/openapi.js');
-      return qraftOpenapi(processArgv, processArgvParseOptions);
-    },
-    processArgv,
-    processArgvParseOptions
-  );
+function buildRedoclyArgv(
+  apis: string[],
+  redoclyConfig: string | boolean
+): string[] {
+  const argv: string[] = [...apis];
 
-  const asyncapiResults = await new RedoclyConfigCommand(undefined, {
-    configKey: ASYNCAPI_QRAFT_REDOC_CONFIG_KEY,
-  }).parseConfig(
-    async (processArgv: string[], processArgvParseOptions?: ParseOptions) => {
-      const { qraftAsyncapi } = await import('./commands/asyncapi.js');
-      return qraftAsyncapi(processArgv, processArgvParseOptions);
-    },
-    processArgv,
-    processArgvParseOptions
-  );
+  if (typeof redoclyConfig === 'string') {
+    argv.push('--redocly', redoclyConfig);
+  } else if (redoclyConfig) {
+    argv.push('--redocly');
+  }
 
-  const allResults = [...(openapiResults ?? []), ...(asyncapiResults ?? [])];
-  return allResults.length ? allResults : undefined;
+  return argv;
 }
 
 function extractSubcommandArgv(

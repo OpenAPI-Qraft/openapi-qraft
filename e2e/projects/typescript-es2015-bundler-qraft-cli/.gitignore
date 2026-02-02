@@ -1,0 +1,7 @@
+/package-lock.json
+node_modules
+/src/asyncapi-cli
+/src/asyncapi-redocly
+/src/openapi-cli
+/src/openapi-redocly
+
