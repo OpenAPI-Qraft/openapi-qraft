@@ -15,16 +15,16 @@ describe('RedoclyConfigCommand', () => {
     const { RedoclyConfigCommand, OPENAPI_QRAFT_REDOC_CONFIG_KEY } =
       await import('./RedoclyConfigCommand.js');
 
-    const command = new RedoclyConfigCommand(undefined, {
-      configKey: OPENAPI_QRAFT_REDOC_CONFIG_KEY,
-    });
+    const command = new RedoclyConfigCommand();
 
     await expect(
       command.parseConfig(
-        (processArgv, processArgvParseOptions) => [
-          processArgv,
-          processArgvParseOptions,
-        ],
+        {
+          [OPENAPI_QRAFT_REDOC_CONFIG_KEY]: (
+            processArgv,
+            processArgvParseOptions
+          ) => [processArgv, processArgvParseOptions],
+        },
         ['--redocly', redoclyConfigPath],
         {
           from: 'user',
@@ -91,16 +91,16 @@ describe('RedoclyConfigCommand', () => {
     const { RedoclyConfigCommand, OPENAPI_QRAFT_REDOC_CONFIG_KEY } =
       await import('./RedoclyConfigCommand.js');
 
-    const command = new RedoclyConfigCommand(undefined, {
-      configKey: OPENAPI_QRAFT_REDOC_CONFIG_KEY,
-    });
+    const command = new RedoclyConfigCommand();
 
     await expect(
       command.parseConfig(
-        (processArgv, processArgvParseOptions) => [
-          processArgv,
-          processArgvParseOptions,
-        ],
+        {
+          [OPENAPI_QRAFT_REDOC_CONFIG_KEY]: (
+            processArgv,
+            processArgvParseOptions
+          ) => [processArgv, processArgvParseOptions],
+        },
         [
           'dummy-node',
           'dummy-qraft-bin',
@@ -137,16 +137,16 @@ describe('RedoclyConfigCommand', () => {
     const { RedoclyConfigCommand, OPENAPI_QRAFT_REDOC_CONFIG_KEY } =
       await import('./RedoclyConfigCommand.js');
 
-    const command = new RedoclyConfigCommand(undefined, {
-      configKey: OPENAPI_QRAFT_REDOC_CONFIG_KEY,
-    });
+    const command = new RedoclyConfigCommand();
 
     await expect(
       command.parseConfig(
-        (processArgv, processArgvParseOptions) => [
-          processArgv,
-          processArgvParseOptions,
-        ],
+        {
+          [OPENAPI_QRAFT_REDOC_CONFIG_KEY]: (
+            processArgv,
+            processArgvParseOptions
+          ) => [processArgv, processArgvParseOptions],
+        },
         [
           'dummy-node',
           'dummy-qraft-bin',

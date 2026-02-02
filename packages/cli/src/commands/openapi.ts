@@ -8,9 +8,11 @@ export async function qraftOpenapi(
   const { RedoclyConfigCommand, OPENAPI_QRAFT_REDOC_CONFIG_KEY } =
     await import('@qraft/plugin/lib/RedoclyConfigCommand');
 
-  const redoclyConfigParseResult = await new RedoclyConfigCommand(undefined, {
-    configKey: OPENAPI_QRAFT_REDOC_CONFIG_KEY,
-  }).parseConfig(runOpenAPI, processArgv, processArgvParseOptions);
+  const redoclyConfigParseResult = await new RedoclyConfigCommand().parseConfig(
+    { [OPENAPI_QRAFT_REDOC_CONFIG_KEY]: runOpenAPI },
+    processArgv,
+    processArgvParseOptions
+  );
 
   if (redoclyConfigParseResult?.length) return;
 

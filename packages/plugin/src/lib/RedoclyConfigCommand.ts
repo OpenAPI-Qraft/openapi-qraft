@@ -40,23 +40,23 @@ export function createRedoclyOption() {
   );
 }
 
-export interface RedoclyConfigCommandOptions {
-  configKey: string;
-}
+export type ConfigKeyCallbacks<T> = {
+  [configKey: string]: CallbackFn<T>;
+};
 
 export class RedoclyConfigCommand extends Command {
   protected readonly cwd: URL;
-  protected readonly configKey: string;
+  protected configKeys: string[] = [];
 
   /**
-   * Redocly API item and QraftCommand arguments
+   * Redocly API grouped by configKey
+   * { [configKey]: { [apiName]: argv[] } }
    */
-  protected parsedAPIs: RedoclyQraftAPIs = {};
+  protected parsedAPIsByConfigKey: RedoclyQraftAPIsByConfigKey = {};
 
-  constructor(name: string | undefined, options: RedoclyConfigCommandOptions) {
+  constructor(name?: string) {
     super(name);
     this.cwd = pathToFileURL(`${process.cwd()}/`);
-    this.configKey = options.configKey;
 
     this.usage(c.green('[apis...] --redocly <config>'))
       .argument(
@@ -66,7 +66,7 @@ export class RedoclyConfigCommand extends Command {
       .allowUnknownOption(true)
       .helpOption('--redocly-help', 'Display help for the `--redocly` option')
       .addOption(redoclyOption)
-      .action(async (apis = [], args) => {
+      .action(async (apis: string[] = [], args) => {
         const redocly = args.redocly;
 
         if (!redocly) return;
@@ -86,16 +86,30 @@ export class RedoclyConfigCommand extends Command {
           process.exit(1);
         }
 
-        const redocAPIsToQraftEntries = Object.entries(
-          getRedocAPIsToQraft(redoc, this.cwd, spinner, this.configKey)
-        ).filter(([apiName]) => !apis.length || apis.includes(apiName));
+        type RawApisMap = ReturnType<typeof getRedocAPIsToQraft>;
+        const allRawApisByConfigKey: Record<string, RawApisMap> = {};
+
+        for (const configKey of this.configKeys) {
+          const apisForKey = getRedocAPIsToQraft(
+            redoc,
+            this.cwd,
+            spinner,
+            configKey
+          );
+          if (Object.keys(apisForKey).length > 0) {
+            allRawApisByConfigKey[configKey] = apisForKey;
+          }
+        }
+
+        const allApiNames = new Set(
+          Object.values(allRawApisByConfigKey).flatMap((apis) =>
+            Object.keys(apis)
+          )
+        );
 
         if (apis.length) {
           const notFoundAPIs = apis.filter(
-            (inputAPIName: string) =>
-              !redocAPIsToQraftEntries.some(
-                ([apiName]) => apiName === inputAPIName
-              )
+            (inputAPIName) => !allApiNames.has(inputAPIName)
           );
 
           if (notFoundAPIs.length) {
@@ -115,103 +129,132 @@ export class RedoclyConfigCommand extends Command {
           }
         }
 
-        redocAPIsToQraftEntries.forEach(([apiName, api]) => {
-          const globalQraftConfig =
-            this.configKey in redoc.rawConfig
-              ? (redoc.rawConfig as Record<string, unknown>)[this.configKey]
-              : undefined;
+        for (const [configKey, apisForKey] of Object.entries(
+          allRawApisByConfigKey
+        )) {
+          const filteredEntries = Object.entries(apisForKey).filter(
+            ([apiName]) => !apis.length || apis.includes(apiName)
+          );
 
-          const apiQraftConfigWithOutput = (api as Record<string, unknown>)[
-            this.configKey
-          ] as { ['output-dir']: string };
-          const { ['output-dir']: outputDir, ...apiQraftConfig } =
-            apiQraftConfigWithOutput;
+          if (filteredEntries.length === 0) continue;
 
-          const cwd = fileURLToPath(this.cwd);
+          this.parsedAPIsByConfigKey[configKey] = {};
 
-          this.parsedAPIs[apiName] = [
-            apiName,
-            ...parseConfigToArgs({
-              redocly: relative(cwd, redocConfigFile),
-              'output-dir': relative(cwd, outputDir),
-              ...(globalQraftConfig && typeof globalQraftConfig === 'object'
-                ? globalQraftConfig
-                : undefined),
-              ...apiQraftConfig,
-            }),
-          ];
-        });
+          for (const [apiName, api] of filteredEntries) {
+            const globalQraftConfig =
+              configKey in redoc.rawConfig
+                ? (redoc.rawConfig as Record<string, unknown>)[configKey]
+                : undefined;
+
+            const apiQraftConfigWithOutput = (
+              api as unknown as Record<string, unknown>
+            )[configKey] as { ['output-dir']: string };
+            const { ['output-dir']: outputDir, ...apiQraftConfig } =
+              apiQraftConfigWithOutput;
+
+            const cwd = fileURLToPath(this.cwd);
+
+            this.parsedAPIsByConfigKey[configKey][apiName] = [
+              apiName,
+              ...parseConfigToArgs({
+                redocly: relative(cwd, redocConfigFile),
+                'output-dir': relative(cwd, outputDir),
+                ...(globalQraftConfig && typeof globalQraftConfig === 'object'
+                  ? globalQraftConfig
+                  : undefined),
+                ...apiQraftConfig,
+              }),
+            ];
+          }
+        }
 
         spinner.stop();
       });
   }
 
   async parseConfig<T>(
-    callbackFn: CallbackFn<T>,
+    callbacks: ConfigKeyCallbacks<T>,
     argv: readonly string[],
     options?: ParseOptions
   ): Promise<T[] | undefined> {
+    this.configKeys = Object.keys(callbacks);
+
     await this.parseAsync(argv, options);
 
-    if (!Object.entries(this.parsedAPIs).length) return;
+    const hasAnyAPIs = Object.values(this.parsedAPIsByConfigKey).some(
+      (apis) => Object.keys(apis).length > 0
+    );
+
+    if (!hasAnyAPIs) return; // todo::improve error reporting
 
     return RedoclyConfigCommand.forEachRedoclyAPIEntry(
-      this.parsedAPIs,
-      callbackFn
+      this.parsedAPIsByConfigKey,
+      callbacks
     );
   }
 
   static async forEachRedoclyAPIEntry<T>(
-    redoclyAPIs: RedoclyQraftAPIs,
-    callbackFn: CallbackFn<T>
+    apisByConfigKey: RedoclyQraftAPIsByConfigKey,
+    callbacks: ConfigKeyCallbacks<T>
   ) {
-    const redoclyAPIsEntries = Object.entries(redoclyAPIs);
-
     const spinner = QraftCommand.spinner;
 
     spinner.info('Loading Redocly configuration...');
 
-    const { errors, results } = await Promise.allSettled(
-      redoclyAPIsEntries.map(
-        async ([apiName, [openAPIDocument, ...apiProcessArgv]]) => {
-          spinner.info(
-            `Generating API client for ${c.magenta(apiName)} with the following parameters:\n` +
-              c.gray.italic('bin ') +
-              `${c.green.italic(openAPIDocument)} ` +
-              apiProcessArgv
-                .map((arg) =>
-                  arg.startsWith('--')
-                    ? c.yellow.italic(arg)
-                    : c.yellow.italic.underline(maybeEscapeShellArg(arg))
-                )
-                .join(' ')
-          );
-          spinner.text = '';
-          spinner.start();
+    const allResults: T[] = [];
+    const allErrors: unknown[] = [];
 
-          return await callbackFn([openAPIDocument, ...apiProcessArgv], {
-            from: 'user',
-          });
-        }
-      )
-    ).then((results) =>
-      results.reduce<{ errors: unknown[]; results: T[] }>(
-        (acc, result) => {
-          if (result.status === 'rejected') acc.errors.push(result.reason);
-          else acc.results.push(result.value);
+    for (const [configKey, apis] of Object.entries(apisByConfigKey)) {
+      const callback = callbacks[configKey];
+      if (!callback) continue;
 
-          return acc;
-        },
-        { errors: [], results: [] }
-      )
-    );
+      const apiEntries = Object.entries(apis);
 
-    if (errors.length) {
+      const { errors, results } = await Promise.allSettled(
+        apiEntries.map(
+          async ([apiName, [openAPIDocument, ...apiProcessArgv]]) => {
+            spinner.info(
+              `Generating API client for ${c.magenta(apiName)} with the following parameters:\n` +
+                c.gray.italic('bin ') +
+                `${c.green.italic(openAPIDocument)} ` +
+                apiProcessArgv
+                  .map((arg) =>
+                    arg.startsWith('--')
+                      ? c.yellow.italic(arg)
+                      : c.yellow.italic.underline(maybeEscapeShellArg(arg))
+                  )
+                  .join(' ')
+            );
+            spinner.text = '';
+            spinner.start();
+
+            return await callback([openAPIDocument, ...apiProcessArgv], {
+              from: 'user',
+            });
+          }
+        )
+      ).then((results) =>
+        results.reduce<{ errors: unknown[]; results: T[] }>(
+          (acc, result) => {
+            if (result.status === 'rejected') acc.errors.push(result.reason);
+            else acc.results.push(result.value);
+
+            return acc;
+          },
+          { errors: [], results: [] }
+        )
+      );
+
+      allResults.push(...results);
+      allErrors.push(...errors);
+    }
+
+    if (allErrors.length) {
       throw new CommanderError(
         1,
         'ERROR',
         'The following errors occurred during API client generation:\n' +
-          errors
+          allErrors
             .map((error) =>
               error instanceof Error
                 ? error.message + '\n' + error.stack
@@ -221,15 +264,17 @@ export class RedoclyConfigCommand extends Command {
       );
     }
 
+    const allApiNames = Object.values(apisByConfigKey).flatMap((apis) =>
+      Object.keys(apis)
+    );
+
     spinner.succeed(
       c.green(`API clients successfully generated for: `) +
-        redoclyAPIsEntries
-          .map(([apiName]) => `"${c.magenta(apiName)}"`)
-          .join(', ') +
+        allApiNames.map((apiName) => `"${c.magenta(apiName)}"`).join(', ') +
         '.'
     );
 
-    return results;
+    return allResults;
   }
 }
 
@@ -238,6 +283,8 @@ type CallbackFn<T> = (
   processArgvParseOptions?: ParseOptions
 ) => T | Promise<T>;
 
-type RedoclyQraftAPIs = {
-  [apiName: string]: string[];
+type RedoclyQraftAPIsByConfigKey = {
+  [configKey: string]: {
+    [apiName: string]: string[];
+  };
 };

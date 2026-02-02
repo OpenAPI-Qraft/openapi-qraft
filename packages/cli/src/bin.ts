@@ -10,8 +10,6 @@ import {
 } from '@qraft/plugin/lib/RedoclyConfigCommand';
 import c from 'ansi-colors';
 import { Command } from 'commander';
-import { runAsyncAPI } from './commands/runAsyncAPI.js';
-import { runOpenAPI } from './commands/runOpenAPI.js';
 import { packageVersion } from './packageVersion.js';
 
 export async function main(
@@ -64,13 +62,20 @@ export async function main(
     .action(async (apis: string[], options: { redocly: string | boolean }) => {
       const redoclyArgv = buildRedoclyArgv(apis, options.redocly);
 
-      await new RedoclyConfigCommand(undefined, {
-        configKey: OPENAPI_QRAFT_REDOC_CONFIG_KEY,
-      }).parseConfig(runOpenAPI, redoclyArgv, { from: 'user' });
-
-      await new RedoclyConfigCommand(undefined, {
-        configKey: ASYNCAPI_QRAFT_REDOC_CONFIG_KEY,
-      }).parseConfig(runAsyncAPI, redoclyArgv, { from: 'user' });
+      await new RedoclyConfigCommand().parseConfig(
+        {
+          [OPENAPI_QRAFT_REDOC_CONFIG_KEY]: async (argv, parseOptions) => {
+            const { runOpenAPI } = await import('./commands/runOpenAPI.js');
+            return runOpenAPI(argv, parseOptions);
+          },
+          [ASYNCAPI_QRAFT_REDOC_CONFIG_KEY]: async (argv, parseOptions) => {
+            const { runAsyncAPI } = await import('./commands/runAsyncAPI.js');
+            return runAsyncAPI(argv, parseOptions);
+          },
+        },
+        redoclyArgv,
+        { from: 'user' }
+      );
     });
 
   program.addHelpText(

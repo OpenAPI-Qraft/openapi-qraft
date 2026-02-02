@@ -6,7 +6,9 @@
   "scripts": {
     "build": "tsc",
     "codegen": "qraft redocly --redocly redocly.yaml",
-    "e2e:pre-build": "npm run codegen",
+    "codegen:selective-openapi": "qraft redocly openapi-selective --redocly redocly-selective.yaml",
+    "codegen:selective-asyncapi": "qraft redocly asyncapi-selective --redocly redocly-selective.yaml",
+    "e2e:pre-build": "npm run codegen && npm run codegen:selective-openapi && npm run codegen:selective-asyncapi",
     "e2e:post-build": "echo 'Build completed'"
   },
   "dependencies": {
