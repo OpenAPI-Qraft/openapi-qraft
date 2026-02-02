@@ -8,6 +8,31 @@ CLI tool for generating type-safe code from OpenAPI and AsyncAPI specifications.
 npm install -g @qraft/cli
 ```
 
+### Required Plugins
+
+The CLI requires additional plugins to be installed depending on which features you want to use:
+
+**For OpenAPI generation:**
+
+```bash
+npm install @openapi-qraft/openapi-typescript-plugin @openapi-qraft/tanstack-query-react-plugin
+```
+
+**For AsyncAPI generation:**
+
+```bash
+npm install @qraft/asyncapi-typescript-plugin
+```
+
+**For both OpenAPI and AsyncAPI:**
+
+```bash
+npm install @openapi-qraft/openapi-typescript-plugin @openapi-qraft/tanstack-query-react-plugin @qraft/asyncapi-typescript-plugin
+```
+
+> **Note:** All plugins are peer dependencies and must be installed alongside `@qraft/cli` for the corresponding
+> commands to work.
+
 ## Commands
 
 ### `qraft openapi`
