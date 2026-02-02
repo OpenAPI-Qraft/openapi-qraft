@@ -1,3 +1,4 @@
+// eslint-disable-next-line import-x/no-extraneous-dependencies
 export type { AsyncAPIDocumentInterface } from '@asyncapi/parser';
 export {
   QraftCommand,

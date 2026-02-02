@@ -4,8 +4,8 @@
   "packageManager": "yarn@4.0.2",
   "type": "module",
   "scripts": {
-    "build": "tsc --project tsconfig.build.json",
-    "dev": "yarn build --watch --noEmitOnError false",
+    "build": "yarn clean && NODE_ENV=production rollup --config rollup.config.mjs && tsc --project tsconfig.build.json --emitDeclarationOnly",
+    "dev": "rollup --config rollup.config.mjs --watch",
     "typecheck": "tsc --noEmit",
     "lint": "eslint",
     "clean": "rimraf dist/",
@@ -32,18 +32,20 @@
     }
   },
   "dependencies": {
-    "@asyncapi/parser": "^3.4.0",
     "@qraft/plugin": "workspace:*",
     "ansi-colors": "^4.1.3",
     "commander": "^14.0.2",
     "ora": "^8.2.0"
   },
   "devDependencies": {
+    "@asyncapi/parser": "^3.4.0",
     "@openapi-qraft/eslint-config": "workspace:*",
+    "@openapi-qraft/rollup-config": "workspace:*",
     "@types/node": "^20.16.5",
     "eslint": "^9.39.1",
     "memfs": "^4.11.1",
     "rimraf": "^6.1.2",
+    "rollup": "~4.22.5",
     "typescript": "^5.6.2"
   },
   "files": [

@@ -1,3 +1,4 @@
+// eslint-disable-next-line import-x/no-extraneous-dependencies
 import type { AsyncAPIDocumentInterface } from '@asyncapi/parser';
 import { URL } from 'node:url';
 import {

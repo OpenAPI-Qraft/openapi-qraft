@@ -1,6 +1,8 @@
 import type { Readable } from 'node:stream';
+// eslint-disable-next-line import-x/no-extraneous-dependencies
 import type { AsyncAPIDocumentInterface } from '@asyncapi/parser';
 import { fileURLToPath } from 'node:url';
+// eslint-disable-next-line import-x/no-extraneous-dependencies
 import { fromFile, fromURL, Parser } from '@asyncapi/parser';
 
 export interface AsyncAPISchemaResult {
