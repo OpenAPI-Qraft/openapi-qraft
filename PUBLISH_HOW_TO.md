@@ -56,6 +56,8 @@ Add NPM Auth Token into `~/.yarnrc.yml`:
 ```bash
 yarn config set 'npmScopes["openapi-qraft"]' --home \
   --json '{"npmAuthToken":"npm_YOUR_TOKEN", "npmAlwaysAuth":true}'
+yarn config set 'npmScopes["qraft"]' --home \
+  --json '{"npmAuthToken":"npm_YOUR_TOKEN", "npmAlwaysAuth":true}'
 ```
 
 > 📍 **Place** `.yarnrc.yml` file in the directory above the application directory

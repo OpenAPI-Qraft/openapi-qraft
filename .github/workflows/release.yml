@@ -38,6 +38,7 @@ jobs:
       - name: Set token in .yarnrc.yml
         run: |
           yarn config set 'npmScopes["openapi-qraft"]' --home --json '{"npmAlwaysAuth":true,"npmAuthToken":"${NPM_TOKEN}"}'
+          yarn config set 'npmScopes["qraft"]' --home --json '{"npmAlwaysAuth":true,"npmAuthToken":"${NPM_TOKEN}"}'
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 
