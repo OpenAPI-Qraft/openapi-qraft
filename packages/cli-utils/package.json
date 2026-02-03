@@ -1,6 +1,6 @@
 {
   "name": "@qraft/cli-utils",
-  "version": "0.0.0",
+  "version": "1.0.0-beta.0",
   "description": "Shared CLI utilities for Qraft code generation tools",
   "scripts": {
     "build": "tsc --project tsconfig.build.json",
