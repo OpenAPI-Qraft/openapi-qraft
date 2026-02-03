@@ -1,6 +1,6 @@
 #!/usr/bin/env sh
 set -o errexit
-NPM_PUBLISH_SCOPES=${NPM_PUBLISH_SCOPES:-'openapi-qraft'}
+NPM_PUBLISH_SCOPES=${NPM_PUBLISH_SCOPES:-'openapi-qraft qraft'}
 
 release_tag() {
   # Check if the .changeset/pre.json file exists for alpha/beta releases
