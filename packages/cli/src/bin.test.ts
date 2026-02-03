@@ -54,9 +54,7 @@ describe('CLI binary help output', () => {
     it('should display help without plugins', async () => {
       const output = await executeBin(['openapi', '--help']);
       expect(output).toMatchInlineSnapshot(`
-        "ℹ ✨ OpenAPI Qraft 2.15.0-beta.0
-
-        Usage: qraft openapi [input] [options]
+        "Usage: qraft openapi [input] [options]
 
         Arguments:
           input                                            Input OpenAPI Document file path, URL (json, yml) (default: null)
@@ -91,9 +89,7 @@ describe('CLI binary help output', () => {
         '--help',
       ]);
       expect(output).toMatchInlineSnapshot(`
-        "ℹ ✨ OpenAPI Qraft 2.15.0-beta.0
-
-        Usage: qraft openapi --plugin tanstack-query-react [input] [options]
+        "Usage: qraft openapi --plugin tanstack-query-react [input] [options]
 
         Generate a TanStack Query React client from OpenAPI Document
 
@@ -136,9 +132,7 @@ describe('CLI binary help output', () => {
         '--help',
       ]);
       expect(output).toMatchInlineSnapshot(`
-        "ℹ ✨ OpenAPI Qraft 2.15.0-beta.0
-
-        Usage: qraft openapi --plugin openapi-typescript [input] [options]
+        "Usage: qraft openapi --plugin openapi-typescript [input] [options]
 
         Generate a type-safe TanStack Query client for React from an OpenAPI Document.
 
@@ -192,9 +186,7 @@ describe('CLI binary help output', () => {
         '--help',
       ]);
       expect(output).toMatchInlineSnapshot(`
-        "ℹ ✨ OpenAPI Qraft 2.15.0-beta.0
-
-        Usage: qraft openapi --plugin tanstack-query-react --plugin openapi-typescript [input] [options]
+        "Usage: qraft openapi --plugin tanstack-query-react --plugin openapi-typescript [input] [options]
 
         Generate a type-safe TanStack Query client for React from an OpenAPI Document.
 
@@ -250,9 +242,7 @@ describe('CLI binary help output', () => {
     it('should display help without plugins', async () => {
       const output = await executeBin(['asyncapi', '--help']);
       expect(output).toMatchInlineSnapshot(`
-        "ℹ ✨ AsyncAPI Qraft 1.0.0
-
-        Usage: qraft asyncapi [input] [options]
+        "Usage: qraft asyncapi [input] [options]
 
         Arguments:
           input                                Input AsyncAPI Document file path, URL
@@ -296,9 +286,7 @@ describe('CLI binary help output', () => {
         '--help',
       ]);
       expect(output).toMatchInlineSnapshot(`
-        "ℹ ✨ AsyncAPI Qraft 1.0.0
-
-        Usage: qraft asyncapi --plugin asyncapi-typescript [input] [options]
+        "Usage: qraft asyncapi --plugin asyncapi-typescript [input] [options]
 
         Generate TypeScript types from an AsyncAPI Document.
 
@@ -360,6 +348,21 @@ function stripAnsiCodes(str: string): string {
   );
 }
 
+function stripVersionLine(str: string): string {
+  const lines = str.split('\n');
+  if (
+    lines.length > 0 &&
+    /ℹ\s*✨\s*(OpenAPI|AsyncAPI)\s+Qraft\s+[\d.]+/.test(lines[0])
+  ) {
+    const remaining = lines.slice(1);
+    if (remaining.length > 0 && remaining[0].trim() === '') {
+      return remaining.slice(1).join('\n');
+    }
+    return remaining.join('\n');
+  }
+  return str;
+}
+
 async function executeBin(args: string[]): Promise<string> {
   const command = `node ${binPath} ${args.join(' ')}`;
   try {
@@ -368,12 +371,12 @@ async function executeBin(args: string[]): Promise<string> {
       encoding: 'utf-8',
     });
     const output = (stderr ? stderr + '\n' : '') + (stdout || '');
-    return stripAnsiCodes(output.trimEnd());
+    return stripVersionLine(stripAnsiCodes(output.trimEnd()));
   } catch (error: any) {
     const output =
       (error.stderr ? error.stderr + '\n' : '') +
       (error.stdout || '') +
       (error.message || '');
-    return stripAnsiCodes(output.trimEnd());
+    return stripVersionLine(stripAnsiCodes(output.trimEnd()));
   }
 }
