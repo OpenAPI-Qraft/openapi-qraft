@@ -23,5 +23,9 @@
     "@qraft/plugin": "0.0.0",
     "@qraft/asyncapi-typescript-plugin": "0.0.0"
   },
-  "changesets": ["short-suits-shine"]
+  "changesets": [
+    "deep-boxes-tan",
+    "public-lies-sell",
+    "short-suits-shine"
+  ]
 }
