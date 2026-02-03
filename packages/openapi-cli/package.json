@@ -18,6 +18,8 @@
     "@openapi-qraft/openapi-typescript-plugin": "workspace:*",
     "@openapi-qraft/plugin": "workspace:*",
     "@openapi-qraft/tanstack-query-react-plugin": "workspace:*",
+    "@qraft/cli-utils": "workspace:*",
+    "@qraft/plugin": "workspace:*",
     "ansi-colors": "^4.1.3",
     "commander": "^14.0.2"
   },

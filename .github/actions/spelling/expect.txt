@@ -1,8 +1,8 @@
+addl
 amannn
 APITS
 apps
 Batalov
-bccc
 bnpm
 bnpx
 bytesin
@@ -45,6 +45,7 @@ jwt
 kubb
 linkcheck
 linting
+mdc
 monite
 mozilla
 mryechkin
@@ -52,10 +53,13 @@ mycdn
 myclient
 myqraft
 nbf
+nlights
 nnull
 nochange
 npmrc
 npx
+nqry
+oapi
 openapis
 opensource
 ordercer
@@ -74,18 +78,22 @@ refetched
 Refetches
 remarkjs
 remarkrc
+reqid
 retext
 rfc
 sitemap
+Smartylighting
 somedomain
 srv
 ssr
+streetlights
 swcrc
 TAdditional
 tagline
 tarball
 TAsync
 TCombined
+TCommand
 TContext
 TData
 TInfinite
@@ -111,6 +119,7 @@ URLTo
 usagge
 usernames
 Vapi
+varnames
 verdaccio
 versioned
 versioning
@@ -121,3 +130,4 @@ workaround
 workflows
 workspaces
 XMonite
+Zcf

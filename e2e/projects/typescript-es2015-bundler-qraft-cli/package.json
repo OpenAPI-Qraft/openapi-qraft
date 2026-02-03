@@ -1,0 +1,26 @@
+{
+  "name": "typescript-es2015-bundler-qraft-cli",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "codegen:openapi-cli": "qraft openapi https://raw.githubusercontent.com/swagger-api/swagger-petstore/7767363b841961221a38c0be9c6b1066a5120051/src/main/resources/openapi.yaml -o src/openapi-cli --plugin openapi-typescript --clean",
+    "codegen:asyncapi-cli": "qraft asyncapi ./asyncapi.json -o src/asyncapi-cli --plugin asyncapi-typescript --clean --asyncapi-types-file-name asyncapi.ts",
+    "codegen:openapi-redocly": "qraft openapi --redocly redocly.yaml",
+    "codegen:asyncapi-redocly": "qraft asyncapi --redocly redocly.yaml",
+    "e2e:pre-build": "npm run codegen:openapi-cli && npm run codegen:asyncapi-cli && npm run codegen:openapi-redocly && npm run codegen:asyncapi-redocly",
+    "e2e:post-build": "echo 'Build completed'"
+  },
+  "dependencies": {
+    "@qraft/cli": "latest",
+    "@qraft/asyncapi-typescript-plugin": "latest",
+    "@openapi-qraft/openapi-typescript-plugin": "latest",
+    "@types/node": "latest",
+    "typescript": "latest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/OpenAPI-Qraft/openapi-qraft.git"
+  }
+}

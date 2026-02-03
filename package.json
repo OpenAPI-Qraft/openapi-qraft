@@ -5,7 +5,7 @@
   "scripts": {
     "build": "turbo run build",
     "dev": "turbo run dev",
-    "dev:qraft": "turbo run dev --filter '@openapi-qraft/*'",
+    "dev:qraft": "turbo run dev --filter '@openapi-qraft/*' --filter '@qraft/*'",
     "test": "turbo run test --continue --output-logs=new-only",
     "lint": "turbo run lint --continue --output-logs=new-only",
     "typecheck": "turbo run typecheck --output-logs=new-only"

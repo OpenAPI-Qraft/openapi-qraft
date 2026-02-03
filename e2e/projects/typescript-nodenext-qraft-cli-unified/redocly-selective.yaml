@@ -1,0 +1,16 @@
+apis:
+  openapi-selective:
+    root: https://raw.githubusercontent.com/swagger-api/swagger-petstore/7767363b841961221a38c0be9c6b1066a5120051/src/main/resources/openapi.yaml
+    x-openapi-qraft:
+      plugin:
+        openapi-typescript: true
+      output-dir: src/openapi-selective
+      clean: true
+
+  asyncapi-selective:
+    root: ./asyncapi.json
+    x-asyncapi-qraft:
+      plugin:
+        asyncapi-typescript: true
+      output-dir: src/asyncapi-selective
+      clean: true

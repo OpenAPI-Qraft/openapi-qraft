@@ -1,6 +1,5 @@
-import { fileHeader } from '@openapi-qraft/plugin/lib/fileHeader';
-import { formatFileHeader } from '@openapi-qraft/plugin/lib/formatFileHeader';
 import { QraftCommandPlugin } from '@openapi-qraft/plugin/lib/QraftCommandPlugin';
+import { formatFileHeader } from '@qraft/plugin/lib/formatFileHeader';
 import c from 'ansi-colors';
 import { CommanderError } from 'commander';
 import { generateSchemaTypes } from './generateSchemaTypes.js';
@@ -76,7 +75,7 @@ export const plugin: QraftCommandPlugin = {
         resolve([
           {
             file: new URL(args.openapiTypesFileName, output.dir),
-            code: formatFileHeader(args.fileHeader ?? fileHeader) + code,
+            code: formatFileHeader(args.fileHeader) + code,
           },
         ]);
       });

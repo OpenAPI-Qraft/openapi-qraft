@@ -1,5 +1,4 @@
 import type { OverrideImportType } from './ts-factory/OverrideImportType.js';
-import { fileHeader } from '@openapi-qraft/plugin/lib/fileHeader';
 import {
   createPredefinedParametersGlobs,
   parseOperationPredefinedParametersOption,
@@ -84,7 +83,7 @@ export const plugin: QraftCommandPlugin = {
             : undefined,
           output: {
             ...output,
-            fileHeader: args.fileHeader ?? fileHeader,
+            fileHeader: args.fileHeader,
             explicitImportExtensions: args.explicitImportExtensions,
             servicesDirName: 'services',
             exportSchemaTypes: args.exportOpenapiTypes,

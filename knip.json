@@ -12,25 +12,7 @@
     ".": {
       "ignoreDependencies": ["memfs", "@vitest/coverage-v8"]
     },
-    "packages/openapi-cli": {
-      "project": [
-        "src/**/*.{js,cjs,mjs,jsx,ts,cts,mts,tsx}",
-        "!src/**/__snapshots__/**",
-        "!src/tests/**",
-        "!src/**/fixtures/**"
-      ],
-      "ignore": ["src/**/__snapshots__/**", "eslint.config.js"]
-    },
-    "packages/openapi-typescript-plugin": {
-      "project": [
-        "src/**/*.{js,cjs,mjs,jsx,ts,cts,mts,tsx}",
-        "!src/**/__snapshots__/**",
-        "!src/tests/**",
-        "!src/**/fixtures/**"
-      ],
-      "ignore": ["src/**/__snapshots__/**", "eslint.config.js"]
-    },
-    "packages/openapi-plugin": {
+    "packages/*": {
       "project": [
         "src/**/*.{js,cjs,mjs,jsx,ts,cts,mts,tsx}",
         "!src/**/__snapshots__/**",
@@ -76,21 +58,28 @@
       "ignore": ["src/**/__snapshots__/**", "eslint.config.js"],
       "ignoreDependencies": ["@openapi-qraft/test-fixtures"]
     },
-    "packages/tanstack-query-react-types": {
-      "project": [
-        "src/**/*.{js,cjs,mjs,jsx,ts,cts,mts,tsx}",
-        "!src/**/__snapshots__/**",
-        "!src/tests/**",
-        "!src/**/fixtures/**"
-      ],
-      "ignore": ["src/**/__snapshots__/**", "eslint.config.js"]
-    },
     "packages/eslint-plugin-query": {
       "project": [
         "src/**/*.{js,cjs,mjs,jsx,ts,cts,mts,tsx}",
         "!src/__tests__/**"
       ],
       "ignore": ["rollup.config.mjs", "eslint.config.js"]
+    },
+    "packages/cli": {
+      "project": [
+        "src/**/*.{js,cjs,mjs,jsx,ts,cts,mts,tsx}",
+        "!src/**/__snapshots__/**",
+        "!src/tests/**",
+        "!src/**/fixtures/**"
+      ],
+      "ignore": ["src/**/__snapshots__/**", "eslint.config.js"],
+      "ignoreDependencies": [
+        "@openapi-qraft/openapi-typescript-plugin",
+        "@openapi-qraft/plugin",
+        "@openapi-qraft/tanstack-query-react-plugin",
+        "@qraft/asyncapi-plugin",
+        "@qraft/asyncapi-typescript-plugin"
+      ]
     },
     "playground": {
       "ignoreDependencies": [

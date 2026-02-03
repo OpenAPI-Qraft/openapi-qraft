@@ -35,6 +35,8 @@
   },
   "dependencies": {
     "@openapi-qraft/plugin": "workspace:^",
+    "@qraft/cli-utils": "workspace:*",
+    "@qraft/plugin": "workspace:^",
     "@redocly/openapi-core": "^1.34.5",
     "ansi-colors": "^4.1.3",
     "commander": "^14.0.2",
@@ -44,6 +46,7 @@
   "devDependencies": {
     "@openapi-qraft/eslint-config": "workspace:*",
     "@openapi-qraft/test-fixtures": "workspace:*",
+    "@qraft/test-utils": "workspace:*",
     "@types/node": "^20.16.5",
     "eslint": "^9.39.1",
     "memfs": "^4.11.1",

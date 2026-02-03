@@ -15,9 +15,13 @@
     "@openapi-qraft/test-fixtures": "1.1.1",
     "@openapi-qraft/ts-factory-code-generator": "1.0.2",
     "playground": "0.0.14",
-    "openapi-qraft-website": "0.0.0"
+    "openapi-qraft-website": "0.0.0",
+    "@qraft/cli": "0.0.0",
+    "@qraft/cli-utils": "0.0.0",
+    "@qraft/test-utils": "0.0.0",
+    "@qraft/asyncapi-plugin": "0.0.0",
+    "@qraft/plugin": "0.0.0",
+    "@qraft/asyncapi-typescript-plugin": "0.0.0"
   },
-  "changesets": [
-    "short-suits-shine"
-  ]
+  "changesets": ["short-suits-shine"]
 }

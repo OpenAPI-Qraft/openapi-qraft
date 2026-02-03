@@ -1,0 +1,114 @@
+{
+  "name": "@qraft/cli",
+  "version": "0.0.0",
+  "description": "CLI tool for generating type-safe code from OpenAPI and AsyncAPI specifications",
+  "scripts": {
+    "build": "tsc --project tsconfig.build.json",
+    "dev": "yarn build --watch --noEmitOnError false",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint",
+    "clean": "rimraf dist/",
+    "write-package-version-file": "yarn exec ../../write-package-version-file.sh"
+  },
+  "type": "module",
+  "bin": {
+    "qraft": "./bin.mjs"
+  },
+  "peerDependencies": {
+    "@openapi-qraft/openapi-typescript-plugin": "workspace:*",
+    "@openapi-qraft/plugin": "workspace:*",
+    "@openapi-qraft/tanstack-query-react-plugin": "workspace:*",
+    "@qraft/asyncapi-plugin": "workspace:*",
+    "@qraft/asyncapi-typescript-plugin": "workspace:*"
+  },
+  "peerDependenciesMeta": {
+    "@openapi-qraft/openapi-typescript-plugin": {
+      "optional": true
+    },
+    "@openapi-qraft/plugin": {
+      "optional": true
+    },
+    "@openapi-qraft/tanstack-query-react-plugin": {
+      "optional": true
+    },
+    "@qraft/asyncapi-plugin": {
+      "optional": true
+    },
+    "@qraft/asyncapi-typescript-plugin": {
+      "optional": true
+    }
+  },
+  "dependencies": {
+    "@qraft/cli-utils": "workspace:*",
+    "@qraft/plugin": "workspace:*",
+    "ansi-colors": "^4.1.3",
+    "commander": "^14.0.2"
+  },
+  "devDependencies": {
+    "@openapi-qraft/eslint-config": "workspace:*",
+    "@openapi-qraft/openapi-typescript-plugin": "workspace:*",
+    "@openapi-qraft/plugin": "workspace:*",
+    "@openapi-qraft/tanstack-query-react-plugin": "workspace:*",
+    "@qraft/asyncapi-plugin": "workspace:*",
+    "@qraft/asyncapi-typescript-plugin": "workspace:*",
+    "@types/node": "^20.16.5",
+    "eslint": "^9.39.1",
+    "rimraf": "^6.1.2",
+    "typescript": "^5.6.2",
+    "vitest": "^3.2.4"
+  },
+  "files": [
+    "dist",
+    "src",
+    "!dist/**/*.test.*",
+    "!dist/**/*.spec.*",
+    "!src/**/*.test.*",
+    "!src/**/*.spec.*"
+  ],
+  "module": "dist/bin.js",
+  "types": "dist/bin.d.ts",
+  "exports": {
+    "./package.json": "./package.json",
+    "./*": {
+      "types": "./dist/*.d.ts",
+      "import": "./dist/*.js"
+    }
+  },
+  "typesVersions": {
+    "*": {
+      "*": [
+        "dist/*"
+      ]
+    }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/OpenAPI-Qraft/openapi-qraft.git",
+    "directory": "packages/cli"
+  },
+  "bugs": {
+    "url": "https://github.com/OpenAPI-Qraft/openapi-qraft/issues"
+  },
+  "homepage": "https://openapi-qraft.github.io/openapi-qraft/",
+  "keywords": [
+    "openapi",
+    "swagger",
+    "rest",
+    "api",
+    "oapi_3",
+    "oapi_3_1",
+    "typescript",
+    "ts",
+    "dts",
+    "codegen",
+    "generation",
+    "fetch",
+    "react",
+    "hooks",
+    "TanStack Query"
+  ],
+  "publishConfig": {
+    "access": "public"
+  }
+}

@@ -1,4 +1,4 @@
-import './vitestFsMock';
+import '@qraft/test-utils/vitestFsMock';
 import { createRequire } from 'node:module';
 import { dirname } from 'node:path';
 import { describe, expect, test } from 'vitest';
@@ -12,16 +12,19 @@ describe('RedoclyConfigCommand', () => {
     ) + '/redocly.yaml';
 
   test('processes only x-openapi-qraft options', async () => {
-    const { RedoclyConfigCommand } = await import('./RedoclyConfigCommand.js');
+    const { RedoclyConfigCommand, OPENAPI_QRAFT_REDOC_CONFIG_KEY } =
+      await import('./RedoclyConfigCommand.js');
 
     const command = new RedoclyConfigCommand();
 
     await expect(
       command.parseConfig(
-        (processArgv, processArgvParseOptions) => [
-          processArgv,
-          processArgvParseOptions,
-        ],
+        {
+          [OPENAPI_QRAFT_REDOC_CONFIG_KEY]: (
+            processArgv,
+            processArgvParseOptions
+          ) => [processArgv, processArgvParseOptions],
+        },
         ['--redocly', redoclyConfigPath],
         {
           from: 'user',
@@ -85,16 +88,19 @@ describe('RedoclyConfigCommand', () => {
   });
 
   test('processes specific API entry', async () => {
-    const { RedoclyConfigCommand } = await import('./RedoclyConfigCommand.js');
+    const { RedoclyConfigCommand, OPENAPI_QRAFT_REDOC_CONFIG_KEY } =
+      await import('./RedoclyConfigCommand.js');
 
     const command = new RedoclyConfigCommand();
 
     await expect(
       command.parseConfig(
-        (processArgv, processArgvParseOptions) => [
-          processArgv,
-          processArgvParseOptions,
-        ],
+        {
+          [OPENAPI_QRAFT_REDOC_CONFIG_KEY]: (
+            processArgv,
+            processArgvParseOptions
+          ) => [processArgv, processArgvParseOptions],
+        },
         [
           'dummy-node',
           'dummy-qraft-bin',
@@ -128,16 +134,19 @@ describe('RedoclyConfigCommand', () => {
   });
 
   test('fails when specific API entry is provided but not found', async () => {
-    const { RedoclyConfigCommand } = await import('./RedoclyConfigCommand.js');
+    const { RedoclyConfigCommand, OPENAPI_QRAFT_REDOC_CONFIG_KEY } =
+      await import('./RedoclyConfigCommand.js');
 
     const command = new RedoclyConfigCommand();
 
     await expect(
       command.parseConfig(
-        (processArgv, processArgvParseOptions) => [
-          processArgv,
-          processArgvParseOptions,
-        ],
+        {
+          [OPENAPI_QRAFT_REDOC_CONFIG_KEY]: (
+            processArgv,
+            processArgvParseOptions
+          ) => [processArgv, processArgvParseOptions],
+        },
         [
           'dummy-node',
           'dummy-qraft-bin',

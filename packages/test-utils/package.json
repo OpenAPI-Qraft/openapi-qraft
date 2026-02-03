@@ -1,0 +1,62 @@
+{
+  "name": "@qraft/test-utils",
+  "private": true,
+  "version": "0.0.0",
+  "description": "Shared Test utilities for Qraft code generation tools",
+  "scripts": {
+    "build": "tsc --project tsconfig.build.json",
+    "dev": "yarn build --watch --noEmitOnError false",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint",
+    "clean": "rimraf dist/"
+  },
+  "type": "module",
+  "devDependencies": {
+    "@openapi-qraft/eslint-config": "workspace:*",
+    "@types/node": "^20.16.5",
+    "eslint": "^9.39.1",
+    "memfs": "^4.11.1",
+    "rimraf": "^6.1.2",
+    "typescript": "^5.6.2",
+    "vitest": "^3.2.4"
+  },
+  "files": [
+    "dist",
+    "src",
+    "!dist/**/*.test.*",
+    "!dist/**/*.spec.*",
+    "!src/**/*.test.*",
+    "!src/**/*.spec.*"
+  ],
+  "exports": {
+    "./package.json": "./package.json",
+    "./*": {
+      "types": "./dist/*.d.ts",
+      "import": "./dist/*.js"
+    }
+  },
+  "typesVersions": {
+    "*": {
+      "*": [
+        "dist/*"
+      ]
+    }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/OpenAPI-Qraft/openapi-qraft.git",
+    "directory": "packages/test-utils"
+  },
+  "bugs": {
+    "url": "https://github.com/OpenAPI-Qraft/openapi-qraft/issues"
+  },
+  "homepage": "https://openapi-qraft.github.io/openapi-qraft/",
+  "keywords": [
+    "openapi",
+    "typescript",
+    "ts",
+    "dts",
+    "codegen",
+    "generation"
+  ]
+}

@@ -1,0 +1,12 @@
+apis:
+  main:
+    root: ./asyncapi.json
+    x-asyncapi-qraft:
+      plugin:
+        asyncapi-typescript: true
+      output-dir: src/asyncapi
+      clean: true
+      asyncapi-types-file-name: asyncapi.ts
+
+  not-gen:
+    root: ./openapi.json

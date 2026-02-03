@@ -11,6 +11,14 @@
       "@openapi-qraft/react",
       "@openapi-qraft/tanstack-query-react-types",
       "@openapi-qraft/eslint-plugin-query"
+    ],
+    [
+      "@qraft/cli",
+      "@qraft/cli-utils",
+      "@qraft/test-utils",
+      "@qraft/asyncapi-plugin",
+      "@qraft/plugin",
+      "@qraft/asyncapi-typescript-plugin"
     ]
   ],
   "linked": [],
