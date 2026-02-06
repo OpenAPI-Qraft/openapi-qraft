@@ -113,6 +113,7 @@ TSignal
 TValue
 TVariables
 typesafe
+unionfs
 unpkg
 Unpublishing
 URLTo
