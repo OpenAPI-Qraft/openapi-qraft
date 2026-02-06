@@ -1,0 +1,99 @@
+---
+sidebar_label: isMutating()
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# isMutating(...)
+
+This method returns an integer representing how many mutations are currently in the _loading_ state.
+Refer to the TanStack [_queryClient.isMutating 🌴_](https://tanstack.com/query/latest/docs/reference/QueryClient#queryclientismutating)
+guide for more information.
+
+<Tabs>
+  <TabItem value="with-filters" label={<span style={{verticalAlign: "middle"}}>With <code>filters</code></span>}>
+    Checks if any mutations are fetching with the specified _filters_.
+
+    ```ts
+    const mutationNumber = qraft.<service>.<operation>.isMutating(
+      filters
+    )
+    ```
+
+    ### Arguments
+
+    1.  `filters: UseMutationStateFiltersByParameters | UseMutationStateFiltersByMutationKey`,
+        - **Required**, represents the [_Mutation Filters 🌴_](https://tanstack.com/query/latest/docs/framework/react/guides/filters#mutation-filters)
+          to be used, strictly-typed ✨
+        - `filters.parameters: { path, query, header }` will be used for filtering mutations by parameters
+        - `filters.mutationKey: MutationKey` will be used for filtering mutations by _MutationKey_ instead of parameters
+          - `filters.mutationKey` and `filters.parameters` are mutually exclusive
+        - `filters.predicate?: (mutation: Mutation) => boolean` will be used for filtering mutations by custom predicate
+
+    ### Returns
+
+    `mutationsNumber`: The number of mutations that are matching the provided filters and are in the _loading_ state
+
+  </TabItem>
+  <TabItem value="without-filters" label={<span style={{verticalAlign: "middle"}}>Without <code style={{textDecoration: 'line-through'}}>filters</code></span>}>
+    Check _all_ mutations for the specified endpoint.
+
+    ```ts
+    const mutationNumber = qraft.<service>.<operation>.isMutating()
+    ```
+
+    ### Returns
+
+    `mutationsNumber`: The number of all mutations matching to `<service>.<operation>` and are in the _loading_ state
+  </TabItem>
+</Tabs>
+
+### Examples
+
+<Tabs>
+  <TabItem value="with-filters" label={<span style={{verticalAlign: "middle"}}><code>filters</code></span>}>
+    Check if any mutations are pending with the specified parameters:
+
+    ```ts
+    /**
+    * Checks if the mutation with the specified parameters is fetching:
+    * ###
+    * POST /entities/3e3e-3e3e-3e3e
+    * x-monite-version: 2023-09-01
+    **/
+    const numberOfFetchingEntities = qraft.entities.postEntities.isMutating(
+      {
+        header: {
+          'x-monite-version': '2023-09-01',
+        },
+        path: {
+          entity_id: '3e3e-3e3e-3e3e',
+        },
+      }
+    );
+
+    expect(numberOfFetchingEntities).toEqual(1);
+    ```
+  </TabItem>
+  <TabItem value="without-filters" label={<span style={{verticalAlign: "middle"}}><code style={{textDecoration: 'line-through'}}>filters</code></span>}>
+    To check _all mutations status for a particular endpoint_, you can call `isMutating(...)` without `parameters`:
+
+    ```ts
+    /**
+     * Checks mutations matching the specified endpoint:
+     * ###
+     * POST /entities/3e3e-3e3e-3e3e
+     * x-monite-version: 2023-09-01
+     * ###
+     * POST /entities/4c4c-4c4c-4c4c
+     * x-monite-version: 2023-09-01
+     * ###
+     * ⬇︎ All mutations for the specified endpoint will be used
+     **/
+    const numberOfFetchingEntities = qraft.entities.postEntities.isMutating();
+
+    expect(numberOfFetchingEntities).toEqual(2);
+    ```
+  </TabItem>
+</Tabs>

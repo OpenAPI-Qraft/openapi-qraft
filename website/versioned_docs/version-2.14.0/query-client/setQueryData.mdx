@@ -1,0 +1,82 @@
+---
+sidebar_label: setQueryData()
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# setQueryData(...)
+
+The method enables direct access to the `QueryClient` cache to set the data for a specific _Query_.
+See the TanStack [_queryClient.setQueryData 🌴_](https://tanstack.com/query/latest/docs/reference/QueryClient#queryclientsetquerydata) documentation.
+
+```ts
+const data = qraft.<service>.<operation>.setQueryData(
+  parameters,
+  updater,
+  options
+);
+```
+
+## Arguments
+
+1.  `parameters: { path, query, header } | QueryKey`
+    - **Required** parameters to set the data in the _Query Cache_.
+    - Instead of an object with `{path, query, header}`, you can pass a `QueryKey` as an array
+      which is also strictly-typed ✨
+2.  `updater: TData | (oldData: TData | undefined) => TData | undefined`
+    - **Required** updater for the cache data
+    - If a non-function value is passed, the data will be updated to this value
+    - If a function is passed, it will receive the old data value and is expected to return a new one
+3.  `options?: SetQueryDataOptions`
+    - **Optional** options to set the data in the cache
+    - See the TanStack [_queryClient.setQueryData 🌴_](https://tanstack.com/query/latest/docs/reference/QueryClient#queryclientsetquerydata)
+      documentation for more details
+
+## Returns
+
+The `TData` from the updater or `undefined` if it returns nothing
+
+## Example
+
+<Tabs>
+  <TabItem value="without-options" label={<span style={{verticalAlign: 'middle'}}>Without <code>options</code></span>}>
+    ```tsx
+    const parameters = { path: { petId: 123 } };
+
+    qraft.pet.getPetById.setQueryData(
+      parameters,
+      { id: 123, name: 'Rex' }
+    );
+
+    const pet = qraft.pet.getPetById.getQueryData(parameters);
+
+    expect(pet).toEqual({
+      id: 123,
+      name: 'Rex',
+    });
+    ```
+  </TabItem>
+  <TabItem value="with-query-key" label={<span style={{verticalAlign: 'middle'}}>With <code>QueryKey</code></span>}>
+    It's also possible to use a `QueryKey` as an array instead of an object with `{path, query, header}`:
+
+    ```tsx
+    const pet = qraft.pet.getPetById.setQueryData(
+      [
+        { method: 'get', url: '/pet/{petId}', infinite: false },
+        { petId: 123 },
+      ],
+      { id: 123, name: 'Rex' }
+    );
+    ```
+  </TabItem>
+  <TabItem value="with-options" label={<span style={{verticalAlign: 'middle'}}>With <code>options</code></span>}>
+    ```tsx
+    const pet = qraft.pet.getPetById.setQueryData(
+      { path: { petId: 123 } },
+      { id: 123, name: 'Rex' },
+      { updatedAt: Date.now() - 60_000 }
+    );
+    ```
+  </TabItem>
+</Tabs>

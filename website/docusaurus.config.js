@@ -53,6 +53,9 @@ const config = {
             current: {
               label: '2.x',
             },
+            '2.14.0': {
+              label: '2.14.0',
+            },
             '1.x': {
               label: '1.x',
             },
