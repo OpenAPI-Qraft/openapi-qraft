@@ -48,8 +48,9 @@
     "@qraft/test-utils": "workspace:*",
     "@types/node": "^20.16.5",
     "eslint": "^9.39.1",
-    "memfs": "^4.11.1",
+    "memfs": "^4.56.10",
     "rimraf": "^6.1.2",
+    "unionfs": "^4.6.0",
     "vitest": "^3.2.4"
   },
   "files": [
