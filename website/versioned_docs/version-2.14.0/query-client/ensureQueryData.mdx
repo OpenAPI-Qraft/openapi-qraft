@@ -1,0 +1,41 @@
+---
+sidebar_label: ensureQueryData()
+---
+
+# ensureQueryData(...)
+
+The `ensureQueryData` method retrieves cached data for a given query or fetches it if the data is not already available
+in the cache. This ensures that data is prepared and cached ahead of time, improving efficiency and performance.
+
+To understand how `ensureQueryData` works, refer to the TanStack
+[_queryClient.ensureQueryData 🌴_](https://tanstack.com/query/latest/docs/reference/QueryClient/#queryclientensurequerydata) documentation.
+
+```ts
+const result = api.<service>.<operation>.ensureQueryData({
+  parameters,
+  requestFn,
+  baseUrl,
+  revalidateIfStale: false,
+  ...fetchQueryOptions,
+});
+```
+
+### Arguments
+
+1. -  `parameters: { path, query, header } | QueryKey | void`
+      - **Required**, OpenAPI request parameters for the query, strictly-typed ✨
+      - `parameters` will be used to generate the `QueryKey`
+      - `requestFn?: RequestFn`
+        - **Optional**, a function that will be used to execute the request
+      - `revalidateIfStale?: boolean`
+        - **Optional**, defaults to `false`. If `true`, stale data will be revalidated in the background while returning cached data immediately
+      - `baseUrl?: string`
+        - **Optional**, the base URL of the API
+      - `...fetchQueryOptions?: FetchQueryOptions`
+        - **Optional**, represents the rest options of the [_fetchQuery(...) 🌴_](https://tanstack.com/query/latest/docs/reference/QueryClient#queryclientfetchquery) method
+        - `queryOptions.queryFn` could be provided instead of ~~`requestFn`~~
+        - `queryOptions.queryKey` could be provided instead of ~~`parameters`~~
+
+### Returns
+
+`result: Promise<TData>` - The result of the query execution
