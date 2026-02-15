@@ -24,7 +24,7 @@ Qraft CLI integrates with Redocly's configuration framework to simplify API clie
 Here's a basic example of a `redocly.yaml` configuration file:
 
 ```yaml
-# Qraft CLI global config
+# Qraft CLI global OpenAPI config
 x-openapi-qraft:
   plugin:
     tanstack-query-react: true  # Generate React Query hooks for each API Client
@@ -48,14 +48,24 @@ apis:
       # Filter services to only include user-related endpoints
       filter-services:
         - '/users/**'
+
+
+  # Event API (AsyncAPI)
+  events:
+    root: ./events-asyncapi.yaml
+    x-asyncapi-qraft:
+      plugin:
+        asyncapi-typescript: true
+      output-dir: src/events
+      clean: true
 ```
 
 ### Generating from Redocly Configuration
 
-Using the configuration example above, you can generate API clients for both the main and legacy APIs with a single command:
+Using the configuration example above, you can generate API clients for all configured OpenAPI and AsyncAPI entries with a single command:
 
 ```bash npm2yarn
-npx openapi-qraft --redocly
+npx qraft redocly
 ```
 
 This command will:
@@ -65,7 +75,7 @@ This command will:
 If your configuration file is located elsewhere, you can specify its path:
 
 ```bash npm2yarn
-npx openapi-qraft --redocly ./path/to/redocly.yaml
+npx qraft redocly --redocly ./path/to/redocly.yaml
 ```
 
 #### Generating Specific APIs
@@ -73,7 +83,7 @@ npx openapi-qraft --redocly ./path/to/redocly.yaml
 You can also generate clients for specific APIs by listing their names:
 
 ```bash npm2yarn
-npx openapi-qraft legacy --redocly
+npx qraft redocly legacy
 ```
 
 This is particularly useful when you want to generate only certain APIs from your configuration.
@@ -158,7 +168,7 @@ apis:
             QraftPredefinedParameterValue: '../type-overrides/predefined-parameter-value.js'
 ```
 
-### Generating Multiple `createAPIClient()` functions
+### Generating multiple API client functions {#generating-multiple-api-client-functions}
 
 Qraft allows you to generate multiple _create API client functions_ with different parameters using the `--create-api-client-fn`
 option. This is particularly useful when you need to create specialized clients for different environments or use cases.

@@ -1,0 +1,65 @@
+---
+sidebar_position: 3
+sidebar_label: AsyncAPI CLI
+---
+
+# AsyncAPI mode (`qraft asyncapi`)
+
+`qraft asyncapi` is the AsyncAPI-focused mode of `@qraft/cli`.
+
+It uses AsyncAPI-compatible plugins and currently supports built-in generation with:
+
+- `asyncapi-typescript` → `@qraft/asyncapi-typescript-plugin`
+
+## Installation
+
+```bash npm2yarn
+npm install -D @qraft/cli @qraft/asyncapi-typescript-plugin
+```
+
+## Usage
+
+```bash
+npx qraft asyncapi --plugin asyncapi-typescript ./asyncapi.yaml --output-dir src/events
+```
+
+## Required options
+
+- **`-o <path>, --output-dir <path>`** — output directory for generated files.
+
+## Plugin selection
+
+Unlike legacy CLI flows where defaults could be implied, `qraft asyncapi` requires explicit plugin selection:
+
+```bash
+npx qraft asyncapi --plugin asyncapi-typescript ./asyncapi.yaml -o ./src/events
+```
+
+## Redocly config support
+
+AsyncAPI generation can be configured in `redocly.yaml` via `x-asyncapi-qraft`:
+
+```yaml
+apis:
+  events:
+    root: ./asyncapi.yaml
+    x-asyncapi-qraft:
+      plugin:
+        asyncapi-typescript: true
+      output-dir: src/events
+      clean: true
+```
+
+Then run:
+
+```bash
+npx qraft asyncapi --redocly
+# or generate both OpenAPI + AsyncAPI entries
+npx qraft redocly
+```
+
+## Notes on compatibility
+
+- Existing OpenAPI generation remains available through `qraft openapi`.
+- Existing OpenAPI plugins continue to work in OpenAPI mode.
+- AsyncAPI plugins are additive and can coexist in the same project with OpenAPI plugins.
