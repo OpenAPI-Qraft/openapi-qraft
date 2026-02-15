@@ -1,6 +1,6 @@
 ---
 sidebar_position: 3
-sidebar_label: AsyncAPI CLI
+sidebar_label: AsyncAPI
 ---
 
 # AsyncAPI mode (`qraft asyncapi`)
@@ -19,7 +19,7 @@ npm install -D @qraft/cli @qraft/asyncapi-typescript-plugin
 
 ## Usage
 
-```bash
+```bash npm2yarn
 npx qraft asyncapi --plugin asyncapi-typescript ./asyncapi.yaml --output-dir src/events
 ```
 
@@ -29,9 +29,9 @@ npx qraft asyncapi --plugin asyncapi-typescript ./asyncapi.yaml --output-dir src
 
 ## Plugin selection
 
-Unlike legacy CLI flows where defaults could be implied, `qraft asyncapi` requires explicit plugin selection:
+`qraft asyncapi` requires explicit plugin selection:
 
-```bash
+```bash npm2yarn
 npx qraft asyncapi --plugin asyncapi-typescript ./asyncapi.yaml -o ./src/events
 ```
 
@@ -52,14 +52,8 @@ apis:
 
 Then run:
 
-```bash
+```bash npm2yarn
 npx qraft asyncapi --redocly
 # or generate both OpenAPI + AsyncAPI entries
 npx qraft redocly
 ```
-
-## Notes on compatibility
-
-- Existing OpenAPI generation remains available through `qraft openapi`.
-- Existing OpenAPI plugins continue to work in OpenAPI mode.
-- AsyncAPI plugins are additive and can coexist in the same project with OpenAPI plugins.
