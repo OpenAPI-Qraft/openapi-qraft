@@ -48,6 +48,14 @@ const config = {
         docs: {
           path: 'docs',
           sidebarPath: './sidebars.js',
+          async sidebarItemsGenerator({
+            defaultSidebarItemsGenerator,
+            ...args
+          }) {
+            const sidebarItems = await defaultSidebarItemsGenerator(args);
+
+            return removeSidebarDocItems(sidebarItems, new Set(['codegen/CLI/openapi']));
+          },
           lastVersion: 'current',
           versions: {
             current: {
@@ -143,6 +151,19 @@ function getNpxWithYarnRegExp() {
 
 function getNpmExecRegExp() {
   return /\bnpm exec (?:-c|--call)\b/g;
+}
+
+function removeSidebarDocItems(items, removedDocIds) {
+  return items
+    .filter((item) => !(item.type === 'doc' && removedDocIds.has(item.id)))
+    .map((item) => {
+      if (item.type !== 'category') return item;
+
+      return {
+        ...item,
+        items: removeSidebarDocItems(item.items, removedDocIds),
+      };
+    });
 }
 
 export default config;
