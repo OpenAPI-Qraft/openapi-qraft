@@ -9,39 +9,10 @@ sidebar_label: CLI overview
 
 It supports **two generation modes**:
 
-- **OpenAPI mode** (`qraft openapi`) — keeps the existing OpenAPI generation flow and existing OpenAPI plugins.
-- **AsyncAPI mode** (`qraft asyncapi`) — enables generation from AsyncAPI documents with AsyncAPI plugins.
+- **[OpenAPI mode](/codegen/CLI/openapi-cli.mdx)** (`qraft openapi`) — generates code from OpenAPI documents with OpenAPI plugins.
+- **[AsyncAPI mode](/codegen/CLI/asyncapi-cli.mdx)** (`qraft asyncapi`) — enables generation from AsyncAPI documents with AsyncAPI plugins.
 
-This lets you use one CLI package and one binary (`qraft`) for both REST/OpenAPI and event-driven/AsyncAPI schemas.
-
-## Installation
-
-```bash npm2yarn
-npm install -D @qraft/cli
-```
-
-Install plugins depending on your use case:
-
-```bash npm2yarn
-# OpenAPI plugins
-npm install -D @openapi-qraft/tanstack-query-react-plugin @openapi-qraft/openapi-typescript-plugin
-
-# AsyncAPI plugin
-npm install -D @qraft/asyncapi-typescript-plugin
-```
-
-## Quick examples
-
-```bash
-# OpenAPI generation
-npx qraft openapi --plugin tanstack-query-react --plugin openapi-typescript ./openapi.yaml -o ./src/api
-
-# AsyncAPI generation
-npx qraft asyncapi --plugin asyncapi-typescript ./asyncapi.yaml -o ./src/events
-
-# Generate from redocly.yaml (both x-openapi-qraft + x-asyncapi-qraft)
-npx qraft redocly
-```
+This lets you use one CLI package and one binary (`qraft`) for both OpenAPI and AsyncAPI schemas.
 
 ## Detailed docs
 
