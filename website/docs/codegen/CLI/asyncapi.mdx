@@ -5,11 +5,8 @@ sidebar_label: AsyncAPI
 
 # AsyncAPI mode (`qraft asyncapi`)
 
-`qraft asyncapi` is the AsyncAPI-focused mode of `@qraft/cli`.
-
-It uses AsyncAPI-compatible plugins and currently supports built-in generation with:
-
-- `asyncapi-typescript` → `@qraft/asyncapi-typescript-plugin`
+`qraft asyncapi` is the AsyncAPI-focused mode of the unified `@qraft/cli` package.
+It generates TypeScript schema types from AsyncAPI documents using AsyncAPI plugins.
 
 ## Installation
 
@@ -19,21 +16,61 @@ npm install -D @qraft/cli @qraft/asyncapi-typescript-plugin
 
 ## Usage
 
+The command below generates AsyncAPI TypeScript schema types into the `src/events` directory:
+
 ```bash npm2yarn
 npx qraft asyncapi --plugin asyncapi-typescript ./asyncapi.yaml --output-dir src/events
 ```
 
-## Required options
+## Options
 
-- **`-o <path>, --output-dir <path>`** — output directory for generated files.
+### Required
 
-## Plugin selection
+- **`-o <path>, --output-dir <path>`**: Specify where to output generated files.
+  - Example: `--output-dir src/events`
 
-`qraft asyncapi` requires explicit plugin selection:
+### Optional
 
-```bash npm2yarn
-npx qraft asyncapi --plugin asyncapi-typescript ./asyncapi.yaml -o ./src/events
-```
+- **`-c, --clean`**: Clean the output directory before generation.
+- **`--file-header <string>`**: Add a custom header to each generated file, useful for disabling linting rules or adding file comments.
+  - Example: `--file-header '/* eslint-disable */'`
+- **`--redocly [config]`**: Use the Redocly configuration to generate multiple API clients. If the `[config]` parameter is not specified, the default Redocly configuration will be used: `[redocly.yaml | redocly.yml | .redocly.yaml | .redocly.yml]`.
+  - Examples:
+    - `--redocly`
+    - `--redocly ./my-redocly-config.yaml`
+    - `qraft asyncapi events --redocly`
+  - For more information about this option, use the command: `--redocly-help` or [read the docs](/codegen/CLI/redocly-config.mdx).
+- **`--plugin <name_1> --plugin <name_2>`**: Generator plugins to be used. (choices: `asyncapi-typescript`)
+  - Example: `--plugin asyncapi-typescript`
+- **`-h, --help`**: Display help for the command.
+
+## Plugin System
+
+The following plugin is currently supported:
+
+- `asyncapi-typescript` - Generates TypeScript types from an AsyncAPI Document.
+
+:::tip
+Plugin must be provided with the `--plugin <name>` option.
+:::
+
+### `--plugin asyncapi-typescript` options
+
+- **`--asyncapi-types-file-name <path>`**: AsyncAPI Schema types file name, e.g., `schema.d.ts` (default: `schema.ts`).
+  - Must end with `.ts` or `.d.ts`.
+  - Must not include path separators (`/` or `\`).
+  - Must not start with `.`.
+- **`--enum`**: Export true TypeScript enums instead of unions.
+- **`--enum-values`**: Export enum values as arrays.
+- **`--dedupe-enums`**: Dedupe enum types when `--enum` is set.
+- **`-t, --export-type`**: Export top-level `type` instead of `interface`.
+- **`--immutable`**: Generate readonly types.
+- **`--additional-properties`**: Treat schema objects as if `additionalProperties: true` is set.
+- **`--empty-objects-unknown`**: Generate `unknown` instead of `Record<string, never>` for empty objects.
+- **`--default-non-nullable`**: Set to `false` to ignore default values when generating non-nullable types.
+- **`--properties-required-by-default`**: Treat schema objects as if `required` is set to all properties by default.
+- **`--alphabetize`**: Sort object keys alphabetically.
+- **`--exclude-deprecated`**: Exclude deprecated fields from types.
 
 ## Redocly config support
 
@@ -48,6 +85,7 @@ apis:
         asyncapi-typescript: true
       output-dir: src/events
       clean: true
+      asyncapi-types-file-name: asyncapi.ts
 ```
 
 Then run:
