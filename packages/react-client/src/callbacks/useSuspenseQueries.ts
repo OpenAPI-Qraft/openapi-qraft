@@ -11,6 +11,7 @@ import type {
 import type { CreateAPIQueryClientOptions } from '../qraftAPIClient.js';
 import { useSuspenseQueries as useSuspenseQueriesTanstack } from '@tanstack/react-query';
 import { composeQueryKey } from '../lib/composeQueryKey.js';
+import { prepareRequestFnParameters } from '../lib/prepareRequestFnParameters.js';
 import { requestFnResponseRejecter } from '../lib/requestFnResponseRejecter.js';
 import { requestFnResponseResolver } from '../lib/requestFnResponseResolver.js';
 
@@ -52,10 +53,17 @@ export const useSuspenseQueries: (
           queryFn:
             optionsWithQueryKey.queryFn ??
             function ({ queryKey: [, queryParams], signal, meta }) {
+              const { parameters, body } = prepareRequestFnParameters(
+                queryParams,
+                undefined,
+                false
+              );
+
               return qraftOptions
                 .requestFn(schema, {
-                  parameters: queryParams as never,
+                  parameters: parameters as never,
                   baseUrl: qraftOptions.baseUrl,
+                  body,
                   signal,
                   meta,
                 })

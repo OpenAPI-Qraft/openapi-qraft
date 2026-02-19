@@ -48,6 +48,145 @@ describe('Queryable write operations', () => {
     });
   });
 
+  it('queries writable operations with a specific body for useQueries', async () => {
+    const queryClient = new QueryClient();
+    const qraft = createAPIClient({
+      requestFn,
+      baseUrl,
+      queryClient,
+    });
+
+    const parameters = {
+      header: {
+        'x-monite-version': '1',
+        'x-monite-entity-id': '2',
+      },
+      path: {
+        approval_policy_id: '2',
+      },
+      body: {
+        name: 'New Name',
+        description: 'New Description',
+      },
+    };
+
+    const queryKeyParameters = {
+      ...parameters,
+      body: {
+        name: 'Another Name',
+        description: 'Another Description',
+      },
+    };
+
+    const queryKey =
+      qraft.approvalPolicies.patchApprovalPoliciesId.getQueryKey(
+        queryKeyParameters
+      );
+
+    const { result } = renderHook(
+      () =>
+        qraft.approvalPolicies.patchApprovalPoliciesId.useQueries({
+          queries: [{ parameters }, { queryKey }],
+        }),
+      {
+        wrapper: (props) => (
+          <QueryClientProvider client={queryClient} {...props} />
+        ),
+      }
+    );
+
+    await waitFor(() => {
+      expect(result.current[0]?.data).toEqual({
+        id: '2',
+        name: 'New Name',
+        description: 'New Description',
+      });
+      expect(result.current[1]?.data).toEqual({
+        id: '2',
+        name: 'Another Name',
+        description: 'Another Description',
+      });
+    });
+  });
+
+  it('queries writable operations with a specific body for useSuspenseQueries', async () => {
+    const queryClient = new QueryClient();
+    const qraft = createAPIClient({
+      requestFn,
+      baseUrl,
+      queryClient,
+    });
+
+    const parameters = {
+      header: {
+        'x-monite-version': '1',
+        'x-monite-entity-id': '2',
+      },
+      path: {
+        approval_policy_id: '2',
+      },
+      body: {
+        name: 'New Name',
+        description: 'New Description',
+      },
+    };
+
+    const queryKeyParameters = {
+      ...parameters,
+      body: {
+        name: 'Another Name',
+        description: 'Another Description',
+      },
+    };
+
+    const queryKey =
+      qraft.approvalPolicies.patchApprovalPoliciesId.getQueryKey(
+        queryKeyParameters
+      );
+
+    const hook = () => {
+      try {
+        return qraft.approvalPolicies.patchApprovalPoliciesId.useSuspenseQueries(
+          {
+            queries: [{ parameters }, { queryKey }],
+          }
+        );
+      } catch (error) {
+        return error as Promise<void>;
+      }
+    };
+
+    const { result: resultWithErrorPromise } = renderHook(hook, {
+      wrapper: (props) => (
+        <QueryClientProvider client={queryClient} {...props} />
+      ),
+    });
+
+    expect(resultWithErrorPromise.current).toBeInstanceOf(Promise);
+    await resultWithErrorPromise.current;
+
+    const { result: resultWithData } = renderHook(hook, {
+      wrapper: (props) => (
+        <QueryClientProvider client={queryClient} {...props} />
+      ),
+    });
+
+    if (resultWithData.current instanceof Promise) {
+      throw new Error('Promise should be resolved');
+    }
+
+    expect(resultWithData.current[0].data).toEqual({
+      id: '2',
+      name: 'New Name',
+      description: 'New Description',
+    });
+    expect(resultWithData.current[1].data).toEqual({
+      id: '2',
+      name: 'Another Name',
+      description: 'Another Description',
+    });
+  });
+
   it('queries writable operations with a specific body for fetchQuery', async () => {
     const queryClient = new QueryClient();
     const qraft = createAPIClient({
