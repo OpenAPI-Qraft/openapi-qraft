@@ -1,5 +1,12 @@
 # @openapi-qraft/react
 
+## 2.15.0-beta.2
+
+### Patch Changes
+
+- 6fa60c4: Fix `body` handling for queryable write operations in `useQueries` and `useSuspenseQueries`.
+  - @openapi-qraft/tanstack-query-react-types@2.15.0-beta.2
+
 ## 2.15.0-beta.1
 
 ### Patch Changes
