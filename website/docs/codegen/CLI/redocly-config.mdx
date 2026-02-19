@@ -6,7 +6,7 @@ sidebar_label: Redocly config support
 # Redocly Config Support
 
 Qraft CLI can use a [Redocly configuration file](https://redocly.com/docs/cli/configuration) (`redocly.yaml`)
-to generate one or multiple API clients with custom settings and authentication rules. By integrating
+to generate one or multiple API clients with custom settings and authentication rules for both OpenAPI and AsyncAPI documents. By integrating
 with Redocly's powerful configuration schema resolution, you can
 streamline client generation across various services defined in your project.
 
@@ -19,6 +19,17 @@ Qraft CLI integrates with Redocly's configuration framework to simplify API clie
 - Centralize Qraft CLI options
 - Configure [authentication and header](https://redocly.com/docs/cli/configuration/reference/resolve) definitions in one place
 
+### One config for OpenAPI and AsyncAPI
+
+You can keep both modes in the same file:
+
+- Use `x-openapi-qraft` for OpenAPI generation options (plugins and OpenAPI-specific flags).
+- Use `x-asyncapi-qraft` for AsyncAPI generation options (plugins and AsyncAPI-specific flags).
+- Both keys can be set globally and per API entry under `apis.<name>`.
+- Per-API options override global defaults.
+
+This makes it possible to maintain one `redocly.yaml` for all services in a project while still using mode-specific plugin options.
+
 ### Configuration Example: Redocly 🤝 Qraft
 
 Here's a basic example of a `redocly.yaml` configuration file:
@@ -29,6 +40,14 @@ x-openapi-qraft:
   plugin:
     tanstack-query-react: true  # Generate React Query hooks for each API Client
     openapi-typescript: true    # Generate TypeScript types for each API Client
+  clean: true
+
+# Qraft CLI global AsyncAPI config
+x-asyncapi-qraft:
+  plugin:
+    asyncapi-typescript: true
+  asyncapi-types-file-name: asyncapi.ts
+  clean: true
 
 apis:
   # Main API configuration
@@ -39,25 +58,19 @@ apis:
       output-dir: src/api  # Output directory for a generated API client
       clean: true          # Clean output directory before generation
 
-  # Legacy API configuration
-  legacy:
-    root: ./legacy-openapi.json
+  # Another OpenAPI entry
+  payments:
+    root: ./payments-openapi.json
     x-openapi-qraft:
-      output-dir: src/legacy-api
-      clean: true
-      # Filter services to only include user-related endpoints
-      filter-services:
-        - '/users/**'
+      output-dir: src/payments-api
+      service-name-base: tags
 
-
-  # Event API (AsyncAPI)
-  events:
-    root: ./events-asyncapi.yaml
+  # AsyncAPI entry
+  hermes:
+    root: ./asyncapi-hermes.yaml
     x-asyncapi-qraft:
-      plugin:
-        asyncapi-typescript: true
-      output-dir: src/events
-      clean: true
+      output-dir: src/events/hermes
+      asyncapi-types-file-name: schema.ts
 ```
 
 ### Generating from Redocly Configuration
@@ -166,6 +179,31 @@ apis:
         create-predefined-parameters-request-fn:
           '@openapi-qraft/react':
             QraftPredefinedParameterValue: '../type-overrides/predefined-parameter-value.js'
+```
+
+You can keep AsyncAPI entries in the same config with their own mode-specific options:
+
+```yaml
+apis:
+  wallet:
+    root: ./openapi-wallet.json
+    x-openapi-qraft:
+      output-dir: src/api/wallet
+      queryable-write-operations: true
+      create-api-client-fn:
+        createAPIClient:
+          filename: create-api-client
+          services: all
+          callbacks:
+            - useQuery
+            - useMutation
+
+  hermes:
+    root: ./asyncapi-hermes.yaml
+    x-asyncapi-qraft:
+      output-dir: src/api/hermes
+      asyncapi-types-file-name: asyncapi.ts
+      alphabetize: true
 ```
 
 ### Generating multiple API client functions {#generating-multiple-api-client-functions}
