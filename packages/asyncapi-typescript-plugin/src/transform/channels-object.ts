@@ -83,23 +83,13 @@ export default function transformChannelsObject(
     if (channel.parameters && typeof channel.parameters === 'object') {
       const paramMembers: ts.TypeElement[] = [];
 
-      for (const [paramId, param] of Object.entries(channel.parameters)) {
-        let paramType: ts.TypeNode;
-
-        if (param && '$ref' in param) {
-          paramType = oapiRef((param as ReferenceObject).$ref);
-        } else {
-          paramType = ts.factory.createKeywordTypeNode(
-            ts.SyntaxKind.UnknownKeyword
-          );
-        }
-
+      for (const [paramId] of Object.entries(channel.parameters)) {
         paramMembers.push(
           ts.factory.createPropertySignature(
             tsModifiers({ readonly: ctx.immutable }),
             tsPropertyIndex(paramId),
             undefined,
-            paramType
+            ts.factory.createKeywordTypeNode(ts.SyntaxKind.StringKeyword)
           )
         );
       }

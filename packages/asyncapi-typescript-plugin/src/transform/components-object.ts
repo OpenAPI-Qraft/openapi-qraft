@@ -316,19 +316,6 @@ function transformParameters(
   )) {
     const members: ts.TypeElement[] = [];
 
-    if (param.description) {
-      members.push(
-        ts.factory.createPropertySignature(
-          tsModifiers({ readonly: ctx.immutable }),
-          tsPropertyIndex('description'),
-          undefined,
-          ts.factory.createLiteralTypeNode(
-            ts.factory.createStringLiteral(param.description)
-          )
-        )
-      );
-    }
-
     if (param.location) {
       members.push(
         ts.factory.createPropertySignature(
