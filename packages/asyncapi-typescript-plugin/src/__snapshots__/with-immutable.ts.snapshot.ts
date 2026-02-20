@@ -403,10 +403,12 @@ export interface components {
     parameters: {
         /**
          * @description The ID of the streetlight.
+         * @default streetlight-1
          * @enum {unknown}
          */
         readonly streetlightId: {
             readonly location: "$message.payload#/item/id";
+            readonly default: "streetlight-1";
             readonly enum: [
                 "streetlight-1",
                 "streetlight-2"
