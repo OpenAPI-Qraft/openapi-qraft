@@ -25,7 +25,7 @@ export interface channels {
             lightMeasuredResponse: components["messages"]["lightMeasuredResponse"];
         };
         parameters: {
-            streetlightId: components["parameters"]["streetlightId"];
+            streetlightId: string;
         };
         servers: [
             servers["events-test"],
@@ -39,7 +39,7 @@ export interface channels {
             turnOnResponse: components["messages"]["commandResponse"];
         };
         parameters: {
-            streetlightId: components["parameters"]["streetlightId"];
+            streetlightId: string;
         };
         servers: [
             servers["commands-test"],
@@ -53,7 +53,7 @@ export interface channels {
             turnOffResponse: components["messages"]["commandResponse"];
         };
         parameters: {
-            streetlightId: components["parameters"]["streetlightId"];
+            streetlightId: string;
         };
         servers: [
             servers["commands-test"],
@@ -67,7 +67,7 @@ export interface channels {
             dimLightResponse: components["messages"]["commandResponse"];
         };
         parameters: {
-            streetlightId: components["parameters"]["streetlightId"];
+            streetlightId: string;
         };
         servers: [
             servers["commands-test"],
@@ -403,7 +403,6 @@ export interface components {
     parameters: {
         /** @description The ID of the streetlight. */
         streetlightId: {
-            description: "The ID of the streetlight.";
             location: "$message.payload#/item/id";
         };
     };
