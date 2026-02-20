@@ -1,6 +1,6 @@
 {
   "name": "@qraft/cli",
-  "version": "1.0.0-beta.1",
+  "version": "1.0.0-beta.2",
   "description": "CLI tool for generating type-safe code from OpenAPI and AsyncAPI specifications",
   "scripts": {
     "build": "tsc --project tsconfig.build.json",
