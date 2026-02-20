@@ -1,5 +1,12 @@
 # @openapi-qraft/test-fixtures
 
+## 1.2.0-beta.1
+
+### Patch Changes
+
+- 5b080ee: Added AsyncAPI `Parameter Object` support for channel parameters: we now type channel params as `string` by default and
+  as literal unions when `enum` is provided, and we generate `location`/`enum`/`default` in `components.parameters`.
+
 ## 1.2.0-beta.0
 
 ### Minor Changes

@@ -1,5 +1,15 @@
 # @qraft/asyncapi-typescript-plugin
 
+## 1.0.0-beta.2
+
+### Patch Changes
+
+- 5b080ee: Added AsyncAPI `Parameter Object` support for channel parameters: we now type channel params as `string` by default and
+  as literal unions when `enum` is provided, and we generate `location`/`enum`/`default` in `components.parameters`.
+  - @qraft/cli-utils@1.0.0-beta.2
+  - @qraft/asyncapi-plugin@1.0.0-beta.2
+  - @qraft/plugin@1.0.0-beta.2
+
 ## 1.0.0-beta.1
 
 ### Patch Changes

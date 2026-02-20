@@ -1,5 +1,11 @@
 # @qraft/cli-utils
 
+## 1.0.0-beta.2
+
+### Patch Changes
+
+- @qraft/plugin@1.0.0-beta.2
+
 ## 1.0.0-beta.1
 
 ### Patch Changes
