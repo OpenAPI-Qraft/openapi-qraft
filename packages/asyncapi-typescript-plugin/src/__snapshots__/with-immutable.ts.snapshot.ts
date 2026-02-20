@@ -25,7 +25,7 @@ export interface channels {
             readonly lightMeasuredResponse: components["messages"]["lightMeasuredResponse"];
         };
         readonly parameters: {
-            readonly streetlightId: string;
+            readonly streetlightId: "streetlight-1" | "streetlight-2";
         };
         readonly servers: [
             servers["events-test"],
@@ -39,7 +39,7 @@ export interface channels {
             readonly turnOnResponse: components["messages"]["commandResponse"];
         };
         readonly parameters: {
-            readonly streetlightId: string;
+            readonly streetlightId: "streetlight-1" | "streetlight-2";
         };
         readonly servers: [
             servers["commands-test"],
@@ -53,7 +53,7 @@ export interface channels {
             readonly turnOffResponse: components["messages"]["commandResponse"];
         };
         readonly parameters: {
-            readonly streetlightId: string;
+            readonly streetlightId: "streetlight-1" | "streetlight-2";
         };
         readonly servers: [
             servers["commands-test"],
@@ -67,7 +67,7 @@ export interface channels {
             readonly dimLightResponse: components["messages"]["commandResponse"];
         };
         readonly parameters: {
-            readonly streetlightId: string;
+            readonly streetlightId: "streetlight-1" | "streetlight-2";
         };
         readonly servers: [
             servers["commands-test"],
@@ -401,9 +401,16 @@ export interface components {
         };
     };
     parameters: {
-        /** @description The ID of the streetlight. */
+        /**
+         * @description The ID of the streetlight.
+         * @enum {unknown}
+         */
         readonly streetlightId: {
             readonly location: "$message.payload#/item/id";
+            readonly enum: [
+                "streetlight-1",
+                "streetlight-2"
+            ];
         };
     };
     securitySchemes: {
