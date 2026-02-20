@@ -73,6 +73,7 @@
             "streetlight-1",
             "streetlight-2"
           ],
+          "default": "streetlight-1",
           "location": "$message.payload#/item/id"
         }
       },
@@ -828,6 +829,7 @@
           "streetlight-1",
           "streetlight-2"
         ],
+        "default": "streetlight-1",
         "location": "$message.payload#/item/id"
       }
     },

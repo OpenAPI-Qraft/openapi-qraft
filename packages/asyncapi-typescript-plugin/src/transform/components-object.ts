@@ -330,6 +330,19 @@ function transformParameters(
       );
     }
 
+    if (typeof param.default === 'string') {
+      members.push(
+        ts.factory.createPropertySignature(
+          tsModifiers({ readonly: ctx.immutable }),
+          tsPropertyIndex('default'),
+          undefined,
+          ts.factory.createLiteralTypeNode(
+            ts.factory.createStringLiteral(param.default)
+          )
+        )
+      );
+    }
+
     if (Array.isArray(param.enum) && param.enum.length > 0) {
       members.push(
         ts.factory.createPropertySignature(
