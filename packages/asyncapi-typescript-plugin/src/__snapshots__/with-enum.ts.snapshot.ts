@@ -25,7 +25,7 @@ export interface channels {
             lightMeasuredResponse: components["messages"]["lightMeasuredResponse"];
         };
         parameters: {
-            streetlightId: components["parameters"]["streetlightId"];
+            streetlightId: "streetlight-1" | "streetlight-2";
         };
         servers: [
             servers["events-test"],
@@ -39,7 +39,7 @@ export interface channels {
             turnOnResponse: components["messages"]["commandResponse"];
         };
         parameters: {
-            streetlightId: components["parameters"]["streetlightId"];
+            streetlightId: "streetlight-1" | "streetlight-2";
         };
         servers: [
             servers["commands-test"],
@@ -53,7 +53,7 @@ export interface channels {
             turnOffResponse: components["messages"]["commandResponse"];
         };
         parameters: {
-            streetlightId: components["parameters"]["streetlightId"];
+            streetlightId: "streetlight-1" | "streetlight-2";
         };
         servers: [
             servers["commands-test"],
@@ -67,7 +67,7 @@ export interface channels {
             dimLightResponse: components["messages"]["commandResponse"];
         };
         parameters: {
-            streetlightId: components["parameters"]["streetlightId"];
+            streetlightId: "streetlight-1" | "streetlight-2";
         };
         servers: [
             servers["commands-test"],
@@ -401,10 +401,18 @@ export interface components {
         };
     };
     parameters: {
-        /** @description The ID of the streetlight. */
+        /**
+         * @description The ID of the streetlight.
+         * @default streetlight-1
+         * @enum {unknown}
+         */
         streetlightId: {
-            description: "The ID of the streetlight.";
             location: "$message.payload#/item/id";
+            default: "streetlight-1";
+            enum: [
+                "streetlight-1",
+                "streetlight-2"
+            ];
         };
     };
     securitySchemes: {

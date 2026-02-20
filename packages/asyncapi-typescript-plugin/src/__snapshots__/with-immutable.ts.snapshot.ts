@@ -25,7 +25,7 @@ export interface channels {
             readonly lightMeasuredResponse: components["messages"]["lightMeasuredResponse"];
         };
         readonly parameters: {
-            readonly streetlightId: components["parameters"]["streetlightId"];
+            readonly streetlightId: "streetlight-1" | "streetlight-2";
         };
         readonly servers: [
             servers["events-test"],
@@ -39,7 +39,7 @@ export interface channels {
             readonly turnOnResponse: components["messages"]["commandResponse"];
         };
         readonly parameters: {
-            readonly streetlightId: components["parameters"]["streetlightId"];
+            readonly streetlightId: "streetlight-1" | "streetlight-2";
         };
         readonly servers: [
             servers["commands-test"],
@@ -53,7 +53,7 @@ export interface channels {
             readonly turnOffResponse: components["messages"]["commandResponse"];
         };
         readonly parameters: {
-            readonly streetlightId: components["parameters"]["streetlightId"];
+            readonly streetlightId: "streetlight-1" | "streetlight-2";
         };
         readonly servers: [
             servers["commands-test"],
@@ -67,7 +67,7 @@ export interface channels {
             readonly dimLightResponse: components["messages"]["commandResponse"];
         };
         readonly parameters: {
-            readonly streetlightId: components["parameters"]["streetlightId"];
+            readonly streetlightId: "streetlight-1" | "streetlight-2";
         };
         readonly servers: [
             servers["commands-test"],
@@ -401,10 +401,18 @@ export interface components {
         };
     };
     parameters: {
-        /** @description The ID of the streetlight. */
+        /**
+         * @description The ID of the streetlight.
+         * @default streetlight-1
+         * @enum {unknown}
+         */
         readonly streetlightId: {
-            readonly description: "The ID of the streetlight.";
             readonly location: "$message.payload#/item/id";
+            readonly default: "streetlight-1";
+            readonly enum: [
+                "streetlight-1",
+                "streetlight-2"
+            ];
         };
     };
     securitySchemes: {

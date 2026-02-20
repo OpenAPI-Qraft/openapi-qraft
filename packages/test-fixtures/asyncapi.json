@@ -68,7 +68,13 @@
       "description": "The WebSocket path on which measured values may be sent and received.",
       "parameters": {
         "streetlightId": {
-          "$ref": "#/components/parameters/streetlightId"
+          "description": "The ID of the streetlight.",
+          "enum": [
+            "streetlight-1",
+            "streetlight-2"
+          ],
+          "default": "streetlight-1",
+          "location": "$message.payload#/item/id"
         }
       },
       "servers": [
@@ -819,6 +825,11 @@
     "parameters": {
       "streetlightId": {
         "description": "The ID of the streetlight.",
+        "enum": [
+          "streetlight-1",
+          "streetlight-2"
+        ],
+        "default": "streetlight-1",
         "location": "$message.payload#/item/id"
       }
     },
