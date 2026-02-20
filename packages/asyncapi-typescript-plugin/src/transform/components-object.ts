@@ -14,6 +14,7 @@ import {
   addJSDocComment,
   NEVER,
   QUESTION_TOKEN,
+  tsLiteral,
   tsModifiers,
   tsPropertyIndex,
 } from 'openapi-typescript/dist/lib/ts.js';
@@ -325,6 +326,17 @@ function transformParameters(
           ts.factory.createLiteralTypeNode(
             ts.factory.createStringLiteral(param.location)
           )
+        )
+      );
+    }
+
+    if (Array.isArray(param.enum) && param.enum.length > 0) {
+      members.push(
+        ts.factory.createPropertySignature(
+          tsModifiers({ readonly: ctx.immutable }),
+          tsPropertyIndex('enum'),
+          undefined,
+          ts.factory.createTupleTypeNode(param.enum.map(tsLiteral))
         )
       );
     }

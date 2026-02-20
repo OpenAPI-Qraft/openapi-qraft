@@ -162,6 +162,9 @@ export interface AsyncAPIMessageObject {
 
 export interface AsyncAPIParameterObject {
   description?: string;
+  enum?: string[];
+  default?: string;
+  examples?: string[];
   schema?: SchemaObject | ReferenceObject;
   location?: string;
   [key: `x-${string}`]: unknown;

@@ -1,6 +1,7 @@
 import type {
   AsyncAPIChannelObject,
   AsyncAPIContext,
+  AsyncAPIParameterObject,
   ReferenceObject,
 } from '../types.js';
 import {
@@ -9,6 +10,7 @@ import {
   tsLiteral,
   tsModifiers,
   tsPropertyIndex,
+  tsUnion,
 } from 'openapi-typescript/dist/lib/ts.js';
 import { getEntries } from 'openapi-typescript/dist/lib/utils.js';
 import ts from 'typescript';
@@ -83,13 +85,16 @@ export default function transformChannelsObject(
     if (channel.parameters && typeof channel.parameters === 'object') {
       const paramMembers: ts.TypeElement[] = [];
 
-      for (const [paramId] of Object.entries(channel.parameters)) {
+      for (const [paramId, param] of Object.entries(channel.parameters)) {
         paramMembers.push(
           ts.factory.createPropertySignature(
             tsModifiers({ readonly: ctx.immutable }),
             tsPropertyIndex(paramId),
             undefined,
-            ts.factory.createKeywordTypeNode(ts.SyntaxKind.StringKeyword)
+            transformChannelParameterType(
+              param as AsyncAPIParameterObject | ReferenceObject,
+              ctx
+            )
           )
         );
       }
@@ -150,4 +155,25 @@ export default function transformChannelsObject(
   }
 
   return ts.factory.createTypeLiteralNode(members);
+}
+
+function transformChannelParameterType(
+  parameter: AsyncAPIParameterObject | ReferenceObject,
+  ctx: AsyncAPIContext
+): ts.TypeNode {
+  const parameterObject =
+    '$ref' in parameter
+      ? ctx.resolve<AsyncAPIParameterObject>(parameter.$ref)
+      : parameter;
+
+  const enumValues =
+    parameterObject?.enum?.filter(
+      (value): value is string => typeof value === 'string'
+    ) ?? [];
+
+  if (enumValues.length > 0) {
+    return tsUnion(enumValues.map(tsLiteral));
+  }
+
+  return ts.factory.createKeywordTypeNode(ts.SyntaxKind.StringKeyword);
 }

@@ -69,6 +69,10 @@
       "parameters": {
         "streetlightId": {
           "description": "The ID of the streetlight.",
+          "enum": [
+            "streetlight-1",
+            "streetlight-2"
+          ],
           "location": "$message.payload#/item/id"
         }
       },
@@ -820,6 +824,10 @@
     "parameters": {
       "streetlightId": {
         "description": "The ID of the streetlight.",
+        "enum": [
+          "streetlight-1",
+          "streetlight-2"
+        ],
         "location": "$message.payload#/item/id"
       }
     },
