@@ -68,7 +68,8 @@
       "description": "The WebSocket path on which measured values may be sent and received.",
       "parameters": {
         "streetlightId": {
-          "$ref": "#/components/parameters/streetlightId"
+          "description": "The ID of the streetlight.",
+          "location": "$message.payload#/item/id"
         }
       },
       "servers": [
