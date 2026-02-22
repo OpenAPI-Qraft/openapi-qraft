@@ -140,29 +140,13 @@ const getOperationClientImportsFactory = ({
       factory.createImportClause(
         false,
         undefined,
-        factory.createNamedImports(
-          [
-            factory.createImportSpecifier(
-              false,
-              undefined,
-              factory.createIdentifier('qraftAPIClient')
-            ),
-            contextName
-              ? factory.createImportSpecifier(
-                  false,
-                  undefined,
-                  factory.createIdentifier('qraftReactAPIClient')
-                )
-              : null,
-            contextName
-              ? factory.createImportSpecifier(
-                  false,
-                  undefined,
-                  factory.createIdentifier('memoizeFunctionCall')
-                )
-              : null,
-          ].filter(nonNullable)
-        )
+        factory.createNamedImports([
+          factory.createImportSpecifier(
+            false,
+            undefined,
+            factory.createIdentifier('qraftAPIClient')
+          ),
+        ])
       ),
       factory.createStringLiteral('@openapi-qraft/react'),
       undefined
@@ -216,29 +200,6 @@ const getOperationClientImportsFactory = ({
                   factory.createIdentifier('const'),
                   undefined
                 )
-              )
-            ),
-          ],
-          ts.NodeFlags.Const
-        )
-      )
-    );
-  }
-
-  if (contextName) {
-    imports.push(
-      factory.createVariableStatement(
-        undefined,
-        factory.createVariableDeclarationList(
-          [
-            factory.createVariableDeclaration(
-              factory.createIdentifier('instanceCache'),
-              undefined,
-              undefined,
-              factory.createNewExpression(
-                factory.createIdentifier('WeakMap'),
-                undefined,
-                []
               )
             ),
           ],
@@ -1035,42 +996,21 @@ const getCreateOperationClientFunctionFactory = ({
             undefined
           ),
           factory.createReturnStatement(
-            contextName
-              ? factory.createCallExpression(
-                  factory.createIdentifier('memoizeFunctionCall'),
-                  undefined,
-                  [
-                    factory.createIdentifier('instanceCache'),
-                    factory.createIdentifier('qraftReactAPIClient'),
-                    factory.createIdentifier('services'),
-                    shouldImportAllCallbacks
-                      ? factory.createIdentifier('allCallbacks')
-                      : factory.createBinaryExpression(
-                          factory.createIdentifier('callbacksOrOptions'),
-                          factory.createToken(
-                            ts.SyntaxKind.QuestionQuestionToken
-                          ),
-                          factory.createIdentifier('callbacks')
-                        ),
-                    factory.createIdentifier(contextName),
-                  ]
-                )
-              : factory.createCallExpression(
-                  factory.createIdentifier('qraftAPIClient'),
-                  undefined,
-                  [
-                    factory.createIdentifier('services'),
-                    shouldImportAllCallbacks
-                      ? factory.createIdentifier('allCallbacks')
-                      : factory.createBinaryExpression(
-                          factory.createIdentifier('callbacksOrOptions'),
-                          factory.createToken(
-                            ts.SyntaxKind.QuestionQuestionToken
-                          ),
-                          factory.createIdentifier('callbacks')
-                        ),
-                  ]
-                )
+            factory.createCallExpression(
+              factory.createIdentifier('qraftAPIClient'),
+              undefined,
+              [
+                factory.createIdentifier('services'),
+                shouldImportAllCallbacks
+                  ? factory.createIdentifier('allCallbacks')
+                  : factory.createBinaryExpression(
+                      factory.createIdentifier('callbacksOrOptions'),
+                      factory.createToken(ts.SyntaxKind.QuestionQuestionToken),
+                      factory.createIdentifier('callbacks')
+                    ),
+                ...(contextName ? [factory.createIdentifier(contextName)] : []),
+              ]
+            )
           ),
         ],
         true

@@ -30,4 +30,3 @@ export {
   type OperationSchema,
   type RequestFnPayload,
 } from './lib/requestFn.js';
-export { memoizeFunctionCall } from './lib/memoizeFunctionCall.js';

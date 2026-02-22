@@ -214,16 +214,14 @@ export function qraftReactAPIClient<
   | APIUtilityClientServices<Services, Callbacks>
   | APIContextQueryClientServices<Services, Callbacks> {
   if (options && 'Provider' in options && 'Consumer' in options) {
-    return qraftAPIClient(
-      services,
-      wrapHooksWithUseContext(callbacks, options)
-    ) as never;
+    const wrappedCallbacks = wrapHookCallbacks(callbacks, options);
+    return qraftAPIClient(services, wrappedCallbacks) as never;
   }
 
   return qraftAPIClient(services, callbacks, options as never) as never;
 }
 
-function wrapHooksWithUseContext<Callbacks extends PartialServiceMethods>(
+function wrapHookCallbacks<Callbacks extends PartialServiceMethods>(
   callbacks: Callbacks,
   context: Context<CreateAPIQueryClientOptions | undefined>
 ): Callbacks {
@@ -231,23 +229,34 @@ function wrapHooksWithUseContext<Callbacks extends PartialServiceMethods>(
     Object.entries(callbacks).map(([callbackName, callback]) => {
       if (!callbackName.startsWith('use')) return [callbackName, callback];
 
-      return [callbackName, useAPIClientContext.bind(null, context, callback)];
+      return [
+        callbackName,
+        wrapHookCallbackWithUseContext(context, callback as never),
+      ];
     })
   ) as Callbacks;
 }
 
-function useAPIClientContext(
+function wrapHookCallbackWithUseContext(
   context: Context<CreateAPIQueryClientOptions | undefined>,
-  callback: ServiceMethods[keyof ServiceMethods],
-  _options: CreateAPIQueryClientOptions | undefined,
-  schema: OperationSchema,
-  args: unknown[]
+  callback: (
+    options: CreateAPIClientOptions,
+    schema: OperationSchema,
+    args: unknown[]
+  ) => any
 ) {
-  const options = useContext(context);
-  if (!options) throw new Error('No API Client context found');
+  function useCallbackContext(
+    _options: CreateAPIQueryClientOptions | undefined,
+    schema: OperationSchema,
+    args: unknown[]
+  ) {
+    const options = useContext(context);
+    if (!options) throw new Error('No API Client context found');
 
-  // @ts-expect-error - Too complex union type
-  return callback(options, schema, args);
+    return callback(options, schema, args);
+  }
+
+  return useCallbackContext;
 }
 
 export type APIContextQueryClientServices<
