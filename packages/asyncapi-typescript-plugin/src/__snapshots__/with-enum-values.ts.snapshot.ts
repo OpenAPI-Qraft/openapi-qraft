@@ -5,15 +5,15 @@
 
 export interface servers {
     "events-test": components["servers"]["events-test"];
+    /** @description Production WebSocket server for events (lighting measurements) secured with TLS */
     "events-prod": {
         host: "prod-events.example.com";
         protocol: "wss";
-        description: "Production WebSocket server for events (lighting measurements) secured with TLS";
     };
+    /** @description Test WebSocket server for commands (turn on/off, dim) */
     "commands-test": {
         host: "test-commands.example.com";
         protocol: "ws";
-        description: "Test WebSocket server for commands (turn on/off, dim)";
     };
     "commands-prod": components["servers"]["commands-prod"];
 }
@@ -198,9 +198,9 @@ export interface operations {
             channels["lightTurnOff"]["messages"]["turnOff"]
         ];
         reply: {
+            /** @description Inline reply address extracted from message header */
             address: {
                 location: "$message.header#/replyTo";
-                description: "Inline reply address extracted from message header";
             };
             channel: channels["lightTurnOffDynamicReply"];
             messages: [
@@ -311,9 +311,9 @@ export interface components {
                 reqid: string;
             };
             contentType: "application/json";
+            /** @description Correlation ID. */
             correlationId: {
                 location: "$message.header#/reqid";
-                description: "Correlation ID.";
             };
         };
         /**
@@ -325,9 +325,9 @@ export interface components {
             payload?: components["schemas"]["measurementResponsePayload"];
             headers?: components["messageTraits"]["optionalReplyHeaders"]["headers"];
             contentType: "application/json";
+            /** @description Correlation ID. */
             correlationId: {
                 location: "$message.header#/reqid";
-                description: "Correlation ID.";
             };
         };
         /**
@@ -344,9 +344,9 @@ export interface components {
                 /** @description Correlation identifier for request/reply matching. */
                 reqid: string;
             };
+            /** @description Correlation ID. */
             correlationId: {
                 location: "$message.header#/reqid";
-                description: "Correlation ID.";
             };
         };
         /**
@@ -363,9 +363,9 @@ export interface components {
                 /** @description Correlation identifier for request/reply matching. */
                 reqid: string;
             };
+            /** @description Correlation ID. */
             correlationId: {
                 location: "$message.header#/reqid";
-                description: "Correlation ID.";
             };
         };
         /**
@@ -416,28 +416,28 @@ export interface components {
         };
     };
     securitySchemes: {
+        /** @description Bearer token authentication */
         bearerAuth: {
             type: "http";
-            description: "Bearer token authentication";
         };
     };
     servers: {
+        /** @description Test WebSocket server for events (lighting measurements) */
         "events-test": {
             host: "test-events.example.com";
             protocol: "ws";
-            description: "Test WebSocket server for events (lighting measurements)";
         };
+        /** @description Production WebSocket server for commands (turn on/off, dim) secured with TLS */
         "commands-prod": {
             host: "prod-commands.example.com";
             protocol: "wss";
-            description: "Production WebSocket server for commands (turn on/off, dim) secured with TLS";
         };
     };
     messageTraits: {
         correlationId: {
+            /** @description Correlation ID for request-reply matching, extracted from message header. */
             correlationId: {
                 location: "$message.header#/reqid";
-                description: "Correlation ID for request-reply matching, extracted from message header.";
             };
         };
         commonHeaders: {
@@ -465,19 +465,16 @@ export interface components {
         /** @description Reply address extracted from message header replyTo field */
         turnOnReplyAddress: {
             location: "$message.header#/replyTo";
-            description: "Reply address extracted from message header replyTo field";
         };
         /** @description Reply address extracted from message payload responseAddress field */
         dimLightReplyAddress: {
             location: "$message.payload#/responseAddress";
-            description: "Reply address extracted from message payload responseAddress field";
         };
     };
     correlationIds: {
         /** @description Request ID. */
         reqid: {
             location: "$message.header#/reqid";
-            description: "Request ID.";
         };
     };
 }

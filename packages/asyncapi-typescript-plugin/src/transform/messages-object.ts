@@ -7,6 +7,7 @@ import type {
   SchemaObject,
 } from '../types.js';
 import {
+  addJSDocComment,
   oapiRef,
   QUESTION_TOKEN,
   tsModifiers,
@@ -291,14 +292,21 @@ export default function transformMessageObject(
         )
       : createLocationDescriptionType(correlationIdSource, ctx);
 
-    members.push(
-      ts.factory.createPropertySignature(
-        tsModifiers({ readonly: ctx.immutable }),
-        tsPropertyIndex('correlationId'),
-        undefined,
-        correlationType
-      )
+    const correlationProperty = ts.factory.createPropertySignature(
+      tsModifiers({ readonly: ctx.immutable }),
+      tsPropertyIndex('correlationId'),
+      undefined,
+      correlationType
     );
+
+    if (!correlationIdSource.ref) {
+      addJSDocComment(
+        correlationIdSource as unknown as any,
+        correlationProperty
+      );
+    }
+
+    members.push(correlationProperty);
   }
 
   return ts.factory.createTypeLiteralNode(members);
