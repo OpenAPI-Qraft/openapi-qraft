@@ -45,6 +45,9 @@ const getOperationClientImportsFactory = ({
 
   const qraftImportTypeOverrides =
     createAPIClientFnImportTypeOverrides?.['@openapi-qraft/react'];
+  const qraftClientFactoryName = contextName
+    ? 'qraftReactAPIClient'
+    : 'qraftAPIClient';
 
   const availableQraftImportedTypes = [
     'APIBasicClientServices',
@@ -144,7 +147,7 @@ const getOperationClientImportsFactory = ({
           factory.createImportSpecifier(
             false,
             undefined,
-            factory.createIdentifier('qraftAPIClient')
+            factory.createIdentifier(qraftClientFactoryName)
           ),
         ])
       ),
@@ -242,6 +245,9 @@ const getCreateOperationClientFunctionFactory = ({
   contextName,
 }: Options) => {
   const factory = ts.factory;
+  const qraftClientFactoryName = contextName
+    ? 'qraftReactAPIClient'
+    : 'qraftAPIClient';
 
   const shouldImportAllCallbacks = defaultClientCallbacks?.some(
     (name) => name === 'all'
@@ -940,7 +946,7 @@ const getCreateOperationClientFunctionFactory = ({
                   ),
                   factory.createReturnStatement(
                     factory.createCallExpression(
-                      factory.createIdentifier('qraftAPIClient'),
+                      factory.createIdentifier(qraftClientFactoryName),
                       undefined,
                       [
                         factory.createIdentifier('services'),
@@ -971,7 +977,7 @@ const getCreateOperationClientFunctionFactory = ({
                   ),
                   factory.createReturnStatement(
                     factory.createCallExpression(
-                      factory.createIdentifier('qraftAPIClient'),
+                      factory.createIdentifier(qraftClientFactoryName),
                       undefined,
                       [
                         factory.createIdentifier('services'),
@@ -997,7 +1003,7 @@ const getCreateOperationClientFunctionFactory = ({
           ),
           factory.createReturnStatement(
             factory.createCallExpression(
-              factory.createIdentifier('qraftAPIClient'),
+              factory.createIdentifier(qraftClientFactoryName),
               undefined,
               [
                 factory.createIdentifier('services'),
