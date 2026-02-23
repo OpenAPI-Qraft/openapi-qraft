@@ -4,6 +4,7 @@ import type {
   ReferenceObject,
 } from '../types.js';
 import {
+  addJSDocComment,
   oapiRef,
   tsModifiers,
   tsPropertyIndex,
@@ -69,19 +70,6 @@ export function transformServerObject(
     );
   }
 
-  if (server.description) {
-    members.push(
-      ts.factory.createPropertySignature(
-        tsModifiers({ readonly: ctx.immutable }),
-        tsPropertyIndex('description'),
-        undefined,
-        ts.factory.createLiteralTypeNode(
-          ts.factory.createStringLiteral(server.description)
-        )
-      )
-    );
-  }
-
   return ts.factory.createTypeLiteralNode(members);
 }
 
@@ -111,14 +99,18 @@ export default function transformServersObject(
       serverType = transformServerObject(server as AsyncAPIServerObject, ctx);
     }
 
-    members.push(
-      ts.factory.createPropertySignature(
-        tsModifiers({ readonly: ctx.immutable }),
-        tsPropertyIndex(serverId),
-        undefined,
-        serverType
-      )
+    const property = ts.factory.createPropertySignature(
+      tsModifiers({ readonly: ctx.immutable }),
+      tsPropertyIndex(serverId),
+      undefined,
+      serverType
     );
+
+    if (!('$ref' in server)) {
+      addJSDocComment(server as unknown as any, property);
+    }
+
+    members.push(property);
   }
 
   return ts.factory.createTypeLiteralNode(members);

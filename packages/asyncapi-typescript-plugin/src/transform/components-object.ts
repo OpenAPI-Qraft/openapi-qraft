@@ -433,27 +433,14 @@ function transformSecuritySchemes(
       );
     }
 
-    if (schemeObj.description && typeof schemeObj.description === 'string') {
-      members.push(
-        ts.factory.createPropertySignature(
-          tsModifiers({ readonly: ctx.immutable }),
-          tsPropertyIndex('description'),
-          undefined,
-          ts.factory.createLiteralTypeNode(
-            ts.factory.createStringLiteral(schemeObj.description)
-          )
-        )
-      );
-    }
-
-    items.push(
-      ts.factory.createPropertySignature(
-        tsModifiers({ readonly: ctx.immutable }),
-        tsPropertyIndex(name),
-        undefined,
-        ts.factory.createTypeLiteralNode(members)
-      )
+    const property = ts.factory.createPropertySignature(
+      tsModifiers({ readonly: ctx.immutable }),
+      tsPropertyIndex(name),
+      undefined,
+      ts.factory.createTypeLiteralNode(members)
     );
+    addJSDocComment(schemeObj as unknown as any, property);
+    items.push(property);
   }
 
   return items;
@@ -500,6 +487,11 @@ function transformServers(
       undefined,
       serverType
     );
+
+    if (!('$ref' in server)) {
+      addJSDocComment(server as unknown as any, property);
+    }
+
     items.push(property);
   }
 
@@ -551,20 +543,30 @@ function transformMessageTraits(
     }
 
     if (traitObj.correlationId && typeof traitObj.correlationId === 'object') {
+      const correlationIdObject = traitObj.correlationId as
+        | AsyncAPICorrelationIdObject
+        | ReferenceObject;
       const correlationType = transformLocationDescriptionValue(
-        traitObj.correlationId as AsyncAPICorrelationIdObject | ReferenceObject,
+        correlationIdObject,
         'correlationIds',
         ctx
       );
 
-      members.push(
-        ts.factory.createPropertySignature(
-          tsModifiers({ readonly: ctx.immutable }),
-          tsPropertyIndex('correlationId'),
-          undefined,
-          correlationType
-        )
+      const correlationProperty = ts.factory.createPropertySignature(
+        tsModifiers({ readonly: ctx.immutable }),
+        tsPropertyIndex('correlationId'),
+        undefined,
+        correlationType
       );
+
+      if (!('$ref' in correlationIdObject)) {
+        addJSDocComment(
+          correlationIdObject as unknown as any,
+          correlationProperty
+        );
+      }
+
+      members.push(correlationProperty);
     }
 
     items.push(

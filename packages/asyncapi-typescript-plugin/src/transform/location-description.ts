@@ -29,19 +29,6 @@ export function createLocationDescriptionType(
     );
   }
 
-  if (obj.description) {
-    members.push(
-      ts.factory.createPropertySignature(
-        tsModifiers({ readonly: ctx.immutable }),
-        tsPropertyIndex('description'),
-        undefined,
-        ts.factory.createLiteralTypeNode(
-          ts.factory.createStringLiteral(obj.description)
-        )
-      )
-    );
-  }
-
   return ts.factory.createTypeLiteralNode(members);
 }
 

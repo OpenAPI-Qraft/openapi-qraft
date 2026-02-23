@@ -5,6 +5,7 @@ import type {
   ReferenceObject,
 } from '../types.js';
 import {
+  addJSDocComment,
   oapiRef,
   tsLiteral,
   tsModifiers,
@@ -91,22 +92,27 @@ export default function transformOperationsObject(
       const replyMembers: ts.TypeElement[] = [];
 
       if (operation.reply.address) {
+        const replyAddress = operation.reply.address as
+          | AsyncAPIReplyAddressObject
+          | ReferenceObject;
         const addressType = transformLocationDescriptionValue(
-          operation.reply.address as
-            | AsyncAPIReplyAddressObject
-            | ReferenceObject,
+          replyAddress,
           'replyAddresses',
           ctx
         );
 
-        replyMembers.push(
-          ts.factory.createPropertySignature(
-            tsModifiers({ readonly: ctx.immutable }),
-            tsPropertyIndex('address'),
-            undefined,
-            addressType
-          )
+        const addressProperty = ts.factory.createPropertySignature(
+          tsModifiers({ readonly: ctx.immutable }),
+          tsPropertyIndex('address'),
+          undefined,
+          addressType
         );
+
+        if (!('$ref' in replyAddress)) {
+          addJSDocComment(replyAddress as unknown as any, addressProperty);
+        }
+
+        replyMembers.push(addressProperty);
       }
 
       if (operation.reply.channel && '$ref' in operation.reply.channel) {

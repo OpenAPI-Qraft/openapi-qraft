@@ -5,15 +5,15 @@
 
 export interface servers {
     readonly "events-test": components["servers"]["events-test"];
+    /** @description Production WebSocket server for events (lighting measurements) secured with TLS */
     readonly "events-prod": {
         readonly host: "prod-events.example.com";
         readonly protocol: "wss";
-        readonly description: "Production WebSocket server for events (lighting measurements) secured with TLS";
     };
+    /** @description Test WebSocket server for commands (turn on/off, dim) */
     readonly "commands-test": {
         readonly host: "test-commands.example.com";
         readonly protocol: "ws";
-        readonly description: "Test WebSocket server for commands (turn on/off, dim)";
     };
     readonly "commands-prod": components["servers"]["commands-prod"];
 }
@@ -198,9 +198,9 @@ export interface operations {
             channels["lightTurnOff"]["messages"]["turnOff"]
         ];
         readonly reply: {
+            /** @description Inline reply address extracted from message header */
             readonly address: {
                 readonly location: "$message.header#/replyTo";
-                readonly description: "Inline reply address extracted from message header";
             };
             readonly channel: channels["lightTurnOffDynamicReply"];
             readonly messages: [
@@ -311,9 +311,9 @@ export interface components {
                 readonly reqid: string;
             };
             readonly contentType: "application/json";
+            /** @description Correlation ID. */
             readonly correlationId: {
                 readonly location: "$message.header#/reqid";
-                readonly description: "Correlation ID.";
             };
         };
         /**
@@ -325,9 +325,9 @@ export interface components {
             readonly payload?: components["schemas"]["measurementResponsePayload"];
             readonly headers?: components["messageTraits"]["optionalReplyHeaders"]["headers"];
             readonly contentType: "application/json";
+            /** @description Correlation ID. */
             readonly correlationId: {
                 readonly location: "$message.header#/reqid";
-                readonly description: "Correlation ID.";
             };
         };
         /**
@@ -344,9 +344,9 @@ export interface components {
                 /** @description Correlation identifier for request/reply matching. */
                 readonly reqid: string;
             };
+            /** @description Correlation ID. */
             readonly correlationId: {
                 readonly location: "$message.header#/reqid";
-                readonly description: "Correlation ID.";
             };
         };
         /**
@@ -363,9 +363,9 @@ export interface components {
                 /** @description Correlation identifier for request/reply matching. */
                 readonly reqid: string;
             };
+            /** @description Correlation ID. */
             readonly correlationId: {
                 readonly location: "$message.header#/reqid";
-                readonly description: "Correlation ID.";
             };
         };
         /**
@@ -416,28 +416,28 @@ export interface components {
         };
     };
     securitySchemes: {
+        /** @description Bearer token authentication */
         readonly bearerAuth: {
             readonly type: "http";
-            readonly description: "Bearer token authentication";
         };
     };
     servers: {
+        /** @description Test WebSocket server for events (lighting measurements) */
         readonly "events-test": {
             readonly host: "test-events.example.com";
             readonly protocol: "ws";
-            readonly description: "Test WebSocket server for events (lighting measurements)";
         };
+        /** @description Production WebSocket server for commands (turn on/off, dim) secured with TLS */
         readonly "commands-prod": {
             readonly host: "prod-commands.example.com";
             readonly protocol: "wss";
-            readonly description: "Production WebSocket server for commands (turn on/off, dim) secured with TLS";
         };
     };
     messageTraits: {
         readonly correlationId: {
+            /** @description Correlation ID for request-reply matching, extracted from message header. */
             readonly correlationId: {
                 readonly location: "$message.header#/reqid";
-                readonly description: "Correlation ID for request-reply matching, extracted from message header.";
             };
         };
         readonly commonHeaders: {
@@ -465,19 +465,16 @@ export interface components {
         /** @description Reply address extracted from message header replyTo field */
         readonly turnOnReplyAddress: {
             readonly location: "$message.header#/replyTo";
-            readonly description: "Reply address extracted from message header replyTo field";
         };
         /** @description Reply address extracted from message payload responseAddress field */
         readonly dimLightReplyAddress: {
             readonly location: "$message.payload#/responseAddress";
-            readonly description: "Reply address extracted from message payload responseAddress field";
         };
     };
     correlationIds: {
         /** @description Request ID. */
         readonly reqid: {
             readonly location: "$message.header#/reqid";
-            readonly description: "Request ID.";
         };
     };
 }
