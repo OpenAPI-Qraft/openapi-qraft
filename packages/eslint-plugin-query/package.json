@@ -1,6 +1,6 @@
 {
   "name": "@openapi-qraft/eslint-plugin-query",
-  "version": "2.15.0-beta.2",
+  "version": "2.15.0-beta.3",
   "description": "ESLint plugin for OpenAPI Qraft",
   "homepage": "https://openapi-qraft.github.io/openapi-qraft/docs/eslint/eslint-plugin-query",
   "packageManager": "yarn@4.0.2",
