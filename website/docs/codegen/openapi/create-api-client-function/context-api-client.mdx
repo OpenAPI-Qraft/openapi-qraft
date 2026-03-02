@@ -293,7 +293,103 @@ function PetUpdateForm({ petId }: { petId: number }) {
 }
 ```
 
-### Pattern 4: Multiple API Versions
+### Pattern 4: Minimal Context Client with Runtime Callbacks
+
+Use this pattern when you generate a fully minimal context client and pass
+only the services/operations and callbacks you need at runtime.
+Keep hook callbacks (like `useMutation`) on a static client outside components,
+but create a utility client inside a component for methods like `setQueryData`
+that need the current Context value.
+
+```bash
+--create-api-client-fn createMinimalContextAPIClient \
+  filename:create-minimal-context-api-client \
+  context:APIClientContext \
+  services:none \
+  callbacks:none
+```
+
+```tsx title="src/PetEditor.tsx"
+import {
+  createMinimalContextAPIClient,
+  APIClientContext,
+  services,
+} from './api';
+import { useMutation, setQueryData } from '@openapi-qraft/react/callbacks';
+import { requestFn } from '@openapi-qraft/react';
+import { QueryClient } from '@tanstack/react-query';
+import { useContext, useState, useEffect, type ReactNode } from 'react';
+
+// Static hooks client (React Compiler friendly)
+const mutationApi = createMinimalContextAPIClient(
+  {
+    updatePet: services.pet.updatePet,
+  },
+  { useMutation }
+);
+
+function APIProvider({ children }: { children: ReactNode }) {
+  const [queryClient] = useState(() => new QueryClient());
+
+  useEffect(() => {
+    queryClient.mount();
+    return () => queryClient.unmount();
+  }, [queryClient]);
+
+  return (
+    <APIClientContext.Provider
+      value={{
+        requestFn,
+        queryClient,
+        baseUrl: 'https://petstore3.swagger.io/api/v3',
+      }}
+    >
+      {children}
+    </APIClientContext.Provider>
+  );
+}
+
+function PetEditor({ petId }: { petId: number }) {
+  const petParams = { path: { petId } };
+  const apiContext = useContext(APIClientContext);
+
+  // Utility client that needs direct access to runtime queryClient/requestFn/baseUrl from Context
+  const cacheApi = createMinimalContextAPIClient(
+    {
+      getPetById: services.pet.getPetById,
+    },
+    apiContext!,
+    { setQueryData }
+  );
+
+  const { mutate, isPending } = mutationApi.updatePet.useMutation(undefined, {
+    onMutate(variables) {
+      cacheApi.getPetById.setQueryData(petParams, (old) => (
+        old ? { ...old, ...variables.body } : old
+      ));
+    },
+  });
+
+  return (
+    <button
+      disabled={isPending}
+      onClick={() => mutate({ body: { id: petId, name: 'Renamed', photoUrls: [] } })}
+    >
+      Rename Pet
+    </button>
+  );
+}
+
+export default function App() {
+  return (
+    <APIProvider>
+      <PetEditor petId={1} />
+    </APIProvider>
+  );
+}
+```
+
+### Pattern 5: Multiple API Versions
 
 When working with multiple API versions, each can have its own Context:
 

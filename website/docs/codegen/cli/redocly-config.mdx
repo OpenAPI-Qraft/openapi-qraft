@@ -233,6 +233,7 @@ apis:
 
         # React API client with specific callbacks only
         createReactAPIClient:
+          context: APIClientContext             # Read baseUrl/requestFn/queryClient from React Context
           services: none                        # Don't include any services directly
           callbacks:                            # Include only specific callbacks
             - setQueryData
@@ -240,3 +241,10 @@ apis:
             - getQueryKey
             - getInfiniteQueryKey
 ```
+
+::::info Context-based createAPIClient
+`context:<ContextName>` is a must-have for React Compiler compatibility because it keeps generated hooks static
+(API client can be created outside React components).
+Need full setup and runtime patterns? See
+[Context-based API Client](../openapi/create-api-client-function/context-api-client.mdx).
+::::
