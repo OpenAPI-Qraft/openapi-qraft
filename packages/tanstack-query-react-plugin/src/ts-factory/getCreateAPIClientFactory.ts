@@ -495,7 +495,7 @@ const getCreateOperationClientFunctionFactory = ({
           ),
           factory.createTypeReferenceNode(
             factory.createIdentifier(
-              shouldImportAllCallbacks ? 'AllCallbacks' : 'DefaultCallbacks'
+              shouldImportAllCallbacks ? 'AllCallbacks' : 'Callbacks'
             ),
             undefined
           ),
@@ -596,7 +596,7 @@ const getCreateOperationClientFunctionFactory = ({
           ),
           factory.createTypeReferenceNode(
             factory.createIdentifier(
-              shouldImportAllCallbacks ? 'AllCallbacks' : 'DefaultCallbacks'
+              shouldImportAllCallbacks ? 'AllCallbacks' : 'Callbacks'
             ),
             undefined
           ),
