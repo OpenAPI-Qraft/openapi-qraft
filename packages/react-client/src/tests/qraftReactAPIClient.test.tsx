@@ -1,5 +1,11 @@
 import type { ReactNode } from 'react';
-import { fetchQuery } from '@openapi-qraft/react/callbacks/index';
+import {
+  fetchQuery,
+  getQueryData,
+  invalidateQueries,
+  setQueryData,
+  useInfiniteQuery,
+} from '@openapi-qraft/react/callbacks/index';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { act, renderHook, waitFor } from '@testing-library/react';
 import React, { useContext, useEffect, useState } from 'react';
@@ -360,6 +366,171 @@ describe('Create API Client with Context', () => {
 
       await waitFor(() => {
         expect(result.current).toEqual(filesFindAllResponsePayloadFixtures);
+      });
+    });
+  });
+
+  describe('error handling', () => {
+    it('throws error when context is not provided', () => {
+      const queryClient = new QueryClient();
+      const api = createInternalReactAPIClient(services);
+
+      expect(() => {
+        renderHook(() => api.files.getFileList.useQuery(), {
+          wrapper: (props) => (
+            <QueryClientProvider client={queryClient} {...props} />
+          ),
+        });
+      }).toThrow('No API Client context found');
+    });
+  });
+
+  describe('useInfiniteQuery with context', () => {
+    it('supports useInfiniteQuery with context-provided options', async () => {
+      const queryClient = new QueryClient();
+      const api = createInternalReactAPIClient(services, {
+        useInfiniteQuery,
+      });
+
+      const { result } = renderHook(
+        () =>
+          api.files.getFileList.useInfiniteQuery(undefined, {
+            initialPageParam: { query: { id__in: ['1'] } },
+            getNextPageParam: () => undefined,
+          }),
+        {
+          wrapper: (props) => (
+            <ContextProviders queryClient={queryClient} {...props} />
+          ),
+        }
+      );
+
+      await waitFor(() => {
+        expect(result.current.data).toBeDefined();
+      });
+    });
+  });
+
+  describe('cache operations with context in mutation callbacks', () => {
+    it('supports setQueryData and getQueryData with context in mutation callbacks', async () => {
+      const queryClient = new QueryClient();
+      const api = createInternalReactAPIClient(services);
+
+      const { result } = renderHook(
+        () => {
+          const apiContext = useContext(InternalReactAPIClientContext);
+
+          return api.files.postFiles.useMutation(undefined, {
+            async onMutate(variables) {
+              if (!apiContext) return;
+
+              const apiClient = createInternalReactAPIClient(
+                services,
+                apiContext,
+                {
+                  setQueryData,
+                  getQueryData,
+                }
+              );
+
+              const prevData = apiClient.files.getFileList.getQueryData();
+
+              const fileDescription =
+                variables &&
+                'body' in variables &&
+                typeof variables.body === 'object' &&
+                variables.body !== null &&
+                !('append' in variables.body) &&
+                'file_description' in variables.body
+                  ? variables.body.file_description
+                  : '';
+
+              apiClient.files.getFileList.setQueryData(undefined, (old) => ({
+                ...old,
+                data: [
+                  ...(old?.data || []),
+                  {
+                    id: 'new',
+                    name: fileDescription || 'new-file',
+                    file_type: 'pdf',
+                    url: 'http://localhost/new',
+                  },
+                ],
+              }));
+
+              return { prevData };
+            },
+            async onError(_err, _vars, context) {
+              if (!apiContext) return;
+
+              if (context?.prevData) {
+                const apiClient = createInternalReactAPIClient(
+                  services,
+                  apiContext,
+                  {
+                    setQueryData,
+                  }
+                );
+                apiClient.files.getFileList.setQueryData(
+                  undefined,
+                  context.prevData
+                );
+              }
+            },
+          });
+        },
+        {
+          wrapper: (props) => (
+            <ContextProviders queryClient={queryClient} {...props} />
+          ),
+        }
+      );
+
+      act(() => {
+        result.current.mutate({
+          body: { file_description: 'Optimistic test file' },
+        });
+      });
+
+      await waitFor(() => {
+        expect(result.current.isPending).toBe(false);
+        expect(result.current.data).toEqual({
+          body: { file_description: 'Optimistic test file' },
+        });
+      });
+    });
+  });
+
+  describe('invalidateQueries with context', () => {
+    it('supports invalidateQueries with context-provided queryClient', async () => {
+      const queryClient = new QueryClient();
+      const api = createInternalReactAPIClient(services);
+
+      const queryKey = api.files.getFileList.getQueryKey();
+
+      queryClient.setQueryData(queryKey, filesFindAllResponsePayloadFixtures);
+
+      const { result } = renderHook(
+        () => {
+          const apiContext = useContext(InternalReactAPIClientContext);
+
+          if (!apiContext) return undefined;
+
+          const apiClient = createInternalReactAPIClient(services, apiContext, {
+            invalidateQueries,
+          });
+
+          return apiClient.files.getFileList.invalidateQueries();
+        },
+        {
+          wrapper: (props) => (
+            <ContextProviders queryClient={queryClient} {...props} />
+          ),
+        }
+      );
+
+      await waitFor(() => {
+        expect(result.current).toBeInstanceOf(Promise);
       });
     });
   });
