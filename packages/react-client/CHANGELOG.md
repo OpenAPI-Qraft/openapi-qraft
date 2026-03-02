@@ -1,5 +1,19 @@
 # @openapi-qraft/react
 
+## 2.15.0-beta.4
+
+### Patch Changes
+
+- 04fb1bd: Fixed callback typing and client factory overload generation for partial callback clients.
+  - Added `getMutationCache` to mutation state callback typing in `qraftAPIClient`, so it is available on generated
+    clients when relevant callbacks are provided.
+  - Fixed generated `createAPIClient` operation-client overloads to return `APIBasicQueryClientServices<..., Callbacks>`
+    and `APIBasicClientServices<..., Callbacks>` (instead of incorrectly locking to `DefaultCallbacks`) for partial
+    callback configurations.
+
+- e22e6ce: Fix a mutation-related destructuring runtime error when `body` is missing.
+  - @openapi-qraft/tanstack-query-react-types@2.15.0-beta.4
+
 ## 2.15.0-beta.3
 
 ### Patch Changes
