@@ -71,9 +71,7 @@ export const useMutation: <
                 .then(requestFnResponseResolver, requestFnResponseRejecter);
             }
           : function (parametersAndBodyPayload) {
-              const { body, ...parameters } = parametersAndBodyPayload as {
-                body: unknown;
-              };
+              const { body, ...parameters } = parametersAndBodyPayload ?? {};
 
               return qraftOptions
                 .requestFn(schema, {

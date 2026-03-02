@@ -1281,8 +1281,11 @@ describe('Qraft uses Mutations', () => {
         mutateWithEmptyBody,
       } = result.current;
 
-      expect(mutateNoArgsWithVoidParameters.data).toBeUndefined();
+      expect(mutateNoArgsWithVoidParameters.isSuccess).toBeTruthy();
+      expect(mutateNoArgsWithVoidParameters.data).toEqual({});
+      expect(mutateNoArgsWithEmptyParameters.isSuccess).toBeTruthy();
       expect(mutateNoArgsWithEmptyParameters.data).toEqual({});
+      expect(mutateWithPredefinedParameters.isSuccess).toBeTruthy();
       expect(mutateWithPredefinedParameters.data).toEqual({
         query: { all: 'true' },
       });
@@ -1911,6 +1914,40 @@ describe('Qraft uses getMutationCache', () => {
         },
         ...parameters,
       });
+    });
+
+    it('supports getMutationCache().find() with status success and useMutation options mutationKey', async () => {
+      const { qraft, queryClient } = createClient();
+      const mutationKey = qraft.files.deleteFiles.getMutationKey();
+
+      const { result: mutationResult } = renderHook(
+        () =>
+          qraft.files.deleteFiles.useMutation(undefined, {
+            gcTime: Infinity,
+            mutationKey,
+          }),
+        {
+          wrapper: (props) => (
+            <Providers {...props} queryClient={queryClient} />
+          ),
+        }
+      );
+
+      act(() => {
+        mutationResult.current.mutate();
+      });
+
+      await waitFor(() => {
+        expect(mutationResult.current.status).toEqual('success');
+      });
+
+      const foundMutation = queryClient.getMutationCache().find({
+        mutationKey,
+        status: 'success',
+      });
+
+      expect(foundMutation).toBeDefined();
+      expect(foundMutation?.state.status).toEqual('success');
     });
 
     it('supports getMutationCache().find() with partial not exact parameters', async () => {
