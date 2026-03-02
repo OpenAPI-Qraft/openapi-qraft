@@ -447,7 +447,7 @@ type MutationOperationStateHookCallbacks = Extract<
 >;
 
 type MutationOperationStateCallbacks =
-  | Extract<keyof ServiceMethods, 'isMutating'>
+  | Extract<keyof ServiceMethods, 'getMutationCache' | 'isMutating'>
   | MutationOperationStateHookCallbacks;
 
 type InvokeOperationCallback = Extract<
