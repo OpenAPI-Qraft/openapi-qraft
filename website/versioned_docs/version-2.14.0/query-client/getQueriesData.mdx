@@ -1,0 +1,102 @@
+---
+sidebar_label: getQueriesData()
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# getQueriesData(...)
+
+The `getQueriesData()` method enables direct access to the `QueryClient` cache to retrieve data for multiple queries that match specified filters. This method is particularly useful when you need to access data from multiple related queries at once.
+
+See the TanStack [_queryClient.getQueriesData 🌴_](https://tanstack.com/query/latest/docs/reference/QueryClient#queryclientgetqueriesdata) documentation for more details on the underlying implementation.
+
+```ts
+const queriesData = api.<service>.<operation>.getQueriesData(filters);
+```
+
+## Arguments
+
+1.  `filters?: QueryFilters`
+    - **Optional** query filters to apply when selecting queries
+    - `parameters?: { path?, query?, header? }`: Parameters to match against when filtering queries
+      - `queryKey?: QueryKey`: A query key to filter the queries, could be instead of ~~`parameters`~~
+    - `exact?: boolean`: Whether to match the _Query Key_ exactly
+    - `infinite?: boolean`: Whether to retrieve infinite query data
+    - `predicate?: (query: Query) => boolean`: A function to further filter the queries
+    - If no filters are provided, `getQueriesData()` returns data for _all non-infinite queries_ of the specified operation
+
+## Returns
+
+Returns `[]` if there are no matches, or an array of tuples:
+1. The _Query Key_ of the matched query.
+2. The data associated with that query.
+
+```ts
+[queryKey: QueryKey, data: TQueryFnData | undefined][]
+```
+
+## Examples
+
+<Tabs>
+  <TabItem value="basic" label="Basic Usage">
+    ```tsx
+    const queriesData = api.approvalPolicies.getApprovalPoliciesId.getQueriesData({
+      parameters: {
+        header: {
+          'x-monite-version': '1.0.0'
+        },
+        path: {
+          approval_policy_id: '1'
+        },
+        query: {
+          items_order: ['asc', 'desc']
+        }
+      }
+    });
+
+    console.log(queriesData);
+    // [
+    //   [
+    //     [{ url: '/approval_policies/{approval_policy_id}', method: 'get', ... }, { ... }],
+    //     { ...data }
+    //   ],
+    // ]
+    ```
+  </TabItem>
+  <TabItem value="predicate" label="Using Predicate">
+    ```tsx
+    const queriesData = api.approvalPolicies.getApprovalPoliciesId.getQueriesData({
+        predicate: (query) => {
+        return Boolean(query.queryKey?.[1]?.query?.items_order?.includes('asc'));
+      }
+    });
+
+    console.log(queriesData);
+    // Returns all queries where items_order includes 'asc'
+    ```
+  </TabItem>
+  <TabItem value="infinite" label="Infinite Queries">
+    ```tsx
+    const infiniteQueriesData = api.approvalPolicies.getApprovalPoliciesId.getQueriesData({
+      infinite: true,
+      parameters: {
+        header: {
+        'x-monite-version': '1.0.0'
+      },
+      path: {
+        approval_policy_id: '1'
+      }
+    }
+    });
+
+    console.log(infiniteQueriesData);
+    // [
+    //   [
+    //     [{ url: '/approval_policies/{approval_policy_id}', method: 'get', infinite: true, ... }, { ... }],
+    //     { ...data }
+    //   ]
+    // ]
+    ```
+  </TabItem>
+</Tabs>

@@ -17,7 +17,7 @@ which is a powerful tool for generating types from an OpenAPI schema.
 
 :::tip
 
-If you missed the [installation](/getting-started/installation.mdx) step, you can install the `@openapi-qraft/cli` using the following command:
+If you missed the [installation](../../getting-started/installation.mdx) step, you can install the `@openapi-qraft/cli` using the following command:
 
 ```bash npm2yarn
 npm install -D @openapi-qraft/cli
@@ -101,7 +101,7 @@ npx openapi-qraft --plugin tanstack-query-react --plugin openapi-typescript http
     - `--redocly` - use the default Redocly configuration file
     - `--redocly ./my-redocly-config.yaml` - use a custom Redocly configuration file
     - `openapi-qraft my-api@v1 external-api --redocly` - generate clients for multiple APIs defined in the Redocly configuration
-  - For more information about this option, use the command: `--redocly-help` or [read the docs](/codegen/CLI/redocly-config.mdx).
+  - For more information about this option, use the command: `--redocly-help` or [read the docs](./redocly-config.mdx).
 
 - **`--service-name-base <endpoint[<index>] | tags>`:** Use OpenAPI Operation `endpoint[<index>]` path part (e.g.: `/0/1/2`) or `tags` as the base name of the service. _(optional, default: `endpoint[0]`)_.
   - **`endpoint[<index>]`** - Use the path segment (e.g., `/0/1/2`) as the base name for the service.
@@ -157,6 +157,8 @@ It is possible to use multiple plugins at the same time. For example, `--plugin 
       - `--openapi-types-import-path ../openapi.d.ts`
       - `--openapi-types-import-path '@/api/openapi.d.ts'`
       - `--openapi-types-import-path '@external-package-types'`
+- **`--operation-generics-import-path <path>`:** Define the path to the operation generics file, allowing for custom
+  operation handling _(optional, default: `@openapi-qraft/react`)_.
 - **`--export-openapi-types [bool]`:** Add an export statement of the generated OpenAPI document types from the `./index.ts` file. Useful for sharing types within your project. _(optional, default: `true`, if `--plugin openapi-typescript` is used)_
 - **`--override-import-type <pathname overrides...>`:** Override import paths for specific types in generated files.
   This allows using custom type implementations instead of the default ones. The option expects a filepath followed by one or more type override definitions in format `originalModule:importTypeName:customImportPath`.
@@ -169,34 +171,10 @@ It is possible to use multiple plugins at the same time. For example, `--plugin 
     the import in the `create-api-client.ts` file.
   - This option is particularly useful when you need to provide custom implementations of library types
     that better suit your project's needs.
-- **`--operation-parameters-type-wrapper <parameters wrappers...>`:** Configure custom _ParametersWrapper_ types for specific operation patterns. This allows you to use custom type
-  implementations for operation parameters instead of the default generated types. The option expects a pattern followed by `type:TypeName` and `import:ImportPath`.
-  Can be specified multiple times for different patterns. _(optional)_
-  - **Format:** `<pattern> type:<TypeName> import:<ImportPath>`
-  - The `ParametersWrapper` type receives four generic parameters:
-    - `TSchema` - The operation schema (method, url)
-    - `TOperation` - The operation type from OpenAPI paths
-    - `TData` - The response data type
-    - `TError` - The error type
-  - **Note:** Generic parameters `TSchema`, `TData`, and `TError` may appear unused in the type body, but they are required
-    for proper type inference and are passed by the code generator.
-    If your linter flags them as unused, you can disable the rule for your type definition file
-    using `/* eslint-disable @typescript-eslint/no-unused-vars */` or configure ESLint to ignore this specific file.
-  - **Pattern syntax:**
-    - `<method> <path glob>` - Match operations by HTTP method and path pattern
-    - `<path glob>` - Match operations by path pattern only (all methods)
-    - Supports glob patterns (wildcards) for flexible matching
-    - Negative patterns: Use `!` prefix to exclude specific paths (e.g., `'/*,!/fields'` means all paths except `/fields`)
-  - **Examples:**
-    - `--operation-parameters-type-wrapper 'get /files/**' 'type:ReadParametersWrapper' 'import:../../type-overrides/parameters-wrapper.js'` - Use _ParametersWrapper_ for all GET operations under `/files/**`
-    - `--operation-parameters-type-wrapper 'delete /approval_policies/{approval_policy_id}' 'type:DeleteParametersWrapper' 'import:../../type-overrides/parameters-wrapper.js'` - Use _ParametersWrapper_ for a specific DELETE operation
-    - `--operation-parameters-type-wrapper 'post,put /api/**' 'type:WriteParametersWrapper' 'import:../types/write-parameters-wrapper.js'` - Use _WriteParametersWrapper_ for POST and PUT operations under `/api/**`
-    - `--operation-parameters-type-wrapper '/**,!/fields' 'type:ItemsQueryParametersWrapper' 'import:./types'` - Use _ItemsQueryParametersWrapper_ for all paths except `/fields`
-  - This option is particularly useful when you need to provide custom parameter handling logic or transform parameters before they are used in API calls.
 - **`--create-api-client-fn <functionName> [options...]`:** Configure API client creation function. Allows specifying the function name used to create the API client, as well as fine-tuning included services and callbacks.
   You can specify this option **multiple times** to generate **several different API client** creation functions from a single OpenAPI document - for example,
   a fully-featured client for Node.js and a lightweight client for React or service workers. _(optional)_
-  See examples on the [`useQuery()`](/hooks/useQuery.mdx#example) documentation page.
+  See examples on the [`useQuery()`](../../hooks/useQuery.mdx#example) documentation page.
   - **Options:**
     - `filename:<name>` - filename where the function will be generated (defaults to function name)
     - `services:[all|none]` - Specify whether the generated API client should include services: either all available services, or no services by default.
@@ -217,7 +195,7 @@ It is possible to use multiple plugins at the same time. For example, `--plugin 
 
   ::::tip
   When generating multiple API client functions with different parameters, it might be more convenient to use a configuration file
-  instead of command-line parameters. See the [Redocly configuration documentation](/codegen/CLI/redocly-config.mdx#generating-multiple-createapiclient-functions)
+  instead of command-line parameters. See the [Redocly configuration documentation](./redocly-config.mdx#generating-multiple-api-client-functions)
   for more details on how to configure multiple _create API client functions_ in a YAML file.
   ::::
 

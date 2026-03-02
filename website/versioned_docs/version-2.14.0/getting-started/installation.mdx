@@ -1,0 +1,48 @@
+---
+sidebar_position: 1
+---
+
+# Installation
+
+To start using OpenAPI Qraft, you'll need to install two packages:
+1. The CLI tool for generating the API client
+2. The Qraft Client React package for using the generated API client
+
+```bash npm2yarn
+npm install -D @openapi-qraft/cli
+npm install @openapi-qraft/react @openapi-qraft/tanstack-query-react-types
+```
+
+:::tip IDE Support
+
+Installing `@openapi-qraft/tanstack-query-react-types` explicitly helps IntelliJ-based IDEs
+(like WebStorm) provide better autocomplete and type inference. Without explicit installation,
+these IDEs may have slower autocomplete and missing TSDoc hints due to how they handle
+package resolution and type inference.
+
+:::
+
+:::info Peer Dependency
+
+If you're not already using **TanStack Query v5**, you'll need to
+[install](https://tanstack.com/query/latest/docs/framework/react/installation) it separately:
+
+```bash npm2yarn
+npm install @tanstack/react-query
+```
+
+:::
+
+## Requirements 🌴
+
+OpenAPI Qraft is compatible with React v18+ and works with both ReactDOM and React Native.
+The browser support aligns with TanStack Query's requirements:
+
+```text
+Chrome >= 91
+Firefox >= 90
+Edge >= 91
+Safari >= 15
+iOS >= 15
+Opera >= 77
+```

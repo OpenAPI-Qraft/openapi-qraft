@@ -9,8 +9,8 @@ import npmToYarn from 'npm-to-yarn';
 
 /** @type {import('@docusaurus/types').Config} */
 const config = {
-  title: 'OpenAPI Qraft',
-  tagline: 'Generate a type-safe TanStack Query client for React from an OpenAPI Document.',
+  title: 'Qraft',
+  tagline: 'Generate a type-safe TanStack Query client for React from OpenAPI, and declaration files from AsyncAPI.',
 
   // Set the production url of your site here
   url: 'https://openapi-qraft.github.io',
@@ -51,7 +51,10 @@ const config = {
           lastVersion: 'current',
           versions: {
             current: {
-              label: '2.x',
+              label: '2.15.0-beta',
+            },
+            '2.14.0': {
+              label: '2.14.0',
             },
             '1.x': {
               label: '1.x',
@@ -99,7 +102,7 @@ const config = {
     ({
       // Replace with your project's social card
       navbar: {
-        title: 'OpenAPI Qraft',
+        title: 'Qraft',
         items: [
           {
             type: 'docsVersionDropdown',
@@ -130,6 +133,10 @@ const config = {
         appId: 'B42903JOPT',
         apiKey: '68a397ed6b627ba01e722c54228bd79f',
         indexName: 'openapi-qraftio',
+      },
+      announcementBar: {
+        id: 'announcementBar-asyncapi',
+        content: `⛏︎ <b>Qraft now supports code generation from AsyncAPI! 🎉 <a href="/openapi-qraft/docs/codegen/asyncapi">Read more</a></b>`,
       },
     }),
 };

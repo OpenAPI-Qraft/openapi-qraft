@@ -1,0 +1,44 @@
+---
+sidebar_label: getInfiniteQueryKey()
+---
+
+# getInfiniteQueryKey(...)
+
+The method provides a standardized way to generate `QueryKey` the _Infinite Queries_.
+See TanStack [_Query Keys 🌴_](https://tanstack.com/query/latest/docs/framework/react/guides/query-keys)
+guide for more information.
+
+```ts
+const queryKey = api.<service>.<operation>.getInfiniteQueryKey(parameters);
+```
+
+### Arguments
+
+1. -  `parameters: { path, query, header } | QueryKey | void`
+      - **Required**, OpenAPI request parameters for the query, strictly-typed ✨
+      - `parameters` will be used to generate the `QueryKey`
+
+### Returns
+
+`QueryKey` - a query key for the _Infinite Queries_
+
+### Example
+
+```tsx
+const queryKey = api.files.getFiles.getInfiniteQueryKey({
+  header: { 'x-monite-version': '1.0.0' },
+  query: { id__in: ['1', '2'] },
+});
+
+expect(queryKey).toEqual([
+  {
+    method: 'get',
+    url: '/files',
+    infinite: true // ⬅︎ this is the only difference from the `getQueryKey` method result
+  },
+  {
+    header: { 'x-monite-version': '1.0.0' },
+    query: { id__in: ['1', '2'] }
+  }
+]);
+```

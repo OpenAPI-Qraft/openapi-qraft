@@ -1,0 +1,206 @@
+---
+sidebar_label: getMutationCache()
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# getMutationCache()
+
+This method returns a `MutationCache` object that provides access to mutation cache operations
+for the specific endpoint. The returned object has `find()` and `findAll()` methods
+to search for mutations in the cache.
+
+```ts
+const mutationCache = qraft.<service>.<operation>.getMutationCache()
+```
+
+## MutationCache.find(...)
+
+Finds the first mutation that matches the specified filters.
+
+```ts
+const mutation = qraft.<service>.<operation>.getMutationCache().find(
+  filters
+)
+```
+
+### Arguments
+
+1.  `filters: MutationFilters`,
+    - **Optional**, represents the [_Mutation Filters 🌴_](https://tanstack.com/query/latest/docs/framework/react/guides/filters#mutation-filters)
+      to be used, strictly-typed ✨
+    - `filters.parameters: { path, query, header }` will be used for filtering mutations by parameters
+    - `filters.mutationKey: MutationKey` will be used for filtering mutations by _MutationKey_ instead of parameters
+      - `filters.mutationKey` and `filters.parameters` are mutually exclusive
+    - `filters.predicate?: (mutation: Mutation) => boolean` will be used for filtering mutations by custom predicate
+    - `filters.exact?: boolean` will be used for exact or partial matching of parameters (default: `true`)
+    - **Note**: When no `filters` are provided, the method uses the base mutation key for `<service>.<operation>` and automatically sets `exact: false` to match all mutations for the endpoint
+
+### Returns
+
+`mutation: Mutation | undefined`: The first mutation that matches the filters, or `undefined` if no match is found
+
+## MutationCache.findAll(...)
+
+Finds all mutations that match the specified filters.
+
+<Tabs>
+  <TabItem value="with-filters" label={<span style={{verticalAlign: "middle"}}>With <code>filters</code></span>}>
+    Finds all mutations with the specified _filters_.
+
+    ```ts
+    const mutations = qraft.<service>.<operation>.getMutationCache().findAll(
+      filters
+    )
+    ```
+
+    ### Arguments
+
+    1.  `filters: MutationFilters`,
+        - **Optional**, represents the [_Mutation Filters 🌴_](https://tanstack.com/query/latest/docs/framework/react/guides/filters#mutation-filters)
+          to be used, strictly-typed ✨
+        - `filters.parameters: { path, query, header }` will be used for filtering mutations by parameters
+        - `filters.mutationKey: MutationKey` will be used for filtering mutations by _MutationKey_ instead of parameters
+          - `filters.mutationKey` and `filters.parameters` are mutually exclusive
+        - `filters.predicate?: (mutation: Mutation) => boolean` will be used for filtering mutations by custom predicate
+        - `filters.exact?: boolean` will be used for exact or partial matching of parameters (default: `true`)
+        - **Note**: When no `filters` are provided, the method uses the base mutation key for `<service>.<operation>` and automatically sets `exact: false` to match all mutations for the endpoint
+
+    ### Returns
+
+    `mutations: Mutation[]`: Array of all mutations that match the filters
+
+  </TabItem>
+  <TabItem value="without-filters" label={<span style={{verticalAlign: "middle"}}>Without <code style={{textDecoration: 'line-through'}}>filters</code></span>}>
+    Finds all mutations for the specified endpoint.
+
+    ```ts
+    const mutations = qraft.<service>.<operation>.getMutationCache().findAll()
+    ```
+
+    ### Returns
+
+    `mutations: Mutation[]`: Array of all mutations matching `<service>.<operation>`
+  </TabItem>
+</Tabs>
+
+### Examples
+
+<Tabs>
+  <TabItem value="find-with-parameters" label={<span style={{verticalAlign: "middle"}}><code>find()</code> with parameters</span>}>
+    Find a mutation with specific parameters:
+
+    ```ts
+    /**
+     * Find the mutation with the specified parameters:
+     * ###
+     * POST /entities/3e3e-3e3e-3e3e/documents
+     * x-version: 2023-09-01
+     **/
+    const mutationCache = qraft.entities.postEntitiesIdDocuments.getMutationCache();
+    const mutation = mutationCache.find({
+      parameters: {
+        header: {
+          'x-version': '2023-09-01',
+        },
+        path: {
+          entity_id: '3e3e-3e3e-3e3e',
+        },
+      },
+    });
+
+    if (mutation) {
+      console.log('Mutation found:', mutation.state.data);
+    }
+    ```
+  </TabItem>
+  <TabItem value="find-with-mutation-key" label={<span style={{verticalAlign: "middle"}}><code>find()</code> with mutation key</span>}>
+    Find a mutation using mutation key:
+
+    ```ts
+    const mutationCache = qraft.entities.postEntitiesIdDocuments.getMutationCache();
+    const mutationKey = qraft.entities.postEntitiesIdDocuments.getMutationKey({
+      header: {
+        'x-version': '2023-09-01',
+      },
+      path: {
+        entity_id: '3e3e-3e3e-3e3e',
+      },
+    });
+
+    const mutation = mutationCache.find({
+      mutationKey,
+    });
+
+    if (mutation) {
+      console.log('Mutation found:', mutation.state.data);
+    }
+    ```
+  </TabItem>
+  <TabItem value="find-with-partial-parameters" label={<span style={{verticalAlign: "middle"}}><code>find()</code> with partial parameters</span>}>
+    Find a mutation with partial parameters (non-exact matching):
+
+    ```ts
+    /**
+     * Find mutations that match only header parameters:
+     * ###
+     * POST /entities/{id}/documents
+     * x-version: 2023-09-01
+     **/
+    const mutationCache = qraft.entities.postEntitiesIdDocuments.getMutationCache();
+    const mutation = mutationCache.find({
+      exact: false,
+      parameters: {
+        header: {
+          'x-version': '2023-09-01',
+        },
+      },
+    });
+
+    if (mutation) {
+      console.log('Mutation found with matching header:', mutation.state.data);
+    }
+    ```
+  </TabItem>
+  <TabItem value="find-with-predicate" label={<span style={{verticalAlign: "middle"}}><code>find()</code> with predicate</span>}>
+    Find a mutation using custom predicate:
+
+    ```ts
+    const mutationCache = qraft.entities.postEntitiesIdDocuments.getMutationCache();
+    const mutation = mutationCache.find({
+      predicate: (mutation) => {
+        return mutation.state.data?.header?.['x-version'] === '2023-09-01';
+      },
+    });
+
+    if (mutation) {
+      console.log('Mutation found with predicate:', mutation.state.data);
+    }
+    ```
+  </TabItem>
+  <TabItem value="find-all-without-filters" label={<span style={{verticalAlign: "middle"}}><code>findAll()</code> without filters</span>}>
+    Find all mutations for the endpoint:
+
+    ```ts
+    /**
+     * Find all mutations for the endpoint:
+     * ###
+     * POST /entities/3e3e-3e3e-3e3e/documents
+     * x-version: 2023-09-01
+     * ###
+     * POST /entities/4c4c-4c4c-4c4c/documents
+     * x-version: 2023-09-01
+     * ###
+     * ⬇︎ All mutations for the specified endpoint will be returned
+     **/
+    const mutationCache = qraft.entities.postEntitiesIdDocuments.getMutationCache();
+    const mutations = mutationCache.findAll();
+
+    console.log(`Found ${mutations.length} mutations`);
+    mutations.forEach((mutation, index) => {
+      console.log(`Mutation ${index + 1}:`, mutation.state.data);
+    });
+    ```
+  </TabItem>
+</Tabs>
