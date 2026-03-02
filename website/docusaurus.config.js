@@ -134,6 +134,10 @@ const config = {
         apiKey: '68a397ed6b627ba01e722c54228bd79f',
         indexName: 'openapi-qraftio',
       },
+      announcementBar: {
+        id: 'announcementBar-asyncapi',
+        content: `⛏︎ <b>Qraft now supports code generation from AsyncAPI! 🎉 <a href="/openapi-qraft/docs/codegen/asyncapi">Read more</a></b>`,
+      },
     }),
 };
 
