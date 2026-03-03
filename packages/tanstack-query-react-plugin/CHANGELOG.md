@@ -1,5 +1,17 @@
 # @openapi-qraft/tanstack-query-react-plugin
 
+## 2.15.0-beta.5
+
+### Minor Changes
+
+- 37eaa3c: Add `context:` option to `--create-api-client-fn` for React Context-based API clients. Enables creating API clients outside components with static hooks, making them compatible with React Compiler optimization.
+
+### Patch Changes
+
+- @openapi-qraft/plugin@2.15.0-beta.5
+- @qraft/cli-utils@1.0.0-beta.4
+- @qraft/plugin@1.0.0-beta.4
+
 ## 2.15.0-beta.4
 
 ### Patch Changes

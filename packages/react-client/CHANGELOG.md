@@ -1,5 +1,15 @@
 # @openapi-qraft/react
 
+## 2.15.0-beta.5
+
+### Minor Changes
+
+- 37eaa3c: Add `context:` option to `--create-api-client-fn` for React Context-based API clients. Enables creating API clients outside components with static hooks, making them compatible with React Compiler optimization.
+
+### Patch Changes
+
+- @openapi-qraft/tanstack-query-react-types@2.15.0-beta.5
+
 ## 2.15.0-beta.4
 
 ### Patch Changes
