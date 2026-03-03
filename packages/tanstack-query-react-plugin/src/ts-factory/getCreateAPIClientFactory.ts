@@ -11,6 +11,7 @@ type Options = {
   createAPIClientFnImportTypeOverrides:
     | OverrideImportType[keyof OverrideImportType]
     | undefined;
+  contextName: string | undefined;
 };
 
 export const getCreateAPIClientFactory = (options: Options) => {
@@ -26,6 +27,7 @@ const getOperationClientImportsFactory = ({
   defaultClientCallbacks,
   defaultClientServices,
   createAPIClientFnImportTypeOverrides,
+  contextName,
 }: Options) => {
   const factory = ts.factory;
 
@@ -43,13 +45,17 @@ const getOperationClientImportsFactory = ({
 
   const qraftImportTypeOverrides =
     createAPIClientFnImportTypeOverrides?.['@openapi-qraft/react'];
+  const qraftClientFactoryName = contextName
+    ? 'qraftReactAPIClient'
+    : 'qraftAPIClient';
 
   const availableQraftImportedTypes = [
     'APIBasicClientServices',
     'APIBasicQueryClientServices',
     'APIDefaultQueryClientServices',
+    contextName && 'APIContextQueryClientServices',
     !shouldImportAllCallbacks && 'APIQueryClientServices',
-    'APIUtilityClientServices',
+    !contextName && 'APIUtilityClientServices',
     'CreateAPIBasicClientOptions',
     'CreateAPIBasicQueryClientOptions',
     'CreateAPIClientOptions',
@@ -95,6 +101,29 @@ const getOperationClientImportsFactory = ({
     );
   }
 
+  if (contextName) {
+    imports.push(
+      factory.createImportDeclaration(
+        undefined,
+        factory.createImportClause(
+          false,
+          undefined,
+          factory.createNamedImports([
+            factory.createImportSpecifier(
+              false,
+              undefined,
+              factory.createIdentifier(contextName)
+            ),
+          ])
+        ),
+        factory.createStringLiteral(
+          `./${contextName}${explicitImportExtensions ?? ''}`
+        ),
+        undefined
+      )
+    );
+  }
+
   imports.push(
     factory.createImportDeclaration(
       undefined,
@@ -118,7 +147,7 @@ const getOperationClientImportsFactory = ({
           factory.createImportSpecifier(
             false,
             undefined,
-            factory.createIdentifier('qraftAPIClient')
+            factory.createIdentifier(qraftClientFactoryName)
           ),
         ])
       ),
@@ -213,8 +242,12 @@ const getCreateOperationClientFunctionFactory = ({
   defaultClientCallbacks,
   defaultClientServices,
   createAPIClientFnName,
+  contextName,
 }: Options) => {
   const factory = ts.factory;
+  const qraftClientFactoryName = contextName
+    ? 'qraftReactAPIClient'
+    : 'qraftAPIClient';
 
   const shouldImportAllCallbacks = defaultClientCallbacks?.some(
     (name) => name === 'all'
@@ -678,7 +711,11 @@ const getCreateOperationClientFunctionFactory = ({
             ),
       ].filter(nonNullable),
       factory.createTypeReferenceNode(
-        factory.createIdentifier('APIUtilityClientServices'),
+        factory.createIdentifier(
+          contextName
+            ? 'APIContextQueryClientServices'
+            : 'APIUtilityClientServices'
+        ),
         [
           factory.createTypeReferenceNode(
             factory.createIdentifier('Services'),
@@ -823,6 +860,23 @@ const getCreateOperationClientFunctionFactory = ({
                   ),
                 ]
               ),
+          contextName
+            ? factory.createTypeReferenceNode(
+                factory.createIdentifier('APIContextQueryClientServices'),
+                [
+                  factory.createTypeReferenceNode(
+                    factory.createIdentifier('Services'),
+                    undefined
+                  ),
+                  factory.createTypeReferenceNode(
+                    factory.createIdentifier(
+                      shouldImportAllCallbacks ? 'AllCallbacks' : 'Callbacks'
+                    ),
+                    undefined
+                  ),
+                ]
+              )
+            : null,
           factory.createTypeReferenceNode(
             factory.createIdentifier('APIBasicQueryClientServices'),
             [
@@ -853,99 +907,103 @@ const getCreateOperationClientFunctionFactory = ({
               ),
             ]
           ),
-          factory.createTypeReferenceNode(
-            factory.createIdentifier('APIUtilityClientServices'),
-            [
-              factory.createTypeReferenceNode(
-                factory.createIdentifier('Services'),
-                undefined
+          contextName
+            ? null
+            : factory.createTypeReferenceNode(
+                factory.createIdentifier('APIUtilityClientServices'),
+                [
+                  factory.createTypeReferenceNode(
+                    factory.createIdentifier('Services'),
+                    undefined
+                  ),
+                  factory.createTypeReferenceNode(
+                    factory.createIdentifier(
+                      shouldImportAllCallbacks ? 'AllCallbacks' : 'Callbacks'
+                    ),
+                    undefined
+                  ),
+                ]
               ),
-              factory.createTypeReferenceNode(
-                factory.createIdentifier(
-                  shouldImportAllCallbacks ? 'AllCallbacks' : 'Callbacks'
-                ),
-                undefined
-              ),
-            ]
-          ),
         ].filter(nonNullable)
       ),
       factory.createBlock(
         [
           factory.createIfStatement(
-            factory.createPrefixUnaryExpression(
-              ts.SyntaxKind.ExclamationToken,
-              factory.createIdentifier(
-                shouldImportAllCallbacks ? 'options' : 'callbacksOrOptions'
-              )
+            factory.createIdentifier(
+              shouldImportAllCallbacks ? 'options' : 'callbacksOrOptions'
             ),
-            factory.createReturnStatement(
-              factory.createCallExpression(
-                factory.createIdentifier('qraftAPIClient'),
-                undefined,
-                [
-                  factory.createIdentifier('services'),
-                  factory.createIdentifier(
-                    shouldImportAllCallbacks ? 'allCallbacks' : 'callbacks'
+            factory.createBlock(
+              [
+                factory.createIfStatement(
+                  factory.createBinaryExpression(
+                    factory.createStringLiteral('requestFn'),
+                    factory.createToken(ts.SyntaxKind.InKeyword),
+                    factory.createIdentifier(
+                      shouldImportAllCallbacks
+                        ? 'options'
+                        : 'callbacksOrOptions'
+                    )
                   ),
-                ]
-              )
-            ),
-            undefined
-          ),
-          factory.createIfStatement(
-            factory.createBinaryExpression(
-              factory.createStringLiteral('requestFn'),
-              factory.createToken(ts.SyntaxKind.InKeyword),
-              factory.createIdentifier(
-                shouldImportAllCallbacks ? 'options' : 'callbacksOrOptions'
-              )
-            ),
-            factory.createReturnStatement(
-              factory.createCallExpression(
-                factory.createIdentifier('qraftAPIClient'),
-                undefined,
-                [
-                  factory.createIdentifier('services'),
-                  factory.createIdentifier(
-                    shouldImportAllCallbacks ? 'allCallbacks' : 'callbacks'
+                  factory.createReturnStatement(
+                    factory.createCallExpression(
+                      factory.createIdentifier(qraftClientFactoryName),
+                      undefined,
+                      [
+                        factory.createIdentifier('services'),
+                        factory.createIdentifier(
+                          shouldImportAllCallbacks
+                            ? 'allCallbacks'
+                            : 'callbacks'
+                        ),
+                        factory.createIdentifier(
+                          shouldImportAllCallbacks
+                            ? 'options'
+                            : 'callbacksOrOptions'
+                        ),
+                      ]
+                    )
                   ),
-                  factory.createIdentifier(
-                    shouldImportAllCallbacks ? 'options' : 'callbacksOrOptions'
+                  undefined
+                ),
+                factory.createIfStatement(
+                  factory.createBinaryExpression(
+                    factory.createStringLiteral('queryClient'),
+                    factory.createToken(ts.SyntaxKind.InKeyword),
+                    factory.createIdentifier(
+                      shouldImportAllCallbacks
+                        ? 'options'
+                        : 'callbacksOrOptions'
+                    )
                   ),
-                ]
-              )
-            ),
-            undefined
-          ),
-          factory.createIfStatement(
-            factory.createBinaryExpression(
-              factory.createStringLiteral('queryClient'),
-              factory.createToken(ts.SyntaxKind.InKeyword),
-              factory.createIdentifier(
-                shouldImportAllCallbacks ? 'options' : 'callbacksOrOptions'
-              )
-            ),
-            factory.createReturnStatement(
-              factory.createCallExpression(
-                factory.createIdentifier('qraftAPIClient'),
-                undefined,
-                [
-                  factory.createIdentifier('services'),
-                  factory.createIdentifier(
-                    shouldImportAllCallbacks ? 'allCallbacks' : 'callbacks'
+                  factory.createReturnStatement(
+                    factory.createCallExpression(
+                      factory.createIdentifier(qraftClientFactoryName),
+                      undefined,
+                      [
+                        factory.createIdentifier('services'),
+                        factory.createIdentifier(
+                          shouldImportAllCallbacks
+                            ? 'allCallbacks'
+                            : 'callbacks'
+                        ),
+                        factory.createIdentifier(
+                          shouldImportAllCallbacks
+                            ? 'options'
+                            : 'callbacksOrOptions'
+                        ),
+                      ]
+                    )
                   ),
-                  factory.createIdentifier(
-                    shouldImportAllCallbacks ? 'options' : 'callbacksOrOptions'
-                  ),
-                ]
-              )
+                  undefined
+                ),
+              ],
+              true
             ),
             undefined
           ),
           factory.createReturnStatement(
             factory.createCallExpression(
-              factory.createIdentifier('qraftAPIClient'),
+              factory.createIdentifier(qraftClientFactoryName),
               undefined,
               [
                 factory.createIdentifier('services'),
@@ -954,10 +1012,9 @@ const getCreateOperationClientFunctionFactory = ({
                   : factory.createBinaryExpression(
                       factory.createIdentifier('callbacksOrOptions'),
                       factory.createToken(ts.SyntaxKind.QuestionQuestionToken),
-                      factory.createIdentifier(
-                        shouldImportAllCallbacks ? 'allCallbacks' : 'callbacks'
-                      )
+                      factory.createIdentifier('callbacks')
                     ),
+                ...(contextName ? [factory.createIdentifier(contextName)] : []),
               ]
             )
           ),

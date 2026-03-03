@@ -13,6 +13,10 @@ export {
   type QraftClientOptions,
 } from './qraftAPIClient.js';
 export {
+  qraftReactAPIClient,
+  type APIContextQueryClientServices,
+} from './qraftReactAPIClient.js';
+export {
   requestFn,
   baseRequestFn,
   urlSerializer,

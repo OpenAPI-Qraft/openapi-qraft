@@ -12,12 +12,12 @@ export function createAPIClient(options: CreateAPIBasicQueryClientOptions): APIB
 export function createAPIClient(options: CreateAPIBasicClientOptions): APIBasicClientServices<Services, AllCallbacks>;
 export function createAPIClient(): APIUtilityClientServices<Services, AllCallbacks>;
 export function createAPIClient(options?: CreateAPIClientOptions): APIDefaultQueryClientServices<Services> | APIBasicQueryClientServices<Services, AllCallbacks> | APIBasicClientServices<Services, AllCallbacks> | APIUtilityClientServices<Services, AllCallbacks> {
-    if (!options)
-        return qraftAPIClient(services, allCallbacks);
-    if ("requestFn" in options)
-        return qraftAPIClient(services, allCallbacks, options);
-    if ("queryClient" in options)
-        return qraftAPIClient(services, allCallbacks, options);
+    if (options) {
+        if ("requestFn" in options)
+            return qraftAPIClient(services, allCallbacks, options);
+        if ("queryClient" in options)
+            return qraftAPIClient(services, allCallbacks, options);
+    }
     return qraftAPIClient(services, allCallbacks);
 }
 type AllCallbacks = typeof allCallbacks;

@@ -73,10 +73,20 @@ apis:
           filename: create-internal-api-client
           services: all
           callbacks: all
+        createMinimalAPIClient:
+          services: none
+          callbacks: none
+        createNoCallbacksAPIClient:
+          filename: createNoCallbacksAPIClient
+          services: all
+          callbacks: none
         createInternalReactAPIClient:
           services: none
+          context: InternalReactAPIClientContext
           callbacks:
             [
+              'useQuery',
+              'useMutation',
               'setQueryData',
               'getQueryData',
               'getQueryKey',

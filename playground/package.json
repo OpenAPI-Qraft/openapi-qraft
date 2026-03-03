@@ -9,7 +9,8 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",
-    "codegen": "openapi-qraft --plugin tanstack-query-react --plugin openapi-typescript https://raw.githubusercontent.com/swagger-api/swagger-petstore/7767363b841961221a38c0be9c6b1066a5120051/src/main/resources/openapi.yaml --clean -o src/api --openapi-types-import-path '../schema.d.ts' --openapi-types-file-name schema.d.ts",
+    "codegen": "openapi-qraft --plugin tanstack-query-react --plugin openapi-typescript https://raw.githubusercontent.com/swagger-api/swagger-petstore/7767363b841961221a38c0be9c6b1066a5120051/src/main/resources/openapi.yaml --clean -o src/api --openapi-types-import-path '../schema.d.ts' --openapi-types-file-name schema.d.ts --create-api-client-fn createPlaygroundAPIClient filename:create-playground-api-client context:PlaygroundAPIClientContext",
+    "generate:mocks": "msw init && msw-auto-mock https://raw.githubusercontent.com/swagger-api/swagger-petstore/7767363b841961221a38c0be9c6b1066a5120051/src/main/resources/openapi.yaml -o src/mocks --max-array-length 10 --typescript --base-url 'https://petstore3.swagger.io/api/v3'",
     "e2e:pre-build": "npm run codegen",
     "e2e:post-build": "echo 'No post-build command'",
     "clean": "rimraf dist/"
@@ -22,19 +23,29 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",
+    "@faker-js/faker": "^10.2.0",
     "@types/react": "^19.0.9",
     "@types/react-dom": "^19.0.3",
-    "@vitejs/plugin-react-swc": "^3.11.0",
+    "@vitejs/plugin-react": "^5.1.2",
+    "babel-plugin-react-compiler": "^1.0.0",
     "dotenv": "^16.4.5",
     "dotenv-expand": "^10.0.0",
     "eslint": "^9.39.1",
     "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-compiler": "^19.1.0-rc.2",
     "eslint-plugin-react-hooks": "^7.0.1",
     "eslint-plugin-react-refresh": "^0.4.24",
     "globals": "^16.5.0",
+    "msw": "^2.12.7",
+    "msw-auto-mock": "^0.31.0",
     "rimraf": "^6.1.2",
     "typescript": "^5.6.2",
     "typescript-eslint": "^8.24.0",
     "vite": "^6.4.1"
+  },
+  "msw": {
+    "workerDirectory": [
+      "public"
+    ]
   }
 }
