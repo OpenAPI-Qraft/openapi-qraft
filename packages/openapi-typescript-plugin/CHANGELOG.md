@@ -1,5 +1,14 @@
 # @openapi-qraft/openapi-typescript
 
+## 2.15.0-beta.6
+
+### Patch Changes
+
+- Updated dependencies [5041c44]
+  - @qraft/cli-utils@1.0.0-beta.5
+  - @openapi-qraft/plugin@2.15.0-beta.6
+  - @qraft/plugin@1.0.0-beta.5
+
 ## 2.15.0-beta.5
 
 ### Patch Changes

@@ -1,5 +1,12 @@
 # @qraft/cli-utils
 
+## 1.0.0-beta.5
+
+### Patch Changes
+
+- 5041c44: Align release pipeline with the new publishable package set.
+  - @qraft/plugin@1.0.0-beta.5
+
 ## 1.0.0-beta.4
 
 ### Patch Changes
