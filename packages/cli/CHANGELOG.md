@@ -1,5 +1,19 @@
 # @qraft/cli
 
+## 1.0.0-beta.5
+
+### Patch Changes
+
+- 5041c44: Align release pipeline with the new publishable package set.
+- Updated dependencies [5041c44]
+  - @qraft/asyncapi-plugin@1.0.0-beta.5
+  - @qraft/asyncapi-typescript-plugin@1.0.0-beta.5
+  - @qraft/cli-utils@1.0.0-beta.5
+  - @openapi-qraft/openapi-typescript-plugin@2.15.0-beta.6
+  - @openapi-qraft/tanstack-query-react-plugin@2.15.0-beta.6
+  - @openapi-qraft/plugin@2.15.0-beta.6
+  - @qraft/plugin@1.0.0-beta.5
+
 ## 1.0.0-beta.4
 
 ### Patch Changes
