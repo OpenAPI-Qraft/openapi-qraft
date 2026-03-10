@@ -4,6 +4,7 @@
   "type": "module",
   "scripts": {
     "build": "turbo run build",
+    "build:publishable": "turbo run build --filter '@openapi-qraft/*' --filter '@qraft/*' --force",
     "dev": "turbo run dev",
     "dev:qraft": "turbo run dev --filter '@openapi-qraft/*' --filter '@qraft/*'",
     "test": "turbo run test --continue --output-logs=new-only",

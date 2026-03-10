@@ -39,7 +39,7 @@ jobs:
         run: yarn install --immutable
 
       - name: Build
-        run: yarn build --filter "@openapi-qraft/*" --filter "@qraft/*" --force
+        run: yarn build:publishable
 
       - name: Remove Verdaccio Storage
         run: rm -rf e2e/verdaccio-storage

@@ -25,7 +25,7 @@ Ensure you have a NPM account and this account is added to the `@openapi-qraft` 
 1. Login to NPM: `yarn npm login --scope openapi-qraft`
 2. Create new branch `packages-version-update(-<version>)` from the `main` branch.
 3. Run `yarn install --immutable`
-4. Run `yarn build` to validate that packages are building correctly.
+4. Run `yarn build:publishable` to validate that publishable packages are building correctly.
 5. Run Changesets versioning:
    ```bash
    .changeset/version.sh
@@ -34,7 +34,7 @@ Ensure you have a NPM account and this account is added to the `@openapi-qraft` 
    and create a new Merge Request into `main`.
    Review it and merge.
 7. Checkout `main` branch
-8. Run `yarn build` to rebuild packages with the updated versions.
+8. Run `yarn build:publishable` to rebuild publishable packages with the updated versions.
 9. Run command below and answer <kbd>Y</kbd>:
    ```bash
    .changeset/publish.sh
