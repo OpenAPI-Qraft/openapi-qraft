@@ -7,6 +7,7 @@ import { QraftCommand } from '@openapi-qraft/plugin/lib/QraftCommand';
 import { QraftCommandPlugin } from '@openapi-qraft/plugin/lib/QraftCommandPlugin';
 import { CommanderError, Option } from 'commander';
 import { generateCode } from './generateCode.js';
+import { applyRootSecurityToServices } from './lib/applyRootSecurityToServices.js';
 import { parseOptionSubValues } from './lib/parseOptionSubValues.js';
 import { getAllAvailableCallbackNames } from './ts-factory/getCallbackNames.js';
 import { CreateAPIClientFnOptions } from './ts-factory/getIndexFactory.js';
@@ -39,6 +40,10 @@ export const plugin: QraftCommandPlugin = {
         'Enable generation of query hooks (useQuery, useSuspenseQuery, etc.) for writable HTTP methods like POST, PUT, PATCH. By default, only mutation hooks are generated for writable operations.',
         parseBooleanOption
       )
+      .option(
+        '--root-security',
+        'Use root-level OpenAPI security as the default for operations without their own security. Operation-level security overrides it according to OpenAPI semantics.'
+      )
       .addOption(
         (() => {
           const option = new Option(
@@ -66,9 +71,13 @@ export const plugin: QraftCommandPlugin = {
         ).argParser(parseOperationParametersType)
       )
       .action(async ({ spinner, output, args, services, schema }, resolve) => {
+        const resolvedServices = args.rootSecurity
+          ? applyRootSecurityToServices({ services, schema })
+          : services;
+
         return void (await generateCode({
           spinner,
-          services,
+          services: resolvedServices,
           serviceOptions: {
             openapiTypesImportPath: args.openapiTypesImportPath,
             queryableWriteOperations: args.queryableWriteOperations,

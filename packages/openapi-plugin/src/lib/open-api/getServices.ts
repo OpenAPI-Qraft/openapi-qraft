@@ -66,6 +66,7 @@ export const getServices = (
         >
       >(
         (acc, [statusCode, response]) => {
+          if (!response) return acc;
           if (response.$ref) {
             response = resolveDocumentLocalRef(
               response.$ref,

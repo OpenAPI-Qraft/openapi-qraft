@@ -1,12 +1,17 @@
 import '@qraft/test-utils/vitestFsMock';
 import fs from 'node:fs';
 import { createRequire } from 'node:module';
+import path from 'node:path';
 import { createFileHeader } from '@qraft/cli-utils';
 import { beforeAll, describe, expect, test } from 'vitest';
 
 describe('TanStack Query React Client Generation', () => {
   const openAPIDocumentFixturePath = createRequire(process.cwd()).resolve(
     '@openapi-qraft/test-fixtures/openapi.json'
+  );
+  const rootSecurityOpenAPIDocumentFixturePath = path.resolve(
+    process.cwd(),
+    '../test-fixtures/root-security-openapi.json'
   );
 
   describe('--export-openapi-types --explicit-import-extensions --filter-services <blob>', () => {
@@ -407,6 +412,41 @@ describe('TanStack Query React Client Generation', () => {
         fs.readFileSync('/mock-fs/services/ApprovalPoliciesService.ts', 'utf-8')
       ).toMatchFileSnapshot(
         './__snapshots__/operation-parameters-type-wrapper/services/ApprovalPoliciesService.ts.snapshot.ts'
+      );
+    });
+  });
+
+  describe('root-level security inheritance with --root-security', () => {
+    beforeAll(async () => {
+      const { QraftCommand } =
+        await import('@openapi-qraft/plugin/lib/QraftCommand');
+      const { plugin } = await import('./plugin.js');
+      const command = new QraftCommand(undefined, {
+        defaultFileHeader: createFileHeader('@openapi-qraft/cli'),
+      });
+      plugin.setupCommand(command);
+
+      await command.parseAsync([
+        'dummy-node',
+        'dummy-qraft-bin',
+        rootSecurityOpenAPIDocumentFixturePath,
+        '--root-security',
+        '--clean',
+        '-o',
+        '/mock-fs/root-security-inheritance-output',
+        '--openapi-types-import-path',
+        '../../openapi.d.ts',
+      ]);
+    });
+
+    test('emits inherited root-level security into generated service schemas with the flag', () => {
+      expect(
+        fs.readFileSync(
+          '/mock-fs/root-security-inheritance-output/services/AccountsService.ts',
+          'utf-8'
+        )
+      ).toMatchFileSnapshot(
+        './__snapshots__/root-level-security-inheritance/services/AccountsService.ts.snapshot.ts'
       );
     });
   });

@@ -4,6 +4,7 @@ export type OpenAPISchemaType = {
     title: string;
     version: string;
   };
+  security?: Array<Record<string, string[] | undefined>>;
   paths: {
     [path: string]: {
       [method: string]: {
@@ -23,7 +24,7 @@ export type OpenAPISchemaType = {
           required?: boolean;
         };
         responses: {
-          [statusCode in number | 'default']: {
+          [statusCode in number | 'default']?: {
             $ref?: string;
             description?: string;
             content?: {
