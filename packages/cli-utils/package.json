@@ -7,7 +7,7 @@
     "dev": "yarn build --watch --noEmitOnError false",
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
-    "lint": "eslint",
+    "lint": "eslint --max-warnings 0",
     "clean": "rimraf dist/"
   },
   "type": "module",

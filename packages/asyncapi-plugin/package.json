@@ -7,7 +7,7 @@
     "build": "yarn clean && NODE_ENV=production rollup --config rollup.config.mjs && tsc --project tsconfig.build.json --emitDeclarationOnly",
     "dev": "rollup --config rollup.config.mjs --watch",
     "typecheck": "tsc --noEmit",
-    "lint": "eslint",
+    "lint": "eslint --max-warnings 0",
     "clean": "rimraf dist/",
     "write-package-version-file": "yarn exec ../../write-package-version-file.sh"
   },

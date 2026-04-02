@@ -24,6 +24,7 @@ export default [
           includeTypes: true,
         },
       ],
+      'prettier/prettier': 'warn',
     },
   },
   {

@@ -8,7 +8,7 @@
     "test": "vitest run",
     "test:coverage": "vitest run --coverage",
     "typecheck": "tsc --noEmit",
-    "lint": "eslint",
+    "lint": "eslint --max-warnings 0",
     "clean": "rimraf dist/",
     "codegen": "openapi-qraft --redocly && yarn _prettify-api",
     "_prettify-api": "prettier --write 'src/tests/fixtures/{api,queryable-write-operations-api,files-api}/**/*.ts'"

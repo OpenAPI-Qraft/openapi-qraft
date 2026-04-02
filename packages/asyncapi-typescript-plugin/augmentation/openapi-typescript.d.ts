@@ -156,7 +156,6 @@ declare module 'openapi-typescript/dist/lib/utils.js' {
   import type ts from 'typescript';
   import type c from 'ansi-colors';
 
-  // eslint-disable-next-line prettier/prettier
   export { c };
 
   export interface DiscriminatorObject {
