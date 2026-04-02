@@ -24,7 +24,7 @@ export type OpenAPISchemaType = {
           required?: boolean;
         };
         responses: {
-          [statusCode in number | 'default']: {
+          [statusCode in number | 'default']?: {
             $ref?: string;
             description?: string;
             content?: {
