@@ -7,7 +7,7 @@
     "build": "yarn clean && tsc --build",
     "codegen": "yarn exec ./generate-factory-code-generator.mjs",
     "clean": "rimraf dist/",
-    "lint": "eslint"
+    "lint": "eslint --max-warnings 0"
   },
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
