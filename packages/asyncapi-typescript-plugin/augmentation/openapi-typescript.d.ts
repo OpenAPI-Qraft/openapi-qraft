@@ -54,9 +54,15 @@ declare module 'openapi-typescript/dist/lib/ts.js' {
 
   type OapiRefResolved = Referenced<ParameterObject>;
 
+  export interface OapiRefOptions {
+    deep?: boolean;
+    extractProperties?: string[];
+  }
+
   export function oapiRef(
     path: string,
-    resolved?: OapiRefResolved
+    resolved?: OapiRefResolved,
+    options?: OapiRefOptions
   ): ts.TypeNode;
 
   export interface AstToStringOptions {

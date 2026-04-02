@@ -137,18 +137,23 @@ function transformSchemaObjectWithComposition(
         (v) => typeof v === 'string' || typeof v === 'number'
       )
     ) {
-      let enumValuesVariableName = parseRef(options.path ?? '').pointer.join(
-        '/'
-      );
+      const parsed = parseRef(options.path ?? '');
+      let enumValuesVariableName = parsed.pointer.join('/');
       enumValuesVariableName = enumValuesVariableName.replace(
         'components/schemas',
         ''
       );
       enumValuesVariableName = `${enumValuesVariableName}Values`;
+      const { cleanedRefPath, extractProperties } = createEnumValuesRefOptions(
+        parsed.pointer
+      );
 
       const enumValuesArray = tsArrayLiteralExpression(
         enumValuesVariableName,
-        oapiRef(options.path ?? ''),
+        oapiRef(cleanedRefPath, undefined, {
+          deep: true,
+          extractProperties,
+        }),
         schemaObject.enum as (string | number)[],
         {
           export: true,
@@ -530,4 +535,48 @@ function hasKey<K extends string>(
     possibleObject !== null &&
     key in possibleObject
   );
+}
+
+function createEnumValuesRefOptions(pointer: string[]): {
+  cleanedRefPath: string;
+  extractProperties: string[];
+} {
+  // Keep this logic in sync with upstream openapi-typescript enum-values
+  // handling:
+  // https://github.com/openapi-ts/openapi-typescript/blob/v7.13.0/packages/openapi-typescript/src/transform/schema-object.ts
+  const cleanedPointer: string[] = [];
+  const extractProperties: string[] = [];
+
+  for (let i = 0; i < pointer.length; i++) {
+    const segment = pointer[i];
+
+    if (
+      (segment === 'anyOf' || segment === 'oneOf') &&
+      i < pointer.length - 1
+    ) {
+      const next = pointer[i + 1];
+
+      if (/^\d+$/.test(next)) {
+        i++;
+
+        // Collect every remaining real property segment after the union index.
+        // We skip union markers and numeric indices themselves.
+        const remainingSegments = pointer.slice(i + 1);
+        for (const seg of remainingSegments) {
+          if (seg !== 'anyOf' && seg !== 'oneOf' && !/^\d+$/.test(seg)) {
+            extractProperties.push(seg);
+          }
+        }
+
+        continue;
+      }
+    }
+
+    cleanedPointer.push(segment);
+  }
+
+  return {
+    cleanedRefPath: createRef(cleanedPointer),
+    extractProperties,
+  };
 }

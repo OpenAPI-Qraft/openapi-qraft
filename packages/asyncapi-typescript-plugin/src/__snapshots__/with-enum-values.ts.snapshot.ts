@@ -478,9 +478,12 @@ export interface components {
         };
     };
 }
+type FlattenedDeepRequired<T> = {
+    [K in keyof T]-?: FlattenedDeepRequired<T[K] extends unknown[] | undefined | null ? Extract<T[K], unknown[]>[number] : T[K]>;
+};
 type ReadonlyArray<T> = [
     Exclude<T, undefined>
 ] extends [
     unknown[]
 ] ? Readonly<Exclude<T, undefined>> : Readonly<Exclude<T, undefined>[]>;
-export const turnOnOffPayloadCommandValues: ReadonlyArray<components["schemas"]["turnOnOffPayload"]["command"]> = ["on", "off"];
+export const turnOnOffPayloadCommandValues: ReadonlyArray<FlattenedDeepRequired<components>["schemas"]["turnOnOffPayload"]["command"]> = ["on", "off"];
