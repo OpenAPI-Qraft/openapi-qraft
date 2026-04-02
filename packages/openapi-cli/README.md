@@ -36,6 +36,7 @@ Options:
                                                       example: "post /**:[A-Za-z]+Id ==> createOne"
   --postfix-services <string>                         Postfix to be added to the generated service name (eg: Service)
   --service-name-base <endpoint[<index>] | tags>      Use OpenAPI Operation `endpoint[<index>]` path part (e.g.: "/0/1/2") or `tags` as the base name of the service. (default: "endpoint[0]")
+  --root-security                                     Use root-level OpenAPI security as the default for operations without their own security. Operation-level security overrides it according to OpenAPI semantics.
   --file-header <string>                              Header to be added to the generated file (eg: /* eslint-disable */)
   --redocly [config]                                  Use the Redocly configuration to generate multiple API clients
                                                       If the [config] parameter is not specified, the default Redocly configuration will be used: [redocly.yaml | redocly.yml | .redocly.yaml |
@@ -210,6 +211,9 @@ The following plugins are currently supported:
       - `--openapi-types-import-path '@/api/openapi.d.ts'`
       - `--openapi-types-import-path '@external-package-types'`
 - **`--export-openapi-types [bool]`:** Add an export statement of the generated OpenAPI document types from the `./index.ts` file. Useful for sharing types within your project. _(optional, default: `true`, if `--plugin openapi-typescript` is used)_
+- **`--root-security`**: Use root-level OpenAPI `security` as the default for operations that do not define their own `security`. Operation-level `security` overrides it according to OpenAPI semantics. _(optional, disabled by default)_
+  - Use this option when your OpenAPI document defines `security` on the top level and you want generated operation schemas to include those security requirements automatically.
+  - Without this option, only operation-level `security` is emitted into generated schemas.
 
 ### `--plugin openapi-typescript` options
 

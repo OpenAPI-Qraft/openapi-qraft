@@ -226,6 +226,10 @@ It is possible to use multiple plugins at the same time. For example, `--plugin 
   instead of command-line parameters. See the [Redocly configuration documentation](../cli/redocly-config.mdx#generating-multiple-api-client-functions)
   for more details on how to configure multiple _create API client functions_ in a YAML file.
   ::::
+- **`--root-security`**: Use root-level OpenAPI `security` as the default for operations that do not define their own `security`. Operation-level `security` overrides it according to OpenAPI semantics. _(optional, disabled by default)_
+  - Use this option when your OpenAPI document defines `security` on the top level and you want generated operation schemas to include those security requirements automatically.
+  - Without this option, Qraft only includes operation-level `security` in generated schemas.
+  - This is especially useful together with [`QraftSecureRequestFn`](../../authorization/qraft-secure-request-fn.mdx), because secure handlers rely on generated operation `schema.security`.
 
 ## `--plugin openapi-typescript` options
 
