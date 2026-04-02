@@ -29,7 +29,6 @@ export type ServiceOperation = ServiceOperationStable;
 export interface ServiceOutputOptions {
   postfixServices?: string; // todo::rename to `postfixService`
   serviceNameBase?: ServiceBaseName;
-  rootSecurity?: boolean;
 }
 
 export const getServices = (
@@ -37,7 +36,6 @@ export const getServices = (
   {
     postfixServices = 'Service',
     serviceNameBase = 'endpoint[0]',
-    rootSecurity,
   }: ServiceOutputOptions = {}
 ) => {
   const paths = openApiJson.paths;
@@ -58,11 +56,6 @@ export const getServices = (
       }
 
       const methodOperation = paths[path][method];
-      const operationSecurity = resolveOperationSecurity(
-        openApiJson.security,
-        methodOperation,
-        rootSecurity
-      );
 
       const { success, errors } = Object.entries(
         methodOperation.responses
@@ -73,8 +66,6 @@ export const getServices = (
         >
       >(
         (acc, [statusCode, response]) => {
-          if (!response) return acc;
-
           if (response.$ref) {
             response = resolveDocumentLocalRef(
               response.$ref,
@@ -154,25 +145,13 @@ export const getServices = (
                 )
               : methodOperation.requestBody) ?? undefined,
           success: success,
-          security: operationSecurity,
+          security: methodOperation.security,
         });
       }
     }
   }
 
   return Array.from(services.values());
-};
-
-const resolveOperationSecurity = (
-  rootSecurity: OpenAPISchemaType['security'],
-  methodOperation: OpenAPISchemaType['paths'][string][string],
-  shouldUseRootSecurity?: boolean
-) => {
-  if (shouldUseRootSecurity && !('security' in methodOperation)) {
-    return rootSecurity;
-  }
-
-  return methodOperation.security;
 };
 
 export const supportedMethod = (

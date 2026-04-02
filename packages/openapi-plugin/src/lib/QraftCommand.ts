@@ -147,7 +147,6 @@ export class QraftCommand extends QraftCommandBase<OpenAPIQraftCommandActionOpti
     let services = getServices(schema as OpenAPISchemaType, {
       postfixServices: args.postfixServices,
       serviceNameBase: args.serviceNameBase,
-      rootSecurity: args.rootSecurity,
     });
 
     if (args.operationNameModifier) {

@@ -7,6 +7,7 @@ import { QraftCommand } from '@openapi-qraft/plugin/lib/QraftCommand';
 import { QraftCommandPlugin } from '@openapi-qraft/plugin/lib/QraftCommandPlugin';
 import { CommanderError, Option } from 'commander';
 import { generateCode } from './generateCode.js';
+import { applyRootSecurityToServices } from './lib/applyRootSecurityToServices.js';
 import { parseOptionSubValues } from './lib/parseOptionSubValues.js';
 import { getAllAvailableCallbackNames } from './ts-factory/getCallbackNames.js';
 import { CreateAPIClientFnOptions } from './ts-factory/getIndexFactory.js';
@@ -70,9 +71,13 @@ export const plugin: QraftCommandPlugin = {
         ).argParser(parseOperationParametersType)
       )
       .action(async ({ spinner, output, args, services, schema }, resolve) => {
+        const resolvedServices = args.rootSecurity
+          ? applyRootSecurityToServices({ services, schema })
+          : services;
+
         return void (await generateCode({
           spinner,
-          services,
+          services: resolvedServices,
           serviceOptions: {
             openapiTypesImportPath: args.openapiTypesImportPath,
             queryableWriteOperations: args.queryableWriteOperations,
