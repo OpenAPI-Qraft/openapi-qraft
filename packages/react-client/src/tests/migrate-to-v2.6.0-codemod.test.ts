@@ -140,48 +140,44 @@ describe('migrate-to-v2.6.0-codemod', () => {
     expect(customResult).toMatchSnapshot('custom package fixture');
   });
 
-  it(
-    'compatible jscodeshift runner',
-    async () => {
-      // @ts-expect-error - no types
-      const jscodeshift = await import('jscodeshift/src/Runner').then(
-        ({ run }) => run
-      );
+  it('compatible jscodeshift runner', { timeout: 10_000 }, async () => {
+    // @ts-expect-error - no types
+    const jscodeshift = await import('jscodeshift/src/Runner').then(
+      ({ run }) => run
+    );
 
-      expect(
-        await jscodeshift(transformPath, [genericsFixturePath], {
-          dry: true,
-          print: false,
-          verbose: 0,
-          babel: true,
-          parser: 'tsx',
-        })
-      ).toMatchObject({
-        error: 0,
-        nochange: 0,
-        ok: 1,
-        skip: 0,
-        stats: {},
-      });
+    expect(
+      await jscodeshift(transformPath, [genericsFixturePath], {
+        dry: true,
+        print: false,
+        verbose: 0,
+        babel: true,
+        parser: 'tsx',
+      })
+    ).toMatchObject({
+      error: 0,
+      nochange: 0,
+      ok: 1,
+      skip: 0,
+      stats: {},
+    });
 
-      // Check with custom package name
-      expect(
-        await jscodeshift(transformPath, [customPackageFixturePath], {
-          dry: true,
-          print: false,
-          verbose: 0,
-          babel: true,
-          parser: 'tsx',
-          packageName: '@custom/package',
-        })
-      ).toMatchObject({
-        error: 0,
-        nochange: 0,
-        ok: 1,
-        skip: 0,
-        stats: {},
-      });
-    },
-    { timeout: 10_000 }
-  );
+    // Check with custom package name
+    expect(
+      await jscodeshift(transformPath, [customPackageFixturePath], {
+        dry: true,
+        print: false,
+        verbose: 0,
+        babel: true,
+        parser: 'tsx',
+        packageName: '@custom/package',
+      })
+    ).toMatchObject({
+      error: 0,
+      nochange: 0,
+      ok: 1,
+      skip: 0,
+      stats: {},
+    });
+  });
 });
