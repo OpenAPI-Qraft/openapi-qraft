@@ -2314,12 +2314,13 @@ describe('Qraft uses "fetchQuery(...) & "prefetchQuery(...)" & "ensureQueryData(
         method: 'get',
         security: ['partnerToken'],
       },
-      {
+      expect.objectContaining({
         baseUrl: 'https://api.sandbox.monite.com/v222',
+        body: undefined,
         meta: undefined,
         parameters,
-        signal: new AbortController().signal,
-      }
+        signal: expect.any(AbortSignal),
+      })
     );
   });
 
@@ -2344,12 +2345,13 @@ describe('Qraft uses "fetchQuery(...) & "prefetchQuery(...)" & "ensureQueryData(
         method: 'get',
         security: ['partnerToken'],
       },
-      {
+      expect.objectContaining({
         baseUrl: 'https://api.sandbox.monite.com/v333',
+        body: undefined,
         meta: undefined,
         parameters,
-        signal: new AbortController().signal,
-      }
+        signal: expect.any(AbortSignal),
+      })
     );
   });
 
@@ -2699,7 +2701,7 @@ describe('Qraft uses Operation Mutation Function', () => {
 
     expect(requestFnSpy).toHaveBeenCalledWith(
       qraft.entities.postEntitiesIdDocuments.schema,
-      {
+      expect.objectContaining({
         baseUrl: 'https://foo.bar.baz/v1',
         parameters: {
           header: {
@@ -2716,9 +2718,9 @@ describe('Qraft uses Operation Mutation Function', () => {
           verification_document_back: 'back',
           verification_document_front: 'front',
         },
-        signal: new AbortController().signal,
+        signal: expect.any(AbortSignal),
         meta: { someExtraInfo: 'yep' },
-      }
+      })
     );
   });
 });

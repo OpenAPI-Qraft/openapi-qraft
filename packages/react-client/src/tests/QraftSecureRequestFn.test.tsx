@@ -46,6 +46,13 @@ describe('QraftSecureRequestFn', { timeout: 10_000 }, () => {
     },
   };
 
+  const createSecurityCallExpectation = (isRefreshing: boolean) => [
+    expect.objectContaining({
+      isRefreshing,
+      signal: expect.any(AbortSignal),
+    }),
+  ];
+
   it('fetches token one time', async () => {
     const token = createTestJwt({ iat: 1593268893, exp: 1593268893 + 3600 });
 
@@ -93,12 +100,7 @@ describe('QraftSecureRequestFn', { timeout: 10_000 }, () => {
     });
 
     expect(fetchPartnerToken.mock.calls).toEqual([
-      [
-        {
-          isRefreshing: false,
-          signal: new AbortController().signal,
-        },
-      ],
+      createSecurityCallExpectation(false),
     ]);
   });
 
@@ -149,18 +151,8 @@ describe('QraftSecureRequestFn', { timeout: 10_000 }, () => {
     });
 
     expect(fetchPartnerToken.mock.calls).toEqual([
-      [
-        {
-          isRefreshing: false,
-          signal: new AbortController().signal,
-        },
-      ],
-      [
-        {
-          isRefreshing: true,
-          signal: new AbortController().signal,
-        },
-      ],
+      createSecurityCallExpectation(false),
+      createSecurityCallExpectation(true),
     ]);
   });
 
@@ -213,12 +205,7 @@ describe('QraftSecureRequestFn', { timeout: 10_000 }, () => {
     );
 
     expect(fetchPartnerToken.mock.calls).toEqual([
-      [
-        {
-          isRefreshing: false,
-          signal: new AbortController().signal,
-        },
-      ],
+      createSecurityCallExpectation(false),
     ]);
 
     await act(() => vi.advanceTimersByTimeAsync(3600_000 * 0.8));
@@ -228,18 +215,8 @@ describe('QraftSecureRequestFn', { timeout: 10_000 }, () => {
     );
 
     expect(fetchPartnerToken.mock.calls).toEqual([
-      [
-        {
-          isRefreshing: false,
-          signal: new AbortController().signal,
-        },
-      ],
-      [
-        {
-          isRefreshing: true,
-          signal: new AbortController().signal,
-        },
-      ],
+      createSecurityCallExpectation(false),
+      createSecurityCallExpectation(true),
     ]);
 
     await act(() => vi.advanceTimersByTimeAsync(3600_000 * 0.8));
@@ -249,24 +226,9 @@ describe('QraftSecureRequestFn', { timeout: 10_000 }, () => {
     );
 
     expect(fetchPartnerToken.mock.calls).toEqual([
-      [
-        {
-          isRefreshing: false,
-          signal: new AbortController().signal,
-        },
-      ],
-      [
-        {
-          isRefreshing: true,
-          signal: new AbortController().signal,
-        },
-      ],
-      [
-        {
-          isRefreshing: true,
-          signal: new AbortController().signal,
-        },
-      ],
+      createSecurityCallExpectation(false),
+      createSecurityCallExpectation(true),
+      createSecurityCallExpectation(true),
     ]);
   });
 
@@ -311,12 +273,7 @@ describe('QraftSecureRequestFn', { timeout: 10_000 }, () => {
     });
 
     expect(fetchBasicAuth.mock.calls).toEqual([
-      [
-        {
-          isRefreshing: false,
-          signal: new AbortController().signal,
-        },
-      ],
+      createSecurityCallExpectation(false),
     ]);
   });
 
@@ -526,10 +483,12 @@ describe('QraftSecureRequestFn', { timeout: 10_000 }, () => {
         },
       });
       expect(fetchCustomToken).toHaveBeenCalledTimes(1);
-      expect(fetchCustomToken).toHaveBeenCalledWith({
-        isRefreshing: true,
-        signal: new AbortController().signal,
-      });
+      expect(fetchCustomToken).toHaveBeenCalledWith(
+        expect.objectContaining({
+          isRefreshing: true,
+          signal: expect.any(AbortSignal),
+        })
+      );
     });
 
     // Reset counter and check one more mutation after full interval
@@ -604,18 +563,8 @@ describe('QraftSecureRequestFn', { timeout: 10_000 }, () => {
     });
 
     expect(fetchPartnerToken.mock.calls).toEqual([
-      [
-        {
-          isRefreshing: false,
-          signal: new AbortController().signal,
-        },
-      ],
-      [
-        {
-          isRefreshing: true,
-          signal: new AbortController().signal,
-        },
-      ],
+      createSecurityCallExpectation(false),
+      createSecurityCallExpectation(true),
     ]);
   });
 
