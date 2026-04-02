@@ -71,6 +71,10 @@ export class QraftCommand extends QraftCommandBase<OpenAPIQraftCommandActionOpti
         'Use OpenAPI Operation `endpoint[<index>]` path part (e.g.: "/0/1/2") or `tags` as the base name of the service.',
         'endpoint[0]'
       )
+      .option(
+        '--root-security',
+        'Use root-level OpenAPI security as the default for operations without their own security. Operation-level security overrides it according to OpenAPI semantics.'
+      )
       .addOption(createRedoclyOption());
   }
 
@@ -147,6 +151,7 @@ export class QraftCommand extends QraftCommandBase<OpenAPIQraftCommandActionOpti
     let services = getServices(schema as OpenAPISchemaType, {
       postfixServices: args.postfixServices,
       serviceNameBase: args.serviceNameBase,
+      rootSecurity: args.rootSecurity,
     });
 
     if (args.operationNameModifier) {

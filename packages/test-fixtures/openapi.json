@@ -9,6 +9,7 @@
       "email": "radist2s@gmail.com"
     }
   },
+  "security": [{ "userToken": [] }, { "partnerToken": [] }],
   "paths": {
     "/entities/{entity_id}/documents": {
       "post": {

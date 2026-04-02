@@ -1,0 +1,48 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Root Security Fixture",
+    "version": "1.0.0"
+  },
+  "security": [{ "jwtUserToken": [] }, { "sessionToken": [] }],
+  "paths": {
+    "/accounts": {
+      "get": {
+        "tags": ["accounts"],
+        "operationId": "getAccounts",
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          }
+        }
+      }
+    },
+    "/accounts/profile": {
+      "get": {
+        "tags": ["accounts"],
+        "operationId": "getAccountProfile",
+        "security": [{ "jwtUserToken": [] }],
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "parameters": {},
+    "securitySchemes": {
+      "jwtUserToken": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      },
+      "sessionToken": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-Session-Token"
+      }
+    }
+  }
+}
