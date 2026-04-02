@@ -39,6 +39,10 @@ export const plugin: QraftCommandPlugin = {
         'Enable generation of query hooks (useQuery, useSuspenseQuery, etc.) for writable HTTP methods like POST, PUT, PATCH. By default, only mutation hooks are generated for writable operations.',
         parseBooleanOption
       )
+      .option(
+        '--root-security',
+        'Use root-level OpenAPI security as the default for operations without their own security. Operation-level security overrides it according to OpenAPI semantics.'
+      )
       .addOption(
         (() => {
           const option = new Option(
