@@ -1,20 +1,24 @@
 import type { ServiceOperationQueryKey } from '@openapi-qraft/tanstack-query-react-types';
 import type { DeepReadonly } from './DeepReadonly.js';
 
-interface QueryFnOptionsBase<
+export interface QueryFnOptions<
   TMeta extends Record<string, any>,
   TSignal extends AbortSignal = AbortSignal,
 > {
   signal?: TSignal;
   meta?: TMeta;
+  /**
+   * Base URL to use for the request
+   * @example 'https://api.example.com'
+   */
+  baseUrl?: string;
 }
 
 export interface QueryFnOptionsByParameters<
   TParams,
   TMeta extends Record<string, any>,
   TSignal extends AbortSignal = AbortSignal,
->
-  extends QueryFnOptionsBase<TMeta, TSignal>, QueryFnBaseUrlOptions {
+> extends QueryFnOptions<TMeta, TSignal> {
   parameters: DeepReadonly<TParams>;
 
   queryKey?: never;
@@ -25,17 +29,8 @@ export interface QueryFnOptionsByQueryKey<
   TParams,
   TMeta extends Record<string, any>,
   TSignal extends AbortSignal = AbortSignal,
->
-  extends QueryFnOptionsBase<TMeta, TSignal>, QueryFnBaseUrlOptions {
+> extends QueryFnOptions<TMeta, TSignal> {
   queryKey: ServiceOperationQueryKey<TSchema, TParams>;
 
   parameters?: never;
-}
-
-interface QueryFnBaseUrlOptions {
-  /**
-   * Base URL to use for the request
-   * @example 'https://api.example.com'
-   */
-  baseUrl?: string;
 }
