@@ -1,6 +1,6 @@
 {
   "name": "@openapi-qraft/eslint-config",
-  "version": "1.0.1",
+  "version": "1.1.0-beta.0",
   "packageManager": "yarn@4.0.2",
   "private": true,
   "type": "module",

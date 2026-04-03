@@ -1,5 +1,12 @@
 # @openapi-qraft/ts-factory-code-generator
 
+## 1.1.0-beta.0
+
+### Minor Changes
+
+- 6a2f1ed: Updated repository dependencies to current compatible versions across the workspace.
+- 55a23fd: Updated the openapi-typescript package to the current compatible version.
+
 ## 1.0.2
 
 ### Patch Changes

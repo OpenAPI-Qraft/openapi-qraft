@@ -1,5 +1,16 @@
 # @qraft/cli-utils
 
+## 1.0.0-beta.6
+
+### Minor Changes
+
+- 6a2f1ed: Updated repository dependencies to current compatible versions across the workspace.
+
+### Patch Changes
+
+- Updated dependencies [6a2f1ed]
+  - @qraft/plugin@1.0.0-beta.6
+
 ## 1.0.0-beta.5
 
 ### Patch Changes

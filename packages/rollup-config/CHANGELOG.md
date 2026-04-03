@@ -1,5 +1,11 @@
 # @openapi-qraft/rollup-config
 
+## 1.2.0-beta.0
+
+### Minor Changes
+
+- 6a2f1ed: Updated repository dependencies to current compatible versions across the workspace.
+
 ## 1.1.1
 
 ### Patch Changes
