@@ -9,7 +9,7 @@
     "test": {
       "cache": true,
       "dependsOn": ["write-package-version-file", "^build"],
-      "outputs": ["coverage/**"]
+      "outputs": []
     },
     "typecheck": {
       "cache": true,
