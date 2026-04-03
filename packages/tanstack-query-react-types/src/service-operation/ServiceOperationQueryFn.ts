@@ -1,5 +1,6 @@
 import type {
   AreAllOptional,
+  QueryFnOptions,
   QueryFnOptionsByParameters,
   QueryFnOptionsByQueryKey,
   RequestFnResponse,
@@ -18,7 +19,10 @@ export interface ServiceOperationQueryFn<
     options:
       | QueryFnOptionsByQueryKey<TSchema, TQueryParams, TMeta, TSignal>
       | (AreAllOptional<TQueryParams> extends true
-          ? QueryFnOptionsByParameters<TQueryParams, TMeta, TSignal> | void
+          ?
+              | QueryFnOptionsByParameters<TQueryParams, TMeta, TSignal>
+              | QueryFnOptions<TMeta, TSignal>
+              | void
           : QueryFnOptionsByParameters<TQueryParams, TMeta, TSignal>),
     client?: (
       schema: TSchema,
