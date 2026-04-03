@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="generator" content="Docusaurus v3.9.2">
 <title data-rh="true">OpenAPI mode (qraft openapi) | Qraft</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:url" content="https://openapi-qraft.github.io/openapi-qraft/docs/codegen/openapi"><meta data-rh="true" property="og:locale" content="en"><meta data-rh="true" name="docusaurus_locale" content="en"><meta data-rh="true" name="docsearch:language" content="en"><meta data-rh="true" name="docusaurus_version" content="current"><meta data-rh="true" name="docusaurus_tag" content="docs-default-current"><meta data-rh="true" name="docsearch:version" content="current"><meta data-rh="true" name="docsearch:docusaurus_tag" content="docs-default-current"><meta data-rh="true" property="og:title" content="OpenAPI mode (qraft openapi) | Qraft"><meta data-rh="true" name="description" content="qraft openapi is the OpenAPI-focused mode of the unified @qraft/cli package."><meta data-rh="true" property="og:description" content="qraft openapi is the OpenAPI-focused mode of the unified @qraft/cli package."><link data-rh="true" rel="canonical" href="https://openapi-qraft.github.io/openapi-qraft/docs/codegen/openapi"><link data-rh="true" rel="alternate" href="https://openapi-qraft.github.io/openapi-qraft/docs/codegen/openapi" hreflang="en"><link data-rh="true" rel="alternate" href="https://openapi-qraft.github.io/openapi-qraft/docs/codegen/openapi" hreflang="x-default"><link data-rh="true" rel="preconnect" href="https://B42903JOPT-dsn.algolia.net" crossorigin="anonymous"><script data-rh="true" type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"OpenAPI","item":"https://openapi-qraft.github.io/openapi-qraft/docs/codegen/openapi/"}]}</script><link rel="search" type="application/opensearchdescription+xml" title="Qraft" href="/openapi-qraft/opensearch.xml"><link rel="stylesheet" href="/openapi-qraft/assets/css/styles.56e6ba70.css">
-<script src="/openapi-qraft/assets/js/runtime~main.f54375da.js" defer="defer"></script>
-<script src="/openapi-qraft/assets/js/main.a55fa7b5.js" defer="defer"></script>
+<script src="/openapi-qraft/assets/js/runtime~main.cc85c98c.js" defer="defer"></script>
+<script src="/openapi-qraft/assets/js/main.e1754743.js" defer="defer"></script>
 </head>
 <body class="navigation-with-keyboard">
 <svg style="display: none;"><defs>
@@ -333,6 +333,14 @@ the client reads <code>queryClient</code>, <code>requestFn</code>, and <code>bas
 <div class="theme-admonition theme-admonition-tip admonition_WCGJ alert alert--success"><div class="admonitionHeading_GCBg"><span class="admonitionIcon_L39b"><svg viewBox="0 0 12 16"><path fill-rule="evenodd" d="M6.5 0C3.48 0 1 2.19 1 5c0 .92.55 2.25 1 3 1.34 2.25 1.78 2.78 2 4v1h5v-1c.22-1.22.66-1.75 2-4 .45-.75 1-2.08 1-3 0-2.81-2.48-5-5.5-5zm3.64 7.48c-.25.44-.47.8-.67 1.11-.86 1.41-1.25 2.06-1.45 3.23-.02.05-.02.11-.02.17H5c0-.06 0-.13-.02-.17-.2-1.17-.59-1.83-1.45-3.23-.2-.31-.42-.67-.67-1.11C2.44 6.78 2 5.65 2 5c0-2.2 2.02-4 4.5-4 1.22 0 2.36.42 3.22 1.19C10.55 2.94 11 3.94 11 5c0 .66-.44 1.78-.86 2.48zM4 14h5c-.23 1.14-1.3 2-2.5 2s-2.27-.86-2.5-2z"></path></svg></span>tip</div><div class="admonitionContent_pbrs"><p>When generating multiple API client functions with different parameters, it might be more convenient to use a configuration file
 instead of command-line parameters. See the <a class="" href="/openapi-qraft/docs/codegen/cli/redocly-config#generating-multiple-api-client-functions">Redocly configuration documentation</a>
 for more details on how to configure multiple <em>create API client functions</em> in a YAML file.</p></div></div>
+</li>
+<li class="">
+<p><strong><code>--root-security</code></strong>: Use root-level OpenAPI <code>security</code> as the default for operations that do not define their own <code>security</code>. Operation-level <code>security</code> overrides it according to OpenAPI semantics. <em>(optional, disabled by default)</em></p>
+<ul>
+<li class="">Use this option when your OpenAPI document defines <code>security</code> on the top level and you want generated operation schemas to include those security requirements automatically.</li>
+<li class="">Without this option, Qraft only includes operation-level <code>security</code> in generated schemas.</li>
+<li class="">This is especially useful together with <a class="" href="/openapi-qraft/docs/authorization/qraft-secure-request-fn"><code>QraftSecureRequestFn</code></a>, because secure handlers rely on generated operation <code>schema.security</code>.</li>
+</ul>
 </li>
 </ul>
 <h2 class="anchor anchorTargetStickyNavbar_tleR" id="--plugin-openapi-typescript-options"><code>--plugin openapi-typescript</code> options<a href="#--plugin-openapi-typescript-options" class="hash-link" aria-label="Direct link to --plugin-openapi-typescript-options" title="Direct link to --plugin-openapi-typescript-options" translate="no">​</a></h2>
