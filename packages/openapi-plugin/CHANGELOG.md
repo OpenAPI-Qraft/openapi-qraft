@@ -1,5 +1,17 @@
 # @openapi-qraft/plugin
 
+## 2.15.0-beta.7
+
+### Minor Changes
+
+- 6a2f1ed: Updated repository dependencies to current compatible versions across the workspace.
+- 55a23fd: Updated the openapi-typescript package to the current compatible version.
+
+### Patch Changes
+
+- Updated dependencies [6a2f1ed]
+  - @qraft/plugin@1.0.0-beta.6
+
 ## 2.15.0-beta.6
 
 ### Patch Changes

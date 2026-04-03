@@ -1,5 +1,18 @@
 # @qraft/asyncapi-plugin
 
+## 1.0.0-beta.6
+
+### Minor Changes
+
+- 6a2f1ed: Updated repository dependencies to current compatible versions across the workspace.
+- 55a23fd: Updated the openapi-typescript package to the current compatible version.
+
+### Patch Changes
+
+- 4f646ec: Refactored AsyncAPI enum-values ref resolution to match openapi-typescript@7.13.0 while keeping the main schema transform flow readable.
+- Updated dependencies [6a2f1ed]
+  - @qraft/plugin@1.0.0-beta.6
+
 ## 1.0.0-beta.5
 
 ### Patch Changes

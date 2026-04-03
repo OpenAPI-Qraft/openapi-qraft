@@ -1,5 +1,13 @@
 # @openapi-qraft/tanstack-query-react-types
 
+## 2.15.0-beta.7
+
+### Minor Changes
+
+- f43bc5c: When an operation has only optional parameters, the imperative operation function now accepts `QueryFnOptions` (e.g. `signal`, `meta`) without requiring a `parameters` argument. This matches how optional request fields are already handled for hooks and improves typing for direct `qraft.<service>.<operation>(…)` calls.
+- 6a2f1ed: Updated repository dependencies to current compatible versions across the workspace.
+- 55a23fd: Updated the openapi-typescript package to the current compatible version.
+
 ## 2.15.0-beta.6
 
 ## 2.15.0-beta.5

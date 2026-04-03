@@ -1,5 +1,11 @@
 # @qraft/plugin
 
+## 1.0.0-beta.6
+
+### Minor Changes
+
+- 6a2f1ed: Updated repository dependencies to current compatible versions across the workspace.
+
 ## 1.0.0-beta.5
 
 ## 1.0.0-beta.4

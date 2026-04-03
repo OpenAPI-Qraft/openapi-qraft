@@ -1,5 +1,22 @@
 # @openapi-qraft/tanstack-query-react-plugin
 
+## 2.15.0-beta.7
+
+### Minor Changes
+
+- f43bc5c: When an operation has only optional parameters, the imperative operation function now accepts `QueryFnOptions` (e.g. `signal`, `meta`) without requiring a `parameters` argument. This matches how optional request fields are already handled for hooks and improves typing for direct `qraft.<service>.<operation>(…)` calls.
+- 6a2f1ed: Updated repository dependencies to current compatible versions across the workspace.
+- a2327db: Added an optional `--root-security` flag that applies the OpenAPI document’s top-level `security` as the default for operations that omit their own `security`, while any operation-level `security` still overrides it as defined by the specification.
+- 55a23fd: Updated the openapi-typescript package to the current compatible version.
+
+### Patch Changes
+
+- Updated dependencies [6a2f1ed]
+- Updated dependencies [55a23fd]
+  - @openapi-qraft/plugin@2.15.0-beta.7
+  - @qraft/cli-utils@1.0.0-beta.6
+  - @qraft/plugin@1.0.0-beta.6
+
 ## 2.15.0-beta.6
 
 ### Patch Changes
