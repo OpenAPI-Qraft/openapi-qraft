@@ -2172,21 +2172,55 @@ describe('Qraft uses Operation Query Function', () => {
     );
   });
 
-  it('uses Operation Query without arguments', async () => {
-    const { qraft } = createClient();
+  describe('uses Operation Query without arguments', () => {
+    it('uses Operation Query without invoke options', async () => {
+      const { qraft } = createClient();
 
-    const { data, error } = await qraft.files.findAll();
+      const { data, error } = await qraft.files.findAll();
 
-    expect(
-      error satisfies
-        | Services['files']['findAll']['types']['error']
-        | Error
-        | undefined
-    ).toBeUndefined();
+      expect(
+        error satisfies
+          | Services['files']['findAll']['types']['error']
+          | Error
+          | undefined
+      ).toBeUndefined();
 
-    expect(
-      data satisfies Services['files']['findAll']['types']['data'] | undefined
-    ).toEqual(filesFindAllResponsePayloadFixtures);
+      expect(
+        data satisfies Services['files']['findAll']['types']['data'] | undefined
+      ).toEqual(filesFindAllResponsePayloadFixtures);
+    });
+
+    it('uses Operation Query with `signal` without `parameters`', async () => {
+      const { qraft } = createClient();
+
+      const requestFnSpy = vi.fn(requestFn) as typeof requestFn;
+
+      const controller = new AbortController();
+      const signal = controller.signal;
+
+      const { data, error } = await qraft.files.findAll(
+        { signal },
+        requestFnSpy
+      );
+
+      expect(
+        error satisfies
+          | Services['files']['findAll']['types']['error']
+          | Error
+          | undefined
+      ).toBeUndefined();
+
+      expect(
+        data satisfies Services['files']['findAll']['types']['data'] | undefined
+      ).toEqual(filesFindAllResponsePayloadFixtures);
+
+      expect(requestFnSpy).toHaveBeenCalledWith(
+        qraft.files.findAll.schema,
+        expect.objectContaining({
+          signal,
+        })
+      );
+    });
   });
 
   it('uses Operation Query with `queryKey`', async () => {
