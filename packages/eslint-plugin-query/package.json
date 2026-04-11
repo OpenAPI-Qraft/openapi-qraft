@@ -46,19 +46,19 @@
     "!src/__tests__"
   ],
   "dependencies": {
-    "@typescript-eslint/utils": "^8.58.0"
+    "@typescript-eslint/utils": "^8.58.1"
   },
   "devDependencies": {
     "@openapi-qraft/eslint-config": "workspace:*",
     "@openapi-qraft/rollup-config": "workspace:*",
-    "@typescript-eslint/rule-tester": "^8.58.0",
-    "@typescript-eslint/typescript-estree": "^8.58.0",
+    "@typescript-eslint/rule-tester": "^8.58.1",
+    "@typescript-eslint/typescript-estree": "^8.58.1",
     "@vitest/coverage-v8": "^4.1.2",
-    "eslint": "^10.1.0",
+    "eslint": "^10.2.0",
     "rimraf": "^6.1.3",
     "rollup": "~4.60.1",
     "typescript": "^5.9.3",
-    "vitest": "^4.1.2"
+    "vitest": "^4.1.4"
   },
   "peerDependencies": {
     "eslint": "^8.57.0 || ^9.0.0"
