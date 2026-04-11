@@ -13,7 +13,7 @@
     "@rollup/plugin-commonjs": "^29.0.2",
     "@rollup/plugin-json": "^6.1.0",
     "@rollup/plugin-node-resolve": "^16.0.3",
-    "@swc/core": "1.15.21",
+    "@swc/core": "1.15.24",
     "rollup-plugin-swc3": "~0.12.1",
     "rollup-preserve-directives": "~1.1.3"
   },
