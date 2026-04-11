@@ -11,6 +11,11 @@ jobs:
   install:
     name: Lint and Build Docs
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: write
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v4
