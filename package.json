@@ -35,6 +35,7 @@
     "@verdaccio/core@npm:8.0.0-next-8.21/minimatch": "npm:^7.4.9",
     "@verdaccio/local-storage-legacy@npm:11.1.1/lodash": "npm:^4.18.0",
     "@docusaurus/bundler@npm:3.10.0/webpack": "npm:^5.104.1",
+    "@docusaurus/bundler@npm:3.10.0/webpackbar": "npm:^7.0.0",
     "@docusaurus/core@npm:3.10.0/webpack": "npm:^5.104.1",
     "@docusaurus/mdx-loader@npm:3.10.0/webpack": "npm:^5.104.1",
     "@docusaurus/plugin-content-blog@npm:3.10.0/webpack": "npm:^5.104.1",
