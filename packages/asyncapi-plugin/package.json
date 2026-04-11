@@ -43,7 +43,7 @@
     "@openapi-qraft/eslint-config": "workspace:*",
     "@openapi-qraft/rollup-config": "workspace:*",
     "@types/js-yaml": "^4.0.9",
-    "@types/node": "^20.19.37",
+    "@types/node": "^22.19.17",
     "eslint": "^10.1.0",
     "memfs": "^4.57.1",
     "rimraf": "^6.1.3",
