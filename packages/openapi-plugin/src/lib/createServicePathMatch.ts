@@ -1,4 +1,4 @@
-import micromatch from 'micromatch';
+import picomatch from 'picomatch';
 
 /**
  * Create a function to match service paths
@@ -20,7 +20,7 @@ export const createServicePathMatch = (servicesGlob: string[]) => {
   );
 
   return function isServicePatchMatch(path: string) {
-    return micromatch.isMatch(path, servicePathGlobs.match, {
+    return picomatch.isMatch(path, servicePathGlobs.match, {
       ignore: servicePathGlobs.ignore,
     });
   };

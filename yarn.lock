@@ -4340,17 +4340,17 @@ __metadata:
     "@openapi-qraft/test-fixtures": "workspace:*"
     "@qraft/plugin": "workspace:*"
     "@redocly/openapi-core": "npm:^1.34.11"
-    "@types/micromatch": "npm:^4.0.10"
     "@types/node": "npm:^22.19.17"
+    "@types/picomatch": "npm:^4.0.3"
     "@vitest/coverage-v8": "npm:^4.1.2"
     ansi-colors: "npm:^4.1.3"
     camelcase: "npm:^8.0.0"
     commander: "npm:^14.0.3"
     eslint: "npm:^10.2.0"
     memfs: "npm:^4.57.1"
-    micromatch: "npm:^4.0.8"
     openapi-typescript: "npm:^7.13.0"
     ora: "npm:^9.3.0"
+    picomatch: "npm:^4.0.4"
     rimraf: "npm:^6.1.3"
     typescript: "npm:^5.9.3"
     vitest: "npm:^4.1.4"
@@ -6286,13 +6286,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/braces@npm:*":
-  version: 3.0.4
-  resolution: "@types/braces@npm:3.0.4"
-  checksum: 10c0/05220f330814364318a1c2f403046d717690cabf3adc8417357b0b12713f92768cf9df76e0e25212b5a2727c8c56765ff19a284c7ece39e0985d0d6fadb6c4aa
-  languageName: node
-  linkType: hard
-
 "@types/chai@npm:^5.2.2":
   version: 5.2.3
   resolution: "@types/chai@npm:5.2.3"
@@ -6578,15 +6571,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/micromatch@npm:^4.0.10":
-  version: 4.0.10
-  resolution: "@types/micromatch@npm:4.0.10"
-  dependencies:
-    "@types/braces": "npm:*"
-  checksum: 10c0/dc424e0f9ed1a4f22dbed5048ac698d089d4628dd8a41a056b2eb12782cfda85bf06fccc0be341ce9af7345858eb07a27757ca023664cfb8bde235212795d295
-  languageName: node
-  linkType: hard
-
 "@types/mime@npm:^1":
   version: 1.3.5
   resolution: "@types/mime@npm:1.3.5"
@@ -6630,6 +6614,13 @@ __metadata:
   version: 17.0.45
   resolution: "@types/node@npm:17.0.45"
   checksum: 10c0/0db377133d709b33a47892581a21a41cd7958f22723a3cc6c71d55ac018121382de42fbfc7970d5ae3e7819dbe5f40e1c6a5174aedf7e7964e9cb8fa72b580b0
+  languageName: node
+  linkType: hard
+
+"@types/picomatch@npm:^4.0.3":
+  version: 4.0.3
+  resolution: "@types/picomatch@npm:4.0.3"
+  checksum: 10c0/974107ec98ea9a8b437f36bdf6ac9c57772fd66d9d746e43f6da2a7b97f6e03bc48226e5cdf2beb0b73b7a843cf486e7336ae15ab9017e47287dcb49d78499a2
   languageName: node
   linkType: hard
 
