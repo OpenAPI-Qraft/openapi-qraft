@@ -165,7 +165,10 @@ jobs:
     if: ${{
       github.event_name == 'issue_comment' &&
       github.event.issue.pull_request &&
-      contains(github.event.comment.body, '@check-spelling-bot apply')
+      contains(github.event.comment.body, '@check-spelling-bot apply') &&
+      (github.event.comment.author_association == 'OWNER' ||
+        github.event.comment.author_association == 'MEMBER' ||
+        github.event.comment.author_association == 'COLLABORATOR')
       }}
     concurrency:
       group: spelling-update-${{ github.event.issue.number }}
