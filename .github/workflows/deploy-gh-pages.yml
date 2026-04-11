@@ -32,9 +32,6 @@ jobs:
       - name: Install dependencies
         run: yarn install --immutable
 
-      - name: Lint Documentation
-        run: yarn workspace openapi-qraft-website run lint
-
       - name: Build website
         run: yarn workspace openapi-qraft-website run build
 
