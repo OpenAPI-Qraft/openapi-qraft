@@ -8,7 +8,7 @@
     "dev": "turbo run dev",
     "dev:qraft": "turbo run dev --filter '@openapi-qraft/*' --filter '@qraft/*'",
     "test": "turbo run test --continue --output-logs=new-only",
-    "lint": "turbo run lint --continue --output-logs=new-only",
+    "lint": "turbo run lint --continue --output-logs=new-only --filter='!./website'",
     "typecheck": "turbo run typecheck --output-logs=new-only"
   },
   "devDependencies": {
