@@ -29,6 +29,47 @@ describe('filterDocumentPaths', () => {
       const isPathMatch = createServicePathMatch([]);
       expect(isPathMatch('/user/1')).toBe(false);
     });
+
+    it('should match OpenAPI-style path params in braces', () => {
+      const isPathMatch = createServicePathMatch(['/users/*']);
+
+      expect(isPathMatch('/users/{id}')).toBe(true);
+      expect(isPathMatch('/users/{userId}')).toBe(true);
+      expect(isPathMatch('/users/{id}/posts')).toBe(false);
+    });
+
+    it('should support brace expansion patterns', () => {
+      const isPathMatch = createServicePathMatch(['/{users,posts}/**']);
+
+      expect(isPathMatch('/users/1')).toBe(true);
+      expect(isPathMatch('/posts/1')).toBe(true);
+      expect(isPathMatch('/profiles/1')).toBe(false);
+    });
+
+    it('should apply ignore patterns regardless of input order', () => {
+      const firstIncludeThenIgnore = createServicePathMatch([
+        '/admin/**',
+        '!/admin/internal/**',
+      ]);
+      const firstIgnoreThenInclude = createServicePathMatch([
+        '!/admin/internal/**',
+        '/admin/**',
+      ]);
+
+      const paths = [
+        '/admin/users',
+        '/admin/internal',
+        '/admin/internal/audit',
+      ];
+
+      for (const path of paths) {
+        expect(firstIncludeThenIgnore(path)).toBe(firstIgnoreThenInclude(path));
+      }
+
+      expect(firstIncludeThenIgnore('/admin/users')).toBe(true);
+      expect(firstIncludeThenIgnore('/admin/internal')).toBe(false);
+      expect(firstIncludeThenIgnore('/admin/internal/audit')).toBe(false);
+    });
   });
 
   describe('filterDocumentPaths', () => {
