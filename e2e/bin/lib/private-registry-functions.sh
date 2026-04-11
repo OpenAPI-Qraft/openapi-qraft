@@ -47,21 +47,22 @@ start_private_registry() {
     yarn verdaccio >> "$VERDACCIO_LOG_TEMP_FILE" &
     VERDACCIO_PID=$!
 
-    for i in $(seq 1 10); do
-      printf "Waiting for Verdaccio to start... (%02d/10) (PID: $VERDACCIO_PID)\n" $i
+    max_attempts=10
+    for i in $(seq 1 "$max_attempts"); do
+      printf "Waiting for Verdaccio to start... (%02d/%02d) (PID: $VERDACCIO_PID)\n" $i "$max_attempts"
 
-      if grep -q "verdaccio/5" "$VERDACCIO_LOG_TEMP_FILE"; then
+      if _check_registry_accessible; then
         rm -f "$VERDACCIO_LOG_TEMP_FILE" >> /dev/null 2>&1
         echo "Verdaccio started successfully. (PID: $VERDACCIO_PID)"
         return
       fi
 
-      if [ $i -lt 10 ]; then
+      if [ "$i" -lt "$max_attempts" ]; then
         sleep 1
       fi
     done
 
-    echo "Error: The server did not start within 10 seconds."
+    echo "Error: The server did not start within ${max_attempts} seconds."
     stop_private_registry
     rm -f "$VERDACCIO_LOG_TEMP_FILE" >> /dev/null 2>&1
     exit 1
