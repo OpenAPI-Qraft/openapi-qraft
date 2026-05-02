@@ -1,8 +1,8 @@
-# @team-monite/e2e - End-to-End Package Testing
+# @qraft/e2e - End-to-End Package Testing
 
 ## Overview
 
-This package is dedicated to testing the functionality of the `@monite/*` packages. It allows for verification of package installation capabilities and the ability of building projects using these installed packages.
+This package is dedicated to testing the functionality of the `@qraft/*` packages. It allows for verification of package installation capabilities and the ability of building projects using these installed packages.
 
 The testing process utilizes [Verdaccio](https://verdaccio.org/), a local package registry, to simulate the publication and installation of packages in a controlled environment. This approach ensures the reliability of the packages before they are released into production.
 
@@ -32,9 +32,16 @@ This command will sequentially run:
 - `e2e:build-projects` - Build the test projects.
 - `e2e:unpublish-from-private-registry` - Remove packages from the local registry for reuse in future tests.
 
-## Test Stands
+### Local Multi-Bundler Run
 
-- `projects/sdk-drop-in-with-vite` - SDK React with Vite as the bundler.
+To run only the `tree-shaking-bundlers` fixture in an isolated local directory, use:
+
+```bash
+yarn e2e:tree-shaking-bundlers-local
+```
+
+This copies `e2e/projects/tree-shaking-bundlers` into `/Users/radist/w/qraft-e2e`, sets `TEST_PROJECTS_DIR` to that directory, and then runs the same publish/update/build/unpublish flow as CI.
+It also builds the publishable workspace packages first, matching the GitHub workflow.
 
 ## Adding a New Test Stand
 
