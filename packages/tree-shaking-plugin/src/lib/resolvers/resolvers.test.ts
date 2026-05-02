@@ -1,0 +1,118 @@
+import fs from 'node:fs/promises';
+import os from 'node:os';
+import path from 'node:path';
+import { describe, expect, it, vi } from 'vitest';
+import { createAgnosticResolver } from './agnostic.js';
+import { type BundlerResolveContext } from './common.js';
+import { createRollupLikeResolver } from './rollup-like.js';
+import { createRspackResolver } from './rspack.js';
+import { createWebpackLikeResolver } from './webpack-like.js';
+
+async function mktemp() {
+  return fs.mkdtemp(path.join(os.tmpdir(), 'qraft-resolver-'));
+}
+
+describe('resolver composition', () => {
+  it('uses a custom resolver before the local filesystem fallback', async () => {
+    const dir = await mktemp();
+    await fs.writeFile(path.join(dir, 'fallback.ts'), '');
+    const importer = path.join(dir, 'src.ts');
+    const customResolve = vi.fn(async () => null);
+    const resolver = createAgnosticResolver(customResolve);
+
+    await expect(resolver('./fallback', importer)).resolves.toBe(
+      path.join(dir, 'fallback.ts')
+    );
+    expect(customResolve).toHaveBeenCalledWith('./fallback', importer);
+  });
+
+  it('uses the rollup-like bundler resolver before fallback resolution', async () => {
+    const ctx: BundlerResolveContext = {
+      resolve: vi.fn(async (source, importer, options) => {
+        expect(source).toBe('./resolved.js');
+        expect(importer).toBe('/tmp/src.ts');
+        expect(options).toEqual({ skipSelf: true });
+        return {
+          id: '/tmp/resolved.ts?query=1',
+          external: false,
+        };
+      }),
+    };
+
+    const resolver = createRollupLikeResolver(ctx);
+    await expect(resolver('./resolved.js', '/tmp/src.ts')).resolves.toBe(
+      '/tmp/resolved.ts'
+    );
+    expect(ctx.resolve).toHaveBeenCalledTimes(1);
+  });
+
+  it('uses the webpack loader resolver before fallback resolution', async () => {
+    const resolve = vi.fn(async (context: string, request: string) => {
+      expect(context).toBe('/tmp/src');
+      expect(request).toBe('@/generated-api');
+      return '/tmp/generated-api/index.ts';
+    });
+    const ctx: BundlerResolveContext = {
+      getNativeBuildContext() {
+        return {
+          framework: 'webpack',
+          loaderContext: {
+            getResolve(options?: { dependencyType?: string }) {
+              expect(options).toEqual({ dependencyType: 'esm' });
+              return resolve;
+            },
+          },
+        };
+      },
+    };
+
+    const resolver = createWebpackLikeResolver(ctx);
+    await expect(resolver('@/generated-api', '/tmp/src/app.ts')).resolves.toBe(
+      '/tmp/generated-api/index.ts'
+    );
+    expect(resolve).toHaveBeenCalledTimes(1);
+  });
+
+  it('resolves tsconfig aliases through the rspack resolver', async () => {
+    const dir = await mktemp();
+    const tsconfigPath = path.join(dir, 'tsconfig.json');
+    const srcDir = path.join(dir, 'src', 'generated-api');
+    await fs.mkdir(srcDir, { recursive: true });
+    await fs.writeFile(
+      tsconfigPath,
+      JSON.stringify(
+        {
+          compilerOptions: {
+            baseUrl: '.',
+            paths: {
+              '@/generated-api': ['src/generated-api/index.ts'],
+            },
+          },
+        },
+        null,
+        2
+      )
+    );
+    await fs.writeFile(path.join(srcDir, 'index.ts'), '');
+
+    const resolver = createRspackResolver({
+      getNativeBuildContext() {
+        return {
+          framework: 'rspack',
+          compiler: {
+            options: {
+              resolve: {
+                tsConfig: tsconfigPath,
+              },
+            },
+          },
+        };
+      },
+    });
+
+    const expected = await fs.realpath(path.join(srcDir, 'index.ts'));
+    await expect(
+      resolver('@/generated-api', path.join(dir, 'src', 'app.ts'))
+    ).resolves.toBe(expected);
+  });
+});
