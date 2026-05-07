@@ -1,10 +1,11 @@
+import type { Scope } from '@babel/traverse';
 import type { QraftResolver } from './lib/resolvers/common.js';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import * as generateModule from '@babel/generator';
 import { parse } from '@babel/parser';
 import * as traverseModule from '@babel/traverse';
-import { NodePath, type Scope } from '@babel/traverse';
+import { NodePath } from '@babel/traverse';
 import * as t from '@babel/types';
 import { createAgnosticResolver } from './lib/resolvers/agnostic.js';
 import {
@@ -21,10 +22,20 @@ export type QraftFactoryConfig = {
   contextModule?: string;
 };
 
+export type QraftPrecreatedClientConfig = {
+  client: string;
+  clientModule: string;
+  createAPIClientFn: string;
+  createAPIClientFnModule: string;
+  createAPIClientFnOptions: string;
+  createAPIClientFnOptionsModule?: string;
+};
+
 export type { QraftResolver } from './lib/resolvers/common.js';
 
 export type QraftTreeShakeOptions = {
-  createAPIClientFn: QraftFactoryConfig[];
+  createAPIClientFn?: QraftFactoryConfig[];
+  apiClient?: QraftPrecreatedClientConfig[];
   resolve?: QraftResolver;
   include?: FilterPattern;
   exclude?: FilterPattern;
@@ -50,10 +61,17 @@ type ClientBinding = {
   name: string;
   createImportPath: string;
   factory: QraftFactoryConfig;
-  initPath: NodePath<t.VariableDeclarator>;
+  bindingNode: t.Node;
+  declarationScope: Scope;
+  localInitPath?: NodePath<t.VariableDeclarator>;
   mode:
     | { type: 'context' }
-    | { type: 'options'; optionsExpression: t.Expression };
+    | { type: 'options'; optionsExpression: t.Expression }
+    | {
+        type: 'precreated';
+        optionsImportPath: string;
+        optionsExportName: string;
+      };
 };
 
 type OperationUsage = {
@@ -75,6 +93,18 @@ type InlineImportRequest = {
 type GeneratedInfoRequest = {
   createImportPath: string;
   factory: QraftFactoryConfig;
+};
+
+type RuntimeLocalNames = {
+  api: string;
+  react: string;
+};
+
+type ExportedDeclarationResolution = {
+  sourceFile: string;
+  ast: t.File;
+  init: t.Node;
+  importBindings: Map<string, { imported: string; realpath: string | null }>;
 };
 
 type GenerateFn = (typeof import('@babel/generator'))['default'];
@@ -129,8 +159,10 @@ export async function transformQraftTreeShaking(
   resolver: QraftResolver = createAgnosticResolver(options.resolve)
 ) {
   if (!shouldTransformId(id, options)) return null;
-  if (!options.createAPIClientFn || options.createAPIClientFn.length === 0) {
-    return debugSkip(options, id, 'no createAPIClientFn configured');
+  const factoryOptions = options.createAPIClientFn ?? [];
+  const precreatedOptions = options.apiClient ?? [];
+  if (factoryOptions.length === 0 && precreatedOptions.length === 0) {
+    return debugSkip(options, id, 'no API clients configured');
   }
 
   const ast = parse(code, {
@@ -139,9 +171,10 @@ export async function transformQraftTreeShaking(
   });
   const fileBindingNames = getAllBindingNames(ast);
   const programScope = getProgramScope(ast);
+  if (!programScope) return null;
 
   const factoryRealpaths = new Map<QraftFactoryConfig, string | null>();
-  for (const factory of options.createAPIClientFn) {
+  for (const factory of factoryOptions) {
     const resolved = await resolveFactoryModule(factory.module, id, resolver);
     factoryRealpaths.set(
       factory,
@@ -173,7 +206,7 @@ export async function transformQraftTreeShaking(
         continue;
       }
       const importedName = specifier.imported.name;
-      const matchingFactories = options.createAPIClientFn.filter(
+      const matchingFactories = factoryOptions.filter(
         (factory) => factory.name === importedName
       );
       if (matchingFactories.length === 0) continue;
@@ -197,20 +230,35 @@ export async function transformQraftTreeShaking(
     }
   }
 
-  if (!createImports.size) return null;
-
   const clients: ClientBinding[] = [];
+  clients.push(
+    ...(await findPrecreatedClients(
+      ast,
+      id,
+      precreatedOptions,
+      resolver,
+      programScope,
+      options.debug
+    ))
+  );
   const operationImports = new Map<string, OperationImportInfo>();
-  if (!programScope) return null;
   const importLocalNames = new Map<string, string>();
   const reservedImportLocalNames = new Set<string>();
 
-  const runtimeImportLocalName = getOrCreateProgramImportLocalName(
+  const reactRuntimeImportLocalName = getOrCreateProgramImportLocalName(
     programScope,
     importLocalNames,
     reservedImportLocalNames,
-    '@openapi-qraft/react',
+    '@openapi-qraft/react:qraftReactAPIClient',
     'qraftReactAPIClient',
+    fileBindingNames
+  );
+  const apiRuntimeImportLocalName = getOrCreateProgramImportLocalName(
+    programScope,
+    importLocalNames,
+    reservedImportLocalNames,
+    '@openapi-qraft/react:qraftAPIClient',
+    'qraftAPIClient',
     fileBindingNames
   );
 
@@ -239,7 +287,9 @@ export async function transformQraftTreeShaking(
           name: variablePath.node.id.name,
           createImportPath,
           factory: createImport.factory,
-          initPath: variablePath,
+          bindingNode: variablePath.node.id,
+          declarationScope: variablePath.parentPath.scope,
+          localInitPath: variablePath,
           mode: { type: 'context' },
         });
         return;
@@ -254,7 +304,9 @@ export async function transformQraftTreeShaking(
           name: variablePath.node.id.name,
           createImportPath,
           factory: createImport.factory,
-          initPath: variablePath,
+          bindingNode: variablePath.node.id,
+          declarationScope: variablePath.parentPath.scope,
+          localInitPath: variablePath,
           mode: {
             type: 'options',
             optionsExpression: t.cloneNode(args[0], true),
@@ -357,7 +409,7 @@ export async function transformQraftTreeShaking(
       const localClientName =
         localClientNamesByOperation.get(operationKey) ??
         createScopedUniqueName(
-          match.client.initPath.parentPath.scope,
+          match.client.declarationScope,
           composeLocalClientName(
             match.client.name,
             match.serviceName,
@@ -461,7 +513,7 @@ export async function transformQraftTreeShaking(
       hasInlineUsage = true;
 
       const newClientCall = t.callExpression(
-        t.identifier(runtimeImportLocalName),
+        t.identifier(reactRuntimeImportLocalName),
         [
           t.identifier(operationImport.localName),
           t.objectExpression([
@@ -490,23 +542,18 @@ export async function transformQraftTreeShaking(
   if (!usageMap.size && !hasInlineUsage) return null;
 
   const usages = [...usageMap.values()];
-  insertImports(
-    ast,
-    usages,
-    inlineImports,
-    generatedInfoByImport,
-    runtimeImportLocalName
-  );
-  insertOptimizedClients(
-    ast,
-    usages,
-    generatedInfoByImport,
-    runtimeImportLocalName
-  );
+  insertImports(ast, usages, inlineImports, generatedInfoByImport, {
+    api: apiRuntimeImportLocalName,
+    react: reactRuntimeImportLocalName,
+  });
+  insertOptimizedClients(ast, usages, generatedInfoByImport, {
+    api: apiRuntimeImportLocalName,
+    react: reactRuntimeImportLocalName,
+  });
   removeFullyTransformedClients(ast, clients, transformedReferenceKeys);
   removeEmptyCreateImports(
     ast,
-    new Set(options.createAPIClientFn.map((factory) => factory.name))
+    new Set(factoryOptions.map((factory) => factory.name))
   );
 
   const result = generate(ast, {
@@ -519,6 +566,384 @@ export async function transformQraftTreeShaking(
     code: result.code,
     map: result.map,
   };
+}
+
+async function findPrecreatedClients(
+  ast: t.File,
+  importerId: string,
+  configs: QraftPrecreatedClientConfig[],
+  resolver: QraftResolver,
+  programScope: Scope,
+  debug = false
+): Promise<ClientBinding[]> {
+  if (configs.length === 0) return [];
+
+  const resolvedConfigs = await Promise.all(
+    configs.map(async (config) => {
+      const clientFile = await resolveFactoryModule(
+        config.clientModule,
+        importerId,
+        resolver
+      );
+      const factoryModuleFile = await resolveFactoryModule(
+        config.createAPIClientFnModule,
+        importerId,
+        resolver
+      );
+      const factoryExport = factoryModuleFile
+        ? await readExportedDeclarationChain(
+            factoryModuleFile,
+            config.createAPIClientFn,
+            resolver
+          )
+        : null;
+      const factoryFile = factoryExport?.sourceFile ?? factoryModuleFile;
+      const optionsModule =
+        config.createAPIClientFnOptionsModule ?? config.clientModule;
+      const optionsFile = await resolveFactoryModule(
+        optionsModule,
+        importerId,
+        resolver
+      );
+      const optionsImportPath = resolvePrecreatedOptionsImportPath(
+        importerId,
+        optionsModule,
+        optionsFile
+      );
+
+      return {
+        config,
+        clientFile,
+        clientReal: clientFile ? await realpathSafe(clientFile) : null,
+        factoryFile,
+        factoryReal: factoryFile ? await realpathSafe(factoryFile) : null,
+        optionsImportPath,
+      };
+    })
+  );
+
+  const clients: ClientBinding[] = [];
+  const validated = new Map<
+    QraftPrecreatedClientConfig,
+    { factory: QraftFactoryConfig } | null
+  >();
+
+  for (const node of ast.program.body) {
+    if (!t.isImportDeclaration(node)) continue;
+
+    const resolvedImport = await resolver(node.source.value, importerId);
+    const resolvedImportReal = resolvedImport
+      ? await realpathSafe(resolvedImport)
+      : null;
+    if (!resolvedImportReal) continue;
+
+    for (const specifier of node.specifiers) {
+      const match = resolvedConfigs.find((item) => {
+        if (item.clientReal !== resolvedImportReal) return false;
+        if (
+          item.config.client === 'default' &&
+          t.isImportDefaultSpecifier(specifier)
+        ) {
+          return true;
+        }
+        return (
+          t.isImportSpecifier(specifier) &&
+          t.isIdentifier(specifier.imported) &&
+          t.isIdentifier(specifier.local) &&
+          specifier.imported.name === item.config.client
+        );
+      });
+      if (!match?.clientFile || !match.factoryFile) continue;
+      if (!match.factoryReal) continue;
+      if (
+        !t.isImportDefaultSpecifier(specifier) &&
+        !t.isImportSpecifier(specifier)
+      ) {
+        continue;
+      }
+      if (!t.isIdentifier(specifier.local)) continue;
+
+      let validatedConfig = validated.get(match.config);
+      if (validatedConfig === undefined) {
+        validatedConfig = await validatePrecreatedClientConfig(
+          match.config,
+          match.clientFile,
+          match.factoryReal,
+          resolver,
+          debug
+        );
+        validated.set(match.config, validatedConfig);
+      }
+      if (!validatedConfig) continue;
+
+      clients.push({
+        name: specifier.local.name,
+        createImportPath: match.factoryFile,
+        factory: validatedConfig.factory,
+        bindingNode: specifier.local,
+        declarationScope: programScope,
+        mode: {
+          type: 'precreated',
+          optionsImportPath: match.optionsImportPath,
+          optionsExportName: match.config.createAPIClientFnOptions,
+        },
+      });
+    }
+  }
+
+  return clients;
+}
+
+async function validatePrecreatedClientConfig(
+  config: QraftPrecreatedClientConfig,
+  clientFile: string,
+  factoryReal: string,
+  resolver: QraftResolver,
+  debug = false
+): Promise<{ factory: QraftFactoryConfig } | null> {
+  const skip = (reason: string) => {
+    if (debug) {
+      console.warn(
+        `[openapi-qraft/tree-shaking-plugin] skipped ${clientFile}: ${reason}`
+      );
+    }
+    return null;
+  };
+
+  const resolvedExport = await readExportedDeclarationChain(
+    clientFile,
+    config.client,
+    resolver
+  );
+  if (!resolvedExport) return skip('precreated client export was not found');
+  const { init, importBindings, sourceFile } = resolvedExport;
+  if (!t.isCallExpression(init)) {
+    return skip('precreated client export is not a factory call');
+  }
+  if (!t.isIdentifier(init.callee)) {
+    return skip('precreated client factory is not an identifier');
+  }
+
+  if (
+    !(await matchesConfiguredBinding(
+      init.callee.name,
+      config.createAPIClientFn,
+      factoryReal,
+      sourceFile,
+      importBindings
+    ))
+  ) {
+    return skip('precreated client factory did not match configuration');
+  }
+
+  return {
+    factory: {
+      name: config.createAPIClientFn,
+      module: config.createAPIClientFnModule,
+    },
+  };
+}
+
+async function readExportedDeclarationChain(
+  startFile: string,
+  exportName: string,
+  resolver: QraftResolver,
+  seen = new Set<string>()
+): Promise<ExportedDeclarationResolution | null> {
+  const sourceFile = path.normalize(startFile);
+  const canonicalFile = await realpathSafe(startFile);
+  if (seen.has(canonicalFile)) return null;
+  seen.add(canonicalFile);
+
+  let source: string;
+  try {
+    source = await fs.readFile(sourceFile, 'utf8');
+  } catch {
+    return null;
+  }
+
+  const ast = parse(source, {
+    sourceType: 'module',
+    plugins: ['typescript'],
+  });
+  const declarations = readTopLevelDeclarations(ast);
+  const exported = findExportedDeclaration(ast, declarations, exportName);
+  if (exported) {
+    return {
+      sourceFile,
+      ast,
+      init: exported,
+      importBindings: await readTopLevelImportBindings(
+        ast,
+        sourceFile,
+        resolver
+      ),
+    };
+  }
+
+  const reexport = findExportReexport(ast, exportName);
+  if (!reexport) return null;
+
+  const resolved = await resolver(reexport.source, sourceFile);
+  if (!resolved) return null;
+  const resolvedReal = await realpathSafe(resolved);
+  if (resolvedReal === canonicalFile) return null;
+
+  return readExportedDeclarationChain(
+    resolved,
+    reexport.localName,
+    resolver,
+    seen
+  );
+}
+
+async function readTopLevelImportBindings(
+  ast: t.File,
+  importerId: string,
+  resolver: QraftResolver
+) {
+  const imports = new Map<
+    string,
+    { imported: string; realpath: string | null }
+  >();
+
+  for (const node of ast.program.body) {
+    if (!t.isImportDeclaration(node)) continue;
+    const resolved = await resolver(node.source.value, importerId);
+    const real = resolved ? await realpathSafe(resolved) : null;
+
+    for (const specifier of node.specifiers) {
+      if (t.isImportSpecifier(specifier) && t.isIdentifier(specifier.local)) {
+        const imported = t.isIdentifier(specifier.imported)
+          ? specifier.imported.name
+          : specifier.imported.value;
+        imports.set(specifier.local.name, {
+          imported,
+          realpath: real,
+        });
+      }
+      if (t.isImportDefaultSpecifier(specifier)) {
+        imports.set(specifier.local.name, {
+          imported: 'default',
+          realpath: real,
+        });
+      }
+    }
+  }
+
+  return imports;
+}
+
+function readTopLevelDeclarations(ast: t.File) {
+  const declarations = new Map<string, t.Node | null>();
+
+  for (const statement of ast.program.body) {
+    const declaration = t.isExportNamedDeclaration(statement)
+      ? statement.declaration
+      : statement;
+    if (t.isFunctionDeclaration(declaration) && declaration.id) {
+      declarations.set(declaration.id.name, declaration);
+      continue;
+    }
+    if (!t.isVariableDeclaration(declaration)) continue;
+    for (const item of declaration.declarations) {
+      if (!t.isIdentifier(item.id)) continue;
+      declarations.set(
+        item.id.name,
+        t.isExpression(item.init) || t.isFunctionDeclaration(item.init)
+          ? item.init
+          : null
+      );
+    }
+  }
+
+  return declarations;
+}
+
+function findExportedDeclaration(
+  ast: t.File,
+  declarations: Map<string, t.Node | null>,
+  exportName: string
+): t.Node | null {
+  for (const statement of ast.program.body) {
+    if (exportName === 'default' && t.isExportDefaultDeclaration(statement)) {
+      if (t.isIdentifier(statement.declaration)) {
+        return declarations.get(statement.declaration.name) ?? null;
+      }
+      if (t.isExpression(statement.declaration)) return statement.declaration;
+    }
+
+    if (!t.isExportNamedDeclaration(statement)) continue;
+    if (t.isFunctionDeclaration(statement.declaration)) {
+      if (statement.declaration.id?.name === exportName) {
+        return statement.declaration;
+      }
+    }
+    if (t.isVariableDeclaration(statement.declaration)) {
+      for (const declaration of statement.declaration.declarations) {
+        if (!t.isIdentifier(declaration.id)) continue;
+        if (declaration.id.name !== exportName) continue;
+        if (
+          t.isExpression(declaration.init) ||
+          t.isFunctionDeclaration(declaration.init)
+        ) {
+          return declaration.init;
+        }
+        return null;
+      }
+    }
+
+    for (const specifier of statement.specifiers) {
+      if (!t.isExportSpecifier(specifier)) continue;
+      const exportedName = t.isIdentifier(specifier.exported)
+        ? specifier.exported.name
+        : specifier.exported.value;
+      if (exportedName !== exportName) continue;
+      if (!t.isIdentifier(specifier.local)) continue;
+      return declarations.get(specifier.local.name) ?? null;
+    }
+  }
+
+  return null;
+}
+
+function findExportReexport(ast: t.File, exportName: string) {
+  for (const statement of ast.program.body) {
+    if (!t.isExportNamedDeclaration(statement) || !statement.source) continue;
+
+    for (const specifier of statement.specifiers) {
+      if (!t.isExportSpecifier(specifier)) continue;
+      if (!t.isIdentifier(specifier.exported)) continue;
+      if (specifier.exported.name !== exportName) continue;
+      if (!t.isIdentifier(specifier.local)) continue;
+
+      return {
+        source: statement.source.value,
+        localName: specifier.local.name,
+      };
+    }
+  }
+
+  return null;
+}
+
+async function matchesConfiguredBinding(
+  localName: string,
+  exportName: string,
+  expectedRealpath: string,
+  importerId: string,
+  imports: Map<string, { imported: string; realpath: string | null }>
+) {
+  const imported = imports.get(localName);
+  if (imported) {
+    return (
+      imported.imported === exportName && imported.realpath === expectedRealpath
+    );
+  }
+
+  if (localName !== exportName) return false;
+  const importerRealpath = await realpathSafe(importerId);
+  return importerRealpath === expectedRealpath;
 }
 
 function matchClientCall(
@@ -638,19 +1063,34 @@ function insertImports(
   usages: OperationUsage[],
   inlineImports: InlineImportRequest[],
   generatedInfoByImport: Map<string, GeneratedClientInfo | null>,
-  runtimeImportLocalName: string
+  runtimeLocalNames: RuntimeLocalNames
 ) {
   const body = ast.program.body;
   const imported = getExistingImports(ast);
   const declarations: t.ImportDeclaration[] = [];
 
-  addNamedImportDeclaration(
-    declarations,
-    imported,
-    '@openapi-qraft/react',
-    'qraftReactAPIClient',
-    runtimeImportLocalName
-  );
+  if (
+    usages.some((usage) => usage.client.mode.type !== 'precreated') ||
+    inlineImports.length > 0
+  ) {
+    addNamedImportDeclaration(
+      declarations,
+      imported,
+      '@openapi-qraft/react',
+      'qraftReactAPIClient',
+      runtimeLocalNames.react
+    );
+  }
+
+  if (usages.some((usage) => usage.client.mode.type === 'precreated')) {
+    addNamedImportDeclaration(
+      declarations,
+      imported,
+      '@openapi-qraft/react',
+      'qraftAPIClient',
+      runtimeLocalNames.api
+    );
+  }
 
   for (const usage of usages) {
     addNamedImportDeclaration(
@@ -682,6 +1122,15 @@ function insertImports(
           );
         }
       }
+    }
+
+    if (usage.client.mode.type === 'precreated') {
+      addNamedImportDeclaration(
+        declarations,
+        imported,
+        usage.client.mode.optionsImportPath,
+        usage.client.mode.optionsExportName
+      );
     }
   }
 
@@ -718,12 +1167,7 @@ function addNamedImportDeclaration(
   imported.add(key);
   declarations.push(
     t.importDeclaration(
-      [
-        t.importSpecifier(
-          t.identifier(localName),
-          t.identifier(importedName)
-        ),
-      ],
+      [t.importSpecifier(t.identifier(localName), t.identifier(importedName))],
       t.stringLiteral(source)
     )
   );
@@ -766,7 +1210,7 @@ function insertOptimizedClients(
   ast: t.File,
   usages: OperationUsage[],
   generatedInfoByImport: Map<string, GeneratedClientInfo | null>,
-  runtimeImportLocalName: string
+  runtimeLocalNames: RuntimeLocalNames
 ) {
   const contextUsages = usages.filter(
     (usage) => usage.client.mode.type === 'context'
@@ -774,12 +1218,21 @@ function insertOptimizedClients(
   const explicitOptionsUsages = usages.filter(
     (usage) => usage.client.mode.type === 'options'
   );
+  const precreatedUsages = usages.filter(
+    (usage) => usage.client.mode.type === 'precreated'
+  );
 
   const contextDeclarations = createOptimizedClientDeclarations(
     contextUsages,
     contextUsages,
     generatedInfoByImport,
-    runtimeImportLocalName
+    runtimeLocalNames
+  );
+  const precreatedDeclarations = createOptimizedClientDeclarations(
+    precreatedUsages,
+    precreatedUsages,
+    generatedInfoByImport,
+    runtimeLocalNames
   );
 
   const body = ast.program.body;
@@ -787,7 +1240,7 @@ function insertOptimizedClients(
   body.splice(
     lastImportIndex + 1,
     0,
-    ...dedupeDeclarations(contextDeclarations)
+    ...dedupeDeclarations([...contextDeclarations, ...precreatedDeclarations])
   );
 
   const usagesByClient = new Map<ClientBinding, OperationUsage[]>();
@@ -802,10 +1255,10 @@ function insertOptimizedClients(
       clientUsages,
       clientUsages,
       generatedInfoByImport,
-      runtimeImportLocalName
+      runtimeLocalNames
     );
-    const statementPath = client.initPath.parentPath;
-    if (statementPath.isVariableDeclaration()) {
+    const statementPath = client.localInitPath?.parentPath;
+    if (statementPath?.isVariableDeclaration()) {
       statementPath.insertAfter(dedupeDeclarations(declarations));
     }
   }
@@ -815,7 +1268,7 @@ function createOptimizedClientDeclarations(
   declarationsUsages: OperationUsage[],
   callbackUsages: OperationUsage[],
   generatedInfoByImport: Map<string, GeneratedClientInfo | null>,
-  runtimeImportLocalName: string
+  runtimeLocalNames: RuntimeLocalNames
 ) {
   return declarationsUsages.map((usage) => {
     const callbacks = callbackUsages
@@ -826,15 +1279,16 @@ function createOptimizedClientDeclarations(
       }))
       .filter(
         (item, index, all) =>
-          all.findIndex((candidate) => candidate.callbackName === item.callbackName) ===
-          index
+          all.findIndex(
+            (candidate) => candidate.callbackName === item.callbackName
+          ) === index
       );
 
     return createOptimizedClientDeclaration(
       usage,
       callbacks,
       generatedInfoByImport,
-      runtimeImportLocalName
+      runtimeLocalNames
     );
   });
 }
@@ -843,7 +1297,7 @@ function createOptimizedClientDeclaration(
   usage: OperationUsage,
   callbacks: Array<{ callbackName: string; callbackLocalName: string }>,
   generatedInfoByImport: Map<string, GeneratedClientInfo | null>,
-  runtimeImportLocalName: string
+  runtimeLocalNames: RuntimeLocalNames
 ) {
   const args: t.Expression[] = [
     t.identifier(usage.operationImport.localName),
@@ -865,9 +1319,18 @@ function createOptimizedClientDeclaration(
     );
     if (generatedInfo?.contextName)
       args.push(t.identifier(generatedInfo.contextName));
-  } else {
+  } else if (usage.client.mode.type === 'options') {
     args.push(t.cloneNode(usage.client.mode.optionsExpression, true));
+  } else {
+    args.push(
+      t.callExpression(t.identifier(usage.client.mode.optionsExportName), [])
+    );
   }
+
+  const runtimeImportLocalName =
+    usage.client.mode.type === 'precreated'
+      ? runtimeLocalNames.api
+      : runtimeLocalNames.react;
 
   return t.variableDeclaration('const', [
     t.variableDeclarator(
@@ -895,17 +1358,40 @@ function removeFullyTransformedClients(
 ) {
   for (const client of clients) {
     if (!transformedReferenceKeys.has(client.name)) continue;
-    if (hasIdentifierReference(ast, client.name, client.initPath.node.id))
-      continue;
+    if (hasIdentifierReference(ast, client.name, client.bindingNode)) continue;
 
-    const declarationPath = client.initPath.parentPath;
-    if (!declarationPath.isVariableDeclaration()) continue;
+    if (client.mode.type === 'precreated') {
+      removeImportSpecifier(ast, client.bindingNode);
+      continue;
+    }
+
+    const declarationPath = client.localInitPath?.parentPath;
+    if (!declarationPath?.isVariableDeclaration()) continue;
     if (declarationPath.node.declarations.length === 1) {
       declarationPath.remove();
-    } else {
-      client.initPath.remove();
+    } else if (client.localInitPath) {
+      client.localInitPath.remove();
     }
   }
+}
+
+function removeImportSpecifier(ast: t.File, localNode: t.Node) {
+  traverse(ast, {
+    ImportDeclaration(importPath) {
+      const remainingSpecifiers = importPath.node.specifiers.filter(
+        (specifier) => specifier.local !== localNode
+      );
+      if (remainingSpecifiers.length === importPath.node.specifiers.length) {
+        return;
+      }
+      if (remainingSpecifiers.length === 0) {
+        importPath.remove();
+      } else {
+        importPath.node.specifiers = remainingSpecifiers;
+      }
+      importPath.stop();
+    },
+  });
 }
 
 function hasIdentifierReference(
@@ -987,7 +1473,9 @@ async function readGeneratedClientInfo(
     plugins: ['typescript'],
   });
 
-  if (!source.includes('qraftReactAPIClient')) {
+  const usesReactClient = source.includes('qraftReactAPIClient');
+  const usesAPIClient = source.includes('qraftAPIClient');
+  if (!usesReactClient && !usesAPIClient) {
     const reexportPath = findFactoryReexport(ast, factory.name);
     if (reexportPath) {
       const resolvedReexport = await resolver(reexportPath, clientFile);
@@ -1015,7 +1503,7 @@ async function readGeneratedClientInfo(
   let contextImportPath: string | null = null;
   let contextName: string | null = null;
   const expectedContextName = factory.context ?? 'APIClientContext';
-  const shouldScanContextImport = !factory.contextModule;
+  const shouldScanContextImport = usesReactClient && !factory.contextModule;
 
   traverse(ast, {
     ImportDeclaration(importPathNode) {
@@ -1052,7 +1540,7 @@ async function readGeneratedClientInfo(
   );
 
   let resolvedContextImportPath: string | null = null;
-  if (factory.contextModule) {
+  if (usesReactClient && factory.contextModule) {
     resolvedContextImportPath = resolveRelativeImportPath(
       importerId,
       importerId,
@@ -1075,7 +1563,11 @@ async function readGeneratedClientInfo(
     servicesDir,
     serviceImportPaths,
     contextImportPath: resolvedContextImportPath,
-    contextName: factory.contextModule ? expectedContextName : contextName,
+    contextName: usesReactClient
+      ? factory.contextModule
+        ? expectedContextName
+        : contextName
+      : null,
   };
 }
 
@@ -1261,10 +1753,7 @@ function getAllBindingNames(ast: t.File) {
   return names;
 }
 
-function createScopedUniqueName(
-  scope: Scope,
-  baseName: string
-) {
+function createScopedUniqueName(scope: Scope, baseName: string) {
   if (!scope.hasBinding(baseName) && !scope.hasGlobal(baseName)) {
     return baseName;
   }
@@ -1324,7 +1813,8 @@ function createProgramUniqueName(
   }
 
   if (
-    (fileBindingNames.has(baseName) || reservedImportLocalNames.has(baseName)) &&
+    (fileBindingNames.has(baseName) ||
+      reservedImportLocalNames.has(baseName)) &&
     !programScope.hasBinding(baseName) &&
     !programScope.hasGlobal(baseName)
   ) {
@@ -1379,6 +1869,33 @@ function composeImportPath(importerId: string, targetFile: string) {
   const relativePath = path.relative(path.dirname(importerId), targetFile);
   const normalized = relativePath.split(path.sep).join('/');
   return normalized.startsWith('.') ? normalized : `./${normalized}`;
+}
+
+function resolvePrecreatedOptionsImportPath(
+  importerId: string,
+  configuredModule: string,
+  resolvedFile: string | null
+) {
+  if (!isPathLikeSpecifier(configuredModule)) return configuredModule;
+  if (!resolvedFile) return configuredModule;
+  const emittedPath = composeResolvedSourceImportPath(importerId, resolvedFile);
+  return emittedPath === configuredModule ? configuredModule : emittedPath;
+}
+
+function composeResolvedSourceImportPath(
+  importerId: string,
+  targetFile: string
+) {
+  const composed = composeImportPath(importerId, targetFile);
+  return stripIndexSourceExtension(stripSourceExtension(composed));
+}
+
+function stripSourceExtension(importPath: string) {
+  return importPath.replace(/\.(?:[cm]?[jt]sx?)$/, '');
+}
+
+function stripIndexSourceExtension(importPath: string) {
+  return importPath.replace(/\/index$/, '');
 }
 
 function debugSkip(options: QraftTreeShakeOptions, id: string, reason: string) {

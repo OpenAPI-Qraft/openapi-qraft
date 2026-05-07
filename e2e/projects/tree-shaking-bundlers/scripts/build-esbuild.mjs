@@ -3,6 +3,7 @@ import { TsconfigPathsPlugin } from '@esbuild-plugins/tsconfig-paths';
 import { qraftTreeShakeEsbuild } from '@openapi-qraft/tree-shaking-plugin/esbuild';
 import { build } from 'esbuild';
 import {
+  apiClient,
   createAPIClientFn,
   getBundlerOutputDir,
   getScenario,
@@ -31,7 +32,10 @@ await build({
   assetNames: 'assets/[name][ext]',
   plugins: [
     TsconfigPathsPlugin({ tsconfig: resolve(process.cwd(), 'tsconfig.json') }),
-    qraftTreeShakeEsbuild({ createAPIClientFn }),
+    qraftTreeShakeEsbuild({
+      createAPIClientFn,
+      apiClient,
+    }),
     {
       name: 'external-dependencies',
       setup(build) {

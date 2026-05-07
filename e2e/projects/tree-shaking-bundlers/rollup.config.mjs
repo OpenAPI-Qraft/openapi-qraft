@@ -1,9 +1,10 @@
 import { resolve } from 'node:path';
+import { qraftTreeShakeRollup } from '@openapi-qraft/tree-shaking-plugin/rollup';
 import alias from '@rollup/plugin-alias';
 import nodeResolve from '@rollup/plugin-node-resolve';
-import { qraftTreeShakeRollup } from '@openapi-qraft/tree-shaking-plugin/rollup';
 import esbuild from 'rollup-plugin-esbuild';
 import {
+  apiClient,
   createAPIClientFn,
   getBundlerOutputDir,
   getScenario,
@@ -25,7 +26,10 @@ export default {
         extensions: ['.ts', '.tsx', '.mts', '.cts', '.mjs', '.js'],
       }),
     }),
-    qraftTreeShakeRollup({ createAPIClientFn }),
+    qraftTreeShakeRollup({
+      createAPIClientFn,
+      apiClient,
+    }),
     esbuild({
       include: /\.[cm]?[jt]sx?$/,
       sourceMap: false,

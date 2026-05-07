@@ -2,6 +2,7 @@ import { resolve } from 'node:path';
 import { qraftTreeShakeRspack } from '@openapi-qraft/tree-shaking-plugin/rspack';
 import TerserPlugin from 'terser-webpack-plugin';
 import {
+  apiClient,
   createAPIClientFn,
   getBundlerOutputDir,
   getScenario,
@@ -88,5 +89,10 @@ export default {
       }),
     ],
   },
-  plugins: [qraftTreeShakeRspack({ createAPIClientFn })],
+  plugins: [
+    qraftTreeShakeRspack({
+      createAPIClientFn,
+      apiClient,
+    }),
+  ],
 };

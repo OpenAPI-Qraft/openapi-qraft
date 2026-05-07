@@ -2,12 +2,65 @@ import { isAbsolute, resolve } from 'node:path';
 
 export const bundlers = ['vite', 'rollup', 'webpack', 'rspack', 'esbuild'];
 
+const unique = (values) => [...new Set(values.filter(Boolean))];
+
+const qraftReactAPIClientPattern = /qraftReactAPIClient(?:__|\()/;
+const qraftAPIClientPattern = /qraftAPIClient(?:__|\()/;
+
+const contextScenario = ({ name, entry, include, exclude }) => ({
+  name,
+  mode: 'context',
+  entry,
+  include: unique([qraftReactAPIClientPattern, ...include]),
+  exclude: unique([
+    qraftAPIClientPattern,
+    'allCallbacks',
+    'petsService',
+    'storesService',
+    ...exclude,
+  ]),
+});
+
+const precreatedScenario = ({
+  name,
+  entry,
+  include,
+  exclude,
+  clientToken = 'qraftAPIClient',
+  optionsToken = 'createAPIClientOptions',
+}) => ({
+  name,
+  mode: 'precreated',
+  entry,
+  clientToken,
+  optionsToken,
+  include: unique([optionsToken, qraftAPIClientPattern, ...include]),
+  exclude: unique([
+    'allCallbacks',
+    qraftReactAPIClientPattern,
+    'petsService',
+    'storesService',
+    ...exclude,
+  ]),
+});
+
+const mixedScenario = ({ name, entry, include, exclude }) => ({
+  name,
+  mode: 'mixed',
+  entry,
+  include: unique([
+    qraftReactAPIClientPattern,
+    qraftAPIClientPattern,
+    ...include,
+  ]),
+  exclude: unique(['allCallbacks', 'petsService', 'storesService', ...exclude]),
+});
+
 export const scenarios = [
-  {
-    name: 'barrel-relative',
-    entry: 'src/barrel-relative.ts',
+  contextScenario({
+    name: 'barrel-context-relative',
+    entry: 'src/barrel-context-relative.ts',
     include: [
-      'qraftReactAPIClient',
       '@openapi-qraft/react/callbacks/useQuery',
       'getPets',
       'BarrelAPIClientContext',
@@ -19,12 +72,32 @@ export const scenarios = [
       'getStores',
       'createPet',
     ],
-  },
-  {
-    name: 'barrel-alias',
-    entry: 'src/barrel-alias.ts',
+  }),
+  precreatedScenario({
+    name: 'barrel-precreated-relative',
+    entry: 'src/barrel-precreated-relative.ts',
+    clientToken: 'BarrelClient',
+    optionsToken: 'createBarrelClientOptions',
     include: [
-      'qraftReactAPIClient',
+      'qraftAPIClient',
+      '@openapi-qraft/react/callbacks/useQuery',
+      'getPets',
+      'createBarrelClientOptions',
+    ],
+    exclude: [
+      'BarrelAPIClientContext',
+      'createAPIClientOptions',
+      'allCallbacks',
+      '@openapi-qraft/react/callbacks/useMutation',
+      'getStores',
+      'createPet',
+      'createBarrelPrecreatedAPIClient',
+    ],
+  }),
+  contextScenario({
+    name: 'barrel-context-alias',
+    entry: 'src/barrel-context-alias.ts',
+    include: [
       '@openapi-qraft/react/callbacks/useQuery',
       'getStores',
       'AliasAPIClientContext',
@@ -36,12 +109,32 @@ export const scenarios = [
       'getPets',
       'createPet',
     ],
-  },
-  {
-    name: 'file-relative',
-    entry: 'src/file-relative.ts',
+  }),
+  precreatedScenario({
+    name: 'barrel-precreated-alias',
+    entry: 'src/barrel-precreated-alias.ts',
+    clientToken: 'BarrelClient',
+    optionsToken: 'createBarrelClientOptions',
     include: [
-      'qraftReactAPIClient',
+      'qraftAPIClient',
+      '@openapi-qraft/react/callbacks/useQuery',
+      'getStores',
+      'createBarrelClientOptions',
+    ],
+    exclude: [
+      'AliasAPIClientContext',
+      'createAPIClientOptions',
+      'allCallbacks',
+      '@openapi-qraft/react/callbacks/useMutation',
+      'getPets',
+      'createPet',
+      'createBarrelPrecreatedAPIClient',
+    ],
+  }),
+  contextScenario({
+    name: 'file-context-relative',
+    entry: 'src/file-context-relative.ts',
+    include: [
       '@openapi-qraft/react/callbacks/useMutation',
       'createPet',
       'RelativeAPIClientContext',
@@ -53,12 +146,33 @@ export const scenarios = [
       'getPets',
       'getStores',
     ],
-  },
-  {
-    name: 'file-alias',
-    entry: 'src/file-alias.ts',
+  }),
+  precreatedScenario({
+    name: 'file-precreated-relative',
+    entry: 'src/file-precreated-relative.ts',
+    clientToken: 'RelativeClient',
+    optionsToken: 'buildRelativeClientOptions',
     include: [
-      'qraftReactAPIClient',
+      'qraftAPIClient',
+      '@openapi-qraft/react/callbacks/useMutation',
+      'createPet',
+      'buildRelativeClientOptions',
+    ],
+    exclude: [
+      'RelativeAPIClientContext',
+      'createAPIClientOptions',
+      'allCallbacks',
+      '@openapi-qraft/react/callbacks/useQuery',
+      'getPets',
+      'getStores',
+      'createBarrelClientOptions',
+      'createRelativePrecreatedAPIClient',
+    ],
+  }),
+  contextScenario({
+    name: 'file-context-alias',
+    entry: 'src/file-context-alias.ts',
+    include: [
       '@openapi-qraft/react/callbacks/useQuery',
       'getStores',
       'AliasDirectAPIClientContext',
@@ -70,12 +184,32 @@ export const scenarios = [
       'getPets',
       'createPet',
     ],
-  },
-  {
-    name: 'file-relative-ext',
-    entry: 'src/file-relative-ext.ts',
+  }),
+  precreatedScenario({
+    name: 'file-precreated-alias',
+    entry: 'src/file-precreated-alias.ts',
+    clientToken: 'AliasDirectClient',
+    optionsToken: 'createAliasDirectClientOptions',
     include: [
-      'qraftReactAPIClient',
+      'qraftAPIClient',
+      '@openapi-qraft/react/callbacks/useQuery',
+      'getStores',
+      'createAliasDirectClientOptions',
+    ],
+    exclude: [
+      'AliasDirectAPIClientContext',
+      'createAPIClientOptions',
+      'allCallbacks',
+      '@openapi-qraft/react/callbacks/useMutation',
+      'getPets',
+      'createPet',
+      'createAliasDirectPrecreatedAPIClient',
+    ],
+  }),
+  contextScenario({
+    name: 'file-context-relative-ext',
+    entry: 'src/file-context-relative-ext.ts',
+    include: [
       '@openapi-qraft/react/callbacks/useMutation',
       'createPet',
       'RelativeExtAPIClientContext',
@@ -87,11 +221,33 @@ export const scenarios = [
       'getStores',
       'getPets',
     ],
-  },
-  {
-    name: 'mixed-source-mirrors',
-    entry: 'src/mixed-source-mirrors.ts',
+  }),
+  precreatedScenario({
+    name: 'file-precreated-relative-ext',
+    entry: 'src/file-precreated-relative-ext.ts',
+    clientToken: 'RelativeExtClient',
+    optionsToken: 'createRelativeExtClientOptions',
     include: [
+      'qraftAPIClient',
+      '@openapi-qraft/react/callbacks/useMutation',
+      'createPet',
+      'createRelativeExtClientOptions',
+    ],
+    exclude: [
+      'RelativeExtAPIClientContext',
+      'createAPIClientOptions',
+      'allCallbacks',
+      '@openapi-qraft/react/callbacks/useQuery',
+      'getStores',
+      'getPets',
+      'createRelativeExtPrecreatedAPIClient',
+    ],
+  }),
+  mixedScenario({
+    name: 'mixed-context-precreated-mirrors',
+    entry: 'src/mixed-context-precreated-mirrors.ts',
+    include: [
+      'qraftAPIClient',
       'qraftReactAPIClient',
       '@openapi-qraft/react/callbacks/useQuery',
       '@openapi-qraft/react/callbacks/useMutation',
@@ -103,8 +259,56 @@ export const scenarios = [
       'RelativeExtAPIClientContext',
       'AliasAPIClientContext',
       'AliasDirectAPIClientContext',
+      'createBarrelClientOptions',
+      'buildRelativeClientOptions',
+      'createAliasDirectClientOptions',
+      'createRelativeExtClientOptions',
+      'barrelPrecreatedFromRelativeApi_pets_getPets',
+      'barrelPrecreatedFromAliasApi_stores_getStores',
+      'fileRelativePrecreatedApi_pets_createPet',
+      'fileAliasPrecreatedApi_stores_getStores',
+      'fileRelativeExtPrecreatedApi_pets_createPet',
     ],
-    exclude: ['qraftAPIClient(', 'allCallbacks'],
+    exclude: [],
+  }),
+];
+
+export const apiClient = [
+  {
+    client: 'BarrelClient',
+    clientModule: '@/precreated/clients/barrel',
+    createAPIClientFn: 'createBarrelPrecreatedAPIClient',
+    createAPIClientFnModule: '@/precreated/clients/barrel', // rexport of './src/generated-api/create-barrel-precreated-api-client.ts'
+    createAPIClientFnOptions: 'createBarrelClientOptions',
+    createAPIClientFnOptionsModule: '@/precreated/clients/barrel',
+  },
+  {
+    client: 'RelativeClient',
+    clientModule: './src/precreated/clients/file-relative.ts',
+    createAPIClientFn: 'createRelativePrecreatedAPIClient',
+    createAPIClientFnModule:
+      './src/generated-api/create-relative-precreated-api-client.ts',
+    createAPIClientFnOptions: 'buildRelativeClientOptions',
+    createAPIClientFnOptionsModule:
+      './src/precreated/options/barrel/create-relative-client-options.ts',
+  },
+  {
+    client: 'AliasDirectClient',
+    clientModule: '@/precreated/clients/file-alias.ts',
+    createAPIClientFn: 'createAliasDirectPrecreatedAPIClient',
+    createAPIClientFnModule:
+      './src/generated-api/create-alias-direct-precreated-api-client.ts',
+    createAPIClientFnOptions: 'createAliasDirectClientOptions',
+    createAPIClientFnOptionsModule: './src/precreated/options/index.ts',
+  },
+  {
+    client: 'RelativeExtClient',
+    clientModule: './src/precreated/clients/file-relative-ext.ts',
+    createAPIClientFn: 'createRelativeExtPrecreatedAPIClient',
+    createAPIClientFnModule:
+      './src/generated-api/create-relative-ts-precreated-api-client.ts',
+    createAPIClientFnOptions: 'createRelativeExtClientOptions',
+    createAPIClientFnOptionsModule: './src/precreated/options/direct.ts',
   },
 ];
 

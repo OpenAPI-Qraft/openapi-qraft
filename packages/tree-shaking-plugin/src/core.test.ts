@@ -1,8 +1,61 @@
+import '@qraft/test-utils/vitestFsMock';
 import fs from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { transformQraftTreeShaking } from './core.js';
+
+const PRECREATED_API_INDEX_TS = `
+import { qraftAPIClient } from '@openapi-qraft/react';
+import { useQuery } from '@openapi-qraft/react/callbacks/index';
+import { services } from './services/index';
+
+const defaultCallbacks = { useQuery } as const;
+
+export function createAPIClient(options?: { queryClient: unknown }) {
+  return qraftAPIClient(services, defaultCallbacks, options);
+}
+`;
+
+const SERVICES_INDEX_TS = `
+import { petsService } from './PetsService';
+import { storesService } from './StoresService';
+
+export const services = {
+  pets: petsService,
+  stores: storesService,
+} as const;
+`;
+
+const PETS_SERVICE_TS = `
+export const getPets = { schema: { method: 'get', url: '/pets' } };
+export const createPet = { schema: { method: 'post', url: '/pets' } };
+export const updatePet = { schema: { method: 'put', url: '/pets/{petId}' } };
+export const getPetById = { schema: { method: 'get', url: '/pets/{petId}' } };
+export const findPetsByStatus = { schema: { method: 'get', url: '/pets/findByStatus' } };
+
+export const petsService = {
+  getPets,
+  createPet,
+  updatePet,
+  getPetById,
+  findPetsByStatus,
+} as const;
+`;
+
+const STORES_SERVICE_TS = `
+export const getStores = { schema: { method: 'get', url: '/stores' } };
+
+export const storesService = {
+  getStores,
+} as const;
+`;
+
+const DEFAULT_PRECREATED_CLIENT_OPTIONS_TS = `
+export const createAPIClientOptions = () => ({
+  queryClient: {}
+});
+`;
 
 describe('transformQraftTreeShaking', () => {
   it('imports an operation directly for a context API client', async () => {
@@ -746,7 +799,9 @@ export function App() {
 `,
       sourceFile,
       {
-        createAPIClientFn: [{ name: 'createMyAPIClient', module: '@api/my-api' }],
+        createAPIClientFn: [
+          { name: 'createMyAPIClient', module: '@api/my-api' },
+        ],
         async resolve(specifier) {
           if (specifier === '@api/my-api') return apiIndex;
           return null;
@@ -785,8 +840,7 @@ export function App() {
 `
     );
 
-    const previousCwd = process.cwd();
-    process.chdir(fixture);
+    const cwdSpy = vi.spyOn(process, 'cwd').mockReturnValue(fixture);
     try {
       const result = await transformQraftTreeShaking(
         await fs.readFile(sourceFile, 'utf8'),
@@ -811,7 +865,7 @@ export function App() {
       }"
     `);
     } finally {
-      process.chdir(previousCwd);
+      cwdSpy.mockRestore();
     }
   });
 
@@ -856,7 +910,9 @@ api.pets.getPets.useQuery();
 `,
       sourceFile,
       {
-        createAPIClientFn: [{ name: 'createAPIClient', module: 'unresolvable-module' }],
+        createAPIClientFn: [
+          { name: 'createAPIClient', module: 'unresolvable-module' },
+        ],
         resolve: () => null,
       }
     );
@@ -925,6 +981,511 @@ export function App() {
       }"
     `);
   });
+
+  it('imports an operation directly for a precreated named API client', async () => {
+    const root = await fs.mkdtemp(
+      path.join(os.tmpdir(), 'qraft-tree-shaking-')
+    );
+    await writeFixtureFiles(
+      root,
+      createPrecreatedFixtureFiles(`
+import { createAPIClient } from './api';
+import { createAPIClientOptions } from './client-options';
+
+export const APIClient = createAPIClient(createAPIClientOptions());
+`)
+    );
+    const sourceFile = path.join(root, 'src/App.tsx');
+
+    const result = await transformQraftTreeShaking(
+      `
+import { APIClient as API } from './client';
+
+export function App() {
+  return API.pets.getPets.useQuery();
+}
+`,
+      sourceFile,
+      {
+        apiClient: [
+          {
+            client: 'APIClient',
+            clientModule: './client',
+            createAPIClientFn: 'createAPIClient',
+            createAPIClientFnModule: './api',
+            createAPIClientFnOptions: 'createAPIClientOptions',
+            createAPIClientFnOptionsModule: './client-options',
+          },
+        ],
+      }
+    );
+
+    expect(result?.code).toMatchInlineSnapshot(`
+      "import { qraftAPIClient } from "@openapi-qraft/react";
+      import { useQuery } from "@openapi-qraft/react/callbacks/useQuery";
+      import { getPets } from "./api/services/PetsService";
+      import { createAPIClientOptions } from "./client-options";
+      const API_pets_getPets = qraftAPIClient(getPets, {
+        useQuery
+      }, createAPIClientOptions());
+      export function App() {
+        return API_pets_getPets.useQuery();
+      }"
+    `);
+  });
+
+  it('supports a precreated default API client export', async () => {
+    const root = await fs.mkdtemp(
+      path.join(os.tmpdir(), 'qraft-tree-shaking-')
+    );
+    await writeFixtureFiles(
+      root,
+      createPrecreatedFixtureFiles(`
+import { createAPIClient } from './api';
+import { createAPIClientOptions } from './client-options';
+
+const APIClient = createAPIClient(createAPIClientOptions());
+export default APIClient;
+`)
+    );
+    const sourceFile = path.join(root, 'src/App.tsx');
+
+    const result = await transformQraftTreeShaking(
+      `
+import API from './client';
+
+API.pets.getPets.invalidateQueries();
+`,
+      sourceFile,
+      {
+        apiClient: [
+          {
+            client: 'default',
+            clientModule: './client',
+            createAPIClientFn: 'createAPIClient',
+            createAPIClientFnModule: './api',
+            createAPIClientFnOptions: 'createAPIClientOptions',
+            createAPIClientFnOptionsModule: './client-options',
+          },
+        ],
+      }
+    );
+
+    expect(result?.code).toMatchInlineSnapshot(`
+      "import { qraftAPIClient } from "@openapi-qraft/react";
+      import { invalidateQueries } from "@openapi-qraft/react/callbacks/invalidateQueries";
+      import { getPets } from "./api/services/PetsService";
+      import { createAPIClientOptions } from "./client-options";
+      const API_pets_getPets = qraftAPIClient(getPets, {
+        invalidateQueries
+      }, createAPIClientOptions());
+      API_pets_getPets.invalidateQueries();"
+    `);
+  });
+
+  it('imports precreated client options from a separate module', async () => {
+    const root = await fs.mkdtemp(
+      path.join(os.tmpdir(), 'qraft-tree-shaking-')
+    );
+    await writeFixtureFiles(
+      root,
+      createPrecreatedFixtureFiles(`
+import { createAPIClient } from './api';
+import { createAPIClientOptions } from './client-options';
+
+export const APIClient = createAPIClient(createAPIClientOptions());
+`)
+    );
+    const sourceFile = path.join(root, 'src/App.tsx');
+
+    const result = await transformQraftTreeShaking(
+      `
+import { APIClient } from './client';
+
+APIClient.pets.getPets();
+`,
+      sourceFile,
+      {
+        apiClient: [
+          {
+            client: 'APIClient',
+            clientModule: './client',
+            createAPIClientFn: 'createAPIClient',
+            createAPIClientFnModule: './api',
+            createAPIClientFnOptions: 'createAPIClientOptions',
+            createAPIClientFnOptionsModule: './client-options',
+          },
+        ],
+      }
+    );
+
+    expect(result?.code).toMatchInlineSnapshot(`
+      "import { qraftAPIClient } from "@openapi-qraft/react";
+      import { operationInvokeFn } from "@openapi-qraft/react/callbacks/operationInvokeFn";
+      import { getPets } from "./api/services/PetsService";
+      import { createAPIClientOptions } from "./client-options";
+      const APIClient_pets_getPets = qraftAPIClient(getPets, {
+        operationInvokeFn
+      }, createAPIClientOptions());
+      APIClient_pets_getPets();"
+      `);
+  });
+
+  it('imports precreated client options from a project-root-relative module', async () => {
+    const root = await fs.mkdtemp(
+      path.join(os.tmpdir(), 'qraft-tree-shaking-')
+    );
+    await writeFixtureFiles(
+      root,
+      createPrecreatedFixtureFiles(
+        `
+import { createAPIClient } from './api';
+import { buildRelativeClientOptions } from './precreated/options/barrel';
+
+export const APIClient = createAPIClient(buildRelativeClientOptions());
+`,
+        {
+          'src/precreated/options/barrel/index.ts': `
+export {
+  createBarrelClientOptions,
+  buildRelativeClientOptions,
+} from './create-api-client-options';
+`,
+          'src/precreated/options/barrel/create-api-client-options.ts': `
+export const createBarrelClientOptions = () => ({
+  queryClient: {}
+});
+
+export const buildRelativeClientOptions = createBarrelClientOptions;
+`,
+        }
+      )
+    );
+    const fixtureRoot = await fs.realpath(root);
+    const sourceFile = path.join(fixtureRoot, 'src/App.tsx');
+    const cwdSpy = vi.spyOn(process, 'cwd').mockReturnValue(fixtureRoot);
+    try {
+      const result = await transformQraftTreeShaking(
+        `
+import { APIClient } from './client';
+
+APIClient.pets.getPets.useQuery();
+`,
+        sourceFile,
+        {
+          apiClient: [
+            {
+              client: 'APIClient',
+              clientModule: './client',
+              createAPIClientFn: 'createAPIClient',
+              createAPIClientFnModule: './api',
+              createAPIClientFnOptions: 'buildRelativeClientOptions',
+              createAPIClientFnOptionsModule: './src/precreated/options/barrel',
+            },
+          ],
+        }
+      );
+
+      expect(result?.code).toMatchInlineSnapshot(`
+        "import { qraftAPIClient } from "@openapi-qraft/react";
+        import { useQuery } from "@openapi-qraft/react/callbacks/useQuery";
+        import { getPets } from "./api/services/PetsService";
+        import { buildRelativeClientOptions } from "./precreated/options/barrel";
+        const APIClient_pets_getPets = qraftAPIClient(getPets, {
+          useQuery
+        }, buildRelativeClientOptions());
+        APIClient_pets_getPets.useQuery();"
+      `);
+    } finally {
+      cwdSpy.mockRestore();
+    }
+  });
+
+  it('imports precreated client options from the same module as the client', async () => {
+    const root = await fs.mkdtemp(
+      path.join(os.tmpdir(), 'qraft-tree-shaking-')
+    );
+    await writeFixtureFiles(
+      root,
+      createPrecreatedFixtureFiles(`
+import { createAPIClient } from './api';
+
+export const createAPIClientOptions = () => ({
+  queryClient: {}
+});
+
+export const APIClient = createAPIClient(createAPIClientOptions());
+`)
+    );
+    const sourceFile = path.join(root, 'src/App.tsx');
+
+    const result = await transformQraftTreeShaking(
+      `
+import { APIClient, createAPIClientOptions } from './client';
+
+APIClient.pets.getPets.useQuery();
+`,
+      sourceFile,
+      {
+        apiClient: [
+          {
+            client: 'APIClient',
+            clientModule: './client',
+            createAPIClientFn: 'createAPIClient',
+            createAPIClientFnModule: './api',
+            createAPIClientFnOptions: 'createAPIClientOptions',
+            // createAPIClientFnOptionsModule: './client' -- not specified, inherited by `clientModule`
+          },
+        ],
+      }
+    );
+
+    expect(result?.code).toMatchInlineSnapshot(`
+      "import { createAPIClientOptions } from './client';
+      import { qraftAPIClient } from "@openapi-qraft/react";
+      import { useQuery } from "@openapi-qraft/react/callbacks/useQuery";
+      import { getPets } from "./api/services/PetsService";
+      const APIClient_pets_getPets = qraftAPIClient(getPets, {
+        useQuery
+      }, createAPIClientOptions());
+      APIClient_pets_getPets.useQuery();"
+    `);
+  });
+
+  it('supports precreated client options re-exported through client.ts', async () => {
+    const root = await fs.mkdtemp(
+      path.join(os.tmpdir(), 'qraft-tree-shaking-')
+    );
+    await writeFixtureFiles(
+      root,
+      createPrecreatedFixtureFiles(
+        `
+import { createAPIClient } from './api';
+import { createAPIClientOptions } from './client-options';
+
+export { createAPIClientOptions };
+
+export const APIClient = createAPIClient(createAPIClientOptions());
+`
+      )
+    );
+    const sourceFile = path.join(root, 'src/App.tsx');
+
+    const result = await transformQraftTreeShaking(
+      `
+import { APIClient } from './client';
+
+APIClient.pets.getPets.useQuery();
+`,
+      sourceFile,
+      {
+        apiClient: [
+          {
+            client: 'APIClient',
+            clientModule: './client',
+            createAPIClientFn: 'createAPIClient',
+            createAPIClientFnModule: './api',
+            createAPIClientFnOptions: 'createAPIClientOptions',
+            createAPIClientFnOptionsModule: './client',
+          },
+        ],
+      }
+    );
+
+    expect(result?.code).toMatchInlineSnapshot(`
+        "import { qraftAPIClient } from "@openapi-qraft/react";
+        import { useQuery } from "@openapi-qraft/react/callbacks/useQuery";
+        import { getPets } from "./api/services/PetsService";
+        import { createAPIClientOptions } from "./client";
+        const APIClient_pets_getPets = qraftAPIClient(getPets, {
+          useQuery
+        }, createAPIClientOptions());
+        APIClient_pets_getPets.useQuery();"
+      `);
+  });
+
+  it('skips a precreated client created by a local same-named factory', async () => {
+    const root = await fs.mkdtemp(
+      path.join(os.tmpdir(), 'qraft-tree-shaking-')
+    );
+    await writeFixtureFiles(
+      root,
+      createPrecreatedFixtureFiles(`
+const createAPIClient = (options?: unknown) => ({ options });
+
+export const APIClient = createAPIClient({});
+`)
+    );
+    const sourceFile = path.join(root, 'src/App.tsx');
+
+    const result = await transformQraftTreeShaking(
+      `
+import { APIClient } from './client';
+
+APIClient.pets.getPets.useQuery();
+`,
+      sourceFile,
+      {
+        apiClient: [
+          {
+            client: 'APIClient',
+            clientModule: './client',
+            createAPIClientFn: 'createAPIClient',
+            createAPIClientFnModule: './api',
+            createAPIClientFnOptions: 'createAPIClientOptions',
+          },
+        ],
+      }
+    );
+
+    expect(result).toBeNull();
+  });
+
+  it('skips a precreated client when the imported factory module does not match the configured one', async () => {
+    const root = await fs.mkdtemp(
+      path.join(os.tmpdir(), 'qraft-tree-shaking-')
+    );
+    await writeFixtureFiles(
+      root,
+      createPrecreatedFixtureFiles(
+        `
+import { createAPIClient } from './wrong-factory';
+
+export const APIClient = createAPIClient({});
+`,
+        {
+          'src/wrong-factory.ts': `
+export function createAPIClient() {
+  return {};
+}
+`,
+        }
+      )
+    );
+    const sourceFile = path.join(root, 'src/App.tsx');
+
+    const result = await transformQraftTreeShaking(
+      `
+import { APIClient } from './client';
+
+APIClient.pets.getPets.useQuery();
+`,
+      sourceFile,
+      {
+        apiClient: [
+          {
+            client: 'APIClient',
+            clientModule: './client',
+            createAPIClientFn: 'createAPIClient',
+            createAPIClientFnModule: './api',
+            createAPIClientFnOptions: 'createAPIClientOptions',
+          },
+        ],
+      }
+    );
+
+    expect(result).toBeNull();
+  });
+
+  it('skips namespace and dynamic imports of precreated clients', async () => {
+    const root = await fs.mkdtemp(
+      path.join(os.tmpdir(), 'qraft-tree-shaking-')
+    );
+    await writeFixtureFiles(
+      root,
+      createPrecreatedFixtureFiles(`
+import { createAPIClient } from './api';
+export const APIClient = createAPIClient({});
+`)
+    );
+    const sourceFile = path.join(root, 'src/App.tsx');
+    const options = {
+      apiClient: [
+        {
+          client: 'APIClient',
+          clientModule: './client',
+          createAPIClientFn: 'createAPIClient',
+          createAPIClientFnModule: './api',
+          createAPIClientFnOptions: 'createAPIClientOptions',
+        },
+      ],
+    };
+
+    await expect(
+      transformQraftTreeShaking(
+        `
+import * as clientModule from './client';
+
+clientModule.APIClient.pets.getPets.useQuery();
+`,
+        sourceFile,
+        options
+      )
+    ).resolves.toBeNull();
+
+    await expect(
+      transformQraftTreeShaking(
+        `
+const clientModule = await import('./client');
+
+clientModule.APIClient.pets.getPets.useQuery();
+`,
+        sourceFile,
+        options
+      )
+    ).resolves.toBeNull();
+  });
+
+  it('keeps a partially transformed precreated client import', async () => {
+    const root = await fs.mkdtemp(
+      path.join(os.tmpdir(), 'qraft-tree-shaking-')
+    );
+    await writeFixtureFiles(
+      root,
+      createPrecreatedFixtureFiles(`
+import { createAPIClient } from './api';
+import { createAPIClientOptions } from './client-options';
+
+export const APIClient = createAPIClient(createAPIClientOptions());
+`)
+    );
+    const sourceFile = path.join(root, 'src/App.tsx');
+
+    const result = await transformQraftTreeShaking(
+      `
+import { APIClient } from './client';
+
+APIClient.pets.getPets.useQuery();
+console.log(APIClient);
+`,
+      sourceFile,
+      {
+        apiClient: [
+          {
+            client: 'APIClient',
+            clientModule: './client',
+            createAPIClientFn: 'createAPIClient',
+            createAPIClientFnModule: './api',
+            createAPIClientFnOptions: 'createAPIClientOptions',
+            createAPIClientFnOptionsModule: './client-options',
+          },
+        ],
+      }
+    );
+
+    expect(result?.code).toMatchInlineSnapshot(`
+      "import { APIClient } from './client';
+      import { qraftAPIClient } from "@openapi-qraft/react";
+      import { useQuery } from "@openapi-qraft/react/callbacks/useQuery";
+      import { getPets } from "./api/services/PetsService";
+      import { createAPIClientOptions } from "./client-options";
+      const APIClient_pets_getPets = qraftAPIClient(getPets, {
+        useQuery
+      }, createAPIClientOptions());
+      APIClient_pets_getPets.useQuery();
+      console.log(APIClient);"
+    `);
+  });
 });
 
 type FixtureOptions = {
@@ -936,16 +1497,41 @@ type FixtureOptions = {
 
 async function createFixture(options: FixtureOptions = {}) {
   const root = await fs.mkdtemp(path.join(os.tmpdir(), 'qraft-tree-shaking-'));
-  const apiDir = path.join(root, 'src', options.apiDirName ?? 'api');
-  const servicesDir = path.join(apiDir, 'services');
   const contextName = options.contextName ?? 'APIClientContext';
   const contextModule = options.contextModule ?? `./${contextName}`;
   const importContext = options.importContext ?? true;
 
-  await fs.mkdir(servicesDir, { recursive: true });
-  await fs.writeFile(
-    path.join(apiDir, 'index.ts'),
-    `${importContext ? `import { ${contextName} } from '${contextModule}';\n` : ''}
+  await writeFixtureFiles(root, {
+    ...getContextFixtureFiles(
+      contextName,
+      contextModule,
+      importContext,
+      options.apiDirName
+    ),
+  });
+
+  return root;
+}
+
+function getContextFixtureFiles(
+  contextName: string,
+  contextModule: string,
+  importContext: boolean,
+  apiDirName = 'api'
+) {
+  const apiRoot = `src/${apiDirName}`;
+
+  return {
+    [`${apiRoot}/index.ts`]: `${importContext ? `import { ${contextName} } from '${contextModule}';\n` : ''}${CONTEXT_API_INDEX_TS_BODY(contextName)}`,
+    [`${apiRoot}/${contextName}.ts`]: `\nexport const ${contextName} = {};\n`,
+    [`${apiRoot}/services/index.ts`]: SERVICES_INDEX_TS,
+    [`${apiRoot}/services/PetsService.ts`]: PETS_SERVICE_TS,
+    [`${apiRoot}/services/StoresService.ts`]: STORES_SERVICE_TS,
+  } as const;
+}
+
+function CONTEXT_API_INDEX_TS_BODY(contextName: string) {
+  return `
 import { qraftReactAPIClient } from '@openapi-qraft/react';
 import { useQuery } from '@openapi-qraft/react/callbacks/index';
 import { services } from './services/index';
@@ -958,54 +1544,32 @@ export function createAPIClient(callbacks = defaultCallbacks) {
 export function createExtraAPIClient(callbacks = defaultCallbacks) {
   return qraftReactAPIClient(services, callbacks, ${contextName});
 }
-`
-  );
-  await fs.writeFile(
-    path.join(apiDir, `${contextName}.ts`),
-    `
-export const ${contextName} = {};
-`
-  );
-  await fs.writeFile(
-    path.join(servicesDir, 'index.ts'),
-    `
-import { petsService } from './PetsService';
-import { storesService } from './StoresService';
+`;
+}
 
-export const services = {
-  pets: petsService,
-  stores: storesService,
+const PRECREATED_BASE_FILES = {
+  'src/api/index.ts': PRECREATED_API_INDEX_TS,
+  'src/api/services/index.ts': SERVICES_INDEX_TS,
+  'src/api/services/PetsService.ts': PETS_SERVICE_TS,
+  'src/api/services/StoresService.ts': STORES_SERVICE_TS,
+  'src/client-options.ts': DEFAULT_PRECREATED_CLIENT_OPTIONS_TS,
 } as const;
-`
-  );
-  await fs.writeFile(
-    path.join(servicesDir, 'PetsService.ts'),
-    `
-export const getPets = { schema: { method: 'get', url: '/pets' } };
-export const createPet = { schema: { method: 'post', url: '/pets' } };
-export const updatePet = { schema: { method: 'put', url: '/pets/{petId}' } };
-export const getPetById = { schema: { method: 'get', url: '/pets/{petId}' } };
-export const findPetsByStatus = { schema: { method: 'get', url: '/pets/findByStatus' } };
 
-export const petsService = {
-  getPets,
-  createPet,
-  updatePet,
-  getPetById,
-  findPetsByStatus,
-} as const;
-`
-  );
-  await fs.writeFile(
-    path.join(servicesDir, 'StoresService.ts'),
-    `
-export const getStores = { schema: { method: 'get', url: '/stores' } };
+function createPrecreatedFixtureFiles(
+  clientTs: string,
+  extraFiles: Record<string, string> = {}
+) {
+  return {
+    ...PRECREATED_BASE_FILES,
+    'src/client.ts': clientTs,
+    ...extraFiles,
+  } as const;
+}
 
-export const storesService = {
-  getStores,
-} as const;
-`
-  );
-
-  return root;
+async function writeFixtureFiles(root: string, files: Record<string, string>) {
+  for (const [relativePath, content] of Object.entries(files)) {
+    const fullPath = path.join(root, relativePath);
+    await fs.mkdir(path.dirname(fullPath), { recursive: true });
+    await fs.writeFile(fullPath, content);
+  }
 }
