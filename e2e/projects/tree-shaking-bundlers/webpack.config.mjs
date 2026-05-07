@@ -3,6 +3,7 @@ import { qraftTreeShakeWebpack } from '@openapi-qraft/tree-shaking-plugin/webpac
 import TerserPlugin from 'terser-webpack-plugin';
 import TsconfigPathsPlugin from 'tsconfig-paths-webpack-plugin';
 import {
+  apiClient,
   createAPIClientFn,
   getBundlerOutputDir,
   getScenario,
@@ -17,11 +18,15 @@ export default {
   entry: {
     [scenario.name]: resolve(process.cwd(), scenario.entry),
   },
+  experiments: {
+    outputModule: true,
+  },
   output: {
     path: getBundlerOutputDir('webpack', scenario),
     filename: '[name].js',
     chunkFilename: 'chunks/[name].js',
     assetModuleFilename: 'assets/[name][ext]',
+    module: true,
     clean: true,
   },
   resolve: {
@@ -40,11 +45,11 @@ export default {
       '.cjs': ['.cjs', '.cts'],
     },
   },
-  externalsType: 'commonjs',
+  externalsType: 'module',
   externals: [
     ({ request }, callback) => {
       if (request && isExternalModuleRequest(request)) {
-        callback(null, request);
+        callback(null, `module ${request}`);
         return;
       }
 
@@ -72,8 +77,13 @@ export default {
     minimizer: [
       new TerserPlugin({
         terserOptions: {
+          module: true,
           compress: {
             dead_code: true,
+            collapse_vars: false,
+            evaluate: false,
+            inline: false,
+            reduce_vars: false,
             passes: 1,
           },
           format: {
@@ -88,5 +98,10 @@ export default {
       }),
     ],
   },
-  plugins: [qraftTreeShakeWebpack({ createAPIClientFn })],
+  plugins: [
+    qraftTreeShakeWebpack({
+      createAPIClientFn,
+      apiClient,
+    }),
+  ],
 };

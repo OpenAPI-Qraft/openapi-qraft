@@ -75,6 +75,7 @@
   "devDependencies": {
     "@openapi-qraft/eslint-config": "workspace:*",
     "@openapi-qraft/rollup-config": "workspace:*",
+    "@qraft/test-utils": "workspace:*",
     "@rspack/resolver": "^0.4.0",
     "@types/babel__generator": "^7.27.0",
     "@types/babel__traverse": "^7.28.0",
