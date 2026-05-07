@@ -85,63 +85,6 @@ export function createUserResolverStrategy(
   };
 }
 
-export const resolveLocalModuleStrategy: ResolveStrategy = async ({
-  importer,
-  specifier,
-}) => resolveLocalModule(importer, specifier);
-
-export async function resolveLocalModule(
-  importerId: string,
-  importPath: string
-): Promise<string | null> {
-  return resolveLocalModuleFromBase(path.dirname(importerId), importPath);
-}
-
-export async function resolveLocalModuleFromBase(
-  baseDir: string,
-  importPath: string
-): Promise<string | null> {
-  if (!importPath.startsWith('.') && !importPath.startsWith('/')) return null;
-
-  const base = path.resolve(baseDir, importPath);
-  const candidateBases = new Set([base]);
-  const extension = path.extname(importPath);
-  if (
-    extension === '.js' ||
-    extension === '.jsx' ||
-    extension === '.mjs' ||
-    extension === '.cjs'
-  ) {
-    candidateBases.add(base.slice(0, -extension.length));
-  }
-
-  const candidates = [...candidateBases].flatMap((candidateBase) => [
-    candidateBase,
-    `${candidateBase}.ts`,
-    `${candidateBase}.tsx`,
-    `${candidateBase}.js`,
-    `${candidateBase}.jsx`,
-    `${candidateBase}.mts`,
-    `${candidateBase}.cts`,
-    path.join(candidateBase, 'index.ts'),
-    path.join(candidateBase, 'index.tsx'),
-    path.join(candidateBase, 'index.js'),
-    path.join(candidateBase, 'index.jsx'),
-    path.join(candidateBase, 'index.mts'),
-    path.join(candidateBase, 'index.cts'),
-  ]);
-
-  for (const candidate of candidates) {
-    try {
-      const stat = await fs.stat(candidate);
-      if (stat.isFile()) return candidate;
-    } catch {
-      // Try the next candidate.
-    }
-  }
-  return null;
-}
-
 export async function realpathSafe(filePath: string): Promise<string> {
   try {
     return await fs.realpath(filePath);

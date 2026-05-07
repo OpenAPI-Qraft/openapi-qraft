@@ -66,7 +66,7 @@ import { defineConfig } from 'vite';
 export default defineConfig({
   plugins: [
     qraftTreeShakeVite({
-      createAPIClientFn: [{ name: 'createAPIClient', module: './src/api' }],
+      createAPIClientFn: [{ name: 'createAPIClient', module: './api' }],
     }),
   ],
 });
@@ -81,7 +81,7 @@ import { qraftTreeShakeRollup } from '@openapi-qraft/tree-shaking-plugin/rollup'
 export default {
   plugins: [
     qraftTreeShakeRollup({
-      createAPIClientFn: [{ name: 'createAPIClient', module: './src/api' }],
+      createAPIClientFn: [{ name: 'createAPIClient', module: './api' }],
     }),
   ],
 };
@@ -98,7 +98,7 @@ const {
 module.exports = {
   plugins: [
     qraftTreeShakeWebpack({
-      createAPIClientFn: [{ name: 'createAPIClient', module: './src/api' }],
+      createAPIClientFn: [{ name: 'createAPIClient', module: './api' }],
     }),
   ],
 };
@@ -134,7 +134,7 @@ import { qraftTreeShakeRspack } from '@openapi-qraft/tree-shaking-plugin/rspack'
 export default {
   plugins: [
     qraftTreeShakeRspack({
-      createAPIClientFn: [{ name: 'createAPIClient', module: './src/api' }],
+      createAPIClientFn: [{ name: 'createAPIClient', module: './api' }],
     }),
   ],
 };
@@ -149,7 +149,7 @@ import { build } from 'esbuild';
 await build({
   plugins: [
     qraftTreeShakeEsbuild({
-      createAPIClientFn: [{ name: 'createAPIClient', module: './src/api' }],
+      createAPIClientFn: [{ name: 'createAPIClient', module: './api' }],
     }),
   ],
 });
@@ -162,9 +162,8 @@ type QraftTreeShakeOptions = {
   /**
    * Required. Each entry pairs an exported function name with the module
    * specifier that identifies the generated factory. The plugin resolves the
-   * specifier through the bundler first (so aliases, workspace packages, and
-   * bare modules work), then falls back to a project-root-relative or
-   * absolute file path when the bundler cannot resolve a path-like specifier.
+   * specifier through the bundler first, so aliases, workspace packages, bare
+   * modules, and relative paths all work when the bundler can resolve them.
    * Re-export barrels that forward the factory to a `.js`-suffixed file are
    * supported.
    */
@@ -203,10 +202,10 @@ The central configuration. Each entry tells the plugin which function to treat a
 ```ts
 createAPIClientFn: [
   // Relative path to a directory — resolves index.ts automatically
-  { name: 'createAPIClient', module: './src/api' },
+  { name: 'createAPIClient', module: './api' },
 
   // Explicit file path with extension — resolves the exact file, no guessing
-  { name: 'createAPIClient', module: './src/api/create-api-client.ts' },
+  { name: 'createAPIClient', module: './api/create-api-client.ts' },
 
   // TypeScript path alias
   { name: 'createAPIClient', module: '@/api/client' },
@@ -218,9 +217,9 @@ createAPIClientFn: [
 ```
 
 `module` is resolved through the bundler first, so path aliases, bare modules,
-and monorepo workspace packages all work automatically. If the bundler cannot
-resolve a path-like specifier, the plugin falls back to resolving that path
-from the current project root.
+and monorepo workspace packages all work automatically. If you use a relative
+or absolute path, it must be resolvable from the importing file through the
+bundler's own resolver.
 
 `context` defaults to `APIClientContext`; `contextModule` can override the context import source when the generated factory does not colocate it with the default file name.
 
@@ -347,5 +346,4 @@ Inside the `transform` hook the plugin resolves import specifiers using the foll
 
 1. **Bundler native** (`this.resolve`) — covers Rollup, Vite, Webpack, and Rspack loaders; handles all aliases and workspace packages.
 2. **esbuild `build.resolve`** — used when running under esbuild (via `getNativeBuildContext`).
-3. **`options.resolve`** — your custom fallback, useful in unit tests or environments without a bundler.
-4. **Filesystem fallback** — for `./` and `/` paths only; tries `.ts` → `.tsx` and `index.ts` → `index.tsx` variants.
+3. **`options.resolve`** — your custom override, useful in unit tests or environments without a bundler.

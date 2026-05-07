@@ -6,11 +6,7 @@ import type {
 } from './common.js';
 import path from 'node:path';
 import { ResolverFactory } from '@rspack/resolver';
-import {
-  createResolverChain,
-  createUserResolverStrategy,
-  resolveLocalModuleStrategy,
-} from './common.js';
+import { createResolverChain, createUserResolverStrategy } from './common.js';
 
 type RspackResolveOptions = ConstructorParameters<typeof ResolverFactory>[0];
 
@@ -81,6 +77,5 @@ export function createRspackResolver(
   return createResolverChain([
     createRspackResolveStrategy(ctx),
     createUserResolverStrategy(userResolve),
-    resolveLocalModuleStrategy,
   ]);
 }

@@ -3,11 +3,7 @@ import type {
   QraftResolver,
   ResolveStrategy,
 } from './common.js';
-import {
-  createResolverChain,
-  createUserResolverStrategy,
-  resolveLocalModuleStrategy,
-} from './common.js';
+import { createResolverChain, createUserResolverStrategy } from './common.js';
 
 function stripQuery(id: string): string {
   const queryIndex = id.indexOf('?');
@@ -42,6 +38,5 @@ export function createRollupLikeResolver(
   return createResolverChain([
     createRollupResolveStrategy(ctx),
     createUserResolverStrategy(userResolve),
-    resolveLocalModuleStrategy,
   ]);
 }

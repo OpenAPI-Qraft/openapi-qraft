@@ -4,11 +4,7 @@ import type {
   ResolveStrategy,
 } from './common.js';
 import path from 'node:path';
-import {
-  createResolverChain,
-  createUserResolverStrategy,
-  resolveLocalModuleStrategy,
-} from './common.js';
+import { createResolverChain, createUserResolverStrategy } from './common.js';
 
 type WebpackResolveFn = (
   context: string,
@@ -53,6 +49,5 @@ export function createWebpackLikeResolver(
   return createResolverChain([
     createWebpackResolveStrategy(ctx),
     createUserResolverStrategy(userResolve),
-    resolveLocalModuleStrategy,
   ]);
 }

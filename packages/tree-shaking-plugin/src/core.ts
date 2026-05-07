@@ -8,10 +8,7 @@ import * as traverseModule from '@babel/traverse';
 import { NodePath } from '@babel/traverse';
 import * as t from '@babel/types';
 import { createAgnosticResolver } from './lib/resolvers/agnostic.js';
-import {
-  realpathSafe,
-  resolveLocalModuleFromBase,
-} from './lib/resolvers/common.js';
+import { realpathSafe } from './lib/resolvers/common.js';
 
 export type FilterPattern = string | RegExp | Array<string | RegExp>;
 
@@ -1854,11 +1851,7 @@ async function resolveFactoryModule(
   resolver: QraftResolver
 ): Promise<string | null> {
   const resolved = await resolver(specifier, importerId);
-  if (resolved) return resolved;
-
-  if (!isPathLikeSpecifier(specifier)) return null;
-
-  return resolveLocalModuleFromBase(process.cwd(), specifier);
+  return resolved ?? null;
 }
 
 function isPathLikeSpecifier(specifier: string) {

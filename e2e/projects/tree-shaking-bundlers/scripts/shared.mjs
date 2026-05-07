@@ -278,44 +278,43 @@ export const apiClient = [
     client: 'BarrelClient',
     clientModule: '@/precreated/clients/barrel',
     createAPIClientFn: 'createBarrelPrecreatedAPIClient',
-    createAPIClientFnModule: '@/precreated/clients/barrel', // rexport of './src/generated-api/create-barrel-precreated-api-client.ts'
+    createAPIClientFnModule: '@/precreated/clients/barrel', // re-export of './generated-api/create-barrel-precreated-api-client.ts'
     createAPIClientFnOptions: 'createBarrelClientOptions',
     createAPIClientFnOptionsModule: '@/precreated/clients/barrel',
   },
   {
     client: 'RelativeClient',
-    clientModule: './src/precreated/clients/file-relative.ts',
+    clientModule: './precreated/clients/file-relative.ts',
     createAPIClientFn: 'createRelativePrecreatedAPIClient',
     createAPIClientFnModule:
-      './src/generated-api/create-relative-precreated-api-client.ts',
+      './generated-api/create-relative-precreated-api-client.ts',
     createAPIClientFnOptions: 'buildRelativeClientOptions',
-    createAPIClientFnOptionsModule:
-      './src/precreated/options/barrel/create-relative-client-options.ts',
+    createAPIClientFnOptionsModule: './precreated/options/barrel',
   },
   {
     client: 'AliasDirectClient',
     clientModule: '@/precreated/clients/file-alias.ts',
     createAPIClientFn: 'createAliasDirectPrecreatedAPIClient',
     createAPIClientFnModule:
-      './src/generated-api/create-alias-direct-precreated-api-client.ts',
+      './generated-api/create-alias-direct-precreated-api-client.ts',
     createAPIClientFnOptions: 'createAliasDirectClientOptions',
-    createAPIClientFnOptionsModule: './src/precreated/options/index.ts',
+    createAPIClientFnOptionsModule: '@/precreated/options',
   },
   {
     client: 'RelativeExtClient',
-    clientModule: './src/precreated/clients/file-relative-ext.ts',
+    clientModule: './precreated/clients/file-relative-ext.ts',
     createAPIClientFn: 'createRelativeExtPrecreatedAPIClient',
     createAPIClientFnModule:
-      './src/generated-api/create-relative-ts-precreated-api-client.ts',
+      './generated-api/create-relative-ts-precreated-api-client.ts',
     createAPIClientFnOptions: 'createRelativeExtClientOptions',
-    createAPIClientFnOptionsModule: './src/precreated/options/direct.ts',
+    createAPIClientFnOptionsModule: './precreated/options/direct.ts',
   },
 ];
 
 export const createAPIClientFn = [
   {
     name: 'createBarrelAPIClient',
-    module: './src/generated-api',
+    module: './generated-api',
     context: 'BarrelAPIClientContext',
   },
   {
@@ -326,7 +325,7 @@ export const createAPIClientFn = [
   },
   {
     name: 'createRelativeExtAPIClient',
-    module: './src/generated-api/create-relative-ts-api-client.ts',
+    module: './generated-api/create-relative-ts-api-client.ts',
     context: 'RelativeExtAPIClientContext',
     contextModule: '@/generated-api/RelativeExtAPIClientContext',
   },
@@ -338,7 +337,7 @@ export const createAPIClientFn = [
   },
   {
     name: 'createAliasDirectAPIClient',
-    module: './src/generated-api/create-alias-direct-api-client',
+    module: './generated-api/create-alias-direct-api-client',
     context: 'AliasDirectAPIClientContext',
     contextModule: './generated-api/AliasDirectAPIClientContext',
   },

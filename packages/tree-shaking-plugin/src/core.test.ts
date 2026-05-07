@@ -2,8 +2,8 @@ import '@qraft/test-utils/vitestFsMock';
 import fs from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
-import { describe, expect, it, vi } from 'vitest';
-import { transformQraftTreeShaking } from './core.js';
+import { describe, expect, it } from 'vitest';
+import { transformQraftTreeShaking as transformQraftTreeShakingImpl } from './core.js';
 
 const PRECREATED_API_INDEX_TS = `
 import { qraftAPIClient } from '@openapi-qraft/react';
@@ -56,6 +56,31 @@ export const createAPIClientOptions = () => ({
   queryClient: {}
 });
 `;
+
+type TransformOptions = Parameters<typeof transformQraftTreeShakingImpl>[2];
+
+async function transformQraftTreeShaking(
+  code: string,
+  id: string,
+  options: TransformOptions
+) {
+  const fixtureRoot = path.dirname(path.dirname(id));
+  const fixtureResolver = createFixtureResolver(fixtureRoot);
+  const resolver = async (specifier: string, importer: string) => {
+    if (options.resolve) {
+      try {
+        const resolved = await options.resolve(specifier, importer);
+        if (resolved) return resolved;
+      } catch {
+        // Fall through to the fixture resolver.
+      }
+    }
+
+    return fixtureResolver(specifier, importer);
+  };
+
+  return transformQraftTreeShakingImpl(code, id, options, resolver);
+}
 
 describe('transformQraftTreeShaking', () => {
   it('imports an operation directly for a context API client', async () => {
@@ -823,7 +848,7 @@ export function App() {
       `);
   });
 
-  it('resolves a factory module from the project root when the bundler cannot', async () => {
+  it('resolves a factory module through the fixture resolver when the bundler cannot', async () => {
     const fixture = await createFixture({ apiDirName: 'generated-api' });
     const sourceFile = path.join(fixture, 'src/App.tsx');
 
@@ -840,19 +865,17 @@ export function App() {
 `
     );
 
-    const cwdSpy = vi.spyOn(process, 'cwd').mockReturnValue(fixture);
-    try {
-      const result = await transformQraftTreeShaking(
-        await fs.readFile(sourceFile, 'utf8'),
-        sourceFile,
-        {
-          createAPIClientFn: [
-            { name: 'createAPIClient', module: './src/generated-api' },
-          ],
-        }
-      );
+    const result = await transformQraftTreeShaking(
+      await fs.readFile(sourceFile, 'utf8'),
+      sourceFile,
+      {
+        createAPIClientFn: [
+          { name: 'createAPIClient', module: './generated-api' },
+        ],
+      }
+    );
 
-      expect(result?.code).toMatchInlineSnapshot(`
+    expect(result?.code).toMatchInlineSnapshot(`
       "import { qraftReactAPIClient } from "@openapi-qraft/react";
       import { useQuery } from "@openapi-qraft/react/callbacks/useQuery";
       import { getPets } from "./generated-api/services/PetsService";
@@ -864,9 +887,6 @@ export function App() {
         return api_pets_getPets.useQuery();
       }"
     `);
-    } finally {
-      cwdSpy.mockRestore();
-    }
   });
 
   it('does not match a same-named import that resolves to a different module', async () => {
@@ -1131,7 +1151,7 @@ APIClient.pets.getPets();
       `);
   });
 
-  it('imports precreated client options from a project-root-relative module', async () => {
+  it('imports precreated client options from a fixture-relative module', async () => {
     const root = await fs.mkdtemp(
       path.join(os.tmpdir(), 'qraft-tree-shaking-')
     );
@@ -1163,30 +1183,28 @@ export const buildRelativeClientOptions = createBarrelClientOptions;
     );
     const fixtureRoot = await fs.realpath(root);
     const sourceFile = path.join(fixtureRoot, 'src/App.tsx');
-    const cwdSpy = vi.spyOn(process, 'cwd').mockReturnValue(fixtureRoot);
-    try {
-      const result = await transformQraftTreeShaking(
-        `
+    const result = await transformQraftTreeShaking(
+      `
 import { APIClient } from './client';
 
 APIClient.pets.getPets.useQuery();
 `,
-        sourceFile,
-        {
-          apiClient: [
-            {
-              client: 'APIClient',
-              clientModule: './client',
-              createAPIClientFn: 'createAPIClient',
-              createAPIClientFnModule: './api',
-              createAPIClientFnOptions: 'buildRelativeClientOptions',
-              createAPIClientFnOptionsModule: './src/precreated/options/barrel',
-            },
-          ],
-        }
-      );
+      sourceFile,
+      {
+        apiClient: [
+          {
+            client: 'APIClient',
+            clientModule: './client',
+            createAPIClientFn: 'createAPIClient',
+            createAPIClientFnModule: './api',
+            createAPIClientFnOptions: 'buildRelativeClientOptions',
+            createAPIClientFnOptionsModule: './precreated/options/barrel',
+          },
+        ],
+      }
+    );
 
-      expect(result?.code).toMatchInlineSnapshot(`
+    expect(result?.code).toMatchInlineSnapshot(`
         "import { qraftAPIClient } from "@openapi-qraft/react";
         import { useQuery } from "@openapi-qraft/react/callbacks/useQuery";
         import { getPets } from "./api/services/PetsService";
@@ -1196,9 +1214,6 @@ APIClient.pets.getPets.useQuery();
         }, buildRelativeClientOptions());
         APIClient_pets_getPets.useQuery();"
       `);
-    } finally {
-      cwdSpy.mockRestore();
-    }
   });
 
   it('imports precreated client options from the same module as the client', async () => {
@@ -1511,6 +1526,64 @@ async function createFixture(options: FixtureOptions = {}) {
   });
 
   return root;
+}
+
+function createFixtureResolver(fixtureRoot: string) {
+  return async (specifier: string, importer: string) => {
+    if (specifier.startsWith('@/')) {
+      return resolveFixtureModule(
+        path.join(fixtureRoot, 'src'),
+        specifier.slice(2)
+      );
+    }
+
+    if (specifier.startsWith('.') || specifier.startsWith('/')) {
+      return resolveFixtureModule(path.dirname(importer), specifier);
+    }
+
+    return null;
+  };
+}
+
+async function resolveFixtureModule(baseDir: string, importPath: string) {
+  const base = path.resolve(baseDir, importPath);
+  const candidateBases = new Set([base]);
+  const extension = path.extname(importPath);
+  if (
+    extension === '.js' ||
+    extension === '.jsx' ||
+    extension === '.mjs' ||
+    extension === '.cjs'
+  ) {
+    candidateBases.add(base.slice(0, -extension.length));
+  }
+
+  const candidates = [...candidateBases].flatMap((candidateBase) => [
+    candidateBase,
+    `${candidateBase}.ts`,
+    `${candidateBase}.tsx`,
+    `${candidateBase}.js`,
+    `${candidateBase}.jsx`,
+    `${candidateBase}.mts`,
+    `${candidateBase}.cts`,
+    path.join(candidateBase, 'index.ts'),
+    path.join(candidateBase, 'index.tsx'),
+    path.join(candidateBase, 'index.js'),
+    path.join(candidateBase, 'index.jsx'),
+    path.join(candidateBase, 'index.mts'),
+    path.join(candidateBase, 'index.cts'),
+  ]);
+
+  for (const candidate of candidates) {
+    try {
+      const stat = await fs.stat(candidate);
+      if (stat.isFile()) return candidate;
+    } catch {
+      // Try the next candidate.
+    }
+  }
+
+  return null;
 }
 
 function getContextFixtureFiles(
