@@ -13,20 +13,16 @@ async function mktemp() {
 }
 
 describe('resolver composition', () => {
-  it('uses a custom resolver before the local filesystem fallback', async () => {
-    const dir = await mktemp();
-    await fs.writeFile(path.join(dir, 'fallback.ts'), '');
-    const importer = path.join(dir, 'src.ts');
+  it('uses only the custom resolver in the agnostic resolver chain', async () => {
+    const importer = path.join(await mktemp(), 'src.ts');
     const customResolve = vi.fn(async () => null);
     const resolver = createAgnosticResolver(customResolve);
 
-    await expect(resolver('./fallback', importer)).resolves.toBe(
-      path.join(dir, 'fallback.ts')
-    );
+    await expect(resolver('./fallback', importer)).resolves.toBeNull();
     expect(customResolve).toHaveBeenCalledWith('./fallback', importer);
   });
 
-  it('uses the rollup-like bundler resolver before fallback resolution', async () => {
+  it('uses the rollup-like bundler resolver', async () => {
     const ctx: BundlerResolveContext = {
       resolve: vi.fn(async (source, importer, options) => {
         expect(source).toBe('./resolved.js');
@@ -46,7 +42,7 @@ describe('resolver composition', () => {
     expect(ctx.resolve).toHaveBeenCalledTimes(1);
   });
 
-  it('uses the webpack loader resolver before fallback resolution', async () => {
+  it('uses the webpack loader resolver', async () => {
     const resolve = vi.fn(async (context: string, request: string) => {
       expect(context).toBe('/tmp/src');
       expect(request).toBe('@/generated-api');
