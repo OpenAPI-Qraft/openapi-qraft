@@ -22,11 +22,38 @@ const traverse =
  *
  * @example
  * ```ts
+ * const source = `
+ * import { createAPIClient } from './api';
+ *
+ * const api = createAPIClient();
+ *
+ * export function App() {
+ *   api.pets.getPets.useQuery();
+ * }
+ * `;
+ *
  * const plan = await createTransformPlan(source, id, options);
  *
  * applyTransformPlan(plan, plan.runtimeLocalNames);
  *
- * // `plan.ast` is now mutated in place and ready for code generation.
+ * // `plan.ast` now contains the rewritten named client call and imports.
+ * ```
+ *
+ * @example
+ * ```ts
+ * const source = `
+ * import { client } from './client';
+ *
+ * export function App() {
+ *   client.pets.getPets.useQuery();
+ * }
+ * `;
+ *
+ * const plan = await createTransformPlan(source, id, options);
+ *
+ * applyTransformPlan(plan, plan.runtimeLocalNames);
+ *
+ * // `plan.ast` now contains the rewritten precreated client call.
  * ```
  */
 export function applyTransformPlan(

@@ -93,6 +93,16 @@ type ExportedDeclarationResolution = {
  *
  * @example
  * ```ts
+ * const source = `
+ * import { createAPIClient } from './api';
+ *
+ * const api = createAPIClient();
+ *
+ * export function App() {
+ *   api.pets.getPets.useQuery();
+ * }
+ * `;
+ *
  * const plan = await createTransformPlan(source, id, options);
  *
  * plan.clients[0]
@@ -110,12 +120,33 @@ type ExportedDeclarationResolution = {
  * //   callbackName: 'useQuery',
  * //   ...
  * // }
+ * ```
  *
- * plan.inlineUsages[0]
+ * @example
+ * ```ts
+ * const source = `
+ * import { client } from './client';
+ *
+ * export function App() {
+ *   client.pets.getPets.useQuery();
+ * }
+ * `;
+ *
+ * const plan = await createTransformPlan(source, id, options);
+ *
+ * plan.clients[0]
  * // {
- * //   callbackName: 'invalidateQueries',
- * //   callbackLocalName: 'invalidateQueries',
- * //   operationImport: { importPath: './api/services/PetsService' },
+ * //   name: 'client',
+ * //   mode: { type: 'precreated' },
+ * //   ...
+ * // }
+ *
+ * plan.namedUsages[0]
+ * // {
+ * //   client: { name: 'client' },
+ * //   serviceName: 'pets',
+ * //   operationName: 'getPets',
+ * //   callbackName: 'useQuery',
  * //   ...
  * // }
  * ```
