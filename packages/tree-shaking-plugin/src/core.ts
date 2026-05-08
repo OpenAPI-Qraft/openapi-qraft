@@ -1,3 +1,6 @@
+import type { GeneratorOptions as BabelGeneratorOptions } from '@babel/generator';
+// eslint-disable-next-line import-x/no-extraneous-dependencies
+import type { SourceMapInput } from '@jridgewell/trace-mapping';
 import type { QraftResolver } from './lib/resolvers/common.js';
 import * as generateModule from '@babel/generator';
 import { createAgnosticResolver } from './lib/resolvers/agnostic.js';
@@ -34,6 +37,9 @@ export type QraftTreeShakeOptions = {
 };
 
 type GenerateFn = (typeof import('@babel/generator'))['default'];
+type GeneratorOptions = Omit<BabelGeneratorOptions, 'inputSourceMap'> & {
+  inputSourceMap?: SourceMapInput;
+};
 
 const generate = resolveDefaultExport<GenerateFn>(generateModule);
 
@@ -41,7 +47,8 @@ export async function transformQraftTreeShaking(
   code: string,
   id: string,
   options: QraftTreeShakeOptions,
-  resolver: QraftResolver = createAgnosticResolver(options.resolve)
+  resolver: QraftResolver = createAgnosticResolver(options.resolve),
+  inputSourceMap?: SourceMapInput
 ) {
   if (!shouldTransformId(id, options)) return null;
 
@@ -56,11 +63,14 @@ export async function transformQraftTreeShaking(
 
   applyTransformPlan(plan, plan.runtimeLocalNames);
 
-  const result = generate(plan.ast, {
+  const generatorOptions = {
     sourceMaps: true,
     sourceFileName: id,
     jsescOption: { minimal: true },
-  });
+    inputSourceMap,
+  } satisfies GeneratorOptions;
+
+  const result = generate(plan.ast, generatorOptions);
 
   return {
     code: result.code,

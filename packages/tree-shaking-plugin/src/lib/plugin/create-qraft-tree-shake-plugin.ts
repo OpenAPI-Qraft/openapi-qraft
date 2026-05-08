@@ -23,7 +23,13 @@ export function createQraftTreeShakePlugin<TRuntimeContext = unknown>(
       },
       handler(this: any, code, id) {
         const resolver = createResolver(this, options.resolve);
-        return transformQraftTreeShaking(code, id, options, resolver);
+        return transformQraftTreeShaking(
+          code,
+          id,
+          options,
+          resolver,
+          this.inputSourceMap
+        );
       },
     },
   });
