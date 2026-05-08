@@ -1,10 +1,4 @@
 import type { Scope } from '@babel/traverse';
-import fs from 'node:fs/promises';
-import { dirname, isAbsolute, normalize, relative, resolve, sep } from 'node:path';
-import { parse } from '@babel/parser';
-import * as traverseModule from '@babel/traverse';
-import * as t from '@babel/types';
-import { createAgnosticResolver } from '../resolvers/agnostic.js';
 import type { QraftResolver } from '../resolvers/common.js';
 import type {
   ClientBinding,
@@ -20,10 +14,24 @@ import type {
   RuntimeLocalNames,
   TransformPlan,
 } from './types.js';
+import fs from 'node:fs/promises';
+import {
+  dirname,
+  isAbsolute,
+  normalize,
+  relative,
+  resolve,
+  sep,
+} from 'node:path';
+import { parse } from '@babel/parser';
+import * as traverseModule from '@babel/traverse';
+import * as t from '@babel/types';
+import { createAgnosticResolver } from '../resolvers/agnostic.js';
 
-const traverse = resolveDefaultExport<typeof import('@babel/traverse')['default']>(
-  traverseModule
-);
+const traverse =
+  resolveDefaultExport<(typeof import('@babel/traverse'))['default']>(
+    traverseModule
+  );
 
 const callbackNames = new Set([
   'cancelQueries',
@@ -80,7 +88,9 @@ export async function createTransformPlan(
   const servicesDirName = 'services';
   const factoryOptions = options.createAPIClientFn ?? [];
   const precreatedOptions = options.apiClient ?? [];
-  const configuredFactoryNames = new Set(factoryOptions.map((factory) => factory.name));
+  const configuredFactoryNames = new Set(
+    factoryOptions.map((factory) => factory.name)
+  );
 
   const ast = parse(code, {
     sourceType: 'module',
@@ -101,10 +111,7 @@ export async function createTransformPlan(
     );
   }
 
-  const createImports = new Map<
-    string,
-    CreateImportEntry
-  >();
+  const createImports = new Map<string, CreateImportEntry>();
 
   for (const node of ast.program.body) {
     if (!t.isImportDeclaration(node)) continue;
@@ -1167,24 +1174,6 @@ function getObjectPropertyKey(key: t.ObjectProperty['key']) {
 
 function serviceNameToFileBase(serviceName: string) {
   return `${serviceName[0]?.toUpperCase() ?? ''}${serviceName.slice(1)}Service`;
-}
-
-function shouldTransformId(id: string, options: QraftTreeShakeOptions) {
-  if (id.includes('/node_modules/')) return false;
-  if (!/\.[cm]?[jt]sx?$/.test(id)) return false;
-  if (matchesPattern(id, options.exclude)) return false;
-  if (options.include && !matchesPattern(id, options.include)) return false;
-  return true;
-}
-
-function matchesPattern(
-  id: string,
-  pattern: QraftTreeShakeOptions['include'] | undefined
-): boolean {
-  if (!pattern) return false;
-  if (Array.isArray(pattern)) return pattern.some((item) => matchesPattern(id, item));
-  if (typeof pattern === 'string') return id.includes(pattern);
-  return pattern.test(id);
 }
 
 function isExpression(node: t.Node | t.SpreadElement | t.ArgumentPlaceholder) {
