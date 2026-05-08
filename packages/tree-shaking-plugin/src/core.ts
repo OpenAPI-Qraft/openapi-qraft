@@ -162,6 +162,7 @@ export async function transformQraftTreeShaking(
   resolver: QraftResolver = createAgnosticResolver(options.resolve)
 ) {
   if (!shouldTransformId(id, options)) return null;
+  const servicesDirName = 'services';
   const factoryOptions = options.createAPIClientFn ?? [];
   const precreatedOptions = options.apiClient ?? [];
   if (factoryOptions.length === 0 && precreatedOptions.length === 0) {
@@ -179,7 +180,10 @@ export async function transformQraftTreeShaking(
   const factoryResolvedIds = new Map<QraftFactoryConfig, string | null>();
   for (const factory of factoryOptions) {
     const resolved = await resolveFactoryModule(factory.module, id, resolver);
-    factoryResolvedIds.set(factory, resolved ? normalizeResolvedId(resolved) : null);
+    factoryResolvedIds.set(
+      factory,
+      resolved ? normalizeResolvedId(resolved) : null
+    );
   }
 
   const createImports = new Map<
@@ -340,7 +344,8 @@ export async function transformQraftTreeShaking(
           client.createImportPath,
           client.factory,
           resolver,
-          options.debug
+          options.debug,
+          servicesDirName
         )
       );
     }
@@ -460,7 +465,8 @@ export async function transformQraftTreeShaking(
         request.createImportPath,
         request.factory,
         resolver,
-        options.debug
+        options.debug,
+        servicesDirName
       )
     );
   }
@@ -1453,7 +1459,8 @@ async function readGeneratedClientInfo(
   clientFile: string,
   factory: QraftFactoryConfig,
   resolver: QraftResolver,
-  debug = false
+  debug = false,
+  servicesDirName = 'services'
 ): Promise<GeneratedClientInfo | null> {
   const skip = (reason: string) => {
     if (debug) {
@@ -1489,7 +1496,8 @@ async function readGeneratedClientInfo(
             reexportId,
             factory,
             resolver,
-            debug
+            debug,
+            servicesDirName
           );
         }
         return skip('generated client re-export resolved to the same file');
@@ -1515,7 +1523,7 @@ async function readGeneratedClientInfo(
         if (
           t.isImportSpecifier(specifier) &&
           t.isIdentifier(specifier.imported) &&
-          specifier.imported.name === 'services'
+          specifier.imported.name === servicesDirName
         ) {
           servicesDir = sourcePath.replace(/\/index(?:\.[cm]?[jt]s)?$/, '');
         }
@@ -1843,10 +1851,7 @@ function resolveRelativeImportPath(
   importPath: string
 ) {
   return importPath.startsWith('.')
-    ? composeImportPath(
-        importerId,
-        resolve(dirname(baseFile), importPath)
-      )
+    ? composeImportPath(importerId, resolve(dirname(baseFile), importPath))
     : importPath;
 }
 
