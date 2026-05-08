@@ -14,6 +14,7 @@ const scenario = getScenario(process.env.QRAFT_TREE_SHAKE_SCENARIO ?? '');
 export default {
   mode: 'production',
   target: 'web',
+  devtool: 'source-map',
   entry: {
     [scenario.name]: resolve(process.cwd(), scenario.entry),
   },

@@ -361,6 +361,13 @@ export function getBundlePath(bundler, scenario) {
   return resolve(getBundlerOutputDir(bundler, scenario), `${scenario.name}.js`);
 }
 
+export function getBundleMapPath(bundler, scenario) {
+  return resolve(
+    getBundlerOutputDir(bundler, scenario),
+    `${scenario.name}.js.map`
+  );
+}
+
 export function isExternalModuleRequest(request) {
   if (!request) {
     return false;

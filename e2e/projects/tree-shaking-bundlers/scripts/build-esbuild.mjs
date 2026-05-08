@@ -23,7 +23,7 @@ await build({
   format: 'esm',
   bundle: true,
   minify: false,
-  sourcemap: false,
+  sourcemap: true,
   target: 'es2020',
   splitting: true,
   platform: 'browser',
