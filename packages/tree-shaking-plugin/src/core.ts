@@ -299,11 +299,7 @@ export async function transformQraftTreeShaking(
         return;
       }
 
-      if (
-        args.length === 1 &&
-        isExpression(args[0]) &&
-        isOptionsArgument(args[0])
-      ) {
+      if (args.length === 1 && isExpression(args[0])) {
         clients.push({
           name: variablePath.node.id.name,
           createImportPath,
@@ -1029,7 +1025,6 @@ function matchInlineClientCall(
   if (!createImport) return null;
   if (root.arguments.length !== 1) return null;
   if (!isExpression(root.arguments[0])) return null;
-  if (!isOptionsArgument(root.arguments[0])) return null;
 
   return {
     createImportPath: createImport.factoryFile,
@@ -1718,27 +1713,6 @@ function matchesPattern(
 
 function isExpression(node: t.Node | t.SpreadElement | t.ArgumentPlaceholder) {
   return t.isExpression(node);
-}
-
-function isOptionsArgument(expression: t.Expression) {
-  if (!t.isObjectExpression(expression)) return true;
-  return isClientOptionsObject(expression);
-}
-
-function isClientOptionsObject(objectExpression: t.ObjectExpression) {
-  return objectExpression.properties.some((property) => {
-    if (!t.isObjectProperty(property)) return false;
-    if (t.isIdentifier(property.key)) {
-      return (
-        property.key.name === 'requestFn' ||
-        property.key.name === 'queryClient' ||
-        property.key.name === 'baseUrl'
-      );
-    }
-    return t.isStringLiteral(property.key)
-      ? ['requestFn', 'queryClient', 'baseUrl'].includes(property.key.value)
-      : false;
-  });
 }
 
 function composeLocalClientName(

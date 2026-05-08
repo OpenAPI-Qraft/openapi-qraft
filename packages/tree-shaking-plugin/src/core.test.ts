@@ -768,7 +768,7 @@ async function run() {
     `);
   });
 
-  it('skips callbacks-like object arguments', async () => {
+  it('optimizes clients with a single object literal even without known option keys', async () => {
     const fixture = await createFixture();
     const sourceFile = path.join(fixture, 'src/App.tsx');
 
@@ -785,7 +785,18 @@ api.pets.getPets.useQuery();
       { createAPIClientFn: [{ name: 'createAPIClient', module: './api' }] }
     );
 
-    expect(result).toBeNull();
+    expect(result?.code).toMatchInlineSnapshot(`
+      "import { useQuery } from '@openapi-qraft/react/callbacks/useQuery';
+      import { qraftReactAPIClient } from "@openapi-qraft/react";
+      const api_pets_getPets = qraftReactAPIClient(getPets, {
+        useQuery: _useQuery
+      }, {
+        useQuery
+      });
+      import { useQuery as _useQuery } from "@openapi-qraft/react/callbacks/useQuery";
+      import { getPets } from "./api/services/PetsService";
+      api_pets_getPets.useQuery();"
+    `);
   });
 
   it('skips exported clients', async () => {
