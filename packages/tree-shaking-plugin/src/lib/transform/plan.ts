@@ -1,5 +1,11 @@
 import type { Scope } from '@babel/traverse';
 import type { QraftResolver } from '../resolvers/common.js';
+import {
+  composeImportPath,
+  normalizeResolvedId,
+  resolvePrecreatedOptionsImportPath,
+  resolveRelativeImportPath,
+} from './path-rendering.js';
 import type {
   ClientBinding,
   CreateImportEntry,
@@ -15,14 +21,7 @@ import type {
   TransformPlan,
 } from './types.js';
 import fs from 'node:fs/promises';
-import {
-  dirname,
-  isAbsolute,
-  normalize,
-  relative,
-  resolve,
-  sep,
-} from 'node:path';
+import { dirname, resolve } from 'node:path';
 import { parse } from '@babel/parser';
 import * as traverseModule from '@babel/traverse';
 import * as t from '@babel/types';
@@ -1356,16 +1355,6 @@ function getGeneratedInfoKey(
   return `${createImportPath}::${factory.context ?? 'APIClientContext'}::${factory.contextModule ?? ''}`;
 }
 
-function resolveRelativeImportPath(
-  importerId: string,
-  baseFile: string,
-  importPath: string
-) {
-  return importPath.startsWith('.')
-    ? composeImportPath(importerId, resolve(dirname(baseFile), importPath))
-    : importPath;
-}
-
 async function resolveFactoryModule(
   specifier: string,
   importerId: string,
@@ -1373,53 +1362,6 @@ async function resolveFactoryModule(
 ): Promise<string | null> {
   const resolved = await resolver(specifier, importerId);
   return resolved ? normalizeResolvedId(resolved) : null;
-}
-
-function isPathLikeSpecifier(specifier: string) {
-  return specifier.startsWith('.') || isAbsolute(specifier);
-}
-
-function composeImportPath(importerId: string, targetFile: string) {
-  const relativePath = relative(dirname(importerId), targetFile);
-  const normalized = relativePath.split(sep).join('/');
-  return normalized.startsWith('.') ? normalized : `./${normalized}`;
-}
-
-function resolvePrecreatedOptionsImportPath(
-  importerId: string,
-  configuredModule: string,
-  resolvedFile: string | null
-) {
-  if (!isPathLikeSpecifier(configuredModule)) return configuredModule;
-  if (!resolvedFile) return configuredModule;
-  const emittedPath = composeResolvedSourceImportPath(importerId, resolvedFile);
-  return emittedPath === configuredModule ? configuredModule : emittedPath;
-}
-
-function normalizeResolvedId(resolvedId: string) {
-  const withoutQuery = stripQueryAndHash(resolvedId);
-  return normalize(withoutQuery);
-}
-
-function stripQueryAndHash(filePath: string) {
-  const queryIndex = filePath.search(/[?#]/);
-  return queryIndex >= 0 ? filePath.slice(0, queryIndex) : filePath;
-}
-
-function composeResolvedSourceImportPath(
-  importerId: string,
-  targetFile: string
-) {
-  const composed = composeImportPath(importerId, targetFile);
-  return stripIndexSourceExtension(stripSourceExtension(composed));
-}
-
-function stripSourceExtension(importPath: string) {
-  return importPath.replace(/\.(?:[cm]?[jt]sx?)$/, '');
-}
-
-function stripIndexSourceExtension(importPath: string) {
-  return importPath.replace(/\/index$/, '');
 }
 
 function debugSkip(options: QraftTreeShakeOptions, id: string, reason: string) {
