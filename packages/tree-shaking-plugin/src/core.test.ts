@@ -4,6 +4,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { transformQraftTreeShaking as transformQraftTreeShakingImpl } from './core.js';
+import { createTransformPlan } from './lib/transform/plan.js';
 
 const PRECREATED_API_INDEX_TS = `
 import { qraftAPIClient } from '@openapi-qraft/react';
@@ -83,6 +84,31 @@ async function transformQraftTreeShaking(
 }
 
 describe('transformQraftTreeShaking', () => {
+  it('collects named and inline usages in one transform plan', async () => {
+    const fixture = await createFixture();
+    const sourceFile = path.join(fixture, 'src/App.tsx');
+    const fixtureResolver = createFixtureResolver(fixture);
+
+    const plan = await createTransformPlan(
+      `
+import { createAPIClient } from './api';
+
+const api = createAPIClient();
+
+export function App() {
+  api.pets.getPets.useQuery();
+  createAPIClient({ queryClient: {} }).pets.findPetsByStatus.invalidateQueries();
+}
+`,
+      sourceFile,
+      { createAPIClientFn: [{ name: 'createAPIClient', module: './api' }] },
+      fixtureResolver
+    );
+
+    expect(plan.namedUsages).toHaveLength(1);
+    expect(plan.inlineUsages).toHaveLength(1);
+  });
+
   it('imports an operation directly for a context API client', async () => {
     const fixture = await createFixture();
     const sourceFile = path.join(fixture, 'src/App.tsx');

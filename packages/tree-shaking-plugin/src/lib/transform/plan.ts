@@ -1,122 +1,29 @@
 import type { Scope } from '@babel/traverse';
-import type { QraftResolver } from './lib/resolvers/common.js';
 import fs from 'node:fs/promises';
-import {
-  dirname,
-  isAbsolute,
-  normalize,
-  relative,
-  resolve,
-  sep,
-} from 'node:path';
-import * as generateModule from '@babel/generator';
+import { dirname, isAbsolute, normalize, relative, resolve, sep } from 'node:path';
 import { parse } from '@babel/parser';
 import * as traverseModule from '@babel/traverse';
-import { NodePath } from '@babel/traverse';
 import * as t from '@babel/types';
-import { createAgnosticResolver } from './lib/resolvers/agnostic.js';
-import { applyTransformPlan } from './lib/transform/mutate.js';
-import { createTransformPlan } from './lib/transform/plan.js';
+import { createAgnosticResolver } from '../resolvers/agnostic.js';
+import type { QraftResolver } from '../resolvers/common.js';
+import type {
+  ClientBinding,
+  CreateImportEntry,
+  GeneratedClientInfo,
+  GeneratedInfoRequest,
+  InlineImportRequest,
+  OperationImportInfo,
+  OperationUsage,
+  QraftFactoryConfig,
+  QraftPrecreatedClientConfig,
+  QraftTreeShakeOptions,
+  RuntimeLocalNames,
+  TransformPlan,
+} from './types.js';
 
-export type FilterPattern = string | RegExp | Array<string | RegExp>;
-
-export type QraftFactoryConfig = {
-  name: string;
-  module: string;
-  context?: string;
-  contextModule?: string;
-};
-
-export type QraftPrecreatedClientConfig = {
-  client: string;
-  clientModule: string;
-  createAPIClientFn: string;
-  createAPIClientFnModule: string;
-  createAPIClientFnOptions: string;
-  createAPIClientFnOptionsModule?: string;
-};
-
-export type { QraftResolver } from './lib/resolvers/common.js';
-
-export type QraftTreeShakeOptions = {
-  createAPIClientFn?: QraftFactoryConfig[];
-  apiClient?: QraftPrecreatedClientConfig[];
-  resolve?: QraftResolver;
-  include?: FilterPattern;
-  exclude?: FilterPattern;
-  debug?: boolean;
-};
-
-type GeneratedClientInfo = {
-  importerId: string;
-  clientFile: string;
-  servicesDir: string;
-  serviceImportPaths: Record<string, string>;
-  contextImportPath: string | null;
-  contextName: string | null;
-};
-
-type OperationImportInfo = {
-  importPath: string;
-  operationName: string;
-  localName: string;
-};
-
-type ClientBinding = {
-  name: string;
-  createImportPath: string;
-  factory: QraftFactoryConfig;
-  bindingNode: t.Node;
-  declarationScope: Scope;
-  localInitPath?: NodePath<t.VariableDeclarator>;
-  mode:
-    | { type: 'context' }
-    | { type: 'options'; optionsExpression: t.Expression }
-    | {
-        type: 'precreated';
-        optionsImportPath: string;
-        optionsExportName: string;
-      };
-};
-
-type OperationUsage = {
-  client: ClientBinding;
-  serviceName: string;
-  operationName: string;
-  callbackName: string;
-  callbackLocalName: string;
-  localClientName: string;
-  operationImport: OperationImportInfo;
-};
-
-type InlineImportRequest = {
-  callbackName: string;
-  callbackLocalName: string;
-  operationImport: OperationImportInfo;
-};
-
-type GeneratedInfoRequest = {
-  createImportPath: string;
-  factory: QraftFactoryConfig;
-};
-
-type RuntimeLocalNames = {
-  api: string;
-  react: string;
-};
-
-type ExportedDeclarationResolution = {
-  sourceFile: string;
-  ast: t.File;
-  init: t.Node;
-  importBindings: Map<string, { imported: string; resolvedId: string | null }>;
-};
-
-type GenerateFn = (typeof import('@babel/generator'))['default'];
-type TraverseFn = (typeof import('@babel/traverse'))['default'];
-
-const generate = resolveDefaultExport<GenerateFn>(generateModule);
-const traverse = resolveDefaultExport<TraverseFn>(traverseModule);
+const traverse = resolveDefaultExport<typeof import('@babel/traverse')['default']>(
+  traverseModule
+);
 
 const callbackNames = new Set([
   'cancelQueries',
@@ -157,32 +64,374 @@ const callbackNames = new Set([
   'useSuspenseQuery',
 ]);
 
-export async function transformQraftTreeShaking(
+type ExportedDeclarationResolution = {
+  sourceFile: string;
+  ast: t.File;
+  init: t.Node;
+  importBindings: Map<string, { imported: string; resolvedId: string | null }>;
+};
+
+export async function createTransformPlan(
   code: string,
   id: string,
   options: QraftTreeShakeOptions,
   resolver: QraftResolver = createAgnosticResolver(options.resolve)
-) {
-  if (!shouldTransformId(id, options)) return null;
+): Promise<TransformPlan> {
+  const servicesDirName = 'services';
   const factoryOptions = options.createAPIClientFn ?? [];
   const precreatedOptions = options.apiClient ?? [];
-  if (factoryOptions.length === 0 && precreatedOptions.length === 0) {
-    return debugSkip(options, id, 'no API clients configured');
+  const configuredFactoryNames = new Set(factoryOptions.map((factory) => factory.name));
+
+  const ast = parse(code, {
+    sourceType: 'module',
+    plugins: ['jsx', 'typescript'],
+  });
+  const fileBindingNames = getAllBindingNames(ast);
+  const programScope = getProgramScope(ast);
+  if (!programScope) {
+    return emptyTransformPlan(ast);
   }
-  const plan = await createTransformPlan(code, id, options, resolver);
-  if (!plan.namedUsages.length && !plan.inlineUsages.length) return null;
 
-  applyTransformPlan(plan, plan.runtimeLocalNames);
+  const factoryResolvedIds = new Map<QraftFactoryConfig, string | null>();
+  for (const factory of factoryOptions) {
+    const resolved = await resolveFactoryModule(factory.module, id, resolver);
+    factoryResolvedIds.set(
+      factory,
+      resolved ? normalizeResolvedId(resolved) : null
+    );
+  }
 
-  const result = generate(plan.ast, {
-    sourceMaps: true,
-    sourceFileName: id,
-    jsescOption: { minimal: true },
+  const createImports = new Map<
+    string,
+    CreateImportEntry
+  >();
+
+  for (const node of ast.program.body) {
+    if (!t.isImportDeclaration(node)) continue;
+    const source = node.source.value;
+    let resolvedAbs: string | null | undefined;
+    let resolvedId: string | null | undefined;
+
+    for (const specifier of node.specifiers) {
+      if (
+        !t.isImportSpecifier(specifier) ||
+        !t.isIdentifier(specifier.imported) ||
+        !t.isIdentifier(specifier.local)
+      ) {
+        continue;
+      }
+      const importedName = specifier.imported.name;
+      const matchingFactories = factoryOptions.filter(
+        (factory) => factory.name === importedName
+      );
+      if (matchingFactories.length === 0) continue;
+
+      if (resolvedAbs === undefined) {
+        resolvedAbs = (await resolver(source, id)) ?? null;
+        resolvedId = resolvedAbs ? normalizeResolvedId(resolvedAbs) : null;
+      }
+      if (!resolvedAbs) continue;
+
+      const matched = matchingFactories.find(
+        (factory) => factoryResolvedIds.get(factory) === resolvedId
+      );
+      if (!matched) continue;
+
+      createImports.set(specifier.local.name, {
+        sourceSpecifier: source,
+        factoryFile: resolvedAbs,
+        factory: matched,
+      });
+    }
+  }
+
+  const clients: ClientBinding[] = [];
+  clients.push(
+    ...(await findPrecreatedClients(
+      ast,
+      id,
+      precreatedOptions,
+      resolver,
+      programScope,
+      options.debug
+    ))
+  );
+  const operationImports = new Map<string, OperationImportInfo>();
+  const importLocalNames = new Map<string, string>();
+  const reservedImportLocalNames = new Set<string>();
+
+  const reactRuntimeImportLocalName = getOrCreateProgramImportLocalName(
+    programScope,
+    importLocalNames,
+    reservedImportLocalNames,
+    '@openapi-qraft/react:qraftReactAPIClient',
+    'qraftReactAPIClient',
+    fileBindingNames
+  );
+  const apiRuntimeImportLocalName = getOrCreateProgramImportLocalName(
+    programScope,
+    importLocalNames,
+    reservedImportLocalNames,
+    '@openapi-qraft/react:qraftAPIClient',
+    'qraftAPIClient',
+    fileBindingNames
+  );
+  const runtimeLocalNames = {
+    api: apiRuntimeImportLocalName,
+    react: reactRuntimeImportLocalName,
+  } satisfies RuntimeLocalNames;
+
+  traverse(ast, {
+    VariableDeclarator(variablePath) {
+      if (
+        variablePath.parentPath.parentPath?.isExportNamedDeclaration() ||
+        variablePath.parentPath.parentPath?.isExportDefaultDeclaration()
+      ) {
+        return;
+      }
+
+      if (!t.isIdentifier(variablePath.node.id)) return;
+      if (!t.isCallExpression(variablePath.node.init)) return;
+      if (!t.isIdentifier(variablePath.node.init.callee)) return;
+
+      const createImport = createImports.get(
+        variablePath.node.init.callee.name
+      );
+      if (!createImport) return;
+      const createImportPath = createImport.factoryFile;
+
+      const args = variablePath.node.init.arguments;
+      if (args.length === 0) {
+        clients.push({
+          name: variablePath.node.id.name,
+          createImportPath,
+          factory: createImport.factory,
+          bindingNode: variablePath.node.id,
+          declarationScope: variablePath.parentPath.scope,
+          localInitPath: variablePath,
+          mode: { type: 'context' },
+        });
+        return;
+      }
+
+      if (args.length === 1 && isExpression(args[0])) {
+        clients.push({
+          name: variablePath.node.id.name,
+          createImportPath,
+          factory: createImport.factory,
+          bindingNode: variablePath.node.id,
+          declarationScope: variablePath.parentPath.scope,
+          localInitPath: variablePath,
+          mode: {
+            type: 'options',
+            optionsExpression: t.cloneNode(args[0], true),
+          },
+        });
+      }
+    },
+  });
+
+  const usageMap = new Map<string, OperationUsage>();
+  const inlineImports: InlineImportRequest[] = [];
+  const transformedReferenceKeys = new Set<string>();
+  const generatedInfoByImport = new Map<string, GeneratedClientInfo | null>();
+  const generatedInfoRequests = new Map<string, GeneratedInfoRequest>();
+  const localClientNamesByOperation = new Map<string, string>();
+
+  for (const client of clients) {
+    const key = getGeneratedInfoKey(client.createImportPath, client.factory);
+    if (!generatedInfoRequests.has(key)) {
+      generatedInfoRequests.set(key, {
+        createImportPath: client.createImportPath,
+        factory: client.factory,
+      });
+    }
+    if (!generatedInfoByImport.has(key)) {
+      generatedInfoByImport.set(
+        key,
+        await readGeneratedClientInfo(
+          id,
+          client.createImportPath,
+          client.factory,
+          resolver,
+          options.debug,
+          servicesDirName
+        )
+      );
+    }
+  }
+
+  traverse(ast, {
+    CallExpression(callPath) {
+      const inlineMatch = matchInlineClientCall(
+        callPath.node.callee,
+        createImports
+      );
+      if (inlineMatch) {
+        const key = getGeneratedInfoKey(
+          inlineMatch.createImportPath,
+          inlineMatch.factory
+        );
+        if (!generatedInfoRequests.has(key)) {
+          generatedInfoRequests.set(key, {
+            createImportPath: inlineMatch.createImportPath,
+            factory: inlineMatch.factory,
+          });
+        }
+        if (!generatedInfoByImport.has(key)) {
+          generatedInfoByImport.set(key, null);
+        }
+      }
+
+      const match = matchClientCall(callPath.node.callee, clients);
+      if (!match) return;
+
+      const generatedInfo = generatedInfoByImport.get(
+        getGeneratedInfoKey(match.client.createImportPath, match.client.factory)
+      );
+      if (!generatedInfo)
+        return debugSkip(options, id, 'generated client was not resolved');
+      if (match.client.mode.type === 'context' && !generatedInfo.contextName) {
+        return debugSkip(options, id, 'context client was not detected');
+      }
+
+      const operationImport = resolveOperationImport(
+        generatedInfo,
+        match.serviceName,
+        match.operationName,
+        programScope,
+        fileBindingNames,
+        reservedImportLocalNames,
+        operationImports
+      );
+      if (!operationImport)
+        return debugSkip(options, id, 'operation import was not resolved');
+
+      const callbackLocalName = getOrCreateProgramImportLocalName(
+        programScope,
+        importLocalNames,
+        reservedImportLocalNames,
+        `@openapi-qraft/react/callbacks/${match.callbackName}`,
+        match.callbackName,
+        fileBindingNames
+      );
+
+      const operationKey = [
+        match.client.name,
+        match.serviceName,
+        match.operationName,
+      ].join(':');
+      const localClientName =
+        localClientNamesByOperation.get(operationKey) ??
+        createScopedUniqueName(
+          match.client.declarationScope,
+          composeLocalClientName(
+            match.client.name,
+            match.serviceName,
+            match.operationName
+          )
+        );
+      localClientNamesByOperation.set(operationKey, localClientName);
+
+      const key = [
+        match.client.name,
+        match.serviceName,
+        match.operationName,
+        match.callbackName,
+      ].join(':');
+
+      const usage = usageMap.get(key) ?? {
+        client: match.client,
+        serviceName: match.serviceName,
+        operationName: match.operationName,
+        callbackName: match.callbackName,
+        callbackLocalName,
+        localClientName,
+        operationImport,
+      };
+      usageMap.set(key, usage);
+
+      transformedReferenceKeys.add(match.client.name);
+    },
+  });
+
+  for (const [key, generatedInfo] of generatedInfoByImport) {
+    if (generatedInfo !== null) continue;
+    const request = generatedInfoRequests.get(key);
+    if (!request) continue;
+    generatedInfoByImport.set(
+      key,
+      await readGeneratedClientInfo(
+        id,
+        request.createImportPath,
+        request.factory,
+        resolver,
+        options.debug,
+        servicesDirName
+      )
+    );
+  }
+
+  traverse(ast, {
+    CallExpression(callPath) {
+      const match = matchInlineClientCall(callPath.node.callee, createImports);
+      if (!match) return;
+
+      const generatedInfo = generatedInfoByImport.get(
+        getGeneratedInfoKey(match.createImportPath, match.factory)
+      );
+      if (!generatedInfo)
+        return debugSkip(
+          options,
+          id,
+          'generated inline client was not resolved'
+        );
+
+      const operationImport = resolveOperationImport(
+        generatedInfo,
+        match.serviceName,
+        match.operationName,
+        programScope,
+        fileBindingNames,
+        reservedImportLocalNames,
+        operationImports
+      );
+      if (!operationImport)
+        return debugSkip(
+          options,
+          id,
+          'inline operation import was not resolved'
+        );
+
+      const callbackLocalName = getOrCreateProgramImportLocalName(
+        programScope,
+        importLocalNames,
+        reservedImportLocalNames,
+        `@openapi-qraft/react/callbacks/${match.callbackName}`,
+        match.callbackName,
+        fileBindingNames
+      );
+
+      inlineImports.push({
+        callbackName: match.callbackName,
+        callbackLocalName,
+        operationImport,
+      });
+    },
   });
 
   return {
-    code: result.code,
-    map: result.map,
+    ast,
+    clients,
+    namedUsages: [...usageMap.values()],
+    inlineUsages: inlineImports,
+    generatedInfoByImport,
+    generatedInfoRequests,
+    transformedReferenceKeys,
+    localClientNamesByOperation,
+    runtimeLocalNames,
+    createImports,
+    configuredFactoryNames,
   };
 }
 
@@ -677,394 +926,6 @@ function getStaticMemberRoot(
   return node;
 }
 
-function insertImports(
-  ast: t.File,
-  usages: OperationUsage[],
-  inlineImports: InlineImportRequest[],
-  generatedInfoByImport: Map<string, GeneratedClientInfo | null>,
-  runtimeLocalNames: RuntimeLocalNames
-) {
-  const body = ast.program.body;
-  const imported = getExistingImports(ast);
-  const declarations: t.ImportDeclaration[] = [];
-
-  if (
-    usages.some((usage) => usage.client.mode.type !== 'precreated') ||
-    inlineImports.length > 0
-  ) {
-    addNamedImportDeclaration(
-      declarations,
-      imported,
-      '@openapi-qraft/react',
-      'qraftReactAPIClient',
-      runtimeLocalNames.react
-    );
-  }
-
-  if (usages.some((usage) => usage.client.mode.type === 'precreated')) {
-    addNamedImportDeclaration(
-      declarations,
-      imported,
-      '@openapi-qraft/react',
-      'qraftAPIClient',
-      runtimeLocalNames.api
-    );
-  }
-
-  for (const usage of usages) {
-    addNamedImportDeclaration(
-      declarations,
-      imported,
-      `@openapi-qraft/react/callbacks/${usage.callbackName}`,
-      usage.callbackName,
-      usage.callbackLocalName
-    );
-    addNamedImportDeclaration(
-      declarations,
-      imported,
-      usage.operationImport.importPath,
-      usage.operationImport.operationName,
-      usage.operationImport.localName
-    );
-
-    if (usage.client.mode.type === 'context') {
-      const generatedInfo = generatedInfoByImport.get(
-        getGeneratedInfoKey(usage.client.createImportPath, usage.client.factory)
-      );
-      if (generatedInfo?.contextName && generatedInfo.contextImportPath) {
-        if (!hasImportLocalName(ast, generatedInfo.contextName)) {
-          addNamedImportDeclaration(
-            declarations,
-            imported,
-            generatedInfo.contextImportPath,
-            generatedInfo.contextName
-          );
-        }
-      }
-    }
-
-    if (usage.client.mode.type === 'precreated') {
-      addNamedImportDeclaration(
-        declarations,
-        imported,
-        usage.client.mode.optionsImportPath,
-        usage.client.mode.optionsExportName
-      );
-    }
-  }
-
-  for (const inline of inlineImports) {
-    addNamedImportDeclaration(
-      declarations,
-      imported,
-      `@openapi-qraft/react/callbacks/${inline.callbackName}`,
-      inline.callbackName,
-      inline.callbackLocalName
-    );
-    addNamedImportDeclaration(
-      declarations,
-      imported,
-      inline.operationImport.importPath,
-      inline.operationImport.operationName,
-      inline.operationImport.localName
-    );
-  }
-
-  const lastImportIndex = findLastImportIndex(body);
-  body.splice(lastImportIndex + 1, 0, ...declarations);
-}
-
-function addNamedImportDeclaration(
-  declarations: t.ImportDeclaration[],
-  imported: Set<string>,
-  source: string,
-  importedName: string,
-  localName = importedName
-) {
-  const key = `${source}:${importedName}:${localName}`;
-  if (imported.has(key)) return;
-  imported.add(key);
-  declarations.push(
-    t.importDeclaration(
-      [t.importSpecifier(t.identifier(localName), t.identifier(importedName))],
-      t.stringLiteral(source)
-    )
-  );
-}
-
-function getExistingImports(ast: t.File) {
-  const imported = new Set<string>();
-  for (const node of ast.program.body) {
-    if (!t.isImportDeclaration(node)) continue;
-    for (const specifier of node.specifiers) {
-      if (
-        t.isImportSpecifier(specifier) &&
-        t.isIdentifier(specifier.imported)
-      ) {
-        if (t.isIdentifier(specifier.local)) {
-          imported.add(
-            `${node.source.value}:${specifier.imported.name}:${specifier.local.name}`
-          );
-        }
-      }
-    }
-  }
-  return imported;
-}
-
-function hasImportLocalName(ast: t.File, name: string) {
-  return ast.program.body.some(
-    (node) =>
-      t.isImportDeclaration(node) &&
-      node.specifiers.some(
-        (specifier) =>
-          t.isImportSpecifier(specifier) &&
-          t.isIdentifier(specifier.local) &&
-          specifier.local.name === name
-      )
-  );
-}
-
-function insertOptimizedClients(
-  ast: t.File,
-  usages: OperationUsage[],
-  generatedInfoByImport: Map<string, GeneratedClientInfo | null>,
-  runtimeLocalNames: RuntimeLocalNames
-) {
-  const contextUsages = usages.filter(
-    (usage) => usage.client.mode.type === 'context'
-  );
-  const explicitOptionsUsages = usages.filter(
-    (usage) => usage.client.mode.type === 'options'
-  );
-  const precreatedUsages = usages.filter(
-    (usage) => usage.client.mode.type === 'precreated'
-  );
-
-  const contextDeclarations = createOptimizedClientDeclarations(
-    contextUsages,
-    contextUsages,
-    generatedInfoByImport,
-    runtimeLocalNames
-  );
-  const precreatedDeclarations = createOptimizedClientDeclarations(
-    precreatedUsages,
-    precreatedUsages,
-    generatedInfoByImport,
-    runtimeLocalNames
-  );
-
-  const body = ast.program.body;
-  const lastImportIndex = findLastImportIndex(body);
-  body.splice(
-    lastImportIndex + 1,
-    0,
-    ...dedupeDeclarations([...contextDeclarations, ...precreatedDeclarations])
-  );
-
-  const usagesByClient = new Map<ClientBinding, OperationUsage[]>();
-  for (const usage of explicitOptionsUsages) {
-    const clientUsages = usagesByClient.get(usage.client) ?? [];
-    clientUsages.push(usage);
-    usagesByClient.set(usage.client, clientUsages);
-  }
-
-  for (const [client, clientUsages] of usagesByClient) {
-    const declarations = createOptimizedClientDeclarations(
-      clientUsages,
-      clientUsages,
-      generatedInfoByImport,
-      runtimeLocalNames
-    );
-    const statementPath = client.localInitPath?.parentPath;
-    if (statementPath?.isVariableDeclaration()) {
-      statementPath.insertAfter(dedupeDeclarations(declarations));
-    }
-  }
-}
-
-function createOptimizedClientDeclarations(
-  declarationsUsages: OperationUsage[],
-  callbackUsages: OperationUsage[],
-  generatedInfoByImport: Map<string, GeneratedClientInfo | null>,
-  runtimeLocalNames: RuntimeLocalNames
-) {
-  return declarationsUsages.map((usage) => {
-    const callbacks = callbackUsages
-      .filter((item) => item.localClientName === usage.localClientName)
-      .map((item) => ({
-        callbackName: item.callbackName,
-        callbackLocalName: item.callbackLocalName,
-      }))
-      .filter(
-        (item, index, all) =>
-          all.findIndex(
-            (candidate) => candidate.callbackName === item.callbackName
-          ) === index
-      );
-
-    return createOptimizedClientDeclaration(
-      usage,
-      callbacks,
-      generatedInfoByImport,
-      runtimeLocalNames
-    );
-  });
-}
-
-function createOptimizedClientDeclaration(
-  usage: OperationUsage,
-  callbacks: Array<{ callbackName: string; callbackLocalName: string }>,
-  generatedInfoByImport: Map<string, GeneratedClientInfo | null>,
-  runtimeLocalNames: RuntimeLocalNames
-) {
-  const args: t.Expression[] = [
-    t.identifier(usage.operationImport.localName),
-    t.objectExpression(
-      callbacks.map((callback) =>
-        t.objectProperty(
-          t.identifier(callback.callbackName),
-          t.identifier(callback.callbackLocalName),
-          false,
-          true
-        )
-      )
-    ),
-  ];
-
-  if (usage.client.mode.type === 'context') {
-    const generatedInfo = generatedInfoByImport.get(
-      getGeneratedInfoKey(usage.client.createImportPath, usage.client.factory)
-    );
-    if (generatedInfo?.contextName)
-      args.push(t.identifier(generatedInfo.contextName));
-  } else if (usage.client.mode.type === 'options') {
-    args.push(t.cloneNode(usage.client.mode.optionsExpression, true));
-  } else {
-    args.push(
-      t.callExpression(t.identifier(usage.client.mode.optionsExportName), [])
-    );
-  }
-
-  const runtimeImportLocalName =
-    usage.client.mode.type === 'precreated'
-      ? runtimeLocalNames.api
-      : runtimeLocalNames.react;
-
-  return t.variableDeclaration('const', [
-    t.variableDeclarator(
-      t.identifier(usage.localClientName),
-      t.callExpression(t.identifier(runtimeImportLocalName), args)
-    ),
-  ]);
-}
-
-function dedupeDeclarations(declarations: t.VariableDeclaration[]) {
-  return declarations.filter((declaration, index, all) => {
-    const name = (declaration.declarations[0].id as t.Identifier).name;
-    return (
-      all.findIndex(
-        (item) => (item.declarations[0].id as t.Identifier).name === name
-      ) === index
-    );
-  });
-}
-
-function removeFullyTransformedClients(
-  ast: t.File,
-  clients: ClientBinding[],
-  transformedReferenceKeys: Set<string>
-) {
-  for (const client of clients) {
-    if (!transformedReferenceKeys.has(client.name)) continue;
-    if (hasIdentifierReference(ast, client.name, client.bindingNode)) continue;
-
-    if (client.mode.type === 'precreated') {
-      removeImportSpecifier(ast, client.bindingNode);
-      continue;
-    }
-
-    const declarationPath = client.localInitPath?.parentPath;
-    if (!declarationPath?.isVariableDeclaration()) continue;
-    if (declarationPath.node.declarations.length === 1) {
-      declarationPath.remove();
-    } else if (client.localInitPath) {
-      client.localInitPath.remove();
-    }
-  }
-}
-
-function removeImportSpecifier(ast: t.File, localNode: t.Node) {
-  traverse(ast, {
-    ImportDeclaration(importPath) {
-      const remainingSpecifiers = importPath.node.specifiers.filter(
-        (specifier) => specifier.local !== localNode
-      );
-      if (remainingSpecifiers.length === importPath.node.specifiers.length) {
-        return;
-      }
-      if (remainingSpecifiers.length === 0) {
-        importPath.remove();
-      } else {
-        importPath.node.specifiers = remainingSpecifiers;
-      }
-      importPath.stop();
-    },
-  });
-}
-
-function hasIdentifierReference(
-  ast: t.File,
-  name: string,
-  declarationId: t.Node
-) {
-  let found = false;
-
-  traverse(ast, {
-    Identifier(identifierPath) {
-      if (found) return;
-      if (
-        identifierPath.node !== declarationId &&
-        identifierPath.node.name === name &&
-        identifierPath.isReferencedIdentifier()
-      ) {
-        found = true;
-      }
-    },
-  });
-
-  return found;
-}
-
-function removeEmptyCreateImports(ast: t.File, factoryNames: Set<string>) {
-  traverse(ast, {
-    ImportDeclaration(importPath) {
-      const remainingSpecifiers = importPath.node.specifiers.filter(
-        (specifier) => {
-          if (
-            !t.isImportSpecifier(specifier) ||
-            !t.isIdentifier(specifier.local) ||
-            !t.isIdentifier(specifier.imported) ||
-            !factoryNames.has(specifier.imported.name)
-          ) {
-            return true;
-          }
-          return hasIdentifierReference(
-            ast,
-            specifier.local.name,
-            specifier.local
-          );
-        }
-      );
-      if (remainingSpecifiers.length === 0) {
-        importPath.remove();
-      } else {
-        importPath.node.specifiers = remainingSpecifiers;
-      }
-    },
-  });
-}
-
 async function readGeneratedClientInfo(
   importerId: string,
   clientFile: string,
@@ -1318,11 +1179,10 @@ function shouldTransformId(id: string, options: QraftTreeShakeOptions) {
 
 function matchesPattern(
   id: string,
-  pattern: FilterPattern | undefined
+  pattern: QraftTreeShakeOptions['include'] | undefined
 ): boolean {
   if (!pattern) return false;
-  if (Array.isArray(pattern))
-    return pattern.some((item) => matchesPattern(id, item));
+  if (Array.isArray(pattern)) return pattern.some((item) => matchesPattern(id, item));
   if (typeof pattern === 'string') return id.includes(pattern);
   return pattern.test(id);
 }
@@ -1510,16 +1370,35 @@ function debugSkip(options: QraftTreeShakeOptions, id: string, reason: string) {
   return null;
 }
 
-function findLastImportIndex(body: t.Statement[]) {
-  for (let index = body.length - 1; index >= 0; index -= 1) {
-    if (t.isImportDeclaration(body[index])) return index;
-  }
-  return -1;
+function emptyTransformPlan(ast: t.File): TransformPlan {
+  return {
+    ast,
+    clients: [],
+    namedUsages: [],
+    inlineUsages: [],
+    generatedInfoByImport: new Map(),
+    generatedInfoRequests: new Map(),
+    transformedReferenceKeys: new Set(),
+    localClientNamesByOperation: new Map(),
+    runtimeLocalNames: {
+      api: 'qraftAPIClient',
+      react: 'qraftReactAPIClient',
+    },
+    createImports: new Map(),
+    configuredFactoryNames: new Set(),
+  };
 }
 
 function resolveDefaultExport<T>(module: unknown): T {
   const firstDefault = (module as { default?: unknown }).default;
-  const secondDefault = (firstDefault as { default?: unknown } | undefined)
-    ?.default;
-  return (secondDefault ?? firstDefault ?? module) as T;
+  if (
+    firstDefault &&
+    typeof firstDefault === 'object' &&
+    'default' in (firstDefault as { default?: unknown })
+  ) {
+    const nestedDefault = (firstDefault as { default?: unknown }).default;
+    if (nestedDefault) return nestedDefault as T;
+  }
+  if (firstDefault) return firstDefault as T;
+  return module as T;
 }
