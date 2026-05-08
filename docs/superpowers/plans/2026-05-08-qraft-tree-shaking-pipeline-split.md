@@ -17,7 +17,7 @@
 - Create: `packages/tree-shaking-plugin/src/lib/transform/plan.ts`
 - Modify: `packages/tree-shaking-plugin/src/core.test.ts`
 
-- [ ] **Step 1: Add a planner test that fails before the new module exists**
+- [x] **Step 1: Add a planner test that fails before the new module exists**
 
 ```ts
 import { createTransformPlan } from './lib/transform/plan.js';
@@ -46,7 +46,7 @@ export function App() {
 });
 ```
 
-- [ ] **Step 2: Run the targeted test and confirm the planner is missing**
+- [x] **Step 2: Run the targeted test and confirm the planner is missing**
 
 Run:
 
@@ -56,7 +56,7 @@ yarn workspace @openapi-qraft/tree-shaking-plugin test -- src/core.test.ts -t "c
 
 Expected: FAIL because `createTransformPlan` and the shared plan types do not exist yet.
 
-- [ ] **Step 3: Add the shared plan types and the planner implementation**
+- [x] **Step 3: Add the shared plan types and the planner implementation**
 
 Use this shape for the new boundary:
 
@@ -82,7 +82,7 @@ export async function createTransformPlan(
 
 Keep the planner responsible for discovery, resolution, and bookkeeping only. Do not move source-map composition or path rendering into this spec.
 
-- [ ] **Step 4: Re-run the targeted test and confirm the new boundary is real**
+- [x] **Step 4: Re-run the targeted test and confirm the new boundary is real**
 
 Run:
 
@@ -99,7 +99,7 @@ Expected: PASS.
 - Modify: `packages/tree-shaking-plugin/src/core.ts`
 - Modify: `packages/tree-shaking-plugin/src/core.test.ts`
 
-- [ ] **Step 1: Add a regression snapshot that exercises the public transform after the refactor**
+- [x] **Step 1: Add a regression snapshot that exercises the public transform after the refactor**
 
 Keep one representative snapshot in `core.test.ts` that still proves the emitted tree-shaking output is unchanged for a named client.
 
@@ -118,7 +118,7 @@ expect(result?.code).toMatchInlineSnapshot(`
 `);
 ```
 
-- [ ] **Step 2: Move the write path into `applyTransformPlan` and keep `core.ts` as orchestration only**
+- [x] **Step 2: Move the write path into `applyTransformPlan` and keep `core.ts` as orchestration only**
 
 Use this mutator boundary:
 
@@ -131,7 +131,7 @@ export function applyTransformPlan(
 
 `src/core.ts` should parse, build a plan, apply it, and generate code. The AST write path belongs in `mutate.ts`, not in `core.ts`.
 
-- [ ] **Step 3: Run the package unit suite and typecheck**
+- [x] **Step 3: Run the package unit suite and typecheck**
 
 Run:
 
@@ -142,7 +142,7 @@ yarn workspace @openapi-qraft/tree-shaking-plugin typecheck
 
 Expected: both commands pass with the refactor in place.
 
-- [ ] **Step 4: Run the external tree-shaking e2e checkpoint**
+- [x] **Step 4: Run the external tree-shaking e2e checkpoint**
 
 Run:
 
@@ -152,7 +152,7 @@ cd e2e && yarn e2e:tree-shaking-bundlers-local
 
 Expected: the local multi-bundler fixture still publishes, updates, builds, and unpublishes cleanly with the same emitted contract.
 
-- [ ] **Step 5: Commit the split**
+- [x] **Step 5: Commit the split**
 
 ```bash
 git add packages/tree-shaking-plugin/src/lib/transform/types.ts packages/tree-shaking-plugin/src/lib/transform/plan.ts packages/tree-shaking-plugin/src/lib/transform/mutate.ts packages/tree-shaking-plugin/src/core.ts packages/tree-shaking-plugin/src/core.test.ts
@@ -160,3 +160,5 @@ git commit -m "refactor: split tree-shaking pipeline"
 ```
 
 ---
+
+**Status:** completed and validated with package `lint`, `test`, `typecheck`, and external `e2e:tree-shaking-bundlers-local`.
