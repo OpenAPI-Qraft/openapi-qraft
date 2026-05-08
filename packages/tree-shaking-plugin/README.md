@@ -227,7 +227,7 @@ If two imports share the same `name` but resolve to different files, only the on
 
 ## Path rendering
 
-Relative generated imports are emitted without source extensions or trailing `/index` so the output stays bundler-friendly. Bare module specifiers are preserved as-is.
+Normalized generated relative source imports are emitted without source extensions or trailing `/index`. Bare module specifiers are preserved as-is.
 
 ## Context client inside a component
 
