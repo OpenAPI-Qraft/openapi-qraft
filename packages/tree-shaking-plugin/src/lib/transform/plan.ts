@@ -1,4 +1,4 @@
-import type { Scope } from '@babel/traverse';
+import type { NodePath, Scope } from '@babel/traverse';
 import type { QraftResolver } from '../resolvers/common.js';
 import {
   composeImportPath,
@@ -361,7 +361,7 @@ export async function createTransformPlan(
         }
       }
 
-      const match = matchClientCall(callPath.node.callee, clients);
+      const match = matchClientCall(callPath, clients);
       if (!match) return;
 
       const generatedInfo = generatedInfoByImport.get(
@@ -394,10 +394,13 @@ export async function createTransformPlan(
         fileBindingNames
       );
 
+      const scopeKey = getUsageScopeKey(callPath);
+
       const operationKey = [
         match.client.name,
         match.serviceName,
         match.operationName,
+        scopeKey,
       ].join(':');
       const localClientName =
         localClientNamesByOperation.get(operationKey) ??
@@ -416,6 +419,7 @@ export async function createTransformPlan(
         match.serviceName,
         match.operationName,
         match.callbackName,
+        scopeKey,
       ].join(':');
 
       const usage = usageMap.get(key) ?? {
@@ -426,6 +430,7 @@ export async function createTransformPlan(
         callbackLocalName,
         localClientName,
         operationImport,
+        scopeKey,
       };
       usageMap.set(key, usage);
 
@@ -894,7 +899,7 @@ async function matchesConfiguredBinding(
 }
 
 function matchClientCall(
-  callee: t.Expression | t.V8IntrinsicIdentifier,
+  callPath: NodePath<t.CallExpression>,
   clients: ClientBinding[]
 ): {
   client: ClientBinding;
@@ -902,6 +907,7 @@ function matchClientCall(
   operationName: string;
   callbackName: string;
 } | null {
+  const callee = callPath.node.callee;
   if (!t.isMemberExpression(callee) && !t.isOptionalMemberExpression(callee)) {
     return null;
   }
@@ -920,7 +926,11 @@ function matchClientCall(
     return null;
   if (!callbackNames.has(callbackName)) return null;
 
-  const client = clients.find((item) => item.name === clientName);
+  const binding = callPath.scope.getBinding(clientName);
+  const client = clients.find((item) => {
+    if (item.name !== clientName) return false;
+    return binding?.identifier === item.bindingNode;
+  });
   if (!client) return null;
 
   return { client, serviceName, operationName, callbackName };
@@ -1292,6 +1302,16 @@ function getProgramScope(ast: t.File) {
   });
 
   return programScope;
+}
+
+function getUsageScopeKey(callPath: NodePath<t.CallExpression>) {
+  const functionParent = callPath.getFunctionParent();
+  if (!functionParent) {
+    return 'program';
+  }
+
+  const { node } = functionParent;
+  return [node.type, node.start ?? -1, node.end ?? -1].join(':');
 }
 
 function getOrCreateProgramImportLocalName(

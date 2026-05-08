@@ -69,6 +69,7 @@ export type OperationUsage = {
   callbackLocalName: string;
   localClientName: string;
   operationImport: OperationImportInfo;
+  scopeKey: string;
 };
 
 export type InlineImportRequest = {
