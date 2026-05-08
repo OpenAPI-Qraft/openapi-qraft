@@ -184,7 +184,7 @@ function PetUpdateForm({
   onUpdate: () => void;
   onReset: () => void;
 }) {
-  const qraftContext = usePlaygroundAPIClientContext();
+  const qraftOptions = usePlaygroundAPIClientContext();
 
   const petParameters: typeof qraft.pet.getPetById.types.parameters = {
     path: { petId },
@@ -198,7 +198,7 @@ function PetUpdateForm({
 
   const { isPending, mutate } = qraft.pet.updatePet.useMutation(undefined, {
     async onMutate(variables) {
-      const miniQraft = createPlaygroundAPIClient(qraftContext);
+      const miniQraft = createPlaygroundAPIClient(qraftOptions);
       await miniQraft.pet.getPetById.cancelQueries({
         parameters: petParameters,
       });
@@ -214,14 +214,14 @@ function PetUpdateForm({
     },
     async onError(_error, _variables, context) {
       if (context?.prevPet) {
-        createPlaygroundAPIClient(qraftContext).pet.getPetById.setQueryData(
+        createPlaygroundAPIClient(qraftOptions).pet.getPetById.setQueryData(
           petParameters,
           context.prevPet
         );
       }
     },
     async onSuccess(updatedPet) {
-      const miniQraft = createPlaygroundAPIClient(qraftContext);
+      const miniQraft = createPlaygroundAPIClient(qraftOptions);
       miniQraft.pet.getPetById.setQueryData(petParameters, updatedPet);
       await miniQraft.pet.findPetsByStatus.invalidateQueries();
       onUpdate();
@@ -295,12 +295,12 @@ function PetCreateForm({
   onCreate: (pet: components['schemas']['Pet']) => void;
   onReset: () => void;
 }) {
-  const qraftContext = usePlaygroundAPIClientContext();
+  const qraftOptions = usePlaygroundAPIClientContext();
 
   const { isPending, mutate, error } = qraft.pet.addPet.useMutation(undefined, {
     async onSuccess(createdPet) {
       await createPlaygroundAPIClient(
-        qraftContext
+        qraftOptions
       ).pet.findPetsByStatus.invalidateQueries();
       if (!createdPet)
         throw new Error('createdPet not found in addPet.onSuccess');
