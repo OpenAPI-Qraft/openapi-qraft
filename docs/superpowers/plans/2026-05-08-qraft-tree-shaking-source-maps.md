@@ -24,7 +24,7 @@
 - Modify: `packages/tree-shaking-plugin/package.json`
 - Modify: `yarn.lock`
 
-- [ ] **Step 1: Add a source-map test that traces the rewritten call site back to the original source**
+- [x] **Step 1: Add a source-map test that traces the rewritten call site back to the original source**
 
 Update the local test helper first so the new regression test can pass the incoming map through to the real transform:
 
@@ -63,7 +63,7 @@ async function transformQraftTreeShaking(
 ```ts
 import { originalPositionFor, TraceMap } from '@jridgewell/trace-mapping';
 
-it('keeps the rewritten call site traceable through the composed source map', async () => {
+it('keeps a rewritten user call site traceable through an incoming source map', async () => {
   const fixture = await createFixture();
   const sourceFile = path.join(fixture, 'src/App.tsx');
   const originalCode = `
@@ -106,7 +106,7 @@ export function App() {
 });
 ```
 
-- [ ] **Step 2: Add `@jridgewell/trace-mapping` as a direct dev dependency**
+- [x] **Step 2: Add `@jridgewell/trace-mapping` as a direct dev dependency**
 
 Run:
 
@@ -116,12 +116,12 @@ yarn workspace @openapi-qraft/tree-shaking-plugin add -D @jridgewell/trace-mappi
 
 Expected: `packages/tree-shaking-plugin/package.json` and `yarn.lock` now list `@jridgewell/trace-mapping` directly, so the new test can compile under Yarn PnP.
 
-- [ ] **Step 3: Run the focused test before plumbing exists and confirm it fails**
+- [x] **Step 3: Run the focused test before plumbing exists and confirm it fails**
 
 Run:
 
 ```bash
-yarn workspace @openapi-qraft/tree-shaking-plugin test -- src/core.test.ts -t "keeps the rewritten call site traceable through the composed source map"
+yarn workspace @openapi-qraft/tree-shaking-plugin test -- src/core.test.ts -t "keeps a rewritten user call site traceable through an incoming source map"
 ```
 
 Expected: FAIL because the incoming bundler map is not threaded into the transform yet, so the composed-map assertion still points at generated-only positions.
@@ -133,7 +133,7 @@ Expected: FAIL because the incoming bundler map is not threaded into the transfo
 - Modify: `packages/tree-shaking-plugin/src/core.ts`
 - Modify: `packages/tree-shaking-plugin/src/core.test.ts`
 
-- [ ] **Step 1: Pass `this.inputSourceMap` from the unplugin wrapper into the core transform**
+- [x] **Step 1: Pass `this.inputSourceMap` from the unplugin wrapper into the core transform**
 
 The wrapper should keep using the current resolver creation logic, but it must forward the incoming map:
 
@@ -144,7 +144,7 @@ handler(this: any, code, id) {
 }
 ```
 
-- [ ] **Step 2: Extend the core transform signature and pass the incoming map into Babel generator**
+- [x] **Step 2: Extend the core transform signature and pass the incoming map into Babel generator**
 
 Update `packages/tree-shaking-plugin/src/core.ts` so the function accepts the optional map and forwards it unchanged:
 
@@ -168,17 +168,17 @@ export async function transformQraftTreeShaking(
 
 Keep the rest of the transform unchanged. This spec is only about source-map composition for rewritten user call sites; synthetic generated statements do not need bespoke original-source mapping.
 
-- [ ] **Step 3: Re-run the focused source-map test**
+- [x] **Step 3: Re-run the focused source-map test**
 
 Run:
 
 ```bash
-yarn workspace @openapi-qraft/tree-shaking-plugin test -- src/core.test.ts -t "keeps the rewritten call site traceable through the composed source map"
+yarn workspace @openapi-qraft/tree-shaking-plugin test -- src/core.test.ts -t "keeps a rewritten user call site traceable through an incoming source map"
 ```
 
 Expected: PASS, with `originalPositionFor(...)` resolving to the original `api.pets.getPets.useQuery()` call.
 
-- [ ] **Step 4: Run the package suite, typecheck, and the external e2e checkpoint**
+- [x] **Step 4: Run the package suite, typecheck, and the external e2e checkpoint**
 
 Run:
 
@@ -190,7 +190,7 @@ cd e2e && yarn e2e:tree-shaking-bundlers-local
 
 Expected: all three checks pass and the external fixture still builds through every bundler.
 
-- [ ] **Step 5: Commit the source-map plumbing**
+- [x] **Step 5: Commit the source-map plumbing**
 
 ```bash
 git add packages/tree-shaking-plugin/src/lib/plugin/create-qraft-tree-shake-plugin.ts packages/tree-shaking-plugin/src/core.ts packages/tree-shaking-plugin/src/core.test.ts packages/tree-shaking-plugin/package.json yarn.lock
