@@ -79,6 +79,47 @@ type ExportedDeclarationResolution = {
   importBindings: Map<string, { imported: string; resolvedId: string | null }>;
 };
 
+/**
+ * Parse the source, resolve the configured clients, and collect everything the
+ * mutation phase needs without changing the AST.
+ *
+ * The returned plan separates the discovered work into concrete buckets:
+ * - `clients`: bindings for discovered client variables
+ * - `namedUsages`: matched client method calls that already have a local client
+ * - `inlineUsages`: inline `createAPIClient(...)` call sites that need rewrite
+ *
+ * The plan also carries the bookkeeping needed by the mutator to insert
+ * imports, generate optimized clients, and clean up dead declarations.
+ *
+ * @example
+ * ```ts
+ * const plan = await createTransformPlan(source, id, options);
+ *
+ * plan.clients[0]
+ * // {
+ * //   name: 'api',
+ * //   mode: { type: 'context' },
+ * //   ...
+ * // }
+ *
+ * plan.namedUsages[0]
+ * // {
+ * //   client: { name: 'api' },
+ * //   serviceName: 'pets',
+ * //   operationName: 'getPets',
+ * //   callbackName: 'useQuery',
+ * //   ...
+ * // }
+ *
+ * plan.inlineUsages[0]
+ * // {
+ * //   callbackName: 'invalidateQueries',
+ * //   callbackLocalName: 'invalidateQueries',
+ * //   operationImport: { importPath: './api/services/PetsService' },
+ * //   ...
+ * // }
+ * ```
+ */
 export async function createTransformPlan(
   code: string,
   id: string,

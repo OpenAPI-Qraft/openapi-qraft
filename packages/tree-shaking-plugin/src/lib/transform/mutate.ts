@@ -15,6 +15,20 @@ const traverse =
     traverseModule
   );
 
+/**
+ * Apply a previously created transform plan by rewriting call sites, inserting
+ * imports, emitting optimized clients, and removing declarations that became
+ * dead after the rewrite.
+ *
+ * @example
+ * ```ts
+ * const plan = await createTransformPlan(source, id, options);
+ *
+ * applyTransformPlan(plan, plan.runtimeLocalNames);
+ *
+ * // `plan.ast` is now mutated in place and ready for code generation.
+ * ```
+ */
 export function applyTransformPlan(
   plan: TransformPlan,
   runtimeLocalNames: RuntimeLocalNames
