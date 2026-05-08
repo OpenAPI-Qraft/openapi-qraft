@@ -1,6 +1,6 @@
 # Qraft Tree-Shaking E2E Refresh Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. When spawning workers, prefer a mini model and keep `reasoning_effort` at `high` or lower. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Refresh the external `tree-shaking-bundlers` e2e contract so the installed package, generated fixture sources, and dist assertions match the refactored tree-shaking pipeline.
 
@@ -74,4 +74,3 @@ git commit -m "test: refresh tree-shaking e2e contract"
 ```
 
 ---
-

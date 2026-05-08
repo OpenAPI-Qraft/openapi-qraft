@@ -1,6 +1,6 @@
 # Qraft Tree-Shaking Path Rendering Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. When spawning workers, prefer a mini model and keep `reasoning_effort` at `high` or lower. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Extract the import-path rendering rules out of `src/core.ts` so path normalization lives in one focused helper module, while keeping emitted import strings unchanged.
 
