@@ -30,15 +30,15 @@
 - Modify: `e2e/projects/tree-shaking-bundlers/rspack.config.mjs`
 - Modify: `e2e/projects/tree-shaking-bundlers/scripts/build-esbuild.mjs`
 
-- [ ] **Step 1: Add a failing assertion that reads `.js.map` and traces back to the original source**
+- [x] **Step 1: Add a failing assertion that reads `.js.map` and traces back to the original source**
 
 Update `assert-dist.mjs` so it loads the source map for `barrel-context-relative` and `barrel-precreated-relative`, then uses `originalPositionFor(new TraceMap(map), { line, column })` to verify that one emitted call site maps back to `src/barrel-context-relative.ts` and `src/barrel-precreated-relative.ts`.
 
-- [ ] **Step 2: Enable sourcemaps in every bundler config without changing the output shape**
+- [x] **Step 2: Enable sourcemaps in every bundler config without changing the output shape**
 
 Turn on source-map emission in Vite, Rollup, Webpack, Rspack, and esbuild. Keep the existing one-entry, one-JS-file layout intact and do not add assertions for chunks or assets.
 
-- [ ] **Step 3: Re-run the local e2e workflow to prove the new contract is stable**
+- [x] **Step 3: Re-run the local e2e workflow to prove the new contract is stable**
 
 Run:
 
@@ -48,7 +48,7 @@ cd e2e && yarn e2e:tree-shaking-bundlers-local
 
 Expected: the fixture still produces one JS file per scenario, the `.js.map` files exist, and the new source-map assertions pass.
 
-- [ ] **Step 4: Commit the source-map coverage change**
+- [x] **Step 4: Commit the source-map coverage change**
 
 ```bash
 git add e2e/projects/tree-shaking-bundlers
@@ -61,7 +61,7 @@ git commit -m "test: add tree-shaking source-map coverage"
 - Modify: `e2e/projects/tree-shaking-bundlers/dist/**`
 - Modify: `e2e/projects/tree-shaking-bundlers/scripts/assert-dist.mjs`
 
-- [ ] **Step 1: Re-run the local e2e workflow from a clean state**
+- [x] **Step 1: Re-run the local e2e workflow from a clean state**
 
 Run:
 
@@ -71,11 +71,11 @@ cd e2e && yarn e2e:tree-shaking-bundlers-local
 
 Expected: all current scenarios pass with the source-map assertions in place.
 
-- [ ] **Step 2: Update only the checked-in bundle outputs that actually changed**
+- [x] **Step 2: Update only the checked-in bundle outputs that actually changed**
 
 If the emitted bundle text changes because of sourcemap-enabled builds, refresh the checked-in fixture outputs under `e2e/projects/tree-shaking-bundlers/dist`. Do not introduce any extra checks for chunks or assets.
 
-- [ ] **Step 3: Commit the final baseline**
+- [x] **Step 3: Commit the final baseline**
 
 ```bash
 git add e2e/projects/tree-shaking-bundlers
