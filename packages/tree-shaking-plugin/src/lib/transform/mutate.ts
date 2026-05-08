@@ -1,5 +1,3 @@
-import * as t from '@babel/types';
-import * as traverseModule from '@babel/traverse';
 import type {
   ClientBinding,
   CreateImportEntry,
@@ -9,10 +7,13 @@ import type {
   RuntimeLocalNames,
   TransformPlan,
 } from './types.js';
+import * as traverseModule from '@babel/traverse';
+import * as t from '@babel/types';
 
-const traverse = resolveDefaultExport<typeof import('@babel/traverse')['default']>(
-  traverseModule
-);
+const traverse =
+  resolveDefaultExport<(typeof import('@babel/traverse'))['default']>(
+    traverseModule
+  );
 
 export function applyTransformPlan(
   plan: TransformPlan,
@@ -26,10 +27,16 @@ export function applyTransformPlan(
     runtimeLocalNames,
     plan.inlineUsages
   );
-  insertImports(plan.ast, usages, plan.inlineUsages, plan.generatedInfoByImport, {
-    api: runtimeLocalNames.api,
-    react: runtimeLocalNames.react,
-  });
+  insertImports(
+    plan.ast,
+    usages,
+    plan.inlineUsages,
+    plan.generatedInfoByImport,
+    {
+      api: runtimeLocalNames.api,
+      react: runtimeLocalNames.react,
+    }
+  );
   insertOptimizedClients(plan.ast, usages, plan.generatedInfoByImport, {
     api: runtimeLocalNames.api,
     react: runtimeLocalNames.react,
