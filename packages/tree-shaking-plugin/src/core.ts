@@ -1,14 +1,20 @@
 import type { Scope } from '@babel/traverse';
 import type { QraftResolver } from './lib/resolvers/common.js';
 import fs from 'node:fs/promises';
-import path from 'node:path';
+import {
+  dirname,
+  isAbsolute,
+  normalize,
+  relative,
+  resolve,
+  sep,
+} from 'node:path';
 import * as generateModule from '@babel/generator';
 import { parse } from '@babel/parser';
 import * as traverseModule from '@babel/traverse';
 import { NodePath } from '@babel/traverse';
 import * as t from '@babel/types';
 import { createAgnosticResolver } from './lib/resolvers/agnostic.js';
-import { realpathSafe } from './lib/resolvers/common.js';
 
 export type FilterPattern = string | RegExp | Array<string | RegExp>;
 
@@ -101,7 +107,7 @@ type ExportedDeclarationResolution = {
   sourceFile: string;
   ast: t.File;
   init: t.Node;
-  importBindings: Map<string, { imported: string; realpath: string | null }>;
+  importBindings: Map<string, { imported: string; resolvedId: string | null }>;
 };
 
 type GenerateFn = (typeof import('@babel/generator'))['default'];
@@ -170,13 +176,10 @@ export async function transformQraftTreeShaking(
   const programScope = getProgramScope(ast);
   if (!programScope) return null;
 
-  const factoryRealpaths = new Map<QraftFactoryConfig, string | null>();
+  const factoryResolvedIds = new Map<QraftFactoryConfig, string | null>();
   for (const factory of factoryOptions) {
     const resolved = await resolveFactoryModule(factory.module, id, resolver);
-    factoryRealpaths.set(
-      factory,
-      resolved ? await realpathSafe(resolved) : null
-    );
+    factoryResolvedIds.set(factory, resolved ? normalizeResolvedId(resolved) : null);
   }
 
   const createImports = new Map<
@@ -192,7 +195,7 @@ export async function transformQraftTreeShaking(
     if (!t.isImportDeclaration(node)) continue;
     const source = node.source.value;
     let resolvedAbs: string | null | undefined;
-    let resolvedReal: string | null | undefined;
+    let resolvedId: string | null | undefined;
 
     for (const specifier of node.specifiers) {
       if (
@@ -210,12 +213,12 @@ export async function transformQraftTreeShaking(
 
       if (resolvedAbs === undefined) {
         resolvedAbs = (await resolver(source, id)) ?? null;
-        resolvedReal = resolvedAbs ? await realpathSafe(resolvedAbs) : null;
+        resolvedId = resolvedAbs ? normalizeResolvedId(resolvedAbs) : null;
       }
       if (!resolvedAbs) continue;
 
       const matched = matchingFactories.find(
-        (factory) => factoryRealpaths.get(factory) === resolvedReal
+        (factory) => factoryResolvedIds.get(factory) === resolvedId
       );
       if (!matched) continue;
 
@@ -611,9 +614,11 @@ async function findPrecreatedClients(
       return {
         config,
         clientFile,
-        clientReal: clientFile ? await realpathSafe(clientFile) : null,
+        clientResolvedId: clientFile ? normalizeResolvedId(clientFile) : null,
         factoryFile,
-        factoryReal: factoryFile ? await realpathSafe(factoryFile) : null,
+        factoryResolvedId: factoryFile
+          ? normalizeResolvedId(factoryFile)
+          : null,
         optionsImportPath,
       };
     })
@@ -629,14 +634,14 @@ async function findPrecreatedClients(
     if (!t.isImportDeclaration(node)) continue;
 
     const resolvedImport = await resolver(node.source.value, importerId);
-    const resolvedImportReal = resolvedImport
-      ? await realpathSafe(resolvedImport)
+    const resolvedImportId = resolvedImport
+      ? normalizeResolvedId(resolvedImport)
       : null;
-    if (!resolvedImportReal) continue;
+    if (!resolvedImportId) continue;
 
     for (const specifier of node.specifiers) {
       const match = resolvedConfigs.find((item) => {
-        if (item.clientReal !== resolvedImportReal) return false;
+        if (item.clientResolvedId !== resolvedImportId) return false;
         if (
           item.config.client === 'default' &&
           t.isImportDefaultSpecifier(specifier)
@@ -651,7 +656,7 @@ async function findPrecreatedClients(
         );
       });
       if (!match?.clientFile || !match.factoryFile) continue;
-      if (!match.factoryReal) continue;
+      if (!match.factoryResolvedId) continue;
       if (
         !t.isImportDefaultSpecifier(specifier) &&
         !t.isImportSpecifier(specifier)
@@ -665,7 +670,7 @@ async function findPrecreatedClients(
         validatedConfig = await validatePrecreatedClientConfig(
           match.config,
           match.clientFile,
-          match.factoryReal,
+          match.factoryResolvedId,
           resolver,
           debug
         );
@@ -694,7 +699,7 @@ async function findPrecreatedClients(
 async function validatePrecreatedClientConfig(
   config: QraftPrecreatedClientConfig,
   clientFile: string,
-  factoryReal: string,
+  factoryResolvedId: string,
   resolver: QraftResolver,
   debug = false
 ): Promise<{ factory: QraftFactoryConfig } | null> {
@@ -725,7 +730,7 @@ async function validatePrecreatedClientConfig(
     !(await matchesConfiguredBinding(
       init.callee.name,
       config.createAPIClientFn,
-      factoryReal,
+      factoryResolvedId,
       sourceFile,
       importBindings
     ))
@@ -747,10 +752,9 @@ async function readExportedDeclarationChain(
   resolver: QraftResolver,
   seen = new Set<string>()
 ): Promise<ExportedDeclarationResolution | null> {
-  const sourceFile = path.normalize(startFile);
-  const canonicalFile = await realpathSafe(startFile);
-  if (seen.has(canonicalFile)) return null;
-  seen.add(canonicalFile);
+  const sourceFile = normalizeResolvedId(startFile);
+  if (seen.has(sourceFile)) return null;
+  seen.add(sourceFile);
 
   let source: string;
   try {
@@ -783,11 +787,11 @@ async function readExportedDeclarationChain(
 
   const resolved = await resolver(reexport.source, sourceFile);
   if (!resolved) return null;
-  const resolvedReal = await realpathSafe(resolved);
-  if (resolvedReal === canonicalFile) return null;
+  const resolvedId = normalizeResolvedId(resolved);
+  if (resolvedId === sourceFile) return null;
 
   return readExportedDeclarationChain(
-    resolved,
+    resolvedId,
     reexport.localName,
     resolver,
     seen
@@ -801,13 +805,13 @@ async function readTopLevelImportBindings(
 ) {
   const imports = new Map<
     string,
-    { imported: string; realpath: string | null }
+    { imported: string; resolvedId: string | null }
   >();
 
   for (const node of ast.program.body) {
     if (!t.isImportDeclaration(node)) continue;
     const resolved = await resolver(node.source.value, importerId);
-    const real = resolved ? await realpathSafe(resolved) : null;
+    const resolvedId = resolved ? normalizeResolvedId(resolved) : null;
 
     for (const specifier of node.specifiers) {
       if (t.isImportSpecifier(specifier) && t.isIdentifier(specifier.local)) {
@@ -816,13 +820,13 @@ async function readTopLevelImportBindings(
           : specifier.imported.value;
         imports.set(specifier.local.name, {
           imported,
-          realpath: real,
+          resolvedId,
         });
       }
       if (t.isImportDefaultSpecifier(specifier)) {
         imports.set(specifier.local.name, {
           imported: 'default',
-          realpath: real,
+          resolvedId,
         });
       }
     }
@@ -927,20 +931,21 @@ function findExportReexport(ast: t.File, exportName: string) {
 async function matchesConfiguredBinding(
   localName: string,
   exportName: string,
-  expectedRealpath: string,
+  expectedResolvedId: string,
   importerId: string,
-  imports: Map<string, { imported: string; realpath: string | null }>
+  imports: Map<string, { imported: string; resolvedId: string | null }>
 ) {
   const imported = imports.get(localName);
   if (imported) {
     return (
-      imported.imported === exportName && imported.realpath === expectedRealpath
+      imported.imported === exportName &&
+      imported.resolvedId === expectedResolvedId
     );
   }
 
   if (localName !== exportName) return false;
-  const importerRealpath = await realpathSafe(importerId);
-  return importerRealpath === expectedRealpath;
+  const importerResolvedId = normalizeResolvedId(importerId);
+  return importerResolvedId === expectedResolvedId;
 }
 
 function matchClientCall(
@@ -1477,11 +1482,11 @@ async function readGeneratedClientInfo(
     if (reexportPath) {
       const resolvedReexport = await resolver(reexportPath, clientFile);
       if (resolvedReexport) {
-        const reexportReal = await realpathSafe(resolvedReexport);
-        if (reexportReal !== clientFile) {
+        const reexportId = normalizeResolvedId(resolvedReexport);
+        if (reexportId !== clientFile) {
           return readGeneratedClientInfo(
             importerId,
-            reexportReal,
+            reexportId,
             factory,
             resolver,
             debug
@@ -1602,8 +1607,8 @@ function resolveOperationImport(
   const serviceImportPath =
     generatedInfo.serviceImportPaths[serviceName] ??
     `./${serviceNameToFileBase(serviceName)}`;
-  const operationFile = path.resolve(
-    path.dirname(generatedInfo.clientFile),
+  const operationFile = resolve(
+    dirname(generatedInfo.clientFile),
     generatedInfo.servicesDir,
     serviceImportPath
   );
@@ -1840,7 +1845,7 @@ function resolveRelativeImportPath(
   return importPath.startsWith('.')
     ? composeImportPath(
         importerId,
-        path.resolve(path.dirname(baseFile), importPath)
+        resolve(dirname(baseFile), importPath)
       )
     : importPath;
 }
@@ -1851,16 +1856,16 @@ async function resolveFactoryModule(
   resolver: QraftResolver
 ): Promise<string | null> {
   const resolved = await resolver(specifier, importerId);
-  return resolved ?? null;
+  return resolved ? normalizeResolvedId(resolved) : null;
 }
 
 function isPathLikeSpecifier(specifier: string) {
-  return specifier.startsWith('.') || path.isAbsolute(specifier);
+  return specifier.startsWith('.') || isAbsolute(specifier);
 }
 
 function composeImportPath(importerId: string, targetFile: string) {
-  const relativePath = path.relative(path.dirname(importerId), targetFile);
-  const normalized = relativePath.split(path.sep).join('/');
+  const relativePath = relative(dirname(importerId), targetFile);
+  const normalized = relativePath.split(sep).join('/');
   return normalized.startsWith('.') ? normalized : `./${normalized}`;
 }
 
@@ -1873,6 +1878,16 @@ function resolvePrecreatedOptionsImportPath(
   if (!resolvedFile) return configuredModule;
   const emittedPath = composeResolvedSourceImportPath(importerId, resolvedFile);
   return emittedPath === configuredModule ? configuredModule : emittedPath;
+}
+
+function normalizeResolvedId(resolvedId: string) {
+  const withoutQuery = stripQueryAndHash(resolvedId);
+  return normalize(withoutQuery);
+}
+
+function stripQueryAndHash(filePath: string) {
+  const queryIndex = filePath.search(/[?#]/);
+  return queryIndex >= 0 ? filePath.slice(0, queryIndex) : filePath;
 }
 
 function composeResolvedSourceImportPath(
