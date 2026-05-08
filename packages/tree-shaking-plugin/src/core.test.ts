@@ -1181,7 +1181,7 @@ export const buildRelativeClientOptions = createBarrelClientOptions;
         }
       )
     );
-    const fixtureRoot = await fs.realpath(root);
+    const fixtureRoot = root;
     const sourceFile = path.join(fixtureRoot, 'src/App.tsx');
     const result = await transformQraftTreeShaking(
       `

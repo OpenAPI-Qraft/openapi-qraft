@@ -1,6 +1,3 @@
-import fs from 'node:fs/promises';
-import path from 'node:path';
-
 export type QraftResolver = (
   specifier: string,
   importer: string
@@ -83,12 +80,4 @@ export function createUserResolverStrategy(
     const resolved = await userResolve(specifier, importer);
     return resolved || null;
   };
-}
-
-export async function realpathSafe(filePath: string): Promise<string> {
-  try {
-    return await fs.realpath(filePath);
-  } catch {
-    return path.normalize(filePath);
-  }
 }
