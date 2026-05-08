@@ -1313,6 +1313,115 @@ export function App() {
       export function App() {
         return API_pets_getPets.useQuery();
       }"
+      `);
+  });
+
+  it('optimizes precreated mutation callbacks across onMutate and onSuccess', async () => {
+    const root = await fs.mkdtemp(
+      path.join(os.tmpdir(), 'qraft-tree-shaking-')
+    );
+    await writeFixtureFiles(
+      root,
+      createPrecreatedFixtureFiles(`
+import { createAPIClient } from './api';
+import { createAPIClientOptions } from './client-options';
+
+export const APIClient = createAPIClient(createAPIClientOptions());
+`)
+    );
+    const sourceFile = path.join(root, 'src/App.tsx');
+
+    const result = await transformQraftTreeShaking(
+      `
+import { APIClient } from './client';
+
+const petParams = { path: { petId: 1 } };
+
+export function App() {
+  APIClient.pets.updatePet.useMutation(undefined, {
+    async onMutate(variables) {
+      const APIClient_pets_getPetById = () => null;
+      await APIClient.pets.getPetById.cancelQueries({ parameters: petParams });
+      const prevPet = APIClient.pets.getPetById.getQueryData(petParams);
+      APIClient.pets.getPetById.setQueryData(petParams, (old) => ({
+        ...old,
+        ...variables.body,
+      }));
+      return { prevPet };
+    },
+    async onSuccess(updatedPet) {
+      const _APIClient_pets_getPetById = () => null;
+      APIClient.pets.getPetById.setQueryData(petParams, updatedPet);
+      await APIClient.pets.findPetsByStatus.invalidateQueries();
+    },
+  });
+}
+`,
+      sourceFile,
+      {
+        apiClient: [
+          {
+            client: 'APIClient',
+            clientModule: './client',
+            createAPIClientFn: 'createAPIClient',
+            createAPIClientFnModule: './api',
+            createAPIClientFnOptions: 'createAPIClientOptions',
+            createAPIClientFnOptionsModule: './client-options',
+          },
+        ],
+      }
+    );
+
+    expect(result?.code).toMatchInlineSnapshot(`
+      "import { qraftAPIClient } from "@openapi-qraft/react";
+      import { useMutation } from "@openapi-qraft/react/callbacks/useMutation";
+      import { updatePet } from "./api/services/PetsService";
+      import { createAPIClientOptions } from "./client-options";
+      import { cancelQueries } from "@openapi-qraft/react/callbacks/cancelQueries";
+      import { getPetById } from "./api/services/PetsService";
+      import { getQueryData } from "@openapi-qraft/react/callbacks/getQueryData";
+      import { setQueryData } from "@openapi-qraft/react/callbacks/setQueryData";
+      import { invalidateQueries } from "@openapi-qraft/react/callbacks/invalidateQueries";
+      import { findPetsByStatus } from "./api/services/PetsService";
+      const APIClient_pets_updatePet = qraftAPIClient(updatePet, {
+        useMutation
+      }, createAPIClientOptions());
+      const APIClient_pets_getPetById = qraftAPIClient(getPetById, {
+        cancelQueries,
+        getQueryData,
+        setQueryData
+      }, createAPIClientOptions());
+      const APIClient_pets_findPetsByStatus = qraftAPIClient(findPetsByStatus, {
+        invalidateQueries
+      }, createAPIClientOptions());
+      const petParams = {
+        path: {
+          petId: 1
+        }
+      };
+      export function App() {
+        APIClient_pets_updatePet.useMutation(undefined, {
+          async onMutate(variables) {
+            const APIClient_pets_getPetById = () => null;
+            await APIClient_pets_getPetById.cancelQueries({
+              parameters: petParams
+            });
+            const prevPet = APIClient_pets_getPetById.getQueryData(petParams);
+            APIClient_pets_getPetById.setQueryData(petParams, old => ({
+              ...old,
+              ...variables.body
+            }));
+            return {
+              prevPet
+            };
+          },
+          async onSuccess(updatedPet) {
+            const _APIClient_pets_getPetById = () => null;
+            APIClient_pets_getPetById.setQueryData(petParams, updatedPet);
+            await APIClient_pets_findPetsByStatus.invalidateQueries();
+          }
+        });
+      }"
     `);
   });
 
