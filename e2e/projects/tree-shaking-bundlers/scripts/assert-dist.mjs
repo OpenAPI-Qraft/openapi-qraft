@@ -1,6 +1,8 @@
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
-import { bundlers, getBundlePath, scenarios } from './scenarios.mjs';
+import { TraceMap, originalPositionFor } from '@jridgewell/trace-mapping';
+import { bundlers, scenarios } from './scenarios.mjs';
+import { getBundleMapPath, getBundlePath } from './shared.mjs';
 
 const modeExpectations = {
   context: () => ({
@@ -19,6 +21,49 @@ const modeExpectations = {
 
 const tokenMatches = (bundle, token) =>
   token instanceof RegExp ? token.test(bundle) : bundle.includes(token);
+
+const sourceMapAssertions = {
+  'barrel-context-relative': {
+    source: 'src/barrel-context-relative.ts',
+    token: 'qraftReactAPIClient(',
+  },
+  'barrel-precreated-relative': {
+    source: 'src/barrel-precreated-relative.ts',
+    token: 'qraftAPIClient(',
+  },
+};
+
+function sourceMatchesExpected(source, expectedSource) {
+  return source?.replaceAll('\\', '/').endsWith(expectedSource);
+}
+
+function getGeneratedPosition(bundle, traceMap, token, expectedSource) {
+  const bundleLines = bundle.split('\n');
+  const candidateLines = Array.from(
+    { length: bundleLines.length },
+    (_, index) => index + 1
+  );
+
+  for (const line of candidateLines) {
+    const lineText = bundleLines[line - 1];
+
+    for (let column = 0; column < lineText.length; column += 1) {
+      const originalPosition = originalPositionFor(traceMap, { line, column });
+
+      if (sourceMatchesExpected(originalPosition.source, expectedSource)) {
+        return {
+          line,
+          column,
+          originalPosition,
+        };
+      }
+    }
+  }
+
+  throw new Error(
+    `Expected to find a source-mapped generated position for "${token}"`
+  );
+}
 
 for (const bundler of bundlers) {
   for (const scenario of scenarios) {
@@ -48,6 +93,26 @@ for (const bundler of bundlers) {
       assert.ok(
         !tokenMatches(bundle, token),
         `Expected ${bundler} / ${scenario.name} bundle at ${bundlePath} not to include "${token}"`
+      );
+    }
+
+    const sourceMapAssertion = sourceMapAssertions[scenario.name];
+
+    if (sourceMapAssertion) {
+      const mapPath = getBundleMapPath(bundler, scenario);
+      const map = JSON.parse(await readFile(mapPath, 'utf8'));
+      const traceMap = new TraceMap(map);
+      const generatedPosition = getGeneratedPosition(
+        bundle,
+        traceMap,
+        sourceMapAssertion.token,
+        sourceMapAssertion.source
+      );
+      const originalPosition = generatedPosition.originalPosition;
+
+      assert.ok(
+        sourceMatchesExpected(originalPosition.source, sourceMapAssertion.source),
+        `Expected ${bundler} / ${scenario.name} generated call site at ${bundlePath} to map back to ${sourceMapAssertion.source}, got ${originalPosition.source}`
       );
     }
   }

@@ -32,7 +32,7 @@ export default {
     }),
     esbuild({
       include: /\.[cm]?[jt]sx?$/,
-      sourceMap: false,
+      sourceMap: true,
       minify: false,
       target: 'es2020',
     }),
@@ -42,6 +42,7 @@ export default {
   output: {
     dir: getBundlerOutputDir('rollup', scenario),
     format: 'es',
+    sourcemap: true,
     entryFileNames: '[name].js',
     chunkFileNames: 'chunks/[name].js',
     assetFileNames: 'assets/[name][extname]',

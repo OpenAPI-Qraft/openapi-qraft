@@ -25,7 +25,7 @@ export default defineConfig(({ mode }) => {
     build: {
       emptyOutDir: true,
       minify: false,
-      sourcemap: false,
+      sourcemap: true,
       target: 'es2020',
       outDir: getBundlerOutputDir('vite', scenario),
       rollupOptions: {
