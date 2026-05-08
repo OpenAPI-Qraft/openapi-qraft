@@ -225,6 +225,10 @@ bundler's own resolver.
 
 If two imports share the same `name` but resolve to different files, only the one matching a configured entry is transformed. This prevents false positives when an unrelated module happens to export a function with the same name.
 
+## Path rendering
+
+Relative generated imports are emitted without source extensions or trailing `/index` so the output stays bundler-friendly. Bare module specifiers are preserved as-is.
+
 ## Context client inside a component
 
 A common pattern is to use a context client for rendering (top-level `const api = createAPIClient()`) and a fresh options client inside mutation callbacks to perform cache updates with the current context value. Both are optimized in a single pass:
