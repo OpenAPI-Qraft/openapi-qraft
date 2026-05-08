@@ -2,9 +2,9 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. When spawning workers, prefer a mini model and keep `reasoning_effort` at `high` or lower. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Thread incoming bundler source maps through the tree-shaking transform so rewritten call sites remain traceable to original user code.
+**Goal:** Thread incoming bundler source maps through the tree-shaking transform so rewritten user call sites remain traceable to original source code.
 
-**Architecture:** This spec builds on the pipeline split. `src/lib/plugin/create-qraft-tree-shake-plugin.ts` forwards `this.inputSourceMap` into `transformQraftTreeShaking`. `src/core.ts` accepts the incoming map and passes it to Babel generator through `inputSourceMap`. Unit tests assert the composed map with `@jridgewell/trace-mapping`, while the external `tree-shaking-bundlers` fixture confirms the change does not break real bundler output.
+**Architecture:** This spec builds on the pipeline split. `src/lib/plugin/create-qraft-tree-shake-plugin.ts` forwards `this.inputSourceMap` into `transformQraftTreeShaking` as part of the plugin contract. `src/core.ts` accepts the incoming map and passes it to Babel generator through `inputSourceMap`. The composition scope is intentionally narrow: only rewritten user call sites must resolve back to original source positions. Synthetic inserts at the top level or other generated-only regions may remain mapped to generated code if that keeps the implementation simple and predictable. Unit tests assert the composed map with `@jridgewell/trace-mapping`, while the external `tree-shaking-bundlers` fixture confirms the change does not break real bundler output.
 
 **Tech Stack:** TypeScript, Babel generator, unplugin, `@jridgewell/trace-mapping`, Vitest, Yarn 4.
 
@@ -108,15 +108,15 @@ handler(this: any, code, id) {
 Use this generator call in `src/core.ts`:
 
 ```ts
-const result = generate(ast, {
-  sourceMaps: true,
-  sourceFileName: id,
-  inputSourceMap,
-  jsescOption: { minimal: true },
-});
+  const result = generate(ast, {
+    sourceMaps: true,
+    sourceFileName: id,
+    inputSourceMap,
+    jsescOption: { minimal: true },
+  });
 ```
 
-Keep the rest of the transform unchanged. This spec is only about source-map composition.
+Keep the rest of the transform unchanged. This spec is only about source-map composition for rewritten user call sites; synthetic generated statements do not need bespoke original-source mapping.
 
 - [ ] **Step 3: Re-run the focused source-map test**
 
