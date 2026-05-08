@@ -37,6 +37,16 @@ describe('path rendering helpers', () => {
     ).toBe('react-query');
   });
 
+  it('renders path-like precreated options imports relative to the importer', () => {
+    expect(
+      resolvePrecreatedOptionsImportPath(
+        '/repo/src/App.tsx',
+        './client-options',
+        '/repo/src/client-options/index.ts'
+      )
+    ).toBe('./client-options');
+  });
+
   it('normalizes resolved ids by removing query and hash suffixes', () => {
     expect(normalizeResolvedId('/repo/src/api.ts?query=1#hash')).toBe(
       '/repo/src/api.ts'
