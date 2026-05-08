@@ -1,9 +1,9 @@
 import '@qraft/test-utils/vitestFsMock';
+import type { SourceMapInput } from '@jridgewell/trace-mapping';
 import fs from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
-import { TraceMap, originalPositionFor } from '@jridgewell/trace-mapping';
-import type { SourceMapInput } from '@jridgewell/trace-mapping';
+import { originalPositionFor, TraceMap } from '@jridgewell/trace-mapping';
 import { describe, expect, it } from 'vitest';
 import { transformQraftTreeShaking as transformQraftTreeShakingImpl } from './core.js';
 import { createTransformPlan } from './lib/transform/plan.js';
@@ -69,12 +69,13 @@ type TransformWithInputSourceMap = (
   inputSourceMap?: SourceMapInput
 ) => ReturnType<typeof transformQraftTreeShakingImpl>;
 
-const transformQraftTreeShakingImplWithInputSourceMap = transformQraftTreeShakingImpl satisfies (
-  code: string,
-  id: string,
-  options: TransformOptions,
-  resolver: Parameters<typeof transformQraftTreeShakingImpl>[3]
-) => ReturnType<typeof transformQraftTreeShakingImpl>;
+const transformQraftTreeShakingImplWithInputSourceMap =
+  transformQraftTreeShakingImpl satisfies (
+    code: string,
+    id: string,
+    options: TransformOptions,
+    resolver: Parameters<typeof transformQraftTreeShakingImpl>[3]
+  ) => ReturnType<typeof transformQraftTreeShakingImpl>;
 
 const transformQraftTreeShakingWithInputSourceMap =
   transformQraftTreeShakingImplWithInputSourceMap as unknown as TransformWithInputSourceMap;
@@ -758,9 +759,6 @@ function PetUpdateForm({ petId }: { petId: number }) {
               getQueryData,
               setQueryData
             }, apiContext!);
-            const miniQraft_pets_findPetsByStatus = qraftReactAPIClient(findPetsByStatus, {
-              invalidateQueries
-            }, apiContext!);
             await miniQraft_pets_getPetById.cancelQueries({
               parameters: petParams
             });
@@ -781,6 +779,12 @@ function PetUpdateForm({ petId }: { petId: number }) {
             }
           },
           async onSuccess(updatedPet) {
+            const miniQraft_pets_getPetById = qraftReactAPIClient(getPetById, {
+              setQueryData
+            }, apiContext!);
+            const miniQraft_pets_findPetsByStatus = qraftReactAPIClient(findPetsByStatus, {
+              invalidateQueries
+            }, apiContext!);
             miniQraft_pets_getPetById.setQueryData(petParams, updatedPet);
             await miniQraft_pets_findPetsByStatus.invalidateQueries();
             onUpdate();
@@ -814,6 +818,14 @@ function PetUpdateForm({ petId }: { petId: number }) {
       const _apiClient_pets_getPetById = () => null;
       const apiClient = createAPIClient(apiContext!);
 
+      function syncPetPreview() {
+        // This binding intentionally collides with the optimized client name from the outer scope.
+        const _apiClient_pets_getPetById2 = () => null;
+        const apiClient = createAPIClient(apiContext!);
+
+        apiClient.pets.getPetById.setQueryData(petParams, variables.body);
+      }
+
       await apiClient.pets.getPetById.cancelQueries({ parameters: petParams });
       const prevPet = apiClient.pets.getPetById.getQueryData(petParams);
 
@@ -821,6 +833,8 @@ function PetUpdateForm({ petId }: { petId: number }) {
         ...old,
         ...variables.body,
       }));
+
+      syncPetPreview();
 
       return { prevPet };
     },
@@ -837,10 +851,10 @@ function PetUpdateForm({ petId }: { petId: number }) {
       import { qraftReactAPIClient } from "@openapi-qraft/react";
       import { useMutation } from "@openapi-qraft/react/callbacks/useMutation";
       import { updatePet } from "./api/services/PetsService";
-      import { cancelQueries } from "@openapi-qraft/react/callbacks/cancelQueries";
-      import { getPetById } from "./api/services/PetsService";
-      import { getQueryData as _getQueryData2 } from "@openapi-qraft/react/callbacks/getQueryData";
       import { setQueryData } from "@openapi-qraft/react/callbacks/setQueryData";
+      import { getPetById } from "./api/services/PetsService";
+      import { cancelQueries } from "@openapi-qraft/react/callbacks/cancelQueries";
+      import { getQueryData as _getQueryData2 } from "@openapi-qraft/react/callbacks/getQueryData";
       const api_pets_updatePet = qraftReactAPIClient(updatePet, {
         useMutation
       }, APIClientContext);
@@ -862,26 +876,35 @@ function PetUpdateForm({ petId }: { petId: number }) {
             const _getQueryData = () => null;
             const apiClient_pets_getPetById = () => null;
             const _apiClient_pets_getPetById = () => null;
-            const _apiClient_pets_getPetById2 = qraftReactAPIClient(getPetById, {
+            const _apiClient_pets_getPetById4 = qraftReactAPIClient(getPetById, {
               cancelQueries,
               getQueryData: _getQueryData2,
               setQueryData
             }, apiContext!);
-            await _apiClient_pets_getPetById2.cancelQueries({
+            function syncPetPreview() {
+              // This binding intentionally collides with the optimized client name from the outer scope.
+              const _apiClient_pets_getPetById2 = () => null;
+              const _apiClient_pets_getPetById3 = qraftReactAPIClient(getPetById, {
+                setQueryData
+              }, apiContext!);
+              _apiClient_pets_getPetById3.setQueryData(petParams, variables.body);
+            }
+            await _apiClient_pets_getPetById4.cancelQueries({
               parameters: petParams
             });
-            const prevPet = _apiClient_pets_getPetById2.getQueryData(petParams);
-            _apiClient_pets_getPetById2.setQueryData(petParams, old => ({
+            const prevPet = _apiClient_pets_getPetById4.getQueryData(petParams);
+            _apiClient_pets_getPetById4.setQueryData(petParams, old => ({
               ...old,
               ...variables.body
             }));
+            syncPetPreview();
             return {
               prevPet
             };
           }
         });
       }"
-      `);
+    `);
   });
 
   it('preserves void and await prefixes for named client calls', async () => {

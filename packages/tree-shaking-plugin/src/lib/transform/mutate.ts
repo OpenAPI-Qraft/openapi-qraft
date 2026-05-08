@@ -7,6 +7,7 @@ import type {
   RuntimeLocalNames,
   TransformPlan,
 } from './types.js';
+import type { NodePath } from '@babel/traverse';
 import * as traverseModule from '@babel/traverse';
 import * as t from '@babel/types';
 
@@ -102,6 +103,7 @@ function rewriteNamedClientCalls(
         usage.serviceName,
         usage.operationName,
         usage.callbackName,
+        usage.scopeKey,
       ].join(':'),
       usage,
     ])
@@ -109,7 +111,7 @@ function rewriteNamedClientCalls(
 
   traverse(ast, {
     CallExpression(callPath) {
-      const match = matchClientCall(callPath.node.callee, clients);
+      const match = matchClientCall(callPath, clients);
       if (!match) return;
 
       const usage = usageByKey.get(
@@ -118,6 +120,7 @@ function rewriteNamedClientCalls(
           match.serviceName,
           match.operationName,
           match.callbackName,
+          getUsageScopeKey(callPath),
         ].join(':')
       );
       if (!usage) return;
@@ -365,23 +368,27 @@ function insertOptimizedClients(
     ...dedupeDeclarations([...contextDeclarations, ...precreatedDeclarations])
   );
 
-  const usagesByClient = new Map<ClientBinding, OperationUsage[]>();
+  const usagesByClient = new Map<ClientBinding, Map<string, OperationUsage[]>>();
   for (const usage of explicitOptionsUsages) {
-    const clientUsages = usagesByClient.get(usage.client) ?? [];
-    clientUsages.push(usage);
-    usagesByClient.set(usage.client, clientUsages);
+    const scopeUsagesByClient = usagesByClient.get(usage.client) ?? new Map();
+    const scopeUsages = scopeUsagesByClient.get(usage.scopeKey) ?? [];
+    scopeUsages.push(usage);
+    scopeUsagesByClient.set(usage.scopeKey, scopeUsages);
+    usagesByClient.set(usage.client, scopeUsagesByClient);
   }
 
-  for (const [client, clientUsages] of usagesByClient) {
-    const declarations = createOptimizedClientDeclarations(
-      clientUsages,
-      clientUsages,
-      generatedInfoByImport,
-      runtimeLocalNames
-    );
-    const statementPath = client.localInitPath?.parentPath;
-    if (statementPath?.isVariableDeclaration()) {
-      statementPath.insertAfter(dedupeDeclarations(declarations));
+  for (const [client, scopeUsagesByClient] of usagesByClient) {
+    for (const clientUsages of scopeUsagesByClient.values()) {
+      const declarations = createOptimizedClientDeclarations(
+        clientUsages,
+        clientUsages,
+        generatedInfoByImport,
+        runtimeLocalNames
+      );
+      const statementPath = client.localInitPath?.parentPath;
+      if (statementPath?.isVariableDeclaration()) {
+        statementPath.insertAfter(dedupeDeclarations(declarations));
+      }
     }
   }
 }
@@ -569,7 +576,7 @@ function removeEmptyCreateImports(ast: t.File, factoryNames: Set<string>) {
 }
 
 function matchClientCall(
-  callee: t.Expression | t.V8IntrinsicIdentifier,
+  callPath: NodePath<t.CallExpression>,
   clients: ClientBinding[]
 ): {
   client: ClientBinding;
@@ -577,6 +584,7 @@ function matchClientCall(
   operationName: string;
   callbackName: string;
 } | null {
+  const callee = callPath.node.callee;
   if (!t.isMemberExpression(callee) && !t.isOptionalMemberExpression(callee)) {
     return null;
   }
@@ -593,10 +601,24 @@ function matchClientCall(
 
   if (!clientName || !serviceName || !operationName || !callbackName)
     return null;
-  const client = clients.find((item) => item.name === clientName);
+  const binding = callPath.scope.getBinding(clientName);
+  const client = clients.find((item) => {
+    if (item.name !== clientName) return false;
+    return binding?.identifier === item.bindingNode;
+  });
   if (!client) return null;
 
   return { client, serviceName, operationName, callbackName };
+}
+
+function getUsageScopeKey(callPath: NodePath<t.CallExpression>) {
+  const functionParent = callPath.getFunctionParent();
+  if (!functionParent) {
+    return 'program';
+  }
+
+  const { node } = functionParent;
+  return [node.type, node.start ?? -1, node.end ?? -1].join(':');
 }
 
 function matchInlineClientCall(
