@@ -404,14 +404,25 @@ export async function createTransformPlan(
       ].join(':');
       const localClientName =
         localClientNamesByOperation.get(operationKey) ??
-        createScopedUniqueName(
-          match.client.declarationScope,
-          composeLocalClientName(
-            match.client.name,
-            match.serviceName,
-            match.operationName
-          )
-        );
+        (match.client.mode.type === 'precreated'
+          ? createProgramUniqueName(
+              programScope,
+              composeLocalClientName(
+                match.client.name,
+                match.serviceName,
+                match.operationName
+              ),
+              fileBindingNames,
+              reservedImportLocalNames
+            )
+          : createScopedUniqueName(
+              match.client.declarationScope,
+              composeLocalClientName(
+                match.client.name,
+                match.serviceName,
+                match.operationName
+              )
+            ));
       localClientNamesByOperation.set(operationKey, localClientName);
 
       const key = [

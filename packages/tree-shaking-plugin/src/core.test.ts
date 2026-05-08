@@ -1316,7 +1316,7 @@ export function App() {
       `);
   });
 
-  it('optimizes precreated mutation callbacks across onMutate and onSuccess', async () => {
+  it('keeps precreated optimized client names collision-safe inside shadowed callbacks', async () => {
     const root = await fs.mkdtemp(
       path.join(os.tmpdir(), 'qraft-tree-shaking-')
     );
@@ -1340,6 +1340,7 @@ const petParams = { path: { petId: 1 } };
 export function App() {
   APIClient.pets.updatePet.useMutation(undefined, {
     async onMutate(variables) {
+      // These locals intentionally shadow the generated optimized client name.
       const APIClient_pets_getPetById = () => null;
       await APIClient.pets.getPetById.cancelQueries({ parameters: petParams });
       const prevPet = APIClient.pets.getPetById.getQueryData(petParams);
@@ -1350,7 +1351,7 @@ export function App() {
       return { prevPet };
     },
     async onSuccess(updatedPet) {
-      const _APIClient_pets_getPetById = () => null;
+      const APIClient_pets_getPetById = () => null;
       APIClient.pets.getPetById.setQueryData(petParams, updatedPet);
       await APIClient.pets.findPetsByStatus.invalidateQueries();
     },
@@ -1386,9 +1387,12 @@ export function App() {
       const APIClient_pets_updatePet = qraftAPIClient(updatePet, {
         useMutation
       }, createAPIClientOptions());
-      const APIClient_pets_getPetById = qraftAPIClient(getPetById, {
+      const _APIClient_pets_getPetById = qraftAPIClient(getPetById, {
         cancelQueries,
         getQueryData,
+        setQueryData
+      }, createAPIClientOptions());
+      const _APIClient_pets_getPetById2 = qraftAPIClient(getPetById, {
         setQueryData
       }, createAPIClientOptions());
       const APIClient_pets_findPetsByStatus = qraftAPIClient(findPetsByStatus, {
@@ -1402,12 +1406,13 @@ export function App() {
       export function App() {
         APIClient_pets_updatePet.useMutation(undefined, {
           async onMutate(variables) {
+            // These locals intentionally shadow the generated optimized client name.
             const APIClient_pets_getPetById = () => null;
-            await APIClient_pets_getPetById.cancelQueries({
+            await _APIClient_pets_getPetById.cancelQueries({
               parameters: petParams
             });
-            const prevPet = APIClient_pets_getPetById.getQueryData(petParams);
-            APIClient_pets_getPetById.setQueryData(petParams, old => ({
+            const prevPet = _APIClient_pets_getPetById.getQueryData(petParams);
+            _APIClient_pets_getPetById.setQueryData(petParams, old => ({
               ...old,
               ...variables.body
             }));
@@ -1416,8 +1421,8 @@ export function App() {
             };
           },
           async onSuccess(updatedPet) {
-            const _APIClient_pets_getPetById = () => null;
-            APIClient_pets_getPetById.setQueryData(petParams, updatedPet);
+            const APIClient_pets_getPetById = () => null;
+            _APIClient_pets_getPetById2.setQueryData(petParams, updatedPet);
             await APIClient_pets_findPetsByStatus.invalidateQueries();
           }
         });
