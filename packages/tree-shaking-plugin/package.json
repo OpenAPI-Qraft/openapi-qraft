@@ -73,6 +73,7 @@
     }
   },
   "devDependencies": {
+    "@jridgewell/trace-mapping": "^0.3.31",
     "@openapi-qraft/eslint-config": "workspace:*",
     "@openapi-qraft/rollup-config": "workspace:*",
     "@qraft/test-utils": "workspace:*",
