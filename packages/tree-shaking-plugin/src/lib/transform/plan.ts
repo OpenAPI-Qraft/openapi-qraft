@@ -26,50 +26,15 @@ import { parse } from '@babel/parser';
 import * as traverseModule from '@babel/traverse';
 import * as t from '@babel/types';
 import { createAgnosticResolver } from '../resolvers/agnostic.js';
+import {
+  callbackNeedsRuntimeContext,
+  isSupportedCallbackName,
+} from './callbacks.js';
 
 const traverse =
   resolveDefaultExport<(typeof import('@babel/traverse'))['default']>(
     traverseModule
   );
-
-const callbackNames = new Set([
-  'cancelQueries',
-  'ensureInfiniteQueryData',
-  'ensureQueryData',
-  'fetchInfiniteQuery',
-  'fetchQuery',
-  'getInfiniteQueryData',
-  'getInfiniteQueryKey',
-  'getInfiniteQueryState',
-  'getMutationCache',
-  'getMutationKey',
-  'getQueriesData',
-  'getQueryData',
-  'getQueryKey',
-  'getQueryState',
-  'invalidateQueries',
-  'isFetching',
-  'isMutating',
-  'operationInvokeFn',
-  'prefetchInfiniteQuery',
-  'prefetchQuery',
-  'refetchQueries',
-  'removeQueries',
-  'resetQueries',
-  'setInfiniteQueryData',
-  'setQueriesData',
-  'setQueryData',
-  'useInfiniteQuery',
-  'useIsFetching',
-  'useIsMutating',
-  'useMutation',
-  'useMutationState',
-  'useQueries',
-  'useQuery',
-  'useSuspenseInfiniteQuery',
-  'useSuspenseQueries',
-  'useSuspenseQuery',
-]);
 
 type ExportedDeclarationResolution = {
   sourceFile: string;
@@ -935,7 +900,7 @@ function matchClientCall(
 
   if (!clientName || !serviceName || !operationName || !callbackName)
     return null;
-  if (!callbackNames.has(callbackName)) return null;
+  if (!isSupportedCallbackName(callbackName)) return null;
 
   const binding = callPath.scope.getBinding(clientName);
   const client = clients.find((item) => {
@@ -960,7 +925,7 @@ function matchInlineClientCall(
 ): {
   createImportPath: string;
   factory: QraftFactoryConfig;
-  optionsExpression: t.Expression;
+  optionsExpression: t.Expression | null;
   serviceName: string;
   operationName: string;
   callbackName: string;
@@ -979,7 +944,7 @@ function matchInlineClientCall(
         ? path
         : [];
   if (!serviceName || !operationName || !callbackName) return null;
-  if (!callbackNames.has(callbackName)) return null;
+  if (!isSupportedCallbackName(callbackName)) return null;
 
   const root = getStaticMemberRoot(callee);
   if (!t.isCallExpression(root)) return null;
@@ -987,6 +952,19 @@ function matchInlineClientCall(
 
   const createImport = createImports.get(root.callee.name);
   if (!createImport) return null;
+
+  if (root.arguments.length === 0) {
+    if (callbackNeedsRuntimeContext(callbackName)) return null;
+    return {
+      createImportPath: createImport.factoryFile,
+      factory: createImport.factory,
+      optionsExpression: null,
+      serviceName,
+      operationName,
+      callbackName,
+    };
+  }
+
   if (root.arguments.length !== 1) return null;
   if (!isExpression(root.arguments[0])) return null;
 
