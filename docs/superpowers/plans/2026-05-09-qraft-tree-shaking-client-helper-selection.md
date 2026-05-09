@@ -2,9 +2,9 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Make `createAPIClientFn` tree-shaken clients emit `qraftAPIClient` whenever every used callback is non-React, and keep `qraftReactAPIClient` only for clients that actually use React-hook callbacks. `callbacks.ts` should be the source of truth for both callback options and React-runtime requirements.
+**Goal:** Make `createAPIClientFn` tree-shaken clients emit `qraftAPIClient` whenever the used callbacks do not require React runtime, and keep `qraftReactAPIClient` only for clients that actually use React-hook callbacks. `callbacks.ts` should be the source of truth for both callback options and React-runtime requirements.
 
-**Architecture:** Move callback capability knowledge into `packages/tree-shaking-plugin/src/lib/transform/callbacks.ts` as a single metadata table with two booleans: `needsOptions` and `needsReactRuntime`. `mutate.ts` will consume that metadata to choose the runtime helper per generated client binding and per inline rewrite, then reuse the same choice when deciding whether to import `APIClientContext` or the lean `qraftAPIClient` runtime. The existing `apiClient` precreated path stays unchanged.
+**Architecture:** Move callback capability knowledge into `packages/tree-shaking-plugin/src/lib/transform/callbacks.ts` as a single metadata table with two booleans: `needsOptions` and `needsReactRuntime`. `needsOptions` decides whether the generated client must carry the original options expression or options factory result, while `needsReactRuntime` decides whether the runtime helper must be `qraftReactAPIClient`. `mutate.ts` will consume that metadata to choose the runtime helper per generated client binding and per inline rewrite, then reuse the same choice when deciding whether to import `APIClientContext` or the lean `qraftAPIClient` runtime. The existing `apiClient` precreated path stays unchanged.
 
 **Tech Stack:** TypeScript, Babel traverse/types, Vitest inline snapshots, Yarn 4, bundler e2e fixtures.
 
@@ -23,6 +23,7 @@
 ### Task 1: Make callback capabilities explicit in `callbacks.ts`
 
 **Files:**
+
 - Modify: `packages/tree-shaking-plugin/src/lib/transform/callbacks.ts`
 - Create: `packages/tree-shaking-plugin/src/lib/transform/callbacks.test.ts`
 
@@ -44,15 +45,19 @@ describe('callback capability metadata', () => {
       needsOptions: true,
       needsReactRuntime: true,
     });
-    expect(supportedCallbacks.useMutation).toEqual({
-      needsOptions: true,
-      needsReactRuntime: true,
-    });
     expect(supportedCallbacks.getQueryKey).toEqual({
-      needsOptions: true,
+      needsOptions: false,
       needsReactRuntime: false,
     });
     expect(supportedCallbacks.invalidateQueries).toEqual({
+      needsOptions: true,
+      needsReactRuntime: false,
+    });
+    expect(supportedCallbacks.setQueryData).toEqual({
+      needsOptions: true,
+      needsReactRuntime: false,
+    });
+    expect(supportedCallbacks.operationInvokeFn).toEqual({
       needsOptions: true,
       needsReactRuntime: false,
     });
@@ -61,8 +66,9 @@ describe('callback capability metadata', () => {
   it('exposes helpers for both capability checks', () => {
     expect(callbackNeedsReactRuntime('useQuery')).toBe(true);
     expect(callbackNeedsReactRuntime('getQueryKey')).toBe(false);
-    expect(callbackNeedsOptions('useQuery')).toBe(true);
+    expect(callbackNeedsOptions('getQueryKey')).toBe(false);
     expect(callbackNeedsOptions('invalidateQueries')).toBe(true);
+    expect(callbackNeedsOptions('operationInvokeFn')).toBe(true);
   });
 });
 ```
@@ -92,13 +98,13 @@ export const supportedCallbacks = {
   fetchInfiniteQuery: { needsOptions: true, needsReactRuntime: false },
   fetchQuery: { needsOptions: true, needsReactRuntime: false },
   getInfiniteQueryData: { needsOptions: true, needsReactRuntime: false },
-  getInfiniteQueryKey: { needsOptions: true, needsReactRuntime: false },
+  getInfiniteQueryKey: { needsOptions: false, needsReactRuntime: false },
   getInfiniteQueryState: { needsOptions: true, needsReactRuntime: false },
   getMutationCache: { needsOptions: true, needsReactRuntime: false },
-  getMutationKey: { needsOptions: true, needsReactRuntime: false },
+  getMutationKey: { needsOptions: false, needsReactRuntime: false },
   getQueriesData: { needsOptions: true, needsReactRuntime: false },
   getQueryData: { needsOptions: true, needsReactRuntime: false },
-  getQueryKey: { needsOptions: true, needsReactRuntime: false },
+  getQueryKey: { needsOptions: false, needsReactRuntime: false },
   getQueryState: { needsOptions: true, needsReactRuntime: false },
   invalidateQueries: { needsOptions: true, needsReactRuntime: false },
   isFetching: { needsOptions: true, needsReactRuntime: false },
@@ -167,6 +173,7 @@ git commit -m "feat: split tree-shaking callback capabilities"
 ### Task 2: Select the runtime helper per generated client in `mutate.ts`
 
 **Files:**
+
 - Modify: `packages/tree-shaking-plugin/src/lib/transform/mutate.ts`
 - Modify: `packages/tree-shaking-plugin/src/core.test.ts`
 
@@ -204,21 +211,29 @@ The emitted shapes should become:
 
 ```ts
 qraftAPIClient(findPetsByStatus, {
-  getQueryKey
+  getQueryKey,
 });
 
-qraftReactAPIClient(getPets, {
-  useQuery
-}, APIClientContext);
-```
-
-and for explicit options clients:
-
-```ts
-qraftAPIClient(getPetById, {
-  setQueryData,
+qraftAPIClient(findPetsByStatus, {
   invalidateQueries,
-}, apiContext!);
+  setQueryData,
+});
+
+qraftAPIClient(
+  findPetsByStatus,
+  {
+    operationInvokeFn,
+  },
+  apiContext!
+);
+
+qraftReactAPIClient(
+  getPets,
+  {
+    useQuery,
+  },
+  APIClientContext
+);
 ```
 
 The important part is that the runtime helper now follows the callback set, not the presence of a `createAPIClientFn` binding itself.
@@ -241,20 +256,30 @@ Update the affected snapshots in `packages/tree-shaking-plugin/src/core.test.ts`
 Representative new snapshots should look like this:
 
 ```ts
-"import { qraftAPIClient, qraftReactAPIClient } from \"@openapi-qraft/react\";
-import { getQueryKey } from \"@openapi-qraft/react/callbacks/getQueryKey\";
+"import { requestFn } from '@openapi-qraft/react';
+import { QueryClient } from '@tanstack/react-query';
+import { qraftAPIClient, qraftReactAPIClient } from \"@openapi-qraft/react\";
+import { invalidateQueries } from \"@openapi-qraft/react/callbacks/invalidateQueries\";
+import { setQueryData } from \"@openapi-qraft/react/callbacks/setQueryData\";
 import { findPetsByStatus } from \"./api/services/PetsService\";
 import { useQuery } from \"@openapi-qraft/react/callbacks/useQuery\";
 import { getPets } from \"./api/services/PetsService\";
 import { APIClientContext } from \"./api/APIClientContext\";
+import { useContext } from \"react\";
 const api_pets_findPetsByStatus = qraftAPIClient(findPetsByStatus, {
-  getQueryKey
+  invalidateQueries,
+  setQueryData
+}, {
+  // new, top level precreated options, normally passed to createAPIClient({...}) as arg
+  queryClient: new QueryClient(),
+  baseUrl: 'http://localhost:3000',
+  requestFn,
 });
 const api_pets_getPets = qraftReactAPIClient(getPets, {
   useQuery
 }, APIClientContext);
 export function App() {
-  api_pets_findPetsByStatus.getQueryKey();
+  api_pets_findPetsByStatus.invalidateQueries();
   api_pets_getPets.useQuery();
 }"
 ```
@@ -262,27 +287,63 @@ export function App() {
 and:
 
 ```ts
-"import { qraftAPIClient } from \"@openapi-qraft/react\";
-import { getQueryKey } from \"@openapi-qraft/react/callbacks/getQueryKey\";
+import { requestFn } from '@openapi-qraft/react';
+import { QueryClient } from '@tanstack/react-query';
+import { qraftAPIClient } from \"@openapi-qraft/react\";
+import { operationInvokeFn } from \"@openapi-qraft/react/callbacks/operationInvokeFn\";
+import { APIClientContext } from \"./api/APIClientContext\";
+import { useContext } from \"react\";
 import { findPetsByStatus } from \"./api/services/PetsService\";
+const apiContext = { // new, top level precreated options
+  queryClient: new QueryClient(),
+  baseUrl: 'http://localhost:3000',
+  requestFn,
+};
 const api_pets_findPetsByStatus = qraftAPIClient(findPetsByStatus, {
-  getQueryKey
-});
+  operationInvokeFn
+}, apiContext);
 function App() {
   void qraftAPIClient(findPetsByStatus, {
-    getQueryKey
-  }).getQueryKey();
+    operationInvokeFn
+  }, apiContext)();
   const utilityClient_pets_findPetsByStatus = qraftAPIClient(findPetsByStatus, {
-    getQueryKey
-  });
-  void utilityClient_pets_findPetsByStatus.getQueryKey();
+    operationInvokeFn
+  }, apiContext);
+  void utilityClient_pets_findPetsByStatus();
+  api_pets_findPetsByStatus();
+}"
+```
+
+and:
+
+```ts
+"import { qraftAPIClient, qraftReactAPIClient } from \"@openapi-qraft/react\";
+import { useContext } from \"react\";
+import { getQueryKey } from \"@openapi-qraft/react/callbacks/getQueryKey\";
+import { invalidateQueries } from \"@openapi-qraft/react/callbacks/invalidateQueries\";
+import { findPetsByStatus } from \"./api/services/PetsService\";
+import { useQuery } from \"@openapi-qraft/react/callbacks/useQuery\";
+import { getPets } from \"./api/services/PetsService\";
+import { APIClientContext } from \"./api/APIClientContext\";
+const api_pets_getPets = qraftReactAPIClient(getPets, {
+  useQuery
+}, APIClientContext);
+export function App() {
+  const apiContext = useContext(APIClientContext);
+  const api_pets_findPetsByStatus = qraftAPIClient(findPetsByStatus, {
+    getQueryKey,
+    invalidateQueries
+  }, apiContext!);
   api_pets_findPetsByStatus.getQueryKey();
+  api_pets_findPetsByStatus.invalidateQueries();
+  api_pets_getPets.useQuery();
+  api_pets_getPets.getQueryKey();
 }"
 ```
 
 For the nested-options case, the nested-options snapshot should keep the outer `updatePet` client on `qraftReactAPIClient`, but the inner `getPetById` declaration inside `onMutate` and the other utility-only callbacks in `onError` / `onSuccess` should flip to `qraftAPIClient`.
 
-The exact formatting can stay aligned with the current printer output, but every branch that only uses non-React callbacks must flip to `qraftAPIClient`.
+The exact formatting can stay aligned with the current printer output, but every branch that only uses non-React callbacks must flip to `qraftAPIClient`, including `invalidateQueries`, `setQueryData`, and direct operation invocation.
 
 - [ ] **Step 5: Re-run the package test suite**
 
@@ -305,6 +366,7 @@ git commit -m "feat: select qraft API client for non-react callbacks"
 ### Task 3: Add bundler e2e coverage for API-only and mixed helper output
 
 **Files:**
+
 - Add: `e2e/projects/tree-shaking-bundlers/src/barrel-utility-only.ts`
 - Add: `e2e/projects/tree-shaking-bundlers/src/barrel-mixed-helper-selection.ts`
 - Modify: `e2e/projects/tree-shaking-bundlers/scripts/shared.mjs`
@@ -321,8 +383,9 @@ import { createBarrelAPIClient } from './generated-api';
 const api = createBarrelAPIClient();
 
 export const result = [
-  api.pets.findPetsByStatus.getQueryKey(),
-  api.pets.findPetsByStatus.schema,
+  api.pets.findPetsByStatus.invalidateQueries(),
+  api.pets.findPetsByStatus.setQueryData({ path: { petId: 1 } }, { id: 1 }),
+  api.pets.getPets(),
 ];
 ```
 
@@ -333,7 +396,8 @@ import { createBarrelAPIClient } from './generated-api';
 const api = createBarrelAPIClient();
 
 export const result = [
-  api.pets.findPetsByStatus.getQueryKey(),
+  api.pets.findPetsByStatus.invalidateQueries(),
+  api.pets.findPetsByStatus.setQueryData({ path: { petId: 1 } }, { id: 1 }),
   api.pets.getPets.useQuery(),
 ];
 ```
@@ -342,7 +406,7 @@ Add both files to the `scenarios` array in `scripts/shared.mjs`.
 
 - [ ] **Step 2: Extend the scenario mode expectations for API-only output**
 
-Teach `assert-dist.mjs` about the new mode so the utility-only bundle explicitly excludes `qraftReactAPIClient`:
+Teach `assert-dist.mjs` about the new mode so the utility-only bundle explicitly excludes `qraftReactAPIClient` and the mixed bundle proves both helpers can coexist:
 
 ```js
 const modeExpectations = {
@@ -373,6 +437,26 @@ Run:
 
 ```bash
 cd e2e && corepack yarn e2e:tree-shaking-bundlers-local
+```
+
+This local runner copies `e2e/projects/tree-shaking-bundlers` into `/Users/radist/w/qraft-e2e`, regenerates the fixture with `npm run codegen`, builds the bundlers through `scripts/build.mjs`, and then runs `scripts/assert-dist.mjs` against the generated outputs.
+
+If you need faster local iteration inside the fixture, run the project directly:
+
+```bash
+cd e2e/projects/tree-shaking-bundlers
+npm run codegen
+node ./scripts/build.mjs
+node ./scripts/assert-dist.mjs
+```
+
+If you need a NodeNext-only sanity check while working on import resolution, use the dedicated n2n project:
+
+```bash
+cd e2e/projects/typescript-nodenext-nodenext
+npm run e2e:pre-build
+npm run build
+npm run e2e:post-build
 ```
 
 Expected:
