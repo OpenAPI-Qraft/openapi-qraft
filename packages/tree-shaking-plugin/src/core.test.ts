@@ -427,6 +427,86 @@ api.pets.getPets();
     `);
   });
 
+  it('rewrites context-free callbacks from zero-arg createAPIClient calls', async () => {
+    const fixture = await createFixture();
+    const sourceFile = path.join(fixture, 'src/App.tsx');
+
+    const result = await transformQraftTreeShaking(
+      `
+import { createAPIClient } from './api';
+
+const api = createAPIClient();
+
+function App() {
+  void createAPIClient().pets.findPetsByStatus.getQueryKey();
+  const utilityClient = createAPIClient();
+  void utilityClient.pets.findPetsByStatus.getQueryKey();
+  api.pets.findPetsByStatus.getQueryKey();
+}
+`,
+      sourceFile,
+      { createAPIClientFn: [{ name: 'createAPIClient', module: './api' }] }
+    );
+
+    expect(result?.code).toMatchInlineSnapshot(`
+      "import { qraftReactAPIClient } from "@openapi-qraft/react";
+      import { getQueryKey } from "@openapi-qraft/react/callbacks/getQueryKey";
+      import { findPetsByStatus } from "./api/services/PetsService";
+      const api_pets_findPetsByStatus = qraftReactAPIClient(findPetsByStatus, {
+        getQueryKey
+      });
+      function App() {
+        void qraftReactAPIClient(findPetsByStatus, {
+          getQueryKey
+        }).getQueryKey();
+        const utilityClient_pets_findPetsByStatus = qraftReactAPIClient(findPetsByStatus, {
+          getQueryKey
+        });
+        void utilityClient_pets_findPetsByStatus.getQueryKey();
+        api_pets_findPetsByStatus.getQueryKey();
+      }"
+      `);
+  });
+
+  it('keeps APIClientContext when context-free and contextful callbacks share one client', async () => {
+    const fixture = await createFixture();
+    const sourceFile = path.join(fixture, 'src/App.tsx');
+
+    const result = await transformQraftTreeShaking(
+      `
+import { createAPIClient } from './api';
+
+const api = createAPIClient();
+
+export function App() {
+  api.pets.findPetsByStatus.getQueryKey();
+  api.pets.getPets.useQuery();
+}
+`,
+      sourceFile,
+      { createAPIClientFn: [{ name: 'createAPIClient', module: './api' }] }
+    );
+
+    expect(result?.code).toMatchInlineSnapshot(`
+      "import { qraftReactAPIClient } from "@openapi-qraft/react";
+      import { getQueryKey } from "@openapi-qraft/react/callbacks/getQueryKey";
+      import { findPetsByStatus } from "./api/services/PetsService";
+      import { useQuery } from "@openapi-qraft/react/callbacks/useQuery";
+      import { getPets } from "./api/services/PetsService";
+      import { APIClientContext } from "./api/APIClientContext";
+      const api_pets_findPetsByStatus = qraftReactAPIClient(findPetsByStatus, {
+        getQueryKey
+      });
+      const api_pets_getPets = qraftReactAPIClient(getPets, {
+        useQuery
+      }, APIClientContext);
+      export function App() {
+        api_pets_findPetsByStatus.getQueryKey();
+        api_pets_getPets.useQuery();
+      }"
+      `);
+  });
+
   it('creates separate optimized clients for multiple operations from the same service', async () => {
     const fixture = await createFixture();
     const sourceFile = path.join(fixture, 'src/App.tsx');
@@ -691,6 +771,7 @@ function PetUpdateForm({ petId }: { petId: number }) {
   api.pets.updatePet.useMutation(undefined, {
     async onMutate(variables) {
       const miniQraft = createAPIClient(apiContext!);
+      miniQraft.pets.getPetById.getQueryKey();
       await miniQraft.pets.getPetById.cancelQueries({
         parameters: petParams,
       });
@@ -715,6 +796,7 @@ function PetUpdateForm({ petId }: { petId: number }) {
     async onSuccess(updatedPet) {
       const miniQraft = createAPIClient(apiContext!);
       miniQraft.pets.getPetById.setQueryData(petParams, updatedPet);
+      miniQraft.pets.findPetsByStatus.getQueryKey();
       await miniQraft.pets.findPetsByStatus.invalidateQueries();
       onUpdate();
     },
@@ -731,12 +813,13 @@ function PetUpdateForm({ petId }: { petId: number }) {
       import { qraftReactAPIClient } from "@openapi-qraft/react";
       import { useMutation } from "@openapi-qraft/react/callbacks/useMutation";
       import { updatePet } from "./api/services/PetsService";
-      import { cancelQueries } from "@openapi-qraft/react/callbacks/cancelQueries";
+      import { getQueryKey } from "@openapi-qraft/react/callbacks/getQueryKey";
       import { getPetById } from "./api/services/PetsService";
+      import { cancelQueries } from "@openapi-qraft/react/callbacks/cancelQueries";
       import { getQueryData } from "@openapi-qraft/react/callbacks/getQueryData";
       import { setQueryData } from "@openapi-qraft/react/callbacks/setQueryData";
-      import { invalidateQueries } from "@openapi-qraft/react/callbacks/invalidateQueries";
       import { findPetsByStatus } from "./api/services/PetsService";
+      import { invalidateQueries } from "@openapi-qraft/react/callbacks/invalidateQueries";
       const api_pets_updatePet = qraftReactAPIClient(updatePet, {
         useMutation
       }, APIClientContext);
@@ -755,10 +838,12 @@ function PetUpdateForm({ petId }: { petId: number }) {
         api_pets_updatePet.useMutation(undefined, {
           async onMutate(variables) {
             const miniQraft_pets_getPetById = qraftReactAPIClient(getPetById, {
+              getQueryKey,
               cancelQueries,
               getQueryData,
               setQueryData
             }, apiContext!);
+            miniQraft_pets_getPetById.getQueryKey();
             await miniQraft_pets_getPetById.cancelQueries({
               parameters: petParams
             });
@@ -783,9 +868,11 @@ function PetUpdateForm({ petId }: { petId: number }) {
               setQueryData
             }, apiContext!);
             const miniQraft_pets_findPetsByStatus = qraftReactAPIClient(findPetsByStatus, {
+              getQueryKey,
               invalidateQueries
             }, apiContext!);
             miniQraft_pets_getPetById.setQueryData(petParams, updatedPet);
+            miniQraft_pets_findPetsByStatus.getQueryKey();
             await miniQraft_pets_findPetsByStatus.invalidateQueries();
             onUpdate();
           }

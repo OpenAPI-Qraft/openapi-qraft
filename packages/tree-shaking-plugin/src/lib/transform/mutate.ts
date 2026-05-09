@@ -10,6 +10,7 @@ import type {
 import type { NodePath } from '@babel/traverse';
 import * as traverseModule from '@babel/traverse';
 import * as t from '@babel/types';
+import { callbackNeedsRuntimeContext } from './callbacks.js';
 
 const traverse =
   resolveDefaultExport<(typeof import('@babel/traverse'))['default']>(
@@ -155,20 +156,25 @@ function rewriteInlineClientCalls(
       if (!usage) return;
       if (usage.callbackName !== match.callbackName) return;
 
+      const args: t.Expression[] = [
+        t.identifier(usage.operationImport.localName),
+        t.objectExpression([
+          t.objectProperty(
+            t.identifier(match.callbackName),
+            t.identifier(usage.callbackLocalName),
+            false,
+            true
+          ),
+        ]),
+      ];
+
+      if (match.optionsExpression) {
+        args.push(match.optionsExpression);
+      }
+
       const newClientCall = t.callExpression(
         t.identifier(runtimeLocalNames.react),
-        [
-          t.identifier(usage.operationImport.localName),
-          t.objectExpression([
-            t.objectProperty(
-              t.identifier(match.callbackName),
-              t.identifier(usage.callbackLocalName),
-              false,
-              true
-            ),
-          ]),
-          match.optionsExpression,
-        ]
+        args
       );
 
       if (match.callbackName === 'operationInvokeFn') {
@@ -218,6 +224,33 @@ function insertImports(
   }
 
   for (const usage of usages) {
+    const generatedInfo =
+      usage.client.mode.type === 'context'
+        ? generatedInfoByImport.get(
+            getGeneratedInfoKey(
+              usage.client.createImportPath,
+              usage.client.factory
+            )
+          )
+        : null;
+    const contextImportPath = generatedInfo?.contextImportPath ?? null;
+    const contextName = generatedInfo?.contextName ?? null;
+    const shouldImportContext =
+      usage.client.mode.type === 'context' &&
+      callbackNeedsRuntimeContext(usage.callbackName) &&
+      contextName !== null &&
+      contextImportPath !== null &&
+      !hasImportLocalName(ast, contextName);
+
+    if (shouldImportContext && usage.callbackName === 'operationInvokeFn') {
+      addNamedImportDeclaration(
+        declarations,
+        imported,
+        contextImportPath,
+        contextName
+      );
+    }
+
     addNamedImportDeclaration(
       declarations,
       imported,
@@ -233,20 +266,13 @@ function insertImports(
       usage.operationImport.localName
     );
 
-    if (usage.client.mode.type === 'context') {
-      const generatedInfo = generatedInfoByImport.get(
-        getGeneratedInfoKey(usage.client.createImportPath, usage.client.factory)
+    if (shouldImportContext && usage.callbackName !== 'operationInvokeFn') {
+      addNamedImportDeclaration(
+        declarations,
+        imported,
+        contextImportPath,
+        contextName
       );
-      if (generatedInfo?.contextName && generatedInfo.contextImportPath) {
-        if (!hasImportLocalName(ast, generatedInfo.contextName)) {
-          addNamedImportDeclaration(
-            declarations,
-            imported,
-            generatedInfo.contextImportPath,
-            generatedInfo.contextName
-          );
-        }
-      }
     }
 
     if (usage.client.mode.type === 'precreated') {
@@ -347,12 +373,6 @@ function insertOptimizedClients(
     (usage) => usage.client.mode.type === 'precreated'
   );
 
-  const contextDeclarations = createOptimizedClientDeclarations(
-    contextUsages,
-    contextUsages,
-    generatedInfoByImport,
-    runtimeLocalNames
-  );
   const precreatedDeclarations = createOptimizedClientDeclarations(
     precreatedUsages,
     precreatedUsages,
@@ -360,12 +380,37 @@ function insertOptimizedClients(
     runtimeLocalNames
   );
 
+  const contextUsagesByClient = new Map<ClientBinding, OperationUsage[]>();
+  for (const usage of contextUsages) {
+    const clientUsages = contextUsagesByClient.get(usage.client) ?? [];
+    clientUsages.push(usage);
+    contextUsagesByClient.set(usage.client, clientUsages);
+  }
+
+  const topLevelContextDeclarations: t.VariableDeclaration[] = [];
+  for (const [client, clientUsages] of contextUsagesByClient) {
+    const declarations = createOptimizedClientDeclarations(
+      clientUsages,
+      clientUsages,
+      generatedInfoByImport,
+      runtimeLocalNames
+    );
+    const statementPath = client.localInitPath?.parentPath;
+    if (statementPath?.isVariableDeclaration()) {
+      if (statementPath.parentPath?.isProgram()) {
+        topLevelContextDeclarations.push(...dedupeDeclarations(declarations));
+      } else {
+        statementPath.insertAfter(dedupeDeclarations(declarations));
+      }
+    }
+  }
+
   const body = ast.program.body;
   const lastImportIndex = findLastImportIndex(body);
   body.splice(
     lastImportIndex + 1,
     0,
-    ...dedupeDeclarations([...contextDeclarations, ...precreatedDeclarations])
+    ...dedupeDeclarations([...topLevelContextDeclarations, ...precreatedDeclarations])
   );
 
   const usagesByClient = new Map<ClientBinding, Map<string, OperationUsage[]>>();
@@ -442,12 +487,18 @@ function createOptimizedClientDeclaration(
     ),
   ];
 
+  const needsRuntimeContext = callbacks.some((callback) =>
+    callbackNeedsRuntimeContext(callback.callbackName)
+  );
+
   if (usage.client.mode.type === 'context') {
-    const generatedInfo = generatedInfoByImport.get(
-      getGeneratedInfoKey(usage.client.createImportPath, usage.client.factory)
-    );
-    if (generatedInfo?.contextName)
-      args.push(t.identifier(generatedInfo.contextName));
+    if (needsRuntimeContext) {
+      const generatedInfo = generatedInfoByImport.get(
+        getGeneratedInfoKey(usage.client.createImportPath, usage.client.factory)
+      );
+      if (generatedInfo?.contextName)
+        args.push(t.identifier(generatedInfo.contextName));
+    }
   } else if (usage.client.mode.type === 'options') {
     args.push(t.cloneNode(usage.client.mode.optionsExpression, true));
   } else {
@@ -627,7 +678,7 @@ function matchInlineClientCall(
 ): {
   createImportPath: string;
   factory: ClientBinding['factory'];
-  optionsExpression: t.Expression;
+  optionsExpression: t.Expression | null;
   serviceName: string;
   operationName: string;
   callbackName: string;
@@ -653,6 +704,19 @@ function matchInlineClientCall(
 
   const createImport = createImports.get(root.callee.name);
   if (!createImport) return null;
+
+  if (root.arguments.length === 0) {
+    if (callbackNeedsRuntimeContext(callbackName)) return null;
+    return {
+      createImportPath: createImport.factoryFile,
+      factory: createImport.factory,
+      optionsExpression: null,
+      serviceName,
+      operationName,
+      callbackName,
+    };
+  }
+
   if (root.arguments.length !== 1) return null;
   if (!isExpression(root.arguments[0])) return null;
 
