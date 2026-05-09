@@ -252,6 +252,7 @@ export const scenarios = [
       '@openapi-qraft/react/callbacks/useQuery',
       '@openapi-qraft/react/callbacks/useMutation',
       'getPets',
+      'getPets.schema',
       'getStores',
       'createPet',
       'BarrelAPIClientContext',

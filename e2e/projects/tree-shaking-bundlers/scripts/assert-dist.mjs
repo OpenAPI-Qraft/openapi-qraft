@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
-import { TraceMap, originalPositionFor } from '@jridgewell/trace-mapping';
+import { originalPositionFor, TraceMap } from '@jridgewell/trace-mapping';
 import { bundlers, scenarios } from './scenarios.mjs';
 import { getBundleMapPath, getBundlePath } from './shared.mjs';
 
@@ -30,6 +30,10 @@ const sourceMapAssertions = {
   'barrel-precreated-relative': {
     source: 'src/barrel-precreated-relative.ts',
     token: 'qraftAPIClient(',
+  },
+  'mixed-context-precreated-mirrors': {
+    source: 'src/mixed-context-precreated-mirrors.ts',
+    token: 'getPets.schema',
   },
 };
 
@@ -111,7 +115,10 @@ for (const bundler of bundlers) {
       const originalPosition = generatedPosition.originalPosition;
 
       assert.ok(
-        sourceMatchesExpected(originalPosition.source, sourceMapAssertion.source),
+        sourceMatchesExpected(
+          originalPosition.source,
+          sourceMapAssertion.source
+        ),
         `Expected ${bundler} / ${scenario.name} generated call site at ${bundlePath} to map back to ${sourceMapAssertion.source}, got ${originalPosition.source}`
       );
     }
