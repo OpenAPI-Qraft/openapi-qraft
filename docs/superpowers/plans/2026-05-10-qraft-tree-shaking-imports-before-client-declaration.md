@@ -23,7 +23,7 @@
 **Files:**
 - Modify: `packages/tree-shaking-plugin/src/core.test.ts`
 
-- [ ] **Step 1: Update the explicit-options regression so the snapshot expects imports before the generated declaration**
+- [x] **Step 1: Update the explicit-options regression so the snapshot expects imports before the generated declaration**
 
 Keep the current test input, including the valid direct operation invoke on `createAPIClient({})`, but change the expected output to the standard order:
 
@@ -44,11 +44,11 @@ expect(result?.code).toMatchInlineSnapshot(`
 
 This snapshot is the minimal regression that proves the transform is no longer emitting `const api_pets_getPets = ...` before the helper imports.
 
-- [ ] **Step 2: Keep the source-map regression unchanged**
+- [x] **Step 2: Keep the source-map regression unchanged**
 
 Leave `keeps a rewritten user call site traceable through an incoming source map` as-is. It already exercises the rewritten call site mapping, which is the part that could regress if the mutator order changes in a way that shifts original positions.
 
-- [ ] **Step 3: Run the focused unit test file once to capture the new expectation**
+- [x] **Step 3: Run the focused unit test file once to capture the new expectation**
 
 Run:
 
@@ -65,7 +65,7 @@ Expected: the explicit-options snapshot still fails until the mutator refactor i
 **Files:**
 - Modify: `packages/tree-shaking-plugin/src/lib/transform/mutate.ts`
 
-- [ ] **Step 1: Stop emitting program imports from inside declaration creation**
+- [x] **Step 1: Stop emitting program imports from inside declaration creation**
 
 Refactor the client-declaration pipeline so the import nodes and the generated client statement(s) are staged independently. The important part is not the order of helper calls, but the final AST result: no generated client declaration may be committed to the program body before all of its helper imports are already present in the file.
 
@@ -105,7 +105,7 @@ for (const { anchor, statements } of pendingStatementInsertions) {
 
 Keep the existing dedupe behavior, but apply it to the staged import list before the program-level splice.
 
-- [ ] **Step 2: Preserve the current insertion anchors for client declarations**
+- [x] **Step 2: Preserve the current insertion anchors for client declarations**
 
 Do not change where declarations are attached:
 
@@ -117,11 +117,11 @@ if (statementPath?.isVariableDeclaration()) {
 
 The only behavioral change should be that the helper imports are already present in the program before the first generated declaration appears.
 
-- [ ] **Step 3: Keep callback validity and runtime-helper selection untouched**
+- [x] **Step 3: Keep callback validity and runtime-helper selection untouched**
 
 Do not broaden or narrow callback support in this task. `callbackNeedsRuntimeContext(...)`, the `qraftReactAPIClient`/`qraftAPIClient` selection logic, and the zero-arg vs explicit-options validity rules should stay exactly as they are. This change is about ordering, not semantics.
 
-- [ ] **Step 4: Re-run the focused unit suite after the refactor**
+- [x] **Step 4: Re-run the focused unit suite after the refactor**
 
 Run:
 
@@ -140,7 +140,7 @@ Expected: the regression snapshot now shows all imports before the first generat
 - Modify: `e2e/projects/tree-shaking-bundlers/src/*` only if a stable scenario already exists for this shape
 - Modify: `e2e/projects/tree-shaking-bundlers/package.json` only if the fixture needs a new scenario or codegen target to make the order check observable
 
-- [ ] **Step 1: Evaluate whether the bundle artifact preserves the source-level order deterministically**
+- [x] **Step 1: Evaluate whether the bundle artifact preserves the source-level order deterministically**
 
 If a scenario already produces a readable bundle where the relevant imports and generated declaration survive in a stable order, add a single assertion that checks the imports appear before the first generated client declaration for that scenario. Use the existing bundle assertion harness instead of adding a new test runner.
 
@@ -148,7 +148,7 @@ If the shape only becomes visible after adding a dedicated fixture or codegen ta
 
 If the bundler normalizes or reorders the emitted bundle in a way that makes this unstable, skip e2e for this change. The unit snapshot remains the source of truth for this ordering contract.
 
-- [ ] **Step 2: Run the relevant e2e command only if the new assertion was added**
+- [x] **Step 2: Run the relevant e2e command only if the new assertion was added**
 
 Run:
 
@@ -167,3 +167,5 @@ node ./scripts/assert-dist.mjs
 ```
 
 That keeps the exact same fixture and assertion code, but lets you inspect the generated bundle files in place before the root runner copies them into `/Users/radist/w/qraft-e2e`.
+
+For this change, the e2e order assertion was not added because the bundle text is normalized differently by Vite, Rollup, Webpack, Rspack, and esbuild. The stable contract remains the unit snapshot plus the existing token and source-map checks.
