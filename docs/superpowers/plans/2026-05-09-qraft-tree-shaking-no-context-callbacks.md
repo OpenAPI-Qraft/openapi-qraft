@@ -23,7 +23,7 @@
 
 - Modify: `packages/tree-shaking-plugin/src/core.test.ts`
 
-- [ ] **Step 1: Add a focused regression for zero-arg `createAPIClient()` usage in inline and named local form**
+- [x] **Step 1: Add a focused regression for zero-arg `createAPIClient()` usage in inline and named local form**
 
 Add a test that exercises both the inline call and the named local binding in the same file so the transform must handle each path:
 
@@ -77,7 +77,7 @@ This snapshot should prove three things at once:
 - the original `createAPIClient` import disappears when it is fully transformed,
 - the emitted client call does not need `APIClientContext` when the only callback is `getQueryKey`.
 
-- [ ] **Step 2: Run the focused test and confirm it fails before code changes**
+- [x] **Step 2: Run the focused test and confirm it fails before code changes**
 
 Run:
 
@@ -95,7 +95,7 @@ Expected: fail with the inline call still left as an untouched `createAPIClient(
 - Modify: `packages/tree-shaking-plugin/src/lib/transform/plan.ts`
 - Modify: `packages/tree-shaking-plugin/src/lib/transform/mutate.ts`
 
-- [ ] **Step 1: Introduce a shared helper for callbacks that do not need runtime context**
+- [x] **Step 1: Introduce a shared helper for callbacks that do not need runtime context**
 
 Add a small helper module with a single source of truth for the three no-context callbacks:
 
@@ -113,7 +113,7 @@ export function callbackNeedsRuntimeContext(callbackName: string) {
 
 Keep the helper boring: a plain `Set<string>` and a boolean predicate are enough. Import it into both `plan.ts` and `mutate.ts` so the named-client and inline-client rewrite paths can ask the same question without duplicating the string list.
 
-- [ ] **Step 2: Update the mutator to use the helper when building optimized client declarations**
+- [x] **Step 2: Update the mutator to use the helper when building optimized client declarations**
 
 Change `createOptimizedClientDeclaration(...)` so it only pushes the third `APIClientContext` argument when at least one callback for that generated client needs runtime context. For a client whose callback list contains only `getQueryKey`, `getInfiniteQueryKey`, or `getMutationKey`, emit:
 
@@ -125,11 +125,11 @@ qraftReactAPIClient(findPetsByStatus, {
 
 and do not import `APIClientContext` for that client.
 
-- [ ] **Step 3: Update named zero-arg client bindings so `const utilityClient = createAPIClient()` is transformed and removed**
+- [x] **Step 3: Update named zero-arg client bindings so `const utilityClient = createAPIClient()` is transformed and removed**
 
 Change the named-client plan and mutation paths so a zero-arg `createAPIClient()` binding inside a function is still collected into the transform plan when it is only used with context-free callbacks. The emitted optimized declaration should replace the original `utilityClient` binding in the same function scope, not keep `createAPIClient` alive, and the removal logic should delete the dead `const utilityClient = createAPIClient();` statement after the rewritten binding is inserted.
 
-- [ ] **Step 4: Update inline rewrite logic to allow zero-arg factory calls for context-free callbacks**
+- [x] **Step 4: Update inline rewrite logic to allow zero-arg factory calls for context-free callbacks**
 
 Change `matchInlineClientCall(...)` in the plan phase so it accepts both of these forms:
 
@@ -140,7 +140,7 @@ createAPIClient().pets.findPetsByStatus.getQueryKey();
 
 Keep the existing one-argument requirement for callbacks that still need runtime context or options. For no-context callbacks, treat a zero-argument factory call as valid and emit the same 2-argument `qraftReactAPIClient(...)` shape as the named-client path.
 
-- [ ] **Step 5: Run the focused test and update the snapshot**
+- [x] **Step 5: Run the focused test and update the snapshot**
 
 Run:
 
@@ -157,7 +157,7 @@ Expected: the snapshot now shows both the inline call and the named `utilityClie
 - Modify: `packages/tree-shaking-plugin/src/core.test.ts`
 - Modify: `packages/tree-shaking-plugin/src/lib/transform/mutate.ts`
 
-- [ ] **Step 1: Add one mixed-behavior regression so contextful callbacks keep the old path**
+- [x] **Step 1: Add one mixed-behavior regression so contextful callbacks keep the old path**
 
 Add a second test that uses a no-context callback and a contextful callback on the same client, for example:
 
@@ -189,7 +189,7 @@ export function App() {
 
 This guards against an over-aggressive change that strips context from the whole client as soon as one no-context callback appears.
 
-- [ ] **Step 2: Run the targeted test subset**
+- [x] **Step 2: Run the targeted test subset**
 
 Run:
 
@@ -199,7 +199,7 @@ yarn workspace @openapi-qraft/tree-shaking-plugin vitest run src/core.test.ts -t
 
 Expected: both tests pass, and the mixed case still imports and passes `APIClientContext` only because `useQuery` is present.
 
-- [ ] **Step 3: Run the package test and typecheck sweep**
+- [x] **Step 3: Run the package test and typecheck sweep**
 
 Run:
 
