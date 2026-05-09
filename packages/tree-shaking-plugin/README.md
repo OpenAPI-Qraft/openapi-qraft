@@ -1,72 +1,96 @@
 # @openapi-qraft/tree-shaking-plugin
 
-Build plugin that eliminates dead code from [OpenAPI Qraft](https://openapi-qraft.github.io/openapi-qraft/) context API clients. Instead of bundling the full `createAPIClient()` client and all its service callbacks, the plugin rewrites each call site to import only the specific operation schema and the exact callbacks actually used at that location.
+Tree-shaking plugin for OpenAPI Qraft API clients. Use it with Vite, Rollup, Webpack, Rspack, or esbuild through [unplugin](https://github.com/unjs/unplugin).
 
-Supports **Vite**, **Rollup**, **Webpack**, **Rspack**, and **esbuild** via [unplugin](https://github.com/unjs/unplugin).
-
-## How it works
-
-Given a generated API client:
-
-```ts
-// src/api/index.ts  (generated, simplified for brevity)
-export function createAPIClient(callbacks = defaultCallbacks) {
-  return qraftReactAPIClient(services, callbacks, APIClientContext);
-}
-```
-
-And a component that uses it:
-
-```ts
-// src/App.tsx  (your code, before)
-import { createAPIClient } from './api';
-
-const api = createAPIClient();
-
-export function PetList() {
-  const { data: pets } = api.pets.getPets.useQuery();
-  return pets?.map((pet) => <li key={pet.id}>{pet.name}</li>);
-}
-```
-
-The plugin transforms it at build time into:
-
-```ts
-// src/App.tsx  (after transformation)
-import { qraftReactAPIClient } from '@openapi-qraft/react';
-import { useQuery } from '@openapi-qraft/react/callbacks/useQuery';
-import { getPets } from './api/services/PetsService';
-import { APIClientContext } from './api/APIClientContext';
-
-const api_pets_getPets = qraftReactAPIClient(getPets, { useQuery }, APIClientContext);
-
-export function PetList() {
-  const { data: pets } = api_pets_getPets.useQuery();
-  return pets?.map((pet) => <li key={pet.id}>{pet.name}</li>);
-}
-```
-
-Only `getPets`, `useQuery`, and `APIClientContext` end up in the bundle — everything else is tree-shaken by the bundler.
-
-## Installation
+## Install
 
 ```bash
 npm install --save-dev @openapi-qraft/tree-shaking-plugin
 ```
+
+## What gets optimized
+
+There is no special runtime magic here. `qraftReactAPIClient` and `qraftAPIClient` are ordinary runtime functions, and the plugin rewrites generated full-client usage into smaller tree-shake-friendly calls.
+
+The rewritten code stays type-safe because the plugin preserves the generated types while narrowing the emitted runtime imports.
+
+The configuration below shows a single `apis.pets` entry in Redocly so it is clear where these client families live. It shows both generated client families this README refers to: a full Node.js client and a full React client. Both are generated with complete coverage so the plugin can tree-shake what is actually used.
+
+```yaml
+apis:
+  pets:
+    root: ./openapi.json
+    x-openapi-qraft:
+      plugin:
+        tanstack-query-react: true
+        openapi-typescript: true
+      output-dir: src/api
+      create-api-client-fn:
+        # Generated client factories are emitted from modules like ./create-node-api-client and ./create-react-api-client
+        createNodeAPIClient:
+          filename: create-node-api-client
+          services: all
+          callbacks: all
+        createReactAPIClient:
+          filename: create-react-api-client
+          context: APIClientContext
+          services: all
+          callbacks: all
+```
+
+## Supported client modes
+
+- `createAPIClientFn` for context-based factories, for example `createReactAPIClient` and the resulting `reactAPIClient`.
+
+  ```ts
+  import { createReactAPIClient } from './api';
+
+  const reactAPIClient = createReactAPIClient();
+
+  export function PetList() {
+    return reactAPIClient.pets.getPets.useQuery();
+  }
+  ```
+
+- `apiClient` for precreated clients, for example `export const nodeAPIClient = createNodeAPIClient(createNodeAPIClientOptions())`.
+
+  ```ts filename=src/client.ts
+  // src/client.ts
+  import { createNodeAPIClient } from './api';
+  import { createNodeAPIClientOptions } from './client-options';
+
+  export const nodeAPIClient = createNodeAPIClient(
+    createNodeAPIClientOptions()
+  );
+  ```
+
+  ```ts filename=src/App.tsx
+  // src/App.tsx
+  import { nodeAPIClient } from './client';
+
+  export function PetList() {
+    return nodeAPIClient.pets.getPets.useQuery();
+  }
+  ```
 
 ## Setup
 
 ### Vite
 
 ```ts
-// vite.config.ts
 import { qraftTreeShakeVite } from '@openapi-qraft/tree-shaking-plugin/vite';
 import { defineConfig } from 'vite';
 
 export default defineConfig({
   plugins: [
     qraftTreeShakeVite({
-      createAPIClientFn: [{ name: 'createAPIClient', module: './api' }],
+      createAPIClientFn: [
+        {
+          name: 'createReactAPIClient',
+          module: './api',
+          context: 'APIClientContext',
+        },
+      ],
     }),
   ],
 });
@@ -75,13 +99,18 @@ export default defineConfig({
 ### Rollup
 
 ```ts
-// rollup.config.mjs
 import { qraftTreeShakeRollup } from '@openapi-qraft/tree-shaking-plugin/rollup';
 
 export default {
   plugins: [
     qraftTreeShakeRollup({
-      createAPIClientFn: [{ name: 'createAPIClient', module: './api' }],
+      createAPIClientFn: [
+        {
+          name: 'createReactAPIClient',
+          module: './api',
+          context: 'APIClientContext',
+        },
+      ],
     }),
   ],
 };
@@ -90,7 +119,6 @@ export default {
 ### Webpack
 
 ```ts
-// webpack.config.js
 const {
   qraftTreeShakeWebpack,
 } = require('@openapi-qraft/tree-shaking-plugin/webpack');
@@ -98,7 +126,13 @@ const {
 module.exports = {
   plugins: [
     qraftTreeShakeWebpack({
-      createAPIClientFn: [{ name: 'createAPIClient', module: './api' }],
+      createAPIClientFn: [
+        {
+          name: 'createReactAPIClient',
+          module: './api',
+          context: 'APIClientContext',
+        },
+      ],
     }),
   ],
 };
@@ -112,13 +146,11 @@ Rspack uses the same plugin entrypoint, but it also needs the resolver package a
 npm install --save-dev @rspack/resolver
 ```
 
-Make sure your Rspack `resolve` config includes TypeScript-aware resolution:
+If you use TypeScript path aliases or explicit `.js` imports, make sure your Rspack `resolve` config is set up accordingly:
 
 ```ts
 resolve: {
   tsConfig: path.resolve(process.cwd(), 'tsconfig.json'),
-  // Optional. This is mainly needed when you use explicit import extensions
-  // and want .js imports to resolve to .ts/.tsx files.
   extensionAlias: {
     '.js': ['.ts', '.js'],
     '.mjs': ['.mts', '.mjs'],
@@ -128,13 +160,18 @@ resolve: {
 ```
 
 ```ts
-// rspack.config.mjs
 import { qraftTreeShakeRspack } from '@openapi-qraft/tree-shaking-plugin/rspack';
 
 export default {
   plugins: [
     qraftTreeShakeRspack({
-      createAPIClientFn: [{ name: 'createAPIClient', module: './api' }],
+      createAPIClientFn: [
+        {
+          name: 'createReactAPIClient',
+          module: './api',
+          context: 'APIClientContext',
+        },
+      ],
     }),
   ],
 };
@@ -149,205 +186,390 @@ import { build } from 'esbuild';
 await build({
   plugins: [
     qraftTreeShakeEsbuild({
-      createAPIClientFn: [{ name: 'createAPIClient', module: './api' }],
+      createAPIClientFn: [
+        {
+          name: 'createReactAPIClient',
+          module: './api',
+          context: 'APIClientContext',
+        },
+      ],
     }),
   ],
 });
 ```
 
-## Options
-
-```ts
-type QraftTreeShakeOptions = {
-  /**
-   * Required. Each entry pairs an exported function name with the module
-   * specifier that identifies the generated factory. The plugin resolves the
-   * specifier through the bundler first, so aliases, workspace packages, bare
-   * modules, and relative paths all work when the bundler can resolve them.
-   * Re-export barrels that forward the factory to a `.js`-suffixed file are
-   * supported.
-   */
-  createAPIClientFn: Array<{
-    name: string;
-    module: string;
-    context?: string;
-    contextModule?: string;
-  }>;
-
-  /**
-   * Custom resolver, primarily for testing without a live bundler.
-   * Called when the bundler's own resolver returns null.
-   * Return the absolute path of the resolved file, or null to skip.
-   */
-  resolve?: (
-    specifier: string,
-    importer: string
-  ) => string | null | Promise<string | null>;
-
-  /** Files to include. Defaults to all JS/TS source files. */
-  include?: string | RegExp | Array<string | RegExp>;
-
-  /** Files to exclude. Defaults to /node_modules/. */
-  exclude?: string | RegExp | Array<string | RegExp>;
-
-  /** Log skipped files and the reason to stderr. */
-  debug?: boolean;
-};
-```
+## Configuration
 
 ### `createAPIClientFn`
 
-The central configuration. Each entry tells the plugin which function to treat as an API client factory and where it lives:
+Use this when your application imports a factory such as `createReactAPIClient` and creates clients at the call site.
+
+**⬇️ Input**
+
+```ts
+import { createReactAPIClient } from './api';
+
+const reactAPIClient = createReactAPIClient();
+
+export function App() {
+  return reactAPIClient.pets.getPets.useQuery();
+}
+```
+
+**⬆️ Output**
+
+```ts
+import { qraftReactAPIClient } from '@openapi-qraft/react';
+import { useQuery } from '@openapi-qraft/react/callbacks/useQuery';
+import { APIClientContext } from './api/APIClientContext';
+import { getPets } from './api/services/PetsService';
+
+const reactAPIClient_pets_getPets = qraftReactAPIClient(
+  getPets,
+  { useQuery },
+  APIClientContext
+);
+
+export function App() {
+  return reactAPIClient_pets_getPets.useQuery();
+}
+```
+
+Configuration:
 
 ```ts
 createAPIClientFn: [
-  // Relative path to a directory — resolves index.ts automatically
-  { name: 'createAPIClient', module: './api' },
-
-  // Explicit file path with extension — resolves the exact file, no guessing
-  { name: 'createAPIClient', module: './api/create-api-client.ts' },
-
-  // TypeScript path alias
-  { name: 'createAPIClient', module: '@/api/client' },
-
-  // Multiple API client functions from different modules
-  { name: 'createPetsClient', module: '@api/pets' },
-  { name: 'createStoresClient', module: '@api/stores' },
+  {
+    name: 'createReactAPIClient',
+    module: './api',
+    context: 'APIClientContext',
+    contextModule: './api/APIClientContext',
+  },
 ];
 ```
 
-`module` is resolved through the bundler first, so path aliases, bare modules,
-and monorepo workspace packages all work automatically. If you use a relative
-or absolute path, it must be resolvable from the importing file through the
-bundler's own resolver.
+`module` must be a specifier that the bundler can resolve, either as a relative path from the bundler's resolution root or as an alias/third-party module import. `context` defaults to `APIClientContext`. Use `contextModule` when the context is exported from a different module than the factory, or point both options at the same module when the context and factory are exported together.
 
-`context` defaults to `APIClientContext`; `contextModule` can override the context import source when the generated factory does not colocate it with the default file name.
+### `apiClient`
 
-If two imports share the same `name` but resolve to different files, only the one matching a configured entry is transformed. This prevents false positives when an unrelated module happens to export a function with the same name.
+Use this when the client is already created and exported from a module.
 
-## Path rendering
+**⬇️ Input**
 
-Normalized generated relative source imports are emitted without source extensions or trailing `/index`. Bare module specifiers are preserved as-is.
-
-## Context client inside a component
-
-A common pattern is to use a context client for rendering (top-level `const api = createAPIClient()`) and a fresh options client inside mutation callbacks to perform cache updates with the current context value. Both are optimized in a single pass:
+**File Name** `src/client.ts`
 
 ```ts
-// src/PetUpdateForm.tsx  (before)
-import { useContext } from 'react';
-import { APIClientContext, createAPIClient } from './api';
+import { createNodeAPIClient } from './api';
+import { createNodeAPIClientOptions } from './client-options';
 
-const api = createAPIClient();
+export const nodeAPIClient = createNodeAPIClient(createNodeAPIClientOptions());
+```
+
+**File Name** `src/client-options.ts`
+
+```ts
+import { requestFn } from '@openapi-qraft/react';
+import { QueryClient } from '@tanstack/react-query';
+
+export const clientOptions = {
+  requestFn,
+  queryClient: new QueryClient(),
+  baseUrl: 'https://api.example.com/v1',
+} as const;
+
+export function createNodeAPIClientOptions() {
+  return clientOptions;
+}
+```
+
+**File Name** `src/App.tsx`
+
+```ts
+import { nodeAPIClient } from './client';
+
+export function App() {
+  return nodeAPIClient.pets.getPets.useQuery();
+}
+```
+
+**⬆️ Output**
+
+**File Name** `src/App.tsx`
+
+```ts
+import { qraftAPIClient } from '@openapi-qraft/react';
+import { useQuery } from '@openapi-qraft/react/callbacks/useQuery';
+import { getPets } from './api/services/PetsService';
+import { createNodeAPIClientOptions } from './client-options';
+
+const nodeAPIClient_pets_getPets = qraftAPIClient(
+  getPets,
+  { useQuery },
+  createNodeAPIClientOptions()
+);
+
+export function App() {
+  return nodeAPIClient_pets_getPets.useQuery();
+}
+```
+
+Configuration:
+
+```ts
+apiClient: [
+  {
+    client: 'nodeAPIClient',
+    clientModule: './client',
+    createAPIClientFn: 'createNodeAPIClient',
+    createAPIClientFnModule: './create-node-api-client',
+    createAPIClientFnOptions: 'createNodeAPIClientOptions',
+    createAPIClientFnOptionsModule: './client-options',
+  },
+];
+```
+
+Use a named export when possible. `default` export clients are also supported, but they are not recommended for new code. `createAPIClientFnModule` and `createAPIClientFnOptionsModule` should point to module specifiers that the bundler can resolve: either a relative path from the bundler's resolution root or an alias/third-party module import. `createAPIClientFnOptionsModule` is optional; when omitted, it falls back to the client module. You can point it at the same module as `clientModule` when the options factory lives next to the exported client.
+
+> Top-level generated clients still tree-shake. Bundlers can drop any generated operation that is never used in a chunk.
+
+`createNodeAPIClientOptions()` should return the same object each time. Keeping `queryClient` in a shared top-level `clientOptions` object makes that explicit and keeps the `QueryClient` instance stable.
+
+### Other options
+
+- `resolve` - custom resolver used as a fallback when the bundler cannot resolve a specifier.
+- `include` / `exclude` - filter which files are transformed.
+- `debug` - log skipped files and the reason they were skipped.
+
+## Transformation Examples
+
+### Context-based factories
+
+Use this when the client is created in component code and a nested callback creates a fresh client from the current context.
+
+The snippets below show only the files that matter in this flow, so the before/after shape stays easy to follow.
+
+**⬇️ Input**
+
+**File Name** `src/App.tsx`
+
+```ts
+import { useContext } from 'react';
+import { APIClientContext, createReactAPIClient } from './api';
+
+const reactAPIClient = createReactAPIClient();
 
 function PetUpdateForm({ petId }: { petId: number }) {
-  const apiContext = useContext(APIClientContext);
+  const apiClientOptions = useContext(APIClientContext);
   const petParams = { path: { petId } };
 
-  api.pets.updatePet.useMutation(undefined, {
+  reactAPIClient.pets.updatePet.useMutation(undefined, {
     async onMutate(variables) {
-      const apiClient = createAPIClient(apiContext!);
-
-      await apiClient.pets.getPetById.cancelQueries({ parameters: petParams });
-      const prevPet = apiClient.pets.getPetById.getQueryData(petParams);
-      apiClient.pets.getPetById.setQueryData(petParams, (old) => ({
-        ...old,
+      const miniQraft = createReactAPIClient(apiClientOptions);
+      await miniQraft.pets.getPetById.cancelQueries({ parameters: petParams });
+      const prevPet = miniQraft.pets.getPetById.getQueryData(petParams);
+      miniQraft.pets.getPetById.setQueryData(petParams, (oldData) => ({
+        ...oldData,
         ...variables.body,
       }));
-
       return { prevPet };
+    },
+    async onSuccess(updatedPet) {
+      const miniQraft = createReactAPIClient(apiClientOptions);
+      miniQraft.pets.getPetById.setQueryData(petParams, updatedPet);
+      await miniQraft.pets.findPetsByStatus.invalidateQueries();
     },
   });
 }
 ```
 
-After transformation only the three operations and four callbacks appear in the bundle — the rest of the generated client is gone:
+**⬆️ Output**
+
+The `reactAPIClient_pets_*` bindings keep the client family and operation name together, which makes the rewrite easy to trace.
+
+**File Name** `src/App.tsx`
 
 ```ts
-// src/PetUpdateForm.tsx  (after)
 import { qraftReactAPIClient } from '@openapi-qraft/react';
 import { cancelQueries } from '@openapi-qraft/react/callbacks/cancelQueries';
 import { getQueryData } from '@openapi-qraft/react/callbacks/getQueryData';
+import { invalidateQueries } from '@openapi-qraft/react/callbacks/invalidateQueries';
 import { setQueryData } from '@openapi-qraft/react/callbacks/setQueryData';
 import { useMutation } from '@openapi-qraft/react/callbacks/useMutation';
 import { useContext } from 'react';
 import { APIClientContext } from './api';
-import { getPetById, updatePet } from './api/services/PetsService';
+import {
+  findPetsByStatus,
+  getPetById,
+  updatePet,
+} from './api/services/PetsService';
 
-const api_pets_updatePet = qraftReactAPIClient(
+const reactAPIClient_pets_updatePet = qraftReactAPIClient(
   updatePet,
   { useMutation },
   APIClientContext
 );
 
 function PetUpdateForm({ petId }: { petId: number }) {
-  const apiContext = useContext(APIClientContext);
+  const apiClientOptions = useContext(APIClientContext);
   const petParams = { path: { petId } };
 
-  api_pets_updatePet.useMutation(undefined, {
+  reactAPIClient_pets_updatePet.useMutation(undefined, {
     async onMutate(variables) {
-      const apiClient_pets_getPetById = qraftReactAPIClient(
+      const reactAPIClient_pets_getPetById = qraftReactAPIClient(
         getPetById,
         { cancelQueries, getQueryData, setQueryData },
-        apiContext!
+        apiClientOptions
       );
-
-      await apiClient_pets_getPetById.cancelQueries({ parameters: petParams });
-      const prevPet = apiClient_pets_getPetById.getQueryData(petParams);
-      apiClient_pets_getPetById.setQueryData(petParams, (old) => ({
-        ...old,
+      await reactAPIClient_pets_getPetById.cancelQueries({
+        parameters: petParams,
+      });
+      const prevPet = reactAPIClient_pets_getPetById.getQueryData(petParams);
+      reactAPIClient_pets_getPetById.setQueryData(petParams, (oldData) => ({
+        ...oldData,
         ...variables.body,
       }));
-
       return { prevPet };
+    },
+    async onSuccess(updatedPet) {
+      const reactAPIClient_pets_getPetById = qraftReactAPIClient(
+        getPetById,
+        { setQueryData },
+        apiClientOptions
+      );
+      const reactAPIClient_pets_findPetsByStatus = qraftReactAPIClient(
+        findPetsByStatus,
+        { invalidateQueries },
+        apiClientOptions
+      );
+      reactAPIClient_pets_getPetById.setQueryData(petParams, updatedPet);
+      await reactAPIClient_pets_findPetsByStatus.invalidateQueries();
     },
   });
 }
 ```
 
-Note how the plugin handles both clients differently:
+### Precreated clients
 
-- The outer `createAPIClient()` (no arguments) is hoisted to a module-level constant bound to `APIClientContext`.
-- The inner `createAPIClient(apiContext!)` stays inline at the call site, receiving the runtime context value directly.
+Use this when the client is exported from `client.ts` and the options factory lives in a separate module.
 
-## What gets transformed
+The snippets below show the minimum files involved in the precreated flow.
 
-### Named client (created once, used in many places)
+**⬇️ Input**
 
-```ts
-// context client (no arguments — uses React context)
-const api = createAPIClient();
-api.pets.getPets.useQuery();
-api.pets.getPets.getQueryKey({});
-
-// options client (explicit requestFn / queryClient / baseUrl)
-const api = createAPIClient({ requestFn, baseUrl: '/v1' });
-api.pets.getPets.useQuery();
-```
-
-### Inline client (created at the call site)
+**File Name** `src/client.ts`
 
 ```ts
-createAPIClient(apiContext).pets.getPetById.invalidateQueries();
+import { createNodeAPIClientOptions } from './client-options';
+import { createNodeAPIClient } from './create-node-api-client';
+
+export const nodeAPIClient = createNodeAPIClient(createNodeAPIClientOptions());
 ```
 
-### Direct invocation (no callback name — calls `operationInvokeFn`)
+**File Name** `src/client-options.ts`
 
 ```ts
-api.pets.getPets();
+import { requestFn } from '@openapi-qraft/react';
+import { QueryClient } from '@tanstack/react-query';
+
+const queryClient = new QueryClient();
+
+export function createNodeAPIClientOptions() {
+  return {
+    requestFn,
+    queryClient,
+    baseUrl: 'https://api.example.com/v1',
+  };
+}
 ```
 
-## What is NOT transformed
+**File Name** `src/App.tsx`
 
-- **Exported clients** — `export const api = createAPIClient()` is left intact because the plugin cannot know what callbacks consumers will use.
-- **Clients passed as arguments or stored in objects** — only simple `const name = createAPIClient()` declarations are recognized.
-- **Non-matching imports** — any import where the specifier does not resolve to a configured `createAPIClientFn` entry is left untouched.
-- **Files in `node_modules`** — always skipped.
+```ts
+import { nodeAPIClient } from './client';
 
-## Resolver chain
+const petParams = { path: { petId: 1 } };
 
-Inside the `transform` hook the plugin resolves import specifiers using the following priority:
+export function App() {
+  nodeAPIClient.pets.updatePet.useMutation(undefined, {
+    async onMutate(variables) {
+      await nodeAPIClient.pets.getPetById.cancelQueries({
+        parameters: petParams,
+      });
+      const prevPet = nodeAPIClient.pets.getPetById.getQueryData(petParams);
+      nodeAPIClient.pets.getPetById.setQueryData(petParams, (old) => ({
+        ...old,
+        ...variables.body,
+      }));
+      return { prevPet };
+    },
+    async onSuccess(updatedPet) {
+      nodeAPIClient.pets.getPetById.setQueryData(petParams, updatedPet);
+      await nodeAPIClient.pets.findPetsByStatus.invalidateQueries();
+    },
+  });
+}
+```
 
-1. **Bundler native** (`this.resolve`) — covers Rollup, Vite, Webpack, and Rspack loaders; handles all aliases and workspace packages.
-2. **esbuild `build.resolve`** — used when running under esbuild (via `getNativeBuildContext`).
-3. **`options.resolve`** — your custom override, useful in unit tests or environments without a bundler.
+**⬆️ Output**
+
+The `nodeAPIClient_pets_*` bindings keep the client family and operation name together, which makes the rewrite easy to trace.
+
+**File Name** `src/App.tsx`
+
+```ts
+import { qraftAPIClient } from '@openapi-qraft/react';
+import { cancelQueries } from '@openapi-qraft/react/callbacks/cancelQueries';
+import { getQueryData } from '@openapi-qraft/react/callbacks/getQueryData';
+import { invalidateQueries } from '@openapi-qraft/react/callbacks/invalidateQueries';
+import { setQueryData } from '@openapi-qraft/react/callbacks/setQueryData';
+import { useMutation } from '@openapi-qraft/react/callbacks/useMutation';
+import {
+  findPetsByStatus,
+  getPetById,
+  updatePet,
+} from './api/services/PetsService';
+import { createNodeAPIClientOptions } from './client-options';
+
+const nodeAPIClient_pets_updatePet = qraftAPIClient(
+  updatePet,
+  { useMutation },
+  createNodeAPIClientOptions()
+);
+const nodeAPIClient_pets_getPetById = qraftAPIClient(
+  getPetById,
+  { cancelQueries, getQueryData, setQueryData },
+  createNodeAPIClientOptions()
+);
+const nodeAPIClient_pets_findPetsByStatus = qraftAPIClient(
+  findPetsByStatus,
+  { invalidateQueries },
+  createNodeAPIClientOptions()
+);
+
+const petParams = { path: { petId: 1 } };
+
+export function App() {
+  nodeAPIClient_pets_updatePet.useMutation(undefined, {
+    async onMutate(variables) {
+      await nodeAPIClient_pets_getPetById.cancelQueries({
+        parameters: petParams,
+      });
+      const prevPet = nodeAPIClient_pets_getPetById.getQueryData(petParams);
+      nodeAPIClient_pets_getPetById.setQueryData(petParams, (old) => ({
+        ...old,
+        ...variables.body,
+      }));
+      return { prevPet };
+    },
+    async onSuccess(updatedPet) {
+      nodeAPIClient_pets_getPetById.setQueryData(petParams, updatedPet);
+      await nodeAPIClient_pets_findPetsByStatus.invalidateQueries();
+    },
+  });
+}
+```
+
+> **Why top-level clients?**
+>
+> The operation-specific clients are hoisted to the module top level so the bundler can see every referenced operation up front.
+> **This does not block tree-shaking.** If a given chunk does not use one of these generated clients, normal bundler analysis can still drop it.
