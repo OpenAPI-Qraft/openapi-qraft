@@ -13,10 +13,11 @@
 ### Task 1: Add helper-level tests that pin the rendering rules
 
 **Files:**
+
 - Create: `packages/tree-shaking-plugin/src/lib/transform/path-rendering.test.ts`
 - Modify: `packages/tree-shaking-plugin/src/core.ts`
 
-- [ ] **Step 1: Write the helper test before the new module exists**
+- [x] **Step 1: Write the helper test before the new module exists**
 
 ```ts
 import {
@@ -26,16 +27,26 @@ import {
 } from './path-rendering.js';
 
 it('renders relative source imports without source extensions or /index', () => {
-  expect(composeResolvedSourceImportPath('/src/App.tsx', '/src/api/index.ts')).toBe('./api');
-  expect(composeResolvedSourceImportPath('/src/App.tsx', '/src/api/client.tsx')).toBe('./api/client');
   expect(
-    resolvePrecreatedOptionsImportPath('/src/App.tsx', './client-options', '/src/client-options/index.ts')
+    composeResolvedSourceImportPath('/src/App.tsx', '/src/api/index.ts')
+  ).toBe('./api');
+  expect(
+    composeResolvedSourceImportPath('/src/App.tsx', '/src/api/client.tsx')
+  ).toBe('./api/client');
+  expect(
+    resolvePrecreatedOptionsImportPath(
+      '/src/App.tsx',
+      './client-options',
+      '/src/client-options/index.ts'
+    )
   ).toBe('./client-options');
-  expect(composeImportPath('/src/App.tsx', '@openapi-qraft/react')).toBe('@openapi-qraft/react');
+  expect(composeImportPath('/src/App.tsx', '@openapi-qraft/react')).toBe(
+    '@openapi-qraft/react'
+  );
 });
 ```
 
-- [ ] **Step 2: Run the helper test and confirm it fails because the module has not been extracted yet**
+- [x] **Step 2: Run the helper test and confirm it fails because the module has not been extracted yet**
 
 Run:
 
@@ -45,7 +56,7 @@ yarn workspace @openapi-qraft/tree-shaking-plugin test -- src/lib/transform/path
 
 Expected: FAIL because `path-rendering.ts` does not exist yet.
 
-- [ ] **Step 3: Add the helper module and move the path logic out of `core.ts`**
+- [x] **Step 3: Add the helper module and move the path logic out of `core.ts`**
 
 Move these functions unchanged except for imports and exports, and update `core.ts` to import them from the new module:
 
@@ -62,7 +73,7 @@ import {
 } from './lib/transform/path-rendering.js';
 ```
 
-- [ ] **Step 4: Re-run the helper test and one representative core snapshot**
+- [x] **Step 4: Re-run the helper test and one representative core snapshot**
 
 Run:
 
@@ -75,10 +86,11 @@ Expected: PASS, and the representative tree-shaking snapshot still emits the sam
 ### Task 2: Document the convention and validate the external fixture
 
 **Files:**
+
 - Modify: `packages/tree-shaking-plugin/README.md`
 - Modify: `packages/tree-shaking-plugin/src/core.ts`
 
-- [ ] **Step 1: Add a short README note for the rendering rule**
+- [x] **Step 1: Add a short README note for the rendering rule**
 
 Add this note near the options or path-convention section:
 
@@ -87,7 +99,7 @@ Relative generated imports are emitted without source extensions or `/index` so 
 Bare module specifiers are preserved as-is.
 ```
 
-- [ ] **Step 2: Run the package unit suite and typecheck**
+- [x] **Step 2: Run the package unit suite and typecheck**
 
 Run:
 
@@ -98,7 +110,7 @@ yarn workspace @openapi-qraft/tree-shaking-plugin typecheck
 
 Expected: both commands pass after the helper extraction.
 
-- [ ] **Step 3: Run the external tree-shaking e2e checkpoint**
+- [x] **Step 3: Run the external tree-shaking e2e checkpoint**
 
 Run:
 
@@ -108,7 +120,7 @@ cd e2e && yarn e2e:tree-shaking-bundlers-local
 
 Expected: the external multi-bundler fixture still produces the same output shape and the path strings remain bundler-friendly.
 
-- [ ] **Step 4: Commit the extraction**
+- [x] **Step 4: Commit the extraction**
 
 ```bash
 git add packages/tree-shaking-plugin/src/lib/transform/path-rendering.ts packages/tree-shaking-plugin/src/lib/transform/path-rendering.test.ts packages/tree-shaking-plugin/src/core.ts packages/tree-shaking-plugin/README.md
