@@ -414,13 +414,13 @@ api.pets.getPets();
 
     expect(result?.code).toMatchInlineSnapshot(`
       "import { qraftReactAPIClient } from "@openapi-qraft/react";
+      import { getQueryKey } from "@openapi-qraft/react/callbacks/getQueryKey";
+      import { getPets } from "./api/services/PetsService";
+      import { operationInvokeFn } from "@openapi-qraft/react/callbacks/operationInvokeFn";
       const api_pets_getPets = qraftReactAPIClient(getPets, {
         getQueryKey,
         operationInvokeFn
       }, {});
-      import { getQueryKey } from "@openapi-qraft/react/callbacks/getQueryKey";
-      import { getPets } from "./api/services/PetsService";
-      import { operationInvokeFn } from "@openapi-qraft/react/callbacks/operationInvokeFn";
       api_pets_getPets.getQueryKey({});
       api_pets_getPets();"
     `);
@@ -1199,13 +1199,13 @@ api.pets.getPets.useQuery();
     expect(result?.code).toMatchInlineSnapshot(`
       "import { useQuery } from '@openapi-qraft/react/callbacks/useQuery';
       import { qraftReactAPIClient } from "@openapi-qraft/react";
+      import { useQuery as _useQuery } from "@openapi-qraft/react/callbacks/useQuery";
+      import { getPets } from "./api/services/PetsService";
       const api_pets_getPets = qraftReactAPIClient(getPets, {
         useQuery: _useQuery
       }, {
         useQuery
       });
-      import { useQuery as _useQuery } from "@openapi-qraft/react/callbacks/useQuery";
-      import { getPets } from "./api/services/PetsService";
       api_pets_getPets.useQuery();"
     `);
   });
