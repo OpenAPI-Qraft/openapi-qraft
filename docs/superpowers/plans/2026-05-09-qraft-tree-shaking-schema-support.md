@@ -14,9 +14,9 @@
 - `packages/tree-shaking-plugin/src/lib/transform/types.ts`: add a schema-usage shape to the shared plan data.
 - `packages/tree-shaking-plugin/src/lib/transform/plan.ts`: detect `.schema` accesses and resolve the operation import for them.
 - `packages/tree-shaking-plugin/src/lib/transform/mutate.ts`: rewrite schema accesses to the direct imported operation and keep dead-client cleanup consistent.
-- `e2e/projects/tree-shaking-bundlers/src/mixed-context-precreated-mirrors.ts`: add a schema access to the existing mixed fixture so both runtime modes get exercised in a real bundle.
-- `e2e/projects/tree-shaking-bundlers/scripts/shared.mjs`: extend the mixed scenario include list with the existing `getPets.schema` proof token.
-- `e2e/projects/tree-shaking-bundlers/scripts/assert-dist.mjs`: add or update the mixed source-map assertion for the schema access line.
+- `e2e/projects/tree-shaking-bundlers/src/mixed-context-precreated-mirrors.ts`: add schema accesses for every existing client/operation pair in the mixed fixture.
+- `e2e/projects/tree-shaking-bundlers/scripts/shared.mjs`: extend the mixed scenario include list with the existing schema proof tokens.
+- `e2e/projects/tree-shaking-bundlers/scripts/assert-dist.mjs`: add or update the mixed source-map assertions for the schema access lines.
 
 ---
 
@@ -240,29 +240,54 @@ Expected: both snapshots now show direct `findPetsByStatus.schema` access with n
 - Modify: `e2e/projects/tree-shaking-bundlers/scripts/shared.mjs`
 - Modify: `e2e/projects/tree-shaking-bundlers/scripts/assert-dist.mjs`
 
-- [x] **Step 1: Add schema access to the existing mixed fixture**
+- [x] **Step 1: Add schema access to every existing client/operation pair in the mixed fixture**
 
-Extend the existing mixed scenario so it exercises schema access in both runtime modes without introducing a new operation or fixture:
+Extend the existing mixed scenario so every callback access in the fixture has a matching `.schema` access without introducing any new operation or fixture:
 
 ```ts
 export const result = [
   barrelFromRelativeApi.pets.getPets.useQuery(),
   barrelFromRelativeApi.pets.getPets.schema,
+  barrelFromAliasApi.pets.getPets.useQuery(),
+  barrelFromAliasApi.pets.getPets.schema,
+  relativeFromRelativeApi.pets.createPet.useMutation(),
+  relativeFromRelativeApi.pets.createPet.schema,
+  relativeFromAliasApi.pets.createPet.useMutation(),
+  relativeFromAliasApi.pets.createPet.schema,
+  relativeExtFromRelativeApi.pets.createPet.useMutation(),
+  relativeExtFromRelativeApi.pets.createPet.schema,
+  relativeExtFromAliasApi.pets.createPet.useMutation(),
+  relativeExtFromAliasApi.pets.createPet.schema,
+  aliasFromRelativeApi.stores.getStores.useQuery(),
+  aliasFromRelativeApi.stores.getStores.schema,
+  aliasFromAliasApi.stores.getStores.useQuery(),
+  aliasFromAliasApi.stores.getStores.schema,
+  aliasDirectFromRelativeApi.stores.getStores.useQuery(),
+  aliasDirectFromRelativeApi.stores.getStores.schema,
+  aliasDirectFromAliasApi.stores.getStores.useQuery(),
+  aliasDirectFromAliasApi.stores.getStores.schema,
+  barrelPrecreatedFromRelativeApi.pets.getPets.useQuery(),
   barrelPrecreatedFromRelativeApi.pets.getPets.schema,
   barrelPrecreatedFromAliasApi.stores.getStores.useQuery(),
+  barrelPrecreatedFromAliasApi.stores.getStores.schema,
   fileRelativePrecreatedApi.pets.createPet.useMutation(),
+  fileRelativePrecreatedApi.pets.createPet.schema,
+  fileAliasPrecreatedApi.stores.getStores.useQuery(),
+  fileAliasPrecreatedApi.stores.getStores.schema,
+  fileRelativeExtPrecreatedApi.pets.createPet.useMutation(),
+  fileRelativeExtPrecreatedApi.pets.createPet.schema,
 ];
 ```
 
-This keeps the existing callback coverage intact and reuses the already-present `getPets` operation as the schema proof target.
+This keeps the existing callback coverage intact and reuses the already-present operations as the schema proof targets for both context-based and precreated clients.
 
-- [x] **Step 2: Update the shared mixed scenario tokens so the bundle assertion checks the schema rewrite**
+- [x] **Step 2: Update the shared mixed scenario tokens so the bundle assertion checks every schema rewrite**
 
-Add `getPets.schema` to the mixed scenario include list in `scripts/shared.mjs` next to the existing `getPets` proof token. This keeps the scenario definition in one place and avoids a post-processing patch.
+Add the schema proof tokens to the mixed scenario include list in `scripts/shared.mjs` next to the existing callback proof tokens. Keep the scenario definition in one place and avoid a post-processing patch.
 
-- [x] **Step 3: Add or update the source-map assertion for the schema line**
+- [x] **Step 3: Add or update the source-map assertions for the schema lines**
 
-Extend `sourceMapAssertions` in `scripts/assert-dist.mjs` so the generated `getPets.schema` line maps back to the mixed fixture source:
+Extend `sourceMapAssertions` in `scripts/assert-dist.mjs` so the generated schema lines map back to the mixed fixture source. Use representative schema tokens for each operation family so the mixed fixture proves all three shapes:
 
 ```ts
 const sourceMapAssertions = {
@@ -276,12 +301,12 @@ const sourceMapAssertions = {
   },
   'mixed-context-precreated-mirrors': {
     source: 'src/mixed-context-precreated-mirrors.ts',
-    token: 'getPets.schema',
+    tokens: ['getPets.schema', 'createPet.schema', 'getStores.schema'],
   },
 };
 ```
 
-This makes the e2e check verify both the emitted bundle shape and the rewritten source position for the schema access, while still staying on the existing mixed fixture.
+This makes the e2e check verify both the emitted bundle shape and the rewritten source positions for the schema accesses, while still staying on the existing mixed fixture.
 
 - [x] **Step 4: Run the package tests and the e2e fixture**
 
