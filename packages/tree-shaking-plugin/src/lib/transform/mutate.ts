@@ -75,21 +75,27 @@ export function applyTransformPlan(
     inlineCallbackUsages
   );
   rewriteSchemaAccesses(plan.ast, plan.createImports, plan.clients, plan.schemaUsages);
-  insertImports(
+  const generatedDeclarations = insertOptimizedClients(
     plan.ast,
     usages,
-    inlineCallbackUsages,
-    plan.schemaUsages,
     plan.generatedInfoByImport,
     {
       api: runtimeLocalNames.api,
       react: runtimeLocalNames.react,
     }
   );
-  insertOptimizedClients(plan.ast, usages, plan.generatedInfoByImport, {
-    api: runtimeLocalNames.api,
-    react: runtimeLocalNames.react,
-  });
+  insertImports(
+    plan.ast,
+    usages,
+    inlineCallbackUsages,
+    plan.schemaUsages,
+    plan.generatedInfoByImport,
+    generatedDeclarations,
+    {
+      api: runtimeLocalNames.api,
+      react: runtimeLocalNames.react,
+    }
+  );
   removeFullyTransformedClients(
     plan.ast,
     plan.clients,
@@ -242,6 +248,7 @@ function insertImports(
   inlineImports: InlineImportRequest[],
   schemaUsages: SchemaUsage[],
   generatedInfoByImport: Map<string, GeneratedClientInfo | null>,
+  generatedDeclarations: t.VariableDeclaration[],
   runtimeLocalNames: RuntimeLocalNames
 ) {
   const body = ast.program.body;
@@ -364,7 +371,15 @@ function insertImports(
   }
 
   const lastImportIndex = findLastImportIndex(body);
-  body.splice(lastImportIndex + 1, 0, ...declarations);
+  const firstGeneratedDeclarationIndex = findFirstGeneratedDeclarationIndex(
+    body,
+    generatedDeclarations
+  );
+  const insertIndex =
+    firstGeneratedDeclarationIndex === -1
+      ? lastImportIndex + 1
+      : Math.min(lastImportIndex + 1, firstGeneratedDeclarationIndex);
+  body.splice(insertIndex, 0, ...declarations);
 }
 
 function addNamedImportDeclaration(
@@ -423,7 +438,7 @@ function insertOptimizedClients(
   usages: OperationUsage[],
   generatedInfoByImport: Map<string, GeneratedClientInfo | null>,
   runtimeLocalNames: RuntimeLocalNames
-) {
+): t.VariableDeclaration[] {
   const contextUsages = usages.filter(
     (usage) => usage.client.mode.type === 'context'
   );
@@ -441,6 +456,7 @@ function insertOptimizedClients(
     runtimeLocalNames
   );
 
+  const insertedDeclarations: t.VariableDeclaration[] = [];
   const contextUsagesByClient = new Map<ClientBinding, OperationUsage[]>();
   for (const usage of contextUsages) {
     const clientUsages = contextUsagesByClient.get(usage.client) ?? [];
@@ -468,11 +484,16 @@ function insertOptimizedClients(
 
   const body = ast.program.body;
   const lastImportIndex = findLastImportIndex(body);
+  const topLevelDeclarations = dedupeDeclarations([
+    ...topLevelContextDeclarations,
+    ...precreatedDeclarations,
+  ]);
   body.splice(
     lastImportIndex + 1,
     0,
-    ...dedupeDeclarations([...topLevelContextDeclarations, ...precreatedDeclarations])
+    ...topLevelDeclarations
   );
+  insertedDeclarations.push(...topLevelDeclarations);
 
   const usagesByClient = new Map<ClientBinding, Map<string, OperationUsage[]>>();
   for (const usage of explicitOptionsUsages) {
@@ -493,10 +514,14 @@ function insertOptimizedClients(
       );
       const statementPath = client.localInitPath?.parentPath;
       if (statementPath?.isVariableDeclaration()) {
-        statementPath.insertAfter(dedupeDeclarations(declarations));
+        const optimizedDeclarations = dedupeDeclarations(declarations);
+        statementPath.insertAfter(optimizedDeclarations);
+        insertedDeclarations.push(...optimizedDeclarations);
       }
     }
   }
+
+  return insertedDeclarations;
 }
 
 function createOptimizedClientDeclarations(
@@ -885,6 +910,35 @@ function findLastImportIndex(body: t.Statement[]) {
   for (let index = body.length - 1; index >= 0; index -= 1) {
     if (t.isImportDeclaration(body[index])) return index;
   }
+  return -1;
+}
+
+function findFirstGeneratedDeclarationIndex(
+  body: t.Statement[],
+  generatedDeclarations: t.VariableDeclaration[]
+) {
+  const generatedNames = new Set(
+    generatedDeclarations.flatMap((declaration) => {
+      const declaratorId = declaration.declarations[0]?.id;
+      return t.isIdentifier(declaratorId) ? [declaratorId.name] : [];
+    })
+  );
+
+  for (let index = 0; index < body.length; index += 1) {
+    const statement = body[index];
+    if (
+      !t.isVariableDeclaration(statement) ||
+      statement.declarations.length === 0
+    ) {
+      continue;
+    }
+
+    const declaratorId = statement.declarations[0].id;
+    if (t.isIdentifier(declaratorId) && generatedNames.has(declaratorId.name)) {
+      return index;
+    }
+  }
+
   return -1;
 }
 
