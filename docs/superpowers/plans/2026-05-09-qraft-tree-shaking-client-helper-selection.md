@@ -2,9 +2,9 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Emit `qraftAPIClient` for tree-shaken micro-clients that only use ordinary or utility callbacks, while keeping `qraftReactAPIClient` only for hook-bearing clients and covering the split with unit and bundler e2e regressions.
+**Goal:** Emit `qraftAPIClient` for tree-shaken micro-clients that only use ordinary or utility callbacks, keep `qraftReactAPIClient` only for hook-bearing clients, and cover the split plus a no-context Node.js-style factory with unit and bundler e2e regressions.
 
-**Architecture:** Add a second callback classifier in `packages/tree-shaking-plugin/src/lib/transform/callbacks.ts` that distinguishes React-hook callbacks from ordinary callbacks. `mutate.ts` will use that classifier in two places: when choosing which runtime helper import to add, and when emitting each optimized client declaration. `callbackNeedsRuntimeContext(...)` remains the guard for zero-arg factory calls that can only be rewritten for `getQueryKey` / `getInfiniteQueryKey` / `getMutationKey`, so we do not widen the inline-call contract accidentally. The unit suite will update the existing snapshots that already model explicit-options, zero-arg, and mixed-scope clients, and the e2e bundle matrix will get one new utility-only scenario instead of a broader rewrite of the current mixed fixture.
+**Architecture:** Add a second callback classifier in `packages/tree-shaking-plugin/src/lib/transform/callbacks.ts` that distinguishes React-hook callbacks from ordinary callbacks. `mutate.ts` will use that classifier in two places: when choosing which runtime helper import to add, and when emitting each optimized client declaration. `callbackNeedsRuntimeContext(...)` remains the guard for zero-arg factory calls that can only be rewritten for `getQueryKey` / `getInfiniteQueryKey` / `getMutationKey`, so we do not widen the inline-call contract accidentally. The unit suite will update the existing snapshots that already model explicit-options, zero-arg, and mixed-scope clients, and the e2e bundle matrix will cover both a utility-only scenario and a no-context Node.js-style factory that is useful for memory-sensitive runtimes such as lambdas.
 
 **Tech Stack:** TypeScript, Babel traverse/types, Vitest, inline snapshots, Yarn 4, bundler e2e fixtures.
 
@@ -13,7 +13,9 @@
 - `packages/tree-shaking-plugin/src/lib/transform/mutate.ts`: choose `qraftAPIClient` vs `qraftReactAPIClient` per optimized client and per import batch; omit `APIClientContext` when the utility path is selected.
 - `packages/tree-shaking-plugin/src/core.test.ts`: update the existing snapshots that currently assume `qraftReactAPIClient` for utility-only or mixed ordinary-method clients.
 - `packages/tree-shaking-plugin/README.md`: document the new helper-selection behavior and the utility-only zero-arg case.
+- `e2e/projects/tree-shaking-bundlers/package.json`: add a no-context Node.js factory to the codegen command.
 - `e2e/projects/tree-shaking-bundlers/src/barrel-utility-relative.ts`: new utility-only fixture that exercises both named and inline zero-arg client creation.
+- `e2e/projects/tree-shaking-bundlers/src/mixed-context-precreated-node-mirrors.ts`: new mixed-case fixture that includes the Node.js factory alongside the existing context-based and precreated clients.
 - `e2e/projects/tree-shaking-bundlers/scripts/shared.mjs`: add a utility-mode scenario and wire its include/exclude tokens.
 - `e2e/projects/tree-shaking-bundlers/scripts/assert-dist.mjs`: add utility-mode expectations for helper imports and `APIClientContext`.
 
@@ -198,10 +200,12 @@ Expected: the unit subset passes with the new helper split, and typecheck stays 
 
 ---
 
-### Task 3: Add an e2e fixture for utility-only clients
+### Task 3: Add e2e coverage for utility-only clients and a Node.js factory
 
 **Files:**
+- Modify: `e2e/projects/tree-shaking-bundlers/package.json`
 - Create: `e2e/projects/tree-shaking-bundlers/src/barrel-utility-relative.ts`
+- Create: `e2e/projects/tree-shaking-bundlers/src/mixed-context-precreated-node-mirrors.ts`
 - Modify: `e2e/projects/tree-shaking-bundlers/scripts/shared.mjs`
 - Modify: `e2e/projects/tree-shaking-bundlers/scripts/assert-dist.mjs`
 
@@ -245,7 +249,42 @@ utilityScenario({
 
 Also add the helper that defines `mode: 'utility'` with `include: [/qraftAPIClient(?:__|\()/]` and `exclude: [/qraftReactAPIClient(?:__|\()/]` in `assert-dist.mjs`.
 
-- [ ] **Step 3: Run the local bundler matrix and confirm the new mode stays React-free**
+- [ ] **Step 3: Add the Node.js factory to the e2e codegen command**
+
+Update the `codegen` script in `e2e/projects/tree-shaking-bundlers/package.json` so it also emits a contextless Node.js-flavored factory:
+
+```json
+"codegen": "openapi-qraft --plugin tanstack-query-react --plugin openapi-typescript ./openapi.yaml --clean -o src/generated-api --openapi-types-import-path '../schema.ts' --openapi-types-file-name schema.ts --explicit-import-extensions --create-api-client-fn createBarrelAPIClient filename:create-barrel-api-client context:BarrelAPIClientContext --create-api-client-fn createRelativeAPIClient filename:create-relative-api-client context:RelativeAPIClientContext --create-api-client-fn createRelativeExtAPIClient filename:create-relative-ts-api-client context:RelativeExtAPIClientContext --create-api-client-fn createAliasAPIClient filename:create-alias-api-client context:AliasAPIClientContext --create-api-client-fn createAliasDirectAPIClient filename:create-alias-direct-api-client context:AliasDirectAPIClientContext --create-api-client-fn createNodeAPIClient filename:create-node-api-client --create-api-client-fn createBarrelPrecreatedAPIClient filename:create-barrel-precreated-api-client --create-api-client-fn createRelativePrecreatedAPIClient filename:create-relative-precreated-api-client --create-api-client-fn createRelativeExtPrecreatedAPIClient filename:create-relative-ts-precreated-api-client --create-api-client-fn createAliasDirectPrecreatedAPIClient filename:create-alias-direct-precreated-api-client"
+```
+
+This makes `createNodeAPIClient` available without `APIClientContext`, which is the shape we want for Node.js runtimes that should avoid React-specific wiring and keep memory overhead lower in lambda-style deployments.
+
+- [ ] **Step 4: Add a mixed-case Node.js regression alongside the existing utility-only fixture**
+
+Create `e2e/projects/tree-shaking-bundlers/src/mixed-context-precreated-node-mirrors.ts` with the existing context-based and precreated clients plus one Node.js factory client created from `createNodeAPIClient()`. The Node.js client should only use ordinary or utility callbacks so the bundle can prove the transform works for a contextless factory in the same mixed fixture:
+
+```ts
+import {
+  createBarrelAPIClient,
+  createNodeAPIClient,
+  createRelativeAPIClient,
+} from './generated-api';
+
+const nodeApi = createNodeAPIClient();
+const barrelApi = createBarrelAPIClient();
+const relativeApi = createRelativeAPIClient();
+
+export const result = [
+  nodeApi.pets.findPetsByStatus.getQueryKey(),
+  nodeApi.pets.findPetsByStatus.schema,
+  barrelApi.pets.getPets.useQuery(),
+  relativeApi.pets.createPet.useMutation(),
+];
+```
+
+Update `scripts/shared.mjs` to register the new mixed scenario and `assert-dist.mjs` to assert that the Node.js factory emits `qraftAPIClient` and does not import `APIClientContext`.
+
+- [ ] **Step 5: Run the local bundler matrix and confirm the new modes stay React-free**
 
 Run:
 
@@ -253,7 +292,7 @@ Run:
 cd e2e && corepack yarn e2e:tree-shaking-bundlers-local
 ```
 
-Expected: every bundler emits `qraftAPIClient` for the new utility scenario, and none of the bundles contain `qraftReactAPIClient` or `APIClientContext` for that scenario.
+Expected: every bundler emits `qraftAPIClient` for the new utility scenario, and the Node.js mixed scenario also emits `qraftAPIClient` for the no-context factory while keeping the existing React-specific clients unchanged.
 
 ---
 
@@ -264,13 +303,15 @@ Expected: every bundler emits `qraftAPIClient` for the new utility scenario, and
 
 - [ ] **Step 1: Add a short note in `createAPIClientFn` or `Transformation Examples`**
 
-Document that the plugin now emits `qraftAPIClient` for optimized clients that use only ordinary or utility callbacks, and that `qraftReactAPIClient` is reserved for hook-bearing clients. Call out the zero-arg utility-only case explicitly so the reader does not assume every `createAPIClient()` rewrite needs React context.
+Document that the plugin now emits `qraftAPIClient` for optimized clients that use only ordinary or utility callbacks, and that `qraftReactAPIClient` is reserved for hook-bearing clients. Call out the zero-arg utility-only case explicitly so the reader does not assume every `createAPIClient()` rewrite needs React context. Also add a short note that factories can be generated without context for Node.js runtimes, which makes them practical for memory-sensitive deployments like lambda functions.
 
 - [ ] **Step 2: Update the example output so it matches the new runtime split**
 
 Refresh the existing `createAPIClientFn` example or add a compact adjacent example that shows:
 
 ```ts
+import { createNodeAPIClient } from './api';
+
 const utilityClient = qraftAPIClient(findPetsByStatus, {
   getQueryKey
 });
@@ -278,7 +319,11 @@ const utilityClient = qraftAPIClient(findPetsByStatus, {
 const hookClient = qraftReactAPIClient(getPets, {
   useQuery
 }, APIClientContext);
+
+const nodeApi = createNodeAPIClient();
 ```
+
+Add one explicit Node.js example in the same section or immediately below it, showing `createNodeAPIClient()` as a contextless factory that produces utility-only clients. The point is to make the no-context generation path visible in the README, not to imply that the Node.js factory supports hooks.
 
 - [ ] **Step 3: Sanity-check the wording**
 
@@ -299,7 +344,9 @@ Expected: the new explanatory text is present, and the examples still match the 
 - Modify: `packages/tree-shaking-plugin/src/lib/transform/callbacks.ts`
 - Modify: `packages/tree-shaking-plugin/src/lib/transform/mutate.ts`
 - Modify: `packages/tree-shaking-plugin/README.md`
+- Modify: `e2e/projects/tree-shaking-bundlers/package.json`
 - Create: `e2e/projects/tree-shaking-bundlers/src/barrel-utility-relative.ts`
+- Create: `e2e/projects/tree-shaking-bundlers/src/mixed-context-precreated-node-mirrors.ts`
 - Modify: `e2e/projects/tree-shaking-bundlers/scripts/shared.mjs`
 - Modify: `e2e/projects/tree-shaking-bundlers/scripts/assert-dist.mjs`
 
@@ -322,11 +369,11 @@ Run:
 cd e2e && corepack yarn e2e:tree-shaking-bundlers-local
 ```
 
-Expected: the new utility scenario passes across Vite, Rollup, Webpack, Rspack, and esbuild.
+Expected: the new utility scenario and the Node.js mixed scenario pass across Vite, Rollup, Webpack, Rspack, and esbuild.
 
 - [ ] **Step 3: Commit the implementation changes**
 
 ```bash
-git add packages/tree-shaking-plugin/src/core.test.ts packages/tree-shaking-plugin/src/lib/transform/callbacks.ts packages/tree-shaking-plugin/src/lib/transform/mutate.ts packages/tree-shaking-plugin/README.md e2e/projects/tree-shaking-bundlers/src/barrel-utility-relative.ts e2e/projects/tree-shaking-bundlers/scripts/shared.mjs e2e/projects/tree-shaking-bundlers/scripts/assert-dist.mjs
+git add packages/tree-shaking-plugin/src/core.test.ts packages/tree-shaking-plugin/src/lib/transform/callbacks.ts packages/tree-shaking-plugin/src/lib/transform/mutate.ts packages/tree-shaking-plugin/README.md e2e/projects/tree-shaking-bundlers/package.json e2e/projects/tree-shaking-bundlers/src/barrel-utility-relative.ts e2e/projects/tree-shaking-bundlers/src/mixed-context-precreated-node-mirrors.ts e2e/projects/tree-shaking-bundlers/scripts/shared.mjs e2e/projects/tree-shaking-bundlers/scripts/assert-dist.mjs
 git commit -m "feat: split qraft tree-shaking helper selection"
 ```
