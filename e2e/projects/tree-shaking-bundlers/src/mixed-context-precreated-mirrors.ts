@@ -31,6 +31,7 @@ const aliasDirectFromAliasApi = createAliasDirectFromAliasAPIClient();
 
 export const result = [
   barrelFromRelativeApi.pets.getPets.useQuery(),
+  barrelFromRelativeApi.pets.getPets.schema,
   barrelFromAliasApi.pets.getPets.useQuery(),
   relativeFromRelativeApi.pets.createPet.useMutation(),
   relativeFromAliasApi.pets.createPet.useMutation(),
@@ -41,6 +42,7 @@ export const result = [
   aliasDirectFromRelativeApi.stores.getStores.useQuery(),
   aliasDirectFromAliasApi.stores.getStores.useQuery(),
   barrelPrecreatedFromRelativeApi.pets.getPets.useQuery(),
+  barrelPrecreatedFromRelativeApi.pets.getPets.schema,
   barrelPrecreatedFromAliasApi.stores.getStores.useQuery(),
   fileRelativePrecreatedApi.pets.createPet.useMutation(),
   fileAliasPrecreatedApi.stores.getStores.useQuery(),
