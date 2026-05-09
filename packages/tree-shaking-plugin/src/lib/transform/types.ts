@@ -76,6 +76,16 @@ export type InlineImportRequest = {
   callbackName: string;
   callbackLocalName: string;
   operationImport: OperationImportInfo;
+  kind?: 'callback' | 'schema';
+};
+
+export type SchemaUsage = {
+  client: ClientBinding | null;
+  sourceKey: string;
+  serviceName: string;
+  operationName: string;
+  operationImport: OperationImportInfo;
+  scopeKey: string;
 };
 
 export type GeneratedInfoRequest = {
@@ -99,6 +109,7 @@ export type TransformPlan = {
   clients: ClientBinding[];
   namedUsages: OperationUsage[];
   inlineUsages: InlineImportRequest[];
+  schemaUsages: SchemaUsage[];
   generatedInfoByImport: Map<string, GeneratedClientInfo | null>;
   generatedInfoRequests: Map<string, GeneratedInfoRequest>;
   transformedReferenceKeys: Set<string>;

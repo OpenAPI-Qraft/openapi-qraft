@@ -17,6 +17,7 @@ import type {
   QraftFactoryConfig,
   QraftPrecreatedClientConfig,
   QraftTreeShakeOptions,
+  SchemaUsage,
   RuntimeLocalNames,
   TransformPlan,
 } from './types.js';
@@ -51,6 +52,7 @@ type ExportedDeclarationResolution = {
  * - `clients`: bindings for discovered client variables
  * - `namedUsages`: matched client method calls that already have a local client
  * - `inlineUsages`: inline `createAPIClient(...)` call sites that need rewrite
+ * - `schemaUsages`: `.schema` accesses that rewrite directly to operations
  *
  * The plan also carries the bookkeeping needed by the mutator to insert
  * imports, generate optimized clients, and clean up dead declarations.
@@ -137,6 +139,7 @@ export async function createTransformPlan(
   if (!programScope) {
     return emptyTransformPlan(ast);
   }
+  const activeProgramScope = programScope;
 
   const factoryResolvedIds = new Map<QraftFactoryConfig, string | null>();
   for (const factory of factoryOptions) {
@@ -195,7 +198,7 @@ export async function createTransformPlan(
       id,
       precreatedOptions,
       resolver,
-      programScope,
+      activeProgramScope,
       options.debug
     ))
   );
@@ -204,7 +207,7 @@ export async function createTransformPlan(
   const reservedImportLocalNames = new Set<string>();
 
   const reactRuntimeImportLocalName = getOrCreateProgramImportLocalName(
-    programScope,
+    activeProgramScope,
     importLocalNames,
     reservedImportLocalNames,
     '@openapi-qraft/react:qraftReactAPIClient',
@@ -212,7 +215,7 @@ export async function createTransformPlan(
     fileBindingNames
   );
   const apiRuntimeImportLocalName = getOrCreateProgramImportLocalName(
-    programScope,
+    activeProgramScope,
     importLocalNames,
     reservedImportLocalNames,
     '@openapi-qraft/react:qraftAPIClient',
@@ -276,6 +279,7 @@ export async function createTransformPlan(
 
   const usageMap = new Map<string, OperationUsage>();
   const inlineImports: InlineImportRequest[] = [];
+  const schemaUsageMap = new Map<string, SchemaUsage>();
   const transformedReferenceKeys = new Set<string>();
   const generatedInfoByImport = new Map<string, GeneratedClientInfo | null>();
   const generatedInfoRequests = new Map<string, GeneratedInfoRequest>();
@@ -342,7 +346,7 @@ export async function createTransformPlan(
         generatedInfo,
         match.serviceName,
         match.operationName,
-        programScope,
+        activeProgramScope,
         fileBindingNames,
         reservedImportLocalNames,
         operationImports
@@ -351,7 +355,7 @@ export async function createTransformPlan(
         return debugSkip(options, id, 'operation import was not resolved');
 
       const callbackLocalName = getOrCreateProgramImportLocalName(
-        programScope,
+        activeProgramScope,
         importLocalNames,
         reservedImportLocalNames,
         `@openapi-qraft/react/callbacks/${match.callbackName}`,
@@ -371,7 +375,7 @@ export async function createTransformPlan(
         localClientNamesByOperation.get(operationKey) ??
         (match.client.mode.type === 'precreated'
           ? createProgramUniqueName(
-              programScope,
+              activeProgramScope,
               composeLocalClientName(
                 match.client.name,
                 match.serviceName,
@@ -412,6 +416,12 @@ export async function createTransformPlan(
 
       transformedReferenceKeys.add(match.client.name);
     },
+    MemberExpression(memberPath) {
+      registerInlineSchemaRequest(memberPath);
+    },
+    OptionalMemberExpression(memberPath) {
+      registerInlineSchemaRequest(memberPath);
+    },
   });
 
   for (const [key, generatedInfo] of generatedInfoByImport) {
@@ -450,7 +460,7 @@ export async function createTransformPlan(
         generatedInfo,
         match.serviceName,
         match.operationName,
-        programScope,
+        activeProgramScope,
         fileBindingNames,
         reservedImportLocalNames,
         operationImports
@@ -463,7 +473,7 @@ export async function createTransformPlan(
         );
 
       const callbackLocalName = getOrCreateProgramImportLocalName(
-        programScope,
+        activeProgramScope,
         importLocalNames,
         reservedImportLocalNames,
         `@openapi-qraft/react/callbacks/${match.callbackName}`,
@@ -477,13 +487,109 @@ export async function createTransformPlan(
         operationImport,
       });
     },
+    MemberExpression(memberPath) {
+      collectSchemaUsage(memberPath);
+    },
+    OptionalMemberExpression(memberPath) {
+      collectSchemaUsage(memberPath);
+    },
   });
+
+  function registerInlineSchemaRequest(
+    memberPath: NodePath<t.MemberExpression | t.OptionalMemberExpression>
+  ) {
+    const match = matchSchemaAccess(memberPath, createImports, clients);
+    if (!match || match.kind !== 'inline') return;
+
+    const key = getGeneratedInfoKey(match.createImportPath, match.factory);
+    if (!generatedInfoRequests.has(key)) {
+      generatedInfoRequests.set(key, {
+        createImportPath: match.createImportPath,
+        factory: match.factory,
+      });
+    }
+    if (!generatedInfoByImport.has(key)) {
+      generatedInfoByImport.set(key, null);
+    }
+  }
+
+  function collectSchemaUsage(
+    memberPath: NodePath<t.MemberExpression | t.OptionalMemberExpression>
+  ) {
+    const match = matchSchemaAccess(memberPath, createImports, clients);
+    if (!match) return;
+
+    const generatedInfo =
+      match.kind === 'named'
+        ? generatedInfoByImport.get(
+            getGeneratedInfoKey(
+              match.client.createImportPath,
+              match.client.factory
+            )
+          )
+        : generatedInfoByImport.get(
+            getGeneratedInfoKey(match.createImportPath, match.factory)
+          );
+    if (!generatedInfo)
+      return debugSkip(options, id, 'generated client was not resolved');
+
+    const operationImport = resolveOperationImport(
+      generatedInfo,
+      match.serviceName,
+      match.operationName,
+      activeProgramScope,
+      fileBindingNames,
+      reservedImportLocalNames,
+      operationImports
+    );
+    if (!operationImport)
+      return debugSkip(options, id, 'operation import was not resolved');
+
+    const scopeKey = getUsageScopeKey(memberPath);
+    const sourceKey =
+      match.kind === 'named' ? match.client.name : match.createImportPath;
+    const key = [sourceKey, match.serviceName, match.operationName, scopeKey].join(
+      ':'
+    );
+
+    if (!schemaUsageMap.has(key)) {
+      schemaUsageMap.set(key, {
+        client: match.kind === 'named' ? match.client : null,
+        sourceKey,
+        serviceName: match.serviceName,
+        operationName: match.operationName,
+        operationImport,
+        scopeKey,
+      });
+    }
+
+    if (match.kind === 'named') {
+      transformedReferenceKeys.add(match.client.name);
+    }
+  }
+
+  if (
+    schemaUsageMap.size > 0 &&
+    usageMap.size === 0 &&
+    inlineImports.length === 0
+  ) {
+    const firstSchemaUsage = schemaUsageMap.values().next().value;
+    if (firstSchemaUsage) {
+      inlineImports.push({
+        callbackName: 'schema',
+        callbackLocalName: 'schema',
+        operationImport: firstSchemaUsage.operationImport,
+        kind: 'schema',
+      });
+    }
+  }
 
   return {
     ast,
     clients,
     namedUsages: [...usageMap.values()],
     inlineUsages: inlineImports,
+    schemaUsages: [...schemaUsageMap.values()],
     generatedInfoByImport,
     generatedInfoRequests,
     transformedReferenceKeys,
@@ -912,6 +1018,67 @@ function matchClientCall(
   return { client, serviceName, operationName, callbackName };
 }
 
+function matchSchemaAccess(
+  memberPath: NodePath<t.MemberExpression | t.OptionalMemberExpression>,
+  createImports: Map<string, CreateImportEntry>,
+  clients: ClientBinding[]
+):
+  | {
+      kind: 'named';
+      client: ClientBinding;
+      serviceName: string;
+      operationName: string;
+    }
+  | {
+      kind: 'inline';
+      createImportPath: string;
+      factory: QraftFactoryConfig;
+      serviceName: string;
+      operationName: string;
+    }
+  | null {
+  const { node } = memberPath;
+  const path = getStaticMemberPath(node);
+  if (!path) return null;
+
+  if (path.length === 4) {
+    const [clientName, serviceName, operationName, propertyName] = path;
+    if (propertyName !== 'schema') return null;
+
+    const binding = memberPath.scope.getBinding(clientName);
+    const client = clients.find((item) => {
+      if (item.name !== clientName) return false;
+      return binding?.identifier === item.bindingNode;
+    });
+    if (!client) return null;
+
+    return { kind: 'named', client, serviceName, operationName };
+  }
+
+  if (path.length !== 3) return null;
+  const [serviceName, operationName, propertyName] = path;
+  if (propertyName !== 'schema') return null;
+
+  const root = getStaticMemberRoot(node);
+  if (!t.isCallExpression(root)) return null;
+  if (!t.isIdentifier(root.callee)) return null;
+
+  const createImport = createImports.get(root.callee.name);
+  if (!createImport) return null;
+  if (root.arguments.length > 1) return null;
+  if (root.arguments.length === 1 && !isExpression(root.arguments[0])) {
+    return null;
+  }
+
+  return {
+    kind: 'inline',
+    createImportPath: createImport.factoryFile,
+    factory: createImport.factory,
+    serviceName,
+    operationName,
+  };
+}
+
 function matchInlineClientCall(
   callee: t.Expression | t.V8IntrinsicIdentifier,
   createImports: Map<
@@ -1001,6 +1168,16 @@ function getStaticMemberRoot(
     return getStaticMemberRoot(node.object as t.Expression);
   }
   return node;
+}
+
+function getUsageScopeKey<T extends t.Node>(callPath: NodePath<T>) {
+  const functionParent = callPath.getFunctionParent();
+  if (!functionParent) {
+    return 'program';
+  }
+
+  const { node } = functionParent;
+  return [node.type, node.start ?? -1, node.end ?? -1].join(':');
 }
 
 async function readGeneratedClientInfo(
@@ -1293,16 +1470,6 @@ function getProgramScope(ast: t.File) {
   return programScope;
 }
 
-function getUsageScopeKey(callPath: NodePath<t.CallExpression>) {
-  const functionParent = callPath.getFunctionParent();
-  if (!functionParent) {
-    return 'program';
-  }
-
-  const { node } = functionParent;
-  return [node.type, node.start ?? -1, node.end ?? -1].join(':');
-}
-
 function getOrCreateProgramImportLocalName(
   programScope: Scope,
   importLocalNames: Map<string, string>,
@@ -1388,6 +1555,7 @@ function emptyTransformPlan(ast: t.File): TransformPlan {
     clients: [],
     namedUsages: [],
     inlineUsages: [],
+    schemaUsages: [],
     generatedInfoByImport: new Map(),
     generatedInfoRequests: new Map(),
     transformedReferenceKeys: new Set(),
