@@ -4,6 +4,7 @@ import type {
   GeneratedClientInfo,
   InlineImportRequest,
   OperationUsage,
+  SchemaUsage,
   RuntimeLocalNames,
   TransformPlan,
 } from './types.js';
@@ -63,17 +64,22 @@ export function applyTransformPlan(
   runtimeLocalNames: RuntimeLocalNames
 ): void {
   const usages = [...plan.namedUsages];
+  const inlineCallbackUsages = plan.inlineUsages.filter(
+    (usage) => usage.kind !== 'schema'
+  );
   rewriteNamedClientCalls(plan.ast, plan.clients, plan.namedUsages);
   rewriteInlineClientCalls(
     plan.ast,
     plan.createImports,
     runtimeLocalNames,
-    plan.inlineUsages
+    inlineCallbackUsages
   );
+  rewriteSchemaAccesses(plan.ast, plan.createImports, plan.clients, plan.schemaUsages);
   insertImports(
     plan.ast,
     usages,
-    plan.inlineUsages,
+    inlineCallbackUsages,
+    plan.schemaUsages,
     plan.generatedInfoByImport,
     {
       api: runtimeLocalNames.api,
@@ -189,20 +195,65 @@ function rewriteInlineClientCalls(
   });
 }
 
+function rewriteSchemaAccesses(
+  ast: t.File,
+  createImports: Map<string, CreateImportEntry>,
+  clients: ClientBinding[],
+  schemaUsages: SchemaUsage[]
+) {
+  const schemaUsageByKey = new Map(
+    schemaUsages.map((usage) => [
+      [usage.sourceKey, usage.serviceName, usage.operationName, usage.scopeKey].join(
+        ':'
+      ),
+      usage,
+    ])
+  );
+
+  traverse(ast, {
+    MemberExpression(memberPath) {
+      rewriteSchemaAccess(memberPath);
+    },
+    OptionalMemberExpression(memberPath) {
+      rewriteSchemaAccess(memberPath);
+    },
+  });
+
+  function rewriteSchemaAccess(
+    memberPath: NodePath<t.MemberExpression | t.OptionalMemberExpression>
+  ) {
+    const match = matchSchemaAccess(memberPath, createImports, clients);
+    if (!match) return;
+
+    const usage = schemaUsageByKey.get(
+      [match.sourceKey, match.serviceName, match.operationName, getUsageScopeKey(memberPath)].join(
+        ':'
+      )
+    );
+    if (!usage) return;
+
+    memberPath.node.object = t.identifier(usage.operationImport.localName);
+  }
+}
+
 function insertImports(
   ast: t.File,
   usages: OperationUsage[],
   inlineImports: InlineImportRequest[],
+  schemaUsages: SchemaUsage[],
   generatedInfoByImport: Map<string, GeneratedClientInfo | null>,
   runtimeLocalNames: RuntimeLocalNames
 ) {
   const body = ast.program.body;
   const imported = getExistingImports(ast);
   const declarations: t.ImportDeclaration[] = [];
+  const callbackInlineImports = inlineImports.filter(
+    (inline) => inline.kind !== 'schema'
+  );
 
   if (
     usages.some((usage) => usage.client.mode.type !== 'precreated') ||
-    inlineImports.length > 0
+    callbackInlineImports.length > 0
   ) {
     addNamedImportDeclaration(
       declarations,
@@ -285,7 +336,7 @@ function insertImports(
     }
   }
 
-  for (const inline of inlineImports) {
+  for (const inline of callbackInlineImports) {
     addNamedImportDeclaration(
       declarations,
       imported,
@@ -299,6 +350,16 @@ function insertImports(
       inline.operationImport.importPath,
       inline.operationImport.operationName,
       inline.operationImport.localName
+    );
+  }
+
+  for (const schema of schemaUsages) {
+    addNamedImportDeclaration(
+      declarations,
+      imported,
+      schema.operationImport.importPath,
+      schema.operationImport.operationName,
+      schema.operationImport.localName
     );
   }
 
@@ -662,7 +723,61 @@ function matchClientCall(
   return { client, serviceName, operationName, callbackName };
 }
 
-function getUsageScopeKey(callPath: NodePath<t.CallExpression>) {
+function matchSchemaAccess(
+  memberPath: NodePath<t.MemberExpression | t.OptionalMemberExpression>,
+  createImports: Map<string, CreateImportEntry>,
+  clients: ClientBinding[]
+):
+  | {
+      sourceKey: string;
+      serviceName: string;
+      operationName: string;
+    }
+  | null {
+  const path = getStaticMemberPath(memberPath.node);
+  if (!path) return null;
+
+  if (path.length === 4) {
+    const [clientName, serviceName, operationName, propertyName] = path;
+    if (propertyName !== 'schema') return null;
+
+    const binding = memberPath.scope.getBinding(clientName);
+    const client = clients.find((item) => {
+      if (item.name !== clientName) return false;
+      return binding?.identifier === item.bindingNode;
+    });
+    if (!client) return null;
+
+    return {
+      sourceKey: client.name,
+      serviceName,
+      operationName,
+    };
+  }
+
+  if (path.length !== 3) return null;
+  const [serviceName, operationName, propertyName] = path;
+  if (propertyName !== 'schema') return null;
+
+  const root = getStaticMemberRoot(memberPath.node);
+  if (!t.isCallExpression(root)) return null;
+  if (!t.isIdentifier(root.callee)) return null;
+
+  const createImport = createImports.get(root.callee.name);
+  if (!createImport) return null;
+  if (root.arguments.length > 1) return null;
+  if (root.arguments.length === 1 && !isExpression(root.arguments[0])) {
+    return null;
+  }
+
+  return {
+    sourceKey: createImport.factoryFile,
+    serviceName,
+    operationName,
+  };
+}
+
+function getUsageScopeKey<T extends t.Node>(callPath: NodePath<T>) {
   const functionParent = callPath.getFunctionParent();
   if (!functionParent) {
     return 'program';
