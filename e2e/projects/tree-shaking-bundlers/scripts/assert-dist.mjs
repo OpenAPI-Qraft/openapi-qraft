@@ -33,7 +33,7 @@ const sourceMapAssertions = {
   },
   'mixed-context-precreated-mirrors': {
     source: 'src/mixed-context-precreated-mirrors.ts',
-    token: 'getPets.schema',
+    tokens: ['getPets.schema', 'createPet.schema', 'getStores.schema'],
   },
 };
 
@@ -43,13 +43,25 @@ function sourceMatchesExpected(source, expectedSource) {
 
 function getGeneratedPosition(bundle, traceMap, token, expectedSource) {
   const bundleLines = bundle.split('\n');
-  const candidateLines = Array.from(
-    { length: bundleLines.length },
-    (_, index) => index + 1
-  );
+  const candidateLines = bundleLines
+    .map((lineText, index) => ({ lineText, line: index + 1 }))
+    .filter(({ lineText }) => lineText.includes(token));
 
-  for (const line of candidateLines) {
-    const lineText = bundleLines[line - 1];
+  for (const { line, lineText } of candidateLines) {
+    const column = lineText.indexOf(token);
+    const originalPosition = originalPositionFor(traceMap, { line, column });
+
+    if (sourceMatchesExpected(originalPosition.source, expectedSource)) {
+      return {
+        line,
+        column,
+        originalPosition,
+      };
+    }
+  }
+
+  for (const [index, lineText] of bundleLines.entries()) {
+    const line = index + 1;
 
     for (let column = 0; column < lineText.length; column += 1) {
       const originalPosition = originalPositionFor(traceMap, { line, column });
@@ -106,21 +118,25 @@ for (const bundler of bundlers) {
       const mapPath = getBundleMapPath(bundler, scenario);
       const map = JSON.parse(await readFile(mapPath, 'utf8'));
       const traceMap = new TraceMap(map);
-      const generatedPosition = getGeneratedPosition(
-        bundle,
-        traceMap,
-        sourceMapAssertion.token,
-        sourceMapAssertion.source
-      );
-      const originalPosition = generatedPosition.originalPosition;
+      const tokens = sourceMapAssertion.tokens ?? [sourceMapAssertion.token];
 
-      assert.ok(
-        sourceMatchesExpected(
-          originalPosition.source,
+      for (const token of tokens) {
+        const generatedPosition = getGeneratedPosition(
+          bundle,
+          traceMap,
+          token,
           sourceMapAssertion.source
-        ),
-        `Expected ${bundler} / ${scenario.name} generated call site at ${bundlePath} to map back to ${sourceMapAssertion.source}, got ${originalPosition.source}`
-      );
+        );
+        const originalPosition = generatedPosition.originalPosition;
+
+        assert.ok(
+          sourceMatchesExpected(
+            originalPosition.source,
+            sourceMapAssertion.source
+          ),
+          `Expected ${bundler} / ${scenario.name} generated call site for "${token}" at ${bundlePath} to map back to ${sourceMapAssertion.source}, got ${originalPosition.source}`
+        );
+      }
     }
   }
 }
