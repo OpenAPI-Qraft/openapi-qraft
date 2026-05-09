@@ -403,7 +403,7 @@ export function App() {
       `
 import { createAPIClient } from './api';
 
-const api = createAPIClient();
+const api = createAPIClient({});
 
 api.pets.getPets.getQueryKey({});
 api.pets.getPets();
@@ -414,14 +414,13 @@ api.pets.getPets();
 
     expect(result?.code).toMatchInlineSnapshot(`
       "import { qraftReactAPIClient } from "@openapi-qraft/react";
-      import { getQueryKey } from "@openapi-qraft/react/callbacks/getQueryKey";
-      import { getPets } from "./api/services/PetsService";
-      import { APIClientContext } from "./api/APIClientContext";
-      import { operationInvokeFn } from "@openapi-qraft/react/callbacks/operationInvokeFn";
       const api_pets_getPets = qraftReactAPIClient(getPets, {
         getQueryKey,
         operationInvokeFn
-      }, APIClientContext);
+      }, {});
+      import { getQueryKey } from "@openapi-qraft/react/callbacks/getQueryKey";
+      import { getPets } from "./api/services/PetsService";
+      import { operationInvokeFn } from "@openapi-qraft/react/callbacks/operationInvokeFn";
       api_pets_getPets.getQueryKey({});
       api_pets_getPets();"
     `);
