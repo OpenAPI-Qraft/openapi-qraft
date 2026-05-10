@@ -151,6 +151,7 @@ export async function createTransformPlan(
   }
 
   const createImports = new Map<string, CreateImportEntry>();
+  const generatedInfoByImport = new Map<string, GeneratedClientInfo | null>();
 
   for (const node of ast.program.body) {
     if (!t.isImportDeclaration(node)) continue;
@@ -182,14 +183,24 @@ export async function createTransformPlan(
         (factory) => factoryResolvedIds.get(factory) === resolvedId
       );
       if (!matched) {
-        matched =
-          (await resolveBarrelReexportedFactory(
+        for (const factory of matchingFactories) {
+          const info = await readGeneratedClientInfo(
+            id,
             resolvedAbs,
-            importedName,
-            matchingFactories,
-            factoryResolvedIds,
-            resolver
-          )) ?? undefined;
+            factory,
+            resolver,
+            options.debug,
+            servicesDirName
+          );
+          if (info) {
+            matched = factory;
+            const key = getGeneratedInfoKey(resolvedAbs, factory);
+            if (!generatedInfoByImport.has(key)) {
+              generatedInfoByImport.set(key, info);
+            }
+            break;
+          }
+        }
       }
       if (!matched) continue;
 
@@ -291,7 +302,6 @@ export async function createTransformPlan(
   const inlineImports: InlineImportRequest[] = [];
   const schemaUsageMap = new Map<string, SchemaUsage>();
   const transformedReferenceKeys = new Set<string>();
-  const generatedInfoByImport = new Map<string, GeneratedClientInfo | null>();
   const generatedInfoRequests = new Map<string, GeneratedInfoRequest>();
   const localClientNamesByOperation = new Map<string, string>();
 
@@ -1345,38 +1355,6 @@ function findFactoryReexport(ast: t.File, factoryName: string): string | null {
   }
 
   return null;
-}
-
-async function resolveBarrelReexportedFactory(
-  barrelFile: string,
-  importedName: string,
-  matchingFactories: QraftFactoryConfig[],
-  factoryResolvedIds: Map<QraftFactoryConfig, string | null>,
-  resolver: QraftResolver
-): Promise<QraftFactoryConfig | null> {
-  let source: string;
-  try {
-    source = await fs.readFile(barrelFile, 'utf8');
-  } catch {
-    return null;
-  }
-
-  const barrelAst = parse(source, {
-    sourceType: 'module',
-    plugins: ['typescript'],
-  });
-  const reexportSpecifier = findFactoryReexport(barrelAst, importedName);
-  if (!reexportSpecifier) return null;
-
-  const resolved = await resolver(reexportSpecifier, barrelFile);
-  if (!resolved) return null;
-  const resolvedId = normalizeResolvedId(resolved);
-
-  return (
-    matchingFactories.find(
-      (factory) => factoryResolvedIds.get(factory) === resolvedId
-    ) ?? null
-  );
 }
 
 function resolveOperationImport(
