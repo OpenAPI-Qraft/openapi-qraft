@@ -348,7 +348,11 @@ export async function createTransformPlan(
       );
       if (!generatedInfo)
         return debugSkip(options, id, 'generated client was not resolved');
-      if (match.client.mode.type === 'context' && !generatedInfo.contextName) {
+      if (
+        match.client.mode.type === 'context' &&
+        !generatedInfo.contextName &&
+        callbackNeedsRuntimeContext(match.callbackName)
+      ) {
         return debugSkip(options, id, 'context client was not detected');
       }
 
