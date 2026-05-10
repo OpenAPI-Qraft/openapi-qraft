@@ -56,6 +56,14 @@ const mixedScenario = ({ name, entry, include, exclude }) => ({
   exclude: unique(['allCallbacks', 'petsService', 'storesService', ...exclude]),
 });
 
+const apiOnlyScenario = ({ name, entry, include, exclude }) => ({
+  name,
+  mode: 'apiOnly',
+  entry,
+  include: unique([qraftAPIClientPattern, ...include]),
+  exclude: unique([qraftReactAPIClientPattern, 'APIClientContext', ...exclude]),
+});
+
 export const scenarios = [
   contextScenario({
     name: 'barrel-context-relative',
@@ -274,6 +282,25 @@ export const scenarios = [
     ],
     exclude: [],
   }),
+  apiOnlyScenario({
+    name: 'node-api-helper-selection',
+    entry: 'src/node-api-helper-selection.ts',
+    include: ['getQueryKey', 'getPets'],
+    exclude: [],
+  }),
+  {
+    name: 'barrel-mixed-helper-selection',
+    mode: 'mixed',
+    entry: 'src/barrel-mixed-helper-selection.ts',
+    include: unique([
+      qraftReactAPIClientPattern,
+      qraftAPIClientPattern,
+      'useQuery',
+      'getQueryKey',
+      'BarrelAPIClientContext',
+    ]),
+    exclude: [],
+  },
 ];
 
 export const apiClient = [
@@ -337,6 +364,10 @@ export const createAPIClientFn = [
     module: '@/generated-api',
     context: 'AliasAPIClientContext',
     contextModule: '@/generated-api',
+  },
+  {
+    name: 'createNodeAPIClient',
+    module: './generated-api/create-node-api-client',
   },
   {
     name: 'createAliasDirectAPIClient',

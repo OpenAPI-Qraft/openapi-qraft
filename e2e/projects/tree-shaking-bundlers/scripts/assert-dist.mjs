@@ -17,6 +17,10 @@ const modeExpectations = {
     include: [/qraftReactAPIClient(?:__|\()/, /qraftAPIClient(?:__|\()/],
     exclude: [],
   }),
+  apiOnly: () => ({
+    include: [/qraftAPIClient(?:__|\()/],
+    exclude: [/qraftReactAPIClient(?:__|\()/, /APIClientContext/],
+  }),
 };
 
 const tokenMatches = (bundle, token) =>
@@ -34,6 +38,14 @@ const sourceMapAssertions = {
   'mixed-context-precreated-mirrors': {
     source: 'src/mixed-context-precreated-mirrors.ts',
     tokens: ['getPets.schema', 'createPet.schema', 'getStores.schema'],
+  },
+  'node-api-helper-selection': {
+    source: 'src/node-api-helper-selection.ts',
+    token: 'qraftAPIClient(',
+  },
+  'barrel-mixed-helper-selection': {
+    source: 'src/barrel-mixed-helper-selection.ts',
+    tokens: ['qraftAPIClient(', 'qraftReactAPIClient('],
   },
 };
 
