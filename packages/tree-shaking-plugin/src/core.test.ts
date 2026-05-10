@@ -1,10 +1,11 @@
 import '@qraft/test-utils/vitestFsMock';
 import type { SourceMapInput } from '@jridgewell/trace-mapping';
+import type { QraftModuleAccess } from './lib/resolvers/common.js';
 import fs from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 import { originalPositionFor, TraceMap } from '@jridgewell/trace-mapping';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { transformQraftTreeShaking as transformQraftTreeShakingImpl } from './core.js';
 import { createTransformPlan } from './lib/transform/plan.js';
 
@@ -87,25 +88,16 @@ async function transformQraftTreeShaking(
   inputSourceMap?: SourceMapInput
 ) {
   const fixtureRoot = path.dirname(path.dirname(id));
-  const fixtureResolver = createFixtureResolver(fixtureRoot);
-  const resolver = async (specifier: string, importer: string) => {
-    if (options.resolve) {
-      try {
-        const resolved = await options.resolve(specifier, importer);
-        if (resolved) return resolved;
-      } catch {
-        // Fall through to the fixture resolver.
-      }
-    }
-
-    return fixtureResolver(specifier, importer);
-  };
+  const moduleAccess = createFixtureModuleAccess(fixtureRoot, {
+    resolve: options.moduleAccess?.resolve ?? options.resolve,
+    load: options.moduleAccess?.load,
+  });
 
   return transformQraftTreeShakingWithInputSourceMap(
     code,
     id,
     options,
-    resolver,
+    moduleAccess,
     inputSourceMap
   );
 }
@@ -114,7 +106,7 @@ describe('transformQraftTreeShaking', () => {
   it('collects named and inline usages in one transform plan', async () => {
     const fixture = await createFixture();
     const sourceFile = path.join(fixture, 'src/App.tsx');
-    const fixtureResolver = createFixtureResolver(fixture);
+    const fixtureModuleAccess = createFixtureModuleAccess(fixture);
 
     const plan = await createTransformPlan(
       `
@@ -129,7 +121,7 @@ export function App() {
 `,
       sourceFile,
       { createAPIClientFn: [{ name: 'createAPIClient', module: './api' }] },
-      fixtureResolver
+      fixtureModuleAccess
     );
 
     expect(plan.namedUsages).toHaveLength(1);
@@ -1506,6 +1498,44 @@ export function App() {
     `);
   });
 
+  it('does not read generated modules from the filesystem when moduleAccess.load returns null', async () => {
+    const fixture = await createFixture();
+    const sourceFile = path.join(fixture, 'src/App.tsx');
+    const fixtureResolver = createFixtureResolver(fixture);
+    const readFileSpy = vi.spyOn(fs, 'readFile');
+    const load = vi.fn(async () => null);
+
+    try {
+      const result = await transformQraftTreeShakingImpl(
+        `
+import { createAPIClient } from './api';
+
+const api = createAPIClient();
+
+export function App() {
+  return api.pets.getPets.useQuery();
+}
+`,
+        sourceFile,
+        {
+          createAPIClientFn: [
+            { name: 'createAPIClient', module: './api' },
+          ],
+        },
+        {
+          resolve: fixtureResolver,
+          load,
+        }
+      );
+
+      expect(result).toBeNull();
+      expect(load).toHaveBeenCalledWith(path.join(fixture, 'src/api/index.ts'));
+      expect(readFileSpy).not.toHaveBeenCalled();
+    } finally {
+      readFileSpy.mockRestore();
+    }
+  });
+
   it('does not match a same-named import that resolves to a different module', async () => {
     const fixture = await createFixture();
     const sourceFile = path.join(fixture, 'src/App.tsx');
@@ -2273,6 +2303,44 @@ function createFixtureResolver(fixtureRoot: string) {
     }
 
     return null;
+  };
+}
+
+function createFixtureModuleAccess(
+  fixtureRoot: string,
+  userAccess: TransformOptions['moduleAccess'] = {}
+): QraftModuleAccess {
+  const fixtureResolver = createFixtureResolver(fixtureRoot);
+
+  return {
+    resolve: async (specifier, importer) => {
+      if (userAccess.resolve) {
+        try {
+          const resolved = await userAccess.resolve(specifier, importer);
+          if (resolved) return resolved;
+        } catch {
+          // Fall through to the fixture resolver.
+        }
+      }
+
+      return fixtureResolver(specifier, importer);
+    },
+    load: async (id) => {
+      if (userAccess.load) {
+        try {
+          const loaded = await userAccess.load(id);
+          if (loaded !== null && loaded !== undefined) return loaded;
+        } catch {
+          // Fall through to the fixture filesystem loader.
+        }
+      }
+
+      try {
+        return await fs.readFile(id, 'utf8');
+      } catch {
+        return null;
+      }
+    },
   };
 }
 

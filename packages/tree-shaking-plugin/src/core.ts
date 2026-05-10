@@ -1,9 +1,13 @@
 import type { GeneratorOptions as BabelGeneratorOptions } from '@babel/generator';
 // eslint-disable-next-line import-x/no-extraneous-dependencies
 import type { SourceMapInput } from '@jridgewell/trace-mapping';
-import type { QraftResolver } from './lib/resolvers/common.js';
+import type {
+  QraftModuleAccess,
+  QraftModuleAccessOptions,
+  QraftResolver,
+} from './lib/resolvers/common.js';
 import * as generateModule from '@babel/generator';
-import { createAgnosticResolver } from './lib/resolvers/agnostic.js';
+import { createAgnosticModuleAccess } from './lib/resolvers/agnostic.js';
 import { applyTransformPlan } from './lib/transform/mutate.js';
 import { createTransformPlan } from './lib/transform/plan.js';
 
@@ -25,12 +29,17 @@ export type QraftPrecreatedClientConfig = {
   createAPIClientFnOptionsModule?: string;
 };
 
-export type { QraftResolver } from './lib/resolvers/common.js';
+export type {
+  QraftModuleAccess,
+  QraftModuleAccessOptions,
+  QraftResolver,
+} from './lib/resolvers/common.js';
 
 export type QraftTreeShakeOptions = {
   createAPIClientFn?: QraftFactoryConfig[];
   apiClient?: QraftPrecreatedClientConfig[];
   resolve?: QraftResolver;
+  moduleAccess?: QraftModuleAccessOptions;
   include?: FilterPattern;
   exclude?: FilterPattern;
   debug?: boolean;
@@ -47,7 +56,10 @@ export async function transformQraftTreeShaking(
   code: string,
   id: string,
   options: QraftTreeShakeOptions,
-  resolver: QraftResolver = createAgnosticResolver(options.resolve),
+  moduleAccess: QraftModuleAccess = createAgnosticModuleAccess({
+    resolve: options.moduleAccess?.resolve ?? options.resolve,
+    load: options.moduleAccess?.load,
+  }),
   inputSourceMap?: SourceMapInput
 ) {
   if (!shouldTransformId(id, options)) return null;
@@ -58,7 +70,7 @@ export async function transformQraftTreeShaking(
     return debugSkip(options, id, 'no API clients configured');
   }
 
-  const plan = await createTransformPlan(code, id, options, resolver);
+  const plan = await createTransformPlan(code, id, options, moduleAccess);
   if (!plan.namedUsages.length && !plan.inlineUsages.length) return null;
 
   applyTransformPlan(plan, plan.runtimeLocalNames);
