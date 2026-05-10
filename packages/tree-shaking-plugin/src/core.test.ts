@@ -413,11 +413,11 @@ api.pets.getPets();
     );
 
     expect(result?.code).toMatchInlineSnapshot(`
-      "import { qraftReactAPIClient } from "@openapi-qraft/react";
+      "import { qraftAPIClient } from "@openapi-qraft/react";
       import { getQueryKey } from "@openapi-qraft/react/callbacks/getQueryKey";
       import { getPets } from "./api/services/PetsService";
       import { operationInvokeFn } from "@openapi-qraft/react/callbacks/operationInvokeFn";
-      const api_pets_getPets = qraftReactAPIClient(getPets, {
+      const api_pets_getPets = qraftAPIClient(getPets, {
         getQueryKey,
         operationInvokeFn
       }, {});
@@ -448,17 +448,17 @@ function App() {
     );
 
     expect(result?.code).toMatchInlineSnapshot(`
-      "import { qraftReactAPIClient } from "@openapi-qraft/react";
+      "import { qraftAPIClient } from "@openapi-qraft/react";
       import { getQueryKey } from "@openapi-qraft/react/callbacks/getQueryKey";
       import { findPetsByStatus } from "./api/services/PetsService";
-      const api_pets_findPetsByStatus = qraftReactAPIClient(findPetsByStatus, {
+      const api_pets_findPetsByStatus = qraftAPIClient(findPetsByStatus, {
         getQueryKey
       });
       function App() {
-        void qraftReactAPIClient(findPetsByStatus, {
+        void qraftAPIClient(findPetsByStatus, {
           getQueryKey
         }).getQueryKey();
-        const utilityClient_pets_findPetsByStatus = qraftReactAPIClient(findPetsByStatus, {
+        const utilityClient_pets_findPetsByStatus = qraftAPIClient(findPetsByStatus, {
           getQueryKey
         });
         void utilityClient_pets_findPetsByStatus.getQueryKey();
@@ -515,13 +515,14 @@ export function App() {
     );
 
     expect(result?.code).toMatchInlineSnapshot(`
-      "import { qraftReactAPIClient } from "@openapi-qraft/react";
+      "import { qraftAPIClient } from "@openapi-qraft/react";
+      import { qraftReactAPIClient } from "@openapi-qraft/react";
       import { getQueryKey } from "@openapi-qraft/react/callbacks/getQueryKey";
       import { findPetsByStatus } from "./api/services/PetsService";
       import { useQuery } from "@openapi-qraft/react/callbacks/useQuery";
       import { getPets } from "./api/services/PetsService";
       import { APIClientContext } from "./api/APIClientContext";
-      const api_pets_findPetsByStatus = qraftReactAPIClient(findPetsByStatus, {
+      const api_pets_findPetsByStatus = qraftAPIClient(findPetsByStatus, {
         getQueryKey
       });
       const api_pets_getPets = qraftReactAPIClient(getPets, {
@@ -531,7 +532,7 @@ export function App() {
         api_pets_findPetsByStatus.getQueryKey();
         api_pets_getPets.useQuery();
       }"
-      `);
+    `);
   });
 
   it('rewrites schema accesses from precreated API clients directly to operations', async () => {
@@ -695,13 +696,18 @@ import { useContext } from 'react';
 
 const api = createAPIClient();
 
+function PetUpdateItem({ petId }: { petId: number }) {
+  return api.pets.updatePet.useIsMutating(api.pets.updatePet.getMutationKey());
+}
+
 function PetUpdateForm({ petId }: { petId: number }) {
   const apiContext = useContext(APIClientContext);
   const petParams = { path: { petId } };
 
   api.pets.updatePet.useMutation(undefined, {
+    mutationKey: api.pets.updatePet.getMutationKey(),
     async onMutate(variables) {
-      const getQueryData = () => null;
+      const getQueryData = () => api.pets.updatePet.getMutationKey();
       const apiClient_pets_getPetById = () => null;
       const apiClient = createAPIClient(apiContext!);
 
@@ -725,16 +731,28 @@ function PetUpdateForm({ petId }: { petId: number }) {
     expect(result?.code).toMatchInlineSnapshot(`
       "import { APIClientContext } from './api';
       import { useContext } from 'react';
+      import { qraftAPIClient } from "@openapi-qraft/react";
       import { qraftReactAPIClient } from "@openapi-qraft/react";
-      import { useMutation } from "@openapi-qraft/react/callbacks/useMutation";
+      import { useIsMutating } from "@openapi-qraft/react/callbacks/useIsMutating";
       import { updatePet } from "./api/services/PetsService";
+      import { getMutationKey } from "@openapi-qraft/react/callbacks/getMutationKey";
+      import { useMutation } from "@openapi-qraft/react/callbacks/useMutation";
       import { cancelQueries } from "@openapi-qraft/react/callbacks/cancelQueries";
       import { getPetById } from "./api/services/PetsService";
       import { getQueryData as _getQueryData } from "@openapi-qraft/react/callbacks/getQueryData";
       import { setQueryData } from "@openapi-qraft/react/callbacks/setQueryData";
       const api_pets_updatePet = qraftReactAPIClient(updatePet, {
+        useIsMutating,
+        getMutationKey,
         useMutation
       }, APIClientContext);
+      function PetUpdateItem({
+        petId
+      }: {
+        petId: number;
+      }) {
+        return api_pets_updatePet.useIsMutating(api_pets_updatePet.getMutationKey());
+      }
       function PetUpdateForm({
         petId
       }: {
@@ -747,10 +765,11 @@ function PetUpdateForm({ petId }: { petId: number }) {
           }
         };
         api_pets_updatePet.useMutation(undefined, {
+          mutationKey: api_pets_updatePet.getMutationKey(),
           async onMutate(variables) {
-            const getQueryData = () => null;
+            const getQueryData = () => api_pets_updatePet.getMutationKey();
             const apiClient_pets_getPetById = () => null;
-            const _apiClient_pets_getPetById = qraftReactAPIClient(getPetById, {
+            const _apiClient_pets_getPetById = qraftAPIClient(getPetById, {
               cancelQueries,
               getQueryData: _getQueryData,
               setQueryData
@@ -771,7 +790,7 @@ function PetUpdateForm({ petId }: { petId: number }) {
           }
         });
       }"
-      `);
+    `);
   });
 
   it('optimizes inline explicit options clients', async () => {
@@ -801,14 +820,14 @@ function PetUpdateForm() {
     expect(result?.code).toMatchInlineSnapshot(`
       "import { APIClientContext } from './api';
       import { useContext } from 'react';
-      import { qraftReactAPIClient } from "@openapi-qraft/react";
+      import { qraftAPIClient } from "@openapi-qraft/react";
       import { setQueryData } from "@openapi-qraft/react/callbacks/setQueryData";
       import { getPetById } from "./api/services/PetsService";
       import { invalidateQueries } from "@openapi-qraft/react/callbacks/invalidateQueries";
       import { findPetsByStatus } from "./api/services/PetsService";
       function PetUpdateForm() {
         const apiContext = useContext(APIClientContext);
-        qraftReactAPIClient(getPetById, {
+        qraftAPIClient(getPetById, {
           setQueryData
         }, apiContext!).setQueryData({
           path: {
@@ -817,7 +836,7 @@ function PetUpdateForm() {
         }, {
           id: 1
         });
-        qraftReactAPIClient(findPetsByStatus, {
+        qraftAPIClient(findPetsByStatus, {
           invalidateQueries
         }, apiContext!).invalidateQueries();
       }"
@@ -883,6 +902,7 @@ function PetUpdateForm({ petId }: { petId: number }) {
     expect(result?.code).toMatchInlineSnapshot(`
       "import { APIClientContext } from './api';
       import { useContext } from 'react';
+      import { qraftAPIClient } from "@openapi-qraft/react";
       import { qraftReactAPIClient } from "@openapi-qraft/react";
       import { useMutation } from "@openapi-qraft/react/callbacks/useMutation";
       import { updatePet } from "./api/services/PetsService";
@@ -910,7 +930,7 @@ function PetUpdateForm({ petId }: { petId: number }) {
         const onUpdate = () => {};
         api_pets_updatePet.useMutation(undefined, {
           async onMutate(variables) {
-            const miniQraft_pets_getPetById = qraftReactAPIClient(getPetById, {
+            const miniQraft_pets_getPetById = qraftAPIClient(getPetById, {
               getQueryKey,
               cancelQueries,
               getQueryData,
@@ -931,16 +951,16 @@ function PetUpdateForm({ petId }: { petId: number }) {
           },
           async onError(_error, _variables, context) {
             if (context?.prevPet) {
-              qraftReactAPIClient(getPetById, {
+              qraftAPIClient(getPetById, {
                 setQueryData
               }, apiContext!).setQueryData(petParams, context.prevPet);
             }
           },
           async onSuccess(updatedPet) {
-            const miniQraft_pets_getPetById = qraftReactAPIClient(getPetById, {
+            const miniQraft_pets_getPetById = qraftAPIClient(getPetById, {
               setQueryData
             }, apiContext!);
-            const miniQraft_pets_findPetsByStatus = qraftReactAPIClient(findPetsByStatus, {
+            const miniQraft_pets_findPetsByStatus = qraftAPIClient(findPetsByStatus, {
               getQueryKey,
               invalidateQueries
             }, apiContext!);
@@ -1008,6 +1028,7 @@ function PetUpdateForm({ petId }: { petId: number }) {
     expect(result?.code).toMatchInlineSnapshot(`
       "import { APIClientContext } from './api';
       import { useContext } from 'react';
+      import { qraftAPIClient } from "@openapi-qraft/react";
       import { qraftReactAPIClient } from "@openapi-qraft/react";
       import { useMutation } from "@openapi-qraft/react/callbacks/useMutation";
       import { updatePet } from "./api/services/PetsService";
@@ -1036,7 +1057,7 @@ function PetUpdateForm({ petId }: { petId: number }) {
             const _getQueryData = () => null;
             const apiClient_pets_getPetById = () => null;
             const _apiClient_pets_getPetById = () => null;
-            const _apiClient_pets_getPetById4 = qraftReactAPIClient(getPetById, {
+            const _apiClient_pets_getPetById4 = qraftAPIClient(getPetById, {
               cancelQueries,
               getQueryData: _getQueryData2,
               setQueryData
@@ -1044,7 +1065,7 @@ function PetUpdateForm({ petId }: { petId: number }) {
             function syncPetPreview() {
               // This binding intentionally collides with the optimized client name from the outer scope.
               const _apiClient_pets_getPetById2 = () => null;
-              const _apiClient_pets_getPetById3 = qraftReactAPIClient(getPetById, {
+              const _apiClient_pets_getPetById3 = qraftAPIClient(getPetById, {
                 setQueryData
               }, apiContext!);
               _apiClient_pets_getPetById3.setQueryData(petParams, variables.body);
@@ -1087,11 +1108,11 @@ async function run() {
     );
 
     expect(result?.code).toMatchInlineSnapshot(`
-      "import { qraftReactAPIClient } from "@openapi-qraft/react";
+      "import { qraftAPIClient } from "@openapi-qraft/react";
       import { invalidateQueries } from "@openapi-qraft/react/callbacks/invalidateQueries";
       import { findPetsByStatus } from "./api/services/PetsService";
       import { APIClientContext } from "./api/APIClientContext";
-      const api_pets_findPetsByStatus = qraftReactAPIClient(findPetsByStatus, {
+      const api_pets_findPetsByStatus = qraftAPIClient(findPetsByStatus, {
         invalidateQueries
       }, APIClientContext);
       async function run() {
@@ -1123,15 +1144,15 @@ async function run() {
     expect(result?.code).toMatchInlineSnapshot(`
       "import { APIClientContext } from './api';
       import { useContext } from 'react';
-      import { qraftReactAPIClient } from "@openapi-qraft/react";
+      import { qraftAPIClient } from "@openapi-qraft/react";
       import { invalidateQueries } from "@openapi-qraft/react/callbacks/invalidateQueries";
       import { findPetsByStatus } from "./api/services/PetsService";
       async function run() {
         const apiContext = useContext(APIClientContext);
-        void qraftReactAPIClient(findPetsByStatus, {
+        void qraftAPIClient(findPetsByStatus, {
           invalidateQueries
         }, apiContext!).invalidateQueries();
-        await qraftReactAPIClient(findPetsByStatus, {
+        await qraftAPIClient(findPetsByStatus, {
           invalidateQueries
         }, apiContext!).invalidateQueries();
       }"
@@ -1163,16 +1184,16 @@ async function run() {
     expect(result?.code).toMatchInlineSnapshot(`
       "import { APIClientContext } from './api';
       import { useContext } from 'react';
-      import { qraftReactAPIClient } from "@openapi-qraft/react";
+      import { qraftAPIClient } from "@openapi-qraft/react";
       import { invalidateQueries } from "@openapi-qraft/react/callbacks/invalidateQueries";
       import { getPets } from "./api/services/PetsService";
-      const api_pets_getPets = qraftReactAPIClient(getPets, {
+      const api_pets_getPets = qraftAPIClient(getPets, {
         invalidateQueries
       }, APIClientContext);
       async function run() {
         const apiContext = useContext(APIClientContext);
         api_pets_getPets.invalidateQueries();
-        qraftReactAPIClient(getPets, {
+        qraftAPIClient(getPets, {
           invalidateQueries
         }, apiContext!).invalidateQueries();
       }"
