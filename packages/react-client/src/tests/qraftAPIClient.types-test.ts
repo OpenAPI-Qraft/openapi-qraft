@@ -15,6 +15,11 @@ import {
   filesService,
 } from './fixtures/api/services/FilesService.js';
 
+const parameters = {
+  header: { 'x-monite-version': '1.0.0' },
+  query: { id__in: ['1', '2'] },
+} as const;
+
 //// APIDefaultQueryClientServices ////
 const client = qraftAPIClient(services, callbacks, {
   queryClient: new QueryClient(),
@@ -39,10 +44,7 @@ client.files.deleteFiles.useQuery();
 client.files.deleteFiles.useQuery;
 // @ts-expect-error - OK, illegal usage
 client.files.deleteFiles.getInfiniteQueryKey;
-const parameters = {
-  header: { 'x-monite-version': '1.0.0' },
-  query: { id__in: ['1', '2'] },
-} as const;
+
 client.files.getFiles.fetchQuery({ parameters });
 client.files.getFiles.useQuery(parameters);
 client.files.getFiles.fetchQuery({
@@ -56,20 +58,58 @@ client.files.getFiles.useQuery({
   query: { id__in: ['1', '2'] },
 });
 
-//// APIUtilityClientServices ////
-const utilityClient = qraftAPIClient(services, callbacks);
+//// APIBasicClientServices ////
+const apiBasicClient = qraftAPIClient(services, callbacks, {
+  requestFn,
+  baseUrl: 'https://api.sandbox.monite.com/v1',
+});
 
-utilityClient.files.deleteFiles.types.parameters.query;
-utilityClient.files.deleteFiles.schema.method satisfies 'delete';
-utilityClient.files.deleteFiles.getMutationKey();
-// @ts-expect-error - OK, illegal usage
-utilityClient.files.deleteFiles.getQueryKey();
-// @ts-expect-error - OK, illegal usage
-utilityClient.files.deleteFiles.getQueryKey;
-// @ts-expect-error - OK, illegal usage
-utilityClient.files.deleteFiles.getInfiniteQueryKey();
-// @ts-expect-error - OK, illegal usage
-utilityClient.files.deleteFiles.getInfiniteQueryKey;
+apiBasicClient.files.getFiles({ parameters });
+apiBasicClient.files.getFiles.getQueryKey(parameters);
+apiBasicClient.files.getFiles.getInfiniteQueryKey(parameters);
+apiBasicClient.files.deleteFiles({ parameters: { query: { all: true } } });
+apiBasicClient.files.deleteFiles.getMutationKey();
+apiBasicClient.files.deleteFiles.getMutationKey({ query: { all: true } });
+// @ts-expect-error - basic client has request options but no QueryClient
+apiBasicClient.files.getFiles.useQuery(parameters);
+// @ts-expect-error - basic client has request options but no QueryClient
+apiBasicClient.files.getFiles.useIsFetching({ parameters });
+// @ts-expect-error - basic client has request options but no QueryClient
+apiBasicClient.files.getFiles.getQueryData(parameters);
+// @ts-expect-error - basic client has request options but no QueryClient
+apiBasicClient.files.getFiles.invalidateQueries();
+// @ts-expect-error - basic client has request options but no QueryClient
+apiBasicClient.files.deleteFiles.useMutation({ query: { all: true } });
+// @ts-expect-error - basic client has request options but no QueryClient
+apiBasicClient.files.deleteFiles.useIsMutating();
+
+//// APIBasicClientServices - custom callbacks ////
+const apiBasicCustomClient = qraftAPIClient(
+  { filesService },
+  {
+    getMutationKey: callbacks.getMutationKey,
+    operationInvokeFn: callbacks.operationInvokeFn,
+    useMutation: callbacks.useMutation,
+  },
+  {
+    requestFn,
+    baseUrl: 'https://api.sandbox.monite.com/v1',
+  }
+);
+
+apiBasicCustomClient.filesService.deleteFiles({
+  parameters: { query: { all: true } },
+});
+apiBasicCustomClient.filesService.deleteFiles.types.parameters.query;
+apiBasicCustomClient.filesService.deleteFiles.schema.method satisfies 'delete';
+apiBasicCustomClient.filesService.deleteFiles.getMutationKey();
+apiBasicCustomClient.filesService.deleteFiles.getMutationKey({
+  query: { all: true },
+});
+// @ts-expect-error - basic client has request options but no QueryClient
+apiBasicCustomClient.filesService.deleteFiles.useMutation({
+  query: { all: true },
+});
 
 //// APIQueryClientServices - custom callbacks ////
 const partialHooksClient = qraftAPIClient(
@@ -111,47 +151,27 @@ partialHooksClient.filesService.deleteFiles.useQuery;
 // @ts-expect-error - OK, illegal usage
 partialHooksClient.filesService.deleteFiles.getInfiniteQueryKey;
 
-//// APIBasicClientServices ////
-const apiBasicClient = qraftAPIClient(services, callbacks, {
-  requestFn,
-  baseUrl: 'https://api.sandbox.monite.com/v1',
+//// APIBasicQueryClientServices ////
+const queryClientOnlyApi = qraftAPIClient(services, callbacks, {
+  queryClient: new QueryClient(),
 });
 
-apiBasicClient.files.deleteFiles();
-apiBasicClient.files.deleteFiles({ parameters: {} });
-apiBasicClient.files.deleteFiles({ parameters: { query: { all: true } } });
-apiBasicClient.files.deleteFiles.types.parameters.query;
-apiBasicClient.files.deleteFiles.schema.method satisfies 'delete';
-apiBasicClient.files.deleteFiles.getMutationKey();
-apiBasicClient.files.deleteFiles.getMutationKey({ query: { all: true } });
-apiBasicClient.files.deleteFiles.useMutation({ query: { all: true } });
-
-//// APIBasicClientServices - custom callbacks ////
-const apiBasicCustomClient = qraftAPIClient(
-  { filesService },
-  {
-    getMutationKey: callbacks.getMutationKey,
-    useMutation: callbacks.useMutation,
-  },
-  {
-    requestFn,
-    baseUrl: 'https://api.sandbox.monite.com/v1',
-  }
-);
-
-// @ts-expect-error - OK, no invoke callback provided
-apiBasicCustomClient.filesService.deleteFiles({
-  parameters: { query: { all: true } },
-});
-apiBasicCustomClient.filesService.deleteFiles.types.parameters.query;
-apiBasicCustomClient.filesService.deleteFiles.schema.method satisfies 'delete';
-apiBasicCustomClient.filesService.deleteFiles.getMutationKey();
-apiBasicCustomClient.filesService.deleteFiles.getMutationKey({
-  query: { all: true },
-});
-apiBasicCustomClient.filesService.deleteFiles.useMutation({
-  query: { all: true },
-});
+queryClientOnlyApi.files.getFiles.getQueryKey(parameters);
+queryClientOnlyApi.files.getFiles.getQueryData(parameters);
+queryClientOnlyApi.files.getFiles.invalidateQueries();
+queryClientOnlyApi.files.getFiles.useIsFetching({ parameters });
+queryClientOnlyApi.files.deleteFiles.getMutationKey();
+queryClientOnlyApi.files.deleteFiles.getMutationCache();
+queryClientOnlyApi.files.deleteFiles.useIsMutating();
+queryClientOnlyApi.files.deleteFiles.useMutationState();
+// @ts-expect-error - queryClient-only client cannot invoke operations without requestFn
+queryClientOnlyApi.files.getFiles({ parameters });
+// @ts-expect-error - queryClient-only client cannot run request hooks without requestFn
+queryClientOnlyApi.files.getFiles.useQuery(parameters);
+// @ts-expect-error - queryClient-only client cannot run request methods without requestFn
+queryClientOnlyApi.files.getFiles.fetchQuery({ parameters });
+// @ts-expect-error - queryClient-only client cannot run mutation hooks without requestFn
+queryClientOnlyApi.files.deleteFiles.useMutation({ query: { all: true } });
 
 //// APIDefaultQueryClientServices - single service operation ////
 const deleteFilesClient = qraftAPIClient(deleteFiles, callbacks, {
@@ -172,20 +192,40 @@ const noQueryClientRequestApi = qraftAPIClient(services, callbacks, {
   baseUrl: 'https://api.sandbox.monite.com/v1',
 });
 
+noQueryClientRequestApi.files.getFiles({ parameters });
+noQueryClientRequestApi.files.getFiles.getQueryKey(parameters);
+noQueryClientRequestApi.files.getFiles.getInfiniteQueryKey(parameters);
+noQueryClientRequestApi.files.deleteFiles.getMutationKey();
+// @ts-expect-error - request-only client cannot run query hooks
 noQueryClientRequestApi.files.getFiles.useQuery(parameters);
+// @ts-expect-error - request-only client cannot run state hooks without QueryClient
 noQueryClientRequestApi.files.getFiles.useIsFetching({ parameters });
+// @ts-expect-error - request-only client cannot run query hooks
 noQueryClientRequestApi.files.getFiles.useQueries({
   queries: [{ parameters }, { parameters }],
 });
+// @ts-expect-error - request-only client cannot run mutation hooks
 noQueryClientRequestApi.files.deleteFiles.useMutation({ query: { all: true } });
+// @ts-expect-error - request-only client cannot run state hooks without QueryClient
 noQueryClientRequestApi.files.deleteFiles.useIsMutating();
+// @ts-expect-error - request-only client cannot run state hooks without QueryClient
 noQueryClientRequestApi.files.deleteFiles.useMutationState();
+// @ts-expect-error - request-only client cannot use QueryClient methods
+noQueryClientRequestApi.files.getFiles.getQueryData(parameters);
+// @ts-expect-error - request-only client cannot use QueryClient methods
+noQueryClientRequestApi.files.getFiles.invalidateQueries();
+// @ts-expect-error - request-only client cannot use request-executing QueryClient methods
+noQueryClientRequestApi.files.getFiles.fetchQuery({ parameters });
+// @ts-expect-error - request-only client cannot use request-executing QueryClient methods
+noQueryClientRequestApi.files.getFiles.ensureQueryData({ parameters });
 
 const noQueryClientNoRequestApi = qraftAPIClient(services, callbacks);
 
 noQueryClientNoRequestApi.files.getFiles.getQueryKey(parameters);
 noQueryClientNoRequestApi.files.getFiles.getInfiniteQueryKey(parameters);
 noQueryClientNoRequestApi.files.deleteFiles.getMutationKey();
+// @ts-expect-error - utility client without options cannot invoke operations
+noQueryClientNoRequestApi.files.getFiles({ parameters });
 // @ts-expect-error - utility client without options cannot run React/query state hooks
 noQueryClientNoRequestApi.files.getFiles.useQuery(parameters);
 // @ts-expect-error - utility client without options cannot run React/query state hooks
@@ -222,7 +262,69 @@ contextReactApi.files.deleteFiles.useMutationState();
 // @ts-expect-error - context client exposes hooks, not imperative QueryClient methods
 contextReactApi.files.getFiles.setQueryData(parameters, { query: {} });
 // @ts-expect-error - context client exposes hooks, not imperative QueryClient methods
+contextReactApi.files.getFiles.getQueryData(parameters);
+// @ts-expect-error - context client exposes hooks, not imperative QueryClient methods
 contextReactApi.files.getFiles.invalidateQueries();
+
+const directReactUtilityApi = qraftReactAPIClient(services, callbacks);
+
+directReactUtilityApi.files.getFiles.getQueryKey(parameters);
+directReactUtilityApi.files.getFiles.getInfiniteQueryKey(parameters);
+directReactUtilityApi.files.deleteFiles.getMutationKey();
+// @ts-expect-error - direct React utility client without options exposes key helpers only
+directReactUtilityApi.files.getFiles.useQuery(parameters);
+// @ts-expect-error - direct React utility client without options exposes key helpers only
+directReactUtilityApi.files.getFiles.useIsFetching({ parameters });
+// @ts-expect-error - direct React utility client without options exposes key helpers only
+directReactUtilityApi.files.getFiles.invalidateQueries();
+// @ts-expect-error - direct React utility client without options cannot invoke operations
+directReactUtilityApi.files.getFiles({ parameters });
+
+const directReactRequestOnlyApi = qraftReactAPIClient(services, callbacks, {
+  requestFn,
+  baseUrl: 'https://api.sandbox.monite.com/v1',
+});
+
+directReactRequestOnlyApi.files.getFiles({ parameters });
+directReactRequestOnlyApi.files.getFiles.getQueryKey(parameters);
+directReactRequestOnlyApi.files.getFiles.getInfiniteQueryKey(parameters);
+directReactRequestOnlyApi.files.deleteFiles.getMutationKey();
+// @ts-expect-error - direct React request-only client cannot expose hooks
+directReactRequestOnlyApi.files.getFiles.useQuery(parameters);
+// @ts-expect-error - direct React request-only client cannot expose state hooks without QueryClient
+directReactRequestOnlyApi.files.getFiles.useIsFetching({ parameters });
+// @ts-expect-error - direct React request-only client cannot expose QueryClient methods
+directReactRequestOnlyApi.files.getFiles.getQueryData(parameters);
+// @ts-expect-error - direct React request-only client cannot expose mutation hooks
+directReactRequestOnlyApi.files.deleteFiles.useMutation({ query: { all: true } });
+// @ts-expect-error - direct React request-only client cannot expose state hooks without QueryClient
+directReactRequestOnlyApi.files.deleteFiles.useIsMutating();
+// @ts-expect-error - direct React request-only client cannot expose state hooks without QueryClient
+directReactRequestOnlyApi.files.deleteFiles.useMutationState();
+// @ts-expect-error - direct React request-only client cannot expose QueryClient methods
+directReactRequestOnlyApi.files.getFiles.invalidateQueries();
+
+const directReactQueryClientOnlyApi = qraftReactAPIClient(services, callbacks, {
+  queryClient: new QueryClient(),
+});
+
+directReactQueryClientOnlyApi.files.getFiles.getQueryKey(parameters);
+directReactQueryClientOnlyApi.files.getFiles.getQueryData(parameters);
+directReactQueryClientOnlyApi.files.getFiles.invalidateQueries();
+directReactQueryClientOnlyApi.files.deleteFiles.getMutationKey();
+directReactQueryClientOnlyApi.files.deleteFiles.getMutationCache();
+// @ts-expect-error - direct React queryClient-only object options do not expose hooks
+directReactQueryClientOnlyApi.files.getFiles.useQuery(parameters);
+// @ts-expect-error - direct React queryClient-only object options do not expose hooks
+directReactQueryClientOnlyApi.files.getFiles.useIsFetching({ parameters });
+// @ts-expect-error - direct React queryClient-only object options cannot invoke operations without requestFn
+directReactQueryClientOnlyApi.files.getFiles({ parameters });
+// @ts-expect-error - direct React queryClient-only object options do not expose mutation hooks
+directReactQueryClientOnlyApi.files.deleteFiles.useMutation({ query: { all: true } });
+// @ts-expect-error - direct React queryClient-only object options do not expose state hooks
+directReactQueryClientOnlyApi.files.deleteFiles.useIsMutating();
+// @ts-expect-error - direct React queryClient-only object options do not expose state hooks
+directReactQueryClientOnlyApi.files.deleteFiles.useMutationState();
 
 const directReactQueryClientApi = qraftReactAPIClient(services, callbacks, {
   queryClient: new QueryClient(),
@@ -243,3 +345,5 @@ directReactQueryClientApi.files.getFiles.useIsFetching({ parameters });
 directReactQueryClientApi.files.deleteFiles.useMutation({ query: { all: true } });
 // @ts-expect-error - direct object options do not wrap React hooks with context
 directReactQueryClientApi.files.deleteFiles.useIsMutating();
+// @ts-expect-error - direct object options do not wrap React hooks with context
+directReactQueryClientApi.files.deleteFiles.useMutationState();
