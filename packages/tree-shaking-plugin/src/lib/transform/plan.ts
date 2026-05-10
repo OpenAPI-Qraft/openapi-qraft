@@ -1637,22 +1637,20 @@ function assignScopeLocalClientNames(
       }
     }
 
-    let scopeIndex = 1;
     for (const scopeEntry of rootEntries) {
       const usage = scopeEntry.scopeUsages[0];
       if (!usage) continue;
 
       const localClientName = createProgramUniqueName(
         programScope,
-        `${composeLocalClientName(
+        composeLocalClientName(
           usage.client.name,
           usage.serviceName,
           usage.operationName
-        )}${scopeIndex}`,
+        ),
         fileBindingNames,
         reservedImportLocalNames
       );
-      scopeIndex += 1;
       reservedImportLocalNames.add(localClientName);
 
       for (const scopeUsage of scopeEntry.scopeUsages) {
