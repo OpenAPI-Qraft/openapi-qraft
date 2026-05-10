@@ -1,44 +1,45 @@
 type CallbackMetadata = {
-  needsRuntimeContext: boolean;
+  needsOptions: boolean;
+  needsReactRuntime: boolean;
 };
 
 export const supportedCallbacks = {
-  cancelQueries: { needsRuntimeContext: true },
-  ensureInfiniteQueryData: { needsRuntimeContext: true },
-  ensureQueryData: { needsRuntimeContext: true },
-  fetchInfiniteQuery: { needsRuntimeContext: true },
-  fetchQuery: { needsRuntimeContext: true },
-  getInfiniteQueryData: { needsRuntimeContext: true },
-  getInfiniteQueryKey: { needsRuntimeContext: false },
-  getInfiniteQueryState: { needsRuntimeContext: true },
-  getMutationCache: { needsRuntimeContext: true },
-  getMutationKey: { needsRuntimeContext: false },
-  getQueriesData: { needsRuntimeContext: true },
-  getQueryData: { needsRuntimeContext: true },
-  getQueryKey: { needsRuntimeContext: false },
-  getQueryState: { needsRuntimeContext: true },
-  invalidateQueries: { needsRuntimeContext: true },
-  isFetching: { needsRuntimeContext: true },
-  isMutating: { needsRuntimeContext: true },
-  operationInvokeFn: { needsRuntimeContext: true },
-  prefetchInfiniteQuery: { needsRuntimeContext: true },
-  prefetchQuery: { needsRuntimeContext: true },
-  refetchQueries: { needsRuntimeContext: true },
-  removeQueries: { needsRuntimeContext: true },
-  resetQueries: { needsRuntimeContext: true },
-  setInfiniteQueryData: { needsRuntimeContext: true },
-  setQueriesData: { needsRuntimeContext: true },
-  setQueryData: { needsRuntimeContext: true },
-  useInfiniteQuery: { needsRuntimeContext: true },
-  useIsFetching: { needsRuntimeContext: true },
-  useIsMutating: { needsRuntimeContext: true },
-  useMutation: { needsRuntimeContext: true },
-  useMutationState: { needsRuntimeContext: true },
-  useQueries: { needsRuntimeContext: true },
-  useQuery: { needsRuntimeContext: true },
-  useSuspenseInfiniteQuery: { needsRuntimeContext: true },
-  useSuspenseQueries: { needsRuntimeContext: true },
-  useSuspenseQuery: { needsRuntimeContext: true },
+  cancelQueries: { needsOptions: true, needsReactRuntime: false },
+  ensureInfiniteQueryData: { needsOptions: true, needsReactRuntime: false },
+  ensureQueryData: { needsOptions: true, needsReactRuntime: false },
+  fetchInfiniteQuery: { needsOptions: true, needsReactRuntime: false },
+  fetchQuery: { needsOptions: true, needsReactRuntime: false },
+  getInfiniteQueryData: { needsOptions: true, needsReactRuntime: false },
+  getInfiniteQueryKey: { needsOptions: false, needsReactRuntime: false },
+  getInfiniteQueryState: { needsOptions: true, needsReactRuntime: false },
+  getMutationCache: { needsOptions: true, needsReactRuntime: false },
+  getMutationKey: { needsOptions: false, needsReactRuntime: false },
+  getQueriesData: { needsOptions: true, needsReactRuntime: false },
+  getQueryData: { needsOptions: true, needsReactRuntime: false },
+  getQueryKey: { needsOptions: false, needsReactRuntime: false },
+  getQueryState: { needsOptions: true, needsReactRuntime: false },
+  invalidateQueries: { needsOptions: true, needsReactRuntime: false },
+  isFetching: { needsOptions: true, needsReactRuntime: false },
+  isMutating: { needsOptions: true, needsReactRuntime: false },
+  operationInvokeFn: { needsOptions: true, needsReactRuntime: false },
+  prefetchInfiniteQuery: { needsOptions: true, needsReactRuntime: false },
+  prefetchQuery: { needsOptions: true, needsReactRuntime: false },
+  refetchQueries: { needsOptions: true, needsReactRuntime: false },
+  removeQueries: { needsOptions: true, needsReactRuntime: false },
+  resetQueries: { needsOptions: true, needsReactRuntime: false },
+  setInfiniteQueryData: { needsOptions: true, needsReactRuntime: false },
+  setQueriesData: { needsOptions: true, needsReactRuntime: false },
+  setQueryData: { needsOptions: true, needsReactRuntime: false },
+  useInfiniteQuery: { needsOptions: true, needsReactRuntime: true },
+  useIsFetching: { needsOptions: true, needsReactRuntime: true },
+  useIsMutating: { needsOptions: true, needsReactRuntime: true },
+  useMutation: { needsOptions: true, needsReactRuntime: true },
+  useMutationState: { needsOptions: true, needsReactRuntime: true },
+  useQueries: { needsOptions: true, needsReactRuntime: true },
+  useQuery: { needsOptions: true, needsReactRuntime: true },
+  useSuspenseInfiniteQuery: { needsOptions: true, needsReactRuntime: true },
+  useSuspenseQueries: { needsOptions: true, needsReactRuntime: true },
+  useSuspenseQuery: { needsOptions: true, needsReactRuntime: true },
 } as const satisfies Readonly<Record<string, CallbackMetadata>>;
 
 type SupportedCallbackName = keyof typeof supportedCallbacks;
@@ -49,7 +50,16 @@ export function isSupportedCallbackName(
   return callbackName in supportedCallbacks;
 }
 
-export function callbackNeedsRuntimeContext(callbackName: string): boolean {
+export function callbackNeedsOptions(callbackName: string): boolean {
   if (!isSupportedCallbackName(callbackName)) return true;
-  return supportedCallbacks[callbackName].needsRuntimeContext;
+  return supportedCallbacks[callbackName].needsOptions;
+}
+
+export function callbackNeedsReactRuntime(callbackName: string): boolean {
+  if (!isSupportedCallbackName(callbackName)) return true;
+  return supportedCallbacks[callbackName].needsReactRuntime;
+}
+
+export function callbackNeedsRuntimeContext(callbackName: string): boolean {
+  return callbackNeedsOptions(callbackName);
 }

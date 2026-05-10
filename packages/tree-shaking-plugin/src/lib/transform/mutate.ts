@@ -1,22 +1,37 @@
+import type { NodePath } from '@babel/traverse';
 import type {
   ClientBinding,
   CreateImportEntry,
   GeneratedClientInfo,
   InlineImportRequest,
   OperationUsage,
-  SchemaUsage,
   RuntimeLocalNames,
+  SchemaUsage,
   TransformPlan,
 } from './types.js';
-import type { NodePath } from '@babel/traverse';
 import * as traverseModule from '@babel/traverse';
 import * as t from '@babel/types';
-import { callbackNeedsRuntimeContext } from './callbacks.js';
+import {
+  callbackNeedsOptions,
+  callbackNeedsReactRuntime,
+} from './callbacks.js';
 
 const traverse =
   resolveDefaultExport<(typeof import('@babel/traverse'))['default']>(
     traverseModule
   );
+
+type RuntimeHelperKind = 'api' | 'react';
+
+function selectRuntimeHelper(
+  callbackNames: readonly { callbackName: string }[]
+): RuntimeHelperKind {
+  return callbackNames.some((callback) =>
+    callbackNeedsReactRuntime(callback.callbackName)
+  )
+    ? 'react'
+    : 'api';
+}
 
 /**
  * Apply a previously created transform plan by rewriting call sites, inserting
@@ -74,7 +89,12 @@ export function applyTransformPlan(
     runtimeLocalNames,
     inlineCallbackUsages
   );
-  rewriteSchemaAccesses(plan.ast, plan.createImports, plan.clients, plan.schemaUsages);
+  rewriteSchemaAccesses(
+    plan.ast,
+    plan.createImports,
+    plan.clients,
+    plan.schemaUsages
+  );
   const generatedDeclarations = insertOptimizedClients(
     plan.ast,
     usages,
@@ -167,6 +187,9 @@ function rewriteInlineClientCalls(
       const usage = inlineUsageIterator.next().value;
       if (!usage) return;
       if (usage.callbackName !== match.callbackName) return;
+      const runtimeHelperKind = selectRuntimeHelper([
+        { callbackName: usage.callbackName },
+      ]);
 
       const args: t.Expression[] = [
         t.identifier(usage.operationImport.localName),
@@ -185,7 +208,11 @@ function rewriteInlineClientCalls(
       }
 
       const newClientCall = t.callExpression(
-        t.identifier(runtimeLocalNames.react),
+        t.identifier(
+          runtimeHelperKind === 'api'
+            ? runtimeLocalNames.api
+            : runtimeLocalNames.react
+        ),
         args
       );
 
@@ -209,9 +236,12 @@ function rewriteSchemaAccesses(
 ) {
   const schemaUsageByKey = new Map(
     schemaUsages.map((usage) => [
-      [usage.sourceKey, usage.serviceName, usage.operationName, usage.scopeKey].join(
-        ':'
-      ),
+      [
+        usage.sourceKey,
+        usage.serviceName,
+        usage.operationName,
+        usage.scopeKey,
+      ].join(':'),
       usage,
     ])
   );
@@ -232,9 +262,12 @@ function rewriteSchemaAccesses(
     if (!match) return;
 
     const usage = schemaUsageByKey.get(
-      [match.sourceKey, match.serviceName, match.operationName, getUsageScopeKey(memberPath)].join(
-        ':'
-      )
+      [
+        match.sourceKey,
+        match.serviceName,
+        match.operationName,
+        getUsageScopeKey(memberPath),
+      ].join(':')
     );
     if (!usage) return;
 
@@ -257,27 +290,65 @@ function insertImports(
   const callbackInlineImports = inlineImports.filter(
     (inline) => inline.kind !== 'schema'
   );
-
-  if (
-    usages.some((usage) => usage.client.mode.type !== 'precreated') ||
-    callbackInlineImports.length > 0
-  ) {
-    addNamedImportDeclaration(
-      declarations,
-      imported,
-      '@openapi-qraft/react',
-      'qraftReactAPIClient',
-      runtimeLocalNames.react
+  const callbacksByClientScopeKey = new Map<
+    string,
+    Array<{ callbackName: string }>
+  >();
+  for (const usage of usages) {
+    if (usage.client.mode.type === 'precreated') continue;
+    const usageKey = getRuntimeHelperUsageKey(usage);
+    const callbacks = callbacksByClientScopeKey.get(usageKey) ?? [];
+    callbacks.push({ callbackName: usage.callbackName });
+    callbacksByClientScopeKey.set(usageKey, callbacks);
+  }
+  const runtimeHelperKindsByClientScopeKey = new Map<
+    string,
+    RuntimeHelperKind
+  >();
+  for (const [usageKey, callbackNames] of callbacksByClientScopeKey) {
+    runtimeHelperKindsByClientScopeKey.set(
+      usageKey,
+      selectRuntimeHelper(callbackNames)
     );
   }
+  let needsApiRuntimeImport = usages.some(
+    (usage) => usage.client.mode.type === 'precreated'
+  );
+  let needsReactRuntimeImport = false;
+  for (const kind of runtimeHelperKindsByClientScopeKey.values()) {
+    if (kind === 'api') {
+      needsApiRuntimeImport = true;
+    } else {
+      needsReactRuntimeImport = true;
+    }
+  }
+  for (const inline of callbackInlineImports) {
+    if (
+      selectRuntimeHelper([{ callbackName: inline.callbackName }]) === 'api'
+    ) {
+      needsApiRuntimeImport = true;
+    } else {
+      needsReactRuntimeImport = true;
+    }
+  }
 
-  if (usages.some((usage) => usage.client.mode.type === 'precreated')) {
+  if (needsApiRuntimeImport) {
     addNamedImportDeclaration(
       declarations,
       imported,
       '@openapi-qraft/react',
       'qraftAPIClient',
       runtimeLocalNames.api
+    );
+  }
+
+  if (needsReactRuntimeImport) {
+    addNamedImportDeclaration(
+      declarations,
+      imported,
+      '@openapi-qraft/react',
+      'qraftReactAPIClient',
+      runtimeLocalNames.react
     );
   }
 
@@ -295,7 +366,7 @@ function insertImports(
     const contextName = generatedInfo?.contextName ?? null;
     const shouldImportContext =
       usage.client.mode.type === 'context' &&
-      callbackNeedsRuntimeContext(usage.callbackName) &&
+      callbackNeedsOptions(usage.callbackName) &&
       contextName !== null &&
       contextImportPath !== null &&
       !hasImportLocalName(ast, contextName);
@@ -400,6 +471,10 @@ function addNamedImportDeclaration(
   );
 }
 
+function getRuntimeHelperUsageKey(usage: OperationUsage) {
+  return `${usage.localClientName}:${usage.scopeKey}`;
+}
+
 function getExistingImports(ast: t.File) {
   const imported = new Set<string>();
   for (const node of ast.program.body) {
@@ -488,14 +563,13 @@ function insertOptimizedClients(
     ...topLevelContextDeclarations,
     ...precreatedDeclarations,
   ]);
-  body.splice(
-    lastImportIndex + 1,
-    0,
-    ...topLevelDeclarations
-  );
+  body.splice(lastImportIndex + 1, 0, ...topLevelDeclarations);
   insertedDeclarations.push(...topLevelDeclarations);
 
-  const usagesByClient = new Map<ClientBinding, Map<string, OperationUsage[]>>();
+  const usagesByClient = new Map<
+    ClientBinding,
+    Map<string, OperationUsage[]>
+  >();
   for (const usage of explicitOptionsUsages) {
     const scopeUsagesByClient = usagesByClient.get(usage.client) ?? new Map();
     const scopeUsages = scopeUsagesByClient.get(usage.scopeKey) ?? [];
@@ -573,12 +647,13 @@ function createOptimizedClientDeclaration(
     ),
   ];
 
-  const needsRuntimeContext = callbacks.some((callback) =>
-    callbackNeedsRuntimeContext(callback.callbackName)
+  const runtimeHelperKind = selectRuntimeHelper(callbacks);
+  const needsOptions = callbacks.some((callback) =>
+    callbackNeedsOptions(callback.callbackName)
   );
 
   if (usage.client.mode.type === 'context') {
-    if (needsRuntimeContext) {
+    if (needsOptions) {
       const generatedInfo = generatedInfoByImport.get(
         getGeneratedInfoKey(usage.client.createImportPath, usage.client.factory)
       );
@@ -594,7 +669,7 @@ function createOptimizedClientDeclaration(
   }
 
   const runtimeImportLocalName =
-    usage.client.mode.type === 'precreated'
+    usage.client.mode.type === 'precreated' || runtimeHelperKind === 'api'
       ? runtimeLocalNames.api
       : runtimeLocalNames.react;
 
@@ -752,13 +827,11 @@ function matchSchemaAccess(
   memberPath: NodePath<t.MemberExpression | t.OptionalMemberExpression>,
   createImports: Map<string, CreateImportEntry>,
   clients: ClientBinding[]
-):
-  | {
-      sourceKey: string;
-      serviceName: string;
-      operationName: string;
-    }
-  | null {
+): {
+  sourceKey: string;
+  serviceName: string;
+  operationName: string;
+} | null {
   const path = getStaticMemberPath(memberPath.node);
   if (!path) return null;
 
@@ -846,7 +919,7 @@ function matchInlineClientCall(
   if (!createImport) return null;
 
   if (root.arguments.length === 0) {
-    if (callbackNeedsRuntimeContext(callbackName)) return null;
+    if (callbackNeedsOptions(callbackName)) return null;
     return {
       createImportPath: createImport.factoryFile,
       factory: createImport.factory,
