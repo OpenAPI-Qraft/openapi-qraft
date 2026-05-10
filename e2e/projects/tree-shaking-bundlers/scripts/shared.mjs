@@ -63,7 +63,7 @@ const apiOnlyScenario = ({ name, entry, include, exclude }) => ({
   include: unique([qraftAPIClientPattern, ...include]),
   exclude: unique([
     qraftReactAPIClientPattern,
-    name,
+    'allCallbacks',
     'APIClientContext',
     ...exclude,
   ]),
@@ -290,8 +290,8 @@ export const scenarios = [
   apiOnlyScenario({
     name: 'node-api-helper-selection',
     entry: 'src/node-api-helper-selection.ts',
-    include: ['getQueryKey', 'getPets'],
-    exclude: [],
+    include: ['getQueryKey', 'invalidateQueries', 'setQueryData', 'getPets'],
+    exclude: ['createNodeAPIClient'],
   }),
   {
     name: 'barrel-mixed-helper-selection',
