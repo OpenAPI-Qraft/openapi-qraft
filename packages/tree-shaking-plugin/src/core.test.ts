@@ -691,6 +691,65 @@ api.pets.getPets.useQuery();
 
     const result = await transformQraftTreeShaking(
       `
+import { createAPIClient } from './api';
+
+const api = createAPIClient();
+
+function PetUpdateItem({ petId }: { petId: number }) {
+  return api.pets.updatePet.useIsMutating(api.pets.updatePet.getMutationKey());
+}
+
+function PetUpdateForm({ petId }: { petId: number }) {
+  api.pets.updatePet.useMutation(undefined, {
+    mutationKey: api.pets.updatePet.getMutationKey(),
+  });
+}
+`,
+      sourceFile,
+      { createAPIClientFn: [{ name: 'createAPIClient', module: './api' }] }
+    );
+
+    expect(result?.code).toMatchInlineSnapshot(`
+      "import { qraftAPIClient } from "@openapi-qraft/react";
+      import { qraftReactAPIClient } from "@openapi-qraft/react";
+      import { useIsMutating } from "@openapi-qraft/react/callbacks/useIsMutating";
+      import { updatePet } from "./api/services/PetsService";
+      import { APIClientContext } from "./api/APIClientContext";
+      import { getMutationKey } from "@openapi-qraft/react/callbacks/getMutationKey";
+      import { useMutation } from "@openapi-qraft/react/callbacks/useMutation";
+      const api_pets_updatePet1 = qraftReactAPIClient(updatePet, {
+        useIsMutating,
+        getMutationKey
+      }, APIClientContext);
+      const api_pets_updatePet2 = qraftReactAPIClient(updatePet, {
+        useMutation,
+        getMutationKey
+      }, APIClientContext);
+      function PetUpdateItem({
+        petId
+      }: {
+        petId: number;
+      }) {
+        return api_pets_updatePet1.useIsMutating(api_pets_updatePet1.getMutationKey());
+      }
+      function PetUpdateForm({
+        petId
+      }: {
+        petId: number;
+      }) {
+        api_pets_updatePet2.useMutation(undefined, {
+          mutationKey: api_pets_updatePet2.getMutationKey()
+        });
+      }"
+    `);
+  });
+
+  it('splits explicit options clients across sibling callback scopes', async () => {
+    const fixture = await createFixture();
+    const sourceFile = path.join(fixture, 'src/App.tsx');
+
+    const result = await transformQraftTreeShaking(
+      `
 import { createAPIClient, APIClientContext } from './api';
 import { useContext } from 'react';
 
@@ -741,17 +800,20 @@ function PetUpdateForm({ petId }: { petId: number }) {
       import { getPetById } from "./api/services/PetsService";
       import { getQueryData as _getQueryData } from "@openapi-qraft/react/callbacks/getQueryData";
       import { setQueryData } from "@openapi-qraft/react/callbacks/setQueryData";
-      const api_pets_updatePet = qraftReactAPIClient(updatePet, {
+      const api_pets_updatePet1 = qraftReactAPIClient(updatePet, {
         useIsMutating,
-        getMutationKey,
-        useMutation
+        getMutationKey
+      }, APIClientContext);
+      const api_pets_updatePet2 = qraftReactAPIClient(updatePet, {
+        useMutation,
+        getMutationKey
       }, APIClientContext);
       function PetUpdateItem({
         petId
       }: {
         petId: number;
       }) {
-        return api_pets_updatePet.useIsMutating(api_pets_updatePet.getMutationKey());
+        return api_pets_updatePet1.useIsMutating(api_pets_updatePet1.getMutationKey());
       }
       function PetUpdateForm({
         petId
@@ -764,10 +826,10 @@ function PetUpdateForm({ petId }: { petId: number }) {
             petId
           }
         };
-        api_pets_updatePet.useMutation(undefined, {
-          mutationKey: api_pets_updatePet.getMutationKey(),
+        api_pets_updatePet2.useMutation(undefined, {
+          mutationKey: api_pets_updatePet2.getMutationKey(),
           async onMutate(variables) {
-            const getQueryData = () => api_pets_updatePet.getMutationKey();
+            const getQueryData = () => api_pets_updatePet2.getMutationKey();
             const apiClient_pets_getPetById = () => null;
             const _apiClient_pets_getPetById = qraftAPIClient(getPetById, {
               cancelQueries,

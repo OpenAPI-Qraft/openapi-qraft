@@ -290,6 +290,7 @@ function insertImports(
   const callbackInlineImports = inlineImports.filter(
     (inline) => inline.kind !== 'schema'
   );
+  const hasScopeSplitContextUsage = hasScopeSplitUsage(usages);
   const callbacksByClientScopeKey = new Map<
     string,
     Array<{ callbackName: string }>
@@ -311,9 +312,9 @@ function insertImports(
       selectRuntimeHelper(callbackNames)
     );
   }
-  let needsApiRuntimeImport = usages.some(
-    (usage) => usage.client.mode.type === 'precreated'
-  );
+  let needsApiRuntimeImport =
+    usages.some((usage) => usage.client.mode.type === 'precreated') ||
+    hasScopeSplitContextUsage;
   let needsReactRuntimeImport = false;
   for (const kind of runtimeHelperKindsByClientScopeKey.values()) {
     if (kind === 'api') {
@@ -541,11 +542,14 @@ function insertOptimizedClients(
 
   const topLevelContextDeclarations: t.VariableDeclaration[] = [];
   for (const [client, clientUsages] of contextUsagesByClient) {
-    const declarations = createOptimizedClientDeclarations(
-      clientUsages,
-      clientUsages,
-      generatedInfoByImport,
-      runtimeLocalNames
+    const scopeBuckets = groupContextUsagesByScope(clientUsages);
+    const declarations = scopeBuckets.flatMap((bucket) =>
+      createOptimizedClientDeclarations(
+        bucket.usages,
+        bucket.usages,
+        generatedInfoByImport,
+        runtimeLocalNames
+      )
     );
     const statementPath = client.localInitPath?.parentPath;
     if (statementPath?.isVariableDeclaration()) {
@@ -596,6 +600,48 @@ function insertOptimizedClients(
   }
 
   return insertedDeclarations;
+}
+
+function hasScopeSplitUsage(usages: OperationUsage[]) {
+  const scopeKeysByOperation = new Map<string, Set<string>>();
+
+  for (const usage of usages) {
+    if (usage.client.mode.type === 'precreated') continue;
+    const key = [
+      usage.client.name,
+      usage.serviceName,
+      usage.operationName,
+    ].join(':');
+    const scopeKeys = scopeKeysByOperation.get(key) ?? new Set<string>();
+    scopeKeys.add(usage.scopeKey);
+    scopeKeysByOperation.set(key, scopeKeys);
+  }
+
+  return [...scopeKeysByOperation.values()].some((scopeKeys) => scopeKeys.size > 1);
+}
+
+type ScopeUsageBucket = {
+  scopeKey: string;
+  usages: OperationUsage[];
+};
+
+function groupUsagesByScope(usages: OperationUsage[]): ScopeUsageBucket[] {
+  const buckets = new Map<string, OperationUsage[]>();
+
+  for (const usage of usages) {
+    const next = buckets.get(usage.scopeKey) ?? [];
+    next.push(usage);
+    buckets.set(usage.scopeKey, next);
+  }
+
+  return [...buckets.entries()].map(([scopeKey, scopeUsages]) => ({
+    scopeKey,
+    usages: scopeUsages,
+  }));
+}
+
+function groupContextUsagesByScope(usages: OperationUsage[]): ScopeUsageBucket[] {
+  return groupUsagesByScope(usages);
 }
 
 function createOptimizedClientDeclarations(

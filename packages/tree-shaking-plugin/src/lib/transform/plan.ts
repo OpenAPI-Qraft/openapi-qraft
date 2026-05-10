@@ -424,6 +424,14 @@ export async function createTransformPlan(
     },
   });
 
+  assignScopeLocalClientNames(
+    [...usageMap.values()],
+    activeProgramScope,
+    fileBindingNames,
+    reservedImportLocalNames,
+    localClientNamesByOperation
+  );
+
   for (const [key, generatedInfo] of generatedInfoByImport) {
     if (generatedInfo !== null) continue;
     const request = generatedInfoRequests.get(key);
@@ -1567,6 +1575,115 @@ function emptyTransformPlan(ast: t.File): TransformPlan {
     createImports: new Map(),
     configuredFactoryNames: new Set(),
   };
+}
+
+function assignScopeLocalClientNames(
+  usages: OperationUsage[],
+  programScope: Scope,
+  fileBindingNames: Set<string>,
+  reservedImportLocalNames: Set<string>,
+  localClientNamesByOperation: Map<string, string>
+) {
+  const contextUsages = usages.filter(
+    (usage) => usage.client.mode.type === 'context'
+  );
+  const usagesByOperation = new Map<
+    string,
+    Map<string, OperationUsage[]>
+  >();
+
+  for (const usage of contextUsages) {
+    const operationKey = [
+      usage.client.name,
+      usage.serviceName,
+      usage.operationName,
+    ].join(':');
+    const scopeUsagesByOperation = usagesByOperation.get(operationKey) ?? new Map();
+    const scopeUsages = scopeUsagesByOperation.get(usage.scopeKey) ?? [];
+    scopeUsages.push(usage);
+    scopeUsagesByOperation.set(usage.scopeKey, scopeUsages);
+    usagesByOperation.set(operationKey, scopeUsagesByOperation);
+  }
+
+  for (const scopeUsagesByOperation of usagesByOperation.values()) {
+    if (scopeUsagesByOperation.size <= 1) continue;
+
+    const scopeEntries = [...scopeUsagesByOperation.entries()].map(
+      ([scopeKey, scopeUsages]) => ({
+        scopeKey,
+        scopeUsages,
+        scopeRange: parseScopeKey(scopeKey),
+      })
+    );
+
+    const rootEntries = scopeEntries.filter(
+      (entry) =>
+        !scopeEntries.some(
+          (candidate) =>
+            candidate.scopeKey !== entry.scopeKey &&
+            scopeContains(candidate.scopeRange, entry.scopeRange)
+        )
+    );
+
+    if (rootEntries.length <= 1) continue;
+
+    for (const entry of scopeEntries) {
+      if (rootEntries.includes(entry)) continue;
+      const rootParent = rootEntries.find((root) =>
+        scopeContains(root.scopeRange, entry.scopeRange)
+      );
+      if (rootParent) {
+        rootParent.scopeUsages.push(...entry.scopeUsages);
+      }
+    }
+
+    let scopeIndex = 1;
+    for (const scopeEntry of rootEntries) {
+      const usage = scopeEntry.scopeUsages[0];
+      if (!usage) continue;
+
+      const localClientName = createProgramUniqueName(
+        programScope,
+        `${composeLocalClientName(
+          usage.client.name,
+          usage.serviceName,
+          usage.operationName
+        )}${scopeIndex}`,
+        fileBindingNames,
+        reservedImportLocalNames
+      );
+      scopeIndex += 1;
+      reservedImportLocalNames.add(localClientName);
+
+      for (const scopeUsage of scopeEntry.scopeUsages) {
+        scopeUsage.localClientName = localClientName;
+        localClientNamesByOperation.set(
+          [
+            scopeUsage.client.name,
+            scopeUsage.serviceName,
+            scopeUsage.operationName,
+            scopeUsage.scopeKey,
+          ].join(':'),
+          localClientName
+        );
+      }
+    }
+  }
+}
+
+function parseScopeKey(scopeKey: string) {
+  const [, startText = '-1', endText = '-1'] = scopeKey.split(':', 3);
+  return {
+    start: Number(startText),
+    end: Number(endText),
+  };
+}
+
+function scopeContains(
+  outer: { start: number; end: number },
+  inner: { start: number; end: number }
+) {
+  return outer.start < inner.start && outer.end > inner.end;
 }
 
 function resolveDefaultExport<T>(module: unknown): T {
