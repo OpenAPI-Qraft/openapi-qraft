@@ -85,7 +85,7 @@ Expected: the command exits `0` after building `tree-shaking-bundlers` from the 
 - Modify: `packages/tree-shaking-plugin/src/lib/resolvers/agnostic.ts`
 - Modify: `packages/tree-shaking-plugin/src/lib/resolvers/resolvers.test.ts`
 
-- [ ] **Step 1: Add failing tests for module-access resolve/load composition**
+- [x] **Step 1: Add failing tests for module-access resolve/load composition**
 
 Append these tests to `packages/tree-shaking-plugin/src/lib/resolvers/resolvers.test.ts` inside the existing `describe('resolver composition', ...)` block:
 
@@ -124,7 +124,7 @@ it('returns null from load when no source loader is configured', async () => {
 
 Expected initial failure: TypeScript/Vitest cannot find `createAgnosticModuleAccess`.
 
-- [ ] **Step 2: Run the resolver test to verify it fails**
+- [x] **Step 2: Run the resolver test to verify it fails**
 
 ```bash
 corepack yarn workspace @openapi-qraft/tree-shaking-plugin test src/lib/resolvers/resolvers.test.ts -t "custom module loader"
@@ -132,7 +132,7 @@ corepack yarn workspace @openapi-qraft/tree-shaking-plugin test src/lib/resolver
 
 Expected: FAIL with a missing export or missing identifier error for `createAgnosticModuleAccess`.
 
-- [ ] **Step 3: Replace resolver-only types with module-access types**
+- [x] **Step 3: Replace resolver-only types with module-access types**
 
 In `packages/tree-shaking-plugin/src/lib/resolvers/common.ts`, keep `QraftResolver` as a compatibility alias, then add the module-access types and source-loader strategy helpers:
 
@@ -215,7 +215,7 @@ export function createUserSourceLoaderStrategy(
 }
 ```
 
-- [ ] **Step 4: Add the agnostic module-access factory**
+- [x] **Step 4: Add the agnostic module-access factory**
 
 Replace the body of `packages/tree-shaking-plugin/src/lib/resolvers/agnostic.ts` with:
 
@@ -250,7 +250,7 @@ export function createAgnosticModuleAccess(
 }
 ```
 
-- [ ] **Step 5: Update resolver test imports**
+- [x] **Step 5: Update resolver test imports**
 
 In `packages/tree-shaking-plugin/src/lib/resolvers/resolvers.test.ts`, change:
 
@@ -267,7 +267,7 @@ import {
 } from './agnostic.js';
 ```
 
-- [ ] **Step 6: Run resolver tests**
+- [x] **Step 6: Run resolver tests**
 
 ```bash
 corepack yarn workspace @openapi-qraft/tree-shaking-plugin test src/lib/resolvers/resolvers.test.ts
@@ -275,7 +275,7 @@ corepack yarn workspace @openapi-qraft/tree-shaking-plugin test src/lib/resolver
 
 Expected: PASS.
 
-- [ ] **Step 7: Commit the boundary type change**
+- [x] **Step 7: Commit the boundary type change**
 
 ```bash
 git add packages/tree-shaking-plugin/src/lib/resolvers/common.ts \
