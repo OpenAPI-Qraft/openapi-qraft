@@ -1,8 +1,14 @@
 /* eslint-disable @typescript-eslint/no-unused-expressions */
 
-import { qraftAPIClient, requestFn } from '@openapi-qraft/react';
+import {
+  type CreateAPIQueryClientOptions,
+  qraftAPIClient,
+  qraftReactAPIClient,
+  requestFn,
+} from '@openapi-qraft/react';
 import * as callbacks from '@openapi-qraft/react/callbacks/index';
 import { QueryClient } from '@tanstack/react-query';
+import { createContext } from 'react';
 import { services } from './fixtures/api/index.js';
 import {
   deleteFiles,
@@ -176,16 +182,64 @@ noQueryClientRequestApi.files.deleteFiles.useIsMutating();
 noQueryClientRequestApi.files.deleteFiles.useMutationState();
 
 const noQueryClientNoRequestApi = qraftAPIClient(services, callbacks);
-// @ts-expect-error - OK, illegal usage
+
+noQueryClientNoRequestApi.files.getFiles.getQueryKey(parameters);
+noQueryClientNoRequestApi.files.getFiles.getInfiniteQueryKey(parameters);
+noQueryClientNoRequestApi.files.deleteFiles.getMutationKey();
+// @ts-expect-error - utility client without options cannot run React/query state hooks
 noQueryClientNoRequestApi.files.getFiles.useQuery(parameters);
+// @ts-expect-error - utility client without options cannot run React/query state hooks
 noQueryClientNoRequestApi.files.getFiles.useIsFetching({ parameters });
-// @ts-expect-error - OK, illegal usage
+// @ts-expect-error - utility client without options cannot run React/query state hooks
 noQueryClientNoRequestApi.files.getFiles.useQueries({
   queries: [{ parameters }, { parameters }],
 });
-// @ts-expect-error - OK, illegal usage
+// @ts-expect-error - utility client without options cannot run React/query state hooks
 noQueryClientNoRequestApi.files.deleteFiles.useMutation({
   query: { all: true },
 });
+// @ts-expect-error - utility client without options cannot run React/query state hooks
 noQueryClientNoRequestApi.files.deleteFiles.useIsMutating();
+// @ts-expect-error - utility client without options cannot run React/query state hooks
 noQueryClientNoRequestApi.files.deleteFiles.useMutationState();
+// @ts-expect-error - utility client without options cannot use QueryClient methods
+noQueryClientNoRequestApi.files.getFiles.invalidateQueries();
+
+const APIClientContext = createContext<CreateAPIQueryClientOptions | undefined>(
+  undefined
+);
+
+const contextReactApi = qraftReactAPIClient(services, callbacks, APIClientContext);
+
+contextReactApi.files.getFiles.getQueryKey(parameters);
+contextReactApi.files.getFiles.getInfiniteQueryKey(parameters);
+contextReactApi.files.getFiles.useQuery(parameters);
+contextReactApi.files.getFiles.useIsFetching({ parameters });
+contextReactApi.files.deleteFiles.getMutationKey();
+contextReactApi.files.deleteFiles.useMutation({ query: { all: true } });
+contextReactApi.files.deleteFiles.useIsMutating();
+contextReactApi.files.deleteFiles.useMutationState();
+// @ts-expect-error - context client exposes hooks, not imperative QueryClient methods
+contextReactApi.files.getFiles.setQueryData(parameters, { query: {} });
+// @ts-expect-error - context client exposes hooks, not imperative QueryClient methods
+contextReactApi.files.getFiles.invalidateQueries();
+
+const directReactQueryClientApi = qraftReactAPIClient(services, callbacks, {
+  queryClient: new QueryClient(),
+  requestFn,
+  baseUrl: 'https://api.sandbox.monite.com/v1',
+});
+
+directReactQueryClientApi.files.getFiles.getQueryKey(parameters);
+directReactQueryClientApi.files.getFiles.getQueryData(parameters);
+directReactQueryClientApi.files.getFiles.invalidateQueries();
+directReactQueryClientApi.files.deleteFiles.getMutationKey();
+directReactQueryClientApi.files.deleteFiles.getMutationCache();
+// @ts-expect-error - direct object options do not wrap React hooks with context
+directReactQueryClientApi.files.getFiles.useQuery(parameters);
+// @ts-expect-error - direct object options do not wrap React hooks with context
+directReactQueryClientApi.files.getFiles.useIsFetching({ parameters });
+// @ts-expect-error - direct object options do not wrap React hooks with context
+directReactQueryClientApi.files.deleteFiles.useMutation({ query: { all: true } });
+// @ts-expect-error - direct object options do not wrap React hooks with context
+directReactQueryClientApi.files.deleteFiles.useIsMutating();
