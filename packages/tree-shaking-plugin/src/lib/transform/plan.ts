@@ -178,9 +178,19 @@ export async function createTransformPlan(
       }
       if (!resolvedAbs) continue;
 
-      const matched = matchingFactories.find(
+      let matched = matchingFactories.find(
         (factory) => factoryResolvedIds.get(factory) === resolvedId
       );
+      if (!matched) {
+        matched =
+          (await resolveBarrelReexportedFactory(
+            resolvedAbs,
+            importedName,
+            matchingFactories,
+            factoryResolvedIds,
+            resolver
+          )) ?? undefined;
+      }
       if (!matched) continue;
 
       createImports.set(specifier.local.name, {
@@ -1331,6 +1341,38 @@ function findFactoryReexport(ast: t.File, factoryName: string): string | null {
   }
 
   return null;
+}
+
+async function resolveBarrelReexportedFactory(
+  barrelFile: string,
+  importedName: string,
+  matchingFactories: QraftFactoryConfig[],
+  factoryResolvedIds: Map<QraftFactoryConfig, string | null>,
+  resolver: QraftResolver
+): Promise<QraftFactoryConfig | null> {
+  let source: string;
+  try {
+    source = await fs.readFile(barrelFile, 'utf8');
+  } catch {
+    return null;
+  }
+
+  const barrelAst = parse(source, {
+    sourceType: 'module',
+    plugins: ['typescript'],
+  });
+  const reexportSpecifier = findFactoryReexport(barrelAst, importedName);
+  if (!reexportSpecifier) return null;
+
+  const resolved = await resolver(reexportSpecifier, barrelFile);
+  if (!resolved) return null;
+  const resolvedId = normalizeResolvedId(resolved);
+
+  return (
+    matchingFactories.find(
+      (factory) => factoryResolvedIds.get(factory) === resolvedId
+    ) ?? null
+  );
 }
 
 function resolveOperationImport(
