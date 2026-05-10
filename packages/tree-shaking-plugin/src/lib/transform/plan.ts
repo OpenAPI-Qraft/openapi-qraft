@@ -121,7 +121,8 @@ export async function createTransformPlan(
   id: string,
   options: QraftTreeShakeOptions,
   moduleAccess: QraftModuleAccess = createAgnosticModuleAccess({
-    resolve: options.resolve,
+    resolve: options.moduleAccess?.resolve ?? options.resolve,
+    load: options.moduleAccess?.load,
   })
 ): Promise<TransformPlan> {
   const servicesDirName = 'services';

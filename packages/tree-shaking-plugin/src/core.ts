@@ -49,6 +49,7 @@ type GenerateFn = (typeof import('@babel/generator'))['default'];
 type GeneratorOptions = Omit<BabelGeneratorOptions, 'inputSourceMap'> & {
   inputSourceMap?: SourceMapInput;
 };
+type QraftModuleAccessInput = QraftModuleAccess | QraftResolver;
 
 const generate = resolveDefaultExport<GenerateFn>(generateModule);
 
@@ -56,12 +57,22 @@ export async function transformQraftTreeShaking(
   code: string,
   id: string,
   options: QraftTreeShakeOptions,
-  moduleAccess: QraftModuleAccess = createAgnosticModuleAccess({
-    resolve: options.moduleAccess?.resolve ?? options.resolve,
-    load: options.moduleAccess?.load,
-  }),
+  moduleAccessOrResolver?: QraftModuleAccessInput,
   inputSourceMap?: SourceMapInput
 ) {
+  const moduleAccess =
+    moduleAccessOrResolver === undefined
+      ? createAgnosticModuleAccess({
+          resolve: options.moduleAccess?.resolve ?? options.resolve,
+          load: options.moduleAccess?.load,
+        })
+      : typeof moduleAccessOrResolver === 'function'
+        ? createAgnosticModuleAccess({
+            resolve: moduleAccessOrResolver,
+            load: options.moduleAccess?.load,
+          })
+        : moduleAccessOrResolver;
+
   if (!shouldTransformId(id, options)) return null;
 
   const factoryOptions = options.createAPIClientFn ?? [];

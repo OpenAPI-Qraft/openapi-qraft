@@ -1,6 +1,9 @@
 import '@qraft/test-utils/vitestFsMock';
 import type { SourceMapInput } from '@jridgewell/trace-mapping';
-import type { QraftModuleAccess } from './lib/resolvers/common.js';
+import type {
+  QraftModuleAccess,
+  QraftResolver,
+} from './lib/resolvers/common.js';
 import fs from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
@@ -62,11 +65,12 @@ export const createAPIClientOptions = () => ({
 `;
 
 type TransformOptions = Parameters<typeof transformQraftTreeShakingImpl>[2];
+type TransformModuleAccessArg = QraftModuleAccess | QraftResolver;
 type TransformWithInputSourceMap = (
   code: string,
   id: string,
   options: TransformOptions,
-  resolver: Parameters<typeof transformQraftTreeShakingImpl>[3],
+  moduleAccess: TransformModuleAccessArg,
   inputSourceMap?: SourceMapInput
 ) => ReturnType<typeof transformQraftTreeShakingImpl>;
 
@@ -75,7 +79,7 @@ const transformQraftTreeShakingImplWithInputSourceMap =
     code: string,
     id: string,
     options: TransformOptions,
-    resolver: Parameters<typeof transformQraftTreeShakingImpl>[3]
+    moduleAccess: TransformModuleAccessArg
   ) => ReturnType<typeof transformQraftTreeShakingImpl>;
 
 const transformQraftTreeShakingWithInputSourceMap =
@@ -126,6 +130,37 @@ export function App() {
 
     expect(plan.namedUsages).toHaveLength(1);
     expect(plan.inlineUsages).toHaveLength(1);
+  });
+
+  it('uses module access from options by default when creating a transform plan', async () => {
+    const fixture = await createFixture();
+    const sourceFile = path.join(fixture, 'src/App.tsx');
+    const fixtureModuleAccess = createFixtureModuleAccess(fixture);
+    const load = vi.fn(fixtureModuleAccess.load);
+
+    const plan = await createTransformPlan(
+      `
+import { createAPIClient } from './api';
+
+const api = createAPIClient();
+
+export function App() {
+  return api.pets.getPets.useQuery();
+}
+`,
+      sourceFile,
+      {
+        createAPIClientFn: [{ name: 'createAPIClient', module: './api' }],
+        moduleAccess: {
+          resolve: fixtureModuleAccess.resolve,
+          load,
+        },
+      }
+    );
+
+    expect(plan.clients).toHaveLength(1);
+    expect(plan.namedUsages).toHaveLength(1);
+    expect(load).toHaveBeenCalledWith(path.join(fixture, 'src/api/index.ts'));
   });
 
   it('imports an operation directly for a context API client', async () => {
@@ -1534,6 +1569,36 @@ export function App() {
     } finally {
       readFileSpy.mockRestore();
     }
+  });
+
+  it('supports a legacy resolver 4th argument together with module access load options', async () => {
+    const fixture = await createFixture();
+    const sourceFile = path.join(fixture, 'src/App.tsx');
+    const fixtureModuleAccess = createFixtureModuleAccess(fixture);
+    const load = vi.fn(fixtureModuleAccess.load);
+
+    const result = await transformQraftTreeShakingImpl(
+      `
+import { createAPIClient } from './api';
+
+const api = createAPIClient();
+
+export function App() {
+  return api.pets.getPets.useQuery();
+}
+`,
+      sourceFile,
+      {
+        createAPIClientFn: [{ name: 'createAPIClient', module: './api' }],
+        moduleAccess: {
+          load,
+        },
+      },
+      fixtureModuleAccess.resolve
+    );
+
+    expect(result?.code).toContain('api_pets_getPets.useQuery()');
+    expect(load).toHaveBeenCalledWith(path.join(fixture, 'src/api/index.ts'));
   });
 
   it('does not match a same-named import that resolves to a different module', async () => {
