@@ -1,4 +1,11 @@
-import { dirname, isAbsolute, normalize, relative, resolve, sep } from 'node:path';
+import {
+  dirname,
+  isAbsolute,
+  normalize,
+  relative,
+  resolve,
+  sep,
+} from 'node:path';
 
 export function resolveRelativeImportPath(
   importerId: string,

@@ -1553,9 +1553,7 @@ export function App() {
 `,
         sourceFile,
         {
-          createAPIClientFn: [
-            { name: 'createAPIClient', module: './api' },
-          ],
+          createAPIClientFn: [{ name: 'createAPIClient', module: './api' }],
         },
         {
           resolve: fixtureResolver,
