@@ -208,13 +208,13 @@ const runtimeImportLocalName =
 
 That ensures a utility-only bucket emits `qraftAPIClient(...)` even if another scope in the same file still needs `qraftReactAPIClient(...)`.
 
-- [?] **Step 3: Preserve nested callback scopes as independent buckets**
+- [x] **Step 3: Preserve nested callback scopes as independent buckets**
 
 When the outer callback body creates its own `createAPIClient(...)` binding, nested callback bodies like `onMutate`, `onError`, and `onSuccess` must be evaluated separately, so a nested utility-only client can flip to `qraftAPIClient` without affecting the outer hook-bearing binding.
 
 Use the same `scopeKey` that `plan.ts` already derives from the nearest function parent so nested callback bodies and sibling top-level components do not share a declaration bucket.
 
-- [ ] **Step 4: Verify the transform branch with the focused core snapshot**
+- [x] **Step 4: Verify the transform branch with the focused core snapshot**
 
 Run:
 
@@ -222,14 +222,11 @@ Run:
 corepack yarn workspace @openapi-qraft/tree-shaking-plugin test src/core.test.ts -t "splits explicit options clients across sibling callback scopes"
 ```
 
-Expected: the snapshot now shows separate `api_pets_updatePet1` and `api_pets_updatePet2` bindings, and the nested `getPetById` client uses `qraftAPIClient`.
+Expected: the snapshot now shows separate `api_pets_updatePet` and `_api_pets_updatePet` bindings, and the nested `getPetById` client uses `qraftAPIClient`.
 
-- [ ] **Step 5: Commit the transform refactor**
+- [x] **Step 5: Commit the transform refactor**
 
-```bash
-git add packages/tree-shaking-plugin/src/lib/transform/mutate.ts packages/tree-shaking-plugin/src/lib/transform/plan.ts
-git commit -m "feat: split createAPIClientFn clients by lexical scope"
-```
+Combined with snapshot refresh in commit `a23a26b5`.
 
 ### Task 3: Refresh the remaining unit snapshots and run package checks
 
@@ -237,21 +234,11 @@ git commit -m "feat: split createAPIClientFn clients by lexical scope"
 
 - Modify: `packages/tree-shaking-plugin/src/core.test.ts`
 
-- [ ] **Step 1: Refresh the other snapshots that depend on the new split**
+- [x] **Step 1: Refresh the other snapshots that depend on the new split**
 
-Update the existing `core.test.ts` cases that exercise `createAPIClientFn` so they keep the new exact emitted shape:
+Updated snapshots: `optimizes explicit options clients created inside callbacks` and `splits explicit options clients across sibling callback scopes` — replaced `api_pets_updatePet1`/`api_pets_updatePet2` with `api_pets_updatePet`/`_api_pets_updatePet`.
 
-- `groups callbacks per operation and imports operationInvokeFn directly`
-- `rewrites context-free callbacks from zero-arg createAPIClient calls`
-- `keeps APIClientContext when context-free and contextful callbacks share one client`
-- `optimizes inline explicit options clients`
-- `optimizes explicit options clients created inside callbacks`
-- `optimizes mutation callbacks across onMutate, onError, and onSuccess`
-- `aliases generated names for explicit options clients inside nested function scopes`
-
-Make sure the assertions preserve the exact helper names and the exact scope-local client names that the new split emits.
-
-- [ ] **Step 2: Run the focused package checks**
+- [x] **Step 2: Run the focused package checks**
 
 Run:
 
@@ -260,11 +247,8 @@ corepack yarn workspace @openapi-qraft/tree-shaking-plugin test
 corepack yarn workspace @openapi-qraft/tree-shaking-plugin typecheck
 ```
 
-Expected: both pass with the new scope split in place.
+Both pass: 52 tests pass, typecheck clean.
 
-- [ ] **Step 3: Commit the snapshot refresh**
+- [x] **Step 3: Commit the snapshot refresh**
 
-```bash
-git add packages/tree-shaking-plugin/src/core.test.ts
-git commit -m "test: refresh createAPIClientFn scope split snapshots"
-```
+Committed as `a23a26b5`: `feat: use Babel UID for sibling scope client naming, drop manual index`
