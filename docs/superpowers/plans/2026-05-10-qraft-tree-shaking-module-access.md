@@ -294,7 +294,7 @@ git commit -m "refactor(tree-shaking): introduce module access boundary"
 - Modify: `packages/tree-shaking-plugin/src/lib/transform/plan.ts`
 - Modify: `packages/tree-shaking-plugin/src/core.test.ts`
 
-- [ ] **Step 1: Add a failing regression that proves core does not read generated files directly**
+- [x] **Step 1: Add a failing regression that proves core does not read generated files directly**
 
 In `packages/tree-shaking-plugin/src/core.test.ts`, add this test near the existing barrel/precreated factory tests:
 
@@ -335,7 +335,7 @@ api.pets.getPets.invalidateQueries();
 
 Expected initial failure: TypeScript rejects `moduleAccess` on options, or the transform returns generated code because `plan.ts` still reads `resolvedApiFile` from disk.
 
-- [ ] **Step 2: Run the new regression and confirm it fails**
+- [x] **Step 2: Run the new regression and confirm it fails**
 
 ```bash
 corepack yarn workspace @openapi-qraft/tree-shaking-plugin test src/core.test.ts -t "does not read generated modules from the filesystem"
@@ -343,7 +343,7 @@ corepack yarn workspace @openapi-qraft/tree-shaking-plugin test src/core.test.ts
 
 Expected: FAIL for the reason above.
 
-- [ ] **Step 3: Update the public options and transform signature**
+- [x] **Step 3: Update the public options and transform signature**
 
 In `packages/tree-shaking-plugin/src/core.ts`, update imports:
 
@@ -391,7 +391,7 @@ Change the plan call:
 const plan = await createTransformPlan(code, id, options, moduleAccess);
 ```
 
-- [ ] **Step 4: Replace `QraftResolver` usage in `plan.ts`**
+- [x] **Step 4: Replace `QraftResolver` usage in `plan.ts`**
 
 In `packages/tree-shaking-plugin/src/lib/transform/plan.ts`, update imports:
 
@@ -422,7 +422,7 @@ const resolver = moduleAccess.resolve;
 
 This keeps existing resolver call sites compiling while the read paths are migrated.
 
-- [ ] **Step 5: Replace direct generated-client reads with `moduleAccess.load`**
+- [x] **Step 5: Replace direct generated-client reads with `moduleAccess.load`**
 
 Change `readGeneratedClientInfo(...)` signature from:
 
@@ -473,7 +473,7 @@ if (source === null) {
 
 Update recursive calls and every caller to pass `moduleAccess` instead of `resolver`.
 
-- [ ] **Step 6: Replace precreated export-chain reads with `moduleAccess.load`**
+- [x] **Step 6: Replace precreated export-chain reads with `moduleAccess.load`**
 
 Change `readExportedDeclarationChain(...)` signature to accept module access:
 
@@ -507,7 +507,7 @@ if (source === null) return null;
 
 Update recursive calls and every caller to pass `moduleAccess`.
 
-- [ ] **Step 7: Replace services index reads with `moduleAccess.load`**
+- [x] **Step 7: Replace services index reads with `moduleAccess.load`**
 
 Change `readServiceImportPaths(...)` signature:
 
@@ -548,7 +548,7 @@ const serviceImportPaths = await readServiceImportPaths(
 );
 ```
 
-- [ ] **Step 8: Remove the production `fs` import from `plan.ts`**
+- [x] **Step 8: Remove the production `fs` import from `plan.ts`**
 
 Delete this import from `packages/tree-shaking-plugin/src/lib/transform/plan.ts`:
 
@@ -564,7 +564,7 @@ rg -n "node:fs|fs\\.readFile|readFile\\(" packages/tree-shaking-plugin/src/lib/t
 
 Expected: no matches in `plan.ts`.
 
-- [ ] **Step 9: Update core test fixture helper to pass source-aware module access**
+- [x] **Step 9: Update core test fixture helper to pass source-aware module access**
 
 In `packages/tree-shaking-plugin/src/core.test.ts`, update the wrapper helper so ordinary tests still load fixture files from the existing in-memory fs mock:
 
@@ -595,7 +595,7 @@ async function transformQraftTreeShaking(
 
 This keeps disk reads in test fixtures only; production `plan.ts` remains source-provider agnostic.
 
-- [ ] **Step 10: Run the focused core regression**
+- [x] **Step 10: Run the focused core regression**
 
 ```bash
 corepack yarn workspace @openapi-qraft/tree-shaking-plugin test src/core.test.ts -t "does not read generated modules from the filesystem"
@@ -603,7 +603,7 @@ corepack yarn workspace @openapi-qraft/tree-shaking-plugin test src/core.test.ts
 
 Expected: PASS.
 
-- [ ] **Step 11: Run all plugin unit tests**
+- [x] **Step 11: Run all plugin unit tests**
 
 ```bash
 corepack yarn workspace @openapi-qraft/tree-shaking-plugin test
@@ -611,7 +611,7 @@ corepack yarn workspace @openapi-qraft/tree-shaking-plugin test
 
 Expected: PASS.
 
-- [ ] **Step 12: Commit core module-access migration**
+- [x] **Step 12: Commit core module-access migration**
 
 ```bash
 git add packages/tree-shaking-plugin/src/core.ts \
@@ -634,7 +634,7 @@ git commit -m "refactor(tree-shaking): load generated modules through module acc
 - Modify: `packages/tree-shaking-plugin/src/{vite,rollup,webpack,rspack,esbuild}.ts`
 - Modify: `packages/tree-shaking-plugin/src/lib/resolvers/resolvers.test.ts`
 
-- [ ] **Step 1: Add adapter loading tests**
+- [x] **Step 1: Add adapter loading tests**
 
 In `packages/tree-shaking-plugin/src/lib/resolvers/resolvers.test.ts`, add these tests after the existing bundler resolver tests:
 
@@ -734,7 +734,7 @@ import {
 } from './webpack-like.js';
 ```
 
-- [ ] **Step 2: Run adapter tests and confirm failure**
+- [x] **Step 2: Run adapter tests and confirm failure**
 
 ```bash
 corepack yarn workspace @openapi-qraft/tree-shaking-plugin test src/lib/resolvers/resolvers.test.ts -t "loads source"
@@ -742,7 +742,7 @@ corepack yarn workspace @openapi-qraft/tree-shaking-plugin test src/lib/resolver
 
 Expected: FAIL with missing types/exports.
 
-- [ ] **Step 3: Extend bundler context types**
+- [x] **Step 3: Extend bundler context types**
 
 In `packages/tree-shaking-plugin/src/lib/resolvers/common.ts`, add the Rollup-like load type:
 
@@ -780,7 +780,7 @@ export type BundlerResolveContext = {
 };
 ```
 
-- [ ] **Step 4: Implement Rollup/Vite module access**
+- [x] **Step 4: Implement Rollup/Vite module access**
 
 In `packages/tree-shaking-plugin/src/lib/resolvers/rollup-like.ts`, add imports:
 
@@ -838,7 +838,7 @@ export function createRollupLikeResolver(
 }
 ```
 
-- [ ] **Step 5: Implement webpack module access**
+- [x] **Step 5: Implement webpack module access**
 
 In `packages/tree-shaking-plugin/src/lib/resolvers/webpack-like.ts`, add a loader context type:
 
@@ -916,7 +916,7 @@ export function createWebpackLikeModuleAccess(
 
 Keep `createWebpackLikeResolver(...)` as a compatibility wrapper.
 
-- [ ] **Step 6: Implement rspack module access**
+- [x] **Step 6: Implement rspack module access**
 
 In `packages/tree-shaking-plugin/src/lib/resolvers/rspack.ts`, mirror the webpack load strategy because rspack exposes webpack-compatible loader context in this plugin path:
 
@@ -953,7 +953,7 @@ function createRspackLoadStrategy(ctx: BundlerResolveContext): LoadStrategy {
 
 Export `createRspackModuleAccess(...)` with the existing rspack resolve strategy plus the loader strategy, and keep `createRspackResolver(...)` as a wrapper.
 
-- [ ] **Step 7: Implement esbuild module access with adapter-local file fallback**
+- [x] **Step 7: Implement esbuild module access with adapter-local file fallback**
 
 In `packages/tree-shaking-plugin/src/lib/resolvers/esbuild.ts`, import `fs` locally:
 
@@ -1002,7 +1002,9 @@ Keep `createEsbuildResolver(...)` as a wrapper. Add a comment above `createEsbui
 // fallback adapter-local; core transform must not read the filesystem directly.
 ```
 
-- [ ] **Step 8: Update plugin factory to accept module access factories**
+**Implementation correction after real-bundler verification:** Rollup/Vite must not use `this.load(...)` from inside the transform hook for this source inspection. In the e2e fixture, that creates a Rollup cycle warning and can block module loading. The implemented Rollup-like loader uses Rollup's `PluginContext.fs.readFile(...)`, which honors `InputOptions.fs` and custom filesystem providers. Rspack first tries `loadModule(...)`, then uses the loader context `fs.readFile(...)`, which maps to Rspack's compilation input filesystem. These are bundler-owned filesystem abstractions, not hidden `node:fs` reads. Esbuild remains the only adapter-local ordinary-file fallback because esbuild exposes `build.resolve(...)` but not an arbitrary `build.load(...)` API.
+
+- [x] **Step 8: Update plugin factory to accept module access factories**
 
 In `packages/tree-shaking-plugin/src/lib/plugin/create-qraft-tree-shake-plugin.ts`, update types:
 
@@ -1043,7 +1045,7 @@ handler(this: any, code, id) {
 },
 ```
 
-- [ ] **Step 9: Update entrypoint imports**
+- [x] **Step 9: Update entrypoint imports**
 
 Change each entrypoint:
 
@@ -1075,7 +1077,7 @@ import { createEsbuildModuleAccess } from './lib/resolvers/esbuild.js';
 createQraftTreeShakePlugin<BundlerResolveContext>(createEsbuildModuleAccess)
 ```
 
-- [ ] **Step 10: Run adapter tests**
+- [x] **Step 10: Run adapter tests**
 
 ```bash
 corepack yarn workspace @openapi-qraft/tree-shaking-plugin test src/lib/resolvers/resolvers.test.ts
@@ -1083,7 +1085,7 @@ corepack yarn workspace @openapi-qraft/tree-shaking-plugin test src/lib/resolver
 
 Expected: PASS.
 
-- [ ] **Step 11: Run typecheck**
+- [x] **Step 11: Run typecheck**
 
 ```bash
 corepack yarn workspace @openapi-qraft/tree-shaking-plugin typecheck
@@ -1091,7 +1093,7 @@ corepack yarn workspace @openapi-qraft/tree-shaking-plugin typecheck
 
 Expected: PASS.
 
-- [ ] **Step 12: Commit adapter work**
+- [x] **Step 12: Commit adapter work**
 
 ```bash
 git add packages/tree-shaking-plugin/src/lib/plugin/create-qraft-tree-shake-plugin.ts \
@@ -1118,7 +1120,7 @@ git commit -m "feat(tree-shaking): load module source through bundler adapters"
 - Modify: `packages/tree-shaking-plugin/README.md`
 - Modify: `packages/tree-shaking-plugin/src/core.ts`
 
-- [ ] **Step 1: Add README documentation for normal and advanced usage**
+- [x] **Step 1: Add README documentation for normal and advanced usage**
 
 In `packages/tree-shaking-plugin/README.md`, find the existing `createAPIClientFn` or resolver section and add:
 
@@ -1165,7 +1167,7 @@ skips that optimization and, with `debug: true`, prints the skipped module
 reason.
 ````
 
-- [ ] **Step 2: Add an exported options type comment**
+- [x] **Step 2: Add an exported options type comment**
 
 In `packages/tree-shaking-plugin/src/core.ts`, add a short comment above `moduleAccess`:
 
@@ -1177,7 +1179,7 @@ In `packages/tree-shaking-plugin/src/core.ts`, add a short comment above `module
   moduleAccess?: QraftModuleAccessOptions;
 ```
 
-- [ ] **Step 3: Run docs-free typecheck**
+- [x] **Step 3: Run docs-free typecheck**
 
 ```bash
 corepack yarn workspace @openapi-qraft/tree-shaking-plugin typecheck
@@ -1185,7 +1187,7 @@ corepack yarn workspace @openapi-qraft/tree-shaking-plugin typecheck
 
 Expected: PASS.
 
-- [ ] **Step 4: Commit docs**
+- [x] **Step 4: Commit docs**
 
 ```bash
 git add packages/tree-shaking-plugin/README.md packages/tree-shaking-plugin/src/core.ts
@@ -1201,7 +1203,9 @@ git commit -m "docs(tree-shaking): document module access override"
 - Modify only if needed: `e2e/projects/tree-shaking-bundlers/scripts/shared.mjs`
 - Modify only if needed: `e2e/projects/tree-shaking-bundlers/scripts/assert-dist.mjs`
 
-- [ ] **Step 1: Run the fast local fixture loop**
+- [x] **Step 1: Run the fast local fixture loop**
+
+Completed: rebuilt `@openapi-qraft/tree-shaking-plugin`, copied `dist` into the local fixture, ran `npm run build`, then ran `npm run e2e:post-build`; all bundler assertions passed.
 
 From repo root:
 
@@ -1217,7 +1221,9 @@ npm run e2e:post-build
 
 Expected: PASS for Vite, Rollup, webpack, Rspack, and esbuild scenarios.
 
-- [ ] **Step 2: If a bundler fails because its adapter cannot load generated modules, inspect only that bundler output**
+- [x] **Step 2: If a bundler fails because its adapter cannot load generated modules, inspect only that bundler output**
+
+Completed: the fast fixture exposed a Rollup/Vite `this.load(...)` cycle and an Rspack miss. Rollup/Vite were moved to `PluginContext.fs.readFile(...)`; Rspack now falls back to `loaderContext.fs.readFile(...)` after `loadModule(...)`.
 
 Run one scenario at a time from `e2e/projects/tree-shaking-bundlers`:
 
@@ -1228,7 +1234,9 @@ node ./scripts/assert-dist.mjs
 
 Expected: the focused scenario either passes or points to a specific `NO TRANSFORM`/missing token. Fix the corresponding adapter, not the fixture assertion, unless the emitted shape is intentionally different and still equivalent.
 
-- [ ] **Step 3: Add a fixture scenario only if existing coverage does not prove barrel source loading**
+- [x] **Step 3: Add a fixture scenario only if existing coverage does not prove barrel source loading**
+
+Completed: no new fixture scenario was added. Existing `barrel-*` and `mixed-context-precreated-mirrors` scenarios already exercise barrel source loading and passed after the adapter fix.
 
 If the existing `barrel-*` scenarios already fail before the adapter fix and pass after it, do not add new fixture files. If no existing scenario exercises re-exported factory source loading after direct `fs` removal, add a scenario in `e2e/projects/tree-shaking-bundlers/scripts/shared.mjs` that imports a generated factory through a barrel while the config points at the direct generated module.
 
@@ -1255,7 +1263,9 @@ Then assert the exact token in `e2e/projects/tree-shaking-bundlers/scripts/asser
 
 Keep this step skipped if existing scenarios already cover the behavior.
 
-- [ ] **Step 4: Commit any e2e fixture changes**
+- [x] **Step 4: Commit any e2e fixture changes**
+
+Completed: no fixture files changed, so no e2e fixture commit was created.
 
 If Step 3 changed fixture files:
 
@@ -1266,7 +1276,9 @@ git commit -m "test(tree-shaking): cover module-access barrel loading in bundler
 
 If Step 3 made no changes, do not create an empty commit.
 
-- [ ] **Step 5: Run the full Verdaccio e2e loop**
+- [x] **Step 5: Run the full Verdaccio e2e loop**
+
+Completed: `corepack yarn e2e:tree-shaking-bundlers-local` exited `0`; the copied fixture built all Vite, Rollup, webpack, Rspack, and esbuild scenarios and `Tree-shaking bundle assertions passed`.
 
 ```bash
 cd /Users/radist/WebstormProjects/qraft/e2e
@@ -1285,7 +1297,9 @@ Expected: PASS. This command is the slow path and is required before claiming th
 - Inspect: `packages/tree-shaking-plugin/src/lib/resolvers/*.ts`
 - Inspect: `packages/tree-shaking-plugin/src/core.ts`
 
-- [ ] **Step 1: Prove core transform no longer imports filesystem APIs**
+- [x] **Step 1: Prove core transform no longer imports filesystem APIs**
+
+Completed: grep returned no matches in `core.ts` or `plan.ts`.
 
 ```bash
 rg -n "node:fs|fs\\.readFile|readFile\\(" packages/tree-shaking-plugin/src/core.ts packages/tree-shaking-plugin/src/lib/transform/plan.ts
@@ -1293,7 +1307,9 @@ rg -n "node:fs|fs\\.readFile|readFile\\(" packages/tree-shaking-plugin/src/core.
 
 Expected: no matches.
 
-- [ ] **Step 2: Confirm any remaining filesystem reads are adapter-local or test-only**
+- [x] **Step 2: Confirm any remaining filesystem reads are adapter-local or test-only**
+
+Completed: remaining matches are tests, esbuild's documented adapter-local ordinary-file fallback, Rollup `ctx.fs.readFile(...)`, and Rspack loader-context `fs.readFile(...)`.
 
 ```bash
 rg -n "node:fs|fs\\.readFile|readFile\\(" packages/tree-shaking-plugin/src
@@ -1301,7 +1317,9 @@ rg -n "node:fs|fs\\.readFile|readFile\\(" packages/tree-shaking-plugin/src
 
 Expected: matches are limited to tests and adapter-local code such as `src/lib/resolvers/esbuild.ts`; no match appears in `src/core.ts` or `src/lib/transform/plan.ts`.
 
-- [ ] **Step 3: Run final package verification**
+- [x] **Step 3: Run final package verification**
+
+Completed: package lint, test, and typecheck all exited `0`.
 
 ```bash
 corepack yarn workspace @openapi-qraft/tree-shaking-plugin lint
@@ -1311,7 +1329,9 @@ corepack yarn workspace @openapi-qraft/tree-shaking-plugin typecheck
 
 Expected: all commands exit `0`.
 
-- [ ] **Step 4: Run final full e2e verification**
+- [x] **Step 4: Run final full e2e verification**
+
+Completed: `corepack yarn e2e:tree-shaking-bundlers-local` exited `0`.
 
 ```bash
 cd /Users/radist/WebstormProjects/qraft/e2e
@@ -1320,7 +1340,9 @@ corepack yarn e2e:tree-shaking-bundlers-local
 
 Expected: exits `0`.
 
-- [ ] **Step 5: Commit final cleanup if needed**
+- [x] **Step 5: Commit final cleanup if needed**
+
+Completed: no code cleanup was needed after full e2e; only this plan status update remains to commit.
 
 If final verification required cleanup:
 
