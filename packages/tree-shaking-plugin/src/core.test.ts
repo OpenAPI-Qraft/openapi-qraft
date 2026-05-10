@@ -467,6 +467,75 @@ function App() {
       `);
   });
 
+  it('does not transform zero-arg calls to a no-context factory', async () => {
+    const root = await fs.mkdtemp(
+      path.join(os.tmpdir(), 'qraft-tree-shaking-')
+    );
+    await writeFixtureFiles(root, {
+      ...PRECREATED_BASE_FILES,
+    });
+    const sourceFile = path.join(root, 'src/App.tsx');
+
+    const result = await transformQraftTreeShaking(
+      `
+import { createAPIClient } from './api';
+
+const api = createAPIClient();
+
+api.pets.getPets.getQueryKey();
+`,
+      sourceFile,
+      { createAPIClientFn: [{ name: 'createAPIClient', module: './api' }] }
+    );
+
+    // Zero-arg calls to no-context (qraftAPIClient) factories are not transformed —
+    // only options-based calls are optimized.
+    expect(result).toBeNull();
+  });
+
+  it('transforms options calls to a no-context factory while keeping zero-arg calls untouched', async () => {
+    const root = await fs.mkdtemp(
+      path.join(os.tmpdir(), 'qraft-tree-shaking-')
+    );
+    await writeFixtureFiles(root, {
+      ...PRECREATED_BASE_FILES,
+    });
+    const sourceFile = path.join(root, 'src/App.tsx');
+
+    const result = await transformQraftTreeShaking(
+      `
+import { createAPIClient } from './api';
+
+const apiUtility = createAPIClient();
+const apiWithClient = createAPIClient({ queryClient: {} });
+
+apiUtility.pets.getPets.getQueryKey();
+apiWithClient.pets.getPets.invalidateQueries();
+apiWithClient.pets.getPets.setQueryData(undefined, () => undefined);
+`,
+      sourceFile,
+      { createAPIClientFn: [{ name: 'createAPIClient', module: './api' }] }
+    );
+
+    expect(result?.code).toMatchInlineSnapshot(`
+      "import { createAPIClient } from './api';
+      import { qraftAPIClient } from "@openapi-qraft/react";
+      import { invalidateQueries } from "@openapi-qraft/react/callbacks/invalidateQueries";
+      import { getPets } from "./api/services/PetsService";
+      import { setQueryData } from "@openapi-qraft/react/callbacks/setQueryData";
+      const apiUtility = createAPIClient();
+      const apiWithClient_pets_getPets = qraftAPIClient(getPets, {
+        invalidateQueries,
+        setQueryData
+      }, {
+        queryClient: {}
+      });
+      apiUtility.pets.getPets.getQueryKey();
+      apiWithClient_pets_getPets.invalidateQueries();
+      apiWithClient_pets_getPets.setQueryData(undefined, () => undefined);"
+    `);
+  });
+
   it('rewrites schema accesses from context-based and zero-arg createAPIClient calls', async () => {
     const fixture = await createFixture();
     const sourceFile = path.join(fixture, 'src/App.tsx');
