@@ -1,5 +1,5 @@
 import type { NodePath, Scope } from '@babel/traverse';
-import type { QraftResolver } from '../resolvers/common.js';
+import type { QraftModuleAccess } from '../resolvers/common.js';
 import {
   composeImportPath,
   normalizeResolvedId,
@@ -21,12 +21,11 @@ import type {
   RuntimeLocalNames,
   TransformPlan,
 } from './types.js';
-import fs from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
 import { parse } from '@babel/parser';
 import * as traverseModule from '@babel/traverse';
 import * as t from '@babel/types';
-import { createAgnosticResolver } from '../resolvers/agnostic.js';
+import { createAgnosticModuleAccess } from '../resolvers/agnostic.js';
 import {
   callbackNeedsRuntimeContext,
   isSupportedCallbackName,
@@ -121,9 +120,12 @@ export async function createTransformPlan(
   code: string,
   id: string,
   options: QraftTreeShakeOptions,
-  resolver: QraftResolver = createAgnosticResolver(options.resolve)
+  moduleAccess: QraftModuleAccess = createAgnosticModuleAccess({
+    resolve: options.resolve,
+  })
 ): Promise<TransformPlan> {
   const servicesDirName = 'services';
+  const resolveModule = moduleAccess.resolve;
   const factoryOptions = options.createAPIClientFn ?? [];
   const precreatedOptions = options.apiClient ?? [];
   const configuredFactoryNames = new Set(
@@ -143,7 +145,11 @@ export async function createTransformPlan(
 
   const factoryResolvedIds = new Map<QraftFactoryConfig, string | null>();
   for (const factory of factoryOptions) {
-    const resolved = await resolveFactoryModule(factory.module, id, resolver);
+    const resolved = await resolveFactoryModule(
+      factory.module,
+      id,
+      resolveModule
+    );
     factoryResolvedIds.set(
       factory,
       resolved ? normalizeResolvedId(resolved) : null
@@ -174,7 +180,7 @@ export async function createTransformPlan(
       if (matchingFactories.length === 0) continue;
 
       if (resolvedAbs === undefined) {
-        resolvedAbs = (await resolver(source, id)) ?? null;
+        resolvedAbs = (await resolveModule(source, id)) ?? null;
         resolvedId = resolvedAbs ? normalizeResolvedId(resolvedAbs) : null;
       }
       if (!resolvedAbs) continue;
@@ -188,7 +194,7 @@ export async function createTransformPlan(
             id,
             resolvedAbs,
             factory,
-            resolver,
+            moduleAccess,
             options.debug,
             servicesDirName
           );
@@ -218,7 +224,7 @@ export async function createTransformPlan(
       ast,
       id,
       precreatedOptions,
-      resolver,
+      moduleAccess,
       activeProgramScope,
       options.debug
     ))
@@ -320,7 +326,7 @@ export async function createTransformPlan(
           id,
           client.createImportPath,
           client.factory,
-          resolver,
+          moduleAccess,
           options.debug,
           servicesDirName
         )
@@ -466,7 +472,7 @@ export async function createTransformPlan(
         id,
         request.createImportPath,
         request.factory,
-        resolver,
+        moduleAccess,
         options.debug,
         servicesDirName
       )
@@ -636,29 +642,30 @@ async function findPrecreatedClients(
   ast: t.File,
   importerId: string,
   configs: QraftPrecreatedClientConfig[],
-  resolver: QraftResolver,
+  moduleAccess: QraftModuleAccess,
   programScope: Scope,
   debug = false
 ): Promise<ClientBinding[]> {
   if (configs.length === 0) return [];
+  const resolveModule = moduleAccess.resolve;
 
   const resolvedConfigs = await Promise.all(
     configs.map(async (config) => {
       const clientFile = await resolveFactoryModule(
         config.clientModule,
         importerId,
-        resolver
+        resolveModule
       );
       const factoryModuleFile = await resolveFactoryModule(
         config.createAPIClientFnModule,
         importerId,
-        resolver
+        resolveModule
       );
       const factoryExport = factoryModuleFile
         ? await readExportedDeclarationChain(
             factoryModuleFile,
             config.createAPIClientFn,
-            resolver
+            moduleAccess
           )
         : null;
       const factoryFile = factoryExport?.sourceFile ?? factoryModuleFile;
@@ -667,7 +674,7 @@ async function findPrecreatedClients(
       const optionsFile = await resolveFactoryModule(
         optionsModule,
         importerId,
-        resolver
+        resolveModule
       );
       const optionsImportPath = resolvePrecreatedOptionsImportPath(
         importerId,
@@ -697,7 +704,7 @@ async function findPrecreatedClients(
   for (const node of ast.program.body) {
     if (!t.isImportDeclaration(node)) continue;
 
-    const resolvedImport = await resolver(node.source.value, importerId);
+    const resolvedImport = await resolveModule(node.source.value, importerId);
     const resolvedImportId = resolvedImport
       ? normalizeResolvedId(resolvedImport)
       : null;
@@ -735,7 +742,7 @@ async function findPrecreatedClients(
           match.config,
           match.clientFile,
           match.factoryResolvedId,
-          resolver,
+          moduleAccess,
           debug
         );
         validated.set(match.config, validatedConfig);
@@ -764,7 +771,7 @@ async function validatePrecreatedClientConfig(
   config: QraftPrecreatedClientConfig,
   clientFile: string,
   factoryResolvedId: string,
-  resolver: QraftResolver,
+  moduleAccess: QraftModuleAccess,
   debug = false
 ): Promise<{ factory: QraftFactoryConfig } | null> {
   const skip = (reason: string) => {
@@ -779,7 +786,7 @@ async function validatePrecreatedClientConfig(
   const resolvedExport = await readExportedDeclarationChain(
     clientFile,
     config.client,
-    resolver
+    moduleAccess
   );
   if (!resolvedExport) return skip('precreated client export was not found');
   const { init, importBindings, sourceFile } = resolvedExport;
@@ -813,17 +820,15 @@ async function validatePrecreatedClientConfig(
 async function readExportedDeclarationChain(
   startFile: string,
   exportName: string,
-  resolver: QraftResolver,
+  moduleAccess: QraftModuleAccess,
   seen = new Set<string>()
 ): Promise<ExportedDeclarationResolution | null> {
   const sourceFile = normalizeResolvedId(startFile);
   if (seen.has(sourceFile)) return null;
   seen.add(sourceFile);
 
-  let source: string;
-  try {
-    source = await fs.readFile(sourceFile, 'utf8');
-  } catch {
+  const source = await moduleAccess.load(sourceFile);
+  if (source === null) {
     return null;
   }
 
@@ -841,7 +846,7 @@ async function readExportedDeclarationChain(
       importBindings: await readTopLevelImportBindings(
         ast,
         sourceFile,
-        resolver
+        moduleAccess.resolve
       ),
     };
   }
@@ -849,7 +854,7 @@ async function readExportedDeclarationChain(
   const reexport = findExportReexport(ast, exportName);
   if (!reexport) return null;
 
-  const resolved = await resolver(reexport.source, sourceFile);
+  const resolved = await moduleAccess.resolve(reexport.source, sourceFile);
   if (!resolved) return null;
   const resolvedId = normalizeResolvedId(resolved);
   if (resolvedId === sourceFile) return null;
@@ -857,7 +862,7 @@ async function readExportedDeclarationChain(
   return readExportedDeclarationChain(
     resolvedId,
     reexport.localName,
-    resolver,
+    moduleAccess,
     seen
   );
 }
@@ -865,7 +870,7 @@ async function readExportedDeclarationChain(
 async function readTopLevelImportBindings(
   ast: t.File,
   importerId: string,
-  resolver: QraftResolver
+  resolveModule: QraftModuleAccess['resolve']
 ) {
   const imports = new Map<
     string,
@@ -874,7 +879,7 @@ async function readTopLevelImportBindings(
 
   for (const node of ast.program.body) {
     if (!t.isImportDeclaration(node)) continue;
-    const resolved = await resolver(node.source.value, importerId);
+    const resolved = await resolveModule(node.source.value, importerId);
     const resolvedId = resolved ? normalizeResolvedId(resolved) : null;
 
     for (const specifier of node.specifiers) {
@@ -1216,7 +1221,7 @@ async function readGeneratedClientInfo(
   importerId: string,
   clientFile: string,
   factory: QraftFactoryConfig,
-  resolver: QraftResolver,
+  moduleAccess: QraftModuleAccess,
   debug = false,
   servicesDirName = 'services'
 ): Promise<GeneratedClientInfo | null> {
@@ -1229,10 +1234,8 @@ async function readGeneratedClientInfo(
     return null;
   };
 
-  let source: string;
-  try {
-    source = await fs.readFile(clientFile, 'utf8');
-  } catch {
+  const source = await moduleAccess.load(clientFile);
+  if (source === null) {
     return skip('generated client file was not readable');
   }
   const ast = parse(source, {
@@ -1245,7 +1248,10 @@ async function readGeneratedClientInfo(
   if (!usesReactClient && !usesAPIClient) {
     const reexportPath = findFactoryReexport(ast, factory.name);
     if (reexportPath) {
-      const resolvedReexport = await resolver(reexportPath, clientFile);
+      const resolvedReexport = await moduleAccess.resolve(
+        reexportPath,
+        clientFile
+      );
       if (resolvedReexport) {
         const reexportId = normalizeResolvedId(resolvedReexport);
         if (reexportId !== clientFile) {
@@ -1253,7 +1259,7 @@ async function readGeneratedClientInfo(
             importerId,
             reexportId,
             factory,
-            resolver,
+            moduleAccess,
             debug,
             servicesDirName
           );
@@ -1304,7 +1310,7 @@ async function readGeneratedClientInfo(
   const serviceImportPaths = await readServiceImportPaths(
     clientFile,
     servicesDir,
-    resolver
+    moduleAccess
   );
 
   let resolvedContextImportPath: string | null = null;
@@ -1395,17 +1401,15 @@ function resolveOperationImport(
 async function readServiceImportPaths(
   clientFile: string,
   servicesDir: string,
-  resolver: QraftResolver
+  moduleAccess: QraftModuleAccess
 ): Promise<Record<string, string>> {
   const servicesIndexFile =
-    (await resolver(`${servicesDir}/index`, clientFile)) ??
-    (await resolver(servicesDir, clientFile));
+    (await moduleAccess.resolve(`${servicesDir}/index`, clientFile)) ??
+    (await moduleAccess.resolve(servicesDir, clientFile));
   if (!servicesIndexFile) return {};
 
-  let source: string;
-  try {
-    source = await fs.readFile(servicesIndexFile, 'utf8');
-  } catch {
+  const source = await moduleAccess.load(servicesIndexFile);
+  if (source === null) {
     return {};
   }
   const ast = parse(source, {
@@ -1566,9 +1570,9 @@ function getGeneratedInfoKey(
 async function resolveFactoryModule(
   specifier: string,
   importerId: string,
-  resolver: QraftResolver
+  resolveModule: QraftModuleAccess['resolve']
 ): Promise<string | null> {
-  const resolved = await resolver(specifier, importerId);
+  const resolved = await resolveModule(specifier, importerId);
   return resolved ? normalizeResolvedId(resolved) : null;
 }
 
