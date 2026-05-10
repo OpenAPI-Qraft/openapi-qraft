@@ -22,7 +22,7 @@
 
 - Modify: `packages/tree-shaking-plugin/src/core.test.ts`
 
-- [ ] **Step 1: Add the failing snapshot for sibling scopes**
+- [x] **Step 1: Add the failing snapshot for sibling scopes**
 
 Add a focused regression that uses the `PetUpdateItem` / `PetUpdateForm` example and asserts that the same source operation is emitted as separate bindings in separate lexical scopes:
 
@@ -147,7 +147,7 @@ corepack yarn workspace @openapi-qraft/tree-shaking-plugin test src/core.test.ts
 
 Expected: fail until the transform emits separate scope-local clients.
 
-- [ ] **Step 2: Commit the regression first**
+- [x] **Step 2: Commit the regression first**
 
 ```bash
 git add packages/tree-shaking-plugin/src/core.test.ts
@@ -161,7 +161,7 @@ git commit -m "test: lock scope split regression for createAPIClientFn"
 - Modify: `packages/tree-shaking-plugin/src/lib/transform/mutate.ts`
 - Modify: `packages/tree-shaking-plugin/src/lib/transform/plan.ts`
 
-- [ ] **Step 1: Add a scope-bucket helper and stop treating callback shape as a dedupe key**
+- [x] **Step 1: Add a scope-bucket helper and stop treating callback shape as a dedupe key**
 
 Make the transform group usages by lexical scope first, then materialize a client binding for each scope bucket. The emitted binding name should still stay scope-stable, but the grouping must not collapse sibling scopes just because they reuse the same operation.
 
@@ -189,7 +189,7 @@ function groupUsagesByScope(usages: OperationUsage[]): ScopeUsageBucket[] {
 
 Use that helper in the declaration emitter so each scope bucket gets its own `createOptimizedClientDeclaration(...)` calls, and remove any remaining code path that tries to reuse one declaration because two scopes happen to need the same callback set.
 
-- [ ] **Step 2: Keep helper selection local to the emitted bucket**
+- [x] **Step 2: Keep helper selection local to the emitted bucket**
 
 Inside `createOptimizedClientDeclaration(...)`, derive the runtime helper from the callback names present in that bucket only:
 
@@ -208,7 +208,7 @@ const runtimeImportLocalName =
 
 That ensures a utility-only bucket emits `qraftAPIClient(...)` even if another scope in the same file still needs `qraftReactAPIClient(...)`.
 
-- [ ] **Step 3: Preserve nested callback scopes as independent buckets**
+- [?] **Step 3: Preserve nested callback scopes as independent buckets**
 
 When the outer callback body creates its own `createAPIClient(...)` binding, nested callback bodies like `onMutate`, `onError`, and `onSuccess` must be evaluated separately, so a nested utility-only client can flip to `qraftAPIClient` without affecting the outer hook-bearing binding.
 
@@ -268,4 +268,3 @@ Expected: both pass with the new scope split in place.
 git add packages/tree-shaking-plugin/src/core.test.ts
 git commit -m "test: refresh createAPIClientFn scope split snapshots"
 ```
-
