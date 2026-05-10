@@ -56,6 +56,36 @@ describe('resolver composition', () => {
     await expect(access.load('/tmp/src/api/index.ts')).resolves.toBeNull();
   });
 
+  it('propagates loader errors and retries after a rejection', async () => {
+    const error = new Error('source loader failed');
+    const load = vi
+      .fn()
+      .mockRejectedValueOnce(error)
+      .mockResolvedValueOnce('export const marker = true;');
+    const access = createAgnosticModuleAccess({
+      resolve: async () => '/tmp/src/api/index.ts',
+      load,
+    });
+
+    await expect(access.load('/tmp/src/api/index.ts')).rejects.toThrow(error);
+    await expect(access.load('/tmp/src/api/index.ts')).resolves.toBe(
+      'export const marker = true;'
+    );
+    expect(load).toHaveBeenCalledTimes(2);
+  });
+
+  it('caches loaded source text including empty strings', async () => {
+    const load = vi.fn(async () => '');
+    const access = createAgnosticModuleAccess({
+      resolve: async () => '/tmp/src/api/index.ts',
+      load,
+    });
+
+    await expect(access.load('/tmp/src/api/index.ts')).resolves.toBe('');
+    await expect(access.load('/tmp/src/api/index.ts')).resolves.toBe('');
+    expect(load).toHaveBeenCalledTimes(1);
+  });
+
   it('uses the rollup-like bundler resolver', async () => {
     const ctx: BundlerResolveContext = {
       resolve: vi.fn(async (source, importer, options) => {

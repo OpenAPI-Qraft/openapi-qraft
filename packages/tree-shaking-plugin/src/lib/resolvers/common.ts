@@ -117,7 +117,10 @@ export function createSourceLoaderChain(
   return (id) => {
     let pending = cache.get(id);
     if (!pending) {
-      pending = loadWithStrategies(strategies, id);
+      pending = loadWithStrategies(strategies, id).catch((error) => {
+        cache.delete(id);
+        throw error;
+      });
       cache.set(id, pending);
     }
     return pending;
@@ -129,12 +132,8 @@ async function loadWithStrategies(
   id: string
 ): Promise<string | null> {
   for (const strategy of strategies) {
-    try {
-      const loaded = await strategy({ id });
-      if (loaded !== null && loaded !== undefined) return loaded;
-    } catch {
-      // Try the next strategy.
-    }
+    const loaded = await strategy({ id });
+    if (loaded !== null && loaded !== undefined) return loaded;
   }
 
   return null;
