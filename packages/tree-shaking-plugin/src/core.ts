@@ -39,6 +39,11 @@ export type QraftTreeShakeOptions = {
   createAPIClientFn?: QraftFactoryConfig[];
   apiClient?: QraftPrecreatedClientConfig[];
   resolve?: QraftResolver;
+  /**
+   * Advanced source-provider override. Normal bundler integrations provide
+   * this automatically; use it only for virtual modules or custom
+   * filesystems/source providers.
+   */
   moduleAccess?: QraftModuleAccessOptions;
   include?: FilterPattern;
   exclude?: FilterPattern;

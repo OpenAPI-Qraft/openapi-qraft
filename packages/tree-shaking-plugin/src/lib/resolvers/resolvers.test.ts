@@ -7,9 +7,16 @@ import {
   createAgnosticResolver,
 } from './agnostic.js';
 import { type BundlerResolveContext } from './common.js';
-import { createRollupLikeResolver } from './rollup-like.js';
-import { createRspackResolver } from './rspack.js';
-import { createWebpackLikeResolver } from './webpack-like.js';
+import { createEsbuildModuleAccess } from './esbuild.js';
+import {
+  createRollupLikeModuleAccess,
+  createRollupLikeResolver,
+} from './rollup-like.js';
+import { createRspackModuleAccess, createRspackResolver } from './rspack.js';
+import {
+  createWebpackLikeModuleAccess,
+  createWebpackLikeResolver,
+} from './webpack-like.js';
 
 async function mktemp() {
   return fs.mkdtemp(path.join(os.tmpdir(), 'qraft-resolver-'));
@@ -174,5 +181,184 @@ describe('resolver composition', () => {
     await expect(
       resolver('@/generated-api', path.join(dir, 'src', 'app.ts'))
     ).resolves.toBe(expected);
+  });
+
+  it('loads source through the rollup-like filesystem adapter', async () => {
+    const sourceFile = '/virtual/api.ts';
+    const ctx: BundlerResolveContext = {
+      resolve: vi.fn(async () => ({ id: sourceFile, external: false })),
+      fs: {
+        readFile: vi.fn(async (id: string) => {
+          expect(id).toBe(sourceFile);
+          return 'export const fromRollupFs = true;';
+        }),
+      },
+    };
+
+    const access = createRollupLikeModuleAccess(ctx);
+    await expect(access.resolve('./api', '/tmp/App.tsx')).resolves.toBe(
+      sourceFile
+    );
+    await expect(access.load(sourceFile)).resolves.toBe(
+      'export const fromRollupFs = true;'
+    );
+    expect(ctx.fs?.readFile).toHaveBeenCalledTimes(1);
+  });
+
+  it('passes the exact rollup-like resolved id to a custom loader', async () => {
+    const exactResolvedId = '/tmp/api.ts?raw#fragment';
+    const ctx: BundlerResolveContext = {
+      resolve: vi.fn(async () => ({ id: exactResolvedId, external: false })),
+    };
+    const userLoad = vi.fn(async (id: string) =>
+      id === exactResolvedId ? 'export const exact = true;' : null
+    );
+
+    const access = createRollupLikeModuleAccess(ctx, { load: userLoad });
+
+    await expect(access.resolve('./api', '/tmp/App.tsx')).resolves.toBe(
+      exactResolvedId
+    );
+    await expect(access.load(exactResolvedId)).resolves.toBe(
+      'export const exact = true;'
+    );
+    expect(userLoad).toHaveBeenCalledWith(exactResolvedId);
+  });
+
+  it('uses the custom rollup-like loader before filesystem fallback', async () => {
+    const ctx: BundlerResolveContext = {};
+    const userLoad = vi.fn(async (id: string) =>
+      id === '/tmp/api.ts' ? 'export const fromFallback = true;' : null
+    );
+
+    const access = createRollupLikeModuleAccess(ctx, {
+      load: userLoad,
+    });
+
+    await expect(access.load('/tmp/api.ts')).resolves.toBe(
+      'export const fromFallback = true;'
+    );
+    expect(userLoad).toHaveBeenCalledTimes(1);
+  });
+
+  it('loads source through webpack loadModule', async () => {
+    const loadModule = vi.fn(
+      (request: string, callback: (...args: unknown[]) => void) => {
+        expect(request).toBe('/tmp/generated-api/index.ts');
+        callback(
+          null,
+          Buffer.from('export const fromWebpack = true;'),
+          null,
+          {}
+        );
+      }
+    );
+
+    const access = createWebpackLikeModuleAccess({
+      getNativeBuildContext() {
+        return {
+          framework: 'webpack',
+          loaderContext: {
+            getResolve: () => async () => '/tmp/generated-api/index.ts',
+            loadModule,
+          },
+        };
+      },
+    });
+
+    await expect(access.load('/tmp/generated-api/index.ts')).resolves.toBe(
+      'export const fromWebpack = true;'
+    );
+    expect(loadModule).toHaveBeenCalledTimes(1);
+  });
+
+  it('loads source through rspack loadModule', async () => {
+    const loadModule = vi.fn(
+      (request: string, callback: (...args: unknown[]) => void) => {
+        expect(request).toBe('/tmp/generated-api/index.ts');
+        callback(
+          null,
+          Buffer.from('export const fromRspack = true;'),
+          null,
+          {}
+        );
+      }
+    );
+
+    const access = createRspackModuleAccess({
+      getNativeBuildContext() {
+        return {
+          framework: 'rspack',
+          loaderContext: {
+            loadModule,
+          },
+        };
+      },
+    });
+
+    await expect(access.load('/tmp/generated-api/index.ts')).resolves.toBe(
+      'export const fromRspack = true;'
+    );
+    expect(loadModule).toHaveBeenCalledTimes(1);
+  });
+
+  it('loads source through rspack input filesystem when loadModule misses', async () => {
+    const loadModule = vi.fn(
+      (_request: string, callback: (...args: unknown[]) => void) => {
+        callback(new Error('missing'));
+      }
+    );
+    const readFile = vi.fn(
+      (
+        id: string,
+        callback: (error: Error | null, source?: Buffer) => void
+      ) => {
+        expect(id).toBe('/virtual/generated-api/index.ts');
+        callback(null, Buffer.from('export const fromRspackFs = true;'));
+      }
+    );
+
+    const access = createRspackModuleAccess({
+      getNativeBuildContext() {
+        return {
+          framework: 'rspack',
+          loaderContext: {
+            loadModule,
+            fs: {
+              readFile,
+            },
+          },
+        };
+      },
+    });
+
+    await expect(access.load('/virtual/generated-api/index.ts')).resolves.toBe(
+      'export const fromRspackFs = true;'
+    );
+    expect(loadModule).toHaveBeenCalledTimes(1);
+    expect(readFile).toHaveBeenCalledTimes(1);
+  });
+
+  it('uses the custom source loader before esbuild file fallback', async () => {
+    const access = createEsbuildModuleAccess(
+      {
+        getNativeBuildContext() {
+          return {
+            framework: 'esbuild',
+            build: {
+              resolve: async () => ({ path: '/tmp/api.ts', errors: [] }),
+            },
+          };
+        },
+      },
+      {
+        load: async (id) =>
+          id === '/tmp/api.ts' ? 'export const fromUserLoader = true;' : null,
+      }
+    );
+
+    await expect(access.load('/tmp/api.ts')).resolves.toBe(
+      'export const fromUserLoader = true;'
+    );
   });
 });

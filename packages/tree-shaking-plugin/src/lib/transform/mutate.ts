@@ -617,7 +617,9 @@ function hasScopeSplitUsage(usages: OperationUsage[]) {
     scopeKeysByOperation.set(key, scopeKeys);
   }
 
-  return [...scopeKeysByOperation.values()].some((scopeKeys) => scopeKeys.size > 1);
+  return [...scopeKeysByOperation.values()].some(
+    (scopeKeys) => scopeKeys.size > 1
+  );
 }
 
 type ScopeUsageBucket = {
@@ -640,7 +642,9 @@ function groupUsagesByScope(usages: OperationUsage[]): ScopeUsageBucket[] {
   }));
 }
 
-function groupContextUsagesByScope(usages: OperationUsage[]): ScopeUsageBucket[] {
+function groupContextUsagesByScope(
+  usages: OperationUsage[]
+): ScopeUsageBucket[] {
   return groupUsagesByScope(usages);
 }
 

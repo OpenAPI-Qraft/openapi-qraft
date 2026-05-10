@@ -37,6 +37,13 @@ export type RollupLikeResolve = (
   options?: { skipSelf?: boolean }
 ) => Promise<{ id: string; external?: boolean } | null | undefined>;
 
+export type RollupLikeFs = {
+  readFile?: (
+    path: string,
+    encoding: 'utf8'
+  ) => Promise<string | Uint8Array> | string | Uint8Array;
+};
+
 export type LoadRequest = {
   id: string;
 };
@@ -63,6 +70,7 @@ export type BundlerNativeBuildContext = {
 
 export type BundlerResolveContext = {
   resolve?: RollupLikeResolve;
+  fs?: RollupLikeFs;
   getNativeBuildContext?: () => BundlerNativeBuildContext | null;
 };
 

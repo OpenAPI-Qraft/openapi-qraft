@@ -1,10 +1,19 @@
 import type {
   BundlerResolveContext,
+  LoadStrategy,
+  QraftModuleAccess,
+  QraftModuleAccessOptions,
   QraftResolver,
   ResolveStrategy,
 } from './common.js';
+import fs from 'node:fs/promises';
 import path from 'node:path';
-import { createResolverChain, createUserResolverStrategy } from './common.js';
+import {
+  createResolverChain,
+  createSourceLoaderChain,
+  createUserResolverStrategy,
+  createUserSourceLoaderStrategy,
+} from './common.js';
 
 function createEsbuildResolveStrategy(
   ctx: BundlerResolveContext
@@ -34,12 +43,37 @@ function createEsbuildResolveStrategy(
   };
 }
 
+// Esbuild exposes build.resolve but no arbitrary build.load API. Keep this
+// fallback adapter-local; core transform must not read the filesystem directly.
+function createEsbuildFileLoadStrategy(): LoadStrategy {
+  return async ({ id }) => {
+    try {
+      return await fs.readFile(id, 'utf8');
+    } catch {
+      return null;
+    }
+  };
+}
+
+export function createEsbuildModuleAccess(
+  ctx: BundlerResolveContext,
+  userAccess: QraftModuleAccessOptions = {}
+): QraftModuleAccess {
+  return {
+    resolve: createResolverChain([
+      createEsbuildResolveStrategy(ctx),
+      createUserResolverStrategy(userAccess.resolve),
+    ]),
+    load: createSourceLoaderChain([
+      createUserSourceLoaderStrategy(userAccess.load),
+      createEsbuildFileLoadStrategy(),
+    ]),
+  };
+}
+
 export function createEsbuildResolver(
   ctx: BundlerResolveContext,
   userResolve?: QraftResolver
 ): QraftResolver {
-  return createResolverChain([
-    createEsbuildResolveStrategy(ctx),
-    createUserResolverStrategy(userResolve),
-  ]);
+  return createEsbuildModuleAccess(ctx, { resolve: userResolve }).resolve;
 }

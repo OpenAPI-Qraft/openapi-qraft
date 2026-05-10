@@ -250,6 +250,27 @@ createAPIClientFn: [
 
 `module` must be a specifier that the bundler can resolve, either as a relative path from the bundler's resolution root or as an alias/third-party module import. `context` defaults to `APIClientContext`. Use `contextModule` when the context is exported from a different module than the factory, or point both options at the same module when the context and factory are exported together.
 
+### Module access
+
+Normal Vite, Rollup, webpack, Rspack, and esbuild integrations do not need any extra configuration. The active bundler adapter resolves and loads generated modules for the tree-shaking transform.
+
+Use `moduleAccess.load` only when a build relies on virtual modules or a custom source provider that the bundler adapter cannot load directly:
+
+```ts
+qraftTreeShakeVite({
+  createAPIClientFn: [{ name: 'createAPIClient', module: 'virtual:qraft-api' }],
+  moduleAccess: {
+    load: async (resolvedId) => {
+      return resolvedId === 'virtual:qraft-api'
+        ? "export { createAPIClient } from './actual-api';"
+        : null;
+    },
+  },
+});
+```
+
+If a resolved module cannot be loaded through module access, the transform skips that optimization. With `debug: true`, the plugin prints the skip reason.
+
 ### `apiClient`
 
 Use this when the client is already created and exported from a module.

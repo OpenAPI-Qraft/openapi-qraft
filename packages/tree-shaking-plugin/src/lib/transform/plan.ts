@@ -1,11 +1,5 @@
 import type { NodePath, Scope } from '@babel/traverse';
 import type { QraftModuleAccess } from '../resolvers/common.js';
-import {
-  composeImportPath,
-  normalizeResolvedId,
-  resolvePrecreatedOptionsImportPath,
-  resolveRelativeImportPath,
-} from './path-rendering.js';
 import type {
   ClientBinding,
   CreateImportEntry,
@@ -17,8 +11,8 @@ import type {
   QraftFactoryConfig,
   QraftPrecreatedClientConfig,
   QraftTreeShakeOptions,
-  SchemaUsage,
   RuntimeLocalNames,
+  SchemaUsage,
   TransformPlan,
 } from './types.js';
 import { dirname, resolve } from 'node:path';
@@ -30,6 +24,12 @@ import {
   callbackNeedsRuntimeContext,
   isSupportedCallbackName,
 } from './callbacks.js';
+import {
+  composeImportPath,
+  normalizeResolvedId,
+  resolvePrecreatedOptionsImportPath,
+  resolveRelativeImportPath,
+} from './path-rendering.js';
 
 const traverse =
   resolveDefaultExport<(typeof import('@babel/traverse'))['default']>(
@@ -587,9 +587,12 @@ export async function createTransformPlan(
     const scopeKey = getUsageScopeKey(memberPath);
     const sourceKey =
       match.kind === 'named' ? match.client.name : match.createImportPath;
-    const key = [sourceKey, match.serviceName, match.operationName, scopeKey].join(
-      ':'
-    );
+    const key = [
+      sourceKey,
+      match.serviceName,
+      match.operationName,
+      scopeKey,
+    ].join(':');
 
     if (!schemaUsageMap.has(key)) {
       schemaUsageMap.set(key, {
@@ -1616,10 +1619,7 @@ function assignScopeLocalClientNames(
   const contextUsages = usages.filter(
     (usage) => usage.client.mode.type === 'context'
   );
-  const usagesByOperation = new Map<
-    string,
-    Map<string, OperationUsage[]>
-  >();
+  const usagesByOperation = new Map<string, Map<string, OperationUsage[]>>();
 
   for (const usage of contextUsages) {
     const operationKey = [
@@ -1627,7 +1627,8 @@ function assignScopeLocalClientNames(
       usage.serviceName,
       usage.operationName,
     ].join(':');
-    const scopeUsagesByOperation = usagesByOperation.get(operationKey) ?? new Map();
+    const scopeUsagesByOperation =
+      usagesByOperation.get(operationKey) ?? new Map();
     const scopeUsages = scopeUsagesByOperation.get(usage.scopeKey) ?? [];
     scopeUsages.push(usage);
     scopeUsagesByOperation.set(usage.scopeKey, scopeUsages);
