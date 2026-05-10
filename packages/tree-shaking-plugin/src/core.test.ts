@@ -1606,7 +1606,9 @@ export function App() {
     const sourceFile = path.join(fixture, 'src/App.tsx');
     const fixtureModuleAccess = createFixtureModuleAccess(fixture);
     const load = vi.fn(fixtureModuleAccess.load);
-    const legacyResolver = vi.fn(async () => null);
+    const legacyResolver = vi.fn(async () => {
+      throw new Error('legacy resolver should not be called');
+    });
 
     const result = await transformQraftTreeShakingImpl(
       `
@@ -1630,7 +1632,7 @@ export function App() {
     );
 
     expect(result?.code).toContain('api_pets_getPets.useQuery()');
-    expect(legacyResolver).not.toHaveReturnedWith(path.join(fixture, 'src/api/index.ts'));
+    expect(legacyResolver).not.toHaveBeenCalled();
     expect(load).toHaveBeenCalledWith(path.join(fixture, 'src/api/index.ts'));
   });
 
