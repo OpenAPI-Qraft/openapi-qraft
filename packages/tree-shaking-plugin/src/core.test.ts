@@ -1601,6 +1601,39 @@ export function App() {
     expect(load).toHaveBeenCalledWith(path.join(fixture, 'src/api/index.ts'));
   });
 
+  it('prefers module access resolve from options over a conflicting legacy resolver 4th argument', async () => {
+    const fixture = await createFixture();
+    const sourceFile = path.join(fixture, 'src/App.tsx');
+    const fixtureModuleAccess = createFixtureModuleAccess(fixture);
+    const load = vi.fn(fixtureModuleAccess.load);
+    const legacyResolver = vi.fn(async () => null);
+
+    const result = await transformQraftTreeShakingImpl(
+      `
+import { createAPIClient } from './api';
+
+const api = createAPIClient();
+
+export function App() {
+  return api.pets.getPets.useQuery();
+}
+`,
+      sourceFile,
+      {
+        createAPIClientFn: [{ name: 'createAPIClient', module: './api' }],
+        moduleAccess: {
+          resolve: fixtureModuleAccess.resolve,
+          load,
+        },
+      },
+      legacyResolver
+    );
+
+    expect(result?.code).toContain('api_pets_getPets.useQuery()');
+    expect(legacyResolver).not.toHaveReturnedWith(path.join(fixture, 'src/api/index.ts'));
+    expect(load).toHaveBeenCalledWith(path.join(fixture, 'src/api/index.ts'));
+  });
+
   it('does not match a same-named import that resolves to a different module', async () => {
     const fixture = await createFixture();
     const sourceFile = path.join(fixture, 'src/App.tsx');

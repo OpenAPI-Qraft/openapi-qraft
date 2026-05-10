@@ -68,7 +68,7 @@ export async function transformQraftTreeShaking(
         })
       : typeof moduleAccessOrResolver === 'function'
         ? createAgnosticModuleAccess({
-            resolve: moduleAccessOrResolver,
+            resolve: options.moduleAccess?.resolve ?? moduleAccessOrResolver,
             load: options.moduleAccess?.load,
           })
         : moduleAccessOrResolver;
