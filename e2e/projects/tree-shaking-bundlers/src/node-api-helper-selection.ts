@@ -9,10 +9,11 @@ const nodeOptions = {
   requestFn,
 } satisfies CreateAPIClientOptions;
 
+const nodeApiUtility = createNodeAPIClient();
 const nodeApi = createNodeAPIClient(nodeOptions);
 
 export const result = [
-  nodeApi.pets.getPets.getQueryKey(),
+  nodeApiUtility.pets.getPets.getQueryKey(),
   nodeApi.pets.getPets.invalidateQueries(),
   nodeApi.pets.getPets.setQueryData(undefined, () => undefined),
 ];
