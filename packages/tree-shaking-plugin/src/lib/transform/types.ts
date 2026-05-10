@@ -1,6 +1,9 @@
 import type { Scope } from '@babel/traverse';
 import type * as t from '@babel/types';
-import type { QraftResolver } from '../resolvers/common.js';
+import type {
+  QraftModuleAccessOptions,
+  QraftResolver,
+} from '../resolvers/common.js';
 
 export type FilterPattern = string | RegExp | Array<string | RegExp>;
 
@@ -24,6 +27,7 @@ export type QraftTreeShakeOptions = {
   createAPIClientFn?: QraftFactoryConfig[];
   apiClient?: QraftPrecreatedClientConfig[];
   resolve?: QraftResolver;
+  moduleAccess?: QraftModuleAccessOptions;
   include?: FilterPattern;
   exclude?: FilterPattern;
   debug?: boolean;
