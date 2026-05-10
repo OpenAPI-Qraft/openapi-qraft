@@ -3,6 +3,25 @@ export type QraftResolver = (
   importer: string
 ) => Promise<string | null> | string | null;
 
+export type QraftSourceLoader = (
+  resolvedId: string
+) => Promise<string | null> | string | null;
+
+export type QraftModuleAccess = {
+  resolve: QraftResolver;
+  load: QraftSourceLoader;
+};
+
+export type QraftModuleAccessOptions = {
+  resolve?: QraftResolver;
+  load?: QraftSourceLoader;
+};
+
+export type QraftModuleAccessFactory<TRuntimeContext = unknown> = (
+  ctx: TRuntimeContext,
+  userAccess?: QraftModuleAccessOptions
+) => QraftModuleAccess;
+
 export type ResolveRequest = {
   specifier: string;
   importer: string;
@@ -17,6 +36,14 @@ export type RollupLikeResolve = (
   importer?: string,
   options?: { skipSelf?: boolean }
 ) => Promise<{ id: string; external?: boolean } | null | undefined>;
+
+export type LoadRequest = {
+  id: string;
+};
+
+export type LoadStrategy = (
+  request: LoadRequest
+) => Promise<string | null> | string | null;
 
 export type EsbuildLikeBuild = {
   resolve: (
@@ -79,5 +106,46 @@ export function createUserResolverStrategy(
     if (!userResolve) return null;
     const resolved = await userResolve(specifier, importer);
     return resolved || null;
+  };
+}
+
+export function createSourceLoaderChain(
+  strategies: LoadStrategy[]
+): QraftSourceLoader {
+  const cache = new Map<string, Promise<string | null>>();
+
+  return (id) => {
+    let pending = cache.get(id);
+    if (!pending) {
+      pending = loadWithStrategies(strategies, id);
+      cache.set(id, pending);
+    }
+    return pending;
+  };
+}
+
+async function loadWithStrategies(
+  strategies: LoadStrategy[],
+  id: string
+): Promise<string | null> {
+  for (const strategy of strategies) {
+    try {
+      const loaded = await strategy({ id });
+      if (loaded !== null && loaded !== undefined) return loaded;
+    } catch {
+      // Try the next strategy.
+    }
+  }
+
+  return null;
+}
+
+export function createUserSourceLoaderStrategy(
+  userLoad?: QraftSourceLoader
+): LoadStrategy {
+  return async ({ id }) => {
+    if (!userLoad) return null;
+    const loaded = await userLoad(id);
+    return loaded ?? null;
   };
 }

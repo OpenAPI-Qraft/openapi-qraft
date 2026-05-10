@@ -2,7 +2,10 @@ import fs from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 import { describe, expect, it, vi } from 'vitest';
-import { createAgnosticResolver } from './agnostic.js';
+import {
+  createAgnosticModuleAccess,
+  createAgnosticResolver,
+} from './agnostic.js';
 import { type BundlerResolveContext } from './common.js';
 import { createRollupLikeResolver } from './rollup-like.js';
 import { createRspackResolver } from './rspack.js';
@@ -20,6 +23,37 @@ describe('resolver composition', () => {
 
     await expect(resolver('./fallback', importer)).resolves.toBeNull();
     expect(customResolve).toHaveBeenCalledWith('./fallback', importer);
+  });
+
+  it('uses a custom module loader after custom resolution', async () => {
+    const resolve = vi.fn(async (specifier: string, importer: string) => {
+      expect(specifier).toBe('./api');
+      expect(importer).toBe('/tmp/src/App.tsx');
+      return '/tmp/src/api/index.ts';
+    });
+    const load = vi.fn(async (id: string) => {
+      expect(id).toBe('/tmp/src/api/index.ts');
+      return 'export const marker = true;';
+    });
+
+    const access = createAgnosticModuleAccess({ resolve, load });
+
+    await expect(access.resolve('./api', '/tmp/src/App.tsx')).resolves.toBe(
+      '/tmp/src/api/index.ts'
+    );
+    await expect(access.load('/tmp/src/api/index.ts')).resolves.toBe(
+      'export const marker = true;'
+    );
+    expect(resolve).toHaveBeenCalledTimes(1);
+    expect(load).toHaveBeenCalledTimes(1);
+  });
+
+  it('returns null from load when no source loader is configured', async () => {
+    const access = createAgnosticModuleAccess({
+      resolve: async () => '/tmp/src/api/index.ts',
+    });
+
+    await expect(access.load('/tmp/src/api/index.ts')).resolves.toBeNull();
   });
 
   it('uses the rollup-like bundler resolver', async () => {
