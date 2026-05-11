@@ -494,39 +494,6 @@ function App() {
       `);
   });
 
-  it('transforms zero-arg no-options callbacks on a no-context factory', async () => {
-    const root = await fs.mkdtemp(
-      path.join(os.tmpdir(), 'qraft-tree-shaking-')
-    );
-    await writeFixtureFiles(root, {
-      ...PRECREATED_BASE_FILES,
-    });
-    const sourceFile = path.join(root, 'src/App.tsx');
-
-    const result = await transformQraftTreeShaking(
-      `
-import { createAPIClient } from './api';
-
-const api = createAPIClient();
-
-api.pets.getPets.getQueryKey();
-`,
-      sourceFile,
-      { createAPIClientFn: [{ name: 'createAPIClient', module: './api' }] }
-    );
-
-    // getQueryKey needs no options — it must be transformed even for a zero-arg call
-    expect(result?.code).toMatchInlineSnapshot(`
-      "import { qraftAPIClient } from "@openapi-qraft/react";
-      import { getQueryKey } from "@openapi-qraft/react/callbacks/getQueryKey";
-      import { getPets } from "./api/services/PetsService";
-      const api_pets_getPets = qraftAPIClient(getPets, {
-        getQueryKey
-      });
-      api_pets_getPets.getQueryKey();"
-    `);
-  });
-
   it('transforms factory imported via a barrel when the module config points to the direct file', async () => {
     const root = await fs.mkdtemp(
       path.join(os.tmpdir(), 'qraft-tree-shaking-')
@@ -561,7 +528,7 @@ api.pets.getPets.invalidateQueries();
     `);
   });
 
-  it('transforms both zero-arg no-options and options calls to a no-context factory', async () => {
+  it('transforms zero-arg and options calls to a no-context factory', async () => {
     const root = await fs.mkdtemp(
       path.join(os.tmpdir(), 'qraft-tree-shaking-')
     );
