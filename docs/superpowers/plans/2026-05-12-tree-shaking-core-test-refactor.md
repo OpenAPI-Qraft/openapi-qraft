@@ -328,42 +328,26 @@ Create `packages/tree-shaking-plugin/src/__tests__/core/harness.ts`:
 
 ```ts
 import '@qraft/test-utils/vitestFsMock';
-import type { SourceMapInput } from '@jridgewell/trace-mapping';
-import type {
-  QraftModuleAccess,
-  QraftResolver,
-} from '../../lib/resolvers/common.js';
+import fs from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
-import fs from 'node:fs/promises';
+import type { SourceMapInput } from '@jridgewell/trace-mapping';
 import { transformQraftTreeShaking as transformQraftTreeShakingImpl } from '../../core.js';
 import { createTransformPlan } from '../../lib/transform/plan.js';
-import { createFixtureModuleAccess } from './fixtures.js';
+import {
+  createFixtureModuleAccess,
+  getContextFixtureFiles,
+  writeFixtureFiles,
+} from './fixtures.js';
 
-export type TransformOptions = Parameters<
-  typeof transformQraftTreeShakingImpl
->[2];
+export type TransformOptions = Parameters<typeof transformQraftTreeShakingImpl>[2];
 
-type TransformModuleAccessArg = QraftModuleAccess | QraftResolver;
-
-type TransformWithInputSourceMap = (
-  code: string,
-  id: string,
-  options: TransformOptions,
-  moduleAccess: TransformModuleAccessArg,
-  inputSourceMap?: SourceMapInput
-) => ReturnType<typeof transformQraftTreeShakingImpl>;
-
-const transformQraftTreeShakingImplWithInputSourceMap =
-  transformQraftTreeShakingImpl satisfies (
-    code: string,
-    id: string,
-    options: TransformOptions,
-    moduleAccess: TransformModuleAccessArg
-  ) => ReturnType<typeof transformQraftTreeShakingImpl>;
-
-const transformQraftTreeShakingWithInputSourceMap =
-  transformQraftTreeShakingImplWithInputSourceMap as unknown as TransformWithInputSourceMap;
+type FixtureOptions = {
+  contextName?: string;
+  contextModule?: string;
+  importContext?: boolean;
+  apiDirName?: string;
+};
 
 export async function transformQraftTreeShaking(
   code: string,
@@ -371,13 +355,13 @@ export async function transformQraftTreeShaking(
   options: TransformOptions,
   inputSourceMap?: SourceMapInput
 ) {
-  const fixtureRoot = path.dirname(path.dirname(id));
-  const moduleAccess = await createFixtureModuleAccess(fixtureRoot, {
+  const fixtureRoot = getFixtureRootFromSourceFile(id);
+  const moduleAccess = createFixtureModuleAccess(fixtureRoot, {
     resolve: options.moduleAccess?.resolve ?? options.resolve,
     load: options.moduleAccess?.load,
   });
 
-  return transformQraftTreeShakingWithInputSourceMap(
+  return transformQraftTreeShakingImpl(
     code,
     id,
     options,
@@ -386,23 +370,43 @@ export async function transformQraftTreeShaking(
   );
 }
 
-export async function createFixture(files: Record<string, string> = {}) {
+export async function createFixture(options: FixtureOptions = {}) {
   const root = await fs.mkdtemp(path.join(os.tmpdir(), 'qraft-tree-shaking-'));
-  return {
-    root,
-    sourceFile: path.join(root, 'src/App.tsx'),
-    moduleAccess: await createFixtureModuleAccess(root),
-    async write(extraFiles: Record<string, string>) {
-      const { writeFixtureFiles } = await import('./fixtures.js');
-      await writeFixtureFiles(root, extraFiles);
-    },
-  };
+  const contextName = options.contextName ?? 'APIClientContext';
+  const contextModule = options.contextModule ?? `./${contextName}`;
+  const importContext = options.importContext ?? true;
+
+  await writeFixtureFiles(root, {
+    ...getContextFixtureFiles(
+      contextName,
+      contextModule,
+      importContext,
+      options.apiDirName
+    ),
+  });
+
+  return root;
+}
+
+function getFixtureRootFromSourceFile(id: string) {
+  const normalizedPath = path.normalize(id);
+  const parts = normalizedPath.split(path.sep);
+  const srcIndex = parts.lastIndexOf('src');
+
+  if (srcIndex > 0) {
+    const fixtureRoot = parts.slice(0, srcIndex).join(path.sep);
+    if (fixtureRoot) {
+      return fixtureRoot;
+    }
+  }
+
+  return path.dirname(path.dirname(id));
 }
 
 export { createTransformPlan };
 ```
 
-After writing this file, adjust only if TypeScript reports a mismatch with the actual current helper signatures.
+This helper intentionally detects the fixture root by the `src` path segment before falling back to the legacy two-directory behavior. Later moved tests should compute source files with `path.join(fixture, 'src/App.tsx')` or a nested path under `src/**`.
 
 - [ ] **Step 4: Run typecheck for helper compile errors**
 
@@ -918,8 +922,7 @@ In `create-api-client-fn.test.ts`, add a test titled:
 ```ts
 it('rewrites representative suspense and infinite hook callbacks for context clients', async () => {
   const fixture = await createFixture();
-  const sourceFile = path.join(fixture.root, 'src/App.tsx');
-  await fixture.write(getContextFixtureFiles('APIClientContext', './APIClientContext', true));
+  const sourceFile = path.join(fixture, 'src/App.tsx');
 
   const result = await transformQraftTreeShaking(
     `
@@ -949,8 +952,7 @@ In `explicit-options.test.ts`, add a test titled:
 ```ts
 it('rewrites fetch, prefetch, and ensure callbacks for explicit options clients', async () => {
   const fixture = await createFixture();
-  const sourceFile = path.join(fixture.root, 'src/App.tsx');
-  await fixture.write(getContextFixtureFiles('APIClientContext', './APIClientContext', true));
+  const sourceFile = path.join(fixture, 'src/App.tsx');
 
   const result = await transformQraftTreeShaking(
     `
@@ -982,8 +984,9 @@ In `precreated-api-client.test.ts`, add a test titled:
 ```ts
 it('rewrites query-client state callbacks for precreated clients', async () => {
   const fixture = await createFixture();
-  const sourceFile = path.join(fixture.root, 'src/App.tsx');
-  await fixture.write(
+  const sourceFile = path.join(fixture, 'src/App.tsx');
+  await writeFixtureFiles(
+    fixture,
     createPrecreatedFixtureFiles(`
 import { createAPIClient } from './api';
 import { createAPIClientOptions } from './client-options';
@@ -1129,8 +1132,7 @@ Add:
 ```ts
 it('does not rewrite computed member access', async () => {
   const fixture = await createFixture();
-  const sourceFile = path.join(fixture.root, 'src/App.tsx');
-  await fixture.write(getContextFixtureFiles('APIClientContext', './APIClientContext', true));
+  const sourceFile = path.join(fixture, 'src/App.tsx');
 
   const result = await transformQraftTreeShaking(
     `
@@ -1165,8 +1167,7 @@ Add:
 ```ts
 it('does not rewrite destructured client aliases', async () => {
   const fixture = await createFixture();
-  const sourceFile = path.join(fixture.root, 'src/App.tsx');
-  await fixture.write(getContextFixtureFiles('APIClientContext', './APIClientContext', true));
+  const sourceFile = path.join(fixture, 'src/App.tsx');
 
   const result = await transformQraftTreeShaking(
     `
@@ -1195,8 +1196,7 @@ Add:
 ```ts
 it('rewrites static optional member chains when the client binding is clear', async () => {
   const fixture = await createFixture();
-  const sourceFile = path.join(fixture.root, 'src/App.tsx');
-  await fixture.write(getContextFixtureFiles('APIClientContext', './APIClientContext', true));
+  const sourceFile = path.join(fixture, 'src/App.tsx');
 
   const result = await transformQraftTreeShaking(
     `
@@ -1260,8 +1260,8 @@ In `create-api-client-fn.test.ts`, add:
 ```ts
 it('infers an aliased generated context from the qraftReactAPIClient third argument', async () => {
   const fixture = await createFixture();
-  const sourceFile = path.join(fixture.root, 'src/App.tsx');
-  await fixture.write({
+  const sourceFile = path.join(fixture, 'src/App.tsx');
+  await writeFixtureFiles(fixture, {
     'src/api/index.ts': `
 import { qraftReactAPIClient } from '@openapi-qraft/react';
 import { useQuery } from '@openapi-qraft/react/callbacks/index';
