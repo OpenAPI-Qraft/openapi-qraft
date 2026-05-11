@@ -1721,8 +1721,9 @@ export function App() {
     `);
   });
 
-  // Still skipped: mixed-mode files keep the context client call unreplaced while the
-  // precreated client imports the same operation from a different source module.
+  // Still skipped: after source-aware key alignment, the mixed-mode file still
+  // leaves the top-level context client call unreplaced while rewriting the
+  // inline and precreated paths for the same operation.
   it.skip('keeps same-operation rewrites separate across all client modes', async () => {
     const root = await fs.mkdtemp(
       path.join(os.tmpdir(), 'qraft-tree-shaking-')
@@ -1893,8 +1894,8 @@ APIClient.stores.getStores.getQueryKey();
     `);
   });
 
-  // Still skipped: aliased mixed-mode files keep the top-level context client usage
-  // intact instead of rewriting it alongside the precreated client call.
+  // Still skipped: the aliased context client remains unreplaced in the mixed
+  // createAPIClientFn + precreated file after the source-aware key fix.
   it.skip('supports createAPIClientFn and precreated apiClient clients in one file', async () => {
     const root = await fs.mkdtemp(
       path.join(os.tmpdir(), 'qraft-tree-shaking-')
