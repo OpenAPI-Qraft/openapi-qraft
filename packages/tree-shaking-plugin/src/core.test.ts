@@ -1,110 +1,26 @@
-import '@qraft/test-utils/vitestFsMock';
 import type { SourceMapInput } from '@jridgewell/trace-mapping';
-import type {
-  QraftModuleAccess,
-  QraftResolver,
-} from './lib/resolvers/common.js';
 import fs from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 import { originalPositionFor, TraceMap } from '@jridgewell/trace-mapping';
 import { describe, expect, it, vi } from 'vitest';
+import {
+  createFixtureModuleAccess,
+  createPrecreatedFixtureFiles,
+  DEFAULT_PRECREATED_CLIENT_OPTIONS_TS,
+  getContextFixtureFiles,
+  PETS_SERVICE_TS,
+  PRECREATED_API_INDEX_TS,
+  SERVICES_INDEX_TS,
+  STORES_SERVICE_TS,
+  writeFixtureFiles,
+} from './__tests__/core/fixtures.js';
+import {
+  createFixture,
+  createTransformPlan,
+  transformQraftTreeShaking,
+} from './__tests__/core/harness.js';
 import { transformQraftTreeShaking as transformQraftTreeShakingImpl } from './core.js';
-import { createTransformPlan } from './lib/transform/plan.js';
-
-const PRECREATED_API_INDEX_TS = `
-import { qraftAPIClient } from '@openapi-qraft/react';
-import { useQuery } from '@openapi-qraft/react/callbacks/index';
-import { services } from './services/index';
-
-const defaultCallbacks = { useQuery } as const;
-
-export function createAPIClient(options?: { queryClient: unknown }) {
-  return qraftAPIClient(services, defaultCallbacks, options);
-}
-`;
-
-const SERVICES_INDEX_TS = `
-import { petsService } from './PetsService';
-import { storesService } from './StoresService';
-
-export const services = {
-  pets: petsService,
-  stores: storesService,
-} as const;
-`;
-
-const PETS_SERVICE_TS = `
-export const getPets = { schema: { method: 'get', url: '/pets' } };
-export const createPet = { schema: { method: 'post', url: '/pets' } };
-export const updatePet = { schema: { method: 'put', url: '/pets/{petId}' } };
-export const getPetById = { schema: { method: 'get', url: '/pets/{petId}' } };
-export const findPetsByStatus = { schema: { method: 'get', url: '/pets/findByStatus' } };
-
-export const petsService = {
-  getPets,
-  createPet,
-  updatePet,
-  getPetById,
-  findPetsByStatus,
-} as const;
-`;
-
-const STORES_SERVICE_TS = `
-export const getStores = { schema: { method: 'get', url: '/stores' } };
-
-export const storesService = {
-  getStores,
-} as const;
-`;
-
-const DEFAULT_PRECREATED_CLIENT_OPTIONS_TS = `
-export const createAPIClientOptions = () => ({
-  queryClient: {}
-});
-`;
-
-type TransformOptions = Parameters<typeof transformQraftTreeShakingImpl>[2];
-type TransformModuleAccessArg = QraftModuleAccess | QraftResolver;
-type TransformWithInputSourceMap = (
-  code: string,
-  id: string,
-  options: TransformOptions,
-  moduleAccess: TransformModuleAccessArg,
-  inputSourceMap?: SourceMapInput
-) => ReturnType<typeof transformQraftTreeShakingImpl>;
-
-const transformQraftTreeShakingImplWithInputSourceMap =
-  transformQraftTreeShakingImpl satisfies (
-    code: string,
-    id: string,
-    options: TransformOptions,
-    moduleAccess: TransformModuleAccessArg
-  ) => ReturnType<typeof transformQraftTreeShakingImpl>;
-
-const transformQraftTreeShakingWithInputSourceMap =
-  transformQraftTreeShakingImplWithInputSourceMap as unknown as TransformWithInputSourceMap;
-
-async function transformQraftTreeShaking(
-  code: string,
-  id: string,
-  options: TransformOptions,
-  inputSourceMap?: SourceMapInput
-) {
-  const fixtureRoot = path.dirname(path.dirname(id));
-  const moduleAccess = createFixtureModuleAccess(fixtureRoot, {
-    resolve: options.moduleAccess?.resolve ?? options.resolve,
-    load: options.moduleAccess?.load,
-  });
-
-  return transformQraftTreeShakingWithInputSourceMap(
-    code,
-    id,
-    options,
-    moduleAccess,
-    inputSourceMap
-  );
-}
 
 describe('transformQraftTreeShaking', () => {
   it('uses module access from options by default when creating a transform plan', async () => {
@@ -895,7 +811,7 @@ export function App() {
   it('does not read generated modules from the filesystem when moduleAccess.load returns null', async () => {
     const fixture = await createFixture();
     const sourceFile = path.join(fixture, 'src/App.tsx');
-    const fixtureResolver = createFixtureResolver(fixture);
+    const fixtureResolver = createFixtureModuleAccess(fixture).resolve;
     const readFileSpy = vi.spyOn(fs, 'readFile');
     const load = vi.fn(async () => null);
 
@@ -2025,86 +1941,6 @@ console.log(APIClient);
   });
 });
 
-type FixtureOptions = {
-  contextName?: string;
-  contextModule?: string;
-  importContext?: boolean;
-  apiDirName?: string;
-};
-
-async function createFixture(options: FixtureOptions = {}) {
-  const root = await fs.mkdtemp(path.join(os.tmpdir(), 'qraft-tree-shaking-'));
-  const contextName = options.contextName ?? 'APIClientContext';
-  const contextModule = options.contextModule ?? `./${contextName}`;
-  const importContext = options.importContext ?? true;
-
-  await writeFixtureFiles(root, {
-    ...getContextFixtureFiles(
-      contextName,
-      contextModule,
-      importContext,
-      options.apiDirName
-    ),
-  });
-
-  return root;
-}
-
-function createFixtureResolver(fixtureRoot: string) {
-  return async (specifier: string, importer: string) => {
-    if (specifier.startsWith('@/')) {
-      return resolveFixtureModule(
-        path.join(fixtureRoot, 'src'),
-        specifier.slice(2)
-      );
-    }
-
-    if (specifier.startsWith('.') || specifier.startsWith('/')) {
-      return resolveFixtureModule(path.dirname(importer), specifier);
-    }
-
-    return null;
-  };
-}
-
-function createFixtureModuleAccess(
-  fixtureRoot: string,
-  userAccess: TransformOptions['moduleAccess'] = {}
-): QraftModuleAccess {
-  const fixtureResolver = createFixtureResolver(fixtureRoot);
-
-  return {
-    resolve: async (specifier, importer) => {
-      if (userAccess.resolve) {
-        try {
-          const resolved = await userAccess.resolve(specifier, importer);
-          if (resolved) return resolved;
-        } catch {
-          // Fall through to the fixture resolver.
-        }
-      }
-
-      return fixtureResolver(specifier, importer);
-    },
-    load: async (id) => {
-      if (userAccess.load) {
-        try {
-          const loaded = await userAccess.load(id);
-          if (loaded !== null && loaded !== undefined) return loaded;
-        } catch {
-          // Fall through to the fixture filesystem loader.
-        }
-      }
-
-      try {
-        return await fs.readFile(id, 'utf8');
-      } catch {
-        return null;
-      }
-    },
-  };
-}
-
 function createIdentitySourceMap(
   generatedSourceFile: string,
   originalSourceFile: string,
@@ -2123,106 +1959,4 @@ function createIdentitySourceMap(
     sourcesContent: [source],
     mappings,
   };
-}
-
-async function resolveFixtureModule(baseDir: string, importPath: string) {
-  const base = path.resolve(baseDir, importPath);
-  const candidateBases = new Set([base]);
-  const extension = path.extname(importPath);
-  if (
-    extension === '.js' ||
-    extension === '.jsx' ||
-    extension === '.mjs' ||
-    extension === '.cjs'
-  ) {
-    candidateBases.add(base.slice(0, -extension.length));
-  }
-
-  const candidates = [...candidateBases].flatMap((candidateBase) => [
-    candidateBase,
-    `${candidateBase}.ts`,
-    `${candidateBase}.tsx`,
-    `${candidateBase}.js`,
-    `${candidateBase}.jsx`,
-    `${candidateBase}.mts`,
-    `${candidateBase}.cts`,
-    path.join(candidateBase, 'index.ts'),
-    path.join(candidateBase, 'index.tsx'),
-    path.join(candidateBase, 'index.js'),
-    path.join(candidateBase, 'index.jsx'),
-    path.join(candidateBase, 'index.mts'),
-    path.join(candidateBase, 'index.cts'),
-  ]);
-
-  for (const candidate of candidates) {
-    try {
-      const stat = await fs.stat(candidate);
-      if (stat.isFile()) return candidate;
-    } catch {
-      // Try the next candidate.
-    }
-  }
-
-  return null;
-}
-
-function getContextFixtureFiles(
-  contextName: string,
-  contextModule: string,
-  importContext: boolean,
-  apiDirName = 'api'
-) {
-  const apiRoot = `src/${apiDirName}`;
-
-  return {
-    [`${apiRoot}/index.ts`]: `${importContext ? `import { ${contextName} } from '${contextModule}';\n` : ''}${CONTEXT_API_INDEX_TS_BODY(contextName)}`,
-    [`${apiRoot}/${contextName}.ts`]: `\nexport const ${contextName} = {};\n`,
-    [`${apiRoot}/services/index.ts`]: SERVICES_INDEX_TS,
-    [`${apiRoot}/services/PetsService.ts`]: PETS_SERVICE_TS,
-    [`${apiRoot}/services/StoresService.ts`]: STORES_SERVICE_TS,
-  } as const;
-}
-
-function CONTEXT_API_INDEX_TS_BODY(contextName: string) {
-  return `
-import { qraftReactAPIClient } from '@openapi-qraft/react';
-import { useQuery } from '@openapi-qraft/react/callbacks/index';
-import { services } from './services/index';
-
-const defaultCallbacks = { useQuery } as const;
-
-export function createAPIClient(callbacks = defaultCallbacks) {
-  return qraftReactAPIClient(services, callbacks, ${contextName});
-}
-export function createExtraAPIClient(callbacks = defaultCallbacks) {
-  return qraftReactAPIClient(services, callbacks, ${contextName});
-}
-`;
-}
-
-const PRECREATED_BASE_FILES = {
-  'src/api/index.ts': PRECREATED_API_INDEX_TS,
-  'src/api/services/index.ts': SERVICES_INDEX_TS,
-  'src/api/services/PetsService.ts': PETS_SERVICE_TS,
-  'src/api/services/StoresService.ts': STORES_SERVICE_TS,
-  'src/client-options.ts': DEFAULT_PRECREATED_CLIENT_OPTIONS_TS,
-} as const;
-
-function createPrecreatedFixtureFiles(
-  clientTs: string,
-  extraFiles: Record<string, string> = {}
-) {
-  return {
-    ...PRECREATED_BASE_FILES,
-    'src/client.ts': clientTs,
-    ...extraFiles,
-  } as const;
-}
-
-async function writeFixtureFiles(root: string, files: Record<string, string>) {
-  for (const [relativePath, content] of Object.entries(files)) {
-    const fullPath = path.join(root, relativePath);
-    await fs.mkdir(path.dirname(fullPath), { recursive: true });
-    await fs.writeFile(fullPath, content);
-  }
 }
