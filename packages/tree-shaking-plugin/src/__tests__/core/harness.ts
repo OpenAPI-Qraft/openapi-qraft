@@ -26,7 +26,7 @@ export async function transformQraftTreeShaking(
   options: TransformOptions,
   inputSourceMap?: SourceMapInput
 ) {
-  const fixtureRoot = path.dirname(path.dirname(id));
+  const fixtureRoot = getFixtureRootFromSourceFile(id);
   const moduleAccess = createFixtureModuleAccess(fixtureRoot, {
     resolve: options.moduleAccess?.resolve ?? options.resolve,
     load: options.moduleAccess?.load,
@@ -57,6 +57,21 @@ export async function createFixture(options: FixtureOptions = {}) {
   });
 
   return root;
+}
+
+function getFixtureRootFromSourceFile(id: string) {
+  const normalizedPath = path.normalize(id);
+  const parts = normalizedPath.split(path.sep);
+  const srcIndex = parts.lastIndexOf('src');
+
+  if (srcIndex > 0) {
+    const fixtureRoot = parts.slice(0, srcIndex).join(path.sep);
+    if (fixtureRoot) {
+      return fixtureRoot;
+    }
+  }
+
+  return path.dirname(path.dirname(id));
 }
 
 export { createTransformPlan };
