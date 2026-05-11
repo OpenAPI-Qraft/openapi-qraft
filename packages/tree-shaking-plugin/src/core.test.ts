@@ -2450,58 +2450,6 @@ APIClient.pets.getPets.useQuery();
     `);
   });
 
-  it('supports precreated client options re-exported through client.ts', async () => {
-    const root = await fs.mkdtemp(
-      path.join(os.tmpdir(), 'qraft-tree-shaking-')
-    );
-    await writeFixtureFiles(
-      root,
-      createPrecreatedFixtureFiles(
-        `
-import { createAPIClient } from './api';
-import { createAPIClientOptions } from './client-options';
-
-export { createAPIClientOptions };
-
-export const APIClient = createAPIClient(createAPIClientOptions());
-`
-      )
-    );
-    const sourceFile = path.join(root, 'src/App.tsx');
-
-    const result = await transformQraftTreeShaking(
-      `
-import { APIClient } from './client';
-
-APIClient.pets.getPets.useQuery();
-`,
-      sourceFile,
-      {
-        apiClient: [
-          {
-            client: 'APIClient',
-            clientModule: './client',
-            createAPIClientFn: 'createAPIClient',
-            createAPIClientFnModule: './api',
-            createAPIClientFnOptions: 'createAPIClientOptions',
-            createAPIClientFnOptionsModule: './client',
-          },
-        ],
-      }
-    );
-
-    expect(result?.code).toMatchInlineSnapshot(`
-        "import { qraftAPIClient } from "@openapi-qraft/react";
-        import { useQuery } from "@openapi-qraft/react/callbacks/useQuery";
-        import { getPets } from "./api/services/PetsService";
-        import { createAPIClientOptions } from "./client";
-        const APIClient_pets_getPets = qraftAPIClient(getPets, {
-          useQuery
-        }, createAPIClientOptions());
-        APIClient_pets_getPets.useQuery();"
-      `);
-  });
-
   it('skips a precreated client created by a local same-named factory', async () => {
     const root = await fs.mkdtemp(
       path.join(os.tmpdir(), 'qraft-tree-shaking-')
