@@ -132,7 +132,7 @@ function rewriteNamedClientCalls(
   const usageByKey = new Map(
     usages.map((usage) => [
       [
-        usage.client.name,
+        usage.client.clientSourceKey,
         usage.serviceName,
         usage.operationName,
         usage.callbackName,
@@ -149,7 +149,7 @@ function rewriteNamedClientCalls(
 
       const usage = usageByKey.get(
         [
-          match.client.name,
+          match.client.clientSourceKey,
           match.serviceName,
           match.operationName,
           match.callbackName,
@@ -608,7 +608,7 @@ function hasScopeSplitUsage(usages: OperationUsage[]) {
   for (const usage of usages) {
     if (usage.client.mode.type === 'precreated') continue;
     const key = [
-      usage.client.name,
+      usage.client.clientSourceKey,
       usage.serviceName,
       usage.operationName,
     ].join(':');
