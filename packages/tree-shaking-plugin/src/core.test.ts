@@ -720,7 +720,7 @@ export function App() {
       `);
   });
 
-  it('creates separate optimized clients for multiple operations from the same service', async () => {
+  it('creates separate optimized clients for multiple operations across services', async () => {
     const fixture = await createFixture();
     const sourceFile = path.join(fixture, 'src/App.tsx');
 
@@ -732,6 +732,7 @@ const api = createAPIClient();
 
 api.pets.getPets.useQuery();
 api.pets.createPet.useMutation();
+api.stores.getStores.useQuery();
 `,
       sourceFile,
       { createAPIClientFn: [{ name: 'createAPIClient', module: './api' }] }
@@ -744,47 +745,18 @@ api.pets.createPet.useMutation();
       import { APIClientContext } from "./api/APIClientContext";
       import { useMutation } from "@openapi-qraft/react/callbacks/useMutation";
       import { createPet } from "./api/services/PetsService";
+      import { getStores } from "./api/services/StoresService";
       const api_pets_getPets = qraftReactAPIClient(getPets, {
         useQuery
       }, APIClientContext);
       const api_pets_createPet = qraftReactAPIClient(createPet, {
         useMutation
       }, APIClientContext);
-      api_pets_getPets.useQuery();
-      api_pets_createPet.useMutation();"
-    `);
-  });
-
-  it('creates separate optimized clients for operations from different services', async () => {
-    const fixture = await createFixture();
-    const sourceFile = path.join(fixture, 'src/App.tsx');
-
-    const result = await transformQraftTreeShaking(
-      `
-import { createAPIClient } from './api';
-
-const api = createAPIClient();
-
-api.pets.getPets.useQuery();
-api.stores.getStores.useQuery();
-`,
-      sourceFile,
-      { createAPIClientFn: [{ name: 'createAPIClient', module: './api' }] }
-    );
-
-    expect(result?.code).toMatchInlineSnapshot(`
-      "import { qraftReactAPIClient } from "@openapi-qraft/react";
-      import { useQuery } from "@openapi-qraft/react/callbacks/useQuery";
-      import { getPets } from "./api/services/PetsService";
-      import { APIClientContext } from "./api/APIClientContext";
-      import { getStores } from "./api/services/StoresService";
-      const api_pets_getPets = qraftReactAPIClient(getPets, {
-        useQuery
-      }, APIClientContext);
       const api_stores_getStores = qraftReactAPIClient(getStores, {
         useQuery
       }, APIClientContext);
       api_pets_getPets.useQuery();
+      api_pets_createPet.useMutation();
       api_stores_getStores.useQuery();"
     `);
   });
