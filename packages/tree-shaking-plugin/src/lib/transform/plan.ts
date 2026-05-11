@@ -409,7 +409,7 @@ export async function createTransformPlan(
       const scopeKey = getUsageScopeKey(callPath);
 
       const operationKey = [
-        match.client.name,
+        match.client.clientSourceKey,
         match.serviceName,
         match.operationName,
         scopeKey,
@@ -438,7 +438,7 @@ export async function createTransformPlan(
       localClientNamesByOperation.set(operationKey, localClientName);
 
       const key = [
-        match.client.name,
+        match.client.clientSourceKey,
         match.serviceName,
         match.operationName,
         match.callbackName,
@@ -1661,7 +1661,7 @@ function assignScopeLocalClientNames(
 
   for (const usage of contextUsages) {
     const operationKey = [
-      usage.client.name,
+      usage.client.clientSourceKey,
       usage.serviceName,
       usage.operationName,
     ].join(':');
@@ -1725,7 +1725,7 @@ function assignScopeLocalClientNames(
         scopeUsage.localClientName = localClientName;
         localClientNamesByOperation.set(
           [
-            scopeUsage.client.name,
+            scopeUsage.client.clientSourceKey,
             scopeUsage.serviceName,
             scopeUsage.operationName,
             scopeUsage.scopeKey,
