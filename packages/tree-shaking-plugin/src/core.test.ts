@@ -1747,6 +1747,54 @@ export function App() {
     `);
   });
 
+  it('supports context-based and explicit-options createAPIClientFn clients in one file', async () => {
+    const fixture = await createFixture();
+    const sourceFile = path.join(fixture, 'src/App.tsx');
+
+    const result = await transformQraftTreeShaking(
+      `
+import { createAPIClient, APIClientContext } from './api';
+import { useContext, useEffect } from 'react';
+
+const api = createAPIClient();
+
+export function App() {
+  const apiContext = useContext(APIClientContext);
+
+  api.pets.getPets.useQuery();
+  useEffect(() => {
+    void createAPIClient(apiContext!).pets.findPetsByStatus.invalidateQueries();
+  }, [apiContext]);
+}
+`,
+      sourceFile,
+      { createAPIClientFn: [{ name: 'createAPIClient', module: './api' }] }
+    );
+
+    expect(result?.code).toMatchInlineSnapshot(`
+      "import { APIClientContext } from './api';
+      import { useContext, useEffect } from 'react';
+      import { qraftAPIClient } from "@openapi-qraft/react";
+      import { qraftReactAPIClient } from "@openapi-qraft/react";
+      import { useQuery } from "@openapi-qraft/react/callbacks/useQuery";
+      import { getPets } from "./api/services/PetsService";
+      import { invalidateQueries } from "@openapi-qraft/react/callbacks/invalidateQueries";
+      import { findPetsByStatus } from "./api/services/PetsService";
+      const api_pets_getPets = qraftReactAPIClient(getPets, {
+        useQuery
+      }, APIClientContext);
+      export function App() {
+        const apiContext = useContext(APIClientContext);
+        api_pets_getPets.useQuery();
+        useEffect(() => {
+          void qraftAPIClient(findPetsByStatus, {
+            invalidateQueries
+          }, apiContext!).invalidateQueries();
+        }, [apiContext]);
+      }"
+    `);
+  });
+
   it('imports an operation directly for a precreated named API client', async () => {
     const root = await fs.mkdtemp(
       path.join(os.tmpdir(), 'qraft-tree-shaking-')
