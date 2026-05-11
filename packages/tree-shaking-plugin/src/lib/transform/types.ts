@@ -50,6 +50,7 @@ export type OperationImportInfo = {
 
 export type ClientBinding = {
   name: string;
+  clientSourceKey: string;
   createImportPath: string;
   factory: QraftFactoryConfig;
   bindingNode: t.Node;
