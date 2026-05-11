@@ -26,7 +26,6 @@ packages/tree-shaking-plugin/src/__tests__/
   core/
     harness.ts
     fixtures.ts
-    assertions.ts
     create-api-client-fn.test.ts
     explicit-options.test.ts
     precreated-api-client.test.ts
@@ -57,7 +56,7 @@ The existing `core.test.ts` should be removed after its tests have moved. If the
 - filesystem fixture writer
 - fixture module resolver/load helper
 
-`assertions.ts` should contain only small assertion helpers that keep tests clearer. It should not hide the emitted transform shape. Inline snapshots remain in the test files.
+Do not add assertion helpers until there is a concrete consumer that improves clarity without weakening the emitted transform contract. Inline snapshots remain in the test files.
 
 ## Behavioral Test Files
 
