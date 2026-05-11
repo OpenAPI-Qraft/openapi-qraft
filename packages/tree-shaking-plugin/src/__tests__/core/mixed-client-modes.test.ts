@@ -43,14 +43,19 @@ export const APIClient = createAPIClient(createAPIClientOptions());
       `
 import { createAPIClient } from './context-api';
 import { APIClient } from './precreated-client';
+import { useEffect } from 'react';
 
 const api = createAPIClient();
 
-api.pets.getPets.useQuery();
-console.log(api);
+export function App() {
+  api.pets.getPets.useQuery();
+  console.log(api);
 
-APIClient.pets.getPets.useQuery();
-console.log(APIClient);
+  useEffect(() => {
+    APIClient.pets.getPets.useQuery();
+    console.log(APIClient);
+  }, []);
+}
 `,
       sourceFile,
       {
@@ -73,6 +78,7 @@ console.log(APIClient);
     expect(result?.code).toMatchInlineSnapshot(`
       "import { createAPIClient } from './context-api';
       import { APIClient } from './precreated-client';
+      import { useEffect } from 'react';
       import { qraftAPIClient } from "@openapi-qraft/react";
       import { qraftReactAPIClient } from "@openapi-qraft/react";
       import { useQuery } from "@openapi-qraft/react/callbacks/useQuery";
@@ -87,10 +93,14 @@ console.log(APIClient);
         useQuery
       }, createAPIClientOptions());
       const api = createAPIClient();
-      api_pets_getPets.useQuery();
-      console.log(api);
-      APIClient_pets_getPets.useQuery();
-      console.log(APIClient);"
+      export function App() {
+        api_pets_getPets.useQuery();
+        console.log(api);
+        useEffect(() => {
+          APIClient_pets_getPets.useQuery();
+          console.log(APIClient);
+        }, []);
+      }"
     `);
   });
 
