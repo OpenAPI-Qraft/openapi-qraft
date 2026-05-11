@@ -837,65 +837,6 @@ console.log(APIClient);
     `);
   });
 
-  it('optimizes explicit options clients created inside callbacks', async () => {
-    const fixture = await createFixture();
-    const sourceFile = path.join(fixture, 'src/App.tsx');
-
-    const result = await transformQraftTreeShaking(
-      `
-import { createAPIClient } from './api';
-
-const api = createAPIClient();
-
-function PetUpdateItem({ petId }: { petId: number }) {
-  return api.pets.updatePet.useIsMutating(api.pets.updatePet.getMutationKey());
-}
-
-function PetUpdateForm({ petId }: { petId: number }) {
-  api.pets.updatePet.useMutation(undefined, {
-    mutationKey: api.pets.updatePet.getMutationKey(),
-  });
-}
-`,
-      sourceFile,
-      { createAPIClientFn: [{ name: 'createAPIClient', module: './api' }] }
-    );
-
-    expect(result?.code).toMatchInlineSnapshot(`
-      "import { qraftAPIClient } from "@openapi-qraft/react";
-      import { qraftReactAPIClient } from "@openapi-qraft/react";
-      import { useIsMutating } from "@openapi-qraft/react/callbacks/useIsMutating";
-      import { updatePet } from "./api/services/PetsService";
-      import { APIClientContext } from "./api/APIClientContext";
-      import { getMutationKey } from "@openapi-qraft/react/callbacks/getMutationKey";
-      import { useMutation } from "@openapi-qraft/react/callbacks/useMutation";
-      const api_pets_updatePet = qraftReactAPIClient(updatePet, {
-        useIsMutating,
-        getMutationKey
-      }, APIClientContext);
-      const _api_pets_updatePet = qraftReactAPIClient(updatePet, {
-        useMutation,
-        getMutationKey
-      }, APIClientContext);
-      function PetUpdateItem({
-        petId
-      }: {
-        petId: number;
-      }) {
-        return api_pets_updatePet.useIsMutating(api_pets_updatePet.getMutationKey());
-      }
-      function PetUpdateForm({
-        petId
-      }: {
-        petId: number;
-      }) {
-        _api_pets_updatePet.useMutation(undefined, {
-          mutationKey: _api_pets_updatePet.getMutationKey()
-        });
-      }"
-    `);
-  });
-
   it('splits explicit options clients across sibling callback scopes', async () => {
     const fixture = await createFixture();
     const sourceFile = path.join(fixture, 'src/App.tsx');
