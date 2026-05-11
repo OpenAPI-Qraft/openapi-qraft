@@ -900,7 +900,7 @@ function matchSchemaAccess(
     if (!client) return null;
 
     return {
-      sourceKey: client.name,
+      sourceKey: `${client.clientSourceKey}:${client.name}`,
       serviceName,
       operationName,
     };

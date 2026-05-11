@@ -823,14 +823,20 @@ console.log(APIClient);
       "import { createAPIClient } from './context-api';
       import { APIClient } from './precreated-client';
       import { qraftAPIClient } from "@openapi-qraft/react";
+      import { qraftReactAPIClient } from "@openapi-qraft/react";
       import { useQuery } from "@openapi-qraft/react/callbacks/useQuery";
-      import { getPets } from "./precreated-api/services/PetsService";
+      import { getPets } from "./context-api/services/PetsService";
+      import { ContextAPIClientContext } from "./context-api/ContextAPIClientContext";
+      import { getPets as _getPets } from "./precreated-api/services/PetsService";
       import { createAPIClientOptions } from "./precreated-client-options";
-      const APIClient_pets_getPets = qraftAPIClient(getPets, {
+      const api_pets_getPets = qraftReactAPIClient(getPets, {
+        useQuery
+      }, ContextAPIClientContext);
+      const APIClient_pets_getPets = qraftAPIClient(_getPets, {
         useQuery
       }, createAPIClientOptions());
       const api = createAPIClient();
-      api.pets.getPets.useQuery();
+      api_pets_getPets.useQuery();
       console.log(api);
       APIClient_pets_getPets.useQuery();
       console.log(APIClient);"
@@ -1721,10 +1727,7 @@ export function App() {
     `);
   });
 
-  // Still skipped: after source-aware key alignment, the mixed-mode file still
-  // leaves the top-level context client call unreplaced while rewriting the
-  // inline and precreated paths for the same operation.
-  it.skip('keeps same-operation rewrites separate across all client modes', async () => {
+  it('keeps same-operation rewrites separate across all client modes', async () => {
     const root = await fs.mkdtemp(
       path.join(os.tmpdir(), 'qraft-tree-shaking-')
     );
@@ -1788,13 +1791,14 @@ export function App() {
     expect(result?.code).toMatchInlineSnapshot(`
       "import { ContextAPIClientContext } from './context-api';
       import { useContext, useEffect } from 'react';
-      import { qraftReactAPIClient, qraftAPIClient } from "@openapi-qraft/react";
+      import { qraftAPIClient } from "@openapi-qraft/react";
+      import { qraftReactAPIClient } from "@openapi-qraft/react";
       import { useQuery } from "@openapi-qraft/react/callbacks/useQuery";
-      import { getQueryKey } from "@openapi-qraft/react/callbacks/getQueryKey";
-      import { invalidateQueries } from "@openapi-qraft/react/callbacks/invalidateQueries";
       import { getPets } from "./context-api/services/PetsService";
+      import { getQueryKey } from "@openapi-qraft/react/callbacks/getQueryKey";
       import { getPets as _getPets } from "./precreated-api/services/PetsService";
       import { createAPIClientOptions } from "./precreated-client-options";
+      import { invalidateQueries } from "@openapi-qraft/react/callbacks/invalidateQueries";
       const contextApi_pets_getPets = qraftReactAPIClient(getPets, {
         useQuery
       }, ContextAPIClientContext);
@@ -1894,9 +1898,7 @@ APIClient.stores.getStores.getQueryKey();
     `);
   });
 
-  // Still skipped: the aliased context client remains unreplaced in the mixed
-  // createAPIClientFn + precreated file after the source-aware key fix.
-  it.skip('supports createAPIClientFn and precreated apiClient clients in one file', async () => {
+  it('supports createAPIClientFn and precreated apiClient clients in one file', async () => {
     const root = await fs.mkdtemp(
       path.join(os.tmpdir(), 'qraft-tree-shaking-')
     );
@@ -1963,13 +1965,14 @@ export function App() {
     expect(result?.code).toMatchInlineSnapshot(`
       "import { ContextAPIClientContext } from './context-api';
       import { useContext, useEffect } from 'react';
-      import { useQuery } from "@openapi-qraft/react/callbacks/useQuery";
-      import { qraftReactAPIClient } from "@openapi-qraft/react";
-      import { getPets, findPetsByStatus } from "./context-api/services/PetsService";
       import { qraftAPIClient } from "@openapi-qraft/react";
-      import { invalidateQueries } from "@openapi-qraft/react/callbacks/invalidateQueries";
+      import { qraftReactAPIClient } from "@openapi-qraft/react";
+      import { useQuery } from "@openapi-qraft/react/callbacks/useQuery";
+      import { getPets } from "./context-api/services/PetsService";
       import { getStores } from "./precreated-api/services/StoresService";
       import { createAPIClientOptions } from "./precreated-client-options";
+      import { invalidateQueries } from "@openapi-qraft/react/callbacks/invalidateQueries";
+      import { findPetsByStatus } from "./context-api/services/PetsService";
       const contextApi_pets_getPets = qraftReactAPIClient(getPets, {
         useQuery
       }, ContextAPIClientContext);
@@ -2219,12 +2222,13 @@ APIClient.pets.getPets.getQueryKey();
       import { qraftAPIClient } from "@openapi-qraft/react";
       import { getQueryKey } from "@openapi-qraft/react/callbacks/getQueryKey";
       import { getPets } from "./context-api/services/PetsService";
+      import { getPets as _getPets } from "./precreated-api/services/PetsService";
       import { createAPIClientOptions } from "./precreated-client-options";
       import { invalidateQueries } from "@openapi-qraft/react/callbacks/invalidateQueries";
       const _api_pets_getPets = qraftAPIClient(getPets, {
         getQueryKey
       });
-      const _APIClient_pets_getPets = qraftAPIClient(getPets, {
+      const _APIClient_pets_getPets = qraftAPIClient(_getPets, {
         getQueryKey
       }, createAPIClientOptions());
       const apiContext = ContextAPIClientContext;
