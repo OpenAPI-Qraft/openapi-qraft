@@ -276,30 +276,42 @@ export async function createTransformPlan(
 
       const args = variablePath.node.init.arguments;
       if (args.length === 0) {
+        const mode = { type: 'context' } as const;
         clients.push({
           name: variablePath.node.id.name,
+          clientSourceKey: getClientSourceKey(
+            createImportPath,
+            createImport.factory,
+            mode
+          ),
           createImportPath,
           factory: createImport.factory,
           bindingNode: variablePath.node.id,
           declarationScope: variablePath.parentPath.scope,
           localInitPath: variablePath,
-          mode: { type: 'context' },
+          mode,
         });
         return;
       }
 
       if (args.length === 1 && isExpression(args[0])) {
+        const mode = {
+          type: 'options',
+          optionsExpression: t.cloneNode(args[0], true),
+        } as const;
         clients.push({
           name: variablePath.node.id.name,
+          clientSourceKey: getClientSourceKey(
+            createImportPath,
+            createImport.factory,
+            mode
+          ),
           createImportPath,
           factory: createImport.factory,
           bindingNode: variablePath.node.id,
           declarationScope: variablePath.parentPath.scope,
           localInitPath: variablePath,
-          mode: {
-            type: 'options',
-            optionsExpression: t.cloneNode(args[0], true),
-          },
+          mode,
         });
       }
     },
@@ -753,17 +765,24 @@ async function findPrecreatedClients(
       }
       if (!validatedConfig) continue;
 
+      const mode = {
+        type: 'precreated',
+        optionsImportPath: match.optionsImportPath,
+        optionsExportName: match.config.createAPIClientFnOptions,
+      } as const;
+
       clients.push({
         name: specifier.local.name,
+        clientSourceKey: getClientSourceKey(
+          match.factoryFile,
+          validatedConfig.factory,
+          mode
+        ),
         createImportPath: match.factoryFile,
         factory: validatedConfig.factory,
         bindingNode: specifier.local,
         declarationScope: programScope,
-        mode: {
-          type: 'precreated',
-          optionsImportPath: match.optionsImportPath,
-          optionsExportName: match.config.createAPIClientFnOptions,
-        },
+        mode,
       });
     }
   }
@@ -1569,6 +1588,25 @@ function getGeneratedInfoKey(
   factory: QraftFactoryConfig
 ) {
   return `${createImportPath}::${factory.context ?? 'APIClientContext'}::${factory.contextModule ?? ''}`;
+}
+
+function getClientSourceKey(
+  createImportPath: string,
+  factory: QraftFactoryConfig,
+  mode: ClientBinding['mode']
+) {
+  const generatedInfoKey = getGeneratedInfoKey(createImportPath, factory);
+
+  if (mode.type === 'precreated') {
+    return [
+      'precreated',
+      generatedInfoKey,
+      mode.optionsImportPath,
+      mode.optionsExportName,
+    ].join('::');
+  }
+
+  return [mode.type, generatedInfoKey].join('::');
 }
 
 async function resolveFactoryModule(
