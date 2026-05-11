@@ -52,7 +52,7 @@ export function App() {
   console.log(api);
 
   useEffect(() => {
-    APIClient.pets.getPets.useQuery();
+    APIClient.pets.getPets.invalidateQueries();
     console.log(APIClient);
   }, []);
 }
@@ -84,20 +84,21 @@ export function App() {
       import { useQuery } from "@openapi-qraft/react/callbacks/useQuery";
       import { getPets } from "./context-api/services/PetsService";
       import { ContextAPIClientContext } from "./context-api/ContextAPIClientContext";
+      import { invalidateQueries } from "@openapi-qraft/react/callbacks/invalidateQueries";
       import { getPets as _getPets } from "./precreated-api/services/PetsService";
       import { createAPIClientOptions } from "./precreated-client-options";
       const api_pets_getPets = qraftReactAPIClient(getPets, {
         useQuery
       }, ContextAPIClientContext);
       const APIClient_pets_getPets = qraftAPIClient(_getPets, {
-        useQuery
+        invalidateQueries
       }, createAPIClientOptions());
       const api = createAPIClient();
       export function App() {
         api_pets_getPets.useQuery();
         console.log(api);
         useEffect(() => {
-          APIClient_pets_getPets.useQuery();
+          APIClient_pets_getPets.invalidateQueries();
           console.log(APIClient);
         }, []);
       }"
