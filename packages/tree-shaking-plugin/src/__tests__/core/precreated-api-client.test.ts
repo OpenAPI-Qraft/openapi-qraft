@@ -566,6 +566,65 @@ console.log(APIClient);
       }, createAPIClientOptions());
       APIClient_pets_getPets.useQuery();
       console.log(APIClient);"
+      `);
+  });
+
+  it('rewrites query-client state callbacks for precreated clients', async () => {
+    const root = await fs.mkdtemp(
+      path.join(os.tmpdir(), 'qraft-tree-shaking-')
+    );
+    await writeFixtureFiles(
+      root,
+      createPrecreatedFixtureFiles(`
+import { createAPIClient } from './api';
+import { createAPIClientOptions } from './client-options';
+
+export const APIClient = createAPIClient(createAPIClientOptions());
+`)
+    );
+    const sourceFile = path.join(root, 'src/App.tsx');
+
+    const result = await transformQraftTreeShaking(
+      `
+import { APIClient } from './client';
+
+APIClient.pets.getPets.getQueryState();
+APIClient.pets.getPets.isFetching();
+APIClient.pets.updatePet.isMutating();
+`,
+      sourceFile,
+      {
+        apiClient: [
+          {
+            client: 'APIClient',
+            clientModule: './client',
+            createAPIClientFn: 'createAPIClient',
+            createAPIClientFnModule: './api',
+            createAPIClientFnOptions: 'createAPIClientOptions',
+            createAPIClientFnOptionsModule: './client-options',
+          },
+        ],
+      }
+    );
+
+    expect(result?.code).toMatchInlineSnapshot(`
+      "import { qraftAPIClient } from "@openapi-qraft/react";
+      import { getQueryState } from "@openapi-qraft/react/callbacks/getQueryState";
+      import { getPets } from "./api/services/PetsService";
+      import { createAPIClientOptions } from "./client-options";
+      import { isFetching } from "@openapi-qraft/react/callbacks/isFetching";
+      import { isMutating } from "@openapi-qraft/react/callbacks/isMutating";
+      import { updatePet } from "./api/services/PetsService";
+      const APIClient_pets_getPets = qraftAPIClient(getPets, {
+        getQueryState,
+        isFetching
+      }, createAPIClientOptions());
+      const APIClient_pets_updatePet = qraftAPIClient(updatePet, {
+        isMutating
+      }, createAPIClientOptions());
+      APIClient_pets_getPets.getQueryState();
+      APIClient_pets_getPets.isFetching();
+      APIClient_pets_updatePet.isMutating();"
     `);
   });
 });

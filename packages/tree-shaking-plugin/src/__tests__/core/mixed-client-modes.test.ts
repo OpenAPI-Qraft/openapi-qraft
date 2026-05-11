@@ -524,4 +524,95 @@ export function App() {
       }"
     `);
   });
+
+  it('keeps callback-class rewrites separate across context and precreated modes', async () => {
+    const root = await fs.mkdtemp(
+      path.join(os.tmpdir(), 'qraft-tree-shaking-')
+    );
+    await writeFixtureFiles(root, {
+      ...getContextFixtureFiles(
+        'ContextAPIClientContext',
+        './ContextAPIClientContext',
+        true,
+        'context-api'
+      ),
+      'src/precreated-api/index.ts': PRECREATED_API_INDEX_TS,
+      'src/precreated-api/services/index.ts': SERVICES_INDEX_TS,
+      'src/precreated-api/services/PetsService.ts': PETS_SERVICE_TS,
+      'src/precreated-api/services/StoresService.ts': STORES_SERVICE_TS,
+      'src/precreated-client-options.ts': DEFAULT_PRECREATED_CLIENT_OPTIONS_TS,
+      'src/precreated-client.ts': `
+import { createAPIClient } from './precreated-api';
+import { createAPIClientOptions } from './precreated-client-options';
+
+export const APIClient = createAPIClient(createAPIClientOptions());
+`,
+    });
+    const sourceFile = path.join(root, 'src/App.tsx');
+
+    const result = await transformQraftTreeShaking(
+      `
+import { createAPIClient, ContextAPIClientContext } from './context-api';
+import { APIClient } from './precreated-client';
+import { useContext, useEffect } from 'react';
+
+const reactApi = createAPIClient();
+
+export function App() {
+  const apiContext = useContext(ContextAPIClientContext);
+  reactApi.pets.getPets.useSuspenseQuery();
+  useEffect(() => {
+    void createAPIClient(apiContext!).pets.findPetsByStatus.fetchQuery();
+  }, [apiContext]);
+  APIClient.pets.getPets.getInfiniteQueryKey();
+}
+`,
+      sourceFile,
+      {
+        createAPIClientFn: [
+          { name: 'createAPIClient', module: './context-api' },
+        ],
+        apiClient: [
+          {
+            client: 'APIClient',
+            clientModule: './precreated-client',
+            createAPIClientFn: 'createAPIClient',
+            createAPIClientFnModule: './precreated-api',
+            createAPIClientFnOptions: 'createAPIClientOptions',
+            createAPIClientFnOptionsModule: './precreated-client-options',
+          },
+        ],
+      }
+    );
+
+    expect(result?.code).toMatchInlineSnapshot(`
+      "import { ContextAPIClientContext } from './context-api';
+      import { useContext, useEffect } from 'react';
+      import { qraftAPIClient } from "@openapi-qraft/react";
+      import { qraftReactAPIClient } from "@openapi-qraft/react";
+      import { useSuspenseQuery } from "@openapi-qraft/react/callbacks/useSuspenseQuery";
+      import { getPets } from "./context-api/services/PetsService";
+      import { getInfiniteQueryKey } from "@openapi-qraft/react/callbacks/getInfiniteQueryKey";
+      import { getPets as _getPets } from "./precreated-api/services/PetsService";
+      import { createAPIClientOptions } from "./precreated-client-options";
+      import { fetchQuery } from "@openapi-qraft/react/callbacks/fetchQuery";
+      import { findPetsByStatus } from "./context-api/services/PetsService";
+      const reactApi_pets_getPets = qraftReactAPIClient(getPets, {
+        useSuspenseQuery
+      }, ContextAPIClientContext);
+      const APIClient_pets_getPets = qraftAPIClient(_getPets, {
+        getInfiniteQueryKey
+      }, createAPIClientOptions());
+      export function App() {
+        const apiContext = useContext(ContextAPIClientContext);
+        reactApi_pets_getPets.useSuspenseQuery();
+        useEffect(() => {
+          void qraftAPIClient(findPetsByStatus, {
+            fetchQuery
+          }, apiContext!).fetchQuery();
+        }, [apiContext]);
+        APIClient_pets_getPets.getInfiniteQueryKey();
+      }"
+    `);
+  });
 });
