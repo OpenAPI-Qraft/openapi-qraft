@@ -106,13 +106,12 @@ describe('Qraft uses singular Query', () => {
     });
   });
 
-  it('supports useQuery with QueryClient options', async () => {
+  it('supports useQuery with QueryClient from context', async () => {
     const queryClient = new QueryClient();
 
     const qraft = createAPIClient({
       requestFn,
       baseUrl,
-      queryClient,
     });
 
     const { result } = renderHook(
@@ -1179,9 +1178,9 @@ describe('Qraft uses Mutations', () => {
     });
   });
 
-  it('supports useMutation with QueryClient options', async () => {
+  it('supports useMutation with QueryClient from context', async () => {
     const queryClient = new QueryClient();
-    const qraft = createAPIClient({ requestFn, baseUrl, queryClient });
+    const qraft = createAPIClient({ requestFn, baseUrl });
 
     const { result } = renderHook(
       () => qraft.entities.postEntitiesIdDocuments.useMutation(),
@@ -1517,6 +1516,7 @@ describe('Qraft uses useIsMutating', () => {
 
   it('supports useIsMutating with filters', async () => {
     const { qraft, queryClient } = createClient();
+    const noQueryClientQraft = createAPIClient({ requestFn, baseUrl });
     const { result: mutationResult } = renderHook(
       () => qraft.entities.postEntitiesIdDocuments.useMutation(parameters),
       {
@@ -1533,11 +1533,11 @@ describe('Qraft uses useIsMutating', () => {
 
     const { result: isMutatingResult } = renderHook(
       () => {
-        const noRequestQraft = createAPIClient({ queryClient });
-
-        return noRequestQraft.entities.postEntitiesIdDocuments.useIsMutating({
-          parameters,
-        });
+        return noQueryClientQraft.entities.postEntitiesIdDocuments.useIsMutating(
+          {
+            parameters,
+          }
+        );
       },
       {
         wrapper: (props) => <Providers {...props} queryClient={queryClient} />,

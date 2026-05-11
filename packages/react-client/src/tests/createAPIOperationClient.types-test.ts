@@ -89,6 +89,9 @@ const generatedRequestOnlyApi = createMinimalAPIClient(
     operationInvokeFn,
     useQuery,
     useIsFetching,
+    useMutation,
+    useIsMutating,
+    useMutationState,
     getQueryData,
     invalidateQueries,
   }
@@ -96,10 +99,11 @@ const generatedRequestOnlyApi = createMinimalAPIClient(
 
 generatedRequestOnlyApi.files.getFileList();
 generatedRequestOnlyApi.files.getFileList.getQueryKey();
-// @ts-expect-error - request-only generated client cannot expose query hooks
 generatedRequestOnlyApi.files.getFileList.useQuery();
-// @ts-expect-error - request-only generated client cannot expose state hooks without QueryClient
 generatedRequestOnlyApi.files.getFileList.useIsFetching();
+generatedRequestOnlyApi.files.deleteFiles.useMutation();
+generatedRequestOnlyApi.files.deleteFiles.useIsMutating();
+generatedRequestOnlyApi.files.deleteFiles.useMutationState();
 // @ts-expect-error - request-only generated client cannot expose QueryClient methods
 generatedRequestOnlyApi.files.getFileList.getQueryData();
 // @ts-expect-error - request-only generated client cannot expose QueryClient methods
@@ -213,7 +217,9 @@ const generatedContextRequestOnlyApi = createInternalReactAPIClient(
     getQueryKey,
     operationInvokeFn,
     useIsFetching,
+    useIsMutating,
     useMutation,
+    useMutationState,
     useQuery,
   }
 );
@@ -222,12 +228,16 @@ generatedContextRequestOnlyApi.files.getFileList();
 generatedContextRequestOnlyApi.files.getFileList.getQueryKey();
 // @ts-expect-error - context request-only object options do not expose query hooks
 generatedContextRequestOnlyApi.files.getFileList.useQuery();
-// @ts-expect-error - context request-only object options do not expose state hooks without QueryClient
+// @ts-expect-error - context request-only object options do not expose state hooks
 generatedContextRequestOnlyApi.files.getFileList.useIsFetching();
 // @ts-expect-error - context request-only object options do not expose QueryClient methods
 generatedContextRequestOnlyApi.files.getFileList.getQueryData();
 // @ts-expect-error - context request-only object options do not expose mutation hooks
 generatedContextRequestOnlyApi.files.deleteFiles.useMutation();
+// @ts-expect-error - context request-only object options do not expose state hooks
+generatedContextRequestOnlyApi.files.deleteFiles.useIsMutating();
+// @ts-expect-error - context request-only object options do not expose state hooks
+generatedContextRequestOnlyApi.files.deleteFiles.useMutationState();
 
 const generatedContextQueryClientOnlyApi = createInternalReactAPIClient(
   services,
