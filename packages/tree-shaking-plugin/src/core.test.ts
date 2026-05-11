@@ -1721,7 +1721,8 @@ export function App() {
     `);
   });
 
-  // Documents the expected post-fix contract while production still mishandles this case.
+  // Still skipped: mixed-mode files keep the context client call unreplaced while the
+  // precreated client imports the same operation from a different source module.
   it.skip('keeps same-operation rewrites separate across all client modes', async () => {
     const root = await fs.mkdtemp(
       path.join(os.tmpdir(), 'qraft-tree-shaking-')
@@ -1892,7 +1893,8 @@ APIClient.stores.getStores.getQueryKey();
     `);
   });
 
-  // Uncovered behavior: aliased createAPIClientFn imports do not rewrite the precreated context client hook in mixed-mode files.
+  // Still skipped: aliased mixed-mode files keep the top-level context client usage
+  // intact instead of rewriting it alongside the precreated client call.
   it.skip('supports createAPIClientFn and precreated apiClient clients in one file', async () => {
     const root = await fs.mkdtemp(
       path.join(os.tmpdir(), 'qraft-tree-shaking-')
