@@ -16,8 +16,6 @@
   - Owns transform execution, source-map wiring, and fixture-root module access setup.
 - Create: `packages/tree-shaking-plugin/src/__tests__/core/fixtures.ts`
   - Owns generated API fixture source strings, fixture file builders, resolver/load helpers, and filesystem writer.
-- Create: `packages/tree-shaking-plugin/src/__tests__/core/assertions.ts`
-  - Owns only small high-signal assertion helpers. It must not hide transform snapshots.
 - Create: `packages/tree-shaking-plugin/src/__tests__/core/create-api-client-fn.test.ts`
   - Context-based and zero-arg `createAPIClientFn` behavior.
 - Create: `packages/tree-shaking-plugin/src/__tests__/core/explicit-options.test.ts`
@@ -120,7 +118,6 @@ Move tests by title exactly as follows.
 **Files:**
 - Create: `packages/tree-shaking-plugin/src/__tests__/core/fixtures.ts`
 - Create: `packages/tree-shaking-plugin/src/__tests__/core/harness.ts`
-- Create: `packages/tree-shaking-plugin/src/__tests__/core/assertions.ts`
 - Read: `packages/tree-shaking-plugin/src/core.test.ts`
 
 - [ ] **Step 1: Create the test helper directory**
@@ -407,28 +404,7 @@ export { createTransformPlan };
 
 After writing this file, adjust only if TypeScript reports a mismatch with the actual current helper signatures.
 
-- [ ] **Step 4: Add assertion helper file**
-
-Create `packages/tree-shaking-plugin/src/__tests__/core/assertions.ts`:
-
-```ts
-import { expect } from 'vitest';
-
-export function expectNoTransform(result: { code?: string | null } | null) {
-  expect(result).toBeNull();
-}
-
-export function expectCodeToContainAll(code: string | undefined, tokens: string[]) {
-  expect(code).toBeTypeOf('string');
-  for (const token of tokens) {
-    expect(code).toContain(token);
-  }
-}
-```
-
-Use these helpers only for tests that already use `toContain(...)` or `toBeNull()`. Do not replace inline snapshots with token-only assertions.
-
-- [ ] **Step 5: Run typecheck for helper compile errors**
+- [ ] **Step 4: Run typecheck for helper compile errors**
 
 Run:
 
@@ -438,7 +414,7 @@ corepack yarn workspace @openapi-qraft/tree-shaking-plugin typecheck
 
 Expected: PASS. If it fails because a copied helper signature differs from current `core.test.ts`, align the new helper with the current code before continuing.
 
-- [ ] **Step 6: Commit shared helpers**
+- [ ] **Step 5: Commit shared helpers**
 
 Run:
 
