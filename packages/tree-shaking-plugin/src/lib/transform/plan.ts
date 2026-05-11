@@ -1303,6 +1303,8 @@ async function readGeneratedClientInfo(
   let servicesDir: string | null = null;
   let contextImportPath: string | null = null;
   let contextName: string | null = null;
+  const contextImportPathsByLocalName = new Map<string, string>();
+  const reactClientLocalNames = new Set<string>();
   const expectedContextName = factory.context ?? 'APIClientContext';
   const shouldScanContextImport = usesReactClient && !factory.contextModule;
 
@@ -1323,13 +1325,38 @@ async function readGeneratedClientInfo(
           shouldScanContextImport &&
           t.isImportSpecifier(specifier) &&
           t.isIdentifier(specifier.imported) &&
-          t.isIdentifier(specifier.local) &&
-          specifier.imported.name === expectedContextName
+          t.isIdentifier(specifier.local)
         ) {
-          contextName = specifier.local.name;
-          contextImportPath = sourcePath;
+          contextImportPathsByLocalName.set(specifier.local.name, sourcePath);
+
+          if (specifier.imported.name === expectedContextName) {
+            contextName = specifier.local.name;
+            contextImportPath = sourcePath;
+          }
+        }
+
+        if (
+          usesReactClient &&
+          t.isImportSpecifier(specifier) &&
+          t.isIdentifier(specifier.imported) &&
+          t.isIdentifier(specifier.local) &&
+          specifier.imported.name === 'qraftReactAPIClient'
+        ) {
+          reactClientLocalNames.add(specifier.local.name);
         }
       }
+    },
+    CallExpression(callPath) {
+      if (!shouldScanContextImport || contextName) return;
+      if (!t.isIdentifier(callPath.node.callee)) return;
+      if (!reactClientLocalNames.has(callPath.node.callee.name)) return;
+
+      const contextArgument = callPath.node.arguments[2];
+      if (!t.isIdentifier(contextArgument)) return;
+
+      contextName = contextArgument.name;
+      contextImportPath =
+        contextImportPathsByLocalName.get(contextArgument.name) ?? null;
     },
   });
 
@@ -1399,7 +1426,7 @@ function resolveOperationImport(
   reservedImportLocalNames: Set<string>,
   operationImports: Map<string, OperationImportInfo>
 ): OperationImportInfo | null {
-  const key = `${generatedInfo.importerId}:${serviceName}:${operationName}`;
+  const key = `${generatedInfo.clientFile}:${serviceName}:${operationName}`;
   const cached = operationImports.get(key);
   if (cached) return cached;
 
@@ -1421,6 +1448,7 @@ function resolveOperationImport(
       reservedImportLocalNames
     ),
   };
+  reservedImportLocalNames.add(resolved.localName);
   operationImports.set(key, resolved);
   return resolved;
 }
