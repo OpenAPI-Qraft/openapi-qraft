@@ -1,17 +1,19 @@
 import '@qraft/test-utils/vitestFsMock';
+import type { SourceMapInput } from '@jridgewell/trace-mapping';
 import fs from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
-import type { SourceMapInput } from '@jridgewell/trace-mapping';
-import { createTransformPlan } from '../../lib/transform/plan.js';
 import { transformQraftTreeShaking as transformQraftTreeShakingImpl } from '../../core.js';
+import { createTransformPlan } from '../../lib/transform/plan.js';
 import {
   createFixtureModuleAccess,
   getContextFixtureFiles,
   writeFixtureFiles,
 } from './fixtures.js';
 
-export type TransformOptions = Parameters<typeof transformQraftTreeShakingImpl>[2];
+export type TransformOptions = Parameters<
+  typeof transformQraftTreeShakingImpl
+>[2];
 
 type FixtureOptions = {
   contextName?: string;

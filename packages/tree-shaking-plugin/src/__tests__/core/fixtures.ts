@@ -1,6 +1,9 @@
+import type {
+  QraftModuleAccess,
+  QraftModuleAccessOptions,
+} from '../../lib/resolvers/common.js';
 import fs from 'node:fs/promises';
 import path from 'node:path';
-import type { QraftModuleAccess, QraftModuleAccessOptions } from '../../lib/resolvers/common.js';
 
 export const PRECREATED_API_INDEX_TS = `
 import { qraftAPIClient } from '@openapi-qraft/react';
