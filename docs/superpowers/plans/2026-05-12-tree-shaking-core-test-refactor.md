@@ -8,6 +8,8 @@
 
 **Tech Stack:** TypeScript, Vitest, Babel-generated inline snapshots, existing fixture module access helpers, `@jridgewell/trace-mapping`, `@qraft/test-utils/vitestFsMock`.
 
+**Current status:** the old `packages/tree-shaking-plugin/src/core.test.ts` file has been deleted after the split. Run focused core transform tests from `packages/tree-shaking-plugin/src/__tests__/core/*.test.ts`.
+
 ---
 
 ## File Structure
@@ -876,10 +878,10 @@ git commit -m "test(tree-shaking): split remaining core transform tests"
 Run:
 
 ```bash
-rg -n "^  it\\(" packages/tree-shaking-plugin/src/core.test.ts
+test ! -e packages/tree-shaking-plugin/src/core.test.ts || rg -n "^  it\\(" packages/tree-shaking-plugin/src/core.test.ts
 ```
 
-Expected: no output. If output remains, move those tests to the correct file before continuing.
+Expected: exit code `0`, or no `it(...)` output if the file still exists during migration. If output remains, move those tests to the correct file before continuing.
 
 - [ ] **Step 2: Delete the old file**
 

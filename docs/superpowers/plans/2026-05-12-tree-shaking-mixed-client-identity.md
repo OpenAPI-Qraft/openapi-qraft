@@ -239,7 +239,7 @@ Use this key shape:
 Run:
 
 ```bash
-corepack yarn workspace @openapi-qraft/tree-shaking-plugin vitest run src/core.test.ts -t "keeps same-operation rewrites separate across all client modes|supports createAPIClientFn and precreated apiClient clients in one file"
+corepack yarn workspace @openapi-qraft/tree-shaking-plugin vitest run src/__tests__/core/mixed-client-modes.test.ts -t "keeps same-operation rewrites separate across all client modes|supports createAPIClientFn and precreated apiClient clients in one file"
 ```
 
 Expected: Vitest reports these tests as skipped because they still use `it.skip(...)`. This command is only a sanity check that the file still loads.
@@ -326,7 +326,7 @@ Read `dedupeDeclarations(...)`. Do not change it unless tests prove it drops dis
 Do not edit `it.skip` yet. Run the full file load:
 
 ```bash
-corepack yarn workspace @openapi-qraft/tree-shaking-plugin vitest run src/core.test.ts
+corepack yarn workspace @openapi-qraft/tree-shaking-plugin vitest run src/__tests__/core/mixed-client-modes.test.ts
 ```
 
 Expected: PASS with two skipped tests.

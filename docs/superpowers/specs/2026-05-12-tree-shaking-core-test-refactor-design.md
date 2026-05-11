@@ -6,6 +6,8 @@ Refactor `packages/tree-shaking-plugin/src/core.test.ts` from one large catch-al
 
 The refactor should preserve the existing exact snapshot contract while making it easier to add missing regression coverage for client modes, callback classes, mixed-source identity, context detection, and unsupported syntax.
 
+Implementation note: the old `packages/tree-shaking-plugin/src/core.test.ts` path has been removed. New core transform coverage lives in `packages/tree-shaking-plugin/src/__tests__/core/*.test.ts`.
+
 ## Current Problems
 
 `core.test.ts` is now large enough that coverage gaps are hard to see. It mixes resolver tests, source-map tests, context-client snapshots, explicit-options snapshots, precreated-client snapshots, mixed-mode regressions, schema rewrites, collision tests, and fixture helpers in one file.
@@ -36,7 +38,7 @@ packages/tree-shaking-plugin/src/__tests__/
     source-maps.test.ts
 ```
 
-The existing `core.test.ts` should be removed after its tests have moved. If the project or Vitest setup requires keeping the path temporarily, it may be left only during migration, not as a long-term aggregator.
+The existing `core.test.ts` should be removed after its tests have moved. If the project or Vitest setup requires keeping the path temporarily, it may be left only during migration, not as a long-term aggregator. The final implementation removes the file rather than keeping an aggregator.
 
 ## Shared Test Utilities
 
