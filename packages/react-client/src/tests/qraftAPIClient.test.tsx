@@ -1516,7 +1516,7 @@ describe('Qraft uses useIsMutating', () => {
 
   it('supports useIsMutating with filters', async () => {
     const { qraft, queryClient } = createClient();
-    const noQueryClientQraft = createAPIClient({ requestFn, baseUrl });
+    const noRequestQraft = createAPIClient();
     const { result: mutationResult } = renderHook(
       () => qraft.entities.postEntitiesIdDocuments.useMutation(parameters),
       {
@@ -1533,11 +1533,9 @@ describe('Qraft uses useIsMutating', () => {
 
     const { result: isMutatingResult } = renderHook(
       () => {
-        return noQueryClientQraft.entities.postEntitiesIdDocuments.useIsMutating(
-          {
-            parameters,
-          }
-        );
+        return noRequestQraft.entities.postEntitiesIdDocuments.useIsMutating({
+          parameters,
+        });
       },
       {
         wrapper: (props) => <Providers {...props} queryClient={queryClient} />,

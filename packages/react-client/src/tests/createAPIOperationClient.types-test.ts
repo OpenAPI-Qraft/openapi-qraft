@@ -110,16 +110,24 @@ generatedRequestOnlyApi.files.getFileList.getQueryData();
 generatedRequestOnlyApi.files.getFileList.invalidateQueries();
 
 const generatedUtilityApi = createMinimalAPIClient(services, {
+  getMutationKey,
   getQueryKey,
-  operationInvokeFn,
-  useQuery,
+  useIsFetching,
+  useIsMutating,
+  useMutationState,
 });
 
 generatedUtilityApi.files.getFileList.getQueryKey();
+generatedUtilityApi.files.getFileList.useIsFetching();
+generatedUtilityApi.files.deleteFiles.getMutationKey();
+generatedUtilityApi.files.deleteFiles.useIsMutating();
+generatedUtilityApi.files.deleteFiles.useMutationState();
 // @ts-expect-error - no-options generated client exposes key helpers only
 generatedUtilityApi.files.getFileList();
 // @ts-expect-error - no-options generated client exposes key helpers only
 generatedUtilityApi.files.getFileList.useQuery();
+// @ts-expect-error - no-options generated client exposes key helpers only
+generatedUtilityApi.files.deleteFiles.useMutation();
 
 const generatedQueryClientOnlyApi = createMinimalAPIClient(
   services,

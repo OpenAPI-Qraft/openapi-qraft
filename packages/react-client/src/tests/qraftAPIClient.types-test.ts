@@ -217,25 +217,24 @@ const noQueryClientNoRequestApi = qraftAPIClient(services, callbacks);
 
 noQueryClientNoRequestApi.files.getFiles.getQueryKey(parameters);
 noQueryClientNoRequestApi.files.getFiles.getInfiniteQueryKey(parameters);
+noQueryClientNoRequestApi.files.getFiles.useIsFetching({ parameters });
 noQueryClientNoRequestApi.files.deleteFiles.getMutationKey();
+noQueryClientNoRequestApi.files.deleteFiles.useIsMutating();
+noQueryClientNoRequestApi.files.deleteFiles.useMutationState();
 // @ts-expect-error - utility client without options cannot invoke operations
 noQueryClientNoRequestApi.files.getFiles({ parameters });
-// @ts-expect-error - utility client without options cannot run React/query state hooks
+// @ts-expect-error - utility client without options cannot run request hooks
 noQueryClientNoRequestApi.files.getFiles.useQuery(parameters);
-// @ts-expect-error - utility client without options cannot run React/query state hooks
-noQueryClientNoRequestApi.files.getFiles.useIsFetching({ parameters });
-// @ts-expect-error - utility client without options cannot run React/query state hooks
+// @ts-expect-error - utility client without options cannot run request hooks
 noQueryClientNoRequestApi.files.getFiles.useQueries({
   queries: [{ parameters }, { parameters }],
 });
-// @ts-expect-error - utility client without options cannot run React/query state hooks
+// @ts-expect-error - utility client without options cannot run mutation hooks
 noQueryClientNoRequestApi.files.deleteFiles.useMutation({
   query: { all: true },
 });
-// @ts-expect-error - utility client without options cannot run React/query state hooks
-noQueryClientNoRequestApi.files.deleteFiles.useIsMutating();
-// @ts-expect-error - utility client without options cannot run React/query state hooks
-noQueryClientNoRequestApi.files.deleteFiles.useMutationState();
+// @ts-expect-error - utility client without options cannot use QueryClient methods
+noQueryClientNoRequestApi.files.getFiles.getQueryData(parameters);
 // @ts-expect-error - utility client without options cannot use QueryClient methods
 noQueryClientNoRequestApi.files.getFiles.invalidateQueries();
 
@@ -273,6 +272,10 @@ directReactUtilityApi.files.deleteFiles.getMutationKey();
 directReactUtilityApi.files.getFiles.useQuery(parameters);
 // @ts-expect-error - direct React utility client without options exposes key helpers only
 directReactUtilityApi.files.getFiles.useIsFetching({ parameters });
+// @ts-expect-error - direct React utility client without options exposes key helpers only
+directReactUtilityApi.files.deleteFiles.useIsMutating();
+// @ts-expect-error - direct React utility client without options exposes key helpers only
+directReactUtilityApi.files.deleteFiles.useMutationState();
 // @ts-expect-error - direct React utility client without options exposes key helpers only
 directReactUtilityApi.files.getFiles.invalidateQueries();
 // @ts-expect-error - direct React utility client without options cannot invoke operations
