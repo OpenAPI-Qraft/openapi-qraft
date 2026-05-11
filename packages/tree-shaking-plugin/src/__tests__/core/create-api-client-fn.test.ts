@@ -629,4 +629,43 @@ export function App() {
       }"
     `);
   });
+
+  it('rewrites representative suspense and infinite hook callbacks for context clients', async () => {
+    const fixture = await createFixture();
+    const sourceFile = path.join(fixture, 'src/App.tsx');
+
+    const result = await transformQraftTreeShaking(
+      `
+import { createAPIClient } from './api';
+
+const reactApi = createAPIClient();
+
+export function App() {
+  reactApi.pets.getPets.useSuspenseQuery();
+  reactApi.pets.findPetsByStatus.useInfiniteQuery();
+}
+`,
+      sourceFile,
+      { createAPIClientFn: [{ name: 'createAPIClient', module: './api' }] }
+    );
+
+    expect(result?.code).toMatchInlineSnapshot(`
+      "import { qraftReactAPIClient } from "@openapi-qraft/react";
+      import { useSuspenseQuery } from "@openapi-qraft/react/callbacks/useSuspenseQuery";
+      import { getPets } from "./api/services/PetsService";
+      import { APIClientContext } from "./api/APIClientContext";
+      import { useInfiniteQuery } from "@openapi-qraft/react/callbacks/useInfiniteQuery";
+      import { findPetsByStatus } from "./api/services/PetsService";
+      const reactApi_pets_getPets = qraftReactAPIClient(getPets, {
+        useSuspenseQuery
+      }, APIClientContext);
+      const reactApi_pets_findPetsByStatus = qraftReactAPIClient(findPetsByStatus, {
+        useInfiniteQuery
+      }, APIClientContext);
+      export function App() {
+        reactApi_pets_getPets.useSuspenseQuery();
+        reactApi_pets_findPetsByStatus.useInfiniteQuery();
+      }"
+    `);
+  });
 });

@@ -451,4 +451,57 @@ async function run() {
       }"
     `);
   });
+
+  it('rewrites fetch, prefetch, and ensure callbacks for explicit options clients', async () => {
+    const fixture = await createFixture();
+    const sourceFile = path.join(fixture, 'src/App.tsx');
+
+    const result = await transformQraftTreeShaking(
+      `
+import { createAPIClient } from './api';
+
+const queryClientOptions = { queryClient: {} };
+const optionsApi = createAPIClient(queryClientOptions);
+
+async function loadPets() {
+  await optionsApi.pets.getPets.fetchQuery();
+  await optionsApi.pets.findPetsByStatus.prefetchQuery();
+  return optionsApi.pets.getPetById.ensureQueryData({ parameters: { petId: 1 } });
+}
+`,
+      sourceFile,
+      { createAPIClientFn: [{ name: 'createAPIClient', module: './api' }] }
+    );
+
+    expect(result?.code).toMatchInlineSnapshot(`
+      "import { qraftAPIClient } from "@openapi-qraft/react";
+      import { fetchQuery } from "@openapi-qraft/react/callbacks/fetchQuery";
+      import { getPets } from "./api/services/PetsService";
+      import { prefetchQuery } from "@openapi-qraft/react/callbacks/prefetchQuery";
+      import { findPetsByStatus } from "./api/services/PetsService";
+      import { ensureQueryData } from "@openapi-qraft/react/callbacks/ensureQueryData";
+      import { getPetById } from "./api/services/PetsService";
+      const queryClientOptions = {
+        queryClient: {}
+      };
+      const optionsApi_pets_getPets = qraftAPIClient(getPets, {
+        fetchQuery
+      }, queryClientOptions);
+      const optionsApi_pets_findPetsByStatus = qraftAPIClient(findPetsByStatus, {
+        prefetchQuery
+      }, queryClientOptions);
+      const optionsApi_pets_getPetById = qraftAPIClient(getPetById, {
+        ensureQueryData
+      }, queryClientOptions);
+      async function loadPets() {
+        await optionsApi_pets_getPets.fetchQuery();
+        await optionsApi_pets_findPetsByStatus.prefetchQuery();
+        return optionsApi_pets_getPetById.ensureQueryData({
+          parameters: {
+            petId: 1
+          }
+        });
+      }"
+    `);
+  });
 });
