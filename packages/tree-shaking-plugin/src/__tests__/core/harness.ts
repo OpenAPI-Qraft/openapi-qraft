@@ -29,8 +29,20 @@ export async function transformQraftTreeShaking(
   const fixtureRoot = getFixtureRootFromSourceFile(id);
   const moduleAccess = createFixtureModuleAccess(fixtureRoot, {
     resolve: options.moduleAccess?.resolve ?? options.resolve,
-    load: options.moduleAccess?.load,
   });
+
+  if (options.moduleAccess?.load) {
+    return transformQraftTreeShakingImpl(
+      code,
+      id,
+      options,
+      {
+        ...moduleAccess,
+        load: options.moduleAccess.load,
+      },
+      inputSourceMap
+    );
+  }
 
   return transformQraftTreeShakingImpl(
     code,
