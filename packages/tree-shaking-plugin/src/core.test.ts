@@ -1335,51 +1335,19 @@ function PetUpdateForm({ petId }: { petId: number }) {
     `);
   });
 
-  it('preserves void and await prefixes for named client calls', async () => {
-    const fixture = await createFixture();
-    const sourceFile = path.join(fixture, 'src/App.tsx');
-
-    const result = await transformQraftTreeShaking(
-      `
-import { createAPIClient } from './api';
-
-const api = createAPIClient();
-
-async function run() {
-  void api.pets.findPetsByStatus.invalidateQueries();
-  await api.pets.findPetsByStatus.invalidateQueries();
-}
-`,
-      sourceFile,
-      { createAPIClientFn: [{ name: 'createAPIClient', module: './api' }] }
-    );
-
-    expect(result?.code).toMatchInlineSnapshot(`
-      "import { qraftAPIClient } from "@openapi-qraft/react";
-      import { invalidateQueries } from "@openapi-qraft/react/callbacks/invalidateQueries";
-      import { findPetsByStatus } from "./api/services/PetsService";
-      import { APIClientContext } from "./api/APIClientContext";
-      const api_pets_findPetsByStatus = qraftAPIClient(findPetsByStatus, {
-        invalidateQueries
-      }, APIClientContext);
-      async function run() {
-        void api_pets_findPetsByStatus.invalidateQueries();
-        await api_pets_findPetsByStatus.invalidateQueries();
-      }"
-    `);
-  });
-
-  it('preserves void and await prefixes for inline client calls', async () => {
+  it('preserves void and await prefixes for named and inline client calls', async () => {
     const fixture = await createFixture();
     const sourceFile = path.join(fixture, 'src/App.tsx');
 
     const result = await transformQraftTreeShaking(
       `
 import { createAPIClient, APIClientContext } from './api';
-import { useContext } from 'react';
 
 async function run() {
-  const apiContext = useContext(APIClientContext);
+  const api = createAPIClient();
+  const apiContext = APIClientContext;
+  void api.pets.findPetsByStatus.invalidateQueries();
+  await api.pets.findPetsByStatus.invalidateQueries();
   void createAPIClient(apiContext!).pets.findPetsByStatus.invalidateQueries();
   await createAPIClient(apiContext!).pets.findPetsByStatus.invalidateQueries();
 }
@@ -1390,12 +1358,16 @@ async function run() {
 
     expect(result?.code).toMatchInlineSnapshot(`
       "import { APIClientContext } from './api';
-      import { useContext } from 'react';
       import { qraftAPIClient } from "@openapi-qraft/react";
       import { invalidateQueries } from "@openapi-qraft/react/callbacks/invalidateQueries";
       import { findPetsByStatus } from "./api/services/PetsService";
       async function run() {
-        const apiContext = useContext(APIClientContext);
+        const api_pets_findPetsByStatus = qraftAPIClient(findPetsByStatus, {
+          invalidateQueries
+        }, APIClientContext);
+        const apiContext = APIClientContext;
+        void api_pets_findPetsByStatus.invalidateQueries();
+        await api_pets_findPetsByStatus.invalidateQueries();
         void qraftAPIClient(findPetsByStatus, {
           invalidateQueries
         }, apiContext!).invalidateQueries();
