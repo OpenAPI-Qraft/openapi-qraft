@@ -1,7 +1,5 @@
-/* eslint-disable @typescript-eslint/no-unused-expressions */
-
+import type { CreateAPIQueryClientOptions } from '@openapi-qraft/react';
 import {
-  type CreateAPIQueryClientOptions,
   qraftAPIClient,
   qraftReactAPIClient,
   requestFn,
@@ -14,6 +12,8 @@ import {
   deleteFiles,
   filesService,
 } from './fixtures/api/services/FilesService.js';
+
+/* eslint-disable @typescript-eslint/no-unused-expressions */
 
 const parameters = {
   header: { 'x-monite-version': '1.0.0' },
@@ -249,7 +249,11 @@ const APIClientContext = createContext<CreateAPIQueryClientOptions | undefined>(
   undefined
 );
 
-const contextReactApi = qraftReactAPIClient(services, callbacks, APIClientContext);
+const contextReactApi = qraftReactAPIClient(
+  services,
+  callbacks,
+  APIClientContext
+);
 
 contextReactApi.files.getFiles.getQueryKey(parameters);
 contextReactApi.files.getFiles.getInfiniteQueryKey(parameters);
@@ -296,7 +300,9 @@ directReactRequestOnlyApi.files.getFiles.useIsFetching({ parameters });
 // @ts-expect-error - direct React request-only client cannot expose QueryClient methods
 directReactRequestOnlyApi.files.getFiles.getQueryData(parameters);
 // @ts-expect-error - direct React request-only client cannot expose mutation hooks
-directReactRequestOnlyApi.files.deleteFiles.useMutation({ query: { all: true } });
+directReactRequestOnlyApi.files.deleteFiles.useMutation({
+  query: { all: true },
+});
 // @ts-expect-error - direct React request-only client cannot expose state hooks without QueryClient
 directReactRequestOnlyApi.files.deleteFiles.useIsMutating();
 // @ts-expect-error - direct React request-only client cannot expose state hooks without QueryClient
@@ -320,7 +326,9 @@ directReactQueryClientOnlyApi.files.getFiles.useIsFetching({ parameters });
 // @ts-expect-error - direct React queryClient-only object options cannot invoke operations without requestFn
 directReactQueryClientOnlyApi.files.getFiles({ parameters });
 // @ts-expect-error - direct React queryClient-only object options do not expose mutation hooks
-directReactQueryClientOnlyApi.files.deleteFiles.useMutation({ query: { all: true } });
+directReactQueryClientOnlyApi.files.deleteFiles.useMutation({
+  query: { all: true },
+});
 // @ts-expect-error - direct React queryClient-only object options do not expose state hooks
 directReactQueryClientOnlyApi.files.deleteFiles.useIsMutating();
 // @ts-expect-error - direct React queryClient-only object options do not expose state hooks
@@ -342,7 +350,9 @@ directReactQueryClientApi.files.getFiles.useQuery(parameters);
 // @ts-expect-error - direct object options do not wrap React hooks with context
 directReactQueryClientApi.files.getFiles.useIsFetching({ parameters });
 // @ts-expect-error - direct object options do not wrap React hooks with context
-directReactQueryClientApi.files.deleteFiles.useMutation({ query: { all: true } });
+directReactQueryClientApi.files.deleteFiles.useMutation({
+  query: { all: true },
+});
 // @ts-expect-error - direct object options do not wrap React hooks with context
 directReactQueryClientApi.files.deleteFiles.useIsMutating();
 // @ts-expect-error - direct object options do not wrap React hooks with context

@@ -25,7 +25,6 @@ import { qraftAPIClient, requestFn } from '../index.js';
 import { createPredefinedParametersRequestFn } from './fixtures/api/create-predefined-parameters-request-fn.js';
 import { createAPIClient, services } from './fixtures/api/index.js';
 import { getApprovalPoliciesId } from './fixtures/api/services/ApprovalPoliciesService.js';
-import { createInternalReactAPIClient } from './fixtures/files-api/index.js';
 import { filesFindAllResponsePayloadFixtures } from './msw/handlers.js';
 
 const baseUrl = 'https://api.sandbox.monite.com/v1';
@@ -107,12 +106,13 @@ describe('Qraft uses singular Query', () => {
     });
   });
 
-  it('supports useQuery with QueryClient from context', async () => {
+  it('supports useQuery with QueryClient options', async () => {
     const queryClient = new QueryClient();
 
     const qraft = createAPIClient({
       requestFn,
       baseUrl,
+      queryClient,
     });
 
     const { result } = renderHook(
@@ -1179,9 +1179,9 @@ describe('Qraft uses Mutations', () => {
     });
   });
 
-  it('supports useMutation with QueryClient from context', async () => {
+  it('supports useMutation with QueryClient options', async () => {
     const queryClient = new QueryClient();
-    const qraft = createAPIClient({ requestFn, baseUrl });
+    const qraft = createAPIClient({ requestFn, baseUrl, queryClient });
 
     const { result } = renderHook(
       () => qraft.entities.postEntitiesIdDocuments.useMutation(),
@@ -1533,7 +1533,7 @@ describe('Qraft uses useIsMutating', () => {
 
     const { result: isMutatingResult } = renderHook(
       () => {
-        const noRequestQraft = createAPIClient();
+        const noRequestQraft = createAPIClient({ queryClient });
 
         return noRequestQraft.entities.postEntitiesIdDocuments.useIsMutating({
           parameters,
@@ -2994,10 +2994,10 @@ describe('Custom Callbacks support', () => {
         queryClient,
       } as const;
 
-      const getApprovalPoliciesIdOperation = createInternalReactAPIClient(
+      const getApprovalPoliciesIdOperation = qraftAPIClient(
         getApprovalPoliciesId,
-        defaultOptions,
-        { useQuery, getQueryKey }
+        { useQuery, getQueryKey },
+        defaultOptions
       );
 
       const queryKey = getApprovalPoliciesIdOperation.getQueryKey({
