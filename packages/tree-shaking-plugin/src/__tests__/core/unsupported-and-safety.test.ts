@@ -98,8 +98,7 @@ pets.getPets.useQuery();
     expect(result).toBeNull();
   });
 
-  // Production gap: optional member expressions are not planned as supported static client access yet.
-  it.skip('rewrites static optional member chains when the client binding is clear', async () => {
+  it('does not rewrite optional member chains until short-circuit semantics can be preserved', async () => {
     const fixture = await createFixture();
     const sourceFile = path.join(fixture, 'src/App.tsx');
 
@@ -115,17 +114,6 @@ api?.pets?.getPets?.useQuery();
       { createAPIClientFn: [{ name: 'createAPIClient', module: './api' }] }
     );
 
-    expect(result?.code).toMatchInlineSnapshot(`
-      "import { createAPIClient } from './api';
-      import { qraftReactAPIClient } from "@openapi-qraft/react";
-      import { useQuery } from "@openapi-qraft/react/callbacks/useQuery";
-      import { getPets } from "./api/services/PetsService";
-      import { APIClientContext } from "./api/APIClientContext";
-      const api_pets_getPets = qraftReactAPIClient(getPets, {
-        useQuery
-      }, APIClientContext);
-      const api = createAPIClient();
-      api_pets_getPets?.useQuery();"
-    `);
+    expect(result).toBeNull();
   });
 });
