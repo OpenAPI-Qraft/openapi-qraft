@@ -4,6 +4,7 @@ import path from 'node:path';
 import { describe, expect, it } from 'vitest';
 import {
   createFixtureModuleAccess,
+  getContextFixtureFiles,
   PRECREATED_BASE_FILES,
   writeFixtureFiles,
 } from './fixtures.js';
@@ -191,6 +192,54 @@ export function App() {
       const api_pets_getPets = qraftReactAPIClient(getPets, {
         useQuery
       }, MyAPIContext);
+      export function App() {
+        return api_pets_getPets.useQuery();
+      }"
+    `);
+  });
+
+  it('infers an aliased generated context from the qraftReactAPIClient third argument', async () => {
+    const fixture = await createFixture();
+    const sourceFile = path.join(fixture, 'src/App.tsx');
+
+    await writeFixtureFiles(fixture, {
+      ...getContextFixtureFiles('APIClientContext', './APIClientContext', true),
+      'src/api/index.ts': `
+import { qraftReactAPIClient } from '@openapi-qraft/react';
+import { useQuery } from '@openapi-qraft/react/callbacks/index';
+import { APIClientContext as InternalContext } from './APIClientContext';
+import { services } from './services/index';
+
+const defaultCallbacks = { useQuery } as const;
+
+export function createAPIClient(callbacks = defaultCallbacks) {
+  return qraftReactAPIClient(services, callbacks, InternalContext);
+}
+`,
+    });
+
+    const result = await transformQraftTreeShaking(
+      `
+import { createAPIClient } from './api';
+
+const api = createAPIClient();
+
+export function App() {
+  return api.pets.getPets.useQuery();
+}
+`,
+      sourceFile,
+      { createAPIClientFn: [{ name: 'createAPIClient', module: './api' }] }
+    );
+
+    expect(result?.code).toMatchInlineSnapshot(`
+      "import { qraftReactAPIClient } from "@openapi-qraft/react";
+      import { useQuery } from "@openapi-qraft/react/callbacks/useQuery";
+      import { getPets } from "./api/services/PetsService";
+      import { InternalContext } from "./api/APIClientContext";
+      const api_pets_getPets = qraftReactAPIClient(getPets, {
+        useQuery
+      }, InternalContext);
       export function App() {
         return api_pets_getPets.useQuery();
       }"
