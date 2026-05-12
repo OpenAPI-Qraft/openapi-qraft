@@ -2,7 +2,11 @@ import fs from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { createPrecreatedFixtureFiles, writeFixtureFiles } from './fixtures.js';
+import {
+  createPrecreatedFixtureFiles,
+  getContextFixtureFiles,
+  writeFixtureFiles,
+} from './fixtures.js';
 import { createFixture, transformQraftTreeShaking } from './harness.js';
 
 describe('transformQraftTreeShaking schema and imports', () => {
@@ -87,6 +91,12 @@ export function App() {
       path.join(os.tmpdir(), 'qraft-tree-shaking-')
     );
     await writeFixtureFiles(root, {
+      ...getContextFixtureFiles(
+        'APIClientContext',
+        './APIClientContext',
+        true,
+        'context-api'
+      ),
       ...createPrecreatedFixtureFiles(
         `
 import { createAPIClient } from './precreated-api';
@@ -108,46 +118,6 @@ export function createAPIClient(options?: { queryClient: unknown }) {
 `,
         }
       ),
-      'src/context-api/index.ts': `
-import { qraftReactAPIClient } from '@openapi-qraft/react';
-import { useQuery } from '@openapi-qraft/react/callbacks/index';
-import { APIClientContext } from './APIClientContext';
-import { services } from './services/index';
-
-const defaultCallbacks = { useQuery } as const;
-
-export function createAPIClient(callbacks = defaultCallbacks) {
-  return qraftReactAPIClient(services, callbacks, APIClientContext);
-}
-`,
-      'src/context-api/APIClientContext.ts': `
-export const APIClientContext = {};
-`,
-      'src/context-api/services/index.ts': `
-import { petsService } from './PetsService';
-import { storesService } from './StoresService';
-
-export const services = {
-  pets: petsService,
-  stores: storesService,
-} as const;
-`,
-      'src/context-api/services/PetsService.ts': `
-export const getPets = { schema: { method: 'get', url: '/pets' } };
-export const createPet = { schema: { method: 'post', url: '/pets' } };
-
-export const petsService = {
-  getPets,
-  createPet,
-} as const;
-`,
-      'src/context-api/services/StoresService.ts': `
-export const getStores = { schema: { method: 'get', url: '/stores' } };
-
-export const storesService = {
-  getStores,
-} as const;
-`,
     });
     const sourceFile = path.join(root, 'src/App.tsx');
 
