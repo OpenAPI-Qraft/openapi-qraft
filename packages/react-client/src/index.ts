@@ -14,7 +14,11 @@ export {
 } from './qraftAPIClient.js';
 export {
   qraftReactAPIClient,
-  type APIContextQueryClientServices,
+  type APIQueryClientHooksServices,
+  type APIQueryClientMethodsServices,
+  type APIBasicQueryClientMethodsServices,
+  type APIBasicClientMethodsServices,
+  type APIUtilityClientMethodsServices,
 } from './qraftReactAPIClient.js';
 export {
   requestFn,
