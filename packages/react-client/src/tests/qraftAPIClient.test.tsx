@@ -1,4 +1,4 @@
-import type { QueryClientConfig } from '@tanstack/react-query';
+import type { QueryClientConfig, QueryFunctionContext } from '@tanstack/react-query';
 import type { ReactNode } from 'react';
 import type { CreateAPIQueryClientOptions } from '../index.js';
 import type {
@@ -22,6 +22,7 @@ import { act, renderHook, waitFor } from '@testing-library/react';
 import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
 import { qraftAPIClient, requestFn } from '../index.js';
+import { createQueryRequestFnInfo } from '../lib/createRequestFnInfo.js';
 import { createPredefinedParametersRequestFn } from './fixtures/api/create-predefined-parameters-request-fn.js';
 import { createAPIClient, services } from './fixtures/api/index.js';
 import { getApprovalPoliciesId } from './fixtures/api/services/ApprovalPoliciesService.js';
@@ -57,7 +58,10 @@ const createClient = ({
 
 describe('requestFn', () => {
   it('does not forward qraft request source metadata to fetch', async () => {
-    const fetchSpy = vi.fn(async () => Response.json({ ok: true }));
+    const fetchImplementation = (async (
+      ..._args: Parameters<typeof fetch>
+    ) => Response.json({ ok: true })) satisfies typeof fetch;
+    const fetchSpy = vi.fn(fetchImplementation);
 
     await requestFn(
       { url: '/ok', method: 'get' },
@@ -65,15 +69,60 @@ describe('requestFn', () => {
         baseUrl: 'https://api.sandbox.monite.com/v1',
         source: { type: 'invoke' },
       },
-      { fetch: fetchSpy as typeof fetch }
+      { fetch: fetchSpy }
     );
 
-    expect(fetchSpy).toHaveBeenCalledWith(
-      'https://api.sandbox.monite.com/v1/ok',
-      expect.not.objectContaining({
-        source: expect.anything(),
-      })
-    );
+    expect(fetchSpy).toHaveBeenCalledTimes(1);
+
+    const [fetchUrl, fetchInit] = fetchSpy.mock.calls[0] satisfies Parameters<
+      typeof fetch
+    >;
+
+    expect(fetchUrl).toBe('https://api.sandbox.monite.com/v1/ok');
+    expect(fetchInit).toBeDefined();
+    if (!fetchInit) {
+      throw new Error('fetch init should be defined');
+    }
+    expect(
+      Object.prototype.hasOwnProperty.call(fetchInit, 'source')
+    ).toBe(false);
+  });
+});
+
+describe('createQueryRequestFnInfo', () => {
+  it('keeps query request source signal lazy', () => {
+    let signalReads = 0;
+    const signal = new AbortController().signal;
+    const client = new QueryClient();
+    const contextBase = {
+      client,
+      meta: undefined,
+      queryKey: ['test'],
+    } satisfies Omit<QueryFunctionContext, 'signal'>;
+    const context = Object.defineProperty(
+      contextBase,
+      'signal',
+      {
+        enumerable: true,
+        get() {
+          signalReads += 1;
+          return signal;
+        },
+      }
+    ) as unknown as QueryFunctionContext;
+
+    const requestInfo = createQueryRequestFnInfo(context, {
+      baseUrl: 'https://api.sandbox.monite.com/v1',
+    });
+
+    expect(signalReads).toBe(0);
+    expect(requestInfo.source).toEqual({
+      type: 'query',
+      context,
+    });
+    expect(signalReads).toBe(0);
+    expect(requestInfo.signal).toBe(signal);
+    expect(signalReads).toBe(1);
   });
 });
 
