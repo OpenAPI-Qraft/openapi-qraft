@@ -877,6 +877,21 @@ const getCreateOperationClientFunctionFactory = ({
                   ),
                 ]
               ),
+          contextName && !shouldImportAllCallbacks
+            ? factory.createTypeReferenceNode(
+                factory.createIdentifier(queryClientServicesTypeName),
+                [
+                  factory.createTypeReferenceNode(
+                    factory.createIdentifier('Services'),
+                    undefined
+                  ),
+                  factory.createTypeReferenceNode(
+                    factory.createIdentifier('AllCallbacks'),
+                    undefined
+                  ),
+                ]
+              )
+            : null,
           shouldImportAllCallbacks && !contextName
             ? null
             : factory.createTypeReferenceNode(

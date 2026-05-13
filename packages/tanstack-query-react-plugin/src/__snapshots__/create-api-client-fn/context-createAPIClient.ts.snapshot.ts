@@ -18,7 +18,7 @@ export function createAPIClient<Callbacks extends Partial<AllCallbacks> = Defaul
 export function createAPIClient<Callbacks extends Partial<AllCallbacks> = DefaultCallbacks>(options: CreateAPIBasicQueryClientOptions, callbacks?: Callbacks): APIBasicQueryClientMethodsServices<Services, Callbacks>;
 export function createAPIClient<Callbacks extends Partial<AllCallbacks> = DefaultCallbacks>(options: CreateAPIBasicClientOptions, callbacks?: Callbacks): APIBasicClientMethodsServices<Services, Callbacks>;
 export function createAPIClient<Callbacks extends Partial<AllCallbacks> = DefaultCallbacks>(callbacks?: Callbacks): APIQueryClientHooksServices<Services, Callbacks>;
-export function createAPIClient<Callbacks extends Partial<AllCallbacks> = DefaultCallbacks>(callbacksOrOptions?: CreateAPIClientOptions | Callbacks, callbacks: Callbacks = defaultCallbacks as Callbacks): APIQueryClientMethodsServices<Services, Callbacks> | APIQueryClientHooksServices<Services, Callbacks> | APIBasicQueryClientMethodsServices<Services, Callbacks> | APIBasicClientMethodsServices<Services, Callbacks> {
+export function createAPIClient<Callbacks extends Partial<AllCallbacks> = DefaultCallbacks>(callbacksOrOptions?: CreateAPIClientOptions | Callbacks, callbacks: Callbacks = defaultCallbacks as Callbacks): APIQueryClientMethodsServices<Services, AllCallbacks> | APIQueryClientMethodsServices<Services, Callbacks> | APIQueryClientHooksServices<Services, Callbacks> | APIBasicQueryClientMethodsServices<Services, Callbacks> | APIBasicClientMethodsServices<Services, Callbacks> {
     if (callbacksOrOptions) {
         if ("requestFn" in callbacksOrOptions)
             return qraftReactAPIClient(services, callbacks, callbacksOrOptions);

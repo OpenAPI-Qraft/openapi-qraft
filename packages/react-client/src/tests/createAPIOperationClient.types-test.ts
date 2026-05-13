@@ -12,11 +12,15 @@ import {
   useMutationState,
   useQuery,
 } from '@openapi-qraft/react/callbacks/index';
+import * as allCallbacks from '@openapi-qraft/react/callbacks/index';
 import { QueryClient } from '@tanstack/react-query';
 import {
   createInternalReactAPIClient,
   createMinimalAPIClient,
   createNoCallbacksAPIClient,
+  createAllCallbacksReactAPIClient,
+  createEmbeddedReactAPIClient,
+  createNoCallbacksReactAPIClient,
   services,
 } from './fixtures/files-api/index.js';
 
@@ -216,6 +220,157 @@ generatedContextApi.files.getFileList.getQueryData();
 generatedContextApi.files.getFileList.invalidateQueries();
 // @ts-expect-error - generated context client without direct request options cannot invoke operations
 generatedContextApi.files.getFileList();
+
+const generatedEmbeddedContextApi = createEmbeddedReactAPIClient();
+
+generatedEmbeddedContextApi.files.getFileList.getQueryKey();
+generatedEmbeddedContextApi.files.getFileList.useQuery();
+generatedEmbeddedContextApi.files.deleteFiles.useMutation();
+// @ts-expect-error - embedded context client default callbacks do not include getMutationKey
+generatedEmbeddedContextApi.files.deleteFiles.getMutationKey();
+// @ts-expect-error - embedded context client default callbacks do not include getMutationCache
+generatedEmbeddedContextApi.files.deleteFiles.getMutationCache();
+// @ts-expect-error - embedded context client default callbacks do not include useIsFetching
+generatedEmbeddedContextApi.files.getFileList.useIsFetching();
+// @ts-expect-error - embedded context client exposes hooks, not imperative QueryClient methods
+generatedEmbeddedContextApi.files.getFileList.getQueryData();
+// @ts-expect-error - embedded context client without direct request options cannot invoke operations
+generatedEmbeddedContextApi.files.getFileList();
+
+const generatedEmbeddedCustomContextApi = createEmbeddedReactAPIClient({
+  getQueryKey,
+  useIsFetching,
+});
+
+generatedEmbeddedCustomContextApi.files.getFileList.getQueryKey();
+generatedEmbeddedCustomContextApi.files.getFileList.useIsFetching();
+// @ts-expect-error - custom embedded context callbacks do not include useQuery
+generatedEmbeddedCustomContextApi.files.getFileList.useQuery();
+// @ts-expect-error - custom embedded context callbacks do not include getMutationKey
+generatedEmbeddedCustomContextApi.files.deleteFiles.getMutationKey();
+
+const generatedEmbeddedAllCallbacksObjectApi = createEmbeddedReactAPIClient(
+  {
+    queryClient,
+    requestFn,
+    baseUrl: 'https://example.com',
+  },
+  allCallbacks
+);
+
+generatedEmbeddedAllCallbacksObjectApi.files.getFileList();
+generatedEmbeddedAllCallbacksObjectApi.files.getFileList.getQueryData();
+generatedEmbeddedAllCallbacksObjectApi.files.deleteFiles.getMutationCache();
+// @ts-expect-error - explicit all-callbacks object options expose methods, not hooks
+generatedEmbeddedAllCallbacksObjectApi.files.getFileList.useQuery();
+
+const generatedNoCallbacksContextApi = createNoCallbacksReactAPIClient(
+  services,
+  {
+    getMutationKey,
+    getQueryKey,
+    useIsFetching,
+    useIsMutating,
+    useMutation,
+    useMutationState,
+    useQuery,
+  }
+);
+
+generatedNoCallbacksContextApi.files.getFileList.getQueryKey();
+generatedNoCallbacksContextApi.files.getFileList.useQuery();
+generatedNoCallbacksContextApi.files.getFileList.useIsFetching();
+generatedNoCallbacksContextApi.files.deleteFiles.getMutationKey();
+generatedNoCallbacksContextApi.files.deleteFiles.useMutation();
+generatedNoCallbacksContextApi.files.deleteFiles.useIsMutating();
+generatedNoCallbacksContextApi.files.deleteFiles.useMutationState();
+// @ts-expect-error - no-callbacks context client exposes hooks, not imperative QueryClient methods
+generatedNoCallbacksContextApi.files.getFileList.getQueryData();
+// @ts-expect-error - no-callbacks context client without direct request options cannot invoke operations
+generatedNoCallbacksContextApi.files.getFileList();
+
+const generatedNoCallbacksContextQueryClientOnlyApi =
+  createNoCallbacksReactAPIClient(
+    services,
+    { queryClient },
+    {
+      getMutationCache,
+      getMutationKey,
+      getQueryData,
+      getQueryKey,
+      invalidateQueries,
+      useMutationState,
+    }
+  );
+
+generatedNoCallbacksContextQueryClientOnlyApi.files.getFileList.getQueryKey();
+generatedNoCallbacksContextQueryClientOnlyApi.files.getFileList.getQueryData();
+generatedNoCallbacksContextQueryClientOnlyApi.files.getFileList.invalidateQueries();
+generatedNoCallbacksContextQueryClientOnlyApi.files.deleteFiles.getMutationKey();
+generatedNoCallbacksContextQueryClientOnlyApi.files.deleteFiles.getMutationCache();
+// @ts-expect-error - no-callbacks queryClient object options do not expose state hooks
+generatedNoCallbacksContextQueryClientOnlyApi.files.deleteFiles.useMutationState();
+// @ts-expect-error - no-callbacks queryClient object options cannot invoke operations without requestFn
+generatedNoCallbacksContextQueryClientOnlyApi.files.getFileList();
+// @ts-expect-error - no-callbacks queryClient object options do not expose request hooks
+generatedNoCallbacksContextQueryClientOnlyApi.files.getFileList.useQuery();
+// @ts-expect-error - no-callbacks queryClient object options do not expose mutation hooks
+generatedNoCallbacksContextQueryClientOnlyApi.files.deleteFiles.useMutation();
+
+const generatedNoCallbacksAllCallbacksObjectApi =
+  createNoCallbacksReactAPIClient(
+    services,
+    {
+      queryClient,
+      requestFn,
+      baseUrl: 'https://example.com',
+    },
+    allCallbacks
+  );
+
+generatedNoCallbacksAllCallbacksObjectApi.files.getFileList();
+generatedNoCallbacksAllCallbacksObjectApi.files.getFileList.getQueryData();
+generatedNoCallbacksAllCallbacksObjectApi.files.deleteFiles.getMutationCache();
+// @ts-expect-error - explicit all-callbacks object options expose methods, not hooks
+generatedNoCallbacksAllCallbacksObjectApi.files.getFileList.useQuery();
+
+const generatedAllCallbacksContextApi = createAllCallbacksReactAPIClient();
+
+generatedAllCallbacksContextApi.files.getFileList.getQueryKey();
+generatedAllCallbacksContextApi.files.getFileList.useQuery();
+generatedAllCallbacksContextApi.files.getFileList.useIsFetching();
+generatedAllCallbacksContextApi.files.deleteFiles.getMutationKey();
+generatedAllCallbacksContextApi.files.deleteFiles.useMutation();
+generatedAllCallbacksContextApi.files.deleteFiles.useIsMutating();
+generatedAllCallbacksContextApi.files.deleteFiles.useMutationState();
+// @ts-expect-error - all-callbacks context client exposes hooks, not imperative QueryClient methods
+generatedAllCallbacksContextApi.files.getFileList.getQueryData();
+// @ts-expect-error - all-callbacks context client exposes hooks, not imperative QueryClient methods
+generatedAllCallbacksContextApi.files.getFileList.invalidateQueries();
+// @ts-expect-error - all-callbacks context client without direct request options cannot invoke operations
+generatedAllCallbacksContextApi.files.getFileList();
+
+const generatedAllCallbacksContextFullObjectApi =
+  createAllCallbacksReactAPIClient({
+    queryClient,
+    requestFn,
+    baseUrl: 'https://example.com',
+  });
+
+generatedAllCallbacksContextFullObjectApi.files.getFileList();
+generatedAllCallbacksContextFullObjectApi.files.getFileList.getQueryKey();
+generatedAllCallbacksContextFullObjectApi.files.getFileList.getQueryData();
+generatedAllCallbacksContextFullObjectApi.files.getFileList.invalidateQueries();
+generatedAllCallbacksContextFullObjectApi.files.deleteFiles.getMutationKey();
+generatedAllCallbacksContextFullObjectApi.files.deleteFiles.getMutationCache();
+// @ts-expect-error - all-callbacks context object options expose methods, not hooks
+generatedAllCallbacksContextFullObjectApi.files.getFileList.useQuery();
+// @ts-expect-error - all-callbacks context object options expose methods, not state hooks
+generatedAllCallbacksContextFullObjectApi.files.getFileList.useIsFetching();
+// @ts-expect-error - all-callbacks context object options expose methods, not mutation hooks
+generatedAllCallbacksContextFullObjectApi.files.deleteFiles.useMutation();
+// @ts-expect-error - all-callbacks context object options expose methods, not state hooks
+generatedAllCallbacksContextFullObjectApi.files.deleteFiles.useMutationState();
 
 const generatedContextRequestOnlyApi = createInternalReactAPIClient(
   services,
