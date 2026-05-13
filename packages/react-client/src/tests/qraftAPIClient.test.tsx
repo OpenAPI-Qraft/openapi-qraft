@@ -55,6 +55,28 @@ const createClient = ({
   };
 };
 
+describe('requestFn', () => {
+  it('does not forward qraft request source metadata to fetch', async () => {
+    const fetchSpy = vi.fn(async () => Response.json({ ok: true }));
+
+    await requestFn(
+      { url: '/ok', method: 'get' },
+      {
+        baseUrl: 'https://api.sandbox.monite.com/v1',
+        source: { type: 'invoke' },
+      },
+      { fetch: fetchSpy as typeof fetch }
+    );
+
+    expect(fetchSpy).toHaveBeenCalledWith(
+      'https://api.sandbox.monite.com/v1/ok',
+      expect.not.objectContaining({
+        source: expect.anything(),
+      })
+    );
+  });
+});
+
 describe('Qraft uses singular Query', () => {
   it('supports useQuery', async () => {
     const { qraft, queryClient } = createClient();
