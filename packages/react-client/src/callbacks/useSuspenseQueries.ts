@@ -48,11 +48,7 @@ export const useSuspenseQueries: (
                 delete queryOptionsCopy.parameters;
                 return queryOptionsCopy;
               })()
-            : ('queryKey' in queryOptions && queryOptions.queryKey !== undefined
-                ? queryOptions
-                : Object.assign({}, queryOptions, {
-                    queryKey: composeQueryKey(schema, undefined),
-                  }));
+            : queryOptions;
 
         return {
           ...optionsWithQueryKey,

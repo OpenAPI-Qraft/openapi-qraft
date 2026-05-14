@@ -495,16 +495,15 @@ describe('Qraft uses Queries', () => {
   it('passes original query function context as request source for useQueries', async () => {
     const requestFnSpy = vi.fn(requestFn);
     const { qraft, queryClient } = createClient({ requestFn: requestFnSpy });
-    const emptyQueryOptionsBase = {} satisfies Record<string, never>;
-    const emptyQueryOptions =
-      emptyQueryOptionsBase as Parameters<
-        typeof qraft.files.findAll.useQueries
-      >[0]['queries'][number];
 
     renderHook(
       () =>
         qraft.files.findAll.useQueries({
-          queries: [emptyQueryOptions],
+          queries: [
+            {
+              queryKey: qraft.files.findAll.getQueryKey(),
+            },
+          ],
         }),
       {
         wrapper: (props) => <Providers queryClient={queryClient} {...props} />,
