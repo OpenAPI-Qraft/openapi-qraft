@@ -1,5 +1,13 @@
 # @qraft/asyncapi-typescript-plugin
 
+## 1.0.0-beta.7
+
+### Patch Changes
+
+- @qraft/cli-utils@1.0.0-beta.7
+- @qraft/asyncapi-plugin@1.0.0-beta.7
+- @qraft/plugin@1.0.0-beta.7
+
 ## 1.0.0-beta.6
 
 ### Minor Changes
