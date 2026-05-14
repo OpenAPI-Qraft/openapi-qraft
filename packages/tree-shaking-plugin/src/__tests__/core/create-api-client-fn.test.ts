@@ -5,7 +5,9 @@ import { describe, expect, it } from 'vitest';
 import {
   createFixtureModuleAccess,
   getContextFixtureFiles,
+  PETS_SERVICE_TS,
   PRECREATED_BASE_FILES,
+  SERVICES_INDEX_TS,
   writeFixtureFiles,
 } from './fixtures.js';
 import {
@@ -70,6 +72,51 @@ export function App() {
         return api_pets_getPets.useQuery();
       }"
       `);
+  });
+
+  it('skips generic generated factories that receive services as an argument', async () => {
+    const fixture = await fs.mkdtemp(
+      path.join(os.tmpdir(), 'qraft-tree-shaking-')
+    );
+    await writeFixtureFiles(fixture, {
+      'src/api/createAPIClient.ts': `
+import { qraftAPIClient } from '@openapi-qraft/react';
+import { getQueryKey } from '@openapi-qraft/react/callbacks/index';
+
+const defaultCallbacks = { getQueryKey } as const;
+
+export function createAPIClient(services, callbacks = defaultCallbacks) {
+  return qraftAPIClient(services, callbacks);
+}
+`,
+      'src/api/services/index.ts': SERVICES_INDEX_TS,
+      'src/api/services/PetsService.ts': PETS_SERVICE_TS,
+      'src/api/services/StoresService.ts': `
+export const storesService = {} as const;
+`,
+    });
+    const sourceFile = path.join(fixture, 'src/App.tsx');
+
+    const result = await transformQraftTreeShaking(
+      `
+import { createAPIClient } from './api/createAPIClient';
+import { services } from './api/services/index';
+
+const api = createAPIClient(services);
+
+export function App() {
+  return api.pets.getPets.getQueryKey();
+}
+`,
+      sourceFile,
+      {
+        createAPIClientFn: [
+          { name: 'createAPIClient', module: './api/createAPIClient' },
+        ],
+      }
+    );
+
+    expect(result).toBeNull();
   });
 
   it('aliases an imported operation when a local binding uses the same name', async () => {
