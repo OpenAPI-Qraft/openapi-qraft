@@ -4,10 +4,15 @@ import type {
   OperationSchema,
   ServiceOperationUseQueries,
 } from '@openapi-qraft/tanstack-query-react-types';
-import type { DefaultError, QueriesResults } from '@tanstack/react-query';
+import type {
+  DefaultError,
+  QueriesResults,
+  QueryFunctionContext,
+} from '@tanstack/react-query';
 import type { CreateAPIQueryClientOptions } from '../qraftAPIClient.js';
 import { useQueries as useQueriesTanstack } from '@tanstack/react-query';
 import { composeQueryKey } from '../lib/composeQueryKey.js';
+import { createQueryRequestFnInfo } from '../lib/createRequestFnInfo.js';
 import { prepareRequestFnParameters } from '../lib/prepareRequestFnParameters.js';
 import { requestFnResponseRejecter } from '../lib/requestFnResponseRejecter.js';
 import { requestFnResponseResolver } from '../lib/requestFnResponseResolver.js';
@@ -42,13 +47,21 @@ export const useQueries: (
                 delete queryOptionsCopy.parameters;
                 return queryOptionsCopy;
               })()
-            : queryOptions;
+            : ('queryKey' in queryOptions && queryOptions.queryKey !== undefined
+                ? queryOptions
+                : Object.assign({}, queryOptions, {
+                    queryKey: composeQueryKey(schema, undefined),
+                  }));
 
         return {
           ...optionsWithQueryKey,
           queryFn:
             optionsWithQueryKey.queryFn ??
-            function ({ queryKey: [, queryParams], signal, meta }) {
+            function (context: QueryFunctionContext) {
+              const {
+                queryKey: [, queryParams],
+                meta,
+              } = context;
               const { parameters, body } = prepareRequestFnParameters(
                 queryParams,
                 undefined,
@@ -56,13 +69,15 @@ export const useQueries: (
               );
 
               return qraftOptions
-                .requestFn(schema, {
-                  parameters: parameters as never,
-                  baseUrl: qraftOptions.baseUrl,
-                  body,
-                  signal,
-                  meta,
-                })
+                .requestFn(
+                  schema,
+                  createQueryRequestFnInfo(context, {
+                    parameters: parameters as never,
+                    baseUrl: qraftOptions.baseUrl,
+                    body,
+                    meta,
+                  })
+                )
                 .then(requestFnResponseResolver, requestFnResponseRejecter);
             },
         };

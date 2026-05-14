@@ -14,6 +14,7 @@ import type { OperationSchema } from './requestFn.js';
 import { useMemo } from 'react';
 import { composeInfiniteQueryKey } from './composeInfiniteQueryKey.js';
 import { composeQueryKey } from './composeQueryKey.js';
+import { createQueryRequestFnInfo } from './createRequestFnInfo.js';
 import { prepareRequestFnParameters } from './prepareRequestFnParameters.js';
 import { requestFnResponseRejecter } from './requestFnResponseRejecter.js';
 import { requestFnResponseResolver } from './requestFnResponseResolver.js';
@@ -53,29 +54,31 @@ export function useComposeUseQueryOptions(
 function qraftQueryFn(
   requestFn: CreateAPIQueryClientOptions['requestFn'],
   baseUrl: CreateAPIQueryClientOptions['baseUrl'],
-  {
-    queryKey: [schema, queryParams],
-    signal,
-    meta,
-    pageParam,
-  }: QueryFunctionContext<
+  context: QueryFunctionContext<
     | ServiceOperationQueryKey<OperationSchema, unknown>
     | ServiceOperationInfiniteQueryKey<OperationSchema, unknown>
   >
 ) {
+  const {
+    queryKey: [schema, queryParams],
+    meta,
+    pageParam,
+  } = context;
   const { parameters, body } = prepareRequestFnParameters(
     queryParams,
     pageParam,
     Boolean('infinite' in schema && schema.infinite)
   );
 
-  return requestFn(schema, {
-    parameters: parameters as never,
-    baseUrl,
-    body,
-    signal,
-    meta,
-  }).then(requestFnResponseResolver, requestFnResponseRejecter);
+  return requestFn(
+    schema,
+    createQueryRequestFnInfo(context, {
+      parameters: parameters as never,
+      baseUrl,
+      body,
+      meta,
+    })
+  ).then(requestFnResponseResolver, requestFnResponseRejecter);
 }
 
 type UseQueryOptionsArgs = [

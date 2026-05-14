@@ -1,8 +1,9 @@
-import type { QueryClient } from '@tanstack/react-query';
+import type { QueryClient, QueryFunctionContext } from '@tanstack/react-query';
 import type { CreateAPIQueryClientOptions } from '../qraftAPIClient.js';
 import type { OperationSchema, RequestFn } from './requestFn.js';
 import { composeInfiniteQueryKey } from './composeInfiniteQueryKey.js';
 import { composeQueryKey } from './composeQueryKey.js';
+import { createQueryRequestFnInfo } from './createRequestFnInfo.js';
 import { prepareRequestFnParameters } from './prepareRequestFnParameters.js';
 import { requestFnResponseRejecter } from './requestFnResponseRejecter.js';
 import { requestFnResponseResolver } from './requestFnResponseResolver.js';
@@ -48,21 +49,27 @@ export function callQueryClientMethodWithQueryKey<
   const queryFn =
     queryFnOption ??
     (requestFn
-      ? // @ts-expect-error - Too complex union to type
-        function ({ queryKey: [, queryParams], signal, meta, pageParam }) {
+      ? function (context: QueryFunctionContext) {
+          const {
+            queryKey: [, queryParams],
+            meta,
+            pageParam,
+          } = context;
           const { parameters, body } = prepareRequestFnParameters(
             queryParams,
             pageParam,
             infinite
           );
 
-          return requestFn(schema, {
-            parameters: parameters as never,
-            baseUrl,
-            body,
-            signal,
-            meta,
-          }).then(requestFnResponseResolver, requestFnResponseRejecter);
+          return requestFn(
+            schema,
+            createQueryRequestFnInfo(context, {
+              parameters: parameters as never,
+              baseUrl,
+              body,
+              meta,
+            })
+          ).then(requestFnResponseResolver, requestFnResponseRejecter);
         }
       : undefined);
 

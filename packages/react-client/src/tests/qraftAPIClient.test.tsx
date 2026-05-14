@@ -177,6 +177,28 @@ describe('Qraft uses singular Query', () => {
     });
   });
 
+  it('passes original query function context as request source for useQuery', async () => {
+    const requestFnSpy = vi.fn(requestFn);
+    const { qraft, queryClient } = createClient({ requestFn: requestFnSpy });
+
+    renderHook(() => qraft.files.findAll.useQuery(), {
+      wrapper: (props) => <Providers queryClient={queryClient} {...props} />,
+    });
+
+    await waitFor(() => expect(requestFnSpy).toHaveBeenCalled());
+
+    const requestInfo = requestFnSpy.mock.calls[0]?.[1];
+
+    expect(requestInfo?.source?.type).toBe('query');
+    if (requestInfo?.source?.type !== 'query') {
+      throw new Error('Expected query source');
+    }
+    expect(requestInfo.source.context.queryKey).toEqual(
+      qraft.files.findAll.getQueryKey()
+    );
+    expect(requestInfo.source.context.meta).toBeUndefined();
+  });
+
   it('supports useQuery with QueryClient from context', async () => {
     const queryClient = new QueryClient();
 
@@ -468,6 +490,39 @@ describe('Qraft uses Queries', () => {
         parameters.path.approval_policy_id,
       ]);
     });
+  });
+
+  it('passes original query function context as request source for useQueries', async () => {
+    const requestFnSpy = vi.fn(requestFn);
+    const { qraft, queryClient } = createClient({ requestFn: requestFnSpy });
+    const emptyQueryOptionsBase = {} satisfies Record<string, never>;
+    const emptyQueryOptions =
+      emptyQueryOptionsBase as Parameters<
+        typeof qraft.files.findAll.useQueries
+      >[0]['queries'][number];
+
+    renderHook(
+      () =>
+        qraft.files.findAll.useQueries({
+          queries: [emptyQueryOptions],
+        }),
+      {
+        wrapper: (props) => <Providers queryClient={queryClient} {...props} />,
+      }
+    );
+
+    await waitFor(() => expect(requestFnSpy).toHaveBeenCalled());
+
+    const requestInfo = requestFnSpy.mock.calls[0]?.[1];
+
+    expect(requestInfo?.source?.type).toBe('query');
+    if (requestInfo?.source?.type !== 'query') {
+      throw new Error('Expected query source');
+    }
+    expect(requestInfo.source.context.queryKey).toEqual(
+      qraft.files.findAll.getQueryKey()
+    );
+    expect(requestInfo.source.context.meta).toBeUndefined();
   });
 });
 
@@ -2357,6 +2412,24 @@ describe('Qraft uses "fetchQuery(...) & "prefetchQuery(...)" & "ensureQueryData(
     const result = qraft.files.findAll.fetchQuery();
 
     await expect(result).resolves.toEqual(filesFindAllResponsePayloadFixtures);
+  });
+
+  it('passes original query function context as request source for fetchQuery', async () => {
+    const requestFnSpy = vi.fn(requestFn);
+    const { qraft } = createClient({ requestFn: requestFnSpy });
+
+    await qraft.files.findAll.fetchQuery();
+
+    const requestInfo = requestFnSpy.mock.calls[0]?.[1];
+
+    expect(requestInfo?.source?.type).toBe('query');
+    if (requestInfo?.source?.type !== 'query') {
+      throw new Error('Expected query source');
+    }
+    expect(requestInfo.source.context.queryKey).toEqual(
+      qraft.files.findAll.getQueryKey()
+    );
+    expect(requestInfo.source.context.meta).toBeUndefined();
   });
 
   it('emits type and response error required `parameters` are omitted', async () => {
