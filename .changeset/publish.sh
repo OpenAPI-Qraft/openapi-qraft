@@ -44,9 +44,24 @@ if [ -z "$NPM_PUBLISH_SCOPES" ]; then
   exit 1
 fi
 
+echo "Checking npm publish authentication"
+
 for scope in $NPM_PUBLISH_SCOPES; do
+  if ! yarn npm whoami --scope "$scope" --publish; then
+    echo "Error: npm publish authentication failed for @${scope}." >&2
+    echo "Check the NPM_TOKEN secret and npm scope permissions before publishing." >&2
+    exit 1
+  fi
+
   from_flags="$from_flags --from '@${scope}/*'"
 done
+
+publish_failed() {
+  echo "Error: npm publish failed." >&2
+  echo "If npm reports a two-factor authentication error, use a granular access token with write access and bypass 2FA enabled for the published packages." >&2
+  echo "The whoami preflight only verifies that the token is recognized by the publish registry; npm can still reject the actual package PUT for 2FA or package-level permission reasons." >&2
+  exit 1
+}
 
 if [ "$WITH_PROVENANCE" = "true" ]; then
   provenance_flags="--provenance"
@@ -56,10 +71,10 @@ TAG=$(release_tag)
 
 if [ -n "$TAG" ]; then
   echo "Publishing under @${TAG} tag"
-  sh -c "yarn workspaces foreach --verbose --recursive --no-private $from_flags npm publish $provenance_flags --tolerate-republish --tag '$TAG'"
+  sh -c "yarn workspaces foreach --verbose --recursive --no-private $from_flags npm publish $provenance_flags --tolerate-republish --tag '$TAG'" || publish_failed
 else
   echo "Publishing as @latest"
-  sh -c "yarn workspaces foreach --verbose --recursive --no-private $from_flags npm publish $provenance_flags --tolerate-republish"
+  sh -c "yarn workspaces foreach --verbose --recursive --no-private $from_flags npm publish $provenance_flags --tolerate-republish" || publish_failed
 fi
 
 for arg in "$@"; do
