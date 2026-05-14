@@ -208,6 +208,7 @@ It is possible to use multiple plugins at the same time. For example, `--plugin 
     - `context:<ContextName>` - Generate a React Context that provides `queryClient`, `requestFn`, and `baseUrl` to the API client.
       When the API client is created without options, it reads these values from the Context at render time.
       This enables creating the client **outside of React components**, making hooks static and compatible with React Compiler.
+      When the context-based client is created with an options object instead, it exposes method callbacks and operation calls, but not React hooks.
       See [Context-based API Client](./create-api-client-function/context-api-client.mdx) for detailed documentation.
   - **Examples:**
     - `--create-api-client-fn createAPIClient services:all callbacks:all` - creates the `createAPIClient()` function that

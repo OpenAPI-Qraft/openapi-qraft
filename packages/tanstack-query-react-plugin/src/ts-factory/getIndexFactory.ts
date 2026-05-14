@@ -16,6 +16,13 @@ export const getIndexFactory = ({
 } & Partial<Pick<ServiceFactoryOptions, 'openapiTypesImportPath'>>) => {
   const factory = ts.factory;
   const importExtension = explicitImportExtensions ?? '';
+  const contextNames = [
+    ...new Set(
+      createApiClientFn
+        .map(([, value]) => value.context?.[0])
+        .filter((contextName): contextName is string => Boolean(contextName))
+    ),
+  ];
 
   return [
     ...(openapiTypesImportPath
@@ -87,25 +94,21 @@ export const getIndexFactory = ({
         undefined
       )
     ),
-    ...createApiClientFn
-      .filter(([, value]) => value.context?.[0])
-      .map(([, value]) =>
-        factory.createExportDeclaration(
-          undefined,
-          false,
-          factory.createNamedExports([
-            factory.createExportSpecifier(
-              false,
-              undefined,
-              factory.createIdentifier(value.context![0])
-            ),
-          ]),
-          factory.createStringLiteral(
-            `./${value.context![0]}${importExtension}`
+    ...contextNames.map((contextName) =>
+      factory.createExportDeclaration(
+        undefined,
+        false,
+        factory.createNamedExports([
+          factory.createExportSpecifier(
+            false,
+            undefined,
+            factory.createIdentifier(contextName)
           ),
-          undefined
-        )
-      ),
+        ]),
+        factory.createStringLiteral(`./${contextName}${importExtension}`),
+        undefined
+      )
+    ),
   ];
 };
 

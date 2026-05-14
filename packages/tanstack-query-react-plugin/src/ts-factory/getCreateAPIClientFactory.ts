@@ -48,13 +48,20 @@ const getOperationClientImportsFactory = ({
   const qraftClientFactoryName = contextName
     ? 'qraftReactAPIClient'
     : 'qraftAPIClient';
+  const basicQueryClientServicesTypeName = contextName
+    ? 'APIBasicQueryClientMethodsServices'
+    : 'APIBasicQueryClientServices';
+  const basicClientServicesTypeName = contextName
+    ? 'APIBasicClientMethodsServices'
+    : 'APIBasicClientServices';
 
   const availableQraftImportedTypes = [
-    'APIBasicClientServices',
-    'APIBasicQueryClientServices',
-    'APIDefaultQueryClientServices',
-    contextName && 'APIContextQueryClientServices',
-    !shouldImportAllCallbacks && 'APIQueryClientServices',
+    basicClientServicesTypeName,
+    basicQueryClientServicesTypeName,
+    !contextName && 'APIDefaultQueryClientServices',
+    contextName && 'APIQueryClientHooksServices',
+    contextName && 'APIQueryClientMethodsServices',
+    !contextName && !shouldImportAllCallbacks && 'APIQueryClientServices',
     !contextName && 'APIUtilityClientServices',
     'CreateAPIBasicClientOptions',
     'CreateAPIBasicQueryClientOptions',
@@ -248,6 +255,15 @@ const getCreateOperationClientFunctionFactory = ({
   const qraftClientFactoryName = contextName
     ? 'qraftReactAPIClient'
     : 'qraftAPIClient';
+  const queryClientServicesTypeName = contextName
+    ? 'APIQueryClientMethodsServices'
+    : 'APIQueryClientServices';
+  const basicQueryClientServicesTypeName = contextName
+    ? 'APIBasicQueryClientMethodsServices'
+    : 'APIBasicQueryClientServices';
+  const basicClientServicesTypeName = contextName
+    ? 'APIBasicClientMethodsServices'
+    : 'APIBasicClientServices';
 
   const shouldImportAllCallbacks = defaultClientCallbacks?.some(
     (name) => name === 'all'
@@ -325,15 +341,29 @@ const getCreateOperationClientFunctionFactory = ({
               undefined
             ),
       ].filter(nonNullable),
-      factory.createTypeReferenceNode(
-        factory.createIdentifier('APIDefaultQueryClientServices'),
-        [
-          factory.createTypeReferenceNode(
-            factory.createIdentifier('Services'),
-            undefined
+      contextName
+        ? factory.createTypeReferenceNode(
+            factory.createIdentifier('APIQueryClientMethodsServices'),
+            [
+              factory.createTypeReferenceNode(
+                factory.createIdentifier('Services'),
+                undefined
+              ),
+              factory.createTypeReferenceNode(
+                factory.createIdentifier('AllCallbacks'),
+                undefined
+              ),
+            ]
+          )
+        : factory.createTypeReferenceNode(
+            factory.createIdentifier('APIDefaultQueryClientServices'),
+            [
+              factory.createTypeReferenceNode(
+                factory.createIdentifier('Services'),
+                undefined
+              ),
+            ]
           ),
-        ]
-      ),
       undefined
     ),
     shouldImportAllCallbacks
@@ -421,7 +451,7 @@ const getCreateOperationClientFunctionFactory = ({
             ),
           ].filter(nonNullable),
           factory.createTypeReferenceNode(
-            factory.createIdentifier('APIQueryClientServices'),
+            factory.createIdentifier(queryClientServicesTypeName),
             [
               factory.createTypeReferenceNode(
                 factory.createIdentifier('Services'),
@@ -520,7 +550,7 @@ const getCreateOperationClientFunctionFactory = ({
             ),
       ].filter(nonNullable),
       factory.createTypeReferenceNode(
-        factory.createIdentifier('APIBasicQueryClientServices'),
+        factory.createIdentifier(basicQueryClientServicesTypeName),
         [
           factory.createTypeReferenceNode(
             factory.createIdentifier('Services'),
@@ -621,7 +651,7 @@ const getCreateOperationClientFunctionFactory = ({
             ),
       ].filter(nonNullable),
       factory.createTypeReferenceNode(
-        factory.createIdentifier('APIBasicClientServices'),
+        factory.createIdentifier(basicClientServicesTypeName),
         [
           factory.createTypeReferenceNode(
             factory.createIdentifier('Services'),
@@ -713,7 +743,7 @@ const getCreateOperationClientFunctionFactory = ({
       factory.createTypeReferenceNode(
         factory.createIdentifier(
           contextName
-            ? 'APIContextQueryClientServices'
+            ? 'APIQueryClientHooksServices'
             : 'APIUtilityClientServices'
         ),
         [
@@ -836,33 +866,52 @@ const getCreateOperationClientFunctionFactory = ({
       ].filter(nonNullable),
       factory.createUnionTypeNode(
         [
-          factory.createTypeReferenceNode(
-            factory.createIdentifier('APIDefaultQueryClientServices'),
-            [
-              factory.createTypeReferenceNode(
-                factory.createIdentifier('Services'),
-                undefined
-              ),
-            ]
-          ),
-          shouldImportAllCallbacks
+          contextName
             ? null
             : factory.createTypeReferenceNode(
-                factory.createIdentifier('APIQueryClientServices'),
+                factory.createIdentifier('APIDefaultQueryClientServices'),
+                [
+                  factory.createTypeReferenceNode(
+                    factory.createIdentifier('Services'),
+                    undefined
+                  ),
+                ]
+              ),
+          contextName && !shouldImportAllCallbacks
+            ? factory.createTypeReferenceNode(
+                factory.createIdentifier(queryClientServicesTypeName),
                 [
                   factory.createTypeReferenceNode(
                     factory.createIdentifier('Services'),
                     undefined
                   ),
                   factory.createTypeReferenceNode(
-                    factory.createIdentifier('Callbacks'),
+                    factory.createIdentifier('AllCallbacks'),
+                    undefined
+                  ),
+                ]
+              )
+            : null,
+          shouldImportAllCallbacks && !contextName
+            ? null
+            : factory.createTypeReferenceNode(
+                factory.createIdentifier(queryClientServicesTypeName),
+                [
+                  factory.createTypeReferenceNode(
+                    factory.createIdentifier('Services'),
+                    undefined
+                  ),
+                  factory.createTypeReferenceNode(
+                    factory.createIdentifier(
+                      shouldImportAllCallbacks ? 'AllCallbacks' : 'Callbacks'
+                    ),
                     undefined
                   ),
                 ]
               ),
           contextName
             ? factory.createTypeReferenceNode(
-                factory.createIdentifier('APIContextQueryClientServices'),
+                factory.createIdentifier('APIQueryClientHooksServices'),
                 [
                   factory.createTypeReferenceNode(
                     factory.createIdentifier('Services'),
@@ -878,7 +927,7 @@ const getCreateOperationClientFunctionFactory = ({
               )
             : null,
           factory.createTypeReferenceNode(
-            factory.createIdentifier('APIBasicQueryClientServices'),
+            factory.createIdentifier(basicQueryClientServicesTypeName),
             [
               factory.createTypeReferenceNode(
                 factory.createIdentifier('Services'),
@@ -893,7 +942,7 @@ const getCreateOperationClientFunctionFactory = ({
             ]
           ),
           factory.createTypeReferenceNode(
-            factory.createIdentifier('APIBasicClientServices'),
+            factory.createIdentifier(basicClientServicesTypeName),
             [
               factory.createTypeReferenceNode(
                 factory.createIdentifier('Services'),

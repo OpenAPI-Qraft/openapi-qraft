@@ -25,7 +25,6 @@ import { qraftAPIClient, requestFn } from '../index.js';
 import { createPredefinedParametersRequestFn } from './fixtures/api/create-predefined-parameters-request-fn.js';
 import { createAPIClient, services } from './fixtures/api/index.js';
 import { getApprovalPoliciesId } from './fixtures/api/services/ApprovalPoliciesService.js';
-import { createInternalReactAPIClient } from './fixtures/files-api/index.js';
 import { filesFindAllResponsePayloadFixtures } from './msw/handlers.js';
 
 const baseUrl = 'https://api.sandbox.monite.com/v1';
@@ -1517,6 +1516,7 @@ describe('Qraft uses useIsMutating', () => {
 
   it('supports useIsMutating with filters', async () => {
     const { qraft, queryClient } = createClient();
+    const noRequestQraft = createAPIClient();
     const { result: mutationResult } = renderHook(
       () => qraft.entities.postEntitiesIdDocuments.useMutation(parameters),
       {
@@ -1533,8 +1533,6 @@ describe('Qraft uses useIsMutating', () => {
 
     const { result: isMutatingResult } = renderHook(
       () => {
-        const noRequestQraft = createAPIClient();
-
         return noRequestQraft.entities.postEntitiesIdDocuments.useIsMutating({
           parameters,
         });
@@ -2994,10 +2992,10 @@ describe('Custom Callbacks support', () => {
         queryClient,
       } as const;
 
-      const getApprovalPoliciesIdOperation = createInternalReactAPIClient(
+      const getApprovalPoliciesIdOperation = qraftAPIClient(
         getApprovalPoliciesId,
-        defaultOptions,
-        { useQuery, getQueryKey }
+        { useQuery, getQueryKey },
+        defaultOptions
       );
 
       const queryKey = getApprovalPoliciesIdOperation.getQueryKey({

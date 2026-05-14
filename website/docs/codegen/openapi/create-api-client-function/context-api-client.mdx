@@ -46,7 +46,16 @@ function MyComponent() {
 - **React Compiler optimization** - Static hooks can be automatically memoized
 - **Cleaner component code** - No need to create API client inside components
 - **Multiple API versions** - Easy to manage different API clients with separate Contexts
-- **Flexible configuration** - Change `queryClient`, `requestFn`, or `baseUrl` dynamically via Context
+- **Flexible configuration** - Change `queryClient`, `requestFn`, or `baseUrl` via Context without recreating the static hooks client
+
+## Type Surface
+
+Context-based clients have two different TypeScript surfaces:
+
+- `createAPIClient()` uses the generated React Context and exposes hook callbacks, such as `useQuery`, `useMutation`, `useIsFetching`, plus key helpers. It does not expose imperative `QueryClient` methods like `getQueryData`, `setQueryData`, `cancelQueries`, or `invalidateQueries`.
+- `createAPIClient(options)` uses the provided `queryClient`, `requestFn`, and `baseUrl` directly and exposes method callbacks. It does not expose React hooks.
+
+Use the no-argument client as a static hooks client outside components. When you need cache methods in callbacks, read the Context value with `useContext` and create a method-only client with `createAPIClient(apiOptions)`.
 
 ## Configuration
 
@@ -69,7 +78,7 @@ You can combine `context:` with other options:
 --create-api-client-fn createAPIClient \
   filename:create-api-client \
   context:APIClientContext \
-  callbacks:useQuery,useMutation,setQueryData,getQueryData
+  callbacks:useQuery,useMutation,getQueryKey,getInfiniteQueryKey,setQueryData,getQueryData,cancelQueries,invalidateQueries
 ```
 
 ### Redocly Configuration
@@ -93,6 +102,8 @@ apis:
             - useMutation
             - setQueryData
             - getQueryData
+            - cancelQueries
+            - invalidateQueries
             - getQueryKey
             - getInfiniteQueryKey
 ```
@@ -232,7 +243,8 @@ function APIProvider({ children }: { children: ReactNode }) {
 ### Pattern 3: Using Context in Callbacks
 
 When you need to access the API client inside mutation callbacks (e.g., for optimistic updates),
-you can use `useContext` to get options and create a new client instance:
+use `useContext` to get options and create a method-only client instance.
+Keep hooks on the static `api` client, and use the client created from Context only for cache methods and operation calls:
 
 ```tsx title="src/PetUpdateForm.tsx"
 import { createAPIClient, APIClientContext } from './api';
@@ -242,14 +254,14 @@ const api = createAPIClient();
 
 function PetUpdateForm({ petId }: { petId: number }) {
   // ⬇︎ Get context value to create API client in callbacks
-  const apiContext = useContext(APIClientContext);
+  const apiOptions = useContext(APIClientContext);
 
   const petParams = { path: { petId } };
 
   const { mutate } = api.pet.updatePet.useMutation(undefined, {
     async onMutate(variables) {
-      // ⬇︎ Create a new client instance with context options
-      const apiClient = createAPIClient(apiContext!);
+      // ⬇︎ Create a method-only client instance with context options
+      const apiClient = createAPIClient(apiOptions!);
 
       // Cancel outgoing queries
       await apiClient.pet.getPetById.cancelQueries({ parameters: petParams });
@@ -269,7 +281,7 @@ function PetUpdateForm({ petId }: { petId: number }) {
     async onError(_error, _variables, context) {
       // Rollback on error
       if (context?.prevPet) {
-        createAPIClient(apiContext!).pet.getPetById.setQueryData(
+        createAPIClient(apiOptions!).pet.getPetById.setQueryData(
           petParams,
           context.prevPet
         );
@@ -278,7 +290,7 @@ function PetUpdateForm({ petId }: { petId: number }) {
 
     async onSuccess() {
       // Invalidate related queries
-      await createAPIClient(apiContext!).pet.findPetsByStatus.invalidateQueries();
+      await createAPIClient(apiOptions!).pet.findPetsByStatus.invalidateQueries();
     },
   });
 
@@ -351,14 +363,14 @@ function APIProvider({ children }: { children: ReactNode }) {
 
 function PetEditor({ petId }: { petId: number }) {
   const petParams = { path: { petId } };
-  const apiContext = useContext(APIClientContext);
+  const apiOptions = useContext(APIClientContext);
 
-  // Utility client that needs direct access to runtime queryClient/requestFn/baseUrl from Context
+  // Method-only client that needs direct access to runtime queryClient/requestFn/baseUrl from Context
   const cacheApi = createMinimalContextAPIClient(
     {
       getPetById: services.pet.getPetById,
     },
-    apiContext!,
+    apiOptions!,
     { setQueryData }
   );
 
@@ -528,14 +540,15 @@ function PetList() {
 }
 
 function PetForm({ petId }: { petId: number }) {
-  const apiContext = useContext(APIClientContext);
+  const apiOptions = useContext(APIClientContext);
   const petParams = { path: { petId } };
 
   const { data: pet, isPending: isLoading } = api.pet.getPetById.useQuery(petParams);
 
   const { mutate, isPending } = api.pet.updatePet.useMutation(undefined, {
     async onMutate(variables) {
-      const apiClient = createAPIClient(apiContext!);
+      // Method-only client for cache operations inside callbacks.
+      const apiClient = createAPIClient(apiOptions!);
       await apiClient.pet.getPetById.cancelQueries({ parameters: petParams });
       const prevPet = apiClient.pet.getPetById.getQueryData(petParams);
       apiClient.pet.getPetById.setQueryData(petParams, (old) => ({
@@ -546,14 +559,14 @@ function PetForm({ petId }: { petId: number }) {
     },
     async onError(_err, _vars, context) {
       if (context?.prevPet) {
-        createAPIClient(apiContext!).pet.getPetById.setQueryData(
+        createAPIClient(apiOptions!).pet.getPetById.setQueryData(
           petParams,
           context.prevPet
         );
       }
     },
     async onSuccess() {
-      await createAPIClient(apiContext!).pet.findPetsByStatus.invalidateQueries();
+      await createAPIClient(apiOptions!).pet.findPetsByStatus.invalidateQueries();
     },
   });
 

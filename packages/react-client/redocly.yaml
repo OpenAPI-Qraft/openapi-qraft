@@ -93,6 +93,27 @@ apis:
               'getInfiniteQueryKey',
               'getMutationCache',
             ]
+        createAllCallbacksReactAPIClient:
+          services: all
+          context: InternalReactAPIClientContext
+          callbacks: all
+        createNoCallbacksReactAPIClient:
+          services: none
+          context: InternalReactAPIClientContext
+          callbacks: none
+        createEmbeddedReactAPIClient:
+          filename: createEmbeddedReactAPIClient
+          context: InternalReactAPIClientContext
+          callbacks:
+            [
+              'useQuery',
+              'useMutation',
+              'setQueryData',
+              'getQueryData',
+              'getQueryKey',
+              'getInfiniteQueryKey',
+              'getMutationCache',
+            ]
       operation-parameters-type-wrapper:
         'get /files/**':
           type: 'ParametersWrapper'

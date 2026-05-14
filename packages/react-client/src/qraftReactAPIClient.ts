@@ -4,11 +4,6 @@ import type { Context } from 'react';
 import type * as callbacks from './callbacks/index.js';
 import type { OperationSchema } from './lib/requestFn.js';
 import type {
-  APIBasicClientServices,
-  APIBasicQueryClientServices,
-  APIDefaultQueryClientServices,
-  APIQueryClientServices,
-  APIUtilityClientServices,
   CreateAPIBasicClientOptions,
   CreateAPIBasicQueryClientOptions,
   CreateAPIClientOptions,
@@ -27,8 +22,8 @@ type ServiceMethods = typeof callbacks;
 type PartialServiceMethods = Partial<ServiceMethods>;
 
 /**
- * Creates a QueryClient compatible API Client which contains all operations
- * such as `useQuery`, `useMutation` with React Context support.
+ * Creates a QueryClient compatible API Client which contains all non-hook
+ * methods with request and QueryClient options bound.
  *
  * @example Fetching data with QueryClient
  * ```ts
@@ -49,10 +44,8 @@ export function qraftReactAPIClient<
 >(
   services: Services,
   callbacks: Callbacks,
-  options:
-    | CreateAPIQueryClientOptions
-    | Context<CreateAPIQueryClientOptions | undefined>
-): APIDefaultQueryClientServices<Services>;
+  options: CreateAPIQueryClientOptions
+): APIQueryClientMethodsServices<Services, Callbacks>;
 
 /**
  * It creates a QueryClient-compatible API client that contains all the hooks
@@ -75,11 +68,11 @@ export function qraftReactAPIClient<
   services: Services,
   callbacks: Callbacks,
   options: Context<CreateAPIQueryClientOptions | undefined>
-): APIContextQueryClientServices<Services, Callbacks>;
+): APIQueryClientHooksServices<Services, Callbacks>;
 
 /**
- * Creates a QueryClient compatible API Client which contains all operations
- * such as `useQuery`, `useMutation`.
+ * Creates a QueryClient compatible API Client which contains all non-hook
+ * methods with request and QueryClient options bound.
  *
  * @example Fetching data with QueryClient
  * ```ts
@@ -101,12 +94,12 @@ export function qraftReactAPIClient<
   services: Services,
   callbacks: Callbacks,
   options: CreateAPIQueryClientOptions
-): APIQueryClientServices<Services, Callbacks>;
+): APIQueryClientMethodsServices<Services, Callbacks>;
 
 /**
- * Creates a QueryClient compatible API Client which contains
- * only state management manipulations such as `useIsMutating`,
- * `setQueryData`, `getQueryData` and `invalidateQueries`.
+ * Creates a QueryClient compatible API Client which contains non-hook state
+ * management methods such as `setQueryData`, `getQueryData` and
+ * `invalidateQueries`.
  *
  * @example Invalidating queries with QueryClient
  * ```ts
@@ -126,28 +119,12 @@ export function qraftReactAPIClient<
   services: Services,
   callbacks: Callbacks,
   options: CreateAPIBasicQueryClientOptions
-): APIBasicQueryClientServices<Services, Callbacks>;
+): APIBasicQueryClientMethodsServices<Services, Callbacks>;
 
 /**
- * Creates a basic API Client which contains all hooks and methods
- * that don't require an explicitly provided QueryClient.
- * Hooks like `useQuery` and `useMutation` will automatically retrieve
- * the QueryClient from the `<QueryClientProvider />` context.
+ * Creates a basic API Client which contains operation invoke and key helpers.
  *
- * @example Fetching data with QueryClient from context
- * ```ts
- * const api = qraftReactAPIClient(services, callbacks, {
- *   requestFn: requestFn,
- *   baseUrl: 'https://api.example.com',
- * });
- *
- * // QueryClient will be retrieved from React context
- * api.service.operation.useQuery({
- *   parameters: { path: { id: 1 } },
- * });
- * ```
- *
- * @example Fetching data without QueryClient
+ * @example Fetching data
  * ```ts
  * const api = qraftReactAPIClient(services, callbacks, {
  *   requestFn: requestFn,
@@ -166,20 +143,11 @@ export function qraftReactAPIClient<
   services: Services,
   callbacks: Callbacks,
   options: CreateAPIBasicClientOptions
-): APIBasicClientServices<Services, Callbacks>;
+): APIBasicClientMethodsServices<Services, Callbacks>;
 
 /**
- * Creates a utility API Client which contains utility operations
- * such as `getQueryKey`, `getInfiniteQueryKey`, `getMutationKey` and state hooks
- * like `useIsFetching` and `useMutationData`.
- *
- * @example Using state hooks
- * ```ts
- * const api = qraftReactAPIClient(services, callbacks);
- *
- * // Check if any query is currently fetching
- * const isFetching = api.service.operation.useIsFetching();
- * ```
+ * Creates a utility API Client which contains key helper operations such as
+ * `getQueryKey`, `getInfiniteQueryKey` and `getMutationKey`.
  *
  * @example Getting query keys with utility client
  * ```ts
@@ -192,11 +160,11 @@ export function qraftReactAPIClient<
  */
 export function qraftReactAPIClient<
   Services extends UnionServiceOperationsDeclaration<Services>,
-  Callbacks extends Pick<PartialServiceMethods, UtilityOperationCallbacks>,
+  Callbacks extends PartialServiceMethods,
 >(
   services: Services,
   callbacks: Callbacks
-): APIUtilityClientServices<Services, Callbacks>;
+): APIUtilityClientMethodsServices<Services, Callbacks>;
 
 export function qraftReactAPIClient<
   Services extends UnionServiceOperationsDeclaration<Services>,
@@ -208,11 +176,11 @@ export function qraftReactAPIClient<
     | CreateAPIClientOptions
     | Context<CreateAPIQueryClientOptions | undefined>
 ):
-  | APIQueryClientServices<Services, Callbacks>
-  | APIDefaultQueryClientServices<Services>
-  | APIBasicQueryClientServices<Services, Callbacks>
-  | APIUtilityClientServices<Services, Callbacks>
-  | APIContextQueryClientServices<Services, Callbacks> {
+  | APIQueryClientMethodsServices<Services, Callbacks>
+  | APIBasicQueryClientMethodsServices<Services, Callbacks>
+  | APIBasicClientMethodsServices<Services, Callbacks>
+  | APIUtilityClientMethodsServices<Services, Callbacks>
+  | APIQueryClientHooksServices<Services, Callbacks> {
   if (options && 'Provider' in options && 'Consumer' in options) {
     const wrappedCallbacks = wrapHookCallbacks(callbacks, options);
     return qraftAPIClient(services, wrappedCallbacks) as never;
@@ -259,7 +227,7 @@ function wrapHookCallbackWithUseContext(
   return useCallbackContext;
 }
 
-export type APIContextQueryClientServices<
+export type APIQueryClientHooksServices<
   Services extends UnionServiceOperationsDeclaration<Services>,
   Callbacks extends PartialServiceMethods,
 > = ServicesFilteredByCallbacks<
@@ -271,3 +239,90 @@ type HookOperationCallbackList =
   | UtilityOperationCallbacks
   | QueryOperationHookCallbacks
   | MutationOperationHookCallbacks;
+
+export type APIUtilityClientMethodsServices<
+  Services extends UnionServiceOperationsDeclaration<Services>,
+  Callbacks extends PartialServiceMethods,
+> = ServicesFilteredByCallbacks<
+  Services,
+  Extract<keyof Callbacks, KeyOperationCallbacks>
+>;
+
+export type APIBasicClientMethodsServices<
+  Services extends UnionServiceOperationsDeclaration<Services>,
+  Callbacks extends PartialServiceMethods,
+> = ServicesFilteredByCallbacks<
+  Services,
+  Extract<keyof Callbacks, InvokeOperationCallback | KeyOperationCallbacks>
+>;
+
+export type APIBasicQueryClientMethodsServices<
+  Services extends UnionServiceOperationsDeclaration<Services>,
+  Callbacks extends PartialServiceMethods,
+> = ServicesFilteredByCallbacks<
+  Services,
+  Extract<
+    keyof Callbacks,
+    | QueryOperationStateMethodCallbacks
+    | MutationOperationStateMethodCallbacks
+    | KeyOperationCallbacks
+  >
+>;
+
+export type APIQueryClientMethodsServices<
+  Services extends UnionServiceOperationsDeclaration<Services>,
+  Callbacks extends PartialServiceMethods,
+> = ServicesFilteredByCallbacks<
+  Services,
+  Extract<
+    keyof Callbacks,
+    | QueryOperationMethodCallbacks
+    | QueryOperationStateMethodCallbacks
+    | MutationOperationStateMethodCallbacks
+    | InvokeOperationCallback
+    | KeyOperationCallbacks
+  >
+>;
+
+type QueryOperationMethodCallbacks = Extract<
+  keyof ServiceMethods,
+  | 'fetchInfiniteQuery'
+  | 'fetchQuery'
+  | 'prefetchInfiniteQuery'
+  | 'prefetchQuery'
+  | 'refetchQueries'
+  | 'ensureQueryData'
+  | 'ensureInfiniteQueryData'
+>;
+
+type QueryOperationStateMethodCallbacks = Extract<
+  keyof ServiceMethods,
+  | 'cancelQueries'
+  | 'getInfiniteQueryData'
+  | 'getInfiniteQueryState'
+  | 'getQueriesData'
+  | 'getQueryData'
+  | 'getQueryState'
+  | 'invalidateQueries'
+  | 'isFetching'
+  | 'removeQueries'
+  | 'resetQueries'
+  | 'setInfiniteQueryData'
+  | 'setQueriesData'
+  | 'setQueryData'
+>;
+
+type MutationOperationStateMethodCallbacks = Extract<
+  keyof ServiceMethods,
+  'getMutationCache' | 'isMutating'
+>;
+
+type InvokeOperationCallback = Extract<
+  keyof ServiceMethods,
+  'operationInvokeFn'
+>;
+
+type KeyOperationCallbacks = Extract<
+  keyof ServiceMethods,
+  'getQueryKey' | 'getInfiniteQueryKey' | 'getMutationKey'
+>;
