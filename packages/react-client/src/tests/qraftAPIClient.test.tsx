@@ -1495,6 +1495,36 @@ describe('Qraft uses Mutations', () => {
     });
   });
 
+  it('passes mutation variables and mutationKey as request source', async () => {
+    const requestFnSpy = vi.fn(requestFn);
+    const { qraft, queryClient } = createClient({ requestFn: requestFnSpy });
+    const mutationKey = qraft.files.deleteFiles.getMutationKey({
+      query: { all: true },
+    });
+    const variables = {
+      body: { ok: true },
+    } satisfies { body: { ok: boolean } };
+
+    const { result } = renderHook(
+      () =>
+        qraft.files.deleteFiles.useMutation(undefined, {
+          mutationKey,
+        }),
+      {
+        wrapper: (props) => <Providers queryClient={queryClient} {...props} />,
+      }
+    );
+
+    await act(() => result.current.mutateAsync(variables as never));
+
+    const requestInfo = requestFnSpy.mock.calls[0]![1];
+    expect(requestInfo.source).toEqual({
+      type: 'mutation',
+      variables,
+      mutationKey,
+    });
+  });
+
   it('supports useMutation with form data and plain data', async () => {
     const { qraft, queryClient } = createClient();
 
