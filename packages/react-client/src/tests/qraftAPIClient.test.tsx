@@ -2321,7 +2321,13 @@ describe('Qraft uses Operation Query Function', () => {
 
     expect(requestFnSpy).toHaveBeenCalledWith(
       qraft.approvalPolicies.getApprovalPoliciesId.schema,
-      { parameters, baseUrl: 'https://foo.bar.baz/v1' }
+      {
+        parameters,
+        baseUrl: 'https://foo.bar.baz/v1',
+        source: {
+          type: 'invoke',
+        },
+      }
     );
   });
 
@@ -3061,6 +3067,20 @@ describe('Custom Callbacks support', () => {
           | Services['approvalPolicies']['getApprovalPoliciesId']['types']['data']
           | undefined
       ).toEqual(parameters);
+    });
+
+    it('passes invoke source for direct operation calls', async () => {
+      const requestFnSpy = vi.fn(requestFn) as typeof requestFn;
+      const { qraft } = createClient({ requestFn: requestFnSpy });
+
+      await qraft.files.findAll(undefined, requestFnSpy);
+
+      expect(requestFnSpy).toHaveBeenCalledWith(
+        qraft.files.findAll.schema,
+        expect.objectContaining({
+          source: { type: 'invoke' },
+        })
+      );
     });
 
     it('supports POST "operationInvokeFn" if callback provided', async () => {
