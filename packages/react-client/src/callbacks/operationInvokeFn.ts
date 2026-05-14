@@ -54,5 +54,8 @@ export const operationInvokeFn: <
     ...options,
     baseUrl: baseUrl ?? qraftOptions.baseUrl,
     parameters: invokeParameters,
+    source: {
+      type: 'invoke',
+    },
   } as never);
 };

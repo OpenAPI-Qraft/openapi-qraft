@@ -62,7 +62,8 @@ export const useMutation: <
             qraftOptions.requestFn,
             qraftOptions.baseUrl,
             schema,
-            parameters
+            parameters,
+            mutationKey
           ),
         [
           options?.mutationFn,
@@ -70,6 +71,7 @@ export const useMutation: <
           qraftOptions.baseUrl,
           schema,
           parameters,
+          mutationKey,
         ]
       ),
     },
@@ -82,6 +84,7 @@ function qraftMutationFn(
   baseUrl: CreateAPIQueryClientOptions['baseUrl'],
   schema: OperationSchema,
   parameters: unknown,
+  mutationKey: ServiceOperationMutationKey<OperationSchema, unknown>,
   mutationVariables:
     | {
         body: unknown;
@@ -93,6 +96,11 @@ function qraftMutationFn(
       parameters,
       baseUrl,
       body: mutationVariables as never,
+      source: {
+        type: 'mutation',
+        variables: mutationVariables,
+        mutationKey,
+      },
     }).then(requestFnResponseResolver, requestFnResponseRejecter);
   }
 
@@ -107,5 +115,10 @@ function qraftMutationFn(
     parameters: mutationParameters,
     baseUrl,
     body,
+    source: {
+      type: 'mutation',
+      variables: mutationVariables,
+      mutationKey,
+    },
   } as never).then(requestFnResponseResolver, requestFnResponseRejecter);
 }
