@@ -1,4 +1,7 @@
-import type { QueryClientConfig, QueryFunctionContext } from '@tanstack/react-query';
+import type {
+  QueryClientConfig,
+  QueryFunctionContext,
+} from '@tanstack/react-query';
 import type { ReactNode } from 'react';
 import type { CreateAPIQueryClientOptions } from '../index.js';
 import type {
@@ -58,9 +61,8 @@ const createClient = ({
 
 describe('requestFn', () => {
   it('does not forward qraft request source metadata to fetch', async () => {
-    const fetchImplementation = (async (
-      ..._args: Parameters<typeof fetch>
-    ) => Response.json({ ok: true })) satisfies typeof fetch;
+    const fetchImplementation = (async (..._args: Parameters<typeof fetch>) =>
+      Response.json({ ok: true })) satisfies typeof fetch;
     const fetchSpy = vi.fn(fetchImplementation);
 
     await requestFn(
@@ -83,9 +85,9 @@ describe('requestFn', () => {
     if (!fetchInit) {
       throw new Error('fetch init should be defined');
     }
-    expect(
-      Object.prototype.hasOwnProperty.call(fetchInit, 'source')
-    ).toBe(false);
+    expect(Object.prototype.hasOwnProperty.call(fetchInit, 'source')).toBe(
+      false
+    );
   });
 });
 
@@ -99,17 +101,13 @@ describe('createQueryRequestFnInfo', () => {
       meta: undefined,
       queryKey: ['test'],
     } satisfies Omit<QueryFunctionContext, 'signal'>;
-    const context = Object.defineProperty(
-      contextBase,
-      'signal',
-      {
-        enumerable: true,
-        get() {
-          signalReads += 1;
-          return signal;
-        },
-      }
-    ) as unknown as QueryFunctionContext;
+    const context = Object.defineProperty(contextBase, 'signal', {
+      enumerable: true,
+      get() {
+        signalReads += 1;
+        return signal;
+      },
+    }) as unknown as QueryFunctionContext;
 
     const requestInfo = createQueryRequestFnInfo(context, {
       baseUrl: 'https://api.sandbox.monite.com/v1',
@@ -625,6 +623,43 @@ describe('Qraft uses Suspense Queries', () => {
         ['asc', 'desc'],
       ]);
     });
+  });
+
+  it('passes original query function context as request source for useSuspenseQueries', async () => {
+    const requestFnSpy = vi.fn(requestFn);
+    const { qraft, queryClient } = createClient({ requestFn: requestFnSpy });
+
+    const hook = () => {
+      try {
+        return qraft.files.findAll.useSuspenseQueries({
+          queries: [
+            {
+              queryKey: qraft.files.findAll.getQueryKey(),
+            },
+          ],
+        });
+      } catch (error) {
+        return error as Promise<void>;
+      }
+    };
+
+    const { result: resultWithErrorPromise } = renderHook(hook, {
+      wrapper: (props) => <Providers {...props} queryClient={queryClient} />,
+    });
+
+    expect(resultWithErrorPromise.current).toBeInstanceOf(Promise);
+    await resultWithErrorPromise.current;
+
+    const requestInfo = requestFnSpy.mock.calls[0]?.[1];
+
+    expect(requestInfo?.source?.type).toBe('query');
+    if (requestInfo?.source?.type !== 'query') {
+      throw new Error('Expected query source');
+    }
+    expect(requestInfo.source.context.queryKey).toEqual(
+      qraft.files.findAll.getQueryKey()
+    );
+    expect(requestInfo.source.context.meta).toBeUndefined();
   });
 });
 
