@@ -1,5 +1,11 @@
 # @openapi-qraft/tanstack-query-react-types
 
+## 2.15.0-beta.8
+
+### Minor Changes
+
+- 0da32c6: Expose request source metadata on `requestFn` calls. Query requests now include the original TanStack Query function context, mutation requests include variables and the computed mutation key, and direct operation calls are marked as invokes.
+
 ## 2.15.0-beta.7
 
 ### Minor Changes

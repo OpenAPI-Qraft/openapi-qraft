@@ -1,5 +1,7 @@
 # @qraft/test-utils
 
+## 1.0.0-beta.7
+
 ## 1.0.0-beta.6
 
 ### Minor Changes
