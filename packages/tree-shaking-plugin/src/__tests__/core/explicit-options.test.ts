@@ -43,7 +43,15 @@ function PetUpdateForm({ petId }: { petId: number }) {
 }
 `,
       sourceFile,
-      { createAPIClientFn: [{ name: 'createAPIClient', module: './api' }] }
+      {
+        createAPIClientFn: [
+          {
+            name: 'createAPIClient',
+            module: './api',
+            context: 'APIClientContext',
+          },
+        ],
+      }
     );
 
     expect(result?.code).toMatchInlineSnapshot(`
@@ -135,7 +143,15 @@ function PetUpdateForm() {
 }
 `,
       sourceFile,
-      { createAPIClientFn: [{ name: 'createAPIClient', module: './api' }] }
+      {
+        createAPIClientFn: [
+          {
+            name: 'createAPIClient',
+            module: './api',
+            context: 'APIClientContext',
+          },
+        ],
+      }
     );
 
     expect(result?.code).toMatchInlineSnapshot(`
@@ -217,7 +233,15 @@ function PetUpdateForm({ petId }: { petId: number }) {
 }
 `,
       sourceFile,
-      { createAPIClientFn: [{ name: 'createAPIClient', module: './api' }] }
+      {
+        createAPIClientFn: [
+          {
+            name: 'createAPIClient',
+            module: './api',
+            context: 'APIClientContext',
+          },
+        ],
+      }
     );
 
     expect(result?.code).toMatchInlineSnapshot(`
@@ -343,7 +367,15 @@ function PetUpdateForm({ petId }: { petId: number }) {
 }
 `,
       sourceFile,
-      { createAPIClientFn: [{ name: 'createAPIClient', module: './api' }] }
+      {
+        createAPIClientFn: [
+          {
+            name: 'createAPIClient',
+            module: './api',
+            context: 'APIClientContext',
+          },
+        ],
+      }
     );
 
     expect(result?.code).toMatchInlineSnapshot(`
@@ -427,7 +459,15 @@ async function run() {
 }
 `,
       sourceFile,
-      { createAPIClientFn: [{ name: 'createAPIClient', module: './api' }] }
+      {
+        createAPIClientFn: [
+          {
+            name: 'createAPIClient',
+            module: './api',
+            context: 'APIClientContext',
+          },
+        ],
+      }
     );
 
     expect(result?.code).toMatchInlineSnapshot(`
@@ -470,7 +510,15 @@ async function loadPets() {
 }
 `,
       sourceFile,
-      { createAPIClientFn: [{ name: 'createAPIClient', module: './api' }] }
+      {
+        createAPIClientFn: [
+          {
+            name: 'createAPIClient',
+            module: './api',
+            context: 'APIClientContext',
+          },
+        ],
+      }
     );
 
     expect(result?.code).toMatchInlineSnapshot(`

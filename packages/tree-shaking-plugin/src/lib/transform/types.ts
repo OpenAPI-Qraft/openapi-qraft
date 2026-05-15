@@ -52,6 +52,7 @@ export type ClientBinding = {
   name: string;
   clientSourceKey: string;
   createImportPath: string;
+  hasExplicitContext: boolean;
   factory: QraftFactoryConfig;
   bindingNode: t.Node;
   declarationScope: Scope;
@@ -78,6 +79,9 @@ export type OperationUsage = {
 };
 
 export type InlineImportRequest = {
+  createImportPath: string;
+  serviceName: string;
+  operationName: string;
   callbackName: string;
   callbackLocalName: string;
   operationImport: OperationImportInfo;

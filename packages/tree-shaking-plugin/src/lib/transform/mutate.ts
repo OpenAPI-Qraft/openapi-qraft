@@ -33,6 +33,15 @@ function selectRuntimeHelper(
     : 'api';
 }
 
+function selectOptimizedClientRuntimeHelper(
+  usage: OperationUsage,
+  callbacks: Array<{ callbackName: string }>
+): RuntimeHelperKind {
+  if (usage.client.mode.type !== 'context') return 'api';
+  if (!usage.client.hasExplicitContext) return 'api';
+  return selectRuntimeHelper(callbacks);
+}
+
 /**
  * Apply a previously created transform plan by rewriting call sites, inserting
  * imports, emitting optimized clients, and removing declarations that became
@@ -179,19 +188,17 @@ function rewriteInlineClientCalls(
   runtimeLocalNames: RuntimeLocalNames,
   inlineUsages: InlineImportRequest[]
 ) {
-  const inlineUsageIterator = inlineUsages[Symbol.iterator]();
+  const inlineUsagesByMatchKey = new Map(
+    inlineUsages.map((usage) => [getInlineUsageMatchKey(usage), usage])
+  );
 
   traverse(ast, {
     CallExpression(callPath) {
       const match = matchInlineClientCall(callPath.node.callee, createImports);
       if (!match) return;
 
-      const usage = inlineUsageIterator.next().value;
+      const usage = inlineUsagesByMatchKey.get(getInlineUsageMatchKey(match));
       if (!usage) return;
-      if (usage.callbackName !== match.callbackName) return;
-      const runtimeHelperKind = selectRuntimeHelper([
-        { callbackName: usage.callbackName },
-      ]);
 
       const args: t.Expression[] = [
         t.identifier(usage.operationImport.localName),
@@ -210,11 +217,7 @@ function rewriteInlineClientCalls(
       }
 
       const newClientCall = t.callExpression(
-        t.identifier(
-          runtimeHelperKind === 'api'
-            ? runtimeLocalNames.api
-            : runtimeLocalNames.react
-        ),
+        t.identifier(runtimeLocalNames.api),
         args
       );
 
@@ -228,6 +231,18 @@ function rewriteInlineClientCalls(
       }
     },
   });
+}
+
+function getInlineUsageMatchKey({
+  createImportPath,
+  serviceName,
+  operationName,
+  callbackName,
+}: Pick<
+  InlineImportRequest,
+  'createImportPath' | 'serviceName' | 'operationName' | 'callbackName'
+>) {
+  return [createImportPath, serviceName, operationName, callbackName].join(':');
 }
 
 function rewriteSchemaAccesses(
@@ -309,9 +324,13 @@ function insertImports(
     RuntimeHelperKind
   >();
   for (const [usageKey, callbackNames] of callbacksByClientScopeKey) {
+    const usage = usages.find(
+      (candidate) => getRuntimeHelperUsageKey(candidate) === usageKey
+    );
+    if (!usage) continue;
     runtimeHelperKindsByClientScopeKey.set(
       usageKey,
-      selectRuntimeHelper(callbackNames)
+      selectOptimizedClientRuntimeHelper(usage, callbackNames)
     );
   }
   let needsApiRuntimeImport =
@@ -325,14 +344,8 @@ function insertImports(
       needsReactRuntimeImport = true;
     }
   }
-  for (const inline of callbackInlineImports) {
-    if (
-      selectRuntimeHelper([{ callbackName: inline.callbackName }]) === 'api'
-    ) {
-      needsApiRuntimeImport = true;
-    } else {
-      needsReactRuntimeImport = true;
-    }
+  if (callbackInlineImports.length > 0) {
+    needsApiRuntimeImport = true;
   }
 
   if (needsApiRuntimeImport) {
@@ -700,7 +713,10 @@ function createOptimizedClientDeclaration(
     ),
   ];
 
-  const runtimeHelperKind = selectRuntimeHelper(callbacks);
+  const runtimeHelperKind = selectOptimizedClientRuntimeHelper(
+    usage,
+    callbacks
+  );
   const needsOptions = callbacks.some((callback) =>
     callbackNeedsOptions(callback.callbackName)
   );

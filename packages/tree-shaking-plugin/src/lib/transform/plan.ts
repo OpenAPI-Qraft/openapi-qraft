@@ -285,6 +285,7 @@ export async function createTransformPlan(
             mode
           ),
           createImportPath,
+          hasExplicitContext: Boolean(createImport.factory.context),
           factory: createImport.factory,
           bindingNode: variablePath.node.id,
           declarationScope: variablePath.parentPath.scope,
@@ -307,6 +308,7 @@ export async function createTransformPlan(
             mode
           ),
           createImportPath,
+          hasExplicitContext: Boolean(createImport.factory.context),
           factory: createImport.factory,
           bindingNode: variablePath.node.id,
           declarationScope: variablePath.parentPath.scope,
@@ -535,6 +537,9 @@ export async function createTransformPlan(
       );
 
       inlineImports.push({
+        createImportPath: match.createImportPath,
+        serviceName: match.serviceName,
+        operationName: match.operationName,
         callbackName: match.callbackName,
         callbackLocalName,
         operationImport,
@@ -634,6 +639,9 @@ export async function createTransformPlan(
     const firstSchemaUsage = schemaUsageMap.values().next().value;
     if (firstSchemaUsage) {
       inlineImports.push({
+        createImportPath: firstSchemaUsage.sourceKey,
+        serviceName: firstSchemaUsage.serviceName,
+        operationName: firstSchemaUsage.operationName,
         callbackName: 'schema',
         callbackLocalName: 'schema',
         operationImport: firstSchemaUsage.operationImport,
@@ -783,6 +791,7 @@ async function findPrecreatedClients(
           mode
         ),
         createImportPath: match.factoryFile,
+        hasExplicitContext: false,
         factory: validatedConfig.factory,
         bindingNode: specifier.local,
         declarationScope: programScope,

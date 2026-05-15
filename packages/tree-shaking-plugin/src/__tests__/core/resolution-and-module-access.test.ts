@@ -63,7 +63,11 @@ export function App() {
       sourceFile,
       {
         createAPIClientFn: [
-          { name: 'createAPIClient', module: './generated-api' },
+          {
+            name: 'createAPIClient',
+            module: './generated-api',
+            context: 'APIClientContext',
+          },
         ],
       }
     );
