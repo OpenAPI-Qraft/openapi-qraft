@@ -36,6 +36,53 @@ Concrete implementation checks:
   optional chains, namespace imports, dynamic imports, and exported local client
   declarations stay untransformed.
 
+## E2E Verification Strategy
+
+Do not postpone all end-to-end verification until the final cleanup task. Run an
+e2e guard after each implementation milestone that can affect emitted bundle
+shape, generated-source resolution, or real bundler integration.
+
+Use two e2e loops:
+
+**Fast in-place fixture loop.** Use this after a milestone when
+`e2e/projects/tree-shaking-bundlers/node_modules` is already installed and the
+goal is to verify real bundle output quickly:
+
+```bash
+corepack yarn workspace @openapi-qraft/tree-shaking-plugin build
+rm -rf e2e/projects/tree-shaking-bundlers/node_modules/@openapi-qraft/tree-shaking-plugin/dist
+cp -R packages/tree-shaking-plugin/dist \
+  e2e/projects/tree-shaking-bundlers/node_modules/@openapi-qraft/tree-shaking-plugin/dist
+cd e2e/projects/tree-shaking-bundlers
+npm run codegen
+npm run build
+npm run e2e:post-build
+```
+
+Expected: `Tree-shaking bundle assertions passed.`
+
+**Full Verdaccio loop.** Use this before ending a session that changed the
+published package surface, package build output, bundler adapters, or e2e
+fixture assertions:
+
+```bash
+cd e2e && corepack yarn e2e:tree-shaking-bundlers-local
+```
+
+This copies the fixture into `/Users/radist/w/qraft-e2e`, publishes workspace
+packages to the local registry, installs the copied project from that registry,
+builds all bundlers, and runs the same bundle/source-map assertions.
+
+Default milestone gates:
+
+- after Task 2: fast loop if diagnostics/entrypoint wiring reached `core.ts`;
+- after Task 4: fast loop because source gating and generated metadata affect
+  real resolver/module-access behavior;
+- after Task 6: fast loop at minimum, full Verdaccio loop before handing off the
+  session result;
+- after Task 7: full Verdaccio loop if README/e2e/package-surface work changed
+  anything not covered by the previous full loop.
+
 ## File Structure
 
 - Create: `packages/tree-shaking-plugin/src/lib/transform/diagnostics.ts`
@@ -597,6 +644,30 @@ git commit -m "refactor: normalize tree-shaking entrypoints"
 ```
 
 Expected: one commit introducing normalized entrypoint types and tests.
+
+## Milestone A: Diagnostics And Config Normalization E2E Gate
+
+Run this gate if Task 1 or Task 2 changed `core.ts`, public config types, plugin
+exports, or any code path that the bundled fixture can execute.
+
+Preferred command:
+
+```bash
+corepack yarn workspace @openapi-qraft/tree-shaking-plugin build
+rm -rf e2e/projects/tree-shaking-bundlers/node_modules/@openapi-qraft/tree-shaking-plugin/dist
+cp -R packages/tree-shaking-plugin/dist \
+  e2e/projects/tree-shaking-bundlers/node_modules/@openapi-qraft/tree-shaking-plugin/dist
+cd e2e/projects/tree-shaking-bundlers
+npm run codegen
+npm run build
+npm run e2e:post-build
+```
+
+Expected: `Tree-shaking bundle assertions passed.`
+
+If Task 1 and Task 2 stayed entirely inside helper modules that are not wired
+into `core.ts` yet, document that the e2e gate was intentionally skipped and
+will run after Task 4.
 
 ## Task 3: Add The Pre-Parse Source Gate
 
@@ -1182,6 +1253,31 @@ git commit -m "refactor: extract generated metadata inspection"
 
 Expected: one commit with the metadata boundary and tests.
 
+## Milestone B: Source Gate And Generated Metadata E2E Gate
+
+Run the fast in-place fixture loop after Task 4. This milestone touches the
+plugin's decision to parse source and the generated-module inspection boundary,
+so unit tests are not enough.
+
+Run:
+
+```bash
+corepack yarn workspace @openapi-qraft/tree-shaking-plugin build
+rm -rf e2e/projects/tree-shaking-bundlers/node_modules/@openapi-qraft/tree-shaking-plugin/dist
+cp -R packages/tree-shaking-plugin/dist \
+  e2e/projects/tree-shaking-bundlers/node_modules/@openapi-qraft/tree-shaking-plugin/dist
+cd e2e/projects/tree-shaking-bundlers
+npm run codegen
+npm run build
+npm run e2e:post-build
+```
+
+Expected: `Tree-shaking bundle assertions passed.`
+
+If this fails only for one bundler, inspect that bundler's generated output
+inside `e2e/projects/tree-shaking-bundlers/dist` before changing assertions.
+Do not weaken bundle assertions until the root cause is understood.
+
 ## Task 5: Route Planner Through Normalized Entrypoints And Metadata
 
 **Files:**
@@ -1573,6 +1669,37 @@ git commit -m "feat: enforce tree-shaking diagnostics policy"
 
 Expected: one commit implementing default error diagnostics for unresolved candidates.
 
+## Milestone C: Planner, Mutator, And Diagnostics E2E Gate
+
+Run the fast in-place fixture loop after Task 6 because this milestone directly
+changes emitted helper selection, runtime inputs, imports, and unresolved
+candidate behavior.
+
+Run:
+
+```bash
+corepack yarn workspace @openapi-qraft/tree-shaking-plugin build
+rm -rf e2e/projects/tree-shaking-bundlers/node_modules/@openapi-qraft/tree-shaking-plugin/dist
+cp -R packages/tree-shaking-plugin/dist \
+  e2e/projects/tree-shaking-bundlers/node_modules/@openapi-qraft/tree-shaking-plugin/dist
+cd e2e/projects/tree-shaking-bundlers
+npm run codegen
+npm run build
+npm run e2e:post-build
+```
+
+Expected: `Tree-shaking bundle assertions passed.`
+
+Before ending the implementation session, run the full Verdaccio loop unless the
+session is being intentionally paused for a known failing milestone:
+
+```bash
+cd e2e && corepack yarn e2e:tree-shaking-bundlers-local
+```
+
+Expected: the copied fixture under `/Users/radist/w/qraft-e2e` builds and ends
+with the same bundle assertion success message.
+
 ## Task 7: Documentation And Full Verification
 
 **Files:**
@@ -1646,7 +1773,12 @@ git diff --check
 
 Expected: no output.
 
-- [ ] **Step 7: Run local e2e guard if package build succeeds**
+- [ ] **Step 7: Run final full e2e guard if needed**
+
+If Milestone C already ran the full Verdaccio loop after the last code change,
+record that result here and do not rerun it just for README-only edits. If code,
+package build output, e2e fixture assertions, or public package surface changed
+after Milestone C, run the full loop again.
 
 Run:
 
