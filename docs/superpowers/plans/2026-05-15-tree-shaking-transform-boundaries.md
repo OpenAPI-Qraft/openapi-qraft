@@ -38,7 +38,7 @@
 **Files:**
 - Modify: `packages/tree-shaking-plugin/src/__tests__/core/create-api-client-fn.test.ts`
 
-- [ ] **Step 1: Add a failing explicit-options hook test**
+- [x] **Step 1: Add a failing explicit-options hook test**
 
 Add this test near the existing context/argument boundary tests:
 
@@ -79,7 +79,7 @@ export function App() {
   });
 ```
 
-- [ ] **Step 2: Verify the explicit-options hook test fails**
+- [x] **Step 2: Verify the explicit-options hook test fails**
 
 Run:
 
@@ -89,7 +89,7 @@ corepack yarn workspace @openapi-qraft/tree-shaking-plugin test -- --run src/__t
 
 Expected: FAIL because current output imports or emits `qraftReactAPIClient` for `useQuery`.
 
-- [ ] **Step 3: Add an explicit context-config test or update an existing context test**
+- [x] **Step 3: Add an explicit context-config test or update an existing context test**
 
 Update the existing `"imports an operation directly for a context API client"` options object to make the context contract explicit:
 
@@ -113,7 +113,7 @@ const api_pets_getPets = qraftReactAPIClient(getPets, {
 }, APIClientContext);
 ```
 
-- [ ] **Step 4: Add a services-none operation argument skip test**
+- [x] **Step 4: Add a services-none operation argument skip test**
 
 Add this test next to the existing explicit services argument skip test:
 
@@ -160,7 +160,7 @@ export function App() {
   });
 ```
 
-- [ ] **Step 5: Run focused createAPIClientFn tests**
+- [x] **Step 5: Run focused createAPIClientFn tests**
 
 Run:
 
@@ -177,7 +177,7 @@ Expected: explicit-options hook test still fails until Task 2; skip tests pass.
 - Modify: `packages/tree-shaking-plugin/src/lib/transform/plan.ts`
 - Modify: `packages/tree-shaking-plugin/src/lib/transform/mutate.ts`
 
-- [ ] **Step 1: Extend `ClientBinding` with explicit context metadata**
+- [x] **Step 1: Extend `ClientBinding` with explicit context metadata**
 
 In `types.ts`, update the `ClientBinding` shape to include:
 
@@ -187,7 +187,7 @@ In `types.ts`, update the `ClientBinding` shape to include:
 
 The property belongs at the top level of `ClientBinding`, next to `factory`, because it applies to both `context` and `options` modes discovered from the same generated factory config.
 
-- [ ] **Step 2: Populate `hasExplicitContext` for local createAPIClientFn clients**
+- [x] **Step 2: Populate `hasExplicitContext` for local createAPIClientFn clients**
 
 In `plan.ts`, when pushing a `ClientBinding` for a local generated factory client, set:
 
@@ -243,7 +243,7 @@ if (args.length === 1 && isExpression(args[0])) {
 }
 ```
 
-- [ ] **Step 3: Populate `hasExplicitContext` for pre-created clients**
+- [x] **Step 3: Populate `hasExplicitContext` for pre-created clients**
 
 In `findPrecreatedClients(...)`, set:
 
@@ -253,7 +253,7 @@ In `findPrecreatedClients(...)`, set:
 
 when pushing the pre-created `ClientBinding`. Pre-created clients never select `qraftReactAPIClient`.
 
-- [ ] **Step 4: Change runtime helper selection in `mutate.ts`**
+- [x] **Step 4: Change runtime helper selection in `mutate.ts`**
 
 Replace the runtime helper selection for optimized client declarations with a mode-aware helper:
 
@@ -292,7 +292,7 @@ Keep this existing line unchanged:
       : runtimeLocalNames.react;
 ```
 
-- [ ] **Step 5: Run the focused failing test**
+- [x] **Step 5: Run the focused failing test**
 
 Run:
 
@@ -302,7 +302,7 @@ corepack yarn workspace @openapi-qraft/tree-shaking-plugin test -- --run src/__t
 
 Expected: PASS.
 
-- [ ] **Step 6: Run createAPIClientFn tests and update snapshots intentionally**
+- [x] **Step 6: Run createAPIClientFn tests and update snapshots intentionally**
 
 Run:
 
@@ -317,7 +317,7 @@ Expected: Some existing context tests may fail because they relied on inferred c
 **Files:**
 - Modify: `packages/tree-shaking-plugin/src/__tests__/core/precreated-api-client.test.ts`
 
-- [ ] **Step 1: Add services-none pre-created client skip test**
+- [x] **Step 1: Add services-none pre-created client skip test**
 
 Add this test near existing pre-created skip/safety tests:
 
@@ -378,7 +378,7 @@ APIClient.pets.getPets.useQuery();
   });
 ```
 
-- [ ] **Step 2: Run focused pre-created tests**
+- [x] **Step 2: Run focused pre-created tests**
 
 Run:
 
@@ -393,7 +393,7 @@ Expected: PASS. The existing named pre-created hook test should continue emittin
 **Files:**
 - Modify: `packages/tree-shaking-plugin/src/__tests__/core/mixed-client-modes.test.ts`
 
-- [ ] **Step 1: Add or update a mixed-mode test for helper selection**
+- [x] **Step 1: Add or update a mixed-mode test for helper selection**
 
 Add a new test or extend the existing `"keeps callback-class rewrites separate across context and precreated modes"` test so the input includes all three calls:
 
@@ -435,7 +435,7 @@ createAPIClientFn: [
 ],
 ```
 
-- [ ] **Step 2: Run focused mixed-mode tests**
+- [x] **Step 2: Run focused mixed-mode tests**
 
 Run:
 
@@ -450,7 +450,7 @@ Expected: PASS after snapshot updates that match the approved helper selection c
 **Files:**
 - Modify: `packages/tree-shaking-plugin/src/__tests__/core/schema-and-imports.test.ts`
 
-- [ ] **Step 1: Add schema skip imports**
+- [x] **Step 1: Add schema skip imports**
 
 Ensure the file imports the fixture helpers it needs:
 
@@ -461,7 +461,7 @@ import path from 'node:path';
 import { PETS_SERVICE_TS, writeFixtureFiles } from './fixtures.js';
 ```
 
-- [ ] **Step 2: Add schema skip test**
+- [x] **Step 2: Add schema skip test**
 
 Add:
 
@@ -502,7 +502,7 @@ api.pets.getPets.schema;
   });
 ```
 
-- [ ] **Step 3: Run schema tests**
+- [x] **Step 3: Run schema tests**
 
 Run:
 
@@ -517,7 +517,7 @@ Expected: PASS.
 **Files:**
 - All modified files from previous tasks.
 
-- [ ] **Step 1: Run full package tests**
+- [x] **Step 1: Run full package tests**
 
 Run:
 
@@ -527,7 +527,7 @@ corepack yarn workspace @openapi-qraft/tree-shaking-plugin test -- --run
 
 Expected: all tree-shaking-plugin tests pass.
 
-- [ ] **Step 2: Run typecheck**
+- [x] **Step 2: Run typecheck**
 
 Run:
 
@@ -537,7 +537,7 @@ corepack yarn workspace @openapi-qraft/tree-shaking-plugin typecheck
 
 Expected: no TypeScript errors.
 
-- [ ] **Step 3: Run lint**
+- [x] **Step 3: Run lint**
 
 Run:
 
@@ -547,7 +547,7 @@ corepack yarn workspace @openapi-qraft/tree-shaking-plugin lint
 
 Expected: no ESLint errors.
 
-- [ ] **Step 4: Run diff whitespace check**
+- [x] **Step 4: Run diff whitespace check**
 
 Run:
 
@@ -557,7 +557,7 @@ git diff --check
 
 Expected: no output.
 
-- [ ] **Step 5: Review final diff**
+- [x] **Step 5: Review final diff**
 
 Run:
 
@@ -573,7 +573,7 @@ Expected:
 - pre-created hook transforms use `qraftAPIClient`;
 - `services: none` generated factories are skipped.
 
-- [ ] **Step 6: Commit implementation**
+- [x] **Step 6: Commit implementation**
 
 Run:
 
