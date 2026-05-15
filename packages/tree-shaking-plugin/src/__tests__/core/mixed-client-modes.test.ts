@@ -60,7 +60,11 @@ export function App() {
       sourceFile,
       {
         createAPIClientFn: [
-          { name: 'createAPIClient', module: './context-api' },
+          {
+            name: 'createAPIClient',
+            module: './context-api',
+            context: 'ContextAPIClientContext',
+          },
         ],
         apiClient: [
           {
@@ -137,7 +141,15 @@ export function App() {
 }
 `,
       sourceFile,
-      { createAPIClientFn: [{ name: 'createAPIClient', module: './api' }] }
+      {
+        createAPIClientFn: [
+          {
+            name: 'createAPIClient',
+            module: './api',
+            context: 'APIClientContext',
+          },
+        ],
+      }
     );
 
     expect(result?.code).toMatchInlineSnapshot(`
@@ -210,7 +222,11 @@ export function App() {
       sourceFile,
       {
         createAPIClientFn: [
-          { name: 'createAPIClient', module: './context-api' },
+          {
+            name: 'createAPIClient',
+            module: './context-api',
+            context: 'ContextAPIClientContext',
+          },
         ],
         apiClient: [
           {
@@ -295,7 +311,11 @@ APIClient.stores.getStores.getQueryKey();
       sourceFile,
       {
         createAPIClientFn: [
-          { name: 'createAPIClient', module: './context-api' },
+          {
+            name: 'createAPIClient',
+            module: './context-api',
+            context: 'ContextAPIClientContext',
+          },
         ],
         apiClient: [
           {
@@ -384,7 +404,11 @@ export function App() {
       sourceFile,
       {
         createAPIClientFn: [
-          { name: 'createAPIClient', module: './context-api' },
+          {
+            name: 'createAPIClient',
+            module: './context-api',
+            context: 'ContextAPIClientContext',
+          },
         ],
         apiClient: [
           {
@@ -479,7 +503,11 @@ export function App() {
       sourceFile,
       {
         createAPIClientFn: [
-          { name: 'createAPIClient', module: './context-api' },
+          {
+            name: 'createAPIClient',
+            module: './context-api',
+            context: 'ContextAPIClientContext',
+          },
         ],
         apiClient: [
           {
@@ -570,7 +598,11 @@ export function App() {
       sourceFile,
       {
         createAPIClientFn: [
-          { name: 'createAPIClient', module: './context-api' },
+          {
+            name: 'createAPIClient',
+            module: './context-api',
+            context: 'ContextAPIClientContext',
+          },
         ],
         apiClient: [
           {

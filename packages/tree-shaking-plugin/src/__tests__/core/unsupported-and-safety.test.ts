@@ -18,7 +18,15 @@ console.log(api);
 api.pets.getPets.useQuery();
 `,
       sourceFile,
-      { createAPIClientFn: [{ name: 'createAPIClient', module: './api' }] }
+      {
+        createAPIClientFn: [
+          {
+            name: 'createAPIClient',
+            module: './api',
+            context: 'APIClientContext',
+          },
+        ],
+      }
     );
 
     expect(result?.code).toMatchInlineSnapshot(`
@@ -51,7 +59,15 @@ export const api = createAPIClient();
 api.pets.getPets.useQuery();
 `,
       sourceFile,
-      { createAPIClientFn: [{ name: 'createAPIClient', module: './api' }] }
+      {
+        createAPIClientFn: [
+          {
+            name: 'createAPIClient',
+            module: './api',
+            context: 'APIClientContext',
+          },
+        ],
+      }
     );
 
     expect(result).toBeNull();
@@ -72,7 +88,15 @@ api[serviceName].getPets.useQuery();
 api.pets['getPets'].useQuery();
 `,
       sourceFile,
-      { createAPIClientFn: [{ name: 'createAPIClient', module: './api' }] }
+      {
+        createAPIClientFn: [
+          {
+            name: 'createAPIClient',
+            module: './api',
+            context: 'APIClientContext',
+          },
+        ],
+      }
     );
 
     expect(result).toBeNull();
@@ -92,7 +116,15 @@ const { pets } = api;
 pets.getPets.useQuery();
 `,
       sourceFile,
-      { createAPIClientFn: [{ name: 'createAPIClient', module: './api' }] }
+      {
+        createAPIClientFn: [
+          {
+            name: 'createAPIClient',
+            module: './api',
+            context: 'APIClientContext',
+          },
+        ],
+      }
     );
 
     expect(result).toBeNull();
@@ -111,7 +143,15 @@ const api = createAPIClient();
 api?.pets?.getPets?.useQuery();
 `,
       sourceFile,
-      { createAPIClientFn: [{ name: 'createAPIClient', module: './api' }] }
+      {
+        createAPIClientFn: [
+          {
+            name: 'createAPIClient',
+            module: './api',
+            context: 'APIClientContext',
+          },
+        ],
+      }
     );
 
     expect(result).toBeNull();

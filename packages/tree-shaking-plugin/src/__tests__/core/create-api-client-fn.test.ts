@@ -57,7 +57,15 @@ export function App() {
 }
 `,
       sourceFile,
-      { createAPIClientFn: [{ name: 'createAPIClient', module: './api' }] }
+      {
+        createAPIClientFn: [
+          {
+            name: 'createAPIClient',
+            module: './api',
+            context: 'APIClientContext',
+          },
+        ],
+      }
     );
 
     expect(result?.code).toMatchInlineSnapshot(`
@@ -119,6 +127,47 @@ export function App() {
     expect(result).toBeNull();
   });
 
+  it('skips generated factories that receive an operation argument without services imports', async () => {
+    const fixture = await fs.mkdtemp(
+      path.join(os.tmpdir(), 'qraft-tree-shaking-')
+    );
+    await writeFixtureFiles(fixture, {
+      'src/api/createAPIClient.ts': `
+import { qraftAPIClient } from '@openapi-qraft/react';
+import { getQueryKey } from '@openapi-qraft/react/callbacks/index';
+
+const defaultCallbacks = { getQueryKey } as const;
+
+export function createAPIClient(operation, callbacks = defaultCallbacks) {
+  return qraftAPIClient(operation, callbacks);
+}
+`,
+      'src/api/services/PetsService.ts': PETS_SERVICE_TS,
+    });
+    const sourceFile = path.join(fixture, 'src/App.tsx');
+
+    const result = await transformQraftTreeShaking(
+      `
+import { createAPIClient } from './api/createAPIClient';
+import { getPets } from './api/services/PetsService';
+
+const api = createAPIClient(getPets);
+
+export function App() {
+  return api.pets.getPets.getQueryKey();
+}
+`,
+      sourceFile,
+      {
+        createAPIClientFn: [
+          { name: 'createAPIClient', module: './api/createAPIClient' },
+        ],
+      }
+    );
+
+    expect(result).toBeNull();
+  });
+
   it('aliases an imported operation when a local binding uses the same name', async () => {
     const fixture = await createFixture();
     const sourceFile = path.join(fixture, 'src/App.tsx');
@@ -139,7 +188,15 @@ export function App() {
 }
 `,
       sourceFile,
-      { createAPIClientFn: [{ name: 'createAPIClient', module: './api' }] }
+      {
+        createAPIClientFn: [
+          {
+            name: 'createAPIClient',
+            module: './api',
+            context: 'APIClientContext',
+          },
+        ],
+      }
     );
 
     expect(result?.code).toMatchInlineSnapshot(`
@@ -181,7 +238,15 @@ export function App() {
 }
 `,
       sourceFile,
-      { createAPIClientFn: [{ name: 'createAPIClient', module: './api' }] }
+      {
+        createAPIClientFn: [
+          {
+            name: 'createAPIClient',
+            module: './api',
+            context: 'APIClientContext',
+          },
+        ],
+      }
     );
 
     expect(result?.code).toMatchInlineSnapshot(`
@@ -276,7 +341,15 @@ export function App() {
 }
 `,
       sourceFile,
-      { createAPIClientFn: [{ name: 'createAPIClient', module: './api' }] }
+      {
+        createAPIClientFn: [
+          {
+            name: 'createAPIClient',
+            module: './api',
+            context: 'InternalContext',
+          },
+        ],
+      }
     );
 
     expect(result?.code).toMatchInlineSnapshot(`
@@ -352,7 +425,15 @@ api.pets.getPets.getQueryKey({});
 api.pets.getPets();
 `,
       sourceFile,
-      { createAPIClientFn: [{ name: 'createAPIClient', module: './api' }] }
+      {
+        createAPIClientFn: [
+          {
+            name: 'createAPIClient',
+            module: './api',
+            context: 'APIClientContext',
+          },
+        ],
+      }
     );
 
     expect(result?.code).toMatchInlineSnapshot(`
@@ -366,6 +447,153 @@ api.pets.getPets();
       }, {});
       api_pets_getPets.getQueryKey({});
       api_pets_getPets();"
+    `);
+  });
+
+  it('uses qraftAPIClient for hook callbacks on explicit runtime options clients without configured context', async () => {
+    const fixture = await createFixture();
+    const sourceFile = path.join(fixture, 'src/App.tsx');
+
+    const result = await transformQraftTreeShaking(
+      `
+import { createAPIClient } from './api';
+
+const requestOptions = { requestFn: async () => new Response() };
+const api = createAPIClient(requestOptions);
+
+export function App() {
+  return api.pets.getPets.useQuery();
+}
+`,
+      sourceFile,
+      { createAPIClientFn: [{ name: 'createAPIClient', module: './api' }] }
+    );
+
+    expect(result?.code).toMatchInlineSnapshot(`
+      "import { qraftAPIClient } from "@openapi-qraft/react";
+      import { useQuery } from "@openapi-qraft/react/callbacks/useQuery";
+      import { getPets } from "./api/services/PetsService";
+      const requestOptions = {
+        requestFn: async () => new Response()
+      };
+      const api_pets_getPets = qraftAPIClient(getPets, {
+        useQuery
+      }, requestOptions);
+      export function App() {
+        return api_pets_getPets.useQuery();
+      }"
+    `);
+  });
+
+  it('uses qraftAPIClient for hook callbacks on inline explicit runtime options clients without configured context', async () => {
+    const fixture = await createFixture();
+    const sourceFile = path.join(fixture, 'src/App.tsx');
+
+    const result = await transformQraftTreeShaking(
+      `
+import { createAPIClient } from './api';
+
+const requestOptions = { requestFn: async () => new Response() };
+
+export function App() {
+  return createAPIClient(requestOptions).pets.getPets.useQuery();
+}
+`,
+      sourceFile,
+      { createAPIClientFn: [{ name: 'createAPIClient', module: './api' }] }
+    );
+
+    expect(result?.code).toMatchInlineSnapshot(`
+      "import { qraftAPIClient } from "@openapi-qraft/react";
+      import { useQuery } from "@openapi-qraft/react/callbacks/useQuery";
+      import { getPets } from "./api/services/PetsService";
+      const requestOptions = {
+        requestFn: async () => new Response()
+      };
+      export function App() {
+        return qraftAPIClient(getPets, {
+          useQuery
+        }, requestOptions).useQuery();
+      }"
+    `);
+  });
+
+  it('does not shift inline rewrites when an earlier inline operation is unsupported', async () => {
+    const fixture = await createFixture();
+    const sourceFile = path.join(fixture, 'src/App.tsx');
+
+    const result = await transformQraftTreeShaking(
+      `
+import { createAPIClient } from './api';
+
+const requestOptions = { requestFn: async () => new Response() };
+
+export function App() {
+  createAPIClient(requestOptions).pets.getPets.useUnknown();
+  return createAPIClient(requestOptions).pets.getPets.useQuery();
+}
+`,
+      sourceFile,
+      { createAPIClientFn: [{ name: 'createAPIClient', module: './api' }] }
+    );
+
+    expect(result?.code).toMatchInlineSnapshot(`
+      "import { createAPIClient } from './api';
+      import { qraftAPIClient } from "@openapi-qraft/react";
+      import { useQuery } from "@openapi-qraft/react/callbacks/useQuery";
+      import { getPets } from "./api/services/PetsService";
+      const requestOptions = {
+        requestFn: async () => new Response()
+      };
+      export function App() {
+        createAPIClient(requestOptions).pets.getPets.useUnknown();
+        return qraftAPIClient(getPets, {
+          useQuery
+        }, requestOptions).useQuery();
+      }"
+    `);
+  });
+
+  it('uses qraftAPIClient for hook callbacks on explicit runtime options clients with configured context', async () => {
+    const fixture = await createFixture();
+    const sourceFile = path.join(fixture, 'src/App.tsx');
+
+    const result = await transformQraftTreeShaking(
+      `
+import { createAPIClient } from './api';
+
+const requestOptions = { requestFn: async () => new Response() };
+const api = createAPIClient(requestOptions);
+
+export function App() {
+  return api.pets.getPets.useQuery();
+}
+`,
+      sourceFile,
+      {
+        createAPIClientFn: [
+          {
+            name: 'createAPIClient',
+            module: './api',
+            context: 'APIClientContext',
+          },
+        ],
+      }
+    );
+
+    expect(result?.code).toMatchInlineSnapshot(`
+      "import { qraftAPIClient } from "@openapi-qraft/react";
+      import { useQuery } from "@openapi-qraft/react/callbacks/useQuery";
+      import { getPets } from "./api/services/PetsService";
+      const requestOptions = {
+        requestFn: async () => new Response()
+      };
+      const api_pets_getPets = qraftAPIClient(getPets, {
+        useQuery
+      }, requestOptions);
+      export function App() {
+        return api_pets_getPets.useQuery();
+      }"
     `);
   });
 
@@ -510,7 +738,6 @@ export function App() {
 
     expect(result?.code).toMatchInlineSnapshot(`
       "import { qraftAPIClient } from "@openapi-qraft/react";
-      import { qraftReactAPIClient } from "@openapi-qraft/react";
       import { getQueryKey } from "@openapi-qraft/react/callbacks/getQueryKey";
       import { findPetsByStatus } from "./api/services/PetsService";
       import { useQuery } from "@openapi-qraft/react/callbacks/useQuery";
@@ -519,7 +746,7 @@ export function App() {
       const api_pets_findPetsByStatus = qraftAPIClient(findPetsByStatus, {
         getQueryKey
       });
-      const api_pets_getPets = qraftReactAPIClient(getPets, {
+      const api_pets_getPets = qraftAPIClient(getPets, {
         useQuery
       }, APIClientContext);
       export function App() {
@@ -548,20 +775,20 @@ api.stores.getStores.useQuery();
     );
 
     expect(result?.code).toMatchInlineSnapshot(`
-      "import { qraftReactAPIClient } from "@openapi-qraft/react";
+      "import { qraftAPIClient } from "@openapi-qraft/react";
       import { useQuery } from "@openapi-qraft/react/callbacks/useQuery";
       import { getPets } from "./api/services/PetsService";
       import { APIClientContext } from "./api/APIClientContext";
       import { useMutation } from "@openapi-qraft/react/callbacks/useMutation";
       import { createPet } from "./api/services/PetsService";
       import { getStores } from "./api/services/StoresService";
-      const api_pets_getPets = qraftReactAPIClient(getPets, {
+      const api_pets_getPets = qraftAPIClient(getPets, {
         useQuery
       }, APIClientContext);
-      const api_pets_createPet = qraftReactAPIClient(createPet, {
+      const api_pets_createPet = qraftAPIClient(createPet, {
         useMutation
       }, APIClientContext);
-      const api_stores_getStores = qraftReactAPIClient(getStores, {
+      const api_stores_getStores = qraftAPIClient(getStores, {
         useQuery
       }, APIClientContext);
       api_pets_getPets.useQuery();
@@ -630,10 +857,10 @@ api.pets.getPets.useQuery();
 
     expect(result?.code).toMatchInlineSnapshot(`
       "import { useQuery } from '@openapi-qraft/react/callbacks/useQuery';
-      import { qraftReactAPIClient } from "@openapi-qraft/react";
+      import { qraftAPIClient } from "@openapi-qraft/react";
       import { useQuery as _useQuery } from "@openapi-qraft/react/callbacks/useQuery";
       import { getPets } from "./api/services/PetsService";
-      const api_pets_getPets = qraftReactAPIClient(getPets, {
+      const api_pets_getPets = qraftAPIClient(getPets, {
         useQuery: _useQuery
       }, {
         useQuery
@@ -660,7 +887,11 @@ export function App() {
       sourceFile,
       {
         createAPIClientFn: [
-          { name: 'createMyAPIClient', module: '@api/my-api' },
+          {
+            name: 'createMyAPIClient',
+            module: '@api/my-api',
+            context: 'APIClientContext',
+          },
         ],
         async resolve(specifier) {
           if (specifier === '@api/my-api') return apiIndex;
@@ -702,8 +933,16 @@ export function App() {
       sourceFile,
       {
         createAPIClientFn: [
-          { name: 'createAPIClient', module: './api' },
-          { name: 'createExtraAPIClient', module: './api' },
+          {
+            name: 'createAPIClient',
+            module: './api',
+            context: 'APIClientContext',
+          },
+          {
+            name: 'createExtraAPIClient',
+            module: './api',
+            context: 'APIClientContext',
+          },
         ],
       }
     );
@@ -742,7 +981,15 @@ export function App() {
 }
 `,
       sourceFile,
-      { createAPIClientFn: [{ name: 'createAPIClient', module: './api' }] }
+      {
+        createAPIClientFn: [
+          {
+            name: 'createAPIClient',
+            module: './api',
+            context: 'APIClientContext',
+          },
+        ],
+      }
     );
 
     expect(result?.code).toMatchInlineSnapshot(`
