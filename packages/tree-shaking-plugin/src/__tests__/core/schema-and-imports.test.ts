@@ -120,9 +120,7 @@ api.pets.getPets.schema;
     expect(result).toBeNull();
   });
 
-  // Production gap: mixed context + precreated schema rewrites currently leave the
-  // precreated access untouched instead of aliasing the second generated operation import.
-  it.skip('aliases same-named schema operation imports from different generated roots', async () => {
+  it('aliases same-named schema operation imports from different generated roots', async () => {
     const root = await fs.mkdtemp(
       path.join(os.tmpdir(), 'qraft-tree-shaking-')
     );
@@ -160,7 +158,7 @@ export function createAPIClient(options?: { queryClient: unknown }) {
     const result = await transformQraftTreeShaking(
       `
 import { createAPIClient } from './context-api';
-import { APIClient } from './precreated-client';
+import { APIClient } from './client';
 
 const contextApi = createAPIClient();
 
@@ -175,7 +173,7 @@ APIClient.pets.getPets.schema;
         apiClient: [
           {
             client: 'APIClient',
-            clientModule: './precreated-client',
+            clientModule: './client',
             createAPIClientFn: 'createAPIClient',
             createAPIClientFnModule: './precreated-api',
             createAPIClientFnOptions: 'createAPIClientOptions',
