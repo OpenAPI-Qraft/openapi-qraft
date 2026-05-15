@@ -423,6 +423,67 @@ APIClient.pets.getPets.useQuery();
     expect(result).toBeNull();
   });
 
+  it('skips a precreated client whose generated factory has no static services import', async () => {
+    const root = await fs.mkdtemp(
+      path.join(os.tmpdir(), 'qraft-tree-shaking-')
+    );
+    await writeFixtureFiles(
+      root,
+      createPrecreatedFixtureFiles(
+        `
+import { createAPIClient } from './api';
+import { createAPIClientOptions } from './client-options';
+import { getPets } from './api/services/PetsService';
+
+export const APIClient = createAPIClient(
+  {
+    pets: {
+      getPets
+    }
+  },
+  createAPIClientOptions()
+);
+`,
+        {
+          'src/api/index.ts': `
+import { qraftAPIClient } from '@openapi-qraft/react';
+import { useQuery } from '@openapi-qraft/react/callbacks/index';
+
+const defaultCallbacks = { useQuery } as const;
+
+export function createAPIClient(services, options) {
+  return qraftAPIClient(services, defaultCallbacks, options);
+}
+`,
+        }
+      )
+    );
+    const sourceFile = path.join(root, 'src/App.tsx');
+
+    const result = await transformQraftTreeShaking(
+      `
+import { APIClient } from './client';
+
+APIClient.pets.getPets.useQuery();
+`,
+      sourceFile,
+      {
+        apiClient: [
+          {
+            client: 'APIClient',
+            clientModule: './client',
+            createAPIClientFn: 'createAPIClient',
+            createAPIClientFnModule: './api',
+            createAPIClientFnOptions: 'createAPIClientOptions',
+            createAPIClientFnOptionsModule: './client-options',
+          },
+        ],
+      }
+    );
+
+    expect(result).toBeNull();
+  });
+
   it('skips a precreated client when the imported factory module does not match the configured one', async () => {
     const root = await fs.mkdtemp(
       path.join(os.tmpdir(), 'qraft-tree-shaking-')
