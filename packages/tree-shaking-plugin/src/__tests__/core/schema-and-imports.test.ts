@@ -5,6 +5,7 @@ import { describe, expect, it } from 'vitest';
 import {
   createPrecreatedFixtureFiles,
   getContextFixtureFiles,
+  PETS_SERVICE_TS,
   writeFixtureFiles,
 } from './fixtures.js';
 import { createFixture, transformQraftTreeShaking } from './harness.js';
@@ -82,6 +83,41 @@ export function App() {
         return findPetsByStatus.schema;
       }"
       `);
+  });
+
+  it('skips schema access for generic factories that do not import services', async () => {
+    const root = await fs.mkdtemp(
+      path.join(os.tmpdir(), 'qraft-tree-shaking-')
+    );
+    await writeFixtureFiles(root, {
+      'src/api/createAPIClient.ts': `
+import { qraftAPIClient } from '@openapi-qraft/react';
+
+export function createAPIClient(services) {
+  return qraftAPIClient(services, {});
+}
+`,
+      'src/api/services/PetsService.ts': PETS_SERVICE_TS,
+    });
+    const sourceFile = path.join(root, 'src/App.tsx');
+
+    const result = await transformQraftTreeShaking(
+      `
+import { createAPIClient } from './api/createAPIClient';
+import { getPets } from './api/services/PetsService';
+
+const api = createAPIClient({ pets: { getPets } });
+api.pets.getPets.schema;
+`,
+      sourceFile,
+      {
+        createAPIClientFn: [
+          { name: 'createAPIClient', module: './api/createAPIClient' },
+        ],
+      }
+    );
+
+    expect(result).toBeNull();
   });
 
   // Production gap: mixed context + precreated schema rewrites currently leave the
