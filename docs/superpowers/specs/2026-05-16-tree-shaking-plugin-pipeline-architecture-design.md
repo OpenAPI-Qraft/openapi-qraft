@@ -34,6 +34,49 @@ type/runtime surface should not be reinterpreted to fit the snapshot.
 
 ## Transform Contract
 
+### Transform Criteria Matrix
+
+The tree-shaking contract should be readable without opening every snapshot.
+The plugin should classify client usage into the matrix below before deciding
+whether and how to rewrite it.
+
+| Plugin term | Source shape | Runtime input in emitted code | Runtime helper | Optimized when | Excluded when |
+| --- | --- | --- | --- | --- | --- |
+| Context-based generated client | `const api = createAPIClient()` where generated source returns `qraftReactAPIClient(..., Context)` | `Context` for context-backed hooks; no input for context-free helper buckets | `qraftReactAPIClient` for context-backed hook surfaces; `qraftAPIClient` for context-free helper buckets | configured generated factory resolves, source loads, factory statically owns `services`, operation source is resolved, usage is a static member chain | factory does not own services, operation source is unresolved, required context cannot be resolved, or usage is unsupported |
+| Explicit-options generated client | `const api = createAPIClient(optionsExpression)` or inline `createAPIClient(optionsExpression)` | original `optionsExpression` | `qraftAPIClient` | same generated factory ownership proof as above, and usage is a supported static callback/schema access | options are not represented by one expression, services/operation are supplied by caller instead of owned by generated source, or usage is unsupported |
+| Pre-created client | imported configured client export, for example `nodeAPIClient.pets.getPets.useQuery()` | configured `optionsFactory()` call | `qraftAPIClient` | client export resolves, export is created by configured factory, options factory is known, underlying generated factory owns `services`, operation source is resolved | client export missing, factory binding mismatch, namespace/dynamic import, underlying factory has no static services ownership, or operation source is unresolved |
+| Schema access | `.schema` on any optimizable generated/pre-created operation | none | none | operation source is resolved from owned services | operation source is unresolved or service ownership is not proven |
+
+The matrix is intentionally based on the valid generated-client type/runtime
+surface, especially the context and object-options behavior covered by the
+`ce9479fc` type tests.
+
+Concrete rules:
+
+- optimize only configured entrypoints;
+- require static ownership proof for generated services before resolving an
+  operation source;
+- treat `createAPIClient(optionsExpression)` as explicit-options usage, not as
+  context usage;
+- treat pre-created clients as runtime-options clients that receive the
+  configured options factory call;
+- rewrite `.schema` to direct operation access without runtime helpers;
+- remove the original client only when every reference is safely transformed;
+- keep the original client when unsupported references remain;
+- do not inspect option object keys to decide eligibility.
+
+Explicit exclusions:
+
+- factories where services or a single operation are supplied only by the
+  caller;
+- computed member access;
+- destructured client aliases;
+- optional chains;
+- namespace or dynamic imports of configured clients;
+- exported local client declarations;
+- unresolved generated module, generated source, services import, client export,
+  options factory, or operation source.
+
 ### Eligibility
 
 The plugin may optimize only configured entrypoints.
@@ -87,6 +130,9 @@ Rules:
 - do not wrap hooks through React context;
 - do not inspect option object keys in the plugin to decide transform
   eligibility.
+- if TypeScript allows the callback on that generated object-options surface,
+  the plugin may rewrite the supported static usage without re-validating the
+  option object's runtime shape.
 
 `precreated` clients come from configured imported client exports.
 
@@ -96,6 +142,8 @@ Rules:
 - preserve the configured options factory call as the runtime input;
 - do not use `qraftReactAPIClient` for pre-created clients unless a separate
   pre-created-context contract is designed later.
+- validate the configured client export against the configured generated
+  factory before rewriting any usage of the imported client.
 
 ### Callback And Schema Rewrites
 

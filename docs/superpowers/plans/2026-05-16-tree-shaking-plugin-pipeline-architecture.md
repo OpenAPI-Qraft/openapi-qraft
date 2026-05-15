@@ -10,6 +10,32 @@
 
 ---
 
+## Transform Criteria Matrix
+
+Before changing code, keep this matrix as the implementation contract. If a
+snapshot differs from this contract, update the transform/snapshot to the
+contract instead of preserving the accidental printed shape.
+
+| Plugin term | Source shape | Runtime input in emitted code | Runtime helper | Optimized when | Excluded when |
+| --- | --- | --- | --- | --- | --- |
+| Context-based generated client | `const api = createAPIClient()` where generated source returns `qraftReactAPIClient(..., Context)` | `Context` for context-backed hooks; no input for context-free helper buckets | `qraftReactAPIClient` for context-backed hook surfaces; `qraftAPIClient` for context-free helper buckets | configured generated factory resolves, source loads, factory statically owns `services`, operation source is resolved, usage is a static member chain | factory does not own services, operation source is unresolved, required context cannot be resolved, or usage is unsupported |
+| Explicit-options generated client | `const api = createAPIClient(optionsExpression)` or inline `createAPIClient(optionsExpression)` | original `optionsExpression` | `qraftAPIClient` | same generated factory ownership proof as above, and usage is a supported static callback/schema access | options are not represented by one expression, services/operation are supplied by caller instead of owned by generated source, or usage is unsupported |
+| Pre-created client | imported configured client export, for example `nodeAPIClient.pets.getPets.useQuery()` | configured `optionsFactory()` call | `qraftAPIClient` | client export resolves, export is created by configured factory, options factory is known, underlying generated factory owns `services`, operation source is resolved | client export missing, factory binding mismatch, namespace/dynamic import, underlying factory has no static services ownership, or operation source is unresolved |
+| Schema access | `.schema` on any optimizable generated/pre-created operation | none | none | operation source is resolved from owned services | operation source is unresolved or service ownership is not proven |
+
+Concrete implementation checks:
+
+- only configured entrypoints may be optimized;
+- generated factory usage requires static ownership proof for `services`;
+- `createAPIClient(optionsExpression)` is explicit-options usage and must emit
+  `qraftAPIClient(operation, callbacks, optionsExpression)`;
+- pre-created clients must emit
+  `qraftAPIClient(operation, callbacks, optionsFactory())`;
+- `.schema` access must emit direct `operation.schema` without runtime helpers;
+- caller-supplied services/operation factories, computed access, destructuring,
+  optional chains, namespace imports, dynamic imports, and exported local client
+  declarations stay untransformed.
+
 ## File Structure
 
 - Create: `packages/tree-shaking-plugin/src/lib/transform/diagnostics.ts`
@@ -50,6 +76,22 @@
 - Create: `packages/tree-shaking-plugin/src/lib/transform/diagnostics.test.ts`
 - Modify: `packages/tree-shaking-plugin/src/lib/transform/types.ts`
 - Modify: `packages/tree-shaking-plugin/src/core.ts`
+
+- [ ] **Step 0: Re-read the criteria matrix**
+
+Before writing tests, re-read the `Transform Criteria Matrix` section in this
+plan and the corresponding section in
+`docs/superpowers/specs/2026-05-16-tree-shaking-plugin-pipeline-architecture-design.md`.
+
+Expected:
+
+- context-based zero-arg generated clients preserve context semantics;
+- explicit-options generated clients preserve the original options expression
+  and use `qraftAPIClient`;
+- pre-created clients preserve the configured options factory call and use
+  `qraftAPIClient`;
+- caller-supplied services/operation factories remain excluded from
+  tree-shaking.
 
 - [ ] **Step 1: Add diagnostics unit tests first**
 
@@ -1177,6 +1219,40 @@ api.pets.getPets.useQuery();
 ```
 
 This pins the design decision that generated metadata can prove context when reliable; explicit config is not the only source of truth.
+
+Also add this explicit-options regression near the existing explicit-options
+tests if it is not already present:
+
+```ts
+  it('preserves explicit options clients as qraftAPIClient rewrites even when generated factory is context-capable', async () => {
+    const fixture = await createFixture();
+    const sourceFile = path.join(fixture, 'src/App.tsx');
+
+    const result = await transformQraftTreeShaking(
+      `
+import { createAPIClient } from './api';
+
+const apiOptions = { requestFn: async () => new Response() };
+const api = createAPIClient(apiOptions);
+api.pets.getPets.useQuery();
+`,
+      sourceFile,
+      {
+        createAPIClientFn: [
+          {
+            name: 'createAPIClient',
+            module: './api',
+            context: 'APIClientContext',
+          },
+        ],
+      }
+    );
+
+    expect(result?.code).toContain('qraftAPIClient');
+    expect(result?.code).not.toContain('qraftReactAPIClient');
+    expect(result?.code).toContain('apiOptions');
+  });
+```
 
 - [ ] **Step 2: Run the focused regression**
 
