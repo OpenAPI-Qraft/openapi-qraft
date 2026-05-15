@@ -83,6 +83,20 @@ Default milestone gates:
 - after Task 7: full Verdaccio loop if README/e2e/package-surface work changed
   anything not covered by the previous full loop.
 
+## Session Execution Plans
+
+Use these smaller plans for separate implementation sessions:
+
+- Session 1: `docs/superpowers/plans/2026-05-16-tree-shaking-session-1-diagnostics-config-normalization.md`
+  - diagnostics policy and public config normalization;
+- Session 2: `docs/superpowers/plans/2026-05-16-tree-shaking-session-2-source-gate-generated-metadata.md`
+  - pre-parse source gate and generated metadata inspection;
+- Session 3: `docs/superpowers/plans/2026-05-16-tree-shaking-session-3-planner-mutator-normalized-model.md`
+  - planner/mutator rewrite through normalized runtime inputs and diagnostics
+    enforcement;
+- Session 4: `docs/superpowers/plans/2026-05-16-tree-shaking-session-4-debt-docs-final-verification.md`
+  - debt deletion, README/test-guide docs, and final verification.
+
 ## File Structure
 
 - Create: `packages/tree-shaking-plugin/src/lib/transform/diagnostics.ts`
