@@ -576,14 +576,10 @@ function insertOptimizedClients(
     }
   }
 
-  const body = ast.program.body;
-  const lastImportIndex = findLastImportIndex(body);
   const topLevelDeclarations = dedupeDeclarations([
     ...topLevelContextDeclarations,
     ...precreatedDeclarations,
   ]);
-  body.splice(lastImportIndex + 1, 0, ...topLevelDeclarations);
-  insertedDeclarations.push(...topLevelDeclarations);
 
   const usagesByClient = new Map<
     ClientBinding,
@@ -613,6 +609,11 @@ function insertOptimizedClients(
       }
     }
   }
+
+  const body = ast.program.body;
+  const lastImportIndex = findLastImportIndex(body);
+  body.splice(lastImportIndex + 1, 0, ...topLevelDeclarations);
+  insertedDeclarations.push(...topLevelDeclarations);
 
   return insertedDeclarations;
 }
