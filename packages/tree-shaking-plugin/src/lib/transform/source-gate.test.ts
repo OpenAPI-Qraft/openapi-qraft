@@ -12,7 +12,10 @@ describe('shouldInspectSource', () => {
       {
         kind: 'precreatedClient',
         client: { exportName: 'nodeAPIClient', moduleSpecifier: './client' },
-        factory: { exportName: 'createNodeAPIClient', moduleSpecifier: './api' },
+        factory: {
+          exportName: 'createNodeAPIClient',
+          moduleSpecifier: './api',
+        },
         optionsFactory: {
           exportName: 'createNodeAPIClientOptions',
           moduleSpecifier: './client-options',
