@@ -1,5 +1,6 @@
 import type { NodePath, Scope } from '@babel/traverse';
 import type { QraftModuleAccess } from '../resolvers/common.js';
+import type { DiagnosticReporter } from './diagnostics.js';
 import type {
   ClientBinding,
   CreateImportEntry,
@@ -17,7 +18,6 @@ import type {
   SchemaUsage,
   TransformPlan,
 } from './types.js';
-import type { DiagnosticReporter } from './diagnostics.js';
 import { dirname, resolve } from 'node:path';
 import { parse } from '@babel/parser';
 import * as traverseModule from '@babel/traverse';
@@ -898,7 +898,10 @@ function collectUsedEntrypointKeys(
     const clientSignal =
       (clientBinding ? localClientSignals.get(clientBinding) : undefined) ??
       precreatedImportSignals.get(clientName);
-    if (!clientSignal || !bindingMatches(memberPath, clientName, clientSignal)) {
+    if (
+      !clientSignal ||
+      !bindingMatches(memberPath, clientName, clientSignal)
+    ) {
       return;
     }
 
