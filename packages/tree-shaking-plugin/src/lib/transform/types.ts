@@ -113,6 +113,20 @@ export type GeneratedClientInfo = {
   contextName: string | null;
 };
 
+export type GeneratedClientMetadata = {
+  entrypoint: ClientEntrypoint;
+  factoryFile: string;
+  servicesDir: string;
+  serviceImportPaths: Record<string, string>;
+  reactContext: ReactContextConfig | null;
+  optionsFactory?: ImportTarget;
+};
+
+export type GeneratedMetadataResult = {
+  metadataByEntrypointKey: Map<string, GeneratedClientMetadata | null>;
+  reasons: DiagnosticReason[];
+};
+
 export type OperationImportInfo = {
   importPath: string;
   operationName: string;
