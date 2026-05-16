@@ -61,7 +61,7 @@ Do not implement:
 
 ## Task 1: Planner And Mutator Runtime Inputs
 
-- [ ] **Step 1: Read the semantic contract**
+- [x] **Step 1: Read the semantic contract**
 
 Run:
 
@@ -72,7 +72,7 @@ sed -n '/## Task 5: Route Planner Through Normalized Entrypoints And Metadata/,/
 
 Expected: the session implementer sees the exact runtime-input type, focused regressions, and semantic signals.
 
-- [ ] **Step 2: Add planner regressions first**
+- [x] **Step 2: Add planner regressions first**
 
 Add the tests from master Task 5 Step 1 to the relevant core test files.
 
@@ -84,7 +84,7 @@ corepack yarn workspace @openapi-qraft/tree-shaking-plugin test -- --run src/__t
 
 Expected: FAIL if current helper selection still follows legacy flags; PASS is acceptable when existing code already satisfies a regression.
 
-- [ ] **Step 3: Add `RuntimeInput` to transform types**
+- [x] **Step 3: Add `RuntimeInput` to transform types**
 
 Update `packages/tree-shaking-plugin/src/lib/transform/types.ts` using master Task 5 Step 3.
 
@@ -95,7 +95,7 @@ Required variants:
 - `{ kind: 'optionsExpression'; expression: t.Expression }`;
 - `{ kind: 'optionsFactoryCall'; target: ImportTarget }`.
 
-- [ ] **Step 4: Populate runtime input for local generated clients**
+- [x] **Step 4: Populate runtime input for local generated clients**
 
 Update `packages/tree-shaking-plugin/src/lib/transform/plan.ts` using master Task 5 Step 4.
 
@@ -105,7 +105,7 @@ Required behavior:
 - `createAPIClient(optionsExpression)` produces `runtimeInput.kind === 'optionsExpression'`;
 - invalid or ambiguous call shapes stay untransformed.
 
-- [ ] **Step 5: Populate runtime input for pre-created clients**
+- [x] **Step 5: Populate runtime input for pre-created clients**
 
 Update `packages/tree-shaking-plugin/src/lib/transform/plan.ts` using master Task 5 Step 5.
 
@@ -115,7 +115,7 @@ Required behavior:
 - the options factory target comes from normalized entrypoint/metadata;
 - pre-created clients never choose `qraftReactAPIClient` in this design.
 
-- [ ] **Step 6: Update mutation helper selection**
+- [x] **Step 6: Update mutation helper selection**
 
 Update `packages/tree-shaking-plugin/src/lib/transform/mutate.ts` using master Task 5 Step 6.
 
@@ -126,7 +126,7 @@ Required behavior:
 - pre-created runtime input emits `qraftAPIClient(operation, callbacks, optionsFactory())`;
 - `.schema` emits direct `operation.schema` and imports no runtime helper.
 
-- [ ] **Step 7: Run core transform suites**
+- [x] **Step 7: Run core transform suites**
 
 Run:
 
@@ -144,7 +144,7 @@ Verify these semantic signals before accepting snapshot updates:
 - schema usage imports no runtime helper;
 - unsupported references keep original clients alive.
 
-- [ ] **Step 8: Commit normalized planner wiring**
+- [x] **Step 8: Commit normalized planner wiring**
 
 Run:
 
@@ -164,7 +164,7 @@ Expected: one commit removing legacy runtime-helper branching where the normaliz
 
 ## Task 2: Diagnostics Enforcement
 
-- [ ] **Step 1: Read diagnostics enforcement task**
+- [x] **Step 1: Read diagnostics enforcement task**
 
 Run:
 
@@ -174,7 +174,7 @@ sed -n '/## Task 6: Enforce Diagnostics In Core Transform Behavior/,/## Mileston
 
 Expected: the session implementer sees the exact core diagnostics tests and expected error/warn/off behavior.
 
-- [ ] **Step 2: Add core diagnostics behavior tests first**
+- [x] **Step 2: Add core diagnostics behavior tests first**
 
 Update the core tests listed in master Task 6 Step 1.
 
@@ -186,7 +186,7 @@ corepack yarn workspace @openapi-qraft/tree-shaking-plugin test -- --run src/__t
 
 Expected: FAIL where unresolved candidates still silently skip by default.
 
-- [ ] **Step 3: Enforce diagnostics in core/planner**
+- [x] **Step 3: Enforce diagnostics in core/planner**
 
 Update `packages/tree-shaking-plugin/src/core.ts` and `packages/tree-shaking-plugin/src/lib/transform/plan.ts` using master Task 6 Steps 3-5.
 
@@ -198,7 +198,7 @@ Required behavior:
 - `diagnostics: 'off'` skips silently;
 - old soft-skip tests set `diagnostics: 'off'` only when the skipped behavior is intentional.
 
-- [ ] **Step 4: Run diagnostics and core tests**
+- [x] **Step 4: Run diagnostics and core tests**
 
 Run:
 
@@ -208,7 +208,7 @@ corepack yarn workspace @openapi-qraft/tree-shaking-plugin test -- --run src/lib
 
 Expected: PASS.
 
-- [ ] **Step 5: Commit diagnostics enforcement**
+- [x] **Step 5: Commit diagnostics enforcement**
 
 Run:
 
@@ -226,7 +226,7 @@ Expected: one commit implementing default error diagnostics for unresolved candi
 
 ## Milestone C Verification
 
-- [ ] **Step 1: Run package checks**
+- [x] **Step 1: Run package checks**
 
 Run:
 
@@ -239,7 +239,7 @@ git diff --check
 
 Expected: tests pass, typecheck has no TypeScript errors, lint has no ESLint errors, and `git diff --check` prints no output.
 
-- [ ] **Step 2: Run fast e2e gate**
+- [x] **Step 2: Run fast e2e gate**
 
 Run:
 
@@ -256,7 +256,7 @@ npm run e2e:post-build
 
 Expected: `Tree-shaking bundle assertions passed.`
 
-- [ ] **Step 3: Run full Verdaccio e2e before handoff**
+- [x] **Step 3: Run full Verdaccio e2e before handoff**
 
 Run:
 
