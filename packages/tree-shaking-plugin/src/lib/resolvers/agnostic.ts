@@ -4,8 +4,8 @@ import type {
   QraftResolver,
 } from './common.js';
 import {
+  createQraftModuleAccess,
   createResolverChain,
-  createSourceLoaderChain,
   createUserResolverStrategy,
   createUserSourceLoaderStrategy,
 } from './common.js';
@@ -19,10 +19,8 @@ export function createAgnosticResolver(
 export function createAgnosticModuleAccess(
   userAccess: QraftModuleAccessOptions = {}
 ): QraftModuleAccess {
-  return {
-    resolve: createAgnosticResolver(userAccess.resolve),
-    load: createSourceLoaderChain([
-      createUserSourceLoaderStrategy(userAccess.load),
-    ]),
-  };
+  return createQraftModuleAccess(
+    [createUserResolverStrategy(userAccess.resolve)],
+    [createUserSourceLoaderStrategy(userAccess.load)]
+  );
 }

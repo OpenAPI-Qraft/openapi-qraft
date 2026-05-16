@@ -1,3 +1,4 @@
+import type { BundlerResolveContext } from './common.js';
 import fs from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
@@ -6,7 +7,7 @@ import {
   createAgnosticModuleAccess,
   createAgnosticResolver,
 } from './agnostic.js';
-import { type BundlerResolveContext } from './common.js';
+import { getQraftModuleAccessStrategyMetadata } from './common.js';
 import { createEsbuildModuleAccess } from './esbuild.js';
 import {
   createRollupLikeModuleAccess,
@@ -23,6 +24,39 @@ async function mktemp() {
 }
 
 describe('resolver composition', () => {
+  it('exposes named strategy order for adapter-created module access', () => {
+    expect(
+      getQraftModuleAccessStrategyMetadata(createAgnosticModuleAccess())
+    ).toEqual({
+      resolve: ['user'],
+      load: ['user'],
+    });
+    expect(
+      getQraftModuleAccessStrategyMetadata(createRollupLikeModuleAccess({}))
+    ).toEqual({
+      resolve: ['native', 'user'],
+      load: ['user', 'adapter-fallback'],
+    });
+    expect(
+      getQraftModuleAccessStrategyMetadata(createWebpackLikeModuleAccess({}))
+    ).toEqual({
+      resolve: ['native', 'user'],
+      load: ['native', 'user', 'adapter-fallback'],
+    });
+    expect(
+      getQraftModuleAccessStrategyMetadata(createRspackModuleAccess({}))
+    ).toEqual({
+      resolve: ['native', 'user'],
+      load: ['native', 'user', 'adapter-fallback'],
+    });
+    expect(
+      getQraftModuleAccessStrategyMetadata(createEsbuildModuleAccess({}))
+    ).toEqual({
+      resolve: ['native', 'user'],
+      load: ['user', 'adapter-fallback'],
+    });
+  });
+
   it('uses only the custom resolver in the agnostic resolver chain', async () => {
     const importer = path.join(await mktemp(), 'src.ts');
     const customResolve = vi.fn(async () => null);
@@ -53,6 +87,49 @@ describe('resolver composition', () => {
     );
     expect(resolve).toHaveBeenCalledTimes(1);
     expect(load).toHaveBeenCalledTimes(1);
+  });
+
+  it('uses native resolve before user resolve when native resolve hits', async () => {
+    const userResolve = vi.fn(async () => '/tmp/from-user.ts');
+    const access = createRollupLikeModuleAccess(
+      {
+        resolve: vi.fn(async () => ({
+          id: '/tmp/from-native.ts',
+          external: false,
+        })),
+      },
+      { resolve: userResolve }
+    );
+
+    await expect(access.resolve('./api', '/tmp/App.tsx')).resolves.toBe(
+      '/tmp/from-native.ts'
+    );
+    expect(userResolve).not.toHaveBeenCalled();
+  });
+
+  it('uses user resolve after native resolve misses or errors', async () => {
+    const importer = '/tmp/App.tsx';
+    const userResolve = vi
+      .fn()
+      .mockResolvedValueOnce('/tmp/from-user-after-miss.ts')
+      .mockResolvedValueOnce('/tmp/from-user-after-error.ts');
+    const nativeResolve = vi
+      .fn()
+      .mockResolvedValueOnce(null)
+      .mockRejectedValueOnce(new Error('native failed'));
+    const access = createRollupLikeModuleAccess(
+      { resolve: nativeResolve },
+      { resolve: userResolve }
+    );
+
+    await expect(access.resolve('./miss', importer)).resolves.toBe(
+      '/tmp/from-user-after-miss.ts'
+    );
+    await expect(access.resolve('./error', importer)).resolves.toBe(
+      '/tmp/from-user-after-error.ts'
+    );
+    expect(userResolve).toHaveBeenNthCalledWith(1, './miss', importer);
+    expect(userResolve).toHaveBeenNthCalledWith(2, './error', importer);
   });
 
   it('returns null from load when no source loader is configured', async () => {
@@ -184,12 +261,12 @@ describe('resolver composition', () => {
   });
 
   it('loads source through the rollup-like filesystem adapter', async () => {
-    const sourceFile = '/virtual/api.ts';
+    const sourceFile = '/virtual/api.ts?raw#factory';
     const ctx: BundlerResolveContext = {
       resolve: vi.fn(async () => ({ id: sourceFile, external: false })),
       fs: {
         readFile: vi.fn(async (id: string) => {
-          expect(id).toBe(sourceFile);
+          expect(id).toBe('/virtual/api.ts');
           return 'export const fromRollupFs = true;';
         }),
       },
@@ -226,19 +303,24 @@ describe('resolver composition', () => {
   });
 
   it('uses the custom rollup-like loader before filesystem fallback', async () => {
-    const ctx: BundlerResolveContext = {};
-    const userLoad = vi.fn(async (id: string) =>
-      id === '/tmp/api.ts' ? 'export const fromFallback = true;' : null
-    );
+    const readFile = vi.fn(async () => 'export const fromFs = true;');
+    const ctx: BundlerResolveContext = {
+      fs: { readFile },
+    };
+    const userLoad = vi.fn(async (id: string) => {
+      expect(id).toBe('/tmp/api.ts?raw#factory');
+      return 'export const fromUserLoader = true;';
+    });
 
     const access = createRollupLikeModuleAccess(ctx, {
       load: userLoad,
     });
 
-    await expect(access.load('/tmp/api.ts')).resolves.toBe(
-      'export const fromFallback = true;'
+    await expect(access.load('/tmp/api.ts?raw#factory')).resolves.toBe(
+      'export const fromUserLoader = true;'
     );
     expect(userLoad).toHaveBeenCalledTimes(1);
+    expect(readFile).not.toHaveBeenCalled();
   });
 
   it('loads source through webpack loadModule', async () => {
@@ -272,6 +354,71 @@ describe('resolver composition', () => {
     expect(loadModule).toHaveBeenCalledTimes(1);
   });
 
+  it('uses webpack loadModule before user load', async () => {
+    const userLoad = vi.fn(async () => 'export const fromUser = true;');
+    const loadModule = vi.fn(
+      (request: string, callback: (...args: unknown[]) => void) => {
+        expect(request).toBe('/tmp/generated-api/index.ts');
+        callback(null, 'export const fromNative = true;', null, {});
+      }
+    );
+
+    const access = createWebpackLikeModuleAccess(
+      {
+        getNativeBuildContext() {
+          return {
+            framework: 'webpack',
+            loaderContext: {
+              loadModule,
+            },
+          };
+        },
+      },
+      { load: userLoad }
+    );
+
+    await expect(access.load('/tmp/generated-api/index.ts')).resolves.toBe(
+      'export const fromNative = true;'
+    );
+    expect(userLoad).not.toHaveBeenCalled();
+  });
+
+  it('uses webpack user load before input filesystem fallback', async () => {
+    const userLoad = vi.fn(async (id: string) => {
+      expect(id).toBe('/virtual/generated-api/index.ts?raw#factory');
+      return 'export const fromUser = true;';
+    });
+    const loadModule = vi.fn(
+      (_request: string, callback: (...args: unknown[]) => void) => {
+        callback(new Error('missing'));
+      }
+    );
+    const readFile = vi.fn(
+      (_id: string, callback: (error: Error | null, source?: Buffer) => void) =>
+        callback(null, Buffer.from('export const fromFs = true;'))
+    );
+
+    const access = createWebpackLikeModuleAccess(
+      {
+        getNativeBuildContext() {
+          return {
+            framework: 'webpack',
+            loaderContext: {
+              loadModule,
+              fs: { readFile },
+            },
+          };
+        },
+      },
+      { load: userLoad }
+    );
+
+    await expect(
+      access.load('/virtual/generated-api/index.ts?raw#factory')
+    ).resolves.toBe('export const fromUser = true;');
+    expect(readFile).not.toHaveBeenCalled();
+  });
+
   it('loads source through webpack input filesystem when loadModule misses', async () => {
     const loadModule = vi.fn(
       (_request: string, callback: (...args: unknown[]) => void) => {
@@ -302,9 +449,9 @@ describe('resolver composition', () => {
       },
     });
 
-    await expect(access.load('/virtual/generated-api/index.ts')).resolves.toBe(
-      'export const fromWebpackFs = true;'
-    );
+    await expect(
+      access.load('/virtual/generated-api/index.ts?raw#factory')
+    ).resolves.toBe('export const fromWebpackFs = true;');
     expect(loadModule).toHaveBeenCalledTimes(1);
     expect(readFile).toHaveBeenCalledTimes(1);
   });
@@ -339,6 +486,71 @@ describe('resolver composition', () => {
     expect(loadModule).toHaveBeenCalledTimes(1);
   });
 
+  it('uses rspack loadModule before user load', async () => {
+    const userLoad = vi.fn(async () => 'export const fromUser = true;');
+    const loadModule = vi.fn(
+      (request: string, callback: (...args: unknown[]) => void) => {
+        expect(request).toBe('/tmp/generated-api/index.ts');
+        callback(null, 'export const fromNative = true;', null, {});
+      }
+    );
+
+    const access = createRspackModuleAccess(
+      {
+        getNativeBuildContext() {
+          return {
+            framework: 'rspack',
+            loaderContext: {
+              loadModule,
+            },
+          };
+        },
+      },
+      { load: userLoad }
+    );
+
+    await expect(access.load('/tmp/generated-api/index.ts')).resolves.toBe(
+      'export const fromNative = true;'
+    );
+    expect(userLoad).not.toHaveBeenCalled();
+  });
+
+  it('uses rspack user load before input filesystem fallback', async () => {
+    const userLoad = vi.fn(async (id: string) => {
+      expect(id).toBe('/virtual/generated-api/index.ts?raw#factory');
+      return 'export const fromUser = true;';
+    });
+    const loadModule = vi.fn(
+      (_request: string, callback: (...args: unknown[]) => void) => {
+        callback(new Error('missing'));
+      }
+    );
+    const readFile = vi.fn(
+      (_id: string, callback: (error: Error | null, source?: Buffer) => void) =>
+        callback(null, Buffer.from('export const fromFs = true;'))
+    );
+
+    const access = createRspackModuleAccess(
+      {
+        getNativeBuildContext() {
+          return {
+            framework: 'rspack',
+            loaderContext: {
+              loadModule,
+              fs: { readFile },
+            },
+          };
+        },
+      },
+      { load: userLoad }
+    );
+
+    await expect(
+      access.load('/virtual/generated-api/index.ts?raw#factory')
+    ).resolves.toBe('export const fromUser = true;');
+    expect(readFile).not.toHaveBeenCalled();
+  });
+
   it('loads source through rspack input filesystem when loadModule misses', async () => {
     const loadModule = vi.fn(
       (_request: string, callback: (...args: unknown[]) => void) => {
@@ -369,14 +581,21 @@ describe('resolver composition', () => {
       },
     });
 
-    await expect(access.load('/virtual/generated-api/index.ts')).resolves.toBe(
-      'export const fromRspackFs = true;'
-    );
+    await expect(
+      access.load('/virtual/generated-api/index.ts?raw#factory')
+    ).resolves.toBe('export const fromRspackFs = true;');
     expect(loadModule).toHaveBeenCalledTimes(1);
     expect(readFile).toHaveBeenCalledTimes(1);
   });
 
   it('uses the custom source loader before esbuild file fallback', async () => {
+    const readFile = vi
+      .spyOn(fs, 'readFile')
+      .mockResolvedValue('export const fromFile = true;');
+    const userLoad = vi.fn(async (id: string) => {
+      expect(id).toBe('/tmp/api.ts?raw#hash');
+      return 'export const fromUserLoader = true;';
+    });
     const access = createEsbuildModuleAccess(
       {
         getNativeBuildContext() {
@@ -389,13 +608,37 @@ describe('resolver composition', () => {
         },
       },
       {
-        load: async (id) =>
-          id === '/tmp/api.ts' ? 'export const fromUserLoader = true;' : null,
+        load: userLoad,
       }
     );
 
-    await expect(access.load('/tmp/api.ts')).resolves.toBe(
+    await expect(access.load('/tmp/api.ts?raw#hash')).resolves.toBe(
       'export const fromUserLoader = true;'
     );
+    expect(userLoad).toHaveBeenCalledTimes(1);
+    expect(readFile).not.toHaveBeenCalled();
+    readFile.mockRestore();
+  });
+
+  it('strips query and hash only when esbuild file fallback reads locally', async () => {
+    const readFile = vi
+      .spyOn(fs, 'readFile')
+      .mockResolvedValue('export const fromFile = true;');
+    const access = createEsbuildModuleAccess({
+      getNativeBuildContext() {
+        return {
+          framework: 'esbuild',
+          build: {
+            resolve: async () => ({ path: '/tmp/api.ts?raw#hash', errors: [] }),
+          },
+        };
+      },
+    });
+
+    await expect(access.load('/tmp/api.ts?raw#hash')).resolves.toBe(
+      'export const fromFile = true;'
+    );
+    expect(readFile).toHaveBeenCalledWith('/tmp/api.ts', 'utf8');
+    readFile.mockRestore();
   });
 });

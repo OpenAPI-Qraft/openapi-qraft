@@ -8,10 +8,10 @@ import type {
 } from './common.js';
 import path from 'node:path';
 import {
-  createResolverChain,
-  createSourceLoaderChain,
+  createQraftModuleAccess,
   createUserResolverStrategy,
   createUserSourceLoaderStrategy,
+  stripQueryAndHash,
 } from './common.js';
 
 type WebpackResolveFn = (
@@ -86,78 +86,91 @@ function getWebpackInputFileSystem(
 function createWebpackResolveStrategy(
   ctx: WebpackLoaderContextLike
 ): ResolveStrategy {
-  return async ({ specifier, importer }) => {
-    const loaderContext = ctx.getNativeBuildContext?.()?.loaderContext;
-    const getResolve =
-      typeof loaderContext === 'object' &&
-      loaderContext !== null &&
-      'getResolve' in loaderContext &&
-      typeof loaderContext.getResolve === 'function'
-        ? loaderContext.getResolve
-        : ctx.getResolve;
-    if (typeof getResolve !== 'function') return null;
+  return {
+    name: 'native',
+    async resolve({ specifier, importer }) {
+      const loaderContext = ctx.getNativeBuildContext?.()?.loaderContext;
+      const getResolve =
+        typeof loaderContext === 'object' &&
+        loaderContext !== null &&
+        'getResolve' in loaderContext &&
+        typeof loaderContext.getResolve === 'function'
+          ? loaderContext.getResolve
+          : ctx.getResolve;
+      if (typeof getResolve !== 'function') return null;
 
-    try {
-      const resolve = getResolve({ dependencyType: 'esm' });
-      const resolved = await resolve(path.dirname(importer), specifier);
-      return typeof resolved === 'string' ? resolved : null;
-    } catch {
-      // fall through
-    }
+      try {
+        const resolve = getResolve({ dependencyType: 'esm' });
+        const resolved = await resolve(path.dirname(importer), specifier);
+        return typeof resolved === 'string' ? resolved : null;
+      } catch {
+        // fall through
+      }
 
-    return null;
+      return null;
+    },
   };
 }
 
 function createWebpackLoadStrategy(
   ctx: WebpackLoaderContextLike
 ): LoadStrategy {
-  return async ({ id }) => {
-    const loaderContext = ctx.getNativeBuildContext?.()?.loaderContext;
-    const loadModule =
-      typeof loaderContext === 'object' &&
-      loaderContext !== null &&
-      'loadModule' in loaderContext &&
-      typeof loaderContext.loadModule === 'function'
-        ? loaderContext.loadModule
-        : ctx.loadModule;
-    if (typeof loadModule !== 'function') return null;
+  return {
+    name: 'native',
+    async load({ id }) {
+      const loaderContext = ctx.getNativeBuildContext?.()?.loaderContext;
+      const loadModule =
+        typeof loaderContext === 'object' &&
+        loaderContext !== null &&
+        'loadModule' in loaderContext &&
+        typeof loaderContext.loadModule === 'function'
+          ? loaderContext.loadModule
+          : ctx.loadModule;
+      if (typeof loadModule !== 'function') return null;
 
-    return new Promise<string | null>((resolve) => {
-      loadModule(id, (error: Error | null, source: string | Buffer | null) => {
-        if (error || source === null || source === undefined) {
-          resolve(null);
-          return;
-        }
+      return new Promise<string | null>((resolve) => {
+        loadModule(
+          id,
+          (error: Error | null, source: string | Buffer | null) => {
+            if (error || source === null || source === undefined) {
+              resolve(null);
+              return;
+            }
 
-        resolve(Buffer.isBuffer(source) ? source.toString('utf8') : source);
+            resolve(Buffer.isBuffer(source) ? source.toString('utf8') : source);
+          }
+        );
       });
-    });
+    },
   };
 }
 
 function createWebpackInputFileSystemLoadStrategy(
   ctx: WebpackLoaderContextLike
 ): LoadStrategy {
-  return async ({ id }) => {
-    const loaderContext = ctx.getNativeBuildContext?.()?.loaderContext;
-    const inputFileSystem = getWebpackInputFileSystem(loaderContext);
-    if (typeof inputFileSystem?.readFile !== 'function') {
-      return null;
-    }
+  return {
+    name: 'adapter-fallback',
+    async load({ id }) {
+      const loaderContext = ctx.getNativeBuildContext?.()?.loaderContext;
+      const inputFileSystem = getWebpackInputFileSystem(loaderContext);
+      if (typeof inputFileSystem?.readFile !== 'function') {
+        return null;
+      }
 
-    return new Promise<string | null>((resolve) => {
-      inputFileSystem.readFile?.(id, (error, source) => {
-        if (error || source === null || source === undefined) {
-          resolve(null);
-          return;
-        }
+      const fileId = stripQueryAndHash(id);
+      return new Promise<string | null>((resolve) => {
+        inputFileSystem.readFile?.(fileId, (error, source) => {
+          if (error || source === null || source === undefined) {
+            resolve(null);
+            return;
+          }
 
-        resolve(
-          Buffer.isBuffer(source) ? source.toString('utf8') : String(source)
-        );
+          resolve(
+            Buffer.isBuffer(source) ? source.toString('utf8') : String(source)
+          );
+        });
       });
-    });
+    },
   };
 }
 
@@ -165,17 +178,17 @@ export function createWebpackLikeModuleAccess(
   ctx: WebpackLoaderContextLike,
   userAccess: QraftModuleAccessOptions = {}
 ): QraftModuleAccess {
-  return {
-    resolve: createResolverChain([
+  return createQraftModuleAccess(
+    [
       createWebpackResolveStrategy(ctx),
       createUserResolverStrategy(userAccess.resolve),
-    ]),
-    load: createSourceLoaderChain([
+    ],
+    [
       createWebpackLoadStrategy(ctx),
       createUserSourceLoaderStrategy(userAccess.load),
       createWebpackInputFileSystemLoadStrategy(ctx),
-    ]),
-  };
+    ]
+  );
 }
 
 export function createWebpackLikeResolver(
