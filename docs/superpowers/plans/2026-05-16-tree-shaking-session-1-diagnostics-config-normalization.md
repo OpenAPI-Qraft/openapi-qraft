@@ -51,7 +51,7 @@ Do not implement:
 
 ## Task 1: Diagnostics Contract
 
-- [ ] **Step 1: Read the contract**
+- [x] **Step 1: Read the contract**
 
 Read the master plan sections:
 
@@ -62,7 +62,7 @@ sed -n '/## Task 1: Add Diagnostics Contract/,/## Task 2:/p' docs/superpowers/pl
 
 Expected: the session implementer sees the diagnostics levels, ordinary-skip rule, unresolved-candidate rule, and the exact `diagnostics.test.ts` test cases.
 
-- [ ] **Step 2: Add diagnostics tests first**
+- [x] **Step 2: Add diagnostics tests first**
 
 Create `packages/tree-shaking-plugin/src/lib/transform/diagnostics.test.ts` using the test body from master Task 1 Step 1.
 
@@ -74,7 +74,7 @@ corepack yarn workspace @openapi-qraft/tree-shaking-plugin test -- --run src/lib
 
 Expected: FAIL because `diagnostics.ts` does not exist yet.
 
-- [ ] **Step 3: Implement diagnostics types and reporter**
+- [x] **Step 3: Implement diagnostics types and reporter**
 
 Update `packages/tree-shaking-plugin/src/lib/transform/types.ts`, `packages/tree-shaking-plugin/src/core.ts`, and create `packages/tree-shaking-plugin/src/lib/transform/diagnostics.ts` using master Task 1 Steps 3-5.
 
@@ -88,7 +88,7 @@ Required exported names:
 - `createDiagnosticReporter(...)`;
 - `formatDiagnosticReason(...)`.
 
-- [ ] **Step 4: Verify diagnostics**
+- [x] **Step 4: Verify diagnostics**
 
 Run:
 
@@ -98,7 +98,7 @@ corepack yarn workspace @openapi-qraft/tree-shaking-plugin test -- --run src/lib
 
 Expected: PASS.
 
-- [ ] **Step 5: Commit diagnostics**
+- [x] **Step 5: Commit diagnostics**
 
 Run:
 
@@ -112,9 +112,11 @@ git commit -m "feat: add tree-shaking diagnostics policy"
 
 Expected: one focused diagnostics commit.
 
+Completed in commit `a8ceee0e feat: add tree-shaking diagnostics policy`.
+
 ## Task 2: Entrypoint Normalization
 
-- [ ] **Step 1: Read the config-normalization task**
+- [x] **Step 1: Read the config-normalization task**
 
 Run:
 
@@ -124,7 +126,7 @@ sed -n '/## Task 2: Normalize Public Config Into Entrypoints/,/## Milestone A:/p
 
 Expected: the session implementer sees the exact `entrypoints.test.ts` cases and normalized type shapes.
 
-- [ ] **Step 2: Add entrypoint tests first**
+- [x] **Step 2: Add entrypoint tests first**
 
 Create `packages/tree-shaking-plugin/src/lib/transform/entrypoints.test.ts` using master Task 2 Step 1.
 
@@ -136,7 +138,7 @@ corepack yarn workspace @openapi-qraft/tree-shaking-plugin test -- --run src/lib
 
 Expected: FAIL because `entrypoints.ts` does not exist yet.
 
-- [ ] **Step 3: Implement normalized entrypoint types**
+- [x] **Step 3: Implement normalized entrypoint types**
 
 Update `packages/tree-shaking-plugin/src/lib/transform/types.ts` using master Task 2 Step 3.
 
@@ -148,7 +150,7 @@ Required model:
 - `PrecreatedClientEntrypoint`;
 - `ClientEntrypoint`.
 
-- [ ] **Step 4: Implement `normalizeEntrypoints(...)`**
+- [x] **Step 4: Implement `normalizeEntrypoints(...)`**
 
 Create `packages/tree-shaking-plugin/src/lib/transform/entrypoints.ts` using master Task 2 Step 4.
 
@@ -159,7 +161,7 @@ Required behavior:
 - preserve legacy config on each entrypoint;
 - compose stable keys from kind, export name, and module specifier.
 
-- [ ] **Step 5: Verify entrypoints**
+- [x] **Step 5: Verify entrypoints**
 
 Run:
 
@@ -169,7 +171,7 @@ corepack yarn workspace @openapi-qraft/tree-shaking-plugin test -- --run src/lib
 
 Expected: PASS.
 
-- [ ] **Step 6: Commit entrypoints**
+- [x] **Step 6: Commit entrypoints**
 
 Run:
 
@@ -182,9 +184,11 @@ git commit -m "refactor: normalize tree-shaking entrypoints"
 
 Expected: one focused entrypoint-normalization commit.
 
+Completed in commit `667870e7 refactor: normalize tree-shaking entrypoints`.
+
 ## Milestone A Verification
 
-- [ ] **Step 1: Run package-level tests touched by this session**
+- [x] **Step 1: Run package-level tests touched by this session**
 
 Run:
 
@@ -194,7 +198,9 @@ corepack yarn workspace @openapi-qraft/tree-shaking-plugin test -- --run src/lib
 
 Expected: PASS.
 
-- [ ] **Step 2: Run typecheck**
+Completed: PASS, `13 passed`, `97 passed`.
+
+- [x] **Step 2: Run typecheck**
 
 Run:
 
@@ -204,7 +210,9 @@ corepack yarn workspace @openapi-qraft/tree-shaking-plugin typecheck
 
 Expected: no TypeScript errors.
 
-- [ ] **Step 3: Run the e2e gate when code is wired into `core.ts`**
+Completed: PASS.
+
+- [x] **Step 3: Run the e2e gate when code is wired into `core.ts`**
 
 Run this when Task 1 or Task 2 changed executable plugin paths:
 
@@ -221,6 +229,21 @@ npm run e2e:post-build
 
 Expected: `Tree-shaking bundle assertions passed.`
 
-- [ ] **Step 4: Record intentional e2e skip**
+- [x] **Step 4: Record intentional e2e skip**
 
 If Tasks 1-2 stayed entirely in helper modules not executed by the bundled fixture, write the skip reason in the session final response and run Milestone B in Session 2.
+
+Completed: e2e intentionally skipped. Session 1 added diagnostics and entrypoint
+helper modules plus public type surface, but did not wire the new modules into
+the runtime transform path. The fast e2e gate should run in Session 2 after the
+source gate or generated metadata boundary reaches executable plugin behavior.
+
+Additional completed checks:
+
+```bash
+corepack yarn workspace @openapi-qraft/tree-shaking-plugin lint
+corepack yarn workspace @openapi-qraft/tree-shaking-plugin build
+git diff --check
+```
+
+Expected: PASS.
