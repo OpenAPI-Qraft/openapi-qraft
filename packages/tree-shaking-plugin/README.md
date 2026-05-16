@@ -40,7 +40,7 @@ apis:
 
 ## Supported client modes
 
-- `createAPIClientFn` for context-based factories, for example `createReactAPIClient` and the resulting `reactAPIClient`.
+- `kind: 'clientFactory'` for factory imports such as `createReactAPIClient` and the resulting `reactAPIClient`.
 
   ```ts
   import { createReactAPIClient } from './api';
@@ -52,7 +52,7 @@ apis:
   }
   ```
 
-- `apiClient` for precreated clients, for example `export const nodeAPIClient = createNodeAPIClient(createNodeAPIClientOptions())`.
+- `kind: 'precreatedClient'` for clients that are already created and exported from another module, for example `export const nodeAPIClient = createNodeAPIClient(createNodeAPIClientOptions())`.
 
   ```ts filename=src/client.ts
   // src/client.ts
@@ -75,6 +75,21 @@ apis:
 
 ## Setup
 
+The setup snippets below use this `entrypoints` value:
+
+```ts
+const entrypoints = [
+  {
+    kind: 'clientFactory',
+    factory: { exportName: 'createReactAPIClient', moduleSpecifier: './api' },
+    reactContext: {
+      exportName: 'APIClientContext',
+      moduleSpecifier: './api/APIClientContext',
+    },
+  },
+];
+```
+
 ### Vite
 
 ```ts
@@ -82,17 +97,7 @@ import { qraftTreeShakeVite } from '@openapi-qraft/tree-shaking-plugin/vite';
 import { defineConfig } from 'vite';
 
 export default defineConfig({
-  plugins: [
-    qraftTreeShakeVite({
-      createAPIClientFn: [
-        {
-          name: 'createReactAPIClient',
-          module: './api',
-          context: 'APIClientContext',
-        },
-      ],
-    }),
-  ],
+  plugins: [qraftTreeShakeVite({ entrypoints })],
 });
 ```
 
@@ -102,17 +107,7 @@ export default defineConfig({
 import { qraftTreeShakeRollup } from '@openapi-qraft/tree-shaking-plugin/rollup';
 
 export default {
-  plugins: [
-    qraftTreeShakeRollup({
-      createAPIClientFn: [
-        {
-          name: 'createReactAPIClient',
-          module: './api',
-          context: 'APIClientContext',
-        },
-      ],
-    }),
-  ],
+  plugins: [qraftTreeShakeRollup({ entrypoints })],
 };
 ```
 
@@ -124,17 +119,7 @@ const {
 } = require('@openapi-qraft/tree-shaking-plugin/webpack');
 
 module.exports = {
-  plugins: [
-    qraftTreeShakeWebpack({
-      createAPIClientFn: [
-        {
-          name: 'createReactAPIClient',
-          module: './api',
-          context: 'APIClientContext',
-        },
-      ],
-    }),
-  ],
+  plugins: [qraftTreeShakeWebpack({ entrypoints })],
 };
 ```
 
@@ -163,17 +148,7 @@ resolve: {
 import { qraftTreeShakeRspack } from '@openapi-qraft/tree-shaking-plugin/rspack';
 
 export default {
-  plugins: [
-    qraftTreeShakeRspack({
-      createAPIClientFn: [
-        {
-          name: 'createReactAPIClient',
-          module: './api',
-          context: 'APIClientContext',
-        },
-      ],
-    }),
-  ],
+  plugins: [qraftTreeShakeRspack({ entrypoints })],
 };
 ```
 
@@ -184,23 +159,44 @@ import { qraftTreeShakeEsbuild } from '@openapi-qraft/tree-shaking-plugin/esbuil
 import { build } from 'esbuild';
 
 await build({
-  plugins: [
-    qraftTreeShakeEsbuild({
-      createAPIClientFn: [
-        {
-          name: 'createReactAPIClient',
-          module: './api',
-          context: 'APIClientContext',
-        },
-      ],
-    }),
-  ],
+  plugins: [qraftTreeShakeEsbuild({ entrypoints })],
 });
 ```
 
 ## Configuration
 
-### `createAPIClientFn`
+### `entrypoints`
+
+`entrypoints` describes the generated client surfaces that the plugin is allowed to optimize. Every target uses named exports and bundler-resolvable module specifiers, either relative to the bundler's resolution root or alias/third-party imports.
+
+```ts
+qraftTreeShakeVite({
+  entrypoints: [
+    {
+      kind: 'clientFactory',
+      factory: { exportName: 'createReactAPIClient', moduleSpecifier: './api' },
+      reactContext: {
+        exportName: 'APIClientContext',
+        moduleSpecifier: './api/APIClientContext',
+      },
+    },
+    {
+      kind: 'precreatedClient',
+      client: { exportName: 'nodeAPIClient', moduleSpecifier: './client' },
+      factory: {
+        exportName: 'createNodeAPIClient',
+        moduleSpecifier: './create-node-api-client',
+      },
+      optionsFactory: {
+        exportName: 'createNodeAPIClientOptions',
+        moduleSpecifier: './client-options',
+      },
+    },
+  ],
+});
+```
+
+#### `kind: 'clientFactory'`
 
 Use this when your application imports a factory such as `createReactAPIClient` and creates clients at the call site.
 
@@ -238,17 +234,19 @@ export function App() {
 Configuration:
 
 ```ts
-createAPIClientFn: [
+entrypoints: [
   {
-    name: 'createReactAPIClient',
-    module: './api',
-    context: 'APIClientContext',
-    contextModule: './api/APIClientContext',
+    kind: 'clientFactory',
+    factory: { exportName: 'createReactAPIClient', moduleSpecifier: './api' },
+    reactContext: {
+      exportName: 'APIClientContext',
+      moduleSpecifier: './api/APIClientContext',
+    },
   },
 ];
 ```
 
-`module` must be a specifier that the bundler can resolve, either as a relative path from the bundler's resolution root or as an alias/third-party module import. `context` defaults to `APIClientContext`. Use `contextModule` when the context is exported from a different module than the factory, or point both options at the same module when the context and factory are exported together.
+`factory` points at the generated client factory export. `reactContext` is optional; use it when zero-argument React clients should keep context-backed runtime semantics. Omit `reactContext` for explicit-options clients such as `createNodeAPIClient(options)`.
 
 ### Module access
 
@@ -258,7 +256,15 @@ Use `moduleAccess.load` only when a build relies on virtual modules or a custom 
 
 ```ts
 qraftTreeShakeVite({
-  createAPIClientFn: [{ name: 'createAPIClient', module: 'virtual:qraft-api' }],
+  entrypoints: [
+    {
+      kind: 'clientFactory',
+      factory: {
+        exportName: 'createAPIClient',
+        moduleSpecifier: 'virtual:qraft-api',
+      },
+    },
+  ],
   moduleAccess: {
     load: async (resolvedId) => {
       return resolvedId === 'virtual:qraft-api'
@@ -269,9 +275,9 @@ qraftTreeShakeVite({
 });
 ```
 
-If a resolved module cannot be loaded through module access, the transform skips that optimization. With `debug: true`, the plugin prints the skip reason.
+If a resolved module cannot be loaded through module access for a configured transform candidate, `diagnostics` controls the result: `'error'` throws, `'warn'` prints a warning and skips the candidate, and `'off'` skips it silently.
 
-### `apiClient`
+#### `kind: 'precreatedClient'`
 
 Use this when the client is already created and exported from a module.
 
@@ -337,19 +343,23 @@ export function App() {
 Configuration:
 
 ```ts
-apiClient: [
+entrypoints: [
   {
-    client: 'nodeAPIClient',
-    clientModule: './client',
-    createAPIClientFn: 'createNodeAPIClient',
-    createAPIClientFnModule: './create-node-api-client',
-    createAPIClientFnOptions: 'createNodeAPIClientOptions',
-    createAPIClientFnOptionsModule: './client-options',
+    kind: 'precreatedClient',
+    client: { exportName: 'nodeAPIClient', moduleSpecifier: './client' },
+    factory: {
+      exportName: 'createNodeAPIClient',
+      moduleSpecifier: './create-node-api-client',
+    },
+    optionsFactory: {
+      exportName: 'createNodeAPIClientOptions',
+      moduleSpecifier: './client-options',
+    },
   },
 ];
 ```
 
-Use a named export when possible. `default` export clients are also supported, but they are not recommended for new code. `createAPIClientFnModule` and `createAPIClientFnOptionsModule` should point to module specifiers that the bundler can resolve: either a relative path from the bundler's resolution root or an alias/third-party module import. `createAPIClientFnOptionsModule` is optional; when omitted, it falls back to the client module. You can point it at the same module as `clientModule` when the options factory lives next to the exported client.
+`client` points at the exported precreated client. `factory` points at the generated factory used to create that client. `optionsFactory` points at the function the plugin should call when it emits smaller `qraftAPIClient(...)` helpers.
 
 > Top-level generated clients still tree-shake. Bundlers can drop any generated operation that is never used in a chunk.
 
@@ -359,7 +369,11 @@ Use a named export when possible. `default` export clients are also supported, b
 
 - `resolve` - custom resolver used as a fallback when the bundler cannot resolve a specifier.
 - `include` / `exclude` - filter which files are transformed.
-- `debug` - log skipped files and the reason they were skipped.
+- `diagnostics` - controls unresolved transform candidates:
+  - `'error'` (default) throws when configured source looks transformable but generated metadata or operation ownership cannot be proven.
+  - `'warn'` prints a warning and skips the candidate.
+  - `'off'` skips unresolved candidates silently.
+- `debug` - temporary backward-compatible legacy logging for skipped files and skip reasons.
 
 ## Transformation Examples
 

@@ -17,10 +17,9 @@
 - Session 1 prerequisite: `docs/superpowers/plans/2026-05-16-tree-shaking-session-1-diagnostics-config-normalization.md`
 - Session 1.5 prerequisite: `docs/superpowers/plans/2026-05-16-tree-shaking-session-1-5-public-config-alignment.md`
 
-Run Session 1.5 before this plan if the branch still exposes public
-`createAPIClientFn` / `apiClient` options. This session should consume the new
-`entrypoints` public config shape with `kind: 'clientFactory'` and
-`kind: 'precreatedClient'`.
+Run Session 1.5 before this plan if the branch still exposes legacy top-level
+client-family options. This session should consume the public `entrypoints`
+config shape with `kind: 'clientFactory'` and `kind: 'precreatedClient'`.
 
 Use the master plan as the source for test bodies and type snippets, but
 translate any older public config snippets through the Session 1.5 contract:

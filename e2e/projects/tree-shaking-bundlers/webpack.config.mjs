@@ -3,8 +3,7 @@ import { qraftTreeShakeWebpack } from '@openapi-qraft/tree-shaking-plugin/webpac
 import TerserPlugin from 'terser-webpack-plugin';
 import TsconfigPathsPlugin from 'tsconfig-paths-webpack-plugin';
 import {
-  apiClient,
-  createAPIClientFn,
+  entrypoints,
   getBundlerOutputDir,
   getScenario,
   isExternalModuleRequest,
@@ -101,8 +100,7 @@ export default {
   },
   plugins: [
     qraftTreeShakeWebpack({
-      createAPIClientFn,
-      apiClient,
+      entrypoints,
     }),
   ],
 };

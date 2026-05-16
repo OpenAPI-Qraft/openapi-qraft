@@ -1,6 +1,6 @@
 export {
   bundlers,
-  createAPIClientFn,
+  entrypoints,
   getBundlerOutputDir,
   getBundlePath,
   getScenario,

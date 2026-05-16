@@ -308,78 +308,140 @@ export const scenarios = [
   },
 ];
 
-export const apiClient = [
+const precreatedClientEntrypoints = [
   {
-    client: 'BarrelClient',
-    clientModule: '@/precreated/clients/barrel',
-    createAPIClientFn: 'createBarrelPrecreatedAPIClient',
-    createAPIClientFnModule: '@/precreated/clients/barrel', // re-export of './generated-api/create-barrel-precreated-api-client.ts'
-    createAPIClientFnOptions: 'createBarrelClientOptions',
-    createAPIClientFnOptionsModule: '@/precreated/clients/barrel',
+    kind: 'precreatedClient',
+    client: {
+      exportName: 'BarrelClient',
+      moduleSpecifier: '@/precreated/clients/barrel',
+    },
+    factory: {
+      exportName: 'createBarrelPrecreatedAPIClient',
+      moduleSpecifier: '@/precreated/clients/barrel', // re-export of './generated-api/create-barrel-precreated-api-client.ts'
+    },
+    optionsFactory: {
+      exportName: 'createBarrelClientOptions',
+      moduleSpecifier: '@/precreated/clients/barrel',
+    },
   },
   {
-    client: 'RelativeClient',
-    clientModule: './precreated/clients/file-relative.ts',
-    createAPIClientFn: 'createRelativePrecreatedAPIClient',
-    createAPIClientFnModule:
-      './generated-api/create-relative-precreated-api-client.ts',
-    createAPIClientFnOptions: 'buildRelativeClientOptions',
-    createAPIClientFnOptionsModule: './precreated/options/barrel',
+    kind: 'precreatedClient',
+    client: {
+      exportName: 'RelativeClient',
+      moduleSpecifier: './precreated/clients/file-relative.ts',
+    },
+    factory: {
+      exportName: 'createRelativePrecreatedAPIClient',
+      moduleSpecifier:
+        './generated-api/create-relative-precreated-api-client.ts',
+    },
+    optionsFactory: {
+      exportName: 'buildRelativeClientOptions',
+      moduleSpecifier: './precreated/options/barrel',
+    },
   },
   {
-    client: 'AliasDirectClient',
-    clientModule: '@/precreated/clients/file-alias.ts',
-    createAPIClientFn: 'createAliasDirectPrecreatedAPIClient',
-    createAPIClientFnModule:
-      './generated-api/create-alias-direct-precreated-api-client.ts',
-    createAPIClientFnOptions: 'createAliasDirectClientOptions',
-    createAPIClientFnOptionsModule: '@/precreated/options',
+    kind: 'precreatedClient',
+    client: {
+      exportName: 'AliasDirectClient',
+      moduleSpecifier: '@/precreated/clients/file-alias.ts',
+    },
+    factory: {
+      exportName: 'createAliasDirectPrecreatedAPIClient',
+      moduleSpecifier:
+        './generated-api/create-alias-direct-precreated-api-client.ts',
+    },
+    optionsFactory: {
+      exportName: 'createAliasDirectClientOptions',
+      moduleSpecifier: '@/precreated/options',
+    },
   },
   {
-    client: 'RelativeExtClient',
-    clientModule: './precreated/clients/file-relative-ext.ts',
-    createAPIClientFn: 'createRelativeExtPrecreatedAPIClient',
-    createAPIClientFnModule:
-      './generated-api/create-relative-ts-precreated-api-client.ts',
-    createAPIClientFnOptions: 'createRelativeExtClientOptions',
-    createAPIClientFnOptionsModule: './precreated/options/direct.ts',
+    kind: 'precreatedClient',
+    client: {
+      exportName: 'RelativeExtClient',
+      moduleSpecifier: './precreated/clients/file-relative-ext.ts',
+    },
+    factory: {
+      exportName: 'createRelativeExtPrecreatedAPIClient',
+      moduleSpecifier:
+        './generated-api/create-relative-ts-precreated-api-client.ts',
+    },
+    optionsFactory: {
+      exportName: 'createRelativeExtClientOptions',
+      moduleSpecifier: './precreated/options/direct.ts',
+    },
   },
 ];
 
-export const createAPIClientFn = [
+const clientFactoryEntrypoints = [
   {
-    name: 'createBarrelAPIClient',
-    module: './generated-api',
-    context: 'BarrelAPIClientContext',
+    kind: 'clientFactory',
+    factory: {
+      exportName: 'createBarrelAPIClient',
+      moduleSpecifier: './generated-api',
+    },
+    reactContext: {
+      exportName: 'BarrelAPIClientContext',
+      moduleSpecifier: './generated-api',
+    },
   },
   {
-    name: 'createRelativeAPIClient',
-    module: '@/generated-api/create-relative-api-client',
-    context: 'RelativeAPIClientContext',
-    contextModule: './generated-api/RelativeAPIClientContext',
+    kind: 'clientFactory',
+    factory: {
+      exportName: 'createRelativeAPIClient',
+      moduleSpecifier: '@/generated-api/create-relative-api-client',
+    },
+    reactContext: {
+      exportName: 'RelativeAPIClientContext',
+      moduleSpecifier: './generated-api/RelativeAPIClientContext',
+    },
   },
   {
-    name: 'createRelativeExtAPIClient',
-    module: './generated-api/create-relative-ts-api-client.ts',
-    context: 'RelativeExtAPIClientContext',
-    contextModule: '@/generated-api/RelativeExtAPIClientContext',
+    kind: 'clientFactory',
+    factory: {
+      exportName: 'createRelativeExtAPIClient',
+      moduleSpecifier: './generated-api/create-relative-ts-api-client.ts',
+    },
+    reactContext: {
+      exportName: 'RelativeExtAPIClientContext',
+      moduleSpecifier: '@/generated-api/RelativeExtAPIClientContext',
+    },
   },
   {
-    name: 'createAliasAPIClient',
-    module: '@/generated-api',
-    context: 'AliasAPIClientContext',
-    contextModule: '@/generated-api',
+    kind: 'clientFactory',
+    factory: {
+      exportName: 'createAliasAPIClient',
+      moduleSpecifier: '@/generated-api',
+    },
+    reactContext: {
+      exportName: 'AliasAPIClientContext',
+      moduleSpecifier: '@/generated-api',
+    },
   },
   {
-    name: 'createNodeAPIClient',
-    module: './generated-api/create-node-api-client',
+    kind: 'clientFactory',
+    factory: {
+      exportName: 'createNodeAPIClient',
+      moduleSpecifier: './generated-api/create-node-api-client',
+    },
   },
   {
-    name: 'createAliasDirectAPIClient',
-    module: './generated-api/create-alias-direct-api-client',
-    context: 'AliasDirectAPIClientContext',
-    contextModule: './generated-api/AliasDirectAPIClientContext',
+    kind: 'clientFactory',
+    factory: {
+      exportName: 'createAliasDirectAPIClient',
+      moduleSpecifier: './generated-api/create-alias-direct-api-client',
+    },
+    reactContext: {
+      exportName: 'AliasDirectAPIClientContext',
+      moduleSpecifier: './generated-api/AliasDirectAPIClientContext',
+    },
   },
+];
+
+export const entrypoints = [
+  ...clientFactoryEntrypoints,
+  ...precreatedClientEntrypoints,
 ];
 
 export function getScenario(name) {

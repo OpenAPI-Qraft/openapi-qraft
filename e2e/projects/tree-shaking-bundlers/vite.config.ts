@@ -3,8 +3,7 @@ import { qraftTreeShakeVite } from '@openapi-qraft/tree-shaking-plugin/vite';
 import { defineConfig } from 'vite';
 import { getScenario } from './scripts/scenarios.mjs';
 import {
-  apiClient,
-  createAPIClientFn,
+  entrypoints,
   getBundlerOutputDir,
   isExternalModuleRequest,
 } from './scripts/shared.mjs';
@@ -15,8 +14,7 @@ export default defineConfig(({ mode }) => {
   return {
     plugins: [
       qraftTreeShakeVite({
-        createAPIClientFn,
-        apiClient,
+        entrypoints,
       }),
     ],
     resolve: {
