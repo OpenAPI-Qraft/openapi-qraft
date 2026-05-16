@@ -528,6 +528,7 @@ APIClient.pets.getPets.useQuery();
 `,
       sourceFile,
       {
+        diagnostics: 'off',
         entrypoints: [
           {
             kind: 'precreatedClient',

@@ -311,12 +311,15 @@ export async function createTransformPlan(
         : t.isIdentifier(specifier.imported)
           ? specifier.imported.name
           : specifier.imported.value;
+      const importResolvedId =
+        resolvedId === undefined
+          ? normalizeOptionalResolvedId(await resolveModule(source, id))
+          : resolvedId;
 
       for (const precreated of precreatedOptions) {
         if (precreated.client !== importedName) continue;
         if (
-          precreatedClientResolvedIds.get(precreated) !==
-          (resolvedId ?? null)
+          precreatedClientResolvedIds.get(precreated) !== importResolvedId
         ) {
           continue;
         }
@@ -2048,6 +2051,10 @@ async function resolveFactoryModule(
   resolveModule: QraftModuleAccess['resolve']
 ): Promise<string | null> {
   const resolved = await resolveModule(specifier, importerId);
+  return normalizeOptionalResolvedId(resolved);
+}
+
+function normalizeOptionalResolvedId(resolved: string | null | undefined) {
   return resolved ? normalizeResolvedId(resolved) : null;
 }
 

@@ -81,6 +81,94 @@ createAPIClient().pets.getPets.useQuery();
     ).resolves.toBeNull();
   });
 
+  it('throws by default when a configured precreated transform candidate cannot resolve generated source', async () => {
+    const sourceFile = path.join(
+      await fs.mkdtemp(path.join(os.tmpdir(), 'qraft-tree-shaking-')),
+      'src/App.tsx'
+    );
+
+    await expect(
+      transformQraftTreeShaking(
+        `
+import { APIClient } from './client';
+APIClient.pets.getPets.useQuery();
+`,
+        sourceFile,
+        {
+          entrypoints: [
+            {
+              kind: 'precreatedClient',
+              client: {
+                exportName: 'APIClient',
+                moduleSpecifier: './client',
+              },
+              factory: {
+                exportName: 'createAPIClient',
+                moduleSpecifier: './api',
+              },
+              optionsFactory: {
+                exportName: 'createAPIClientOptions',
+                moduleSpecifier: './client-options',
+              },
+            },
+          ],
+          moduleAccess: {
+            resolve: async (specifier) =>
+              specifier === './client' ? '/virtual/client.ts' : null,
+            load: async () => null,
+          },
+        }
+      )
+    ).rejects.toMatchObject({
+      name: 'QraftTreeShakeError',
+      reason: expect.objectContaining({
+        code: 'entrypoint-source-unavailable',
+      }),
+    });
+  });
+
+  it('skips unresolved precreated transform candidates when diagnostics is off', async () => {
+    const sourceFile = path.join(
+      await fs.mkdtemp(path.join(os.tmpdir(), 'qraft-tree-shaking-')),
+      'src/App.tsx'
+    );
+
+    await expect(
+      transformQraftTreeShaking(
+        `
+import { APIClient } from './client';
+APIClient.pets.getPets.useQuery();
+`,
+        sourceFile,
+        {
+          diagnostics: 'off',
+          entrypoints: [
+            {
+              kind: 'precreatedClient',
+              client: {
+                exportName: 'APIClient',
+                moduleSpecifier: './client',
+              },
+              factory: {
+                exportName: 'createAPIClient',
+                moduleSpecifier: './api',
+              },
+              optionsFactory: {
+                exportName: 'createAPIClientOptions',
+                moduleSpecifier: './client-options',
+              },
+            },
+          ],
+          moduleAccess: {
+            resolve: async (specifier) =>
+              specifier === './client' ? '/virtual/client.ts' : null,
+            load: async () => null,
+          },
+        }
+      )
+    ).resolves.toBeNull();
+  });
+
   it('warns and skips unresolved transform candidates when diagnostics is warn', async () => {
     const sourceFile = path.join(
       await fs.mkdtemp(path.join(os.tmpdir(), 'qraft-tree-shaking-')),
