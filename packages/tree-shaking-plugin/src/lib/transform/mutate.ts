@@ -335,8 +335,7 @@ function insertImports(
   let needsApiRuntimeImport =
     usages.some(
       (usage) => usage.client.runtimeInput.kind === 'optionsFactoryCall'
-    ) ||
-    hasScopeSplitContextUsage;
+    ) || hasScopeSplitContextUsage;
   let needsReactRuntimeImport = false;
   for (const kind of runtimeHelperKindsByClientScopeKey.values()) {
     if (kind === 'api') {
