@@ -1,4 +1,5 @@
 import fs from 'node:fs/promises';
+import os from 'node:os';
 import path from 'node:path';
 import { describe, expect, it, vi } from 'vitest';
 import { transformQraftTreeShaking as transformQraftTreeShakingImpl } from '../../core.js';
@@ -10,6 +11,118 @@ import {
 } from './harness.js';
 
 describe('transformQraftTreeShaking resolution and module access', () => {
+  it('throws by default when a configured transform candidate cannot load generated source', async () => {
+    const sourceFile = path.join(
+      await fs.mkdtemp(path.join(os.tmpdir(), 'qraft-tree-shaking-')),
+      'src/App.tsx'
+    );
+
+    await expect(
+      transformQraftTreeShaking(
+        `
+import { createAPIClient } from './api';
+createAPIClient().pets.getPets.useQuery();
+`,
+        sourceFile,
+        {
+          entrypoints: [
+            {
+              kind: 'clientFactory',
+              factory: {
+                exportName: 'createAPIClient',
+                moduleSpecifier: './api',
+              },
+            },
+          ],
+          moduleAccess: {
+            resolve: async () => '/virtual/api/index.ts',
+            load: async () => null,
+          },
+        }
+      )
+    ).rejects.toMatchObject({
+      name: 'QraftTreeShakeError',
+      reason: expect.objectContaining({
+        code: 'entrypoint-source-unavailable',
+      }),
+    });
+  });
+
+  it('skips unresolved transform candidates when diagnostics is off', async () => {
+    const sourceFile = path.join(
+      await fs.mkdtemp(path.join(os.tmpdir(), 'qraft-tree-shaking-')),
+      'src/App.tsx'
+    );
+
+    await expect(
+      transformQraftTreeShaking(
+        `
+import { createAPIClient } from './api';
+createAPIClient().pets.getPets.useQuery();
+`,
+        sourceFile,
+        {
+          diagnostics: 'off',
+          entrypoints: [
+            {
+              kind: 'clientFactory',
+              factory: {
+                exportName: 'createAPIClient',
+                moduleSpecifier: './api',
+              },
+            },
+          ],
+          moduleAccess: {
+            resolve: async () => '/virtual/api/index.ts',
+            load: async () => null,
+          },
+        }
+      )
+    ).resolves.toBeNull();
+  });
+
+  it('warns and skips unresolved transform candidates when diagnostics is warn', async () => {
+    const sourceFile = path.join(
+      await fs.mkdtemp(path.join(os.tmpdir(), 'qraft-tree-shaking-')),
+      'src/App.tsx'
+    );
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+    try {
+      await expect(
+        transformQraftTreeShaking(
+          `
+import { createAPIClient } from './api';
+createAPIClient().pets.getPets.useQuery();
+`,
+          sourceFile,
+          {
+            diagnostics: 'warn',
+            entrypoints: [
+              {
+                kind: 'clientFactory',
+                factory: {
+                  exportName: 'createAPIClient',
+                  moduleSpecifier: './api',
+                },
+              },
+            ],
+            moduleAccess: {
+              resolve: async () => '/virtual/api/index.ts',
+              load: async () => null,
+            },
+          }
+        )
+      ).resolves.toBeNull();
+
+      expect(warn).toHaveBeenCalledWith(
+        expect.stringContaining('entrypoint-source-unavailable')
+      );
+    } finally {
+      warn.mockRestore();
+    }
+  });
+
   it('uses module access from options by default when creating a transform plan', async () => {
     const fixture = await createFixture();
     const sourceFile = path.join(fixture, 'src/App.tsx');
@@ -119,6 +232,7 @@ export function App() {
 `,
         sourceFile,
         {
+          diagnostics: 'off',
           entrypoints: [
             {
               kind: 'clientFactory',

@@ -128,6 +128,7 @@ api.pets.getPets.schema;
 `,
       sourceFile,
       {
+        diagnostics: 'off',
         entrypoints: [
           {
             kind: 'clientFactory',
