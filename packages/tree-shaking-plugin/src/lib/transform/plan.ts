@@ -3,6 +3,7 @@ import type { QraftModuleAccess } from '../resolvers/common.js';
 import type {
   ClientBinding,
   CreateImportEntry,
+  DiagnosticReason,
   GeneratedClientInfo,
   GeneratedClientMetadata,
   GeneratedInfoRequest,
@@ -16,6 +17,7 @@ import type {
   SchemaUsage,
   TransformPlan,
 } from './types.js';
+import type { DiagnosticReporter } from './diagnostics.js';
 import { dirname, resolve } from 'node:path';
 import { parse } from '@babel/parser';
 import * as traverseModule from '@babel/traverse';
@@ -25,6 +27,7 @@ import {
   callbackNeedsRuntimeContext,
   isSupportedCallbackName,
 } from './callbacks.js';
+import { createDiagnosticReporter } from './diagnostics.js';
 import { normalizeEntrypoints } from './entrypoints.js';
 import { inspectGeneratedEntrypoints } from './generated-metadata.js';
 import {
@@ -44,6 +47,11 @@ type ExportedDeclarationResolution = {
   ast: t.File;
   init: t.Node;
   importBindings: Map<string, { imported: string; resolvedId: string | null }>;
+};
+
+type EntrypointUseSignal = {
+  key: string;
+  bindingNode: t.Node;
 };
 
 /**
@@ -131,30 +139,48 @@ export async function createTransformPlan(
   const servicesDirName = 'services';
   const resolveModule = moduleAccess.resolve;
   const entrypoints = normalizeEntrypoints(options);
+  const diagnostics = createDiagnosticReporter(options);
   const generatedMetadata = await inspectGeneratedEntrypoints({
     importerId: id,
     entrypoints,
     moduleAccess,
   });
   const rawEntrypoints = options.entrypoints ?? [];
-  const factoryOptions = rawEntrypoints
-    .filter((entrypoint) => entrypoint.kind === 'clientFactory')
-    .map((entrypoint) => ({
-      name: entrypoint.factory.exportName,
-      module: entrypoint.factory.moduleSpecifier,
-      context: entrypoint.reactContext?.exportName,
-      contextModule: entrypoint.reactContext?.moduleSpecifier,
-    })) satisfies LegacyQraftFactoryConfig[];
-  const precreatedOptions = rawEntrypoints
-    .filter((entrypoint) => entrypoint.kind === 'precreatedClient')
-    .map((entrypoint) => ({
+  const factoryOptions: LegacyQraftFactoryConfig[] = [];
+  const factoryEntrypointKeys = new Map<LegacyQraftFactoryConfig, string>();
+  const precreatedOptions: LegacyQraftPrecreatedClientConfig[] = [];
+  const precreatedEntrypointKeys = new Map<
+    LegacyQraftPrecreatedClientConfig,
+    string
+  >();
+
+  rawEntrypoints.forEach((entrypoint, index) => {
+    const normalizedEntrypoint = entrypoints[index];
+    if (!normalizedEntrypoint) return;
+
+    if (entrypoint.kind === 'clientFactory') {
+      const factory = {
+        name: entrypoint.factory.exportName,
+        module: entrypoint.factory.moduleSpecifier,
+        context: entrypoint.reactContext?.exportName,
+        contextModule: entrypoint.reactContext?.moduleSpecifier,
+      };
+      factoryOptions.push(factory);
+      factoryEntrypointKeys.set(factory, normalizedEntrypoint.key);
+      return;
+    }
+
+    const precreated = {
       client: entrypoint.client.exportName,
       clientModule: entrypoint.client.moduleSpecifier,
       createAPIClientFn: entrypoint.factory.exportName,
       createAPIClientFnModule: entrypoint.factory.moduleSpecifier,
       createAPIClientFnOptions: entrypoint.optionsFactory.exportName,
       createAPIClientFnOptionsModule: entrypoint.optionsFactory.moduleSpecifier,
-    })) satisfies LegacyQraftPrecreatedClientConfig[];
+    };
+    precreatedOptions.push(precreated);
+    precreatedEntrypointKeys.set(precreated, normalizedEntrypoint.key);
+  });
   const configuredFactoryNames = new Set(
     factoryOptions.map((factory) => factory.name)
   );
@@ -182,8 +208,20 @@ export async function createTransformPlan(
       resolved ? normalizeResolvedId(resolved) : null
     );
   }
+  const precreatedClientResolvedIds = new Map<
+    LegacyQraftPrecreatedClientConfig,
+    string | null
+  >();
+  for (const precreated of precreatedOptions) {
+    precreatedClientResolvedIds.set(
+      precreated,
+      await resolveFactoryModule(precreated.clientModule, id, resolveModule)
+    );
+  }
 
   const createImports = new Map<string, CreateImportEntry>();
+  const factoryImportSignals = new Map<string, EntrypointUseSignal>();
+  const precreatedImportSignals = new Map<string, EntrypointUseSignal>();
   const generatedInfoByImport = new Map<string, GeneratedClientInfo | null>();
   seedGeneratedInfoByImport(
     generatedInfoByImport,
@@ -249,8 +287,55 @@ export async function createTransformPlan(
         factoryFile: resolvedAbs,
         factory: matched,
       });
+      const entrypointKey = factoryEntrypointKeys.get(matched);
+      if (entrypointKey) {
+        factoryImportSignals.set(specifier.local.name, {
+          key: entrypointKey,
+          bindingNode: specifier.local,
+        });
+      }
+    }
+
+    for (const specifier of node.specifiers) {
+      if (
+        !t.isImportSpecifier(specifier) &&
+        !t.isImportDefaultSpecifier(specifier)
+      ) {
+        continue;
+      }
+      if (!t.isIdentifier(specifier.local)) {
+        continue;
+      }
+      const importedName = t.isImportDefaultSpecifier(specifier)
+        ? 'default'
+        : t.isIdentifier(specifier.imported)
+          ? specifier.imported.name
+          : specifier.imported.value;
+
+      for (const precreated of precreatedOptions) {
+        if (precreated.client !== importedName) continue;
+        if (
+          precreatedClientResolvedIds.get(precreated) !==
+          (resolvedId ?? null)
+        ) {
+          continue;
+        }
+
+        const entrypointKey = precreatedEntrypointKeys.get(precreated);
+        if (!entrypointKey) continue;
+        precreatedImportSignals.set(specifier.local.name, {
+          key: entrypointKey,
+          bindingNode: specifier.local,
+        });
+      }
     }
   }
+
+  const usedEntrypointKeys = collectUsedEntrypointKeys(
+    ast,
+    factoryImportSignals,
+    precreatedImportSignals
+  );
 
   const clients: ClientBinding[] = [];
   clients.push(
@@ -701,6 +786,12 @@ export async function createTransformPlan(
     }
   }
 
+  reportUsedUnresolvedEntrypoints(
+    diagnostics,
+    generatedMetadata.reasons,
+    usedEntrypointKeys
+  );
+
   return {
     ast,
     clients,
@@ -715,6 +806,102 @@ export async function createTransformPlan(
     createImports,
     configuredFactoryNames,
   };
+}
+
+function collectUsedEntrypointKeys(
+  ast: t.File,
+  factoryImportSignals: Map<string, EntrypointUseSignal>,
+  precreatedImportSignals: Map<string, EntrypointUseSignal>
+) {
+  const usedEntrypointKeys = new Set<string>();
+  const localClientSignals = new Map<string, EntrypointUseSignal>();
+
+  traverse(ast, {
+    VariableDeclarator(variablePath) {
+      if (!t.isIdentifier(variablePath.node.id)) return;
+      if (!t.isCallExpression(variablePath.node.init)) return;
+      if (!t.isIdentifier(variablePath.node.init.callee)) return;
+
+      const factorySignal = factoryImportSignals.get(
+        variablePath.node.init.callee.name
+      );
+      if (
+        !factorySignal ||
+        !bindingMatches(
+          variablePath,
+          variablePath.node.init.callee.name,
+          factorySignal
+        )
+      ) {
+        return;
+      }
+
+      localClientSignals.set(variablePath.node.id.name, {
+        key: factorySignal.key,
+        bindingNode: variablePath.node.id,
+      });
+    },
+    MemberExpression(memberPath) {
+      collectMemberEntrypointUse(memberPath);
+    },
+    OptionalMemberExpression(memberPath) {
+      collectMemberEntrypointUse(memberPath);
+    },
+  });
+
+  return usedEntrypointKeys;
+
+  function collectMemberEntrypointUse(
+    memberPath: NodePath<t.MemberExpression | t.OptionalMemberExpression>
+  ) {
+    const path = getStaticMemberPath(memberPath.node);
+    if (!path) return;
+
+    const root = getStaticMemberRoot(memberPath.node);
+    if (t.isCallExpression(root) && t.isIdentifier(root.callee)) {
+      const factorySignal = factoryImportSignals.get(root.callee.name);
+      if (
+        factorySignal &&
+        bindingMatches(memberPath, root.callee.name, factorySignal) &&
+        path.length >= 2
+      ) {
+        usedEntrypointKeys.add(factorySignal.key);
+      }
+      return;
+    }
+
+    const clientName = path[0];
+    if (!clientName || path.length < 3) return;
+
+    const clientSignal =
+      localClientSignals.get(clientName) ??
+      precreatedImportSignals.get(clientName);
+    if (!clientSignal || !bindingMatches(memberPath, clientName, clientSignal)) {
+      return;
+    }
+
+    usedEntrypointKeys.add(clientSignal.key);
+  }
+}
+
+function bindingMatches(
+  path: NodePath,
+  name: string,
+  signal: EntrypointUseSignal
+) {
+  return path.scope.getBinding(name)?.identifier === signal.bindingNode;
+}
+
+function reportUsedUnresolvedEntrypoints(
+  diagnostics: DiagnosticReporter,
+  reasons: DiagnosticReason[],
+  usedEntrypointKeys: Set<string>
+) {
+  for (const reason of reasons) {
+    if (!reason.entrypointKey) continue;
+    if (!usedEntrypointKeys.has(reason.entrypointKey)) continue;
+    diagnostics.unresolved(reason);
+  }
 }
 
 async function findPrecreatedClients(

@@ -199,6 +199,7 @@ export function App() {
 `,
       sourceFile,
       {
+        diagnostics: 'off',
         entrypoints: [
           {
             kind: 'clientFactory',
@@ -246,6 +247,7 @@ export function App() {
 `,
       sourceFile,
       {
+        diagnostics: 'off',
         entrypoints: [
           {
             kind: 'clientFactory',
