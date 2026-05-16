@@ -22,6 +22,7 @@ import { dirname, resolve } from 'node:path';
 import { parse } from '@babel/parser';
 import * as traverseModule from '@babel/traverse';
 import * as t from '@babel/types';
+import { resolveDefaultExport } from '../interop/resolve-default-export.js';
 import { createAgnosticModuleAccess } from '../resolvers/agnostic.js';
 import {
   callbackNeedsRuntimeContext,
@@ -2288,18 +2289,4 @@ function scopeContains(
   inner: { start: number; end: number }
 ) {
   return outer.start < inner.start && outer.end > inner.end;
-}
-
-function resolveDefaultExport<T>(module: unknown): T {
-  const firstDefault = (module as { default?: unknown }).default;
-  if (
-    firstDefault &&
-    typeof firstDefault === 'object' &&
-    'default' in (firstDefault as { default?: unknown })
-  ) {
-    const nestedDefault = (firstDefault as { default?: unknown }).default;
-    if (nestedDefault) return nestedDefault as T;
-  }
-  if (firstDefault) return firstDefault as T;
-  return module as T;
 }

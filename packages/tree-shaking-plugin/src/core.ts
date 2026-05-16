@@ -7,6 +7,7 @@ import type {
   QraftResolver,
 } from './lib/resolvers/common.js';
 import * as generateModule from '@babel/generator';
+import { resolveDefaultExport } from './lib/interop/resolve-default-export.js';
 import { createAgnosticModuleAccess } from './lib/resolvers/agnostic.js';
 import { normalizeEntrypoints } from './lib/transform/entrypoints.js';
 import { applyTransformPlan } from './lib/transform/mutate.js';
@@ -123,11 +124,4 @@ export async function transformQraftTreeShaking(
     code: result.code,
     map: result.map,
   };
-}
-
-function resolveDefaultExport<T>(module: unknown): T {
-  const firstDefault = (module as { default?: unknown }).default;
-  const secondDefault = (firstDefault as { default?: unknown } | undefined)
-    ?.default;
-  return (secondDefault ?? firstDefault ?? module) as T;
 }

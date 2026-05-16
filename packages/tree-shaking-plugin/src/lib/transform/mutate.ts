@@ -11,6 +11,7 @@ import type {
 } from './types.js';
 import * as traverseModule from '@babel/traverse';
 import * as t from '@babel/types';
+import { resolveDefaultExport } from '../interop/resolve-default-export.js';
 import {
   callbackNeedsOptions,
   callbackNeedsReactRuntime,
@@ -1075,18 +1076,4 @@ function findFirstGeneratedDeclarationIndex(
   }
 
   return -1;
-}
-
-function resolveDefaultExport<T>(module: unknown): T {
-  const firstDefault = (module as { default?: unknown }).default;
-  if (
-    firstDefault &&
-    typeof firstDefault === 'object' &&
-    'default' in (firstDefault as { default?: unknown })
-  ) {
-    const nestedDefault = (firstDefault as { default?: unknown }).default;
-    if (nestedDefault) return nestedDefault as T;
-  }
-  if (firstDefault) return firstDefault as T;
-  return module as T;
 }
