@@ -27,7 +27,17 @@ export function App() {
 }
 `,
       sourceFile,
-      { createAPIClientFn: [{ name: 'createAPIClient', module: './api' }] }
+      {
+        entrypoints: [
+          {
+            kind: 'clientFactory',
+            factory: {
+              exportName: 'createAPIClient',
+              moduleSpecifier: './api',
+            },
+          },
+        ],
+      }
     );
 
     expect(result?.code).toMatchInlineSnapshot(`
@@ -64,14 +74,21 @@ export function App() {
 `,
       sourceFile,
       {
-        apiClient: [
+        entrypoints: [
           {
-            client: 'APIClient',
-            clientModule: './client',
-            createAPIClientFn: 'createAPIClient',
-            createAPIClientFnModule: './api',
-            createAPIClientFnOptions: 'createAPIClientOptions',
-            createAPIClientFnOptionsModule: './client-options',
+            kind: 'precreatedClient',
+            client: {
+              exportName: 'APIClient',
+              moduleSpecifier: './client',
+            },
+            factory: {
+              exportName: 'createAPIClient',
+              moduleSpecifier: './api',
+            },
+            optionsFactory: {
+              exportName: 'createAPIClientOptions',
+              moduleSpecifier: './client-options',
+            },
           },
         ],
       }
@@ -111,8 +128,14 @@ api.pets.getPets.schema;
 `,
       sourceFile,
       {
-        createAPIClientFn: [
-          { name: 'createAPIClient', module: './api/createAPIClient' },
+        entrypoints: [
+          {
+            kind: 'clientFactory',
+            factory: {
+              exportName: 'createAPIClient',
+              moduleSpecifier: './api/createAPIClient',
+            },
+          },
         ],
       }
     );
@@ -167,17 +190,28 @@ APIClient.pets.getPets.schema;
 `,
       sourceFile,
       {
-        createAPIClientFn: [
-          { name: 'createAPIClient', module: './context-api' },
-        ],
-        apiClient: [
+        entrypoints: [
           {
-            client: 'APIClient',
-            clientModule: './client',
-            createAPIClientFn: 'createAPIClient',
-            createAPIClientFnModule: './precreated-api',
-            createAPIClientFnOptions: 'createAPIClientOptions',
-            createAPIClientFnOptionsModule: './precreated-client-options',
+            kind: 'clientFactory',
+            factory: {
+              exportName: 'createAPIClient',
+              moduleSpecifier: './context-api',
+            },
+          },
+          {
+            kind: 'precreatedClient',
+            client: {
+              exportName: 'APIClient',
+              moduleSpecifier: './client',
+            },
+            factory: {
+              exportName: 'createAPIClient',
+              moduleSpecifier: './precreated-api',
+            },
+            optionsFactory: {
+              exportName: 'createAPIClientOptions',
+              moduleSpecifier: './precreated-client-options',
+            },
           },
         ],
       }

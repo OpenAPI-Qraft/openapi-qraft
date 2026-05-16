@@ -26,7 +26,15 @@ export function App() {
 `,
         sourceFile,
         {
-          createAPIClientFn: [{ name: 'createAPIClient', module: './api' }],
+          entrypoints: [
+            {
+              kind: 'clientFactory',
+              factory: {
+                exportName: 'createAPIClient',
+                moduleSpecifier: './api',
+              },
+            },
+          ],
           moduleAccess: {
             resolve: fixtureModuleAccess.resolve,
             load,

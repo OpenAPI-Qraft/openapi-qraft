@@ -59,21 +59,31 @@ export function App() {
 `,
       sourceFile,
       {
-        createAPIClientFn: [
+        entrypoints: [
           {
-            name: 'createAPIClient',
-            module: './context-api',
-            context: 'ContextAPIClientContext',
+            kind: 'clientFactory',
+            factory: {
+              exportName: 'createAPIClient',
+              moduleSpecifier: './context-api',
+            },
+            reactContext: {
+              exportName: 'ContextAPIClientContext',
+            },
           },
-        ],
-        apiClient: [
           {
-            client: 'APIClient',
-            clientModule: './precreated-client',
-            createAPIClientFn: 'createAPIClient',
-            createAPIClientFnModule: './precreated-api',
-            createAPIClientFnOptions: 'createAPIClientOptions',
-            createAPIClientFnOptionsModule: './precreated-client-options',
+            kind: 'precreatedClient',
+            client: {
+              exportName: 'APIClient',
+              moduleSpecifier: './precreated-client',
+            },
+            factory: {
+              exportName: 'createAPIClient',
+              moduleSpecifier: './precreated-api',
+            },
+            optionsFactory: {
+              exportName: 'createAPIClientOptions',
+              moduleSpecifier: './precreated-client-options',
+            },
           },
         ],
       }
@@ -109,7 +119,7 @@ export function App() {
     `);
   });
 
-  it('supports context-based and explicit-options createAPIClientFn clients in one file', async () => {
+  it('supports context-based and explicit-options client factory entrypoints in one file', async () => {
     const fixture = await fs.mkdtemp(
       path.join(os.tmpdir(), 'qraft-tree-shaking-')
     );
@@ -142,11 +152,16 @@ export function App() {
 `,
       sourceFile,
       {
-        createAPIClientFn: [
+        entrypoints: [
           {
-            name: 'createAPIClient',
-            module: './api',
-            context: 'APIClientContext',
+            kind: 'clientFactory',
+            factory: {
+              exportName: 'createAPIClient',
+              moduleSpecifier: './api',
+            },
+            reactContext: {
+              exportName: 'APIClientContext',
+            },
           },
         ],
       }
@@ -221,21 +236,31 @@ export function App() {
 `,
       sourceFile,
       {
-        createAPIClientFn: [
+        entrypoints: [
           {
-            name: 'createAPIClient',
-            module: './context-api',
-            context: 'ContextAPIClientContext',
+            kind: 'clientFactory',
+            factory: {
+              exportName: 'createAPIClient',
+              moduleSpecifier: './context-api',
+            },
+            reactContext: {
+              exportName: 'ContextAPIClientContext',
+            },
           },
-        ],
-        apiClient: [
           {
-            client: 'APIClient',
-            clientModule: './precreated-client',
-            createAPIClientFn: 'createAPIClient',
-            createAPIClientFnModule: './precreated-api',
-            createAPIClientFnOptions: 'createAPIClientOptions',
-            createAPIClientFnOptionsModule: './precreated-client-options',
+            kind: 'precreatedClient',
+            client: {
+              exportName: 'APIClient',
+              moduleSpecifier: './precreated-client',
+            },
+            factory: {
+              exportName: 'createAPIClient',
+              moduleSpecifier: './precreated-api',
+            },
+            optionsFactory: {
+              exportName: 'createAPIClientOptions',
+              moduleSpecifier: './precreated-client-options',
+            },
           },
         ],
       }
@@ -271,7 +296,7 @@ export function App() {
     `);
   });
 
-  it('supports top-level createAPIClientFn and precreated apiClient clients in one file', async () => {
+  it('supports top-level client factory and precreated client entrypoints in one file', async () => {
     const root = await fs.mkdtemp(
       path.join(os.tmpdir(), 'qraft-tree-shaking-')
     );
@@ -310,21 +335,31 @@ APIClient.stores.getStores.getQueryKey();
 `,
       sourceFile,
       {
-        createAPIClientFn: [
+        entrypoints: [
           {
-            name: 'createAPIClient',
-            module: './context-api',
-            context: 'ContextAPIClientContext',
+            kind: 'clientFactory',
+            factory: {
+              exportName: 'createAPIClient',
+              moduleSpecifier: './context-api',
+            },
+            reactContext: {
+              exportName: 'ContextAPIClientContext',
+            },
           },
-        ],
-        apiClient: [
           {
-            client: 'APIClient',
-            clientModule: './precreated-client',
-            createAPIClientFn: 'createAPIClient',
-            createAPIClientFnModule: './precreated-api',
-            createAPIClientFnOptions: 'createAPIClientOptions',
-            createAPIClientFnOptionsModule: './precreated-client-options',
+            kind: 'precreatedClient',
+            client: {
+              exportName: 'APIClient',
+              moduleSpecifier: './precreated-client',
+            },
+            factory: {
+              exportName: 'createAPIClient',
+              moduleSpecifier: './precreated-api',
+            },
+            optionsFactory: {
+              exportName: 'createAPIClientOptions',
+              moduleSpecifier: './precreated-client-options',
+            },
           },
         ],
       }
@@ -355,7 +390,7 @@ APIClient.stores.getStores.getQueryKey();
     `);
   });
 
-  it('supports createAPIClientFn and precreated apiClient clients in one file', async () => {
+  it('supports client factory and precreated client entrypoints in one file', async () => {
     const root = await fs.mkdtemp(
       path.join(os.tmpdir(), 'qraft-tree-shaking-')
     );
@@ -403,21 +438,31 @@ export function App() {
 `,
       sourceFile,
       {
-        createAPIClientFn: [
+        entrypoints: [
           {
-            name: 'createAPIClient',
-            module: './context-api',
-            context: 'ContextAPIClientContext',
+            kind: 'clientFactory',
+            factory: {
+              exportName: 'createAPIClient',
+              moduleSpecifier: './context-api',
+            },
+            reactContext: {
+              exportName: 'ContextAPIClientContext',
+            },
           },
-        ],
-        apiClient: [
           {
-            client: 'APIClient',
-            clientModule: './precreated-client',
-            createAPIClientFn: 'createAPIClient',
-            createAPIClientFnModule: './precreated-api',
-            createAPIClientFnOptions: 'createAPIClientOptions',
-            createAPIClientFnOptionsModule: './precreated-client-options',
+            kind: 'precreatedClient',
+            client: {
+              exportName: 'APIClient',
+              moduleSpecifier: './precreated-client',
+            },
+            factory: {
+              exportName: 'createAPIClient',
+              moduleSpecifier: './precreated-api',
+            },
+            optionsFactory: {
+              exportName: 'createAPIClientOptions',
+              moduleSpecifier: './precreated-client-options',
+            },
           },
         ],
       }
@@ -502,21 +547,31 @@ export function App() {
 `,
       sourceFile,
       {
-        createAPIClientFn: [
+        entrypoints: [
           {
-            name: 'createAPIClient',
-            module: './context-api',
-            context: 'ContextAPIClientContext',
+            kind: 'clientFactory',
+            factory: {
+              exportName: 'createAPIClient',
+              moduleSpecifier: './context-api',
+            },
+            reactContext: {
+              exportName: 'ContextAPIClientContext',
+            },
           },
-        ],
-        apiClient: [
           {
-            client: 'APIClient',
-            clientModule: './precreated-client',
-            createAPIClientFn: 'createAPIClient',
-            createAPIClientFnModule: './precreated-api',
-            createAPIClientFnOptions: 'createAPIClientOptions',
-            createAPIClientFnOptionsModule: './precreated-client-options',
+            kind: 'precreatedClient',
+            client: {
+              exportName: 'APIClient',
+              moduleSpecifier: './precreated-client',
+            },
+            factory: {
+              exportName: 'createAPIClient',
+              moduleSpecifier: './precreated-api',
+            },
+            optionsFactory: {
+              exportName: 'createAPIClientOptions',
+              moduleSpecifier: './precreated-client-options',
+            },
           },
         ],
       }
@@ -595,21 +650,31 @@ export function App() {
 `,
       sourceFile,
       {
-        createAPIClientFn: [
+        entrypoints: [
           {
-            name: 'createAPIClient',
-            module: './context-api',
-            context: 'ContextAPIClientContext',
+            kind: 'clientFactory',
+            factory: {
+              exportName: 'createAPIClient',
+              moduleSpecifier: './context-api',
+            },
+            reactContext: {
+              exportName: 'ContextAPIClientContext',
+            },
           },
-        ],
-        apiClient: [
           {
-            client: 'APIClient',
-            clientModule: './precreated-client',
-            createAPIClientFn: 'createAPIClient',
-            createAPIClientFnModule: './precreated-api',
-            createAPIClientFnOptions: 'createAPIClientOptions',
-            createAPIClientFnOptionsModule: './precreated-client-options',
+            kind: 'precreatedClient',
+            client: {
+              exportName: 'APIClient',
+              moduleSpecifier: './precreated-client',
+            },
+            factory: {
+              exportName: 'createAPIClient',
+              moduleSpecifier: './precreated-api',
+            },
+            optionsFactory: {
+              exportName: 'createAPIClientOptions',
+              moduleSpecifier: './precreated-client-options',
+            },
           },
         ],
       }
@@ -688,21 +753,31 @@ export function App() {
 `,
       sourceFile,
       {
-        createAPIClientFn: [
+        entrypoints: [
           {
-            name: 'createAPIClient',
-            module: './context-api',
-            context: 'ContextAPIClientContext',
+            kind: 'clientFactory',
+            factory: {
+              exportName: 'createAPIClient',
+              moduleSpecifier: './context-api',
+            },
+            reactContext: {
+              exportName: 'ContextAPIClientContext',
+            },
           },
-        ],
-        apiClient: [
           {
-            client: 'APIClient',
-            clientModule: './precreated-client',
-            createAPIClientFn: 'createAPIClient',
-            createAPIClientFnModule: './precreated-api',
-            createAPIClientFnOptions: 'createAPIClientOptions',
-            createAPIClientFnOptionsModule: './precreated-client-options',
+            kind: 'precreatedClient',
+            client: {
+              exportName: 'APIClient',
+              moduleSpecifier: './precreated-client',
+            },
+            factory: {
+              exportName: 'createAPIClient',
+              moduleSpecifier: './precreated-api',
+            },
+            optionsFactory: {
+              exportName: 'createAPIClientOptions',
+              moduleSpecifier: './precreated-client-options',
+            },
           },
         ],
       }

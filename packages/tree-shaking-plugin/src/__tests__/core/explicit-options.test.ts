@@ -44,11 +44,16 @@ function PetUpdateForm({ petId }: { petId: number }) {
 `,
       sourceFile,
       {
-        createAPIClientFn: [
+        entrypoints: [
           {
-            name: 'createAPIClient',
-            module: './api',
-            context: 'APIClientContext',
+            kind: 'clientFactory',
+            factory: {
+              exportName: 'createAPIClient',
+              moduleSpecifier: './api',
+            },
+            reactContext: {
+              exportName: 'APIClientContext',
+            },
           },
         ],
       }
@@ -144,11 +149,16 @@ function PetUpdateForm() {
 `,
       sourceFile,
       {
-        createAPIClientFn: [
+        entrypoints: [
           {
-            name: 'createAPIClient',
-            module: './api',
-            context: 'APIClientContext',
+            kind: 'clientFactory',
+            factory: {
+              exportName: 'createAPIClient',
+              moduleSpecifier: './api',
+            },
+            reactContext: {
+              exportName: 'APIClientContext',
+            },
           },
         ],
       }
@@ -234,11 +244,16 @@ function PetUpdateForm({ petId }: { petId: number }) {
 `,
       sourceFile,
       {
-        createAPIClientFn: [
+        entrypoints: [
           {
-            name: 'createAPIClient',
-            module: './api',
-            context: 'APIClientContext',
+            kind: 'clientFactory',
+            factory: {
+              exportName: 'createAPIClient',
+              moduleSpecifier: './api',
+            },
+            reactContext: {
+              exportName: 'APIClientContext',
+            },
           },
         ],
       }
@@ -368,11 +383,16 @@ function PetUpdateForm({ petId }: { petId: number }) {
 `,
       sourceFile,
       {
-        createAPIClientFn: [
+        entrypoints: [
           {
-            name: 'createAPIClient',
-            module: './api',
-            context: 'APIClientContext',
+            kind: 'clientFactory',
+            factory: {
+              exportName: 'createAPIClient',
+              moduleSpecifier: './api',
+            },
+            reactContext: {
+              exportName: 'APIClientContext',
+            },
           },
         ],
       }
@@ -460,11 +480,16 @@ async function run() {
 `,
       sourceFile,
       {
-        createAPIClientFn: [
+        entrypoints: [
           {
-            name: 'createAPIClient',
-            module: './api',
-            context: 'APIClientContext',
+            kind: 'clientFactory',
+            factory: {
+              exportName: 'createAPIClient',
+              moduleSpecifier: './api',
+            },
+            reactContext: {
+              exportName: 'APIClientContext',
+            },
           },
         ],
       }
@@ -511,11 +536,16 @@ async function loadPets() {
 `,
       sourceFile,
       {
-        createAPIClientFn: [
+        entrypoints: [
           {
-            name: 'createAPIClient',
-            module: './api',
-            context: 'APIClientContext',
+            kind: 'clientFactory',
+            factory: {
+              exportName: 'createAPIClient',
+              moduleSpecifier: './api',
+            },
+            reactContext: {
+              exportName: 'APIClientContext',
+            },
           },
         ],
       }

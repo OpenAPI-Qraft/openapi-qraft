@@ -19,11 +19,16 @@ api.pets.getPets.useQuery();
 `,
       sourceFile,
       {
-        createAPIClientFn: [
+        entrypoints: [
           {
-            name: 'createAPIClient',
-            module: './api',
-            context: 'APIClientContext',
+            kind: 'clientFactory',
+            factory: {
+              exportName: 'createAPIClient',
+              moduleSpecifier: './api',
+            },
+            reactContext: {
+              exportName: 'APIClientContext',
+            },
           },
         ],
       }
@@ -60,11 +65,16 @@ api.pets.getPets.useQuery();
 `,
       sourceFile,
       {
-        createAPIClientFn: [
+        entrypoints: [
           {
-            name: 'createAPIClient',
-            module: './api',
-            context: 'APIClientContext',
+            kind: 'clientFactory',
+            factory: {
+              exportName: 'createAPIClient',
+              moduleSpecifier: './api',
+            },
+            reactContext: {
+              exportName: 'APIClientContext',
+            },
           },
         ],
       }
@@ -89,11 +99,16 @@ api.pets['getPets'].useQuery();
 `,
       sourceFile,
       {
-        createAPIClientFn: [
+        entrypoints: [
           {
-            name: 'createAPIClient',
-            module: './api',
-            context: 'APIClientContext',
+            kind: 'clientFactory',
+            factory: {
+              exportName: 'createAPIClient',
+              moduleSpecifier: './api',
+            },
+            reactContext: {
+              exportName: 'APIClientContext',
+            },
           },
         ],
       }
@@ -117,11 +132,16 @@ pets.getPets.useQuery();
 `,
       sourceFile,
       {
-        createAPIClientFn: [
+        entrypoints: [
           {
-            name: 'createAPIClient',
-            module: './api',
-            context: 'APIClientContext',
+            kind: 'clientFactory',
+            factory: {
+              exportName: 'createAPIClient',
+              moduleSpecifier: './api',
+            },
+            reactContext: {
+              exportName: 'APIClientContext',
+            },
           },
         ],
       }
@@ -144,11 +164,16 @@ api?.pets?.getPets?.useQuery();
 `,
       sourceFile,
       {
-        createAPIClientFn: [
+        entrypoints: [
           {
-            name: 'createAPIClient',
-            module: './api',
-            context: 'APIClientContext',
+            kind: 'clientFactory',
+            factory: {
+              exportName: 'createAPIClient',
+              moduleSpecifier: './api',
+            },
+            reactContext: {
+              exportName: 'APIClientContext',
+            },
           },
         ],
       }

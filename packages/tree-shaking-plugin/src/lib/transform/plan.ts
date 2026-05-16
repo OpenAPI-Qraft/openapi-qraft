@@ -6,10 +6,10 @@ import type {
   GeneratedClientInfo,
   GeneratedInfoRequest,
   InlineImportRequest,
-  OperationImportInfo,
-  OperationUsage,
   LegacyQraftFactoryConfig,
   LegacyQraftPrecreatedClientConfig,
+  OperationImportInfo,
+  OperationUsage,
   QraftTreeShakeOptions,
   RuntimeLocalNames,
   SchemaUsage,
@@ -127,8 +127,25 @@ export async function createTransformPlan(
 ): Promise<TransformPlan> {
   const servicesDirName = 'services';
   const resolveModule = moduleAccess.resolve;
-  const factoryOptions = options.createAPIClientFn ?? [];
-  const precreatedOptions = options.apiClient ?? [];
+  const entrypoints = options.entrypoints ?? [];
+  const factoryOptions = entrypoints
+    .filter((entrypoint) => entrypoint.kind === 'clientFactory')
+    .map((entrypoint) => ({
+      name: entrypoint.factory.exportName,
+      module: entrypoint.factory.moduleSpecifier,
+      context: entrypoint.reactContext?.exportName,
+      contextModule: entrypoint.reactContext?.moduleSpecifier,
+    })) satisfies LegacyQraftFactoryConfig[];
+  const precreatedOptions = entrypoints
+    .filter((entrypoint) => entrypoint.kind === 'precreatedClient')
+    .map((entrypoint) => ({
+      client: entrypoint.client.exportName,
+      clientModule: entrypoint.client.moduleSpecifier,
+      createAPIClientFn: entrypoint.factory.exportName,
+      createAPIClientFnModule: entrypoint.factory.moduleSpecifier,
+      createAPIClientFnOptions: entrypoint.optionsFactory.exportName,
+      createAPIClientFnOptionsModule: entrypoint.optionsFactory.moduleSpecifier,
+    })) satisfies LegacyQraftPrecreatedClientConfig[];
   const configuredFactoryNames = new Set(
     factoryOptions.map((factory) => factory.name)
   );
@@ -144,10 +161,7 @@ export async function createTransformPlan(
   }
   const activeProgramScope = programScope;
 
-  const factoryResolvedIds = new Map<
-    LegacyQraftFactoryConfig,
-    string | null
-  >();
+  const factoryResolvedIds = new Map<LegacyQraftFactoryConfig, string | null>();
   for (const factory of factoryOptions) {
     const resolved = await resolveFactoryModule(
       factory.module,
