@@ -15,9 +15,12 @@
 - Master plan: `docs/superpowers/plans/2026-05-16-tree-shaking-plugin-pipeline-architecture.md`
 - Design spec: `docs/superpowers/specs/2026-05-16-tree-shaking-plugin-pipeline-architecture-design.md`
 - Session 1 prerequisite: `docs/superpowers/plans/2026-05-16-tree-shaking-session-1-diagnostics-config-normalization.md`
+- Session 1.5 prerequisite: `docs/superpowers/plans/2026-05-16-tree-shaking-session-1-5-public-config-alignment.md`
 - Session 2 prerequisite: `docs/superpowers/plans/2026-05-16-tree-shaking-session-2-source-gate-generated-metadata.md`
 
-Use the master plan as the source for exact test bodies and type snippets:
+Use the master plan as the source for test bodies and type snippets, but
+translate any older public config snippets through the Session 1.5 contract:
+`entrypoints` with `kind: 'clientFactory' | 'precreatedClient'`.
 
 - Task 5: `Route Planner Through Normalized Entrypoints And Metadata`
 - Task 6: `Enforce Diagnostics In Core Transform Behavior`

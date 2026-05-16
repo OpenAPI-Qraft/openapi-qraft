@@ -253,16 +253,41 @@ QraftTreeShakeOptions
 
 This is the only layer that understands the external config shape.
 
-It converts current and future public options into a single internal
-`ClientEntrypoint[]` model. Existing capabilities remain supported:
+It converts public options into a single internal `ClientEntrypoint[]` model.
+Existing capabilities remain supported:
 
 - generated factory config;
 - pre-created client export config;
 - options factory config for pre-created clients;
-- context/contextModule config;
+- generated React context config;
 - app-facing module specifiers.
 
-Downstream layers should not read `createAPIClientFn` or `apiClient` directly.
+The target public config should use the same naming model as normalized
+entrypoints:
+
+```ts
+type QraftTreeShakeOptions = {
+  entrypoints?: Array<
+    | {
+        kind: 'clientFactory';
+        factory: ModuleExportTarget;
+        reactContext?: {
+          exportName: string;
+          moduleSpecifier?: string;
+        };
+      }
+    | {
+        kind: 'precreatedClient';
+        client: ModuleExportTarget;
+        factory: ModuleExportTarget;
+        optionsFactory: ModuleExportTarget;
+      }
+  >;
+};
+```
+
+Downstream layers should not read old `createAPIClientFn` or `apiClient`
+config directly.
 They should consume normalized entrypoints.
 
 ### `shouldInspectSource`
@@ -408,7 +433,7 @@ Do not delete these capabilities:
 - generated factory configuration;
 - pre-created client configuration;
 - options factory configuration;
-- context/contextModule configuration;
+- generated React context configuration;
 - strict skip for factories without static service ownership.
 
 ## Testing Strategy
@@ -436,9 +461,11 @@ reviewed against the transform contract above.
 
 Add focused tests for config normalization:
 
-- current `createAPIClientFn` config normalizes to `generatedFactory`;
-- current `apiClient` config normalizes to `precreatedClient`;
-- `context` and `contextModule` normalize into `ReactContextConfig`;
+- public `entrypoints` items with `kind: 'clientFactory'` normalize to
+  `generatedFactory`;
+- public `entrypoints` items with `kind: 'precreatedClient'` normalize to
+  `precreatedClient`;
+- `reactContext` normalizes into `ReactContextConfig`;
 - options factory module fallback is normalized once at the boundary.
 
 ### Generated Metadata Tests

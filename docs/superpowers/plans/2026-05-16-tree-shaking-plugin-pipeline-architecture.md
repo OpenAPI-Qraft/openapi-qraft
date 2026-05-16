@@ -89,6 +89,8 @@ Use these smaller plans for separate implementation sessions:
 
 - Session 1: `docs/superpowers/plans/2026-05-16-tree-shaking-session-1-diagnostics-config-normalization.md`
   - diagnostics policy and public config normalization;
+- Session 1.5: `docs/superpowers/plans/2026-05-16-tree-shaking-session-1-5-public-config-alignment.md`
+  - breaking public config alignment to `entrypoints` with discriminated kinds;
 - Session 2: `docs/superpowers/plans/2026-05-16-tree-shaking-session-2-source-gate-generated-metadata.md`
   - pre-parse source gate and generated metadata inspection;
 - Session 3: `docs/superpowers/plans/2026-05-16-tree-shaking-session-3-planner-mutator-normalized-model.md`
@@ -97,6 +99,13 @@ Use these smaller plans for separate implementation sessions:
 - Session 4: `docs/superpowers/plans/2026-05-16-tree-shaking-session-4-debt-docs-final-verification.md`
   - debt deletion, README/test-guide docs, and final verification.
 
+Session 1 was implemented before the final public config naming decision. Treat
+Session 1.5 as the source of truth for public config shape: new work must use
+`entrypoints` with `kind: 'clientFactory' | 'precreatedClient'`. Older
+`createAPIClientFn` / `apiClient` snippets in historical task bodies describe
+the pre-alignment implementation state and must be translated through Session
+1.5 when reused.
+
 ## File Structure
 
 - Create: `packages/tree-shaking-plugin/src/lib/transform/diagnostics.ts`
@@ -104,7 +113,7 @@ Use these smaller plans for separate implementation sessions:
 - Create: `packages/tree-shaking-plugin/src/lib/transform/diagnostics.test.ts`
   - Unit tests for default error behavior, warn/off policy, and ordinary silent skips.
 - Create: `packages/tree-shaking-plugin/src/lib/transform/entrypoints.ts`
-  - Converts public `createAPIClientFn` and `apiClient` config into normalized `ClientEntrypoint[]`.
+  - Converts public `entrypoints` config into normalized `ClientEntrypoint[]`.
 - Create: `packages/tree-shaking-plugin/src/lib/transform/entrypoints.test.ts`
   - Unit tests for config normalization.
 - Create: `packages/tree-shaking-plugin/src/lib/transform/source-gate.ts`
@@ -120,7 +129,7 @@ Use these smaller plans for separate implementation sessions:
 - Modify: `packages/tree-shaking-plugin/src/core.ts`
   - Wire diagnostics, entrypoint normalization, pre-parse gate, and generated metadata cache into transform orchestration.
 - Modify: `packages/tree-shaking-plugin/src/lib/transform/plan.ts`
-  - Consume normalized entrypoints and generated metadata; remove direct deep reads of `QraftTreeShakeOptions.createAPIClientFn` / `apiClient` where possible.
+  - Consume normalized entrypoints and generated metadata; remove direct deep reads of public config fields where possible.
 - Modify: `packages/tree-shaking-plugin/src/lib/transform/mutate.ts`
   - Prefer normalized runtime input over `hasExplicitContext` and legacy mode branching where possible in this phase.
 - Modify: `packages/tree-shaking-plugin/src/__tests__/core/*.test.ts`
@@ -1819,5 +1828,5 @@ Expected: one docs commit.
 
 - Spec coverage: The plan covers transform contract enforcement, diagnostics, entrypoint normalization, source gating, generated metadata inspection, normalized runtime inputs, test updates, README docs, package verification, and e2e verification.
 - Scope control: The plan does not implement a generated manifest, automatic dev/build detection, optional-chain transforms, computed-property transforms, public generated-client type changes, or a full `TransformEditPlan` rewrite.
-- Capability preservation: Generated factory config, pre-created client config, options factory config, context/contextModule config, schema rewrites, explicit options rewrites, and strict services ownership rules remain supported.
+- Capability preservation: Generated factory config, pre-created client config, options factory config, generated React context config, schema rewrites, explicit options rewrites, and strict services ownership rules remain supported.
 - Risk checkpoints: Each major layer has focused tests before implementation and a commit after passing verification.
