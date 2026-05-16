@@ -62,7 +62,6 @@ export type QraftTreeShakeOptions = {
   include?: FilterPattern;
   exclude?: FilterPattern;
   diagnostics?: DiagnosticsLevel;
-  debug?: boolean;
 };
 
 type GenerateFn = (typeof import('@babel/generator'))['default'];

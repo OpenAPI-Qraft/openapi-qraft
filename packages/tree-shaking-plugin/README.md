@@ -375,9 +375,6 @@ entrypoints: [
   - `'warn'` prints a warning and skips the candidate.
   - `'off'` skips unresolved candidates silently.
 
-Legacy compatibility: `debug?: boolean` is still accepted for migration from
-early plugin builds. New configs should use `diagnostics`.
-
 ## Transformation Examples
 
 ### Context-based factories
