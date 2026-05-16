@@ -57,6 +57,5 @@ function normalizeDiagnosticsLevel(
   options: Pick<QraftTreeShakeOptions, 'diagnostics' | 'debug'>
 ): DiagnosticsLevel {
   if (options.diagnostics) return options.diagnostics;
-  if (options.debug) return 'warn';
   return 'error';
 }
