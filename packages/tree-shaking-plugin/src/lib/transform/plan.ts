@@ -258,6 +258,7 @@ export async function createTransformPlan(
       ast,
       id,
       precreatedOptions,
+      generatedMetadata.metadataByEntrypointKey,
       moduleAccess,
       activeProgramScope,
       options.debug
@@ -703,6 +704,7 @@ async function findPrecreatedClients(
   ast: t.File,
   importerId: string,
   configs: LegacyQraftPrecreatedClientConfig[],
+  metadataByEntrypointKey: Map<string, GeneratedClientMetadata | null>,
   moduleAccess: QraftModuleAccess,
   programScope: Scope,
   debug = false
@@ -751,6 +753,7 @@ async function findPrecreatedClients(
         factoryResolvedId: factoryFile
           ? normalizeResolvedId(factoryFile)
           : null,
+        metadata: findPrecreatedMetadata(config, metadataByEntrypointKey),
         optionsImportPath,
       };
     })
@@ -787,8 +790,8 @@ async function findPrecreatedClients(
           specifier.imported.name === item.config.client
         );
       });
-      if (!match?.clientFile || !match.factoryFile) continue;
-      if (!match.factoryResolvedId) continue;
+      const factoryFile = match?.metadata?.factoryFile ?? match?.factoryFile;
+      if (!match?.clientFile || !factoryFile) continue;
       if (
         !t.isImportDefaultSpecifier(specifier) &&
         !t.isImportSpecifier(specifier)
@@ -799,13 +802,24 @@ async function findPrecreatedClients(
 
       let validatedConfig = validated.get(match.config);
       if (validatedConfig === undefined) {
-        validatedConfig = await validatePrecreatedClientConfig(
-          match.config,
-          match.clientFile,
-          match.factoryResolvedId,
-          moduleAccess,
-          debug
-        );
+        if (match.metadata) {
+          validatedConfig = {
+            factory: {
+              name: match.metadata.entrypoint.factory.exportName,
+              module: match.metadata.entrypoint.factory.moduleSpecifier,
+            },
+          };
+        } else if (match.factoryResolvedId) {
+          validatedConfig = await validatePrecreatedClientConfig(
+            match.config,
+            match.clientFile,
+            match.factoryResolvedId,
+            moduleAccess,
+            debug
+          );
+        } else {
+          validatedConfig = null;
+        }
         validated.set(match.config, validatedConfig);
       }
       if (!validatedConfig) continue;
@@ -819,11 +833,11 @@ async function findPrecreatedClients(
       clients.push({
         name: specifier.local.name,
         clientSourceKey: getClientSourceKey(
-          match.factoryFile,
+          factoryFile,
           validatedConfig.factory,
           mode
         ),
-        createImportPath: match.factoryFile,
+        createImportPath: factoryFile,
         hasExplicitContext: false,
         factory: validatedConfig.factory,
         bindingNode: specifier.local,
@@ -834,6 +848,30 @@ async function findPrecreatedClients(
   }
 
   return clients;
+}
+
+function findPrecreatedMetadata(
+  config: LegacyQraftPrecreatedClientConfig,
+  metadataByEntrypointKey: Map<string, GeneratedClientMetadata | null>
+) {
+  for (const metadata of metadataByEntrypointKey.values()) {
+    if (!metadata || metadata.entrypoint.kind !== 'precreatedClient') continue;
+    const { entrypoint } = metadata;
+    if (
+      entrypoint.client.exportName === config.client &&
+      entrypoint.client.moduleSpecifier === config.clientModule &&
+      entrypoint.factory.exportName === config.createAPIClientFn &&
+      entrypoint.factory.moduleSpecifier === config.createAPIClientFnModule &&
+      entrypoint.optionsFactory.exportName ===
+        config.createAPIClientFnOptions &&
+      entrypoint.optionsFactory.moduleSpecifier ===
+        config.createAPIClientFnOptionsModule
+    ) {
+      return metadata;
+    }
+  }
+
+  return null;
 }
 
 async function validatePrecreatedClientConfig(
