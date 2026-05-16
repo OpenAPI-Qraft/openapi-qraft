@@ -6,7 +6,7 @@ import { transformQraftTreeShaking as transformQraftTreeShakingImpl } from '../.
 import { createFixtureModuleAccess } from './fixtures.js';
 import {
   createFixture,
-  createTransformAnalysis,
+  createTransformState,
   transformQraftTreeShaking,
 } from './harness.js';
 
@@ -253,13 +253,13 @@ createAPIClient().pets.getPets.useQuery();
     }
   });
 
-  it('uses module access from options by default when creating a transform analysis', async () => {
+  it('uses module access from options by default when creating a transform state', async () => {
     const fixture = await createFixture();
     const sourceFile = path.join(fixture, 'src/App.tsx');
     const fixtureModuleAccess = createFixtureModuleAccess(fixture);
     const load = vi.fn(fixtureModuleAccess.load);
 
-    const analysis = await createTransformAnalysis(
+    const state = await createTransformState(
       `
 import { createAPIClient } from './api';
 
@@ -290,8 +290,8 @@ export function App() {
       }
     );
 
-    expect(analysis.clients).toHaveLength(1);
-    expect(analysis.namedUsages).toHaveLength(1);
+    expect(state.clients).toHaveLength(1);
+    expect(state.namedUsages).toHaveLength(1);
     expect(load).toHaveBeenCalledWith(path.join(fixture, 'src/api/index.ts'));
   });
 

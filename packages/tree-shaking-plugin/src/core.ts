@@ -9,10 +9,10 @@ import type {
 import * as generateModule from '@babel/generator';
 import { resolveDefaultExport } from './lib/interop/resolve-default-export.js';
 import { createAgnosticModuleAccess } from './lib/resolvers/agnostic.js';
-import { createTransformAnalysis } from './lib/transform/analysis.js';
 import { normalizeEntrypoints } from './lib/transform/entrypoints.js';
-import { applyTransformAnalysis } from './lib/transform/mutate.js';
+import { applyTransformMutations } from './lib/transform/mutate.js';
 import { shouldInspectSource } from './lib/transform/source-gate.js';
+import { createTransformState } from './lib/transform/state.js';
 
 export type FilterPattern = string | RegExp | Array<string | RegExp>;
 
@@ -106,16 +106,10 @@ export async function transformQraftTreeShaking(
     return null;
   }
 
-  const analysis = await createTransformAnalysis(
-    code,
-    id,
-    options,
-    moduleAccess
-  );
-  if (!analysis.namedUsages.length && !analysis.inlineUsages.length)
-    return null;
+  const state = await createTransformState(code, id, options, moduleAccess);
+  if (!state.namedUsages.length && !state.inlineUsages.length) return null;
 
-  const ast = applyTransformAnalysis(analysis);
+  applyTransformMutations(state);
 
   const generatorOptions = {
     sourceMaps: true,
@@ -124,7 +118,7 @@ export async function transformQraftTreeShaking(
     inputSourceMap,
   } satisfies GeneratorOptions;
 
-  const result = generate(ast, generatorOptions);
+  const result = generate(state.ast, generatorOptions);
 
   return {
     code: result.code,

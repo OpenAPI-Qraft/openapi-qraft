@@ -12,17 +12,17 @@ import {
 } from './fixtures.js';
 import {
   createFixture,
-  createTransformAnalysis,
+  createTransformState,
   transformQraftTreeShaking,
 } from './harness.js';
 
 describe('transformQraftTreeShaking clientFactory entrypoints', () => {
-  it('collects named and inline usages in one transform analysis', async () => {
+  it('collects named and inline usages in one transform state', async () => {
     const fixture = await createFixture();
     const sourceFile = path.join(fixture, 'src/App.tsx');
     const fixtureModuleAccess = createFixtureModuleAccess(fixture);
 
-    const analysis = await createTransformAnalysis(
+    const state = await createTransformState(
       `
 import { createAPIClient } from './api';
 
@@ -51,8 +51,8 @@ export function App() {
       fixtureModuleAccess
     );
 
-    expect(analysis.namedUsages).toHaveLength(1);
-    expect(analysis.inlineUsages).toHaveLength(1);
+    expect(state.namedUsages).toHaveLength(1);
+    expect(state.inlineUsages).toHaveLength(1);
   });
 
   it('imports an operation directly for a context API client', async () => {
@@ -167,7 +167,7 @@ api.pets.getPets.useQuery();
     const sourceFile = path.join(fixture, 'src/App.tsx');
     const fixtureModuleAccess = createFixtureModuleAccess(fixture);
 
-    const analysis = await createTransformAnalysis(
+    const state = await createTransformState(
       `
 import { createAPIClient } from './api';
 
@@ -189,8 +189,8 @@ api.pets.getPets.getQueryKey();
       fixtureModuleAccess
     );
 
-    expect(analysis.clients).toHaveLength(1);
-    expect(analysis.clients[0].runtimeInput).toEqual({
+    expect(state.clients).toHaveLength(1);
+    expect(state.clients[0].runtimeInput).toEqual({
       kind: 'none',
     });
   });
@@ -828,7 +828,7 @@ api.pets.getPets.useQuery();
     const sourceFile = path.join(fixture, 'src/App.tsx');
     const fixtureModuleAccess = createFixtureModuleAccess(fixture);
 
-    const analysis = await createTransformAnalysis(
+    const state = await createTransformState(
       `
 import { createAPIClient } from './api';
 
@@ -854,8 +854,8 @@ api.pets.getPets.useQuery();
       fixtureModuleAccess
     );
 
-    expect(analysis.clients).toHaveLength(1);
-    expect(analysis.clients[0].runtimeInput).toMatchObject({
+    expect(state.clients).toHaveLength(1);
+    expect(state.clients[0].runtimeInput).toMatchObject({
       kind: 'optionsExpression',
       expression: {
         type: 'Identifier',

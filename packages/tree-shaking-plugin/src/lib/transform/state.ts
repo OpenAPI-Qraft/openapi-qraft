@@ -16,7 +16,7 @@ import type {
   QraftTreeShakeOptions,
   RuntimeLocalNames,
   SchemaUsage,
-  TransformAnalysis,
+  TransformState,
 } from './types.js';
 import { dirname, resolve } from 'node:path';
 import { parse } from '@babel/parser';
@@ -69,13 +69,13 @@ type EntrypointUseSignal = {
  * Parse the source, resolve the configured clients, and collect everything the
  * mutation phase needs without changing the AST.
  *
- * The returned analysis separates the discovered work into concrete buckets:
+ * The returned state separates the discovered work into concrete buckets:
  * - `clients`: bindings for discovered client variables
  * - `namedUsages`: matched client method calls that already have a local client
  * - `inlineUsages`: inline `createAPIClient(...)` call sites that need rewrite
  * - `schemaUsages`: `.schema` accesses that rewrite directly to operations
  *
- * The analysis also carries the bookkeeping needed by the mutator to insert
+ * The state also carries the bookkeeping needed by the mutator to insert
  * imports, generate optimized clients, and clean up dead declarations.
  *
  * @example
@@ -90,16 +90,16 @@ type EntrypointUseSignal = {
  * }
  * `;
  *
- * const analysis = await createTransformAnalysis(source, id, options);
+ * const state = await createTransformState(source, id, options);
  *
- * analysis.clients[0]
+ * state.clients[0]
  * // {
  * //   name: 'api',
  * //   mode: { type: 'context' },
  * //   ...
  * // }
  *
- * analysis.namedUsages[0]
+ * state.namedUsages[0]
  * // {
  * //   client: { name: 'api' },
  * //   serviceName: 'pets',
@@ -119,16 +119,16 @@ type EntrypointUseSignal = {
  * }
  * `;
  *
- * const analysis = await createTransformAnalysis(source, id, options);
+ * const state = await createTransformState(source, id, options);
  *
- * analysis.clients[0]
+ * state.clients[0]
  * // {
  * //   name: 'client',
  * //   mode: { type: 'precreated' },
  * //   ...
  * // }
  *
- * analysis.namedUsages[0]
+ * state.namedUsages[0]
  * // {
  * //   client: { name: 'client' },
  * //   serviceName: 'pets',
@@ -138,7 +138,7 @@ type EntrypointUseSignal = {
  * // }
  * ```
  */
-export async function createTransformAnalysis(
+export async function createTransformState(
   code: string,
   id: string,
   options: QraftTreeShakeOptions,
@@ -146,7 +146,7 @@ export async function createTransformAnalysis(
     resolve: options.moduleAccess?.resolve ?? options.resolve,
     load: options.moduleAccess?.load,
   })
-): Promise<TransformAnalysis> {
+): Promise<TransformState> {
   const servicesDirName = 'services';
   const resolveModule = moduleAccess.resolve;
   const entrypoints = normalizeEntrypoints(options);
@@ -199,7 +199,7 @@ export async function createTransformAnalysis(
   const fileBindingNames = getAllBindingNames(ast);
   const programScope = getProgramScope(ast);
   if (!programScope) {
-    return emptyTransformAnalysis(ast);
+    return emptyTransformState(ast);
   }
   const activeProgramScope = programScope;
 
@@ -2084,7 +2084,7 @@ function normalizeOptionalResolvedId(resolved: string | null | undefined) {
   return resolved ? normalizeResolvedId(resolved) : null;
 }
 
-function emptyTransformAnalysis(ast: t.File): TransformAnalysis {
+function emptyTransformState(ast: t.File): TransformState {
   return {
     ast,
     clients: [],
