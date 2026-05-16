@@ -48,6 +48,48 @@ createAPIClient().pets.getPets.useQuery();
     });
   });
 
+  it('throws by default when a usage-before-declaration local client cannot load generated source', async () => {
+    const sourceFile = path.join(
+      await fs.mkdtemp(path.join(os.tmpdir(), 'qraft-tree-shaking-')),
+      'src/App.tsx'
+    );
+
+    await expect(
+      transformQraftTreeShaking(
+        `
+import { createAPIClient } from './api';
+
+export function App() {
+  return api.pets.getPets.useQuery();
+}
+
+const api = createAPIClient();
+`,
+        sourceFile,
+        {
+          entrypoints: [
+            {
+              kind: 'clientFactory',
+              factory: {
+                exportName: 'createAPIClient',
+                moduleSpecifier: './api',
+              },
+            },
+          ],
+          moduleAccess: {
+            resolve: async () => '/virtual/api/index.ts',
+            load: async () => null,
+          },
+        }
+      )
+    ).rejects.toMatchObject({
+      name: 'QraftTreeShakeError',
+      reason: expect.objectContaining({
+        code: 'entrypoint-source-unavailable',
+      }),
+    });
+  });
+
   it('skips unresolved transform candidates when diagnostics is off', async () => {
     const sourceFile = path.join(
       await fs.mkdtemp(path.join(os.tmpdir(), 'qraft-tree-shaking-')),

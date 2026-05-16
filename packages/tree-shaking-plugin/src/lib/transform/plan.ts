@@ -861,6 +861,9 @@ function collectUsedEntrypointKeys(
         bindingNode: variablePath.node.id,
       });
     },
+  });
+
+  traverse(ast, {
     MemberExpression(memberPath) {
       collectMemberEntrypointUse(memberPath);
     },
