@@ -29,10 +29,59 @@ type WebpackLoadModule = (
   ) => void
 ) => void;
 
+type WebpackInputFileSystem = {
+  readFile?: (
+    path: string,
+    callback: (
+      error: Error | null,
+      source?: string | Buffer | Uint8Array
+    ) => void
+  ) => void;
+};
+
 type WebpackLoaderContextLike = BundlerResolveContext & {
   getResolve?: (options?: { dependencyType?: string }) => WebpackResolveFn;
   loadModule?: WebpackLoadModule;
 };
+
+function getObjectProperty(value: unknown, key: string): unknown {
+  return typeof value === 'object' && value !== null
+    ? Reflect.get(value, key)
+    : undefined;
+}
+
+function toWebpackInputFileSystem(
+  candidate: unknown
+): WebpackInputFileSystem | null {
+  const readFile = getObjectProperty(candidate, 'readFile');
+  if (typeof readFile !== 'function') return null;
+
+  return {
+    readFile(path, callback) {
+      readFile.call(candidate, path, callback);
+    },
+  } satisfies WebpackInputFileSystem;
+}
+
+function getWebpackInputFileSystem(
+  loaderContext: unknown
+): WebpackInputFileSystem | null {
+  return (
+    toWebpackInputFileSystem(getObjectProperty(loaderContext, 'fs')) ??
+    toWebpackInputFileSystem(
+      getObjectProperty(
+        getObjectProperty(loaderContext, '_compiler'),
+        'inputFileSystem'
+      )
+    ) ??
+    toWebpackInputFileSystem(
+      getObjectProperty(
+        getObjectProperty(loaderContext, '_compilation'),
+        'inputFileSystem'
+      )
+    )
+  );
+}
 
 function createWebpackResolveStrategy(
   ctx: WebpackLoaderContextLike
@@ -87,6 +136,31 @@ function createWebpackLoadStrategy(
   };
 }
 
+function createWebpackInputFileSystemLoadStrategy(
+  ctx: WebpackLoaderContextLike
+): LoadStrategy {
+  return async ({ id }) => {
+    const loaderContext = ctx.getNativeBuildContext?.()?.loaderContext;
+    const inputFileSystem = getWebpackInputFileSystem(loaderContext);
+    if (typeof inputFileSystem?.readFile !== 'function') {
+      return null;
+    }
+
+    return new Promise<string | null>((resolve) => {
+      inputFileSystem.readFile?.(id, (error, source) => {
+        if (error || source === null || source === undefined) {
+          resolve(null);
+          return;
+        }
+
+        resolve(
+          Buffer.isBuffer(source) ? source.toString('utf8') : String(source)
+        );
+      });
+    });
+  };
+}
+
 export function createWebpackLikeModuleAccess(
   ctx: WebpackLoaderContextLike,
   userAccess: QraftModuleAccessOptions = {}
@@ -99,6 +173,7 @@ export function createWebpackLikeModuleAccess(
     load: createSourceLoaderChain([
       createWebpackLoadStrategy(ctx),
       createUserSourceLoaderStrategy(userAccess.load),
+      createWebpackInputFileSystemLoadStrategy(ctx),
     ]),
   };
 }

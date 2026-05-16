@@ -272,6 +272,43 @@ describe('resolver composition', () => {
     expect(loadModule).toHaveBeenCalledTimes(1);
   });
 
+  it('loads source through webpack input filesystem when loadModule misses', async () => {
+    const loadModule = vi.fn(
+      (_request: string, callback: (...args: unknown[]) => void) => {
+        callback(new Error('missing'));
+      }
+    );
+    const readFile = vi.fn(
+      (
+        id: string,
+        callback: (error: Error | null, source?: Buffer) => void
+      ) => {
+        expect(id).toBe('/virtual/generated-api/index.ts');
+        callback(null, Buffer.from('export const fromWebpackFs = true;'));
+      }
+    );
+
+    const access = createWebpackLikeModuleAccess({
+      getNativeBuildContext() {
+        return {
+          framework: 'webpack',
+          loaderContext: {
+            loadModule,
+            fs: {
+              readFile,
+            },
+          },
+        };
+      },
+    });
+
+    await expect(access.load('/virtual/generated-api/index.ts')).resolves.toBe(
+      'export const fromWebpackFs = true;'
+    );
+    expect(loadModule).toHaveBeenCalledTimes(1);
+    expect(readFile).toHaveBeenCalledTimes(1);
+  });
+
   it('loads source through rspack loadModule', async () => {
     const loadModule = vi.fn(
       (request: string, callback: (...args: unknown[]) => void) => {
