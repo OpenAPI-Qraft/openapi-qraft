@@ -1,3 +1,5 @@
+export { stripQueryAndHash } from '../transform/path-rendering.js';
+
 export type QraftResolver = (
   specifier: string,
   importer: string
@@ -11,6 +13,20 @@ export type QraftModuleAccess = {
   resolve: QraftResolver;
   load: QraftSourceLoader;
 };
+
+export type QraftModuleAccessStrategyName =
+  | 'native'
+  | 'user'
+  | 'adapter-fallback';
+
+export type QraftModuleAccessStrategyMetadata = {
+  resolve: QraftModuleAccessStrategyName[];
+  load: QraftModuleAccessStrategyName[];
+};
+
+const qraftModuleAccessStrategyMetadata = Symbol(
+  'qraft.moduleAccessStrategyMetadata'
+);
 
 export type QraftModuleAccessOptions = {
   resolve?: QraftResolver;
@@ -27,9 +43,10 @@ export type ResolveRequest = {
   importer: string;
 };
 
-export type ResolveStrategy = (
-  request: ResolveRequest
-) => Promise<string | null> | string | null;
+export type ResolveStrategy = {
+  name: QraftModuleAccessStrategyName;
+  resolve: (request: ResolveRequest) => Promise<string | null> | string | null;
+};
 
 export type RollupLikeResolve = (
   source: string,
@@ -48,9 +65,10 @@ export type LoadRequest = {
   id: string;
 };
 
-export type LoadStrategy = (
-  request: LoadRequest
-) => Promise<string | null> | string | null;
+export type LoadStrategy = {
+  name: QraftModuleAccessStrategyName;
+  load: (request: LoadRequest) => Promise<string | null> | string | null;
+};
 
 export type EsbuildLikeBuild = {
   resolve: (
@@ -73,6 +91,57 @@ export type BundlerResolveContext = {
   fs?: RollupLikeFs;
   getNativeBuildContext?: () => BundlerNativeBuildContext | null;
 };
+
+export function createQraftModuleAccess(
+  resolveStrategies: ResolveStrategy[],
+  loadStrategies: LoadStrategy[]
+): QraftModuleAccess {
+  const access = {
+    resolve: createResolverChain(resolveStrategies),
+    load: createSourceLoaderChain(loadStrategies),
+  };
+
+  Object.defineProperty(access, qraftModuleAccessStrategyMetadata, {
+    value: {
+      resolve: resolveStrategies.map((strategy) => strategy.name),
+      load: loadStrategies.map((strategy) => strategy.name),
+    } satisfies QraftModuleAccessStrategyMetadata,
+  });
+
+  return access;
+}
+
+export function getQraftModuleAccessStrategyMetadata(
+  access: QraftModuleAccess
+): QraftModuleAccessStrategyMetadata | null {
+  if (!(qraftModuleAccessStrategyMetadata in access)) return null;
+
+  const metadata = Reflect.get(access, qraftModuleAccessStrategyMetadata);
+  if (!isQraftModuleAccessStrategyMetadata(metadata)) return null;
+
+  return metadata;
+}
+
+function isQraftModuleAccessStrategyMetadata(
+  metadata: unknown
+): metadata is QraftModuleAccessStrategyMetadata {
+  if (typeof metadata !== 'object' || metadata === null) return false;
+
+  const resolve = Reflect.get(metadata, 'resolve');
+  const load = Reflect.get(metadata, 'load');
+  return (
+    Array.isArray(resolve) &&
+    resolve.every(isQraftModuleAccessStrategyName) &&
+    Array.isArray(load) &&
+    load.every(isQraftModuleAccessStrategyName)
+  );
+}
+
+function isQraftModuleAccessStrategyName(
+  name: unknown
+): name is QraftModuleAccessStrategyName {
+  return name === 'native' || name === 'user' || name === 'adapter-fallback';
+}
 
 export function createResolverChain(
   strategies: ResolveStrategy[]
@@ -97,7 +166,7 @@ async function resolveWithStrategies(
 ): Promise<string | null> {
   for (const strategy of strategies) {
     try {
-      const resolved = await strategy({ specifier, importer });
+      const resolved = await strategy.resolve({ specifier, importer });
       if (resolved) return resolved;
     } catch {
       // Try the next strategy.
@@ -110,10 +179,13 @@ async function resolveWithStrategies(
 export function createUserResolverStrategy(
   userResolve?: QraftResolver
 ): ResolveStrategy {
-  return async ({ specifier, importer }) => {
-    if (!userResolve) return null;
-    const resolved = await userResolve(specifier, importer);
-    return resolved || null;
+  return {
+    name: 'user',
+    async resolve({ specifier, importer }) {
+      if (!userResolve) return null;
+      const resolved = await userResolve(specifier, importer);
+      return resolved || null;
+    },
   };
 }
 
@@ -140,7 +212,7 @@ async function loadWithStrategies(
   id: string
 ): Promise<string | null> {
   for (const strategy of strategies) {
-    const loaded = await strategy({ id });
+    const loaded = await strategy.load({ id });
     if (loaded !== null && loaded !== undefined) return loaded;
   }
 
@@ -150,9 +222,12 @@ async function loadWithStrategies(
 export function createUserSourceLoaderStrategy(
   userLoad?: QraftSourceLoader
 ): LoadStrategy {
-  return async ({ id }) => {
-    if (!userLoad) return null;
-    const loaded = await userLoad(id);
-    return loaded ?? null;
+  return {
+    name: 'user',
+    async load({ id }) {
+      if (!userLoad) return null;
+      const loaded = await userLoad(id);
+      return loaded ?? null;
+    },
   };
 }
