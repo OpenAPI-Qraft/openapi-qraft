@@ -390,7 +390,7 @@ Keep historical references only when describing old behavior in completed plans.
 
 ## Task 4: Verification
 
-- [ ] **Step 1: Run package checks**
+- [x] **Step 1: Run package checks**
 
 Run:
 
@@ -403,7 +403,7 @@ git diff --check
 
 Expected: PASS.
 
-- [ ] **Step 2: Run fast e2e gate**
+- [x] **Step 2: Run fast e2e gate**
 
 Run:
 
@@ -420,7 +420,7 @@ npm run e2e:post-build
 
 Expected: `Tree-shaking bundle assertions passed.`
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 Run:
 
