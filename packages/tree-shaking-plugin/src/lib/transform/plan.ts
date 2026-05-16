@@ -24,6 +24,8 @@ import {
   callbackNeedsRuntimeContext,
   isSupportedCallbackName,
 } from './callbacks.js';
+import { normalizeEntrypoints } from './entrypoints.js';
+import { inspectGeneratedEntrypoints } from './generated-metadata.js';
 import {
   composeImportPath,
   normalizeResolvedId,
@@ -127,8 +129,15 @@ export async function createTransformPlan(
 ): Promise<TransformPlan> {
   const servicesDirName = 'services';
   const resolveModule = moduleAccess.resolve;
-  const entrypoints = options.entrypoints ?? [];
-  const factoryOptions = entrypoints
+  const entrypoints = normalizeEntrypoints(options);
+  const generatedMetadata = await inspectGeneratedEntrypoints({
+    importerId: id,
+    entrypoints,
+    moduleAccess,
+  });
+  void generatedMetadata;
+  const rawEntrypoints = options.entrypoints ?? [];
+  const factoryOptions = rawEntrypoints
     .filter((entrypoint) => entrypoint.kind === 'clientFactory')
     .map((entrypoint) => ({
       name: entrypoint.factory.exportName,
@@ -136,7 +145,7 @@ export async function createTransformPlan(
       context: entrypoint.reactContext?.exportName,
       contextModule: entrypoint.reactContext?.moduleSpecifier,
     })) satisfies LegacyQraftFactoryConfig[];
-  const precreatedOptions = entrypoints
+  const precreatedOptions = rawEntrypoints
     .filter((entrypoint) => entrypoint.kind === 'precreatedClient')
     .map((entrypoint) => ({
       client: entrypoint.client.exportName,
