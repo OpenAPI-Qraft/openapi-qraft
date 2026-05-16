@@ -875,6 +875,8 @@ function collectUsedEntrypointKeys(
 
     const root = getStaticMemberRoot(memberPath.node);
     if (t.isCallExpression(root) && t.isIdentifier(root.callee)) {
+      if (!isInlineTransformCandidateMemberUse(memberPath, path)) return;
+
       const factorySignal = factoryImportSignals.get(root.callee.name);
       if (
         factorySignal &&
@@ -888,6 +890,7 @@ function collectUsedEntrypointKeys(
 
     const clientName = path[0];
     if (!clientName || path.length < 3) return;
+    if (!isNamedTransformCandidateMemberUse(memberPath, path)) return;
 
     const clientSignal =
       localClientSignals.get(clientName) ??
@@ -898,6 +901,49 @@ function collectUsedEntrypointKeys(
 
     usedEntrypointKeys.add(clientSignal.key);
   }
+}
+
+function isInlineTransformCandidateMemberUse(
+  memberPath: NodePath<t.MemberExpression | t.OptionalMemberExpression>,
+  path: string[]
+) {
+  if (path.length === 3 && path[2] === 'schema') return true;
+
+  if (!isCallCallee(memberPath)) return false;
+  const callbackName =
+    path.length === 2
+      ? 'operationInvokeFn'
+      : path.length === 3
+        ? path[2]
+        : null;
+
+  return Boolean(callbackName && isSupportedCallbackName(callbackName));
+}
+
+function isNamedTransformCandidateMemberUse(
+  memberPath: NodePath<t.MemberExpression | t.OptionalMemberExpression>,
+  path: string[]
+) {
+  if (path.length === 4 && path[3] === 'schema') return true;
+
+  if (!isCallCallee(memberPath)) return false;
+  const callbackName =
+    path.length === 3
+      ? 'operationInvokeFn'
+      : path.length === 4
+        ? path[3]
+        : null;
+
+  return Boolean(callbackName && isSupportedCallbackName(callbackName));
+}
+
+function isCallCallee(
+  memberPath: NodePath<t.MemberExpression | t.OptionalMemberExpression>
+) {
+  return (
+    memberPath.parentPath.isCallExpression() &&
+    memberPath.parentPath.node.callee === memberPath.node
+  );
 }
 
 function bindingMatches(
