@@ -827,7 +827,7 @@ function collectUsedEntrypointKeys(
   precreatedImportSignals: Map<string, EntrypointUseSignal>
 ) {
   const usedEntrypointKeys = new Set<string>();
-  const localClientSignals = new Map<string, EntrypointUseSignal>();
+  const localClientSignals = new Map<t.Identifier, EntrypointUseSignal>();
 
   traverse(ast, {
     VariableDeclarator(variablePath) {
@@ -840,6 +840,7 @@ function collectUsedEntrypointKeys(
       if (!t.isIdentifier(variablePath.node.id)) return;
       if (!t.isCallExpression(variablePath.node.init)) return;
       if (!t.isIdentifier(variablePath.node.init.callee)) return;
+      if (!isSupportedFactoryCallArity(variablePath.node.init)) return;
 
       const factorySignal = factoryImportSignals.get(
         variablePath.node.init.callee.name
@@ -855,7 +856,7 @@ function collectUsedEntrypointKeys(
         return;
       }
 
-      localClientSignals.set(variablePath.node.id.name, {
+      localClientSignals.set(variablePath.node.id, {
         key: factorySignal.key,
         bindingNode: variablePath.node.id,
       });
@@ -876,6 +877,7 @@ function collectUsedEntrypointKeys(
     const root = getStaticMemberRoot(memberPath.node);
     if (t.isCallExpression(root) && t.isIdentifier(root.callee)) {
       if (!isInlineTransformCandidateMemberUse(memberPath, path)) return;
+      if (!isSupportedFactoryCallArity(root)) return;
 
       const factorySignal = factoryImportSignals.get(root.callee.name);
       if (
@@ -892,8 +894,9 @@ function collectUsedEntrypointKeys(
     if (!clientName || path.length < 3) return;
     if (!isNamedTransformCandidateMemberUse(memberPath, path)) return;
 
+    const clientBinding = memberPath.scope.getBinding(clientName)?.identifier;
     const clientSignal =
-      localClientSignals.get(clientName) ??
+      (clientBinding ? localClientSignals.get(clientBinding) : undefined) ??
       precreatedImportSignals.get(clientName);
     if (!clientSignal || !bindingMatches(memberPath, clientName, clientSignal)) {
       return;
@@ -918,6 +921,11 @@ function isInlineTransformCandidateMemberUse(
         : null;
 
   return Boolean(callbackName && isSupportedCallbackName(callbackName));
+}
+
+function isSupportedFactoryCallArity(call: t.CallExpression) {
+  if (call.arguments.length === 0) return true;
+  return call.arguments.length === 1 && isExpression(call.arguments[0]);
 }
 
 function isNamedTransformCandidateMemberUse(

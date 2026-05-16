@@ -350,4 +350,119 @@ createAPIClient().pets.getPets;
 
     expect(result).toBeNull();
   });
+
+  it('reports unavailable generated source for shadowed outer clients by binding', async () => {
+    const fixture = await createFixture();
+    const sourceFile = path.join(fixture, 'src/App.tsx');
+    const fixtureModuleAccess = createFixtureModuleAccess(fixture);
+
+    await expect(
+      transformQraftTreeShaking(
+        `
+import { createAPIClient } from './api';
+
+const api = createAPIClient();
+
+function nested() {
+  const api = createAPIClient({ requestFn: async () => new Response() });
+  return api;
+}
+
+api.pets.getPets.useQuery();
+`,
+        sourceFile,
+        {
+          entrypoints: [
+            {
+              kind: 'clientFactory',
+              factory: {
+                exportName: 'createAPIClient',
+                moduleSpecifier: './api',
+              },
+            },
+          ],
+          moduleAccess: {
+            resolve: fixtureModuleAccess.resolve,
+            load: async () => null,
+          },
+        }
+      )
+    ).rejects.toMatchObject({
+      name: 'QraftTreeShakeError',
+      reason: expect.objectContaining({
+        code: 'entrypoint-source-unavailable',
+      }),
+    });
+  });
+
+  it('does not report unavailable generated source for local clients with unsupported arity', async () => {
+    const fixture = await createFixture();
+    const sourceFile = path.join(fixture, 'src/App.tsx');
+    const fixtureModuleAccess = createFixtureModuleAccess(fixture);
+
+    const result = await transformQraftTreeShaking(
+      `
+import { createAPIClient } from './api';
+
+const a = {};
+const b = {};
+const api = createAPIClient(a, b);
+
+api.pets.getPets.useQuery();
+`,
+      sourceFile,
+      {
+        entrypoints: [
+          {
+            kind: 'clientFactory',
+            factory: {
+              exportName: 'createAPIClient',
+              moduleSpecifier: './api',
+            },
+          },
+        ],
+        moduleAccess: {
+          resolve: fixtureModuleAccess.resolve,
+          load: async () => null,
+        },
+      }
+    );
+
+    expect(result).toBeNull();
+  });
+
+  it('does not report unavailable generated source for inline clients with unsupported arity', async () => {
+    const fixture = await createFixture();
+    const sourceFile = path.join(fixture, 'src/App.tsx');
+    const fixtureModuleAccess = createFixtureModuleAccess(fixture);
+
+    const result = await transformQraftTreeShaking(
+      `
+import { createAPIClient } from './api';
+
+const a = {};
+const b = {};
+
+createAPIClient(a, b).pets.getPets.useQuery();
+`,
+      sourceFile,
+      {
+        entrypoints: [
+          {
+            kind: 'clientFactory',
+            factory: {
+              exportName: 'createAPIClient',
+              moduleSpecifier: './api',
+            },
+          },
+        ],
+        moduleAccess: {
+          resolve: fixtureModuleAccess.resolve,
+          load: async () => null,
+        },
+      }
+    );
+
+    expect(result).toBeNull();
+  });
 });
