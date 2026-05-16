@@ -334,7 +334,7 @@ Expected: PASS without semantic snapshot drift.
 
 ## Task 3: Update Docs And E2E Fixture Config
 
-- [ ] **Step 1: Update README config sections**
+- [x] **Step 1: Update README config sections**
 
 In `packages/tree-shaking-plugin/README.md`:
 
@@ -343,7 +343,7 @@ In `packages/tree-shaking-plugin/README.md`:
 - show `factory`, `reactContext`, `client`, and `optionsFactory` targets;
 - remove docs that explain `clientModule`, `createAPIClientFnModule`, and `createAPIClientFnOptionsModule`.
 
-- [ ] **Step 2: Update tree-shaking-bundlers fixture config**
+- [x] **Step 2: Update tree-shaking-bundlers fixture config**
 
 Update plugin config in `e2e/projects/tree-shaking-bundlers` to use:
 
@@ -380,7 +380,7 @@ entrypoints: [
 
 Use each fixture's existing names and paths; do not change fixture behavior.
 
-- [ ] **Step 3: Update plan references for Sessions 2-4**
+- [x] **Step 3: Update plan references for Sessions 2-4**
 
 Replace implementation instructions that mention public `createAPIClientFn` /
 `apiClient`, `generatedFactories`, or `precreatedClients` config with

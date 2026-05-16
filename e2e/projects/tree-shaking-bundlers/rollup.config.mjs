@@ -4,8 +4,7 @@ import alias from '@rollup/plugin-alias';
 import nodeResolve from '@rollup/plugin-node-resolve';
 import esbuild from 'rollup-plugin-esbuild';
 import {
-  apiClient,
-  createAPIClientFn,
+  entrypoints,
   getBundlerOutputDir,
   getScenario,
   isExternalModuleRequest,
@@ -27,8 +26,7 @@ export default {
       }),
     }),
     qraftTreeShakeRollup({
-      createAPIClientFn,
-      apiClient,
+      entrypoints,
     }),
     esbuild({
       include: /\.[cm]?[jt]sx?$/,
