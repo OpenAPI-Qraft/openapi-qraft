@@ -250,4 +250,104 @@ api?.pets?.getPets?.useQuery();
 
     expect(result).toBeNull();
   });
+
+  it('does not report unavailable generated source for unsupported callbacks', async () => {
+    const fixture = await createFixture();
+    const sourceFile = path.join(fixture, 'src/App.tsx');
+    const fixtureModuleAccess = createFixtureModuleAccess(fixture);
+
+    const result = await transformQraftTreeShaking(
+      `
+import { createAPIClient } from './api';
+
+const api = createAPIClient();
+
+api.pets.getPets.unsupportedCallback();
+`,
+      sourceFile,
+      {
+        entrypoints: [
+          {
+            kind: 'clientFactory',
+            factory: {
+              exportName: 'createAPIClient',
+              moduleSpecifier: './api',
+            },
+          },
+        ],
+        moduleAccess: {
+          resolve: fixtureModuleAccess.resolve,
+          load: async () => null,
+        },
+      }
+    );
+
+    expect(result).toBeNull();
+  });
+
+  it('does not report unavailable generated source for operation property reads', async () => {
+    const fixture = await createFixture();
+    const sourceFile = path.join(fixture, 'src/App.tsx');
+    const fixtureModuleAccess = createFixtureModuleAccess(fixture);
+
+    const result = await transformQraftTreeShaking(
+      `
+import { createAPIClient } from './api';
+
+const api = createAPIClient();
+
+api.pets.getPets;
+`,
+      sourceFile,
+      {
+        entrypoints: [
+          {
+            kind: 'clientFactory',
+            factory: {
+              exportName: 'createAPIClient',
+              moduleSpecifier: './api',
+            },
+          },
+        ],
+        moduleAccess: {
+          resolve: fixtureModuleAccess.resolve,
+          load: async () => null,
+        },
+      }
+    );
+
+    expect(result).toBeNull();
+  });
+
+  it('does not report unavailable generated source for inline operation property reads', async () => {
+    const fixture = await createFixture();
+    const sourceFile = path.join(fixture, 'src/App.tsx');
+    const fixtureModuleAccess = createFixtureModuleAccess(fixture);
+
+    const result = await transformQraftTreeShaking(
+      `
+import { createAPIClient } from './api';
+
+createAPIClient().pets.getPets;
+`,
+      sourceFile,
+      {
+        entrypoints: [
+          {
+            kind: 'clientFactory',
+            factory: {
+              exportName: 'createAPIClient',
+              moduleSpecifier: './api',
+            },
+          },
+        ],
+        moduleAccess: {
+          resolve: fixtureModuleAccess.resolve,
+          load: async () => null,
+        },
+      }
+    );
+
+    expect(result).toBeNull();
+  });
 });
