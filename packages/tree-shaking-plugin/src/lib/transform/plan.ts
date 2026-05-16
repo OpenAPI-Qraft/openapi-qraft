@@ -831,6 +831,12 @@ function collectUsedEntrypointKeys(
 
   traverse(ast, {
     VariableDeclarator(variablePath) {
+      if (
+        variablePath.parentPath.parentPath?.isExportNamedDeclaration() ||
+        variablePath.parentPath.parentPath?.isExportDefaultDeclaration()
+      ) {
+        return;
+      }
       if (!t.isIdentifier(variablePath.node.id)) return;
       if (!t.isCallExpression(variablePath.node.init)) return;
       if (!t.isIdentifier(variablePath.node.init.callee)) return;
@@ -855,9 +861,6 @@ function collectUsedEntrypointKeys(
       });
     },
     MemberExpression(memberPath) {
-      collectMemberEntrypointUse(memberPath);
-    },
-    OptionalMemberExpression(memberPath) {
       collectMemberEntrypointUse(memberPath);
     },
   });

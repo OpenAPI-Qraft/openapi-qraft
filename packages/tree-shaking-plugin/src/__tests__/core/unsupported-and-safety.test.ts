@@ -1,5 +1,6 @@
 import path from 'node:path';
 import { describe, expect, it } from 'vitest';
+import { createFixtureModuleAccess } from './fixtures.js';
 import { createFixture, transformQraftTreeShaking } from './harness.js';
 
 describe('transformQraftTreeShaking unsupported and safety', () => {
@@ -77,6 +78,40 @@ api.pets.getPets.useQuery();
             },
           },
         ],
+      }
+    );
+
+    expect(result).toBeNull();
+  });
+
+  it('does not report unavailable generated source for exported clients', async () => {
+    const fixture = await createFixture();
+    const sourceFile = path.join(fixture, 'src/App.tsx');
+    const fixtureModuleAccess = createFixtureModuleAccess(fixture);
+
+    const result = await transformQraftTreeShaking(
+      `
+import { createAPIClient } from './api';
+
+export const api = createAPIClient();
+
+api.pets.getPets.useQuery();
+`,
+      sourceFile,
+      {
+        entrypoints: [
+          {
+            kind: 'clientFactory',
+            factory: {
+              exportName: 'createAPIClient',
+              moduleSpecifier: './api',
+            },
+          },
+        ],
+        moduleAccess: {
+          resolve: fixtureModuleAccess.resolve,
+          load: async () => null,
+        },
       }
     );
 
@@ -176,6 +211,40 @@ api?.pets?.getPets?.useQuery();
             },
           },
         ],
+      }
+    );
+
+    expect(result).toBeNull();
+  });
+
+  it('does not report unavailable generated source for optional member chains', async () => {
+    const fixture = await createFixture();
+    const sourceFile = path.join(fixture, 'src/App.tsx');
+    const fixtureModuleAccess = createFixtureModuleAccess(fixture);
+
+    const result = await transformQraftTreeShaking(
+      `
+import { createAPIClient } from './api';
+
+const api = createAPIClient();
+
+api?.pets?.getPets?.useQuery();
+`,
+      sourceFile,
+      {
+        entrypoints: [
+          {
+            kind: 'clientFactory',
+            factory: {
+              exportName: 'createAPIClient',
+              moduleSpecifier: './api',
+            },
+          },
+        ],
+        moduleAccess: {
+          resolve: fixtureModuleAccess.resolve,
+          load: async () => null,
+        },
       }
     );
 
