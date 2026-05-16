@@ -11,9 +11,9 @@ import {
   SERVICES_INDEX_TS,
   writeFixtureFiles,
 } from '../../__tests__/core/fixtures.js';
-import { createTransformAnalysis } from './analysis.js';
 import { normalizeEntrypoints } from './entrypoints.js';
 import { inspectGeneratedEntrypoints } from './generated-metadata.js';
+import { createTransformState } from './state.js';
 
 describe('inspectGeneratedEntrypoints', () => {
   it('reads generated factory metadata with static services ownership', async () => {
@@ -343,7 +343,7 @@ export const APIClient = createAPIClient(createAPIClientOptions());
     const fixtureModuleAccess = createFixtureModuleAccess(root);
     let factoryLoadCount = 0;
 
-    const analysis = await createTransformAnalysis(
+    const state = await createTransformState(
       `
 import { createAPIClient } from './api';
 
@@ -375,7 +375,7 @@ api.pets.getPets.useQuery();
       }
     );
 
-    expect(analysis.namedUsages).toHaveLength(1);
+    expect(state.namedUsages).toHaveLength(1);
     expect(factoryLoadCount).toBe(1);
   });
 });

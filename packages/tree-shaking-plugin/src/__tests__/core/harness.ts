@@ -4,7 +4,7 @@ import fs from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 import { transformQraftTreeShaking as transformQraftTreeShakingImpl } from '../../core.js';
-import { createTransformAnalysis } from '../../lib/transform/analysis.js';
+import { createTransformState } from '../../lib/transform/state.js';
 import {
   createFixtureModuleAccess,
   getContextFixtureFiles,
@@ -88,4 +88,4 @@ function getFixtureRootFromSourceFile(id: string) {
   return path.dirname(path.dirname(id));
 }
 
-export { createTransformAnalysis };
+export { createTransformState };

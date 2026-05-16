@@ -7,7 +7,7 @@ import type {
   OperationUsage,
   RuntimeLocalNames,
   SchemaUsage,
-  TransformAnalysis,
+  TransformState,
 } from './types.js';
 import * as traverseModule from '@babel/traverse';
 import * as t from '@babel/types';
@@ -50,10 +50,10 @@ function selectOptimizedClientRuntimeHelper(
 }
 
 /**
- * Apply a previously created transform analysis by rewriting call sites,
- * inserting imports, emitting optimized clients, and removing declarations that
- * became dead after the rewrite. The analysis owns the parsed Babel AST, and
- * this function mutates that AST in place before returning it for printing.
+ * Apply the collected transform mutations by rewriting call sites, inserting
+ * imports, emitting optimized clients, and removing declarations that became
+ * dead after the rewrite. The state owns the parsed Babel AST, and this
+ * function mutates that AST in place.
  *
  * @example
  * ```ts
@@ -67,11 +67,11 @@ function selectOptimizedClientRuntimeHelper(
  * }
  * `;
  *
- * const analysis = await createTransformAnalysis(source, id, options);
+ * const state = await createTransformState(source, id, options);
  *
- * const ast = applyTransformAnalysis(analysis);
+ * applyTransformMutations(state);
  *
- * // `ast` now contains the rewritten named client call and imports.
+ * // `state.ast` now contains the rewritten named client call and imports.
  * ```
  *
  * @example
@@ -84,47 +84,47 @@ function selectOptimizedClientRuntimeHelper(
  * }
  * `;
  *
- * const analysis = await createTransformAnalysis(source, id, options);
+ * const state = await createTransformState(source, id, options);
  *
- * const ast = applyTransformAnalysis(analysis);
+ * applyTransformMutations(state);
  *
- * // `ast` now contains the rewritten precreated client call.
+ * // `state.ast` now contains the rewritten precreated client call.
  * ```
  */
-export function applyTransformAnalysis(analysis: TransformAnalysis): t.File {
-  const { runtimeLocalNames } = analysis;
-  const usages = [...analysis.namedUsages];
-  const inlineCallbackUsages = analysis.inlineUsages.filter(
+export function applyTransformMutations(state: TransformState): void {
+  const { runtimeLocalNames } = state;
+  const usages = [...state.namedUsages];
+  const inlineCallbackUsages = state.inlineUsages.filter(
     (usage) => usage.kind !== 'schema'
   );
-  rewriteNamedClientCalls(analysis.ast, analysis.clients, analysis.namedUsages);
+  rewriteNamedClientCalls(state.ast, state.clients, state.namedUsages);
   rewriteInlineClientCalls(
-    analysis.ast,
-    analysis.createImports,
+    state.ast,
+    state.createImports,
     runtimeLocalNames,
     inlineCallbackUsages
   );
   rewriteSchemaAccesses(
-    analysis.ast,
-    analysis.createImports,
-    analysis.clients,
-    analysis.schemaUsages
+    state.ast,
+    state.createImports,
+    state.clients,
+    state.schemaUsages
   );
   const generatedDeclarations = insertOptimizedClients(
-    analysis.ast,
+    state.ast,
     usages,
-    analysis.generatedInfoByImport,
+    state.generatedInfoByImport,
     {
       api: runtimeLocalNames.api,
       react: runtimeLocalNames.react,
     }
   );
   insertImports(
-    analysis.ast,
+    state.ast,
     usages,
     inlineCallbackUsages,
-    analysis.schemaUsages,
-    analysis.generatedInfoByImport,
+    state.schemaUsages,
+    state.generatedInfoByImport,
     generatedDeclarations,
     {
       api: runtimeLocalNames.api,
@@ -132,13 +132,11 @@ export function applyTransformAnalysis(analysis: TransformAnalysis): t.File {
     }
   );
   removeFullyTransformedClients(
-    analysis.ast,
-    analysis.clients,
-    analysis.transformedReferenceKeys
+    state.ast,
+    state.clients,
+    state.transformedReferenceKeys
   );
-  removeEmptyCreateImports(analysis.ast, analysis.configuredFactoryNames);
-
-  return analysis.ast;
+  removeEmptyCreateImports(state.ast, state.configuredFactoryNames);
 }
 
 function rewriteNamedClientCalls(

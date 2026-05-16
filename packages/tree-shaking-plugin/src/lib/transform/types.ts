@@ -203,7 +203,7 @@ export type RuntimeLocalNames = {
   react: string;
 };
 
-export type TransformAnalysis = {
+export type TransformState = {
   ast: t.File;
   clients: ClientBinding[];
   namedUsages: OperationUsage[];
