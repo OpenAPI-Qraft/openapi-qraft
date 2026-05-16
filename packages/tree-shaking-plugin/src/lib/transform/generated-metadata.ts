@@ -136,7 +136,7 @@ async function inspectPrecreatedClientEntrypoint(
   const validClient = await validatePrecreatedClient(
     entrypoint,
     clientFile,
-    normalizeResolvedId(factoryFile),
+    new Set([factoryModuleFile, normalizeResolvedId(factoryFile)]),
     moduleAccess
   );
   if (!validClient) {
@@ -326,7 +326,7 @@ function readGeneratedFactoryImports(
 async function validatePrecreatedClient(
   entrypoint: PrecreatedClientEntrypoint,
   clientFile: string,
-  factoryResolvedId: string,
+  factoryResolvedIds: Set<string>,
   moduleAccess: QraftModuleAccess
 ) {
   const resolvedExport = await readExportedDeclarationChain(
@@ -342,7 +342,7 @@ async function validatePrecreatedClient(
   return matchesConfiguredBinding(
     init.callee.name,
     entrypoint.factory.exportName,
-    factoryResolvedId,
+    factoryResolvedIds,
     sourceFile,
     importBindings
   );
@@ -523,7 +523,7 @@ function findExportReexport(ast: t.File, exportName: string) {
 async function matchesConfiguredBinding(
   localName: string,
   exportName: string,
-  expectedResolvedId: string,
+  expectedResolvedIds: Set<string>,
   importerId: string,
   imports: Map<string, { imported: string; resolvedId: string | null }>
 ) {
@@ -531,13 +531,15 @@ async function matchesConfiguredBinding(
   if (imported) {
     return (
       imported.imported === exportName &&
-      imported.resolvedId === expectedResolvedId
+      Boolean(
+        imported.resolvedId && expectedResolvedIds.has(imported.resolvedId)
+      )
     );
   }
 
   if (localName !== exportName) return false;
   const importerResolvedId = normalizeResolvedId(importerId);
-  return importerResolvedId === expectedResolvedId;
+  return expectedResolvedIds.has(importerResolvedId);
 }
 
 function findFactoryReexport(ast: t.File, factoryName: string): string | null {
