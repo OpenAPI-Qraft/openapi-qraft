@@ -107,7 +107,6 @@ export type QraftTreeShakeOptions = {
   include?: FilterPattern;
   exclude?: FilterPattern;
   diagnostics?: DiagnosticsLevel;
-  debug?: boolean;
 };
 
 export type GeneratedClientInfo = {

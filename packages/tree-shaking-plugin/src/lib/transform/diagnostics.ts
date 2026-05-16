@@ -23,7 +23,7 @@ export type DiagnosticReporter = {
 };
 
 export function createDiagnosticReporter(
-  options: Pick<QraftTreeShakeOptions, 'diagnostics' | 'debug'>
+  options: Pick<QraftTreeShakeOptions, 'diagnostics'>
 ): DiagnosticReporter {
   const diagnostics = normalizeDiagnosticsLevel(options);
 
@@ -54,7 +54,7 @@ export function formatDiagnosticReason(reason: DiagnosticReason): string {
 }
 
 function normalizeDiagnosticsLevel(
-  options: Pick<QraftTreeShakeOptions, 'diagnostics' | 'debug'>
+  options: Pick<QraftTreeShakeOptions, 'diagnostics'>
 ): DiagnosticsLevel {
   if (options.diagnostics) return options.diagnostics;
   return 'error';

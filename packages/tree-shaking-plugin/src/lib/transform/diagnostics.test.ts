@@ -18,19 +18,6 @@ describe('tree-shaking diagnostics', () => {
     ).toThrow(QraftTreeShakeError);
   });
 
-  it('keeps debug mode on error diagnostics unless diagnostics is explicit', () => {
-    const reporter = createDiagnosticReporter({ debug: true });
-
-    expect(() =>
-      reporter.unresolved({
-        layer: 'generated-metadata',
-        code: 'entrypoint-source-unavailable',
-        message: 'Generated source was unavailable.',
-        entrypointKey: 'generatedFactory:createAPIClient:./api',
-      })
-    ).toThrow(QraftTreeShakeError);
-  });
-
   it('warns and continues when diagnostics is warn', () => {
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
     const reporter = createDiagnosticReporter({ diagnostics: 'warn' });

@@ -267,7 +267,6 @@ export async function createTransformPlan(
             resolvedAbs,
             factory,
             moduleAccess,
-            options.debug,
             servicesDirName
           );
           if (info) {
@@ -354,8 +353,7 @@ export async function createTransformPlan(
       precreatedOptions,
       generatedMetadata.metadataByEntrypointKey,
       moduleAccess,
-      activeProgramScope,
-      options.debug
+      activeProgramScope
     ))
   );
   const operationImports = new Map<string, OperationImportInfo>();
@@ -487,7 +485,6 @@ export async function createTransformPlan(
           client.createImportPath,
           client.factory,
           moduleAccess,
-          options.debug,
           servicesDirName
         )
       );
@@ -647,7 +644,6 @@ export async function createTransformPlan(
         request.createImportPath,
         request.factory,
         moduleAccess,
-        options.debug,
         servicesDirName
       )
     );
@@ -1039,8 +1035,7 @@ async function findPrecreatedClients(
   configs: LegacyQraftPrecreatedClientConfig[],
   metadataByEntrypointKey: Map<string, GeneratedClientMetadata | null>,
   moduleAccess: QraftModuleAccess,
-  programScope: Scope,
-  debug = false
+  programScope: Scope
 ): Promise<ClientBinding[]> {
   if (configs.length === 0) return [];
   const resolveModule = moduleAccess.resolve;
@@ -1147,8 +1142,7 @@ async function findPrecreatedClients(
             match.config,
             match.clientFile,
             match.factoryResolvedId,
-            moduleAccess,
-            debug
+            moduleAccess
           );
         } else {
           validatedConfig = null;
@@ -1218,17 +1212,9 @@ async function validatePrecreatedClientConfig(
   config: LegacyQraftPrecreatedClientConfig,
   clientFile: string,
   factoryResolvedId: string,
-  moduleAccess: QraftModuleAccess,
-  debug = false
+  moduleAccess: QraftModuleAccess
 ): Promise<{ factory: LegacyQraftFactoryConfig } | null> {
-  const skip = (reason: string) => {
-    if (debug) {
-      console.warn(
-        `[openapi-qraft/tree-shaking-plugin] skipped ${clientFile}: ${reason}`
-      );
-    }
-    return null;
-  };
+  const skip = (_reason: string) => null;
 
   const resolvedExport = await readExportedDeclarationChain(
     clientFile,
@@ -1669,17 +1655,9 @@ async function readGeneratedClientInfo(
   clientFile: string,
   factory: LegacyQraftFactoryConfig,
   moduleAccess: QraftModuleAccess,
-  debug = false,
   servicesDirName = 'services'
 ): Promise<GeneratedClientInfo | null> {
-  const skip = (reason: string) => {
-    if (debug) {
-      console.warn(
-        `[openapi-qraft/tree-shaking-plugin] skipped ${clientFile}: ${reason}`
-      );
-    }
-    return null;
-  };
+  const skip = (_reason: string) => null;
 
   const source = await moduleAccess.load(clientFile);
   if (source === null) {
@@ -1707,7 +1685,6 @@ async function readGeneratedClientInfo(
             reexportId,
             factory,
             moduleAccess,
-            debug,
             servicesDirName
           );
         }
