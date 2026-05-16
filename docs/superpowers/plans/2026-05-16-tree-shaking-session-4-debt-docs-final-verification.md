@@ -53,7 +53,7 @@ Do not implement:
 Run:
 
 ```bash
-rg -n "debugSkip|hasExplicitContext|createAPIClientFn|apiClient|diagnostics|debug\\?:" packages/tree-shaking-plugin/src packages/tree-shaking-plugin/README.md
+rg -n "debugSkip|hasExplicitContext|createAPIClientFn|apiClient|generatedFactories|precreatedClients|entrypoints|diagnostics|debug\\?:" packages/tree-shaking-plugin/src packages/tree-shaking-plugin/README.md
 ```
 
 Expected: results show which legacy config reads, debug paths, and runtime-helper flags remain.
@@ -62,9 +62,11 @@ Expected: results show which legacy config reads, debug paths, and runtime-helpe
 
 Use this classification:
 
-- keep public `createAPIClientFn` and `apiClient` only at config normalization/public API boundaries;
+- keep public `entrypoints` only at config normalization/public API boundaries;
 - keep `debug?: boolean` only if Session 1 intentionally preserved temporary compatibility;
-- delete internal reads of `options.createAPIClientFn` and `options.apiClient` after normalization;
+- delete internal reads of old `options.createAPIClientFn` and `options.apiClient` after Session 1.5;
+- delete internal reads of rejected `options.generatedFactories` and `options.precreatedClients`;
+- delete internal reads of `options.entrypoints` after normalization;
 - delete `hasExplicitContext` after `runtimeInput` fully replaces it;
 - delete `debugSkip` after diagnostics reporter handles unresolved candidates and ordinary skips.
 
