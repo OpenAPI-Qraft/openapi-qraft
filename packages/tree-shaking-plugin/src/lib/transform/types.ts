@@ -2,6 +2,7 @@ import type { Scope } from '@babel/traverse';
 import type * as t from '@babel/types';
 import type {
   QraftModuleAccessOptions,
+  QraftModuleAccessTraceEntry,
   QraftResolver,
 } from '../resolvers/common.js';
 
@@ -98,6 +99,7 @@ export type DiagnosticReason = {
   code: string;
   message: string;
   entrypointKey?: string;
+  moduleAccessTrace?: QraftModuleAccessTraceEntry[];
 };
 
 export type QraftTreeShakeOptions = {
