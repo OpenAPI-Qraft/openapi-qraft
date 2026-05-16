@@ -13,6 +13,7 @@ import {
 } from '../../__tests__/core/fixtures.js';
 import { normalizeEntrypoints } from './entrypoints.js';
 import { inspectGeneratedEntrypoints } from './generated-metadata.js';
+import { createTransformPlan } from './plan.js';
 
 describe('inspectGeneratedEntrypoints', () => {
   it('reads generated factory metadata with static services ownership', async () => {
@@ -292,10 +293,7 @@ import { createAPIClientOptions } from './client-options';
 export const APIClient = createAPIClient(createAPIClientOptions());
 `,
         {
-          'src/other-api.ts': PRECREATED_API_INDEX_TS.replace(
-            'createAPIClient',
-            'createOtherAPIClient'
-          ),
+          'src/other-api.ts': PRECREATED_API_INDEX_TS,
         }
       )
     );
@@ -306,7 +304,7 @@ export const APIClient = createAPIClient(createAPIClientOptions());
           kind: 'precreatedClient',
           client: { exportName: 'APIClient', moduleSpecifier: './client' },
           factory: {
-            exportName: 'createOtherAPIClient',
+            exportName: 'createAPIClient',
             moduleSpecifier: './other-api',
           },
           optionsFactory: {
@@ -332,6 +330,53 @@ export const APIClient = createAPIClient(createAPIClientOptions());
         entrypointKey: entrypoints[0].key,
       },
     ]);
+  });
+
+  it('seeds legacy planner metadata without reloading inspected factories', async () => {
+    const root = await createTempFixture();
+    await writeFixtureFiles(
+      root,
+      getContextFixtureFiles('APIClientContext', './APIClientContext', true)
+    );
+    const importerId = path.join(root, 'src/App.tsx');
+    const factoryFile = path.join(root, 'src/api/index.ts');
+    const fixtureModuleAccess = createFixtureModuleAccess(root);
+    let factoryLoadCount = 0;
+
+    const plan = await createTransformPlan(
+      `
+import { createAPIClient } from './api';
+
+const api = createAPIClient();
+
+api.pets.getPets.useQuery();
+`,
+      importerId,
+      {
+        entrypoints: [
+          {
+            kind: 'clientFactory',
+            factory: {
+              exportName: 'createAPIClient',
+              moduleSpecifier: './api',
+            },
+            reactContext: {
+              exportName: 'APIClientContext',
+            },
+          },
+        ],
+      },
+      {
+        resolve: fixtureModuleAccess.resolve,
+        load: async (id) => {
+          if (id === factoryFile) factoryLoadCount += 1;
+          return fixtureModuleAccess.load(id);
+        },
+      }
+    );
+
+    expect(plan.namedUsages).toHaveLength(1);
+    expect(factoryLoadCount).toBe(1);
   });
 });
 

@@ -169,6 +169,7 @@ async function inspectFactoryFile({
   reactContext,
   moduleAccess,
   optionsFactory,
+  seenFactoryFiles = new Set<string>(),
 }: {
   importerId: string;
   entrypoint: ClientEntrypoint;
@@ -177,7 +178,13 @@ async function inspectFactoryFile({
   reactContext: ReactContextConfig | null;
   moduleAccess: QraftModuleAccess;
   optionsFactory?: ImportTarget;
+  seenFactoryFiles?: Set<string>;
 }): Promise<MetadataInspection> {
+  if (seenFactoryFiles.has(factoryFile)) {
+    return missingServicesImport(entrypoint.key);
+  }
+  seenFactoryFiles.add(factoryFile);
+
   const source = await moduleAccess.load(factoryFile);
   if (source === null) {
     return unresolvedSource(entrypoint.key);
@@ -212,6 +219,7 @@ async function inspectFactoryFile({
         reactContext,
         moduleAccess,
         optionsFactory,
+        seenFactoryFiles,
       });
     }
 

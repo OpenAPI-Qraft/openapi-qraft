@@ -4,6 +4,7 @@ import type {
   ClientBinding,
   CreateImportEntry,
   GeneratedClientInfo,
+  GeneratedClientMetadata,
   GeneratedInfoRequest,
   InlineImportRequest,
   LegacyQraftFactoryConfig,
@@ -185,6 +186,13 @@ export async function createTransformPlan(
 
   const createImports = new Map<string, CreateImportEntry>();
   const generatedInfoByImport = new Map<string, GeneratedClientInfo | null>();
+  seedGeneratedInfoByImport(
+    generatedInfoByImport,
+    generatedMetadata.metadataByEntrypointKey,
+    id,
+    factoryOptions,
+    factoryResolvedIds
+  );
 
   for (const node of ast.program.body) {
     if (!t.isImportDeclaration(node)) continue;
@@ -1543,6 +1551,116 @@ function getObjectPropertyKey(key: t.ObjectProperty['key']) {
   if (t.isIdentifier(key)) return key.name;
   if (t.isStringLiteral(key)) return key.value;
   return null;
+}
+
+function seedGeneratedInfoByImport(
+  generatedInfoByImport: Map<string, GeneratedClientInfo | null>,
+  metadataByEntrypointKey: Map<string, GeneratedClientMetadata | null>,
+  importerId: string,
+  factoryOptions: LegacyQraftFactoryConfig[],
+  factoryResolvedIds: Map<LegacyQraftFactoryConfig, string | null>
+) {
+  for (const metadata of metadataByEntrypointKey.values()) {
+    if (!metadata) continue;
+
+    const factory = resolveLegacyFactoryForMetadata(metadata, factoryOptions);
+    const generatedInfo = toGeneratedClientInfo(metadata, factory, importerId);
+    const sourceIds = new Set([metadata.factoryFile]);
+
+    const entrypoint = metadata.entrypoint;
+    if (entrypoint.kind === 'generatedFactory') {
+      const configuredFactory = factoryOptions.find(
+        (item) =>
+          item.name === entrypoint.factory.exportName &&
+          item.module === entrypoint.factory.moduleSpecifier &&
+          item.context === (entrypoint.reactContext?.exportName ?? undefined) &&
+          item.contextModule ===
+            (entrypoint.reactContext?.moduleSpecifier ?? undefined)
+      );
+      const configuredResolvedId = configuredFactory
+        ? factoryResolvedIds.get(configuredFactory)
+        : null;
+      if (configuredResolvedId) sourceIds.add(configuredResolvedId);
+    }
+
+    for (const sourceId of sourceIds) {
+      generatedInfoByImport.set(
+        getGeneratedInfoKey(sourceId, factory),
+        generatedInfo
+      );
+    }
+  }
+}
+
+function resolveLegacyFactoryForMetadata(
+  metadata: GeneratedClientMetadata,
+  factoryOptions: LegacyQraftFactoryConfig[]
+): LegacyQraftFactoryConfig {
+  const entrypoint = metadata.entrypoint;
+  if (entrypoint.kind === 'generatedFactory') {
+    return (
+      factoryOptions.find(
+        (factory) =>
+          factory.name === entrypoint.factory.exportName &&
+          factory.module === entrypoint.factory.moduleSpecifier &&
+          factory.context ===
+            (entrypoint.reactContext?.exportName ?? undefined) &&
+          factory.contextModule ===
+            (entrypoint.reactContext?.moduleSpecifier ?? undefined)
+      ) ?? {
+        name: entrypoint.factory.exportName,
+        module: entrypoint.factory.moduleSpecifier,
+        context: entrypoint.reactContext?.exportName,
+        contextModule: entrypoint.reactContext?.moduleSpecifier ?? undefined,
+      }
+    );
+  }
+
+  return {
+    name: entrypoint.factory.exportName,
+    module: entrypoint.factory.moduleSpecifier,
+  };
+}
+
+function toGeneratedClientInfo(
+  metadata: GeneratedClientMetadata,
+  factory: LegacyQraftFactoryConfig,
+  importerId: string
+): GeneratedClientInfo {
+  return {
+    importerId,
+    clientFile: metadata.factoryFile,
+    servicesDir: metadata.servicesDir,
+    serviceImportPaths: metadata.serviceImportPaths,
+    contextImportPath: resolveMetadataContextImportPath(
+      metadata,
+      factory,
+      importerId
+    ),
+    contextName: metadata.reactContext?.exportName ?? null,
+  };
+}
+
+function resolveMetadataContextImportPath(
+  metadata: GeneratedClientMetadata,
+  factory: LegacyQraftFactoryConfig,
+  importerId: string
+) {
+  if (!metadata.reactContext?.moduleSpecifier) return null;
+
+  if (factory.contextModule) {
+    return resolveRelativeImportPath(
+      importerId,
+      importerId,
+      factory.contextModule
+    );
+  }
+
+  return resolveRelativeImportPath(
+    importerId,
+    metadata.factoryFile,
+    metadata.reactContext.moduleSpecifier
+  );
 }
 
 function serviceNameToFileBase(serviceName: string) {
