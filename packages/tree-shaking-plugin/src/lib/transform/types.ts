@@ -62,6 +62,12 @@ export type ReactContextConfig = {
   moduleSpecifier: string | null;
 };
 
+export type RuntimeInput =
+  | { kind: 'none' }
+  | { kind: 'context'; context: ReactContextConfig }
+  | { kind: 'optionsExpression'; expression: t.Expression }
+  | { kind: 'optionsFactoryCall'; target: ImportTarget };
+
 export type GeneratedFactoryEntrypoint = {
   kind: 'generatedFactory';
   key: string;
@@ -137,10 +143,10 @@ export type ClientBinding = {
   name: string;
   clientSourceKey: string;
   createImportPath: string;
-  hasExplicitContext: boolean;
   factory: LegacyQraftFactoryConfig;
   bindingNode: t.Node;
   declarationScope: Scope;
+  runtimeInput: RuntimeInput;
   localInitPath?: import('@babel/traverse').NodePath<t.VariableDeclarator>;
   mode:
     | { type: 'context' }
