@@ -135,7 +135,7 @@ Normalization rules:
 
 ## Task 1: Update Public Types And Normalizer Tests
 
-- [ ] **Step 1: Add the new public target types**
+- [x] **Step 1: Add the new public target types**
 
 In `packages/tree-shaking-plugin/src/lib/transform/types.ts`, replace the public config types with:
 
@@ -177,7 +177,7 @@ export type ReactContextConfig = {
 };
 ```
 
-- [ ] **Step 2: Rename option fields in `QraftTreeShakeOptions`**
+- [x] **Step 2: Rename option fields in `QraftTreeShakeOptions`**
 
 In `packages/tree-shaking-plugin/src/lib/transform/types.ts`, replace:
 
@@ -194,7 +194,7 @@ entrypoints?: QraftEntrypointConfig[];
 
 Make the same public option change in `packages/tree-shaking-plugin/src/core.ts`.
 
-- [ ] **Step 3: Update normalizer tests first**
+- [x] **Step 3: Update normalizer tests first**
 
 In `packages/tree-shaking-plugin/src/lib/transform/entrypoints.test.ts`, change the fixtures to the new public shape.
 
@@ -250,7 +250,7 @@ corepack yarn workspace @openapi-qraft/tree-shaking-plugin test -- --run src/lib
 
 Expected: FAIL until `normalizeEntrypoints()` reads `options.entrypoints` and the discriminated shapes.
 
-- [ ] **Step 4: Update `normalizeEntrypoints()`**
+- [x] **Step 4: Update `normalizeEntrypoints()`**
 
 In `packages/tree-shaking-plugin/src/lib/transform/entrypoints.ts`:
 
@@ -270,7 +270,7 @@ Expected: PASS.
 
 ## Task 2: Update Transform Tests And Current Runtime Code
 
-- [ ] **Step 1: Replace old config keys in core tests**
+- [x] **Step 1: Replace old config keys in core tests**
 
 In `packages/tree-shaking-plugin/src/__tests__/core/*.test.ts`, replace:
 
@@ -286,7 +286,7 @@ When a test uses both modes, put both objects in the same `entrypoints` array.
 Prefer a local test helper only if it removes repeated mechanical mapping
 without hiding the public config shape in snapshots.
 
-- [ ] **Step 2: Update existing planner code minimally**
+- [x] **Step 2: Update existing planner code minimally**
 
 Until Session 2 rewires the planner through normalized entrypoints, adapt `packages/tree-shaking-plugin/src/lib/transform/plan.ts` to read the new public shape.
 
@@ -322,7 +322,7 @@ const precreatedOptions = entrypoints
 
 This adapter is temporary. Session 2 should remove it when generated metadata consumes normalized entrypoints directly.
 
-- [ ] **Step 3: Run core transform tests**
+- [x] **Step 3: Run core transform tests**
 
 Run:
 
