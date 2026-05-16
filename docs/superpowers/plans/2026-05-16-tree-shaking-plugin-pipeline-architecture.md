@@ -137,7 +137,7 @@ the pre-alignment implementation state and must be translated through Session
 - Modify: `packages/tree-shaking-plugin/src/__tests__/core/AGENTS.md`
   - Update test routing if new transform helper tests change the suite ownership story.
 - Modify: `packages/tree-shaking-plugin/README.md`
-  - Replace `debug` documentation with `diagnostics?: 'error' | 'warn' | 'off'` once implementation lands.
+  - Document `diagnostics?: 'error' | 'warn' | 'off'` once implementation lands.
 
 ## Task 1: Add Diagnostics Contract
 
@@ -286,11 +286,10 @@ export type QraftTreeShakeOptions = {
   include?: FilterPattern;
   exclude?: FilterPattern;
   diagnostics?: DiagnosticsLevel;
-  debug?: boolean;
 };
 ```
 
-Keep `debug?: boolean` only as a temporary compatibility option for existing callers until README/config cleanup lands.
+Do not keep a legacy boolean diagnostics alias as a compatibility option; diagnostics are configured only through `diagnostics?: 'error' | 'warn' | 'off'`.
 
 - [ ] **Step 4: Mirror the public option in `core.ts`**
 
@@ -311,7 +310,6 @@ export type QraftTreeShakeOptions = {
   include?: FilterPattern;
   exclude?: FilterPattern;
   diagnostics?: DiagnosticsLevel;
-  debug?: boolean;
 };
 ```
 
@@ -342,7 +340,7 @@ export type DiagnosticReporter = {
 };
 
 export function createDiagnosticReporter(
-  options: Pick<QraftTreeShakeOptions, 'diagnostics' | 'debug'>
+  options: Pick<QraftTreeShakeOptions, 'diagnostics'>
 ): DiagnosticReporter {
   const diagnostics = normalizeDiagnosticsLevel(options);
 
@@ -365,10 +363,9 @@ export function createDiagnosticReporter(
 }
 
 function normalizeDiagnosticsLevel(
-  options: Pick<QraftTreeShakeOptions, 'diagnostics' | 'debug'>
+  options: Pick<QraftTreeShakeOptions, 'diagnostics'>
 ): DiagnosticsLevel {
   if (options.diagnostics) return options.diagnostics;
-  if (options.debug) return 'warn';
   return 'error';
 }
 
@@ -930,7 +927,7 @@ Run:
 corepack yarn workspace @openapi-qraft/tree-shaking-plugin test -- --run src/lib/transform/source-gate.test.ts src/__tests__/core/resolution-and-module-access.test.ts
 ```
 
-Expected: PASS or focused failures where previous "no config" debug behavior now returns ordinary silent null. If `resolution-and-module-access.test.ts` expected debug output, update that test to the new silent ordinary skip contract.
+Expected: PASS or focused failures where previous unresolved cases now follow the diagnostics contract. If `resolution-and-module-access.test.ts` expected legacy diagnostic output, update that test to the new silent ordinary skip contract.
 
 - [ ] **Step 6: Commit source gate**
 
@@ -1723,7 +1720,7 @@ In `packages/tree-shaking-plugin/README.md`, under configuration options, add:
   - `'off'` skips unresolved candidates silently.
 ```
 
-If the README mentions `debug`, replace that public-facing wording with `diagnostics`. If `debug` remains temporarily supported in code, document it only as legacy compatibility if the package already has a legacy section.
+Ensure the README documents only `diagnostics`; no legacy boolean diagnostics alias is part of the supported public or internal config surface.
 
 - [ ] **Step 2: Update core test guide if ownership changed**
 

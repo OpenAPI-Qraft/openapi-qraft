@@ -53,17 +53,16 @@ Do not implement:
 Run:
 
 ```bash
-rg -n "debugSkip|hasExplicitContext|entrypoints|diagnostics|debug\\?:" packages/tree-shaking-plugin/src packages/tree-shaking-plugin/README.md
+rg -n "debugSkip|hasExplicitContext|entrypoints|diagnostics" packages/tree-shaking-plugin/src packages/tree-shaking-plugin/README.md
 ```
 
-Expected: results show which legacy config reads, debug paths, and runtime-helper flags remain.
+Expected: results show which legacy config reads, diagnostics paths, and runtime-helper flags remain.
 
 - [x] **Step 2: Classify each hit**
 
 Use this classification:
 
 - keep public `entrypoints` only at config normalization/public API boundaries;
-- keep `debug?: boolean` only if Session 1 intentionally preserved temporary compatibility;
 - delete internal reads of old top-level public config options after Session 1.5;
 - delete internal reads of rejected pre-normalized config shapes;
 - delete internal reads of `options.entrypoints` after normalization;
@@ -127,7 +126,7 @@ In `packages/tree-shaking-plugin/README.md`, document:
   - `'off'` skips unresolved candidates silently.
 ```
 
-Replace public-facing `debug` wording with `diagnostics`. If `debug` remains temporarily supported in code, document it only as legacy compatibility when the README already has a legacy section.
+Ensure public-facing wording documents only `diagnostics`; no legacy boolean diagnostics alias is part of the supported public or internal config surface.
 
 - [x] **Step 3: Update core test ownership guide**
 
