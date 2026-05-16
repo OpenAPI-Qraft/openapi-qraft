@@ -109,7 +109,7 @@ export async function transformQraftTreeShaking(
   const plan = await createTransformPlan(code, id, options, moduleAccess);
   if (!plan.namedUsages.length && !plan.inlineUsages.length) return null;
 
-  applyTransformPlan(plan, plan.runtimeLocalNames);
+  applyTransformPlan(plan);
 
   const generatorOptions = {
     sourceMaps: true,

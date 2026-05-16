@@ -60,7 +60,7 @@ function selectOptimizedClientRuntimeHelper(
  *
  * const plan = await createTransformPlan(source, id, options);
  *
- * applyTransformPlan(plan, plan.runtimeLocalNames);
+ * applyTransformPlan(plan);
  *
  * // `plan.ast` now contains the rewritten named client call and imports.
  * ```
@@ -77,15 +77,13 @@ function selectOptimizedClientRuntimeHelper(
  *
  * const plan = await createTransformPlan(source, id, options);
  *
- * applyTransformPlan(plan, plan.runtimeLocalNames);
+ * applyTransformPlan(plan);
  *
  * // `plan.ast` now contains the rewritten precreated client call.
  * ```
  */
-export function applyTransformPlan(
-  plan: TransformPlan,
-  runtimeLocalNames: RuntimeLocalNames
-): void {
+export function applyTransformPlan(plan: TransformPlan): void {
+  const { runtimeLocalNames } = plan;
   const usages = [...plan.namedUsages];
   const inlineCallbackUsages = plan.inlineUsages.filter(
     (usage) => usage.kind !== 'schema'
