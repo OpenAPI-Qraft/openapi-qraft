@@ -88,7 +88,7 @@ Update `packages/tree-shaking-plugin/src/lib/transform/types.ts` using master Ta
 Required variants:
 
 - `{ kind: 'none' }`;
-- `{ kind: 'context'; context: RuntimeContextConfig }`;
+- `{ kind: 'context'; context: ReactContextConfig }`;
 - `{ kind: 'optionsExpression'; expression: t.Expression }`;
 - `{ kind: 'optionsFactoryCall'; target: ImportTarget }`.
 

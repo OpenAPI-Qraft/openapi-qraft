@@ -340,7 +340,7 @@ type ClientEntrypoint =
 type GeneratedFactoryEntrypoint = {
   kind: 'generatedFactory';
   factory: ImportTarget;
-  runtimeContext: RuntimeContextConfig | null;
+  reactContext: ReactContextConfig | null;
 };
 
 type PrecreatedClientEntrypoint = {
@@ -355,7 +355,7 @@ type ImportTarget = {
   moduleSpecifier: string;
 };
 
-type RuntimeContextConfig = {
+type ReactContextConfig = {
   exportName: string;
   moduleSpecifier: string | null;
 };
@@ -369,7 +369,7 @@ type GeneratedClientMetadata = {
   factoryFile: string;
   servicesDir: string;
   serviceImportPaths: Record<string, string>;
-  runtimeContext: RuntimeContextConfig | null;
+  reactContext: ReactContextConfig | null;
 };
 ```
 
@@ -378,7 +378,7 @@ Usage collection should produce semantic usage data close to this:
 ```ts
 type RuntimeInput =
   | { kind: 'none' }
-  | { kind: 'context'; context: RuntimeContextConfig }
+  | { kind: 'context'; context: ReactContextConfig }
   | { kind: 'optionsExpression'; expression: t.Expression }
   | { kind: 'optionsFactoryCall'; target: ImportTarget };
 ```
@@ -438,7 +438,7 @@ Add focused tests for config normalization:
 
 - current `createAPIClientFn` config normalizes to `generatedFactory`;
 - current `apiClient` config normalizes to `precreatedClient`;
-- `context` and `contextModule` normalize into `RuntimeContextConfig`;
+- `context` and `contextModule` normalize into `ReactContextConfig`;
 - options factory module fallback is normalized once at the boundary.
 
 ### Generated Metadata Tests

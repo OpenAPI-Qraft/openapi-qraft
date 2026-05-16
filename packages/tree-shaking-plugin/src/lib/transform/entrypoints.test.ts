@@ -22,7 +22,7 @@ describe('normalizeEntrypoints', () => {
           exportName: 'createReactAPIClient',
           moduleSpecifier: './api',
         },
-        runtimeContext: {
+        reactContext: {
           exportName: 'APIClientContext',
           moduleSpecifier: './api/APIClientContext',
         },

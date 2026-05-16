@@ -30,7 +30,7 @@ export type ImportTarget = {
   moduleSpecifier: string;
 };
 
-export type RuntimeContextConfig = {
+export type ReactContextConfig = {
   exportName: string;
   moduleSpecifier: string | null;
 };
@@ -39,7 +39,7 @@ export type GeneratedFactoryEntrypoint = {
   kind: 'generatedFactory';
   key: string;
   factory: ImportTarget;
-  runtimeContext: RuntimeContextConfig | null;
+  reactContext: ReactContextConfig | null;
 };
 
 export type PrecreatedClientEntrypoint = {
