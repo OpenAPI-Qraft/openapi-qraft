@@ -7,14 +7,41 @@ import type {
 
 export type FilterPattern = string | RegExp | Array<string | RegExp>;
 
-export type QraftFactoryConfig = {
+export type ModuleExportTarget = {
+  exportName: string;
+  moduleSpecifier: string;
+};
+
+export type ReactContextTarget = {
+  exportName: string;
+  moduleSpecifier?: string;
+};
+
+export type QraftClientFactoryEntrypointConfig = {
+  kind: 'clientFactory';
+  factory: ModuleExportTarget;
+  reactContext?: ReactContextTarget;
+};
+
+export type QraftPrecreatedClientEntrypointConfig = {
+  kind: 'precreatedClient';
+  client: ModuleExportTarget;
+  factory: ModuleExportTarget;
+  optionsFactory: ModuleExportTarget;
+};
+
+export type QraftEntrypointConfig =
+  | QraftClientFactoryEntrypointConfig
+  | QraftPrecreatedClientEntrypointConfig;
+
+export type LegacyQraftFactoryConfig = {
   name: string;
   module: string;
   context?: string;
   contextModule?: string;
 };
 
-export type QraftPrecreatedClientConfig = {
+export type LegacyQraftPrecreatedClientConfig = {
   client: string;
   clientModule: string;
   createAPIClientFn: string;
@@ -68,8 +95,7 @@ export type DiagnosticReason = {
 };
 
 export type QraftTreeShakeOptions = {
-  createAPIClientFn?: QraftFactoryConfig[];
-  apiClient?: QraftPrecreatedClientConfig[];
+  entrypoints?: QraftEntrypointConfig[];
   resolve?: QraftResolver;
   moduleAccess?: QraftModuleAccessOptions;
   include?: FilterPattern;
@@ -98,7 +124,7 @@ export type ClientBinding = {
   clientSourceKey: string;
   createImportPath: string;
   hasExplicitContext: boolean;
-  factory: QraftFactoryConfig;
+  factory: LegacyQraftFactoryConfig;
   bindingNode: t.Node;
   declarationScope: Scope;
   localInitPath?: import('@babel/traverse').NodePath<t.VariableDeclarator>;
@@ -144,13 +170,13 @@ export type SchemaUsage = {
 
 export type GeneratedInfoRequest = {
   createImportPath: string;
-  factory: QraftFactoryConfig;
+  factory: LegacyQraftFactoryConfig;
 };
 
 export type CreateImportEntry = {
   sourceSpecifier: string;
   factoryFile: string;
-  factory: QraftFactoryConfig;
+  factory: LegacyQraftFactoryConfig;
 };
 
 export type RuntimeLocalNames = {

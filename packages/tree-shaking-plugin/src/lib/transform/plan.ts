@@ -8,8 +8,8 @@ import type {
   InlineImportRequest,
   OperationImportInfo,
   OperationUsage,
-  QraftFactoryConfig,
-  QraftPrecreatedClientConfig,
+  LegacyQraftFactoryConfig,
+  LegacyQraftPrecreatedClientConfig,
   QraftTreeShakeOptions,
   RuntimeLocalNames,
   SchemaUsage,
@@ -144,7 +144,10 @@ export async function createTransformPlan(
   }
   const activeProgramScope = programScope;
 
-  const factoryResolvedIds = new Map<QraftFactoryConfig, string | null>();
+  const factoryResolvedIds = new Map<
+    LegacyQraftFactoryConfig,
+    string | null
+  >();
   for (const factory of factoryOptions) {
     const resolved = await resolveFactoryModule(
       factory.module,
@@ -669,7 +672,7 @@ export async function createTransformPlan(
 async function findPrecreatedClients(
   ast: t.File,
   importerId: string,
-  configs: QraftPrecreatedClientConfig[],
+  configs: LegacyQraftPrecreatedClientConfig[],
   moduleAccess: QraftModuleAccess,
   programScope: Scope,
   debug = false
@@ -725,8 +728,8 @@ async function findPrecreatedClients(
 
   const clients: ClientBinding[] = [];
   const validated = new Map<
-    QraftPrecreatedClientConfig,
-    { factory: QraftFactoryConfig } | null
+    LegacyQraftPrecreatedClientConfig,
+    { factory: LegacyQraftFactoryConfig } | null
   >();
 
   for (const node of ast.program.body) {
@@ -804,12 +807,12 @@ async function findPrecreatedClients(
 }
 
 async function validatePrecreatedClientConfig(
-  config: QraftPrecreatedClientConfig,
+  config: LegacyQraftPrecreatedClientConfig,
   clientFile: string,
   factoryResolvedId: string,
   moduleAccess: QraftModuleAccess,
   debug = false
-): Promise<{ factory: QraftFactoryConfig } | null> {
+): Promise<{ factory: LegacyQraftFactoryConfig } | null> {
   const skip = (reason: string) => {
     if (debug) {
       console.warn(
@@ -1105,7 +1108,7 @@ function matchSchemaAccess(
   | {
       kind: 'inline';
       createImportPath: string;
-      factory: QraftFactoryConfig;
+      factory: LegacyQraftFactoryConfig;
       serviceName: string;
       operationName: string;
     }
@@ -1159,12 +1162,12 @@ function matchInlineClientCall(
     {
       sourceSpecifier: string;
       factoryFile: string;
-      factory: QraftFactoryConfig;
+      factory: LegacyQraftFactoryConfig;
     }
   >
 ): {
   createImportPath: string;
-  factory: QraftFactoryConfig;
+  factory: LegacyQraftFactoryConfig;
   optionsExpression: t.Expression | null;
   serviceName: string;
   operationName: string;
@@ -1256,7 +1259,7 @@ function getUsageScopeKey<T extends t.Node>(callPath: NodePath<T>) {
 async function readGeneratedClientInfo(
   importerId: string,
   clientFile: string,
-  factory: QraftFactoryConfig,
+  factory: LegacyQraftFactoryConfig,
   moduleAccess: QraftModuleAccess,
   debug = false,
   servicesDirName = 'services'
@@ -1626,14 +1629,14 @@ function createProgramUniqueName(
 
 function getGeneratedInfoKey(
   createImportPath: string,
-  factory: QraftFactoryConfig
+  factory: LegacyQraftFactoryConfig
 ) {
   return `${createImportPath}::${factory.context ?? 'APIClientContext'}::${factory.contextModule ?? ''}`;
 }
 
 function getClientSourceKey(
   createImportPath: string,
-  factory: QraftFactoryConfig,
+  factory: LegacyQraftFactoryConfig,
   mode: ClientBinding['mode']
 ) {
   const generatedInfoKey = getGeneratedInfoKey(createImportPath, factory);
