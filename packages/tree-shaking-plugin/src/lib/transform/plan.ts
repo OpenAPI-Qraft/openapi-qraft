@@ -311,6 +311,19 @@ export async function createTransformPlan(
       const args = variablePath.node.init.arguments;
       if (args.length === 0) {
         const mode = { type: 'context' } as const;
+        const generatedInfo = generatedInfoByImport.get(
+          getGeneratedInfoKey(createImportPath, createImport.factory)
+        );
+        const runtimeInput =
+          generatedInfo?.contextName && generatedInfo.contextImportPath
+            ? {
+                kind: 'context' as const,
+                context: {
+                  exportName: generatedInfo.contextName,
+                  moduleSpecifier: generatedInfo.contextImportPath,
+                },
+              }
+            : { kind: 'none' as const };
         clients.push({
           name: variablePath.node.id.name,
           clientSourceKey: getClientSourceKey(
@@ -319,10 +332,10 @@ export async function createTransformPlan(
             mode
           ),
           createImportPath,
-          hasExplicitContext: Boolean(createImport.factory.context),
           factory: createImport.factory,
           bindingNode: variablePath.node.id,
           declarationScope: variablePath.parentPath.scope,
+          runtimeInput,
           localInitPath: variablePath,
           mode,
         });
@@ -330,6 +343,10 @@ export async function createTransformPlan(
       }
 
       if (args.length === 1 && isExpression(args[0])) {
+        const runtimeInput = {
+          kind: 'optionsExpression' as const,
+          expression: t.cloneNode(args[0], true),
+        };
         const mode = {
           type: 'options',
           optionsExpression: t.cloneNode(args[0], true),
@@ -342,10 +359,10 @@ export async function createTransformPlan(
             mode
           ),
           createImportPath,
-          hasExplicitContext: Boolean(createImport.factory.context),
           factory: createImport.factory,
           bindingNode: variablePath.node.id,
           declarationScope: variablePath.parentPath.scope,
+          runtimeInput,
           localInitPath: variablePath,
           mode,
         });
@@ -829,6 +846,13 @@ async function findPrecreatedClients(
         optionsImportPath: match.optionsImportPath,
         optionsExportName: match.config.createAPIClientFnOptions,
       } as const;
+      const runtimeInput = {
+        kind: 'optionsFactoryCall' as const,
+        target: {
+          exportName: match.config.createAPIClientFnOptions,
+          moduleSpecifier: match.optionsImportPath,
+        },
+      };
 
       clients.push({
         name: specifier.local.name,
@@ -838,10 +862,10 @@ async function findPrecreatedClients(
           mode
         ),
         createImportPath: factoryFile,
-        hasExplicitContext: false,
         factory: validatedConfig.factory,
         bindingNode: specifier.local,
         declarationScope: programScope,
+        runtimeInput,
         mode,
       });
     }

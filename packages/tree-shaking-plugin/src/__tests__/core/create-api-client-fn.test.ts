@@ -97,6 +97,35 @@ export function App() {
       `);
   });
 
+  it('uses generated context metadata when config omits context but source proves it', async () => {
+    const fixture = await createFixture();
+    const sourceFile = path.join(fixture, 'src/App.tsx');
+
+    const result = await transformQraftTreeShaking(
+      `
+import { createAPIClient } from './api';
+
+const api = createAPIClient();
+api.pets.getPets.useQuery();
+`,
+      sourceFile,
+      {
+        entrypoints: [
+          {
+            kind: 'clientFactory',
+            factory: {
+              exportName: 'createAPIClient',
+              moduleSpecifier: './api',
+            },
+          },
+        ],
+      }
+    );
+
+    expect(result?.code).toContain('qraftReactAPIClient');
+    expect(result?.code).toContain('APIClientContext');
+  });
+
   it('skips generic generated factories that receive services as an argument', async () => {
     const fixture = await fs.mkdtemp(
       path.join(os.tmpdir(), 'qraft-tree-shaking-')
@@ -686,7 +715,41 @@ export function App() {
       export function App() {
         return api_pets_getPets.useQuery();
       }"
-    `);
+      `);
+  });
+
+  it('preserves explicit options clients as qraftAPIClient rewrites even when generated factory is context-capable', async () => {
+    const fixture = await createFixture();
+    const sourceFile = path.join(fixture, 'src/App.tsx');
+
+    const result = await transformQraftTreeShaking(
+      `
+import { createAPIClient } from './api';
+
+const apiOptions = { requestFn: async () => new Response() };
+const api = createAPIClient(apiOptions);
+api.pets.getPets.useQuery();
+`,
+      sourceFile,
+      {
+        entrypoints: [
+          {
+            kind: 'clientFactory',
+            factory: {
+              exportName: 'createAPIClient',
+              moduleSpecifier: './api',
+            },
+            reactContext: {
+              exportName: 'APIClientContext',
+            },
+          },
+        ],
+      }
+    );
+
+    expect(result?.code).toContain('qraftAPIClient');
+    expect(result?.code).not.toContain('qraftReactAPIClient');
+    expect(result?.code).toContain('apiOptions');
   });
 
   it('rewrites context-free callbacks from zero-arg createAPIClient calls', async () => {
@@ -870,6 +933,7 @@ export function App() {
 
     expect(result?.code).toMatchInlineSnapshot(`
       "import { qraftAPIClient } from "@openapi-qraft/react";
+      import { qraftReactAPIClient } from "@openapi-qraft/react";
       import { getQueryKey } from "@openapi-qraft/react/callbacks/getQueryKey";
       import { findPetsByStatus } from "./api/services/PetsService";
       import { useQuery } from "@openapi-qraft/react/callbacks/useQuery";
@@ -878,7 +942,7 @@ export function App() {
       const api_pets_findPetsByStatus = qraftAPIClient(findPetsByStatus, {
         getQueryKey
       });
-      const api_pets_getPets = qraftAPIClient(getPets, {
+      const api_pets_getPets = qraftReactAPIClient(getPets, {
         useQuery
       }, APIClientContext);
       export function App() {
@@ -917,20 +981,20 @@ api.stores.getStores.useQuery();
     );
 
     expect(result?.code).toMatchInlineSnapshot(`
-      "import { qraftAPIClient } from "@openapi-qraft/react";
+      "import { qraftReactAPIClient } from "@openapi-qraft/react";
       import { useQuery } from "@openapi-qraft/react/callbacks/useQuery";
       import { getPets } from "./api/services/PetsService";
       import { APIClientContext } from "./api/APIClientContext";
       import { useMutation } from "@openapi-qraft/react/callbacks/useMutation";
       import { createPet } from "./api/services/PetsService";
       import { getStores } from "./api/services/StoresService";
-      const api_pets_getPets = qraftAPIClient(getPets, {
+      const api_pets_getPets = qraftReactAPIClient(getPets, {
         useQuery
       }, APIClientContext);
-      const api_pets_createPet = qraftAPIClient(createPet, {
+      const api_pets_createPet = qraftReactAPIClient(createPet, {
         useMutation
       }, APIClientContext);
-      const api_stores_getStores = qraftAPIClient(getStores, {
+      const api_stores_getStores = qraftReactAPIClient(getStores, {
         useQuery
       }, APIClientContext);
       api_pets_getPets.useQuery();

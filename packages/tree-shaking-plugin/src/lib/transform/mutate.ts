@@ -37,8 +37,7 @@ function selectOptimizedClientRuntimeHelper(
   usage: OperationUsage,
   callbacks: Array<{ callbackName: string }>
 ): RuntimeHelperKind {
-  if (usage.client.mode.type !== 'context') return 'api';
-  if (!usage.client.hasExplicitContext) return 'api';
+  if (usage.client.runtimeInput.kind !== 'context') return 'api';
   return selectRuntimeHelper(callbacks);
 }
 
@@ -313,7 +312,7 @@ function insertImports(
     Array<{ callbackName: string }>
   >();
   for (const usage of usages) {
-    if (usage.client.mode.type === 'precreated') continue;
+    if (usage.client.runtimeInput.kind === 'optionsFactoryCall') continue;
     const usageKey = getRuntimeHelperUsageKey(usage);
     const callbacks = callbacksByClientScopeKey.get(usageKey) ?? [];
     callbacks.push({ callbackName: usage.callbackName });
@@ -334,7 +333,9 @@ function insertImports(
     );
   }
   let needsApiRuntimeImport =
-    usages.some((usage) => usage.client.mode.type === 'precreated') ||
+    usages.some(
+      (usage) => usage.client.runtimeInput.kind === 'optionsFactoryCall'
+    ) ||
     hasScopeSplitContextUsage;
   let needsReactRuntimeImport = false;
   for (const kind of runtimeHelperKindsByClientScopeKey.values()) {
@@ -370,7 +371,7 @@ function insertImports(
 
   for (const usage of usages) {
     const generatedInfo =
-      usage.client.mode.type === 'context'
+      usage.client.runtimeInput.kind === 'context'
         ? generatedInfoByImport.get(
             getGeneratedInfoKey(
               usage.client.createImportPath,
@@ -381,7 +382,7 @@ function insertImports(
     const contextImportPath = generatedInfo?.contextImportPath ?? null;
     const contextName = generatedInfo?.contextName ?? null;
     const shouldImportContext =
-      usage.client.mode.type === 'context' &&
+      usage.client.runtimeInput.kind === 'context' &&
       callbackNeedsOptions(usage.callbackName) &&
       contextName !== null &&
       contextImportPath !== null &&
@@ -420,12 +421,12 @@ function insertImports(
       );
     }
 
-    if (usage.client.mode.type === 'precreated') {
+    if (usage.client.runtimeInput.kind === 'optionsFactoryCall') {
       addNamedImportDeclaration(
         declarations,
         imported,
-        usage.client.mode.optionsImportPath,
-        usage.client.mode.optionsExportName
+        usage.client.runtimeInput.target.moduleSpecifier,
+        usage.client.runtimeInput.target.exportName
       );
     }
   }
@@ -543,7 +544,6 @@ function insertOptimizedClients(
   const precreatedDeclarations = createOptimizedClientDeclarations(
     precreatedUsages,
     precreatedUsages,
-    generatedInfoByImport,
     runtimeLocalNames
   );
 
@@ -562,7 +562,6 @@ function insertOptimizedClients(
       createOptimizedClientDeclarations(
         bucket.usages,
         bucket.usages,
-        generatedInfoByImport,
         runtimeLocalNames
       )
     );
@@ -598,7 +597,6 @@ function insertOptimizedClients(
       const declarations = createOptimizedClientDeclarations(
         clientUsages,
         clientUsages,
-        generatedInfoByImport,
         runtimeLocalNames
       );
       const statementPath = client.localInitPath?.parentPath;
@@ -668,7 +666,6 @@ function groupContextUsagesByScope(
 function createOptimizedClientDeclarations(
   declarationsUsages: OperationUsage[],
   callbackUsages: OperationUsage[],
-  generatedInfoByImport: Map<string, GeneratedClientInfo | null>,
   runtimeLocalNames: RuntimeLocalNames
 ) {
   return declarationsUsages.map((usage) => {
@@ -688,7 +685,6 @@ function createOptimizedClientDeclarations(
     return createOptimizedClientDeclaration(
       usage,
       callbacks,
-      generatedInfoByImport,
       runtimeLocalNames
     );
   });
@@ -697,7 +693,6 @@ function createOptimizedClientDeclarations(
 function createOptimizedClientDeclaration(
   usage: OperationUsage,
   callbacks: Array<{ callbackName: string; callbackLocalName: string }>,
-  generatedInfoByImport: Map<string, GeneratedClientInfo | null>,
   runtimeLocalNames: RuntimeLocalNames
 ) {
   const args: t.Expression[] = [
@@ -722,24 +717,24 @@ function createOptimizedClientDeclaration(
     callbackNeedsOptions(callback.callbackName)
   );
 
-  if (usage.client.mode.type === 'context') {
+  if (usage.client.runtimeInput.kind === 'context') {
     if (needsOptions) {
-      const generatedInfo = generatedInfoByImport.get(
-        getGeneratedInfoKey(usage.client.createImportPath, usage.client.factory)
-      );
-      if (generatedInfo?.contextName)
-        args.push(t.identifier(generatedInfo.contextName));
+      args.push(t.identifier(usage.client.runtimeInput.context.exportName));
     }
-  } else if (usage.client.mode.type === 'options') {
-    args.push(t.cloneNode(usage.client.mode.optionsExpression, true));
-  } else {
+  } else if (usage.client.runtimeInput.kind === 'optionsExpression') {
+    args.push(t.cloneNode(usage.client.runtimeInput.expression, true));
+  } else if (usage.client.runtimeInput.kind === 'optionsFactoryCall') {
     args.push(
-      t.callExpression(t.identifier(usage.client.mode.optionsExportName), [])
+      t.callExpression(
+        t.identifier(usage.client.runtimeInput.target.exportName),
+        []
+      )
     );
   }
 
   const runtimeImportLocalName =
-    usage.client.mode.type === 'precreated' || runtimeHelperKind === 'api'
+    usage.client.runtimeInput.kind === 'optionsFactoryCall' ||
+    runtimeHelperKind === 'api'
       ? runtimeLocalNames.api
       : runtimeLocalNames.react;
 
