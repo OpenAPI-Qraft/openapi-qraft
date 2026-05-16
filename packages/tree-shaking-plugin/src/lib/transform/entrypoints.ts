@@ -21,7 +21,6 @@ export function normalizeEntrypoints(
             moduleSpecifier: factory.contextModule ?? null,
           }
         : null,
-      legacyConfig: factory,
     })),
     ...(options.apiClient ?? []).map((config) =>
       normalizePrecreatedEntrypoint(config)
@@ -58,7 +57,6 @@ function normalizePrecreatedEntrypoint(
       exportName: config.createAPIClientFnOptions,
       moduleSpecifier: optionsModule,
     },
-    legacyConfig: config,
   };
 }
 

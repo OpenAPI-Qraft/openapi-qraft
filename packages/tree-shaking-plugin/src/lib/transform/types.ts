@@ -40,7 +40,6 @@ export type GeneratedFactoryEntrypoint = {
   key: string;
   factory: ImportTarget;
   runtimeContext: RuntimeContextConfig | null;
-  legacyConfig: QraftFactoryConfig;
 };
 
 export type PrecreatedClientEntrypoint = {
@@ -49,7 +48,6 @@ export type PrecreatedClientEntrypoint = {
   client: ImportTarget;
   factory: ImportTarget;
   optionsFactory: ImportTarget;
-  legacyConfig: QraftPrecreatedClientConfig;
 };
 
 export type ClientEntrypoint =
