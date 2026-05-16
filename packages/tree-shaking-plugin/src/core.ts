@@ -13,21 +13,32 @@ import { createTransformPlan } from './lib/transform/plan.js';
 
 export type FilterPattern = string | RegExp | Array<string | RegExp>;
 
-export type QraftFactoryConfig = {
-  name: string;
-  module: string;
-  context?: string;
-  contextModule?: string;
+export type ModuleExportTarget = {
+  exportName: string;
+  moduleSpecifier: string;
 };
 
-export type QraftPrecreatedClientConfig = {
-  client: string;
-  clientModule: string;
-  createAPIClientFn: string;
-  createAPIClientFnModule: string;
-  createAPIClientFnOptions: string;
-  createAPIClientFnOptionsModule?: string;
+export type ReactContextTarget = {
+  exportName: string;
+  moduleSpecifier?: string;
 };
+
+export type QraftClientFactoryEntrypointConfig = {
+  kind: 'clientFactory';
+  factory: ModuleExportTarget;
+  reactContext?: ReactContextTarget;
+};
+
+export type QraftPrecreatedClientEntrypointConfig = {
+  kind: 'precreatedClient';
+  client: ModuleExportTarget;
+  factory: ModuleExportTarget;
+  optionsFactory: ModuleExportTarget;
+};
+
+export type QraftEntrypointConfig =
+  | QraftClientFactoryEntrypointConfig
+  | QraftPrecreatedClientEntrypointConfig;
 
 export type DiagnosticsLevel = 'error' | 'warn' | 'off';
 
@@ -38,8 +49,7 @@ export type {
 } from './lib/resolvers/common.js';
 
 export type QraftTreeShakeOptions = {
-  createAPIClientFn?: QraftFactoryConfig[];
-  apiClient?: QraftPrecreatedClientConfig[];
+  entrypoints?: QraftEntrypointConfig[];
   resolve?: QraftResolver;
   /**
    * Advanced source-provider override. Normal bundler integrations provide
@@ -83,9 +93,8 @@ export async function transformQraftTreeShaking(
 
   if (!shouldTransformId(id, options)) return null;
 
-  const factoryOptions = options.createAPIClientFn ?? [];
-  const precreatedOptions = options.apiClient ?? [];
-  if (factoryOptions.length === 0 && precreatedOptions.length === 0) {
+  const entrypoints = options.entrypoints ?? [];
+  if (entrypoints.length === 0) {
     return debugSkip(options, id, 'no API clients configured');
   }
 

@@ -2,15 +2,20 @@ import { describe, expect, it } from 'vitest';
 import { normalizeEntrypoints } from './entrypoints.js';
 
 describe('normalizeEntrypoints', () => {
-  it('normalizes createAPIClientFn configs with contextModule', () => {
+  it('normalizes clientFactory entrypoints with reactContext moduleSpecifier', () => {
     expect(
       normalizeEntrypoints({
-        createAPIClientFn: [
+        entrypoints: [
           {
-            name: 'createReactAPIClient',
-            module: './api',
-            context: 'APIClientContext',
-            contextModule: './api/APIClientContext',
+            kind: 'clientFactory',
+            factory: {
+              exportName: 'createReactAPIClient',
+              moduleSpecifier: './api',
+            },
+            reactContext: {
+              exportName: 'APIClientContext',
+              moduleSpecifier: './api/APIClientContext',
+            },
           },
         ],
       })
@@ -30,17 +35,24 @@ describe('normalizeEntrypoints', () => {
     ]);
   });
 
-  it('normalizes precreated apiClient configs with explicit options module', () => {
+  it('normalizes precreatedClient entrypoints', () => {
     expect(
       normalizeEntrypoints({
-        apiClient: [
+        entrypoints: [
           {
-            client: 'nodeAPIClient',
-            clientModule: './client',
-            createAPIClientFn: 'createNodeAPIClient',
-            createAPIClientFnModule: './api',
-            createAPIClientFnOptions: 'createNodeAPIClientOptions',
-            createAPIClientFnOptionsModule: './client-options',
+            kind: 'precreatedClient',
+            client: {
+              exportName: 'nodeAPIClient',
+              moduleSpecifier: './client',
+            },
+            factory: {
+              exportName: 'createNodeAPIClient',
+              moduleSpecifier: './api',
+            },
+            optionsFactory: {
+              exportName: 'createNodeAPIClientOptions',
+              moduleSpecifier: './client-options',
+            },
           },
         ],
       })
@@ -64,24 +76,27 @@ describe('normalizeEntrypoints', () => {
     ]);
   });
 
-  it('normalizes precreated options module fallback to clientModule', () => {
+  it('normalizes omitted reactContext moduleSpecifier to null', () => {
     const [entrypoint] = normalizeEntrypoints({
-      apiClient: [
+      entrypoints: [
         {
-          client: 'nodeAPIClient',
-          clientModule: './client',
-          createAPIClientFn: 'createNodeAPIClient',
-          createAPIClientFnModule: './api',
-          createAPIClientFnOptions: 'createNodeAPIClientOptions',
+          kind: 'clientFactory',
+          factory: {
+            exportName: 'createReactAPIClient',
+            moduleSpecifier: './api',
+          },
+          reactContext: {
+            exportName: 'APIClientContext',
+          },
         },
       ],
     });
 
     expect(entrypoint).toMatchObject({
-      kind: 'precreatedClient',
-      optionsFactory: {
-        exportName: 'createNodeAPIClientOptions',
-        moduleSpecifier: './client',
+      kind: 'generatedFactory',
+      reactContext: {
+        exportName: 'APIClientContext',
+        moduleSpecifier: null,
       },
     });
   });

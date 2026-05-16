@@ -1,62 +1,51 @@
 import type {
   ClientEntrypoint,
-  QraftPrecreatedClientConfig,
+  QraftPrecreatedClientEntrypointConfig,
   QraftTreeShakeOptions,
 } from './types.js';
 
 export function normalizeEntrypoints(
-  options: Pick<QraftTreeShakeOptions, 'createAPIClientFn' | 'apiClient'>
+  options: Pick<QraftTreeShakeOptions, 'entrypoints'>
 ): ClientEntrypoint[] {
-  return [
-    ...(options.createAPIClientFn ?? []).map((factory) => ({
-      kind: 'generatedFactory' as const,
-      key: composeGeneratedFactoryEntrypointKey(factory.name, factory.module),
-      factory: {
-        exportName: factory.name,
-        moduleSpecifier: factory.module,
-      },
-      reactContext: factory.context
-        ? {
-            exportName: factory.context,
-            moduleSpecifier: factory.contextModule ?? null,
-          }
-        : null,
-    })),
-    ...(options.apiClient ?? []).map((config) =>
-      normalizePrecreatedEntrypoint(config)
-    ),
-  ];
+  return (options.entrypoints ?? []).map((entrypoint) => {
+    if (entrypoint.kind === 'clientFactory') {
+      return {
+        kind: 'generatedFactory',
+        key: composeGeneratedFactoryEntrypointKey(
+          entrypoint.factory.exportName,
+          entrypoint.factory.moduleSpecifier
+        ),
+        factory: entrypoint.factory,
+        reactContext: entrypoint.reactContext
+          ? {
+              exportName: entrypoint.reactContext.exportName,
+              moduleSpecifier: entrypoint.reactContext.moduleSpecifier ?? null,
+            }
+          : null,
+      };
+    }
+
+    return normalizePrecreatedEntrypoint(entrypoint);
+  });
 }
 
 function normalizePrecreatedEntrypoint(
-  config: QraftPrecreatedClientConfig
+  config: QraftPrecreatedClientEntrypointConfig
 ): ClientEntrypoint {
-  const optionsModule =
-    config.createAPIClientFnOptionsModule ?? config.clientModule;
-
   return {
     kind: 'precreatedClient',
     key: [
       'precreatedClient',
-      config.client,
-      config.clientModule,
-      config.createAPIClientFn,
-      config.createAPIClientFnModule,
-      config.createAPIClientFnOptions,
-      optionsModule,
+      config.client.exportName,
+      config.client.moduleSpecifier,
+      config.factory.exportName,
+      config.factory.moduleSpecifier,
+      config.optionsFactory.exportName,
+      config.optionsFactory.moduleSpecifier,
     ].join(':'),
-    client: {
-      exportName: config.client,
-      moduleSpecifier: config.clientModule,
-    },
-    factory: {
-      exportName: config.createAPIClientFn,
-      moduleSpecifier: config.createAPIClientFnModule,
-    },
-    optionsFactory: {
-      exportName: config.createAPIClientFnOptions,
-      moduleSpecifier: optionsModule,
-    },
+    client: config.client,
+    factory: config.factory,
+    optionsFactory: config.optionsFactory,
   };
 }
 
