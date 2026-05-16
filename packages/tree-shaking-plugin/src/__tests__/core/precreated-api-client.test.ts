@@ -371,6 +371,83 @@ APIClient.pets.getPets.useQuery();
       `);
   });
 
+  it('optimizes a precreated client imported through a barrel entrypoint', async () => {
+    const root = await fs.mkdtemp(
+      path.join(os.tmpdir(), 'qraft-tree-shaking-')
+    );
+    await writeFixtureFiles(
+      root,
+      createPrecreatedFixtureFiles('', {
+        'src/barrel/index.ts': `
+export { createBarrelPrecreatedAPIClient } from '../generated-api';
+export { BarrelClient } from '../barrel-client';
+export { createOptions } from '../barrel-options';
+`,
+        'src/generated-api.ts': `
+import { qraftAPIClient } from '@openapi-qraft/react';
+import { useQuery } from '@openapi-qraft/react/callbacks/index';
+import { services } from './api/services/index';
+
+const defaultCallbacks = { useQuery } as const;
+
+export function createBarrelPrecreatedAPIClient(options?: { queryClient: unknown }) {
+  return qraftAPIClient(services, defaultCallbacks, options);
+}
+`,
+        'src/barrel-client.ts': `
+import { createBarrelPrecreatedAPIClient, createOptions } from './barrel';
+
+export const BarrelClient = createBarrelPrecreatedAPIClient(createOptions());
+`,
+        'src/barrel-options.ts': `
+export const createOptions = () => ({
+  queryClient: {}
+});
+`,
+      })
+    );
+    const sourceFile = path.join(root, 'src/App.tsx');
+
+    const result = await transformQraftTreeShaking(
+      `
+import { BarrelClient } from './barrel';
+
+BarrelClient.pets.getPets.useQuery();
+`,
+      sourceFile,
+      {
+        entrypoints: [
+          {
+            kind: 'precreatedClient',
+            client: {
+              exportName: 'BarrelClient',
+              moduleSpecifier: './barrel',
+            },
+            factory: {
+              exportName: 'createBarrelPrecreatedAPIClient',
+              moduleSpecifier: './barrel',
+            },
+            optionsFactory: {
+              exportName: 'createOptions',
+              moduleSpecifier: './barrel',
+            },
+          },
+        ],
+      }
+    );
+
+    expect(result?.code).toMatchInlineSnapshot(`
+      "import { qraftAPIClient } from "@openapi-qraft/react";
+      import { useQuery } from "@openapi-qraft/react/callbacks/useQuery";
+      import { getPets } from "./api/services/PetsService";
+      import { createOptions } from "./barrel";
+      const BarrelClient_pets_getPets = qraftAPIClient(getPets, {
+        useQuery
+      }, createOptions());
+      BarrelClient_pets_getPets.useQuery();"
+    `);
+  });
+
   it('imports precreated client options from the same module as the client', async () => {
     const root = await fs.mkdtemp(
       path.join(os.tmpdir(), 'qraft-tree-shaking-')
