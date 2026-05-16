@@ -12,7 +12,7 @@ mixes several concepts:
 - user-provided fallback resolving;
 - native source loading;
 - user-provided source loading;
-- adapter-local filesystem fallback;
+- adapter-local best-effort source fallback;
 - normalized ids used for comparison;
 - exact ids needed by virtual or query/hash loaders.
 
@@ -57,8 +57,10 @@ before the feature is published.
 : A user-provided fallback source provider. It can provide source for virtual
   modules or for custom generated-source stores.
 
-`filesystem fallback`
-: Adapter-local file reading used only after native/user loading misses.
+`adapter-local source fallback`
+: Best-effort adapter implementation detail used only after native/user loading
+  misses. It may read ordinary files when an adapter can do so, but it is not a
+  public API and is not configurable.
 
 `exact id`
 : The id returned by `resolve(...)`, including query/hash suffixes.
@@ -103,20 +105,20 @@ bundler graph by default.
 `moduleAccess.load` is a fallback source provider.
 
 The adapter must call user load after native loading misses or is unsupported,
-and before filesystem fallback.
+and before any adapter-local source fallback.
 
 This is a breaking standardization. The resulting contract is:
 
 ```text
 resolve: native resolve -> user resolve
-load:    native load -> user load -> filesystem fallback
+load:    native load -> user load -> adapter-local source fallback
 ```
 
 For adapters without a native arbitrary source-loading API, `native load` is
 `unsupported`, so the effective load order becomes:
 
 ```text
-load: user load -> filesystem fallback
+load: user load -> adapter-local source fallback
 ```
 
 User hooks are therefore escape hatches, not primary overrides. If a user needs
@@ -124,16 +126,22 @@ to replace a real filesystem module with alternate source, they should make the
 native stage miss by resolving to a virtual/custom id or use a bundler-level
 plugin before the tree-shaking plugin.
 
+Adapter-local source fallback is intentionally not configurable public API. It
+may read from the host filesystem for ordinary generated files, but users should
+not model it as a feature surface. If it misses or is unavailable, the adapter
+continues as a load miss and `diagnostics` decides whether that miss throws,
+warns, or stays silent.
+
 ## Adapter Contract
 
-| Adapter | Resolve order | Load order | Native resolve | Native load | Filesystem fallback | Unsupported / weak spots |
+| Adapter | Resolve order | Load order | Native resolve | Native load | Adapter-local fallback | Unsupported / weak spots |
 | --- | --- | --- | --- | --- | --- | --- |
 | Agnostic core/unit tests | user | user | none | none | none | no automatic source access |
-| Vite | `this.resolve(..., { skipSelf: true })` -> user | user -> `ctx.fs.readFile(stripQueryAndHash(id))` | Rollup-compatible plugin context | none | yes | virtual modules need user load unless source is readable through adapter fs |
-| Rollup | `this.resolve(..., { skipSelf: true })` -> user | user -> `ctx.fs.readFile(stripQueryAndHash(id))` | Rollup plugin context | none | yes | `this.load` is intentionally not part of the current contract until proven safe |
-| webpack | `loaderContext.getResolve({ dependencyType: 'esm' })` -> user | `loadModule(id)` -> user -> input filesystem | webpack resolver | webpack loader pipeline | yes | fallback fs reads raw files and may diverge from loader output |
-| Rspack | `@rspack/resolver` built from `compiler.options.resolve` -> user | `loadModule(id)` -> user -> input filesystem | reconstructed Rspack resolver | Rspack loader pipeline | yes | reconstructed resolve can drift from actual Rspack plugin behavior |
-| esbuild | `build.resolve(...)` -> user | user -> `fs.readFile(id)` | esbuild build context | none | yes | virtual/onLoad-only modules need user load |
+| Vite | `this.resolve(..., { skipSelf: true })` -> user | user -> adapter-local source fallback | Rollup-compatible plugin context | none | best-effort ordinary file read | virtual modules need user load unless source is available through the adapter fallback |
+| Rollup | `this.resolve(..., { skipSelf: true })` -> user | user -> adapter-local source fallback | Rollup plugin context | none | best-effort ordinary file read | `this.load` is intentionally not part of the current contract until proven safe |
+| webpack | `loaderContext.getResolve({ dependencyType: 'esm' })` -> user | `loadModule(id)` -> user -> adapter-local source fallback | webpack resolver | webpack loader pipeline | best-effort input filesystem read | fallback reads raw files and may diverge from loader output |
+| Rspack | `@rspack/resolver` built from `compiler.options.resolve` -> user | `loadModule(id)` -> user -> adapter-local source fallback | reconstructed Rspack resolver | Rspack loader pipeline | best-effort input filesystem read | reconstructed resolve can drift from actual Rspack plugin behavior |
+| esbuild | `build.resolve(...)` -> user | user -> adapter-local source fallback | esbuild build context | none | best-effort ordinary file read | virtual/onLoad-only modules need user load |
 
 ### Vite/Rollup
 
@@ -142,17 +150,17 @@ resolution, and barrel paths.
 
 They currently do not have a standardized adapter-native arbitrary load stage in
 this plugin. Until such a stage is proven against real fixtures, user load is
-the only way to provide virtual generated source. Filesystem fallback remains an
-adapter detail for ordinary generated files.
+the only public way to provide virtual generated source. Adapter-local source
+fallback remains an implementation detail for ordinary generated files.
 
 ### webpack
 
 webpack should prefer `loadModule(id)` for source because it is closest to the
 real loader pipeline.
 
-Filesystem fallback is allowed only after `loadModule` and user load miss. It is
-a weak fallback for plain generated files, not a substitute for bundler source
-loading.
+Adapter-local source fallback is allowed only after `loadModule` and user load
+miss. It is a weak fallback for plain generated files, not a substitute for
+bundler source loading.
 
 ### Rspack
 
@@ -183,7 +191,7 @@ resolve("./api", "src/App.tsx") -> "/repo/src/api.ts?raw#factory"
 load("/repo/src/api.ts?raw#factory")
 ```
 
-Only filesystem fallback may strip query/hash when reading from disk:
+Only adapter-local source fallback may strip query/hash when reading from disk:
 
 ```text
 fs.readFile(stripQueryAndHash("/repo/src/api.ts?raw#factory"))
@@ -251,10 +259,10 @@ Required cases:
 - native resolve wins over user resolve;
 - user resolve is called only after native miss/error/external/uninspectable;
 - native load wins over user load for webpack/Rspack;
-- user load runs before filesystem fallback;
+- user load runs before adapter-local source fallback;
 - rejected source loading is not permanently cached;
 - exact query/hash id is passed to user load;
-- filesystem fallback strips query/hash locally;
+- adapter-local source fallback strips query/hash locally when it reads files;
 - agnostic module access does not read files;
 - Rspack `tsConfig` normalization remains covered.
 
@@ -296,7 +304,8 @@ patches inside transform planning.
 Recommended implementation order:
 
 1. Add trace-capable strategy result types in resolver common code.
-2. Standardize adapter order to `native -> user -> fs` according to this design.
+2. Standardize adapter order to `native -> user -> adapter-local fallback`
+   according to this design.
 3. Preserve exact ids through source loading and isolate canonical id helpers.
 4. Thread trace data into unresolved diagnostics.
 5. Add unit tests for adapter contract.
@@ -309,7 +318,7 @@ Recommended implementation order:
 - User hooks have one meaning across all adapter entrypoints.
 - Core transform still has no filesystem dependency.
 - Exact ids are preserved for user load.
-- Filesystem fallback is adapter-local and traceable.
+- Adapter-local source fallback is non-public, best-effort, and traceable.
 - Rspack drift risk is documented and tested.
 - Existing tree-shaking semantic tests pass.
 - Multi-bundler e2e passes after targeted fixture additions.
