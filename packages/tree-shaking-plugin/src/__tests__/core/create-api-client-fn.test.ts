@@ -126,6 +126,43 @@ api.pets.getPets.useQuery();
     expect(result?.code).toContain('APIClientContext');
   });
 
+  it('records generated context metadata as context runtimeInput when config omits context', async () => {
+    const fixture = await createFixture();
+    const sourceFile = path.join(fixture, 'src/App.tsx');
+    const fixtureModuleAccess = createFixtureModuleAccess(fixture);
+
+    const plan = await createTransformPlan(
+      `
+import { createAPIClient } from './api';
+
+const api = createAPIClient();
+api.pets.getPets.useQuery();
+`,
+      sourceFile,
+      {
+        entrypoints: [
+          {
+            kind: 'clientFactory',
+            factory: {
+              exportName: 'createAPIClient',
+              moduleSpecifier: './api',
+            },
+          },
+        ],
+      },
+      fixtureModuleAccess
+    );
+
+    expect(plan.clients).toHaveLength(1);
+    expect(plan.clients[0].runtimeInput).toEqual({
+      kind: 'context',
+      context: {
+        exportName: 'APIClientContext',
+        moduleSpecifier: './api/APIClientContext',
+      },
+    });
+  });
+
   it('skips generic generated factories that receive services as an argument', async () => {
     const fixture = await fs.mkdtemp(
       path.join(os.tmpdir(), 'qraft-tree-shaking-')
@@ -750,6 +787,47 @@ api.pets.getPets.useQuery();
     expect(result?.code).toContain('qraftAPIClient');
     expect(result?.code).not.toContain('qraftReactAPIClient');
     expect(result?.code).toContain('apiOptions');
+  });
+
+  it('records explicit options clients as optionsExpression runtimeInput for context-capable factories', async () => {
+    const fixture = await createFixture();
+    const sourceFile = path.join(fixture, 'src/App.tsx');
+    const fixtureModuleAccess = createFixtureModuleAccess(fixture);
+
+    const plan = await createTransformPlan(
+      `
+import { createAPIClient } from './api';
+
+const apiOptions = { requestFn: async () => new Response() };
+const api = createAPIClient(apiOptions);
+api.pets.getPets.useQuery();
+`,
+      sourceFile,
+      {
+        entrypoints: [
+          {
+            kind: 'clientFactory',
+            factory: {
+              exportName: 'createAPIClient',
+              moduleSpecifier: './api',
+            },
+            reactContext: {
+              exportName: 'APIClientContext',
+            },
+          },
+        ],
+      },
+      fixtureModuleAccess
+    );
+
+    expect(plan.clients).toHaveLength(1);
+    expect(plan.clients[0].runtimeInput).toMatchObject({
+      kind: 'optionsExpression',
+      expression: {
+        type: 'Identifier',
+        name: 'apiOptions',
+      },
+    });
   });
 
   it('rewrites context-free callbacks from zero-arg createAPIClient calls', async () => {
