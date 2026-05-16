@@ -42,6 +42,9 @@ export function App() {
               exportName: 'createAPIClient',
               moduleSpecifier: './api',
             },
+            reactContext: {
+              exportName: 'APIClientContext',
+            },
           },
         ],
       },
@@ -97,7 +100,40 @@ export function App() {
       `);
   });
 
-  it('uses generated context metadata when config omits context but source proves it', async () => {
+  it('throws when a zero-arg client uses context callbacks without configured reactContext', async () => {
+    const fixture = await createFixture();
+    const sourceFile = path.join(fixture, 'src/App.tsx');
+
+    await expect(
+      transformQraftTreeShaking(
+        `
+import { createAPIClient } from './api';
+
+const api = createAPIClient();
+api.pets.getPets.useQuery();
+`,
+        sourceFile,
+        {
+          entrypoints: [
+            {
+              kind: 'clientFactory',
+              factory: {
+                exportName: 'createAPIClient',
+                moduleSpecifier: './api',
+              },
+            },
+          ],
+        }
+      )
+    ).rejects.toMatchObject({
+      name: 'QraftTreeShakeError',
+      reason: {
+        code: 'context-client-unresolved',
+      },
+    });
+  });
+
+  it('skips zero-arg context callbacks without configured reactContext when diagnostics is off', async () => {
     const fixture = await createFixture();
     const sourceFile = path.join(fixture, 'src/App.tsx');
 
@@ -110,6 +146,7 @@ api.pets.getPets.useQuery();
 `,
       sourceFile,
       {
+        diagnostics: 'off',
         entrypoints: [
           {
             kind: 'clientFactory',
@@ -122,11 +159,10 @@ api.pets.getPets.useQuery();
       }
     );
 
-    expect(result?.code).toContain('qraftReactAPIClient');
-    expect(result?.code).toContain('APIClientContext');
+    expect(result).toBeNull();
   });
 
-  it('records generated context metadata as context runtimeInput when config omits context', async () => {
+  it('records zero-arg clients without configured reactContext as no runtime input', async () => {
     const fixture = await createFixture();
     const sourceFile = path.join(fixture, 'src/App.tsx');
     const fixtureModuleAccess = createFixtureModuleAccess(fixture);
@@ -136,7 +172,7 @@ api.pets.getPets.useQuery();
 import { createAPIClient } from './api';
 
 const api = createAPIClient();
-api.pets.getPets.useQuery();
+api.pets.getPets.getQueryKey();
 `,
       sourceFile,
       {
@@ -155,11 +191,7 @@ api.pets.getPets.useQuery();
 
     expect(plan.clients).toHaveLength(1);
     expect(plan.clients[0].runtimeInput).toEqual({
-      kind: 'context',
-      context: {
-        exportName: 'APIClientContext',
-        moduleSpecifier: './api/APIClientContext',
-      },
+      kind: 'none',
     });
   });
 
@@ -1006,6 +1038,9 @@ export function App() {
               exportName: 'createAPIClient',
               moduleSpecifier: './api',
             },
+            reactContext: {
+              exportName: 'APIClientContext',
+            },
           },
         ],
       }
@@ -1054,6 +1089,9 @@ api.stores.getStores.useQuery();
             factory: {
               exportName: 'createAPIClient',
               moduleSpecifier: './api',
+            },
+            reactContext: {
+              exportName: 'APIClientContext',
             },
           },
         ],
@@ -1109,6 +1147,9 @@ async function run() {
             factory: {
               exportName: 'createAPIClient',
               moduleSpecifier: './api',
+            },
+            reactContext: {
+              exportName: 'APIClientContext',
             },
           },
         ],

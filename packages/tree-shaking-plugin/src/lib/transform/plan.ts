@@ -527,7 +527,7 @@ export async function createTransformPlan(
         );
       if (
         match.client.mode.type === 'context' &&
-        !generatedInfo.contextName &&
+        match.client.runtimeInput.kind !== 'context' &&
         callbackNeedsRuntimeContext(match.callbackName)
       ) {
         return skipUnresolvedTransformCandidate(
@@ -1702,8 +1702,9 @@ async function readGeneratedClientInfo(
   let contextName: string | null = null;
   const contextImportPathsByLocalName = new Map<string, string>();
   const reactClientLocalNames = new Set<string>();
-  const expectedContextName = factory.context ?? 'APIClientContext';
-  const shouldScanContextImport = usesReactClient && !factory.contextModule;
+  const expectedContextName = factory.context ?? null;
+  const shouldScanContextImport =
+    usesReactClient && !factory.contextModule && expectedContextName !== null;
 
   traverse(ast, {
     ImportDeclaration(importPathNode) {
@@ -1991,7 +1992,7 @@ function toGeneratedClientInfo(
       factory,
       importerId
     ),
-    contextName: metadata.reactContext?.exportName ?? null,
+    contextName: factory.context ?? null,
   };
 }
 
@@ -2000,6 +2001,7 @@ function resolveMetadataContextImportPath(
   factory: LegacyQraftFactoryConfig,
   importerId: string
 ) {
+  if (!factory.context) return null;
   if (!metadata.reactContext?.moduleSpecifier) return null;
 
   if (factory.contextModule) {
@@ -2126,7 +2128,7 @@ function getGeneratedInfoKey(
   createImportPath: string,
   factory: LegacyQraftFactoryConfig
 ) {
-  return `${createImportPath}::${factory.context ?? 'APIClientContext'}::${factory.contextModule ?? ''}`;
+  return `${createImportPath}::${factory.context ?? ''}::${factory.contextModule ?? ''}`;
 }
 
 function getClientSourceKey(
