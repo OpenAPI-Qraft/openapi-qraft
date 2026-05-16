@@ -3,9 +3,11 @@ import os from 'node:os';
 import path from 'node:path';
 import { describe, expect, it } from 'vitest';
 import {
+  contextApiIndexTsBody,
   createFixtureModuleAccess,
   createPrecreatedFixtureFiles,
   getContextFixtureFiles,
+  PRECREATED_API_INDEX_TS,
   SERVICES_INDEX_TS,
   writeFixtureFiles,
 } from '../../__tests__/core/fixtures.js';
@@ -132,6 +134,51 @@ export const APIClientContext = {};
     ]);
   });
 
+  it('reads generated factory metadata through a re-export chain', async () => {
+    const root = await createTempFixture();
+    await writeFixtureFiles(root, {
+      ...getContextFixtureFiles('APIClientContext', './APIClientContext', true),
+      'src/api/index.ts': `
+export { createAPIClient } from './barrel';
+`,
+      'src/api/barrel.ts': `
+export { createAPIClient } from './createAPIClient';
+`,
+      'src/api/createAPIClient.ts': `
+import { APIClientContext } from './APIClientContext';
+${contextApiIndexTsBody('APIClientContext')}
+`,
+    });
+    const importerId = path.join(root, 'src/App.tsx');
+    const entrypoints = normalizeEntrypoints({
+      entrypoints: [
+        {
+          kind: 'clientFactory',
+          factory: { exportName: 'createAPIClient', moduleSpecifier: './api' },
+          reactContext: { exportName: 'APIClientContext' },
+        },
+      ],
+    });
+
+    const result = await inspectGeneratedEntrypoints({
+      importerId,
+      entrypoints,
+      moduleAccess: createFixtureModuleAccess(root),
+    });
+
+    const metadata = result.metadataByEntrypointKey.get(entrypoints[0].key);
+
+    expect(result.reasons).toEqual([]);
+    expect(metadata).toMatchObject({
+      factoryFile: path.join(root, 'src/api/createAPIClient.ts'),
+      servicesDir: './services',
+      reactContext: {
+        exportName: 'APIClientContext',
+        moduleSpecifier: './APIClientContext',
+      },
+    });
+  });
+
   it('validates precreated clients against configured factory', async () => {
     const root = await createTempFixture();
     await writeFixtureFiles(
@@ -181,6 +228,110 @@ export const APIClient = createAPIClient(createAPIClientOptions());
         moduleSpecifier: './client-options',
       },
     });
+  });
+
+  it('validates precreated clients that import the configured factory barrel', async () => {
+    const root = await createTempFixture();
+    await writeFixtureFiles(
+      root,
+      createPrecreatedFixtureFiles(
+        `
+import { createAPIClient } from './api';
+import { createAPIClientOptions } from './client-options';
+
+export const APIClient = createAPIClient(createAPIClientOptions());
+`,
+        {
+          'src/api/index.ts': `
+export { createAPIClient } from './createAPIClient';
+`,
+          'src/api/createAPIClient.ts': PRECREATED_API_INDEX_TS,
+        }
+      )
+    );
+    const importerId = path.join(root, 'src/App.tsx');
+    const entrypoints = normalizeEntrypoints({
+      entrypoints: [
+        {
+          kind: 'precreatedClient',
+          client: { exportName: 'APIClient', moduleSpecifier: './client' },
+          factory: { exportName: 'createAPIClient', moduleSpecifier: './api' },
+          optionsFactory: {
+            exportName: 'createAPIClientOptions',
+            moduleSpecifier: './client-options',
+          },
+        },
+      ],
+    });
+
+    const result = await inspectGeneratedEntrypoints({
+      importerId,
+      entrypoints,
+      moduleAccess: createFixtureModuleAccess(root),
+    });
+
+    const metadata = result.metadataByEntrypointKey.get(entrypoints[0].key);
+
+    expect(result.reasons).toEqual([]);
+    expect(metadata).toMatchObject({
+      factoryFile: path.join(root, 'src/api/createAPIClient.ts'),
+      servicesDir: './services',
+      reactContext: null,
+    });
+  });
+
+  it('returns mismatch reason when a precreated client uses another factory', async () => {
+    const root = await createTempFixture();
+    await writeFixtureFiles(
+      root,
+      createPrecreatedFixtureFiles(
+        `
+import { createAPIClient } from './api';
+import { createAPIClientOptions } from './client-options';
+
+export const APIClient = createAPIClient(createAPIClientOptions());
+`,
+        {
+          'src/other-api.ts': PRECREATED_API_INDEX_TS.replace(
+            'createAPIClient',
+            'createOtherAPIClient'
+          ),
+        }
+      )
+    );
+    const importerId = path.join(root, 'src/App.tsx');
+    const entrypoints = normalizeEntrypoints({
+      entrypoints: [
+        {
+          kind: 'precreatedClient',
+          client: { exportName: 'APIClient', moduleSpecifier: './client' },
+          factory: {
+            exportName: 'createOtherAPIClient',
+            moduleSpecifier: './other-api',
+          },
+          optionsFactory: {
+            exportName: 'createAPIClientOptions',
+            moduleSpecifier: './client-options',
+          },
+        },
+      ],
+    });
+
+    const result = await inspectGeneratedEntrypoints({
+      importerId,
+      entrypoints,
+      moduleAccess: createFixtureModuleAccess(root),
+    });
+
+    expect(result.metadataByEntrypointKey.get(entrypoints[0].key)).toBeNull();
+    expect(result.reasons).toEqual([
+      {
+        layer: 'generated-metadata',
+        code: 'precreated-client-factory-mismatch',
+        message: 'Precreated client export does not match configured factory.',
+        entrypointKey: entrypoints[0].key,
+      },
+    ]);
   });
 });
 
