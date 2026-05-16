@@ -24,7 +24,8 @@ This directory contains focused tests for `transformQraftTreeShaking`. Keep test
   - Use for `.schema` rewrites, operation import identity, same-name operation aliasing, and import-source separation between generated roots.
 
 - `resolution-and-module-access.test.ts`
-  - Use for resolver behavior, `moduleAccess.resolve`, `moduleAccess.load`, fixture-relative resolution, legacy 4th-argument resolver compatibility, and empty/mismatched config safety.
+  - Use for diagnostics behavior when generated modules cannot be resolved or loaded through module access.
+  - Also use for resolver behavior, `moduleAccess.resolve`, `moduleAccess.load`, fixture-relative resolution, legacy 4th-argument resolver compatibility, and empty/mismatched config safety.
   - Direct imports of the raw production transform are allowed here only when testing legacy resolver/module-access entrypoints.
 
 - `unsupported-and-safety.test.ts`

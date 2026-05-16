@@ -370,10 +370,13 @@ entrypoints: [
 - `resolve` - custom resolver used as a fallback when the bundler cannot resolve a specifier.
 - `include` / `exclude` - filter which files are transformed.
 - `diagnostics` - controls unresolved transform candidates:
-  - `'error'` (default) throws when configured source looks transformable but generated metadata or operation ownership cannot be proven.
+  - `'error'` (default) throws when configured source looks transformable but
+    generated metadata or operation ownership cannot be proven.
   - `'warn'` prints a warning and skips the candidate.
   - `'off'` skips unresolved candidates silently.
-- `debug` - temporary backward-compatible legacy logging for skipped files and skip reasons.
+
+Legacy compatibility: `debug?: boolean` is still accepted for migration from
+early plugin builds. New configs should use `diagnostics`.
 
 ## Transformation Examples
 
