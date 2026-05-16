@@ -463,26 +463,98 @@ lookalike.pets.getPets.useQuery();
     expect(result).toBeNull();
   });
 
-  it('returns null when the specifier cannot be resolved', async () => {
+  it('throws by default when a configured factory import specifier cannot be resolved', async () => {
     const fixture = await createFixture();
     const sourceFile = path.join(fixture, 'src/App.tsx');
 
-    const result = await transformQraftTreeShaking(
-      `
+    await expect(
+      transformQraftTreeShaking(
+        `
 import { createAPIClient } from 'unresolvable-module';
 
 const api = createAPIClient();
 
 api.pets.getPets.useQuery();
 `,
+        sourceFile,
+        {
+          entrypoints: [
+            {
+              kind: 'clientFactory',
+              factory: {
+                exportName: 'createAPIClient',
+                moduleSpecifier: 'unresolvable-module',
+              },
+            },
+          ],
+          resolve: () => null,
+        }
+      )
+    ).rejects.toMatchObject({
+      name: 'QraftTreeShakeError',
+      reason: expect.objectContaining({
+        code: 'entrypoint-source-unavailable',
+      }),
+    });
+  });
+
+  it('skips an unresolved configured factory import specifier when diagnostics is off', async () => {
+    const fixture = await createFixture();
+    const sourceFile = path.join(fixture, 'src/App.tsx');
+
+    await expect(
+      transformQraftTreeShaking(
+        `
+import { createAPIClient } from 'unresolvable-module';
+
+const api = createAPIClient();
+
+api.pets.getPets.useQuery();
+`,
+        sourceFile,
+        {
+          diagnostics: 'off',
+          entrypoints: [
+            {
+              kind: 'clientFactory',
+              factory: {
+                exportName: 'createAPIClient',
+                moduleSpecifier: 'unresolvable-module',
+              },
+            },
+          ],
+          resolve: () => null,
+        }
+      )
+    ).resolves.toBeNull();
+  });
+
+  it('does not report unrelated unresolved same-named precreated imports', async () => {
+    const fixture = await createFixture();
+    const sourceFile = path.join(fixture, 'src/App.tsx');
+
+    const result = await transformQraftTreeShaking(
+      `
+import { APIClient } from './other-client';
+
+APIClient.pets.getPets.useQuery();
+`,
       sourceFile,
       {
         entrypoints: [
           {
-            kind: 'clientFactory',
+            kind: 'precreatedClient',
+            client: {
+              exportName: 'APIClient',
+              moduleSpecifier: './client',
+            },
             factory: {
               exportName: 'createAPIClient',
-              moduleSpecifier: 'unresolvable-module',
+              moduleSpecifier: './api',
+            },
+            optionsFactory: {
+              exportName: 'createAPIClientOptions',
+              moduleSpecifier: './client-options',
             },
           },
         ],

@@ -255,12 +255,16 @@ export async function createTransformPlan(
         resolvedAbs = (await resolveModule(source, id)) ?? null;
         resolvedId = resolvedAbs ? normalizeResolvedId(resolvedAbs) : null;
       }
-      if (!resolvedAbs) continue;
-
-      let matched = matchingFactories.find(
-        (factory) => factoryResolvedIds.get(factory) === resolvedId
+      const matchedBySource = matchingFactories.find((factory) =>
+        entrypointModuleMatchesImportSource(
+          factory.module,
+          source,
+          factoryResolvedIds.get(factory) ?? null,
+          resolvedId ?? null
+        )
       );
-      if (!matched) {
+      let matched = matchedBySource;
+      if (!matched && resolvedAbs) {
         for (const factory of matchingFactories) {
           const info = await readGeneratedClientInfo(
             id,
@@ -282,11 +286,13 @@ export async function createTransformPlan(
       }
       if (!matched) continue;
 
-      createImports.set(specifier.local.name, {
-        sourceSpecifier: source,
-        factoryFile: resolvedAbs,
-        factory: matched,
-      });
+      if (resolvedAbs) {
+        createImports.set(specifier.local.name, {
+          sourceSpecifier: source,
+          factoryFile: resolvedAbs,
+          factory: matched,
+        });
+      }
       const entrypointKey = factoryEntrypointKeys.get(matched);
       if (entrypointKey) {
         factoryImportSignals.set(specifier.local.name, {
@@ -319,10 +325,14 @@ export async function createTransformPlan(
       for (const precreated of precreatedOptions) {
         if (precreated.client !== importedName) continue;
         if (
-          precreatedClientResolvedIds.get(precreated) !== importResolvedId
-        ) {
+          !entrypointModuleMatchesImportSource(
+            precreated.clientModule,
+            source,
+            precreatedClientResolvedIds.get(precreated) ?? null,
+            importResolvedId
+          )
+        )
           continue;
-        }
 
         const entrypointKey = precreatedEntrypointKeys.get(precreated);
         if (!entrypointKey) continue;
@@ -905,6 +915,19 @@ function reportUsedUnresolvedEntrypoints(
     if (!usedEntrypointKeys.has(reason.entrypointKey)) continue;
     diagnostics.unresolved(reason);
   }
+}
+
+function entrypointModuleMatchesImportSource(
+  moduleSpecifier: string,
+  importSource: string,
+  configuredResolvedId: string | null,
+  importResolvedId: string | null
+) {
+  if (configuredResolvedId && importResolvedId) {
+    return configuredResolvedId === importResolvedId;
+  }
+
+  return moduleSpecifier === importSource;
 }
 
 async function findPrecreatedClients(
