@@ -26,12 +26,6 @@ describe('normalizeEntrypoints', () => {
           exportName: 'APIClientContext',
           moduleSpecifier: './api/APIClientContext',
         },
-        legacyConfig: {
-          name: 'createReactAPIClient',
-          module: './api',
-          context: 'APIClientContext',
-          contextModule: './api/APIClientContext',
-        },
       },
     ]);
   });
@@ -65,14 +59,6 @@ describe('normalizeEntrypoints', () => {
         optionsFactory: {
           exportName: 'createNodeAPIClientOptions',
           moduleSpecifier: './client-options',
-        },
-        legacyConfig: {
-          client: 'nodeAPIClient',
-          clientModule: './client',
-          createAPIClientFn: 'createNodeAPIClient',
-          createAPIClientFnModule: './api',
-          createAPIClientFnOptions: 'createNodeAPIClientOptions',
-          createAPIClientFnOptionsModule: './client-options',
         },
       },
     ]);

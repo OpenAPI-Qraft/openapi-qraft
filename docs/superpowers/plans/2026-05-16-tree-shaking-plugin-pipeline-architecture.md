@@ -436,12 +436,6 @@ describe('normalizeEntrypoints', () => {
           exportName: 'APIClientContext',
           moduleSpecifier: './api/APIClientContext',
         },
-        legacyConfig: {
-          name: 'createReactAPIClient',
-          module: './api',
-          context: 'APIClientContext',
-          contextModule: './api/APIClientContext',
-        },
       },
     ]);
   });
@@ -475,14 +469,6 @@ describe('normalizeEntrypoints', () => {
         optionsFactory: {
           exportName: 'createNodeAPIClientOptions',
           moduleSpecifier: './client-options',
-        },
-        legacyConfig: {
-          client: 'nodeAPIClient',
-          clientModule: './client',
-          createAPIClientFn: 'createNodeAPIClient',
-          createAPIClientFnModule: './api',
-          createAPIClientFnOptions: 'createNodeAPIClientOptions',
-          createAPIClientFnOptionsModule: './client-options',
         },
       },
     ]);
@@ -542,7 +528,6 @@ export type GeneratedFactoryEntrypoint = {
   key: string;
   factory: ImportTarget;
   runtimeContext: RuntimeContextConfig | null;
-  legacyConfig: QraftFactoryConfig;
 };
 
 export type PrecreatedClientEntrypoint = {
@@ -551,7 +536,6 @@ export type PrecreatedClientEntrypoint = {
   client: ImportTarget;
   factory: ImportTarget;
   optionsFactory: ImportTarget;
-  legacyConfig: QraftPrecreatedClientConfig;
 };
 
 export type ClientEntrypoint =
@@ -587,7 +571,6 @@ export function normalizeEntrypoints(
             moduleSpecifier: factory.contextModule ?? null,
           }
         : null,
-      legacyConfig: factory,
     })),
     ...(options.apiClient ?? []).map((config) =>
       normalizePrecreatedEntrypoint(config)
@@ -624,7 +607,6 @@ function normalizePrecreatedEntrypoint(
       exportName: config.createAPIClientFnOptions,
       moduleSpecifier: optionsModule,
     },
-    legacyConfig: config,
   };
 }
 

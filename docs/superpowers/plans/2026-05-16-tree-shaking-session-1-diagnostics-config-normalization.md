@@ -158,7 +158,8 @@ Required behavior:
 
 - normalize `createAPIClientFn` into `kind: 'generatedFactory'`;
 - normalize `apiClient` into `kind: 'precreatedClient'`;
-- preserve legacy config on each entrypoint;
+- keep legacy public config support at the `normalizeEntrypoints()` boundary
+  without carrying raw config as `legacyConfig` in normalized entries;
 - compose stable keys from kind, export name, and module specifier.
 
 - [x] **Step 5: Verify entrypoints**
