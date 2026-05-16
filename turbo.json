@@ -3,47 +3,45 @@
   "tasks": {
     "build": {
       "cache": true,
-      "dependsOn": ["write-package-version-file", "^build", "codegen"],
-      "outputs": ["dist/**", "src/ts-factory/service-operation.generated/**"]
+      "dependsOn": ["^build"],
+      "inputs": ["$TURBO_DEFAULT$"],
+      "outputs": ["dist/**"]
     },
     "test": {
       "cache": true,
-      "dependsOn": ["write-package-version-file", "^build"],
+      "dependsOn": ["^build"],
+      "inputs": ["$TURBO_DEFAULT$"],
       "outputs": []
     },
     "typecheck": {
       "cache": true,
+      "inputs": ["$TURBO_DEFAULT$"],
       "outputs": [],
       "outputLogs": "full",
-      "dependsOn": [
-        "write-package-version-file",
-        "^codegen",
-        "codegen",
-        "^build"
-      ]
+      "dependsOn": ["^build"]
     },
     "dev": {
       "cache": false,
       "persistent": true,
-      "dependsOn": ["write-package-version-file", "^build"]
+      "dependsOn": ["^build"]
     },
     "lint": {
       "cache": true,
+      "inputs": ["$TURBO_DEFAULT$"],
       "outputs": [],
       "outputLogs": "full",
-      "dependsOn": ["write-package-version-file", "codegen", "^build"]
+      "dependsOn": ["^build"]
     },
     "clean": {
       "cache": false
     },
     "codegen": {
       "cache": true,
-      "dependsOn": ["^build"],
+      "inputs": ["$TURBO_DEFAULT$"],
       "outputs": [
         "src/tests/fixtures/api/**/*.ts",
         "src/api/**/*.ts"
-      ],
-      "inputs": []
+      ]
     },
     "write-package-version-file": {
       "cache": true,

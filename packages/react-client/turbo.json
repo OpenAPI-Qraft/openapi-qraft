@@ -2,14 +2,26 @@
   "$schema": "https://turbo.build/schema.json",
   "extends": ["//"],
   "tasks": {
+    "build": {
+      "dependsOn": ["^build", "codegen"]
+    },
+    "codegen": {
+      "dependsOn": ["^build"],
+      "inputs": ["$TURBO_DEFAULT$"],
+      "outputs": [
+        "src/tests/fixtures/api/**/*.ts",
+        "src/tests/fixtures/queryable-write-operations-api/**/*.ts",
+        "src/tests/fixtures/files-api/**/*.ts"
+      ]
+    },
     "typecheck": {
-      "cache": true,
-      "dependsOn": ["build"]
+      "dependsOn": ["^build", "codegen"]
+    },
+    "lint": {
+      "dependsOn": ["^build", "codegen"]
     },
     "test": {
-      "cache": true,
-      "dependsOn": ["build"],
-      "outputs": ["coverage/**"]
+      "dependsOn": ["build"]
     }
   }
 }
