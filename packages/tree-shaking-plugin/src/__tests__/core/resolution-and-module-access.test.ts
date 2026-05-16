@@ -28,7 +28,15 @@ export function App() {
 `,
       sourceFile,
       {
-        createAPIClientFn: [{ name: 'createAPIClient', module: './api' }],
+        entrypoints: [
+          {
+            kind: 'clientFactory',
+            factory: {
+              exportName: 'createAPIClient',
+              moduleSpecifier: './api',
+            },
+          },
+        ],
         moduleAccess: {
           resolve: fixtureModuleAccess.resolve,
           load,
@@ -62,11 +70,16 @@ export function App() {
       await fs.readFile(sourceFile, 'utf8'),
       sourceFile,
       {
-        createAPIClientFn: [
+        entrypoints: [
           {
-            name: 'createAPIClient',
-            module: './generated-api',
-            context: 'APIClientContext',
+            kind: 'clientFactory',
+            factory: {
+              exportName: 'createAPIClient',
+              moduleSpecifier: './generated-api',
+            },
+            reactContext: {
+              exportName: 'APIClientContext',
+            },
           },
         ],
       }
@@ -106,7 +119,15 @@ export function App() {
 `,
         sourceFile,
         {
-          createAPIClientFn: [{ name: 'createAPIClient', module: './api' }],
+          entrypoints: [
+            {
+              kind: 'clientFactory',
+              factory: {
+                exportName: 'createAPIClient',
+                moduleSpecifier: './api',
+              },
+            },
+          ],
         },
         {
           resolve: fixtureResolver,
@@ -140,7 +161,15 @@ export function App() {
 `,
       sourceFile,
       {
-        createAPIClientFn: [{ name: 'createAPIClient', module: './api' }],
+        entrypoints: [
+          {
+            kind: 'clientFactory',
+            factory: {
+              exportName: 'createAPIClient',
+              moduleSpecifier: './api',
+            },
+          },
+        ],
         moduleAccess: {
           load,
         },
@@ -173,7 +202,15 @@ export function App() {
 `,
       sourceFile,
       {
-        createAPIClientFn: [{ name: 'createAPIClient', module: './api' }],
+        entrypoints: [
+          {
+            kind: 'clientFactory',
+            factory: {
+              exportName: 'createAPIClient',
+              moduleSpecifier: './api',
+            },
+          },
+        ],
         moduleAccess: {
           resolve: fixtureModuleAccess.resolve,
           load,
@@ -208,7 +245,17 @@ const lookalike = createAPIClient();
 lookalike.pets.getPets.useQuery();
 `,
       sourceFile,
-      { createAPIClientFn: [{ name: 'createAPIClient', module: './api' }] }
+      {
+        entrypoints: [
+          {
+            kind: 'clientFactory',
+            factory: {
+              exportName: 'createAPIClient',
+              moduleSpecifier: './api',
+            },
+          },
+        ],
+      }
     );
 
     expect(result).toBeNull();
@@ -228,8 +275,14 @@ api.pets.getPets.useQuery();
 `,
       sourceFile,
       {
-        createAPIClientFn: [
-          { name: 'createAPIClient', module: 'unresolvable-module' },
+        entrypoints: [
+          {
+            kind: 'clientFactory',
+            factory: {
+              exportName: 'createAPIClient',
+              moduleSpecifier: 'unresolvable-module',
+            },
+          },
         ],
         resolve: () => null,
       }
@@ -238,7 +291,7 @@ api.pets.getPets.useQuery();
     expect(result).toBeNull();
   });
 
-  it('skips when createAPIClientFn is empty', async () => {
+  it('skips when entrypoints are empty', async () => {
     const fixture = await createFixture();
     const sourceFile = path.join(fixture, 'src/App.tsx');
 
@@ -251,7 +304,7 @@ const api = createAPIClient();
 api.pets.getPets.useQuery();
 `,
       sourceFile,
-      { createAPIClientFn: [] }
+      { entrypoints: [] }
     );
 
     expect(result).toBeNull();

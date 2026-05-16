@@ -16,7 +16,7 @@ import {
   transformQraftTreeShaking,
 } from './harness.js';
 
-describe('transformQraftTreeShaking createAPIClientFn clients', () => {
+describe('transformQraftTreeShaking clientFactory entrypoints', () => {
   it('collects named and inline usages in one transform plan', async () => {
     const fixture = await createFixture();
     const sourceFile = path.join(fixture, 'src/App.tsx');
@@ -34,7 +34,17 @@ export function App() {
 }
 `,
       sourceFile,
-      { createAPIClientFn: [{ name: 'createAPIClient', module: './api' }] },
+      {
+        entrypoints: [
+          {
+            kind: 'clientFactory',
+            factory: {
+              exportName: 'createAPIClient',
+              moduleSpecifier: './api',
+            },
+          },
+        ],
+      },
       fixtureModuleAccess
     );
 
@@ -58,11 +68,16 @@ export function App() {
 `,
       sourceFile,
       {
-        createAPIClientFn: [
+        entrypoints: [
           {
-            name: 'createAPIClient',
-            module: './api',
-            context: 'APIClientContext',
+            kind: 'clientFactory',
+            factory: {
+              exportName: 'createAPIClient',
+              moduleSpecifier: './api',
+            },
+            reactContext: {
+              exportName: 'APIClientContext',
+            },
           },
         ],
       }
@@ -118,8 +133,14 @@ export function App() {
 `,
       sourceFile,
       {
-        createAPIClientFn: [
-          { name: 'createAPIClient', module: './api/createAPIClient' },
+        entrypoints: [
+          {
+            kind: 'clientFactory',
+            factory: {
+              exportName: 'createAPIClient',
+              moduleSpecifier: './api/createAPIClient',
+            },
+          },
         ],
       }
     );
@@ -159,8 +180,14 @@ export function App() {
 `,
       sourceFile,
       {
-        createAPIClientFn: [
-          { name: 'createAPIClient', module: './api/createAPIClient' },
+        entrypoints: [
+          {
+            kind: 'clientFactory',
+            factory: {
+              exportName: 'createAPIClient',
+              moduleSpecifier: './api/createAPIClient',
+            },
+          },
         ],
       }
     );
@@ -189,11 +216,16 @@ export function App() {
 `,
       sourceFile,
       {
-        createAPIClientFn: [
+        entrypoints: [
           {
-            name: 'createAPIClient',
-            module: './api',
-            context: 'APIClientContext',
+            kind: 'clientFactory',
+            factory: {
+              exportName: 'createAPIClient',
+              moduleSpecifier: './api',
+            },
+            reactContext: {
+              exportName: 'APIClientContext',
+            },
           },
         ],
       }
@@ -239,11 +271,16 @@ export function App() {
 `,
       sourceFile,
       {
-        createAPIClientFn: [
+        entrypoints: [
           {
-            name: 'createAPIClient',
-            module: './api',
-            context: 'APIClientContext',
+            kind: 'clientFactory',
+            factory: {
+              exportName: 'createAPIClient',
+              moduleSpecifier: './api',
+            },
+            reactContext: {
+              exportName: 'APIClientContext',
+            },
           },
         ],
       }
@@ -286,11 +323,16 @@ export function App() {
 `,
       sourceFile,
       {
-        createAPIClientFn: [
+        entrypoints: [
           {
-            name: 'createAPIClient',
-            module: './api',
-            context: 'MyAPIContext',
+            kind: 'clientFactory',
+            factory: {
+              exportName: 'createAPIClient',
+              moduleSpecifier: './api',
+            },
+            reactContext: {
+              exportName: 'MyAPIContext',
+            },
           },
         ],
       }
@@ -342,11 +384,16 @@ export function App() {
 `,
       sourceFile,
       {
-        createAPIClientFn: [
+        entrypoints: [
           {
-            name: 'createAPIClient',
-            module: './api',
-            context: 'InternalContext',
+            kind: 'clientFactory',
+            factory: {
+              exportName: 'createAPIClient',
+              moduleSpecifier: './api',
+            },
+            reactContext: {
+              exportName: 'InternalContext',
+            },
           },
         ],
       }
@@ -386,12 +433,17 @@ export function App() {
 `,
       sourceFile,
       {
-        createAPIClientFn: [
+        entrypoints: [
           {
-            name: 'createAPIClient',
-            module: './api',
-            context: 'MyAPIContext',
-            contextModule: './api/MyAPIContext',
+            kind: 'clientFactory',
+            factory: {
+              exportName: 'createAPIClient',
+              moduleSpecifier: './api',
+            },
+            reactContext: {
+              exportName: 'MyAPIContext',
+              moduleSpecifier: './api/MyAPIContext',
+            },
           },
         ],
       }
@@ -426,11 +478,16 @@ api.pets.getPets();
 `,
       sourceFile,
       {
-        createAPIClientFn: [
+        entrypoints: [
           {
-            name: 'createAPIClient',
-            module: './api',
-            context: 'APIClientContext',
+            kind: 'clientFactory',
+            factory: {
+              exportName: 'createAPIClient',
+              moduleSpecifier: './api',
+            },
+            reactContext: {
+              exportName: 'APIClientContext',
+            },
           },
         ],
       }
@@ -466,7 +523,17 @@ export function App() {
 }
 `,
       sourceFile,
-      { createAPIClientFn: [{ name: 'createAPIClient', module: './api' }] }
+      {
+        entrypoints: [
+          {
+            kind: 'clientFactory',
+            factory: {
+              exportName: 'createAPIClient',
+              moduleSpecifier: './api',
+            },
+          },
+        ],
+      }
     );
 
     expect(result?.code).toMatchInlineSnapshot(`
@@ -500,7 +567,17 @@ export function App() {
 }
 `,
       sourceFile,
-      { createAPIClientFn: [{ name: 'createAPIClient', module: './api' }] }
+      {
+        entrypoints: [
+          {
+            kind: 'clientFactory',
+            factory: {
+              exportName: 'createAPIClient',
+              moduleSpecifier: './api',
+            },
+          },
+        ],
+      }
     );
 
     expect(result?.code).toMatchInlineSnapshot(`
@@ -534,7 +611,17 @@ export function App() {
 }
 `,
       sourceFile,
-      { createAPIClientFn: [{ name: 'createAPIClient', module: './api' }] }
+      {
+        entrypoints: [
+          {
+            kind: 'clientFactory',
+            factory: {
+              exportName: 'createAPIClient',
+              moduleSpecifier: './api',
+            },
+          },
+        ],
+      }
     );
 
     expect(result?.code).toMatchInlineSnapshot(`
@@ -571,11 +658,16 @@ export function App() {
 `,
       sourceFile,
       {
-        createAPIClientFn: [
+        entrypoints: [
           {
-            name: 'createAPIClient',
-            module: './api',
-            context: 'APIClientContext',
+            kind: 'clientFactory',
+            factory: {
+              exportName: 'createAPIClient',
+              moduleSpecifier: './api',
+            },
+            reactContext: {
+              exportName: 'APIClientContext',
+            },
           },
         ],
       }
@@ -615,7 +707,17 @@ function App() {
 }
 `,
       sourceFile,
-      { createAPIClientFn: [{ name: 'createAPIClient', module: './api' }] }
+      {
+        entrypoints: [
+          {
+            kind: 'clientFactory',
+            factory: {
+              exportName: 'createAPIClient',
+              moduleSpecifier: './api',
+            },
+          },
+        ],
+      }
     );
 
     expect(result?.code).toMatchInlineSnapshot(`
@@ -656,7 +758,17 @@ const api = createAPIClient({ queryClient: {} });
 api.pets.getPets.invalidateQueries();
 `,
       sourceFile,
-      { createAPIClientFn: [{ name: 'createAPIClient', module: './api' }] }
+      {
+        entrypoints: [
+          {
+            kind: 'clientFactory',
+            factory: {
+              exportName: 'createAPIClient',
+              moduleSpecifier: './api',
+            },
+          },
+        ],
+      }
     );
 
     expect(result?.code).toMatchInlineSnapshot(`
@@ -693,7 +805,17 @@ apiWithClient.pets.getPets.invalidateQueries();
 apiWithClient.pets.getPets.setQueryData(undefined, () => undefined);
 `,
       sourceFile,
-      { createAPIClientFn: [{ name: 'createAPIClient', module: './api' }] }
+      {
+        entrypoints: [
+          {
+            kind: 'clientFactory',
+            factory: {
+              exportName: 'createAPIClient',
+              moduleSpecifier: './api',
+            },
+          },
+        ],
+      }
     );
 
     expect(result?.code).toMatchInlineSnapshot(`
@@ -733,7 +855,17 @@ export function App() {
 }
 `,
       sourceFile,
-      { createAPIClientFn: [{ name: 'createAPIClient', module: './api' }] }
+      {
+        entrypoints: [
+          {
+            kind: 'clientFactory',
+            factory: {
+              exportName: 'createAPIClient',
+              moduleSpecifier: './api',
+            },
+          },
+        ],
+      }
     );
 
     expect(result?.code).toMatchInlineSnapshot(`
@@ -771,7 +903,17 @@ api.pets.createPet.useMutation();
 api.stores.getStores.useQuery();
 `,
       sourceFile,
-      { createAPIClientFn: [{ name: 'createAPIClient', module: './api' }] }
+      {
+        entrypoints: [
+          {
+            kind: 'clientFactory',
+            factory: {
+              exportName: 'createAPIClient',
+              moduleSpecifier: './api',
+            },
+          },
+        ],
+      }
     );
 
     expect(result?.code).toMatchInlineSnapshot(`
@@ -816,7 +958,17 @@ async function run() {
 }
 `,
       sourceFile,
-      { createAPIClientFn: [{ name: 'createAPIClient', module: './api' }] }
+      {
+        entrypoints: [
+          {
+            kind: 'clientFactory',
+            factory: {
+              exportName: 'createAPIClient',
+              moduleSpecifier: './api',
+            },
+          },
+        ],
+      }
     );
 
     expect(result?.code).toMatchInlineSnapshot(`
@@ -852,7 +1004,17 @@ const api = createAPIClient({ useQuery });
 api.pets.getPets.useQuery();
 `,
       sourceFile,
-      { createAPIClientFn: [{ name: 'createAPIClient', module: './api' }] }
+      {
+        entrypoints: [
+          {
+            kind: 'clientFactory',
+            factory: {
+              exportName: 'createAPIClient',
+              moduleSpecifier: './api',
+            },
+          },
+        ],
+      }
     );
 
     expect(result?.code).toMatchInlineSnapshot(`
@@ -886,11 +1048,16 @@ export function App() {
 `,
       sourceFile,
       {
-        createAPIClientFn: [
+        entrypoints: [
           {
-            name: 'createMyAPIClient',
-            module: '@api/my-api',
-            context: 'APIClientContext',
+            kind: 'clientFactory',
+            factory: {
+              exportName: 'createMyAPIClient',
+              moduleSpecifier: '@api/my-api',
+            },
+            reactContext: {
+              exportName: 'APIClientContext',
+            },
           },
         ],
         async resolve(specifier) {
@@ -932,16 +1099,26 @@ export function App() {
 `,
       sourceFile,
       {
-        createAPIClientFn: [
+        entrypoints: [
           {
-            name: 'createAPIClient',
-            module: './api',
-            context: 'APIClientContext',
+            kind: 'clientFactory',
+            factory: {
+              exportName: 'createAPIClient',
+              moduleSpecifier: './api',
+            },
+            reactContext: {
+              exportName: 'APIClientContext',
+            },
           },
           {
-            name: 'createExtraAPIClient',
-            module: './api',
-            context: 'APIClientContext',
+            kind: 'clientFactory',
+            factory: {
+              exportName: 'createExtraAPIClient',
+              moduleSpecifier: './api',
+            },
+            reactContext: {
+              exportName: 'APIClientContext',
+            },
           },
         ],
       }
@@ -982,11 +1159,16 @@ export function App() {
 `,
       sourceFile,
       {
-        createAPIClientFn: [
+        entrypoints: [
           {
-            name: 'createAPIClient',
-            module: './api',
-            context: 'APIClientContext',
+            kind: 'clientFactory',
+            factory: {
+              exportName: 'createAPIClient',
+              moduleSpecifier: './api',
+            },
+            reactContext: {
+              exportName: 'APIClientContext',
+            },
           },
         ],
       }

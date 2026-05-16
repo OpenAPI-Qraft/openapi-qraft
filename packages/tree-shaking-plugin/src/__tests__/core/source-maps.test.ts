@@ -27,7 +27,17 @@ describe('transformQraftTreeShaking source maps', () => {
     const result = await transformQraftTreeShaking(
       code,
       generatedSourceFile,
-      { createAPIClientFn: [{ name: 'createAPIClient', module: './api' }] },
+      {
+        entrypoints: [
+          {
+            kind: 'clientFactory',
+            factory: {
+              exportName: 'createAPIClient',
+              moduleSpecifier: './api',
+            },
+          },
+        ],
+      },
       inputSourceMap
     );
 

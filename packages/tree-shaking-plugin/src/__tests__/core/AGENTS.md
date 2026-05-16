@@ -5,18 +5,18 @@ This directory contains focused tests for `transformQraftTreeShaking`. Keep test
 ## Where To Put Tests
 
 - `create-api-client-fn.test.ts`
-  - Use for `createAPIClientFn` clients that are context-based, zero-arg, no-context, custom factory names, generated context inference, factory barrels, and operation-level rewrites for generated factory clients.
-  - Put context-client callback coverage here when the file only uses `createAPIClientFn` mode.
+  - Use for `entrypoints` with `kind: 'clientFactory'` that are context-based, zero-arg, no-context, custom factory names, generated context inference, factory barrels, and operation-level rewrites for generated factory clients.
+  - Put context-client callback coverage here when the file only uses `kind: 'clientFactory'` entrypoints.
 
 - `explicit-options.test.ts`
   - Use for `createAPIClient(options)` clients where the argument is a Node.js-like/options object, including inline options, named options, sibling callback scopes, nested scopes, mutation lifecycle callbacks, and `void`/`await` preservation.
   - Name options objects as `apiOptions`, `queryClientOptions`, or similarly explicit names. Reserve `apiContext` for real React context values from `useContext(...)`.
 
 - `precreated-api-client.test.ts`
-  - Use for configured `apiClient` clients imported from another module, including named/default exports, options module resolution, partial transforms, invalid config skips, namespace/dynamic import skips, and precreated collision safety.
+  - Use for `entrypoints` with `kind: 'precreatedClient'` imported from another module, including named/default exports, options module resolution, partial transforms, invalid config skips, namespace/dynamic import skips, and precreated collision safety.
 
 - `mixed-client-modes.test.ts`
-  - Use when one source file combines multiple client modes, such as context `createAPIClientFn`, explicit-options `createAPIClientFn`, and configured precreated `apiClient`.
+  - Use when one source file combines multiple `entrypoints` client modes, such as context `kind: 'clientFactory'`, explicit-options `kind: 'clientFactory'`, and configured `kind: 'precreatedClient'`.
   - Keep React-like context usage realistic: `createAPIClient(apiContext!)` should usually be inside `useEffect` or another callback when `apiContext` comes from `useContext(...)`.
   - Keep explicit top-level calls only in cases whose title is explicitly about top-level behavior.
 
