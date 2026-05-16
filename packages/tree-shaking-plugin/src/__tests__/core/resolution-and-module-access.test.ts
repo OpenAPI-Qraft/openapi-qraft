@@ -278,6 +278,9 @@ export function App() {
               exportName: 'createAPIClient',
               moduleSpecifier: './api',
             },
+            reactContext: {
+              exportName: 'APIClientContext',
+            },
           },
         ],
         moduleAccess: {
@@ -412,6 +415,9 @@ export function App() {
               exportName: 'createAPIClient',
               moduleSpecifier: './api',
             },
+            reactContext: {
+              exportName: 'APIClientContext',
+            },
           },
         ],
         moduleAccess: {
@@ -452,6 +458,9 @@ export function App() {
             factory: {
               exportName: 'createAPIClient',
               moduleSpecifier: './api',
+            },
+            reactContext: {
+              exportName: 'APIClientContext',
             },
           },
         ],

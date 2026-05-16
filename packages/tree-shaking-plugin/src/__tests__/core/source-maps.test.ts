@@ -35,6 +35,9 @@ describe('transformQraftTreeShaking source maps', () => {
               exportName: 'createAPIClient',
               moduleSpecifier: './api',
             },
+            reactContext: {
+              exportName: 'APIClientContext',
+            },
           },
         ],
       },

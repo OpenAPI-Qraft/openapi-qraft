@@ -1038,7 +1038,7 @@ function getGeneratedInfoKey(
   createImportPath: string,
   factory: ClientBinding['factory']
 ) {
-  return `${createImportPath}::${factory.context ?? 'APIClientContext'}::${factory.contextModule ?? ''}`;
+  return `${createImportPath}::${factory.context ?? ''}::${factory.contextModule ?? ''}`;
 }
 
 function findLastImportIndex(body: t.Statement[]) {
