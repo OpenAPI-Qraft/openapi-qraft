@@ -40,7 +40,7 @@ This directory contains focused tests for `transformQraftTreeShaking`. Keep test
 ## Shared Helpers
 
 - `fixtures.ts` owns generated API source strings, fixture file builders, fixture writes, and module access helpers.
-- `harness.ts` owns transform execution setup, fixture-root detection, source-map forwarding, and `createTransformPlan` re-export.
+- `harness.ts` owns transform execution setup, fixture-root detection, source-map forwarding, and `createTransformAnalysis` re-export.
 - Do not copy fixture or resolver helpers into individual test files. Add shared helper capability only when at least two test files need it, or when it prevents a fixture from drifting away from the generated API shape used elsewhere.
 
 ## Snapshot And Skip Policy

@@ -3,7 +3,7 @@
   "version": "2.15.0-beta.7",
   "description": "Build plugin for optimizing OpenAPI Qraft context API clients for tree-shaking.",
   "scripts": {
-    "build": "NODE_ENV=production rollup --config rollup.config.mjs && tsc --project tsconfig.build.json --emitDeclarationOnly",
+    "build": "yarn clean && NODE_ENV=production rollup --config rollup.config.mjs && tsc --project tsconfig.build.json --emitDeclarationOnly",
     "dev": "yarn build --watch --noEmitOnError false",
     "test": "vitest run",
     "typecheck": "tsc --noEmit",

@@ -9,9 +9,9 @@ import type {
 import * as generateModule from '@babel/generator';
 import { resolveDefaultExport } from './lib/interop/resolve-default-export.js';
 import { createAgnosticModuleAccess } from './lib/resolvers/agnostic.js';
+import { createTransformAnalysis } from './lib/transform/analysis.js';
 import { normalizeEntrypoints } from './lib/transform/entrypoints.js';
-import { applyTransformPlan } from './lib/transform/mutate.js';
-import { createTransformPlan } from './lib/transform/plan.js';
+import { applyTransformAnalysis } from './lib/transform/mutate.js';
 import { shouldInspectSource } from './lib/transform/source-gate.js';
 
 export type FilterPattern = string | RegExp | Array<string | RegExp>;
@@ -106,10 +106,16 @@ export async function transformQraftTreeShaking(
     return null;
   }
 
-  const plan = await createTransformPlan(code, id, options, moduleAccess);
-  if (!plan.namedUsages.length && !plan.inlineUsages.length) return null;
+  const analysis = await createTransformAnalysis(
+    code,
+    id,
+    options,
+    moduleAccess
+  );
+  if (!analysis.namedUsages.length && !analysis.inlineUsages.length)
+    return null;
 
-  applyTransformPlan(plan);
+  const ast = applyTransformAnalysis(analysis);
 
   const generatorOptions = {
     sourceMaps: true,
@@ -118,7 +124,7 @@ export async function transformQraftTreeShaking(
     inputSourceMap,
   } satisfies GeneratorOptions;
 
-  const result = generate(plan.ast, generatorOptions);
+  const result = generate(ast, generatorOptions);
 
   return {
     code: result.code,

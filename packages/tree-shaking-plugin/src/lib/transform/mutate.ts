@@ -7,7 +7,7 @@ import type {
   OperationUsage,
   RuntimeLocalNames,
   SchemaUsage,
-  TransformPlan,
+  TransformAnalysis,
 } from './types.js';
 import * as traverseModule from '@babel/traverse';
 import * as t from '@babel/types';
@@ -50,9 +50,10 @@ function selectOptimizedClientRuntimeHelper(
 }
 
 /**
- * Apply a previously created transform plan by rewriting call sites, inserting
- * imports, emitting optimized clients, and removing declarations that became
- * dead after the rewrite.
+ * Apply a previously created transform analysis by rewriting call sites,
+ * inserting imports, emitting optimized clients, and removing declarations that
+ * became dead after the rewrite. The analysis owns the parsed Babel AST, and
+ * this function mutates that AST in place before returning it for printing.
  *
  * @example
  * ```ts
@@ -66,11 +67,11 @@ function selectOptimizedClientRuntimeHelper(
  * }
  * `;
  *
- * const plan = await createTransformPlan(source, id, options);
+ * const analysis = await createTransformAnalysis(source, id, options);
  *
- * applyTransformPlan(plan);
+ * const ast = applyTransformAnalysis(analysis);
  *
- * // `plan.ast` now contains the rewritten named client call and imports.
+ * // `ast` now contains the rewritten named client call and imports.
  * ```
  *
  * @example
@@ -83,47 +84,47 @@ function selectOptimizedClientRuntimeHelper(
  * }
  * `;
  *
- * const plan = await createTransformPlan(source, id, options);
+ * const analysis = await createTransformAnalysis(source, id, options);
  *
- * applyTransformPlan(plan);
+ * const ast = applyTransformAnalysis(analysis);
  *
- * // `plan.ast` now contains the rewritten precreated client call.
+ * // `ast` now contains the rewritten precreated client call.
  * ```
  */
-export function applyTransformPlan(plan: TransformPlan): void {
-  const { runtimeLocalNames } = plan;
-  const usages = [...plan.namedUsages];
-  const inlineCallbackUsages = plan.inlineUsages.filter(
+export function applyTransformAnalysis(analysis: TransformAnalysis): t.File {
+  const { runtimeLocalNames } = analysis;
+  const usages = [...analysis.namedUsages];
+  const inlineCallbackUsages = analysis.inlineUsages.filter(
     (usage) => usage.kind !== 'schema'
   );
-  rewriteNamedClientCalls(plan.ast, plan.clients, plan.namedUsages);
+  rewriteNamedClientCalls(analysis.ast, analysis.clients, analysis.namedUsages);
   rewriteInlineClientCalls(
-    plan.ast,
-    plan.createImports,
+    analysis.ast,
+    analysis.createImports,
     runtimeLocalNames,
     inlineCallbackUsages
   );
   rewriteSchemaAccesses(
-    plan.ast,
-    plan.createImports,
-    plan.clients,
-    plan.schemaUsages
+    analysis.ast,
+    analysis.createImports,
+    analysis.clients,
+    analysis.schemaUsages
   );
   const generatedDeclarations = insertOptimizedClients(
-    plan.ast,
+    analysis.ast,
     usages,
-    plan.generatedInfoByImport,
+    analysis.generatedInfoByImport,
     {
       api: runtimeLocalNames.api,
       react: runtimeLocalNames.react,
     }
   );
   insertImports(
-    plan.ast,
+    analysis.ast,
     usages,
     inlineCallbackUsages,
-    plan.schemaUsages,
-    plan.generatedInfoByImport,
+    analysis.schemaUsages,
+    analysis.generatedInfoByImport,
     generatedDeclarations,
     {
       api: runtimeLocalNames.api,
@@ -131,11 +132,13 @@ export function applyTransformPlan(plan: TransformPlan): void {
     }
   );
   removeFullyTransformedClients(
-    plan.ast,
-    plan.clients,
-    plan.transformedReferenceKeys
+    analysis.ast,
+    analysis.clients,
+    analysis.transformedReferenceKeys
   );
-  removeEmptyCreateImports(plan.ast, plan.configuredFactoryNames);
+  removeEmptyCreateImports(analysis.ast, analysis.configuredFactoryNames);
+
+  return analysis.ast;
 }
 
 function rewriteNamedClientCalls(
