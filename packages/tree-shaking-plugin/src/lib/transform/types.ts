@@ -25,6 +25,37 @@ export type QraftPrecreatedClientConfig = {
 
 export type DiagnosticsLevel = 'error' | 'warn' | 'off';
 
+export type ImportTarget = {
+  exportName: string;
+  moduleSpecifier: string;
+};
+
+export type RuntimeContextConfig = {
+  exportName: string;
+  moduleSpecifier: string | null;
+};
+
+export type GeneratedFactoryEntrypoint = {
+  kind: 'generatedFactory';
+  key: string;
+  factory: ImportTarget;
+  runtimeContext: RuntimeContextConfig | null;
+  legacyConfig: QraftFactoryConfig;
+};
+
+export type PrecreatedClientEntrypoint = {
+  kind: 'precreatedClient';
+  key: string;
+  client: ImportTarget;
+  factory: ImportTarget;
+  optionsFactory: ImportTarget;
+  legacyConfig: QraftPrecreatedClientConfig;
+};
+
+export type ClientEntrypoint =
+  | GeneratedFactoryEntrypoint
+  | PrecreatedClientEntrypoint;
+
 export type DiagnosticLayer =
   | 'gate'
   | 'entrypoint'
