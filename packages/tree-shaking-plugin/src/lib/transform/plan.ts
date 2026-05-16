@@ -136,7 +136,6 @@ export async function createTransformPlan(
     entrypoints,
     moduleAccess,
   });
-  void generatedMetadata;
   const rawEntrypoints = options.entrypoints ?? [];
   const factoryOptions = rawEntrypoints
     .filter((entrypoint) => entrypoint.kind === 'clientFactory')
