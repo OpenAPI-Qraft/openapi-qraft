@@ -48,7 +48,7 @@ Do not implement:
 
 ## Task 1: Debt Deletion Sweep
 
-- [ ] **Step 1: Find legacy branches and helpers**
+- [x] **Step 1: Find legacy branches and helpers**
 
 Run:
 
@@ -58,7 +58,7 @@ rg -n "debugSkip|hasExplicitContext|entrypoints|diagnostics|debug\\?:" packages/
 
 Expected: results show which legacy config reads, debug paths, and runtime-helper flags remain.
 
-- [ ] **Step 2: Classify each hit**
+- [x] **Step 2: Classify each hit**
 
 Use this classification:
 
@@ -70,7 +70,7 @@ Use this classification:
 - delete `hasExplicitContext` after `runtimeInput` fully replaces it;
 - delete `debugSkip` after diagnostics reporter handles unresolved candidates and ordinary skips.
 
-- [ ] **Step 3: Delete obsolete internal branches**
+- [x] **Step 3: Delete obsolete internal branches**
 
 Edit only the files where Step 2 found dead internal paths. Preserve the current public `entrypoints` boundary.
 
@@ -82,7 +82,7 @@ rg -n "hasExplicitContext|debugSkip" packages/tree-shaking-plugin/src
 
 Expected: no matches, unless a match is in a historical test name or migration comment that explains why it still exists.
 
-- [ ] **Step 4: Verify transform behavior after deletion**
+- [x] **Step 4: Verify transform behavior after deletion**
 
 Run:
 
@@ -92,7 +92,7 @@ corepack yarn workspace @openapi-qraft/tree-shaking-plugin test -- --run src/__t
 
 Expected: PASS without new snapshot changes. If snapshots change, verify they are semantic no-ops or revert the debt deletion that caused the semantic drift.
 
-- [ ] **Step 5: Commit debt deletion**
+- [x] **Step 5: Commit debt deletion**
 
 Run:
 
@@ -105,7 +105,7 @@ Expected: one cleanup commit, or no commit if Step 2 found no removable debt.
 
 ## Task 2: Documentation And Test Routing
 
-- [ ] **Step 1: Read final documentation task**
+- [x] **Step 1: Read final documentation task**
 
 Run:
 
@@ -115,7 +115,7 @@ sed -n '/## Task 7: Documentation And Full Verification/,/## Self-Review/p' docs
 
 Expected: the session implementer sees the exact README diagnostics wording and verification commands.
 
-- [ ] **Step 2: Update README diagnostics docs**
+- [x] **Step 2: Update README diagnostics docs**
 
 In `packages/tree-shaking-plugin/README.md`, document:
 
@@ -129,7 +129,7 @@ In `packages/tree-shaking-plugin/README.md`, document:
 
 Replace public-facing `debug` wording with `diagnostics`. If `debug` remains temporarily supported in code, document it only as legacy compatibility when the README already has a legacy section.
 
-- [ ] **Step 3: Update core test ownership guide**
+- [x] **Step 3: Update core test ownership guide**
 
 Open `packages/tree-shaking-plugin/src/__tests__/core/AGENTS.md`.
 
@@ -142,7 +142,7 @@ If Sessions 1-3 changed diagnostics or metadata test ownership, add:
 
 If test ownership did not change, leave this file untouched.
 
-- [ ] **Step 4: Commit docs**
+- [x] **Step 4: Commit docs**
 
 Run:
 
@@ -162,7 +162,7 @@ Expected: one docs commit.
 
 ## Task 3: Final Verification
 
-- [ ] **Step 1: Run package tests**
+- [x] **Step 1: Run package tests**
 
 Run:
 
@@ -172,7 +172,7 @@ corepack yarn workspace @openapi-qraft/tree-shaking-plugin test -- --run
 
 Expected: all tree-shaking-plugin tests pass.
 
-- [ ] **Step 2: Run typecheck**
+- [x] **Step 2: Run typecheck**
 
 Run:
 
@@ -182,7 +182,7 @@ corepack yarn workspace @openapi-qraft/tree-shaking-plugin typecheck
 
 Expected: no TypeScript errors.
 
-- [ ] **Step 3: Run lint**
+- [x] **Step 3: Run lint**
 
 Run:
 
@@ -192,7 +192,7 @@ corepack yarn workspace @openapi-qraft/tree-shaking-plugin lint
 
 Expected: no ESLint errors.
 
-- [ ] **Step 4: Run whitespace check**
+- [x] **Step 4: Run whitespace check**
 
 Run:
 
@@ -202,7 +202,7 @@ git diff --check
 
 Expected: no output.
 
-- [ ] **Step 5: Run full Verdaccio e2e when needed**
+- [x] **Step 5: Run full Verdaccio e2e when needed**
 
 If Session 3 already ran the full Verdaccio loop after the last code change and this session changed README only, record the earlier result in the final response. Otherwise run:
 
@@ -213,7 +213,7 @@ cd e2e && corepack yarn e2e:tree-shaking-bundlers-local
 
 Expected: `Tree-shaking bundle assertions passed.`
 
-- [ ] **Step 6: Confirm final worktree state**
+- [x] **Step 6: Confirm final worktree state**
 
 Run:
 
