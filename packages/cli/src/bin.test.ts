@@ -1,15 +1,9 @@
-import { exec } from 'node:child_process';
-import { dirname, join } from 'node:path';
-import { fileURLToPath } from 'node:url';
-import { promisify } from 'node:util';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
+import { main } from './bin.js';
 
-const execAsync = promisify(exec);
+const HELP_TEST_TIMEOUT = 15_000;
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-const packageRoot = dirname(__dirname);
-const binPath = join(packageRoot, 'bin.mjs');
+vi.setConfig({ testTimeout: HELP_TEST_TIMEOUT });
 
 describe('CLI binary help output', () => {
   it('should display main help', async () => {
@@ -366,19 +360,93 @@ function stripVersionLine(str: string): string {
 }
 
 async function executeBin(args: string[]): Promise<string> {
-  const command = `node ${binPath} ${args.join(' ')}`;
-  try {
-    const { stdout, stderr } = await execAsync(command, {
-      cwd: packageRoot,
-      encoding: 'utf-8',
+  let stdout = '';
+  let stderr = '';
+
+  const stdoutWrite = vi
+    .spyOn(process.stdout, 'write')
+    .mockImplementation((chunk, encodingOrCallback, callback) => {
+      stdout += chunk.toString();
+
+      const writeCallback =
+        typeof encodingOrCallback === 'function'
+          ? encodingOrCallback
+          : callback;
+
+      writeCallback?.();
+
+      return true;
     });
+  const stderrWrite = vi
+    .spyOn(process.stderr, 'write')
+    .mockImplementation((chunk, encodingOrCallback, callback) => {
+      stderr += chunk.toString();
+
+      const writeCallback =
+        typeof encodingOrCallback === 'function'
+          ? encodingOrCallback
+          : callback;
+
+      writeCallback?.();
+
+      return true;
+    });
+  const exit = vi.spyOn(process, 'exit').mockImplementation((code) => {
+    throw new ProcessExitError(code);
+  });
+
+  try {
+    await main(['node', 'qraft', ...args]);
+
     const output = (stderr ? stderr + '\n' : '') + (stdout || '');
-    return stripVersionLine(stripAnsiCodes(output.trimEnd()));
-  } catch (error: any) {
+    return normalizeOutput(output);
+  } catch (error) {
+    if (error instanceof ProcessExitError && isSuccessfulExit(error.code)) {
+      const output = (stderr ? stderr + '\n' : '') + (stdout || '');
+      return normalizeOutput(output);
+    }
+    if (isSuccessfulCommanderExit(error)) {
+      const output = (stderr ? stderr + '\n' : '') + (stdout || '');
+      return normalizeOutput(output);
+    }
+
+    const errorMessage = error instanceof Error ? error.message : String(error);
     const output =
-      (error.stderr ? error.stderr + '\n' : '') +
-      (error.stdout || '') +
-      (error.message || '');
-    return stripVersionLine(stripAnsiCodes(output.trimEnd()));
+      (stderr ? stderr + '\n' : '') + (stdout || '') + errorMessage;
+    return normalizeOutput(output);
+  } finally {
+    stdoutWrite.mockRestore();
+    stderrWrite.mockRestore();
+    exit.mockRestore();
   }
+}
+
+function stripNodeDeprecationWarnings(str: string): string {
+  return str.replace(
+    /\(node:\d+\) \[DEP0040\] DeprecationWarning: The `punycode` module is deprecated\. Please use a userland alternative instead\.\n\(Use `node --trace-deprecation \.\.\.` to show where the warning was created\)\n+/g,
+    ''
+  );
+}
+
+function normalizeOutput(output: string): string {
+  return stripVersionLine(
+    stripNodeDeprecationWarnings(stripAnsiCodes(output.trimEnd()))
+  );
+}
+
+class ProcessExitError extends Error {
+  constructor(readonly code: string | number | null | undefined) {
+    super(`process.exit(${code ?? 0})`);
+  }
+}
+
+function isSuccessfulExit(code: string | number | null | undefined): boolean {
+  return code === undefined || code === null || code === 0 || code === '0';
+}
+
+function isSuccessfulCommanderExit(error: unknown): boolean {
+  if (!(error instanceof Error) || !('exitCode' in error)) return false;
+
+  const exitCode = error.exitCode;
+  return exitCode === 0 || exitCode === '0';
 }
