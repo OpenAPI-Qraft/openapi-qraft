@@ -145,7 +145,6 @@ export async function createTransformPlan(
     entrypoints,
     moduleAccess,
   });
-  const rawEntrypoints = options.entrypoints ?? [];
   const factoryOptions: LegacyQraftFactoryConfig[] = [];
   const factoryEntrypointKeys = new Map<LegacyQraftFactoryConfig, string>();
   const precreatedOptions: LegacyQraftPrecreatedClientConfig[] = [];
@@ -154,20 +153,17 @@ export async function createTransformPlan(
     string
   >();
 
-  rawEntrypoints.forEach((entrypoint, index) => {
-    const normalizedEntrypoint = entrypoints[index];
-    if (!normalizedEntrypoint) return;
-
-    if (entrypoint.kind === 'clientFactory') {
+  for (const entrypoint of entrypoints) {
+    if (entrypoint.kind === 'generatedFactory') {
       const factory = {
         name: entrypoint.factory.exportName,
         module: entrypoint.factory.moduleSpecifier,
         context: entrypoint.reactContext?.exportName,
-        contextModule: entrypoint.reactContext?.moduleSpecifier,
+        contextModule: entrypoint.reactContext?.moduleSpecifier ?? undefined,
       };
       factoryOptions.push(factory);
-      factoryEntrypointKeys.set(factory, normalizedEntrypoint.key);
-      return;
+      factoryEntrypointKeys.set(factory, entrypoint.key);
+      continue;
     }
 
     const precreated = {
@@ -179,8 +175,8 @@ export async function createTransformPlan(
       createAPIClientFnOptionsModule: entrypoint.optionsFactory.moduleSpecifier,
     };
     precreatedOptions.push(precreated);
-    precreatedEntrypointKeys.set(precreated, normalizedEntrypoint.key);
-  });
+    precreatedEntrypointKeys.set(precreated, entrypoint.key);
+  }
   const configuredFactoryNames = new Set(
     factoryOptions.map((factory) => factory.name)
   );
@@ -527,13 +523,21 @@ export async function createTransformPlan(
         getGeneratedInfoKey(match.client.createImportPath, match.client.factory)
       );
       if (!generatedInfo)
-        return debugSkip(options, id, 'generated client was not resolved');
+        return skipOrdinaryTransformCandidate(
+          diagnostics,
+          'generated-client-unresolved',
+          'Generated client was not resolved.'
+        );
       if (
         match.client.mode.type === 'context' &&
         !generatedInfo.contextName &&
         callbackNeedsRuntimeContext(match.callbackName)
       ) {
-        return debugSkip(options, id, 'context client was not detected');
+        return skipUnresolvedTransformCandidate(
+          diagnostics,
+          'context-client-unresolved',
+          'Context client was not detected.'
+        );
       }
 
       const operationImport = resolveOperationImport(
@@ -546,7 +550,11 @@ export async function createTransformPlan(
         operationImports
       );
       if (!operationImport)
-        return debugSkip(options, id, 'operation import was not resolved');
+        return skipUnresolvedTransformCandidate(
+          diagnostics,
+          'operation-import-unresolved',
+          'Operation import was not resolved.'
+        );
 
       const callbackLocalName = getOrCreateProgramImportLocalName(
         activeProgramScope,
@@ -654,10 +662,10 @@ export async function createTransformPlan(
         getGeneratedInfoKey(match.createImportPath, match.factory)
       );
       if (!generatedInfo)
-        return debugSkip(
-          options,
-          id,
-          'generated inline client was not resolved'
+        return skipOrdinaryTransformCandidate(
+          diagnostics,
+          'generated-inline-client-unresolved',
+          'Generated inline client was not resolved.'
         );
 
       const operationImport = resolveOperationImport(
@@ -670,10 +678,10 @@ export async function createTransformPlan(
         operationImports
       );
       if (!operationImport)
-        return debugSkip(
-          options,
-          id,
-          'inline operation import was not resolved'
+        return skipUnresolvedTransformCandidate(
+          diagnostics,
+          'inline-operation-import-unresolved',
+          'Inline operation import was not resolved.'
         );
 
       const callbackLocalName = getOrCreateProgramImportLocalName(
@@ -738,7 +746,11 @@ export async function createTransformPlan(
             getGeneratedInfoKey(match.createImportPath, match.factory)
           );
     if (!generatedInfo)
-      return debugSkip(options, id, 'generated client was not resolved');
+      return skipOrdinaryTransformCandidate(
+        diagnostics,
+        'generated-client-unresolved',
+        'Generated client was not resolved.'
+      );
 
     const operationImport = resolveOperationImport(
       generatedInfo,
@@ -750,7 +762,11 @@ export async function createTransformPlan(
       operationImports
     );
     if (!operationImport)
-      return debugSkip(options, id, 'operation import was not resolved');
+      return skipUnresolvedTransformCandidate(
+        diagnostics,
+        'operation-import-unresolved',
+        'Operation import was not resolved.'
+      );
 
     const scopeKey = getUsageScopeKey(memberPath);
     const sourceKey =
@@ -978,6 +994,30 @@ function reportUsedUnresolvedEntrypoints(
     if (!usedEntrypointKeys.has(reason.entrypointKey)) continue;
     diagnostics.unresolved(reason);
   }
+}
+
+function skipUnresolvedTransformCandidate(
+  diagnostics: DiagnosticReporter,
+  code: string,
+  message: string
+) {
+  return diagnostics.unresolved({
+    layer: 'usage-collection',
+    code,
+    message,
+  });
+}
+
+function skipOrdinaryTransformCandidate(
+  diagnostics: DiagnosticReporter,
+  code: string,
+  message: string
+) {
+  return diagnostics.ordinarySkip({
+    layer: 'usage-collection',
+    code,
+    message,
+  });
 }
 
 function entrypointModuleMatchesImportSource(
@@ -2142,15 +2182,6 @@ async function resolveFactoryModule(
 
 function normalizeOptionalResolvedId(resolved: string | null | undefined) {
   return resolved ? normalizeResolvedId(resolved) : null;
-}
-
-function debugSkip(options: QraftTreeShakeOptions, id: string, reason: string) {
-  if (options.debug) {
-    console.warn(
-      `[openapi-qraft/tree-shaking-plugin] skipped ${id}: ${reason}`
-    );
-  }
-  return null;
 }
 
 function emptyTransformPlan(ast: t.File): TransformPlan {
