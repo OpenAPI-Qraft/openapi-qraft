@@ -121,6 +121,7 @@ export type GeneratedClientInfo = {
 export type GeneratedClientMetadata = {
   entrypoint: ClientEntrypoint;
   factoryFile: string;
+  factoryLoadId: string;
   servicesDir: string;
   serviceImportPaths: Record<string, string>;
   reactContext: ReactContextConfig | null;
@@ -142,6 +143,7 @@ export type ClientBinding = {
   name: string;
   clientSourceKey: string;
   createImportPath: string;
+  createImportLoadId: string;
   factory: LegacyQraftFactoryConfig;
   bindingNode: t.Node;
   declarationScope: Scope;
@@ -189,12 +191,14 @@ export type SchemaUsage = {
 
 export type GeneratedInfoRequest = {
   createImportPath: string;
+  createImportLoadId: string;
   factory: LegacyQraftFactoryConfig;
 };
 
 export type CreateImportEntry = {
   sourceSpecifier: string;
   factoryFile: string;
+  factoryLoadId: string;
   factory: LegacyQraftFactoryConfig;
 };
 

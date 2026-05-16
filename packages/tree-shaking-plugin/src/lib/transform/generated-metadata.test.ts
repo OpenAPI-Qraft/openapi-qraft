@@ -1,7 +1,7 @@
 import fs from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import {
   contextApiIndexTsBody,
   createFixtureModuleAccess,
@@ -59,6 +59,8 @@ describe('inspectGeneratedEntrypoints', () => {
 
   it('returns unresolved reason when generated source is unavailable', async () => {
     const importerId = '/virtual/src/App.tsx';
+    const resolvedFactoryId = '/virtual/src/api/index.ts?client#factory';
+    const load = vi.fn(async () => null);
     const entrypoints = normalizeEntrypoints({
       entrypoints: [
         {
@@ -72,12 +74,13 @@ describe('inspectGeneratedEntrypoints', () => {
       importerId,
       entrypoints,
       moduleAccess: {
-        resolve: async () => '/virtual/src/api/index.ts',
-        load: async () => null,
+        resolve: async () => resolvedFactoryId,
+        load,
       },
     });
 
     expect(result.metadataByEntrypointKey.get(entrypoints[0].key)).toBeNull();
+    expect(load).toHaveBeenCalledWith(resolvedFactoryId);
     expect(result.reasons).toEqual([
       {
         layer: 'generated-metadata',
@@ -86,6 +89,127 @@ describe('inspectGeneratedEntrypoints', () => {
         entrypointKey: entrypoints[0].key,
       },
     ]);
+  });
+
+  it('loads generated factory metadata through exact query and hash ids', async () => {
+    const importerId = '/virtual/src/App.tsx';
+    const factoryId = '/virtual/src/api/index.ts?client#factory';
+    const servicesId = '/virtual/src/api/services/index.ts?client#services';
+    const load = vi.fn(async (id: string) => {
+      if (id === factoryId) {
+        return contextApiIndexTsBody('APIClientContext');
+      }
+      if (id === servicesId) {
+        return SERVICES_INDEX_TS;
+      }
+      return null;
+    });
+    const entrypoints = normalizeEntrypoints({
+      entrypoints: [
+        {
+          kind: 'clientFactory',
+          factory: { exportName: 'createAPIClient', moduleSpecifier: './api' },
+          reactContext: { exportName: 'APIClientContext' },
+        },
+      ],
+    });
+
+    const result = await inspectGeneratedEntrypoints({
+      importerId,
+      entrypoints,
+      moduleAccess: {
+        resolve: async (specifier) => {
+          if (specifier === './api') return factoryId;
+          if (specifier === './services/index') return servicesId;
+          return null;
+        },
+        load,
+      },
+    });
+
+    const metadata = result.metadataByEntrypointKey.get(entrypoints[0].key);
+
+    expect(result.reasons).toEqual([]);
+    expect(load).toHaveBeenCalledWith(factoryId);
+    expect(load).toHaveBeenCalledWith(servicesId);
+    expect(metadata).toMatchObject({
+      factoryFile: '/virtual/src/api/index.ts',
+      factoryLoadId: factoryId,
+      serviceImportPaths: {
+        pets: './PetsService',
+        stores: './StoresService',
+      },
+    });
+  });
+
+  it('loads re-export chains through exact ids while matching cycles canonically', async () => {
+    const importerId = '/virtual/src/App.tsx';
+    const indexId = '/virtual/src/api/index.ts?entry#client';
+    const barrelId = '/virtual/src/api/barrel.ts?barrel#client';
+    const factoryId = '/virtual/src/api/createAPIClient.ts?factory#client';
+    const servicesId = '/virtual/src/api/services/index.ts?services#client';
+    const load = vi.fn(async (id: string) => {
+      if (id === indexId) return `export { createAPIClient } from './barrel';`;
+      if (id === barrelId) {
+        return `export { createAPIClient } from './createAPIClient';`;
+      }
+      if (id === factoryId) return contextApiIndexTsBody('APIClientContext');
+      if (id === servicesId) return SERVICES_INDEX_TS;
+      return null;
+    });
+    const entrypoints = normalizeEntrypoints({
+      entrypoints: [
+        {
+          kind: 'clientFactory',
+          factory: { exportName: 'createAPIClient', moduleSpecifier: './api' },
+          reactContext: { exportName: 'APIClientContext' },
+        },
+      ],
+    });
+
+    const result = await inspectGeneratedEntrypoints({
+      importerId,
+      entrypoints,
+      moduleAccess: {
+        resolve: async (specifier, importer) => {
+          if (specifier === './api') return indexId;
+          if (
+            specifier === './barrel' &&
+            importer === '/virtual/src/api/index.ts'
+          ) {
+            return barrelId;
+          }
+          if (
+            specifier === './createAPIClient' &&
+            importer === '/virtual/src/api/barrel.ts'
+          ) {
+            return factoryId;
+          }
+          if (
+            specifier === './services/index' &&
+            importer === '/virtual/src/api/createAPIClient.ts'
+          ) {
+            return servicesId;
+          }
+          return null;
+        },
+        load,
+      },
+    });
+
+    const metadata = result.metadataByEntrypointKey.get(entrypoints[0].key);
+
+    expect(result.reasons).toEqual([]);
+    expect(load.mock.calls.map(([id]) => id)).toEqual([
+      indexId,
+      barrelId,
+      factoryId,
+      servicesId,
+    ]);
+    expect(metadata).toMatchObject({
+      factoryFile: '/virtual/src/api/createAPIClient.ts',
+      factoryLoadId: factoryId,
+    });
   });
 
   it('returns unresolved reason for factories without static services imports', async () => {

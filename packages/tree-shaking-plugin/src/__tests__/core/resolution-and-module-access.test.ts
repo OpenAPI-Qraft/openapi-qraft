@@ -3,7 +3,11 @@ import os from 'node:os';
 import path from 'node:path';
 import { describe, expect, it, vi } from 'vitest';
 import { transformQraftTreeShaking as transformQraftTreeShakingImpl } from '../../core.js';
-import { createFixtureModuleAccess } from './fixtures.js';
+import {
+  PRECREATED_API_INDEX_TS,
+  SERVICES_INDEX_TS,
+  createFixtureModuleAccess,
+} from './fixtures.js';
 import {
   createFixture,
   createTransformState,
@@ -293,6 +297,60 @@ export function App() {
     expect(state.clients).toHaveLength(1);
     expect(state.namedUsages).toHaveLength(1);
     expect(load).toHaveBeenCalledWith(path.join(fixture, 'src/api/index.ts'));
+  });
+
+  it('optimizes when generated source is available only through exact resolved ids', async () => {
+    const sourceFile = '/virtual/src/App.tsx';
+    const factoryId = '/virtual/src/api/index.ts?generated#factory';
+    const servicesId = '/virtual/src/api/services/index.ts?generated#services';
+    const load = vi.fn(async (id: string) => {
+      if (id === factoryId) return PRECREATED_API_INDEX_TS;
+      if (id === servicesId) return SERVICES_INDEX_TS;
+      return null;
+    });
+
+    const result = await transformQraftTreeShaking(
+      `
+import { createAPIClient } from './api';
+
+const api = createAPIClient({ queryClient: {} });
+
+export function App() {
+  return api.pets.getPets();
+}
+`,
+      sourceFile,
+      {
+        entrypoints: [
+          {
+            kind: 'clientFactory',
+            factory: {
+              exportName: 'createAPIClient',
+              moduleSpecifier: './api',
+            },
+          },
+        ],
+        moduleAccess: {
+          resolve: async (specifier, importer) => {
+            if (specifier === './api') return factoryId;
+            if (
+              specifier === './services/index' &&
+              importer === '/virtual/src/api/index.ts'
+            ) {
+              return servicesId;
+            }
+            return null;
+          },
+          load,
+        },
+      }
+    );
+
+    expect(result?.code).toContain(
+      'import { getPets } from "./api/services/PetsService";'
+    );
+    expect(result?.code).not.toContain('?generated');
+    expect(load.mock.calls.map(([id]) => id)).toEqual([factoryId, servicesId]);
   });
 
   it('resolves a factory module through the fixture resolver when the bundler cannot', async () => {

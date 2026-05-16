@@ -55,6 +55,7 @@ const traverse =
 
 type ExportedDeclarationResolution = {
   sourceFile: string;
+  sourceLoadId: string;
   ast: t.File;
   init: t.Node;
   importBindings: Map<string, { imported: string; resolvedId: string | null }>;
@@ -282,7 +283,10 @@ export async function createTransformState(
           );
           if (info) {
             matched = factory;
-            const key = getGeneratedInfoKey(resolvedAbs, factory);
+            const key = getGeneratedInfoKey(
+              resolvedId ?? normalizeResolvedId(resolvedAbs),
+              factory
+            );
             if (!generatedInfoByImport.has(key)) {
               generatedInfoByImport.set(key, info);
             }
@@ -295,7 +299,8 @@ export async function createTransformState(
       if (resolvedAbs) {
         createImports.set(specifier.local.name, {
           sourceSpecifier: source,
-          factoryFile: resolvedAbs,
+          factoryFile: resolvedId ?? normalizeResolvedId(resolvedAbs),
+          factoryLoadId: resolvedAbs,
           factory: matched,
         });
       }
@@ -435,6 +440,7 @@ export async function createTransformState(
             mode
           ),
           createImportPath,
+          createImportLoadId: createImport.factoryLoadId,
           factory: createImport.factory,
           bindingNode: variablePath.node.id,
           declarationScope: variablePath.parentPath.scope,
@@ -462,6 +468,7 @@ export async function createTransformState(
             mode
           ),
           createImportPath,
+          createImportLoadId: createImport.factoryLoadId,
           factory: createImport.factory,
           bindingNode: variablePath.node.id,
           declarationScope: variablePath.parentPath.scope,
@@ -485,6 +492,7 @@ export async function createTransformState(
     if (!generatedInfoRequests.has(key)) {
       generatedInfoRequests.set(key, {
         createImportPath: client.createImportPath,
+        createImportLoadId: client.createImportLoadId,
         factory: client.factory,
       });
     }
@@ -493,7 +501,7 @@ export async function createTransformState(
         key,
         await readGeneratedClientInfo(
           id,
-          client.createImportPath,
+          client.createImportLoadId,
           client.factory,
           moduleAccess,
           servicesDirName
@@ -516,6 +524,7 @@ export async function createTransformState(
         if (!generatedInfoRequests.has(key)) {
           generatedInfoRequests.set(key, {
             createImportPath: inlineMatch.createImportPath,
+            createImportLoadId: inlineMatch.createImportLoadId,
             factory: inlineMatch.factory,
           });
         }
@@ -652,7 +661,7 @@ export async function createTransformState(
       key,
       await readGeneratedClientInfo(
         id,
-        request.createImportPath,
+        request.createImportLoadId,
         request.factory,
         moduleAccess,
         servicesDirName
@@ -727,6 +736,7 @@ export async function createTransformState(
     if (!generatedInfoRequests.has(key)) {
       generatedInfoRequests.set(key, {
         createImportPath: match.createImportPath,
+        createImportLoadId: match.createImportLoadId,
         factory: match.factory,
       });
     }
@@ -1053,24 +1063,25 @@ async function findPrecreatedClients(
 
   const resolvedConfigs = await Promise.all(
     configs.map(async (config) => {
-      const clientFile = await resolveFactoryModule(
-        config.clientModule,
-        importerId,
-        resolveModule
-      );
-      const factoryModuleFile = await resolveFactoryModule(
-        config.createAPIClientFnModule,
-        importerId,
-        resolveModule
-      );
-      const factoryExport = factoryModuleFile
+      const clientLoadId =
+        (await resolveModule(config.clientModule, importerId)) ?? null;
+      const clientFile = clientLoadId ? normalizeResolvedId(clientLoadId) : null;
+      const factoryModuleLoadId =
+        (await resolveModule(config.createAPIClientFnModule, importerId)) ??
+        null;
+      const factoryModuleFile = factoryModuleLoadId
+        ? normalizeResolvedId(factoryModuleLoadId)
+        : null;
+      const factoryExport = factoryModuleLoadId
         ? await readExportedDeclarationChain(
-            factoryModuleFile,
+            factoryModuleLoadId,
             config.createAPIClientFn,
             moduleAccess
           )
         : null;
       const factoryFile = factoryExport?.sourceFile ?? factoryModuleFile;
+      const factoryLoadId =
+        factoryExport?.sourceLoadId ?? factoryModuleLoadId ?? factoryFile;
       const optionsModule =
         config.createAPIClientFnOptionsModule ?? config.clientModule;
       const optionsFile = await resolveFactoryModule(
@@ -1087,8 +1098,10 @@ async function findPrecreatedClients(
       return {
         config,
         clientFile,
-        clientResolvedId: clientFile ? normalizeResolvedId(clientFile) : null,
+        clientLoadId,
+        clientResolvedId: clientFile,
         factoryFile,
+        factoryLoadId,
         factoryResolvedId: factoryFile
           ? normalizeResolvedId(factoryFile)
           : null,
@@ -1130,6 +1143,8 @@ async function findPrecreatedClients(
         );
       });
       const factoryFile = match?.metadata?.factoryFile ?? match?.factoryFile;
+      const factoryLoadId =
+        match?.metadata?.factoryLoadId ?? match?.factoryLoadId;
       if (!match?.clientFile || !factoryFile) continue;
       if (
         !t.isImportDefaultSpecifier(specifier) &&
@@ -1151,7 +1166,7 @@ async function findPrecreatedClients(
         } else if (match.factoryResolvedId) {
           validatedConfig = await validatePrecreatedClientConfig(
             match.config,
-            match.clientFile,
+            match.clientLoadId ?? match.clientFile,
             match.factoryResolvedId,
             moduleAccess
           );
@@ -1183,6 +1198,7 @@ async function findPrecreatedClients(
           mode
         ),
         createImportPath: factoryFile,
+        createImportLoadId: factoryLoadId ?? factoryFile,
         factory: validatedConfig.factory,
         bindingNode: specifier.local,
         declarationScope: programScope,
@@ -1221,14 +1237,14 @@ function findPrecreatedMetadata(
 
 async function validatePrecreatedClientConfig(
   config: LegacyQraftPrecreatedClientConfig,
-  clientFile: string,
+  clientLoadId: string,
   factoryResolvedId: string,
   moduleAccess: QraftModuleAccess
 ): Promise<{ factory: LegacyQraftFactoryConfig } | null> {
   const skip = (_reason: string) => null;
 
   const resolvedExport = await readExportedDeclarationChain(
-    clientFile,
+    clientLoadId,
     config.client,
     moduleAccess
   );
@@ -1271,7 +1287,7 @@ async function readExportedDeclarationChain(
   if (seen.has(sourceFile)) return null;
   seen.add(sourceFile);
 
-  const source = await moduleAccess.load(sourceFile);
+  const source = await moduleAccess.load(startFile);
   if (source === null) {
     return null;
   }
@@ -1285,6 +1301,7 @@ async function readExportedDeclarationChain(
   if (exported) {
     return {
       sourceFile,
+      sourceLoadId: startFile,
       ast,
       init: exported,
       importBindings: await readTopLevelImportBindings(
@@ -1304,7 +1321,7 @@ async function readExportedDeclarationChain(
   if (resolvedId === sourceFile) return null;
 
   return readExportedDeclarationChain(
-    resolvedId,
+    resolved,
     reexport.localName,
     moduleAccess,
     seen
@@ -1493,6 +1510,7 @@ function matchSchemaAccess(
   | {
       kind: 'inline';
       createImportPath: string;
+      createImportLoadId: string;
       factory: LegacyQraftFactoryConfig;
       serviceName: string;
       operationName: string;
@@ -1534,6 +1552,7 @@ function matchSchemaAccess(
   return {
     kind: 'inline',
     createImportPath: createImport.factoryFile,
+    createImportLoadId: createImport.factoryLoadId,
     factory: createImport.factory,
     serviceName,
     operationName,
@@ -1542,16 +1561,10 @@ function matchSchemaAccess(
 
 function matchInlineClientCall(
   callee: t.Expression | t.V8IntrinsicIdentifier,
-  createImports: Map<
-    string,
-    {
-      sourceSpecifier: string;
-      factoryFile: string;
-      factory: LegacyQraftFactoryConfig;
-    }
-  >
+  createImports: Map<string, CreateImportEntry>
 ): {
   createImportPath: string;
+  createImportLoadId: string;
   factory: LegacyQraftFactoryConfig;
   optionsExpression: t.Expression | null;
   serviceName: string;
@@ -1585,6 +1598,7 @@ function matchInlineClientCall(
     if (callbackNeedsRuntimeContext(callbackName)) return null;
     return {
       createImportPath: createImport.factoryFile,
+      createImportLoadId: createImport.factoryLoadId,
       factory: createImport.factory,
       optionsExpression: null,
       serviceName,
@@ -1598,6 +1612,7 @@ function matchInlineClientCall(
 
   return {
     createImportPath: createImport.factoryFile,
+    createImportLoadId: createImport.factoryLoadId,
     factory: createImport.factory,
     optionsExpression: t.cloneNode(root.arguments[0], true),
     serviceName,
@@ -1608,14 +1623,15 @@ function matchInlineClientCall(
 
 async function readGeneratedClientInfo(
   importerId: string,
-  clientFile: string,
+  clientLoadId: string,
   factory: LegacyQraftFactoryConfig,
   moduleAccess: QraftModuleAccess,
   servicesDirName = 'services'
 ): Promise<GeneratedClientInfo | null> {
   const skip = (_reason: string) => null;
+  const clientFile = normalizeResolvedId(clientLoadId);
 
-  const source = await moduleAccess.load(clientFile);
+  const source = await moduleAccess.load(clientLoadId);
   if (source === null) {
     return skip('generated client file was not readable');
   }
@@ -1638,7 +1654,7 @@ async function readGeneratedClientInfo(
         if (reexportId !== clientFile) {
           return readGeneratedClientInfo(
             importerId,
-            reexportId,
+            resolvedReexport,
             factory,
             moduleAccess,
             servicesDirName

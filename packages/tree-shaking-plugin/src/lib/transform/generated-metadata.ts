@@ -33,6 +33,7 @@ type InspectGeneratedEntrypointsInput = {
 
 type ExportedDeclarationResolution = {
   sourceFile: string;
+  sourceLoadId: string;
   ast: t.File;
   init: t.Node;
   importBindings: Map<string, { imported: string; resolvedId: string | null }>;
@@ -110,6 +111,7 @@ async function inspectGeneratedFactoryEntrypoint(
     importerId,
     entrypoint,
     factoryFile: normalizeResolvedId(resolved),
+    factoryLoadId: resolved,
     factoryExportName: entrypoint.factory.exportName,
     reactContext: entrypoint.reactContext,
     moduleAccess,
@@ -133,15 +135,17 @@ async function inspectPrecreatedClientEntrypoint(
   const clientFile = normalizeResolvedId(resolvedClient);
   const factoryModuleFile = normalizeResolvedId(resolvedFactory);
   const factoryExport = await readExportedDeclarationChain(
-    factoryModuleFile,
+    resolvedFactory,
     entrypoint.factory.exportName,
     moduleAccess
   );
   const factoryFile = factoryExport?.sourceFile ?? factoryModuleFile;
+  const factoryLoadId = factoryExport?.sourceLoadId ?? resolvedFactory;
 
   const validClient = await validatePrecreatedClient(
     entrypoint,
     clientFile,
+    resolvedClient,
     new Set([factoryModuleFile, normalizeResolvedId(factoryFile)]),
     moduleAccess
   );
@@ -160,6 +164,7 @@ async function inspectPrecreatedClientEntrypoint(
     importerId,
     entrypoint,
     factoryFile,
+    factoryLoadId,
     factoryExportName: entrypoint.factory.exportName,
     reactContext: null,
     moduleAccess,
@@ -171,6 +176,7 @@ async function inspectFactoryFile({
   importerId,
   entrypoint,
   factoryFile,
+  factoryLoadId,
   factoryExportName,
   reactContext,
   moduleAccess,
@@ -180,6 +186,7 @@ async function inspectFactoryFile({
   importerId: string;
   entrypoint: ClientEntrypoint;
   factoryFile: string;
+  factoryLoadId: string;
   factoryExportName: string;
   reactContext: ReactContextConfig | null;
   moduleAccess: QraftModuleAccess;
@@ -191,7 +198,7 @@ async function inspectFactoryFile({
   }
   seenFactoryFiles.add(factoryFile);
 
-  const source = await moduleAccess.load(factoryFile);
+  const source = await moduleAccess.load(factoryLoadId);
   if (source === null) {
     return unresolvedSource(entrypoint.key);
   }
@@ -221,6 +228,7 @@ async function inspectFactoryFile({
         importerId,
         entrypoint,
         factoryFile: resolvedId,
+        factoryLoadId: resolved,
         factoryExportName,
         reactContext,
         moduleAccess,
@@ -247,6 +255,7 @@ async function inspectFactoryFile({
     metadata: {
       entrypoint,
       factoryFile,
+      factoryLoadId,
       servicesDir: factoryImports.servicesDir,
       serviceImportPaths,
       reactContext: factoryImports.reactContext,
@@ -340,11 +349,12 @@ function readGeneratedFactoryImports(
 async function validatePrecreatedClient(
   entrypoint: PrecreatedClientEntrypoint,
   clientFile: string,
+  clientLoadId: string,
   factoryResolvedIds: Set<string>,
   moduleAccess: QraftModuleAccess
 ) {
   const resolvedExport = await readExportedDeclarationChain(
-    clientFile,
+    clientLoadId,
     entrypoint.client.exportName,
     moduleAccess
   );
@@ -372,7 +382,7 @@ async function readExportedDeclarationChain(
   if (seen.has(sourceFile)) return null;
   seen.add(sourceFile);
 
-  const source = await moduleAccess.load(sourceFile);
+  const source = await moduleAccess.load(startFile);
   if (source === null) {
     return null;
   }
@@ -386,6 +396,7 @@ async function readExportedDeclarationChain(
   if (exported) {
     return {
       sourceFile,
+      sourceLoadId: startFile,
       ast,
       init: exported,
       importBindings: await readTopLevelImportBindings(
@@ -405,7 +416,7 @@ async function readExportedDeclarationChain(
   if (resolvedId === sourceFile) return null;
 
   return readExportedDeclarationChain(
-    resolvedId,
+    resolved,
     reexport.localName,
     moduleAccess,
     seen
