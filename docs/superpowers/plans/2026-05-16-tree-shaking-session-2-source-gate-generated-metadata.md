@@ -59,7 +59,7 @@ Do not implement:
 
 ## Task 1: Pre-Parse Source Gate
 
-- [ ] **Step 1: Read the source-gate task**
+- [x] **Step 1: Read the source-gate task**
 
 Run:
 
@@ -69,7 +69,7 @@ sed -n '/## Task 3: Add The Pre-Parse Source Gate/,/## Task 4:/p' docs/superpowe
 
 Expected: the session implementer sees exact source-gate test cases and implementation rules.
 
-- [ ] **Step 2: Add source-gate tests first**
+- [x] **Step 2: Add source-gate tests first**
 
 Create `packages/tree-shaking-plugin/src/lib/transform/source-gate.test.ts` using master Task 3 Step 1.
 
@@ -81,7 +81,7 @@ corepack yarn workspace @openapi-qraft/tree-shaking-plugin test -- --run src/lib
 
 Expected: FAIL because `source-gate.ts` does not exist yet.
 
-- [ ] **Step 3: Implement `shouldInspectSource(...)`**
+- [x] **Step 3: Implement `shouldInspectSource(...)`**
 
 Create `packages/tree-shaking-plugin/src/lib/transform/source-gate.ts` using master Task 3 Steps 3-4.
 
@@ -93,7 +93,7 @@ Required behavior:
 - inspect when the source contains configured names, module specifiers, or static member-chain hints;
 - prefer parsing when uncertain.
 
-- [ ] **Step 4: Wire source gate into `core.ts`**
+- [x] **Step 4: Wire source gate into `core.ts`**
 
 Update `packages/tree-shaking-plugin/src/core.ts` using master Task 3 Step 5.
 
@@ -103,7 +103,7 @@ Required behavior:
 - return `null` before parse for ordinary source-gate skips;
 - do not throw diagnostics for ordinary source-gate skips.
 
-- [ ] **Step 5: Verify source gate**
+- [x] **Step 5: Verify source gate**
 
 Run:
 
@@ -113,7 +113,7 @@ corepack yarn workspace @openapi-qraft/tree-shaking-plugin test -- --run src/lib
 
 Expected: PASS.
 
-- [ ] **Step 6: Commit source gate**
+- [x] **Step 6: Commit source gate**
 
 Run:
 
@@ -128,7 +128,7 @@ Expected: one focused source-gate commit.
 
 ## Task 2: Generated Metadata Inspection
 
-- [ ] **Step 1: Read the generated-metadata task**
+- [x] **Step 1: Read the generated-metadata task**
 
 Run:
 
@@ -138,7 +138,7 @@ sed -n '/## Task 4: Extract Generated Metadata Inspection/,/## Milestone B:/p' d
 
 Expected: the session implementer sees exact generated metadata tests, return types, and extraction boundaries.
 
-- [ ] **Step 2: Add generated-metadata tests first**
+- [x] **Step 2: Add generated-metadata tests first**
 
 Create `packages/tree-shaking-plugin/src/lib/transform/generated-metadata.test.ts` using master Task 4 Step 1.
 
@@ -150,7 +150,7 @@ corepack yarn workspace @openapi-qraft/tree-shaking-plugin test -- --run src/lib
 
 Expected: FAIL because `generated-metadata.ts` does not exist yet.
 
-- [ ] **Step 3: Add metadata result types**
+- [x] **Step 3: Add metadata result types**
 
 Update `packages/tree-shaking-plugin/src/lib/transform/types.ts` using master Task 4 Step 3.
 
@@ -161,7 +161,7 @@ Required model:
 - `GeneratedEntrypointMetadata`;
 - `GeneratedMetadataResult`.
 
-- [ ] **Step 4: Extract generated-source inspection**
+- [x] **Step 4: Extract generated-source inspection**
 
 Create `packages/tree-shaking-plugin/src/lib/transform/generated-metadata.ts` using master Task 4 Step 4.
 
@@ -174,7 +174,7 @@ Required behavior:
 - validate pre-created client export against configured factory export/module;
 - return structured `DiagnosticReason` values instead of direct debug skips.
 
-- [ ] **Step 5: Keep the legacy planner compiling through an adapter**
+- [x] **Step 5: Keep the legacy planner compiling through an adapter**
 
 Update `packages/tree-shaking-plugin/src/lib/transform/plan.ts` using master Task 4 Step 5.
 
@@ -185,7 +185,7 @@ Required behavior:
 - keep old planner maps if needed for compatibility in this session;
 - leave full helper-selection rewiring for Session 3.
 
-- [ ] **Step 6: Verify metadata and core behavior**
+- [x] **Step 6: Verify metadata and core behavior**
 
 Run:
 
@@ -195,7 +195,7 @@ corepack yarn workspace @openapi-qraft/tree-shaking-plugin test -- --run src/lib
 
 Expected: PASS.
 
-- [ ] **Step 7: Commit metadata boundary**
+- [x] **Step 7: Commit metadata boundary**
 
 Run:
 
@@ -211,7 +211,7 @@ Expected: one focused metadata-boundary commit.
 
 ## Milestone B Verification
 
-- [ ] **Step 1: Run focused package checks**
+- [x] **Step 1: Run focused package checks**
 
 Run:
 
@@ -222,7 +222,7 @@ corepack yarn workspace @openapi-qraft/tree-shaking-plugin typecheck
 
 Expected: tests pass and typecheck reports no TypeScript errors.
 
-- [ ] **Step 2: Run fast e2e gate**
+- [x] **Step 2: Run fast e2e gate**
 
 Run:
 
@@ -239,6 +239,6 @@ npm run e2e:post-build
 
 Expected: `Tree-shaking bundle assertions passed.`
 
-- [ ] **Step 3: Debug e2e failures without weakening assertions**
+- [x] **Step 3: Debug e2e failures without weakening assertions**
 
 If one bundler fails, inspect its output under `e2e/projects/tree-shaking-bundlers/dist` and identify whether the root cause is resolver/module-access behavior, source-gate false negative, or generated metadata extraction.
