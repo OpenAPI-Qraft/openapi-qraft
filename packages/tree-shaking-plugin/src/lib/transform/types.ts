@@ -23,6 +23,21 @@ export type QraftPrecreatedClientConfig = {
   createAPIClientFnOptionsModule?: string;
 };
 
+export type DiagnosticsLevel = 'error' | 'warn' | 'off';
+
+export type DiagnosticLayer =
+  | 'gate'
+  | 'entrypoint'
+  | 'generated-metadata'
+  | 'usage-collection';
+
+export type DiagnosticReason = {
+  layer: DiagnosticLayer;
+  code: string;
+  message: string;
+  entrypointKey?: string;
+};
+
 export type QraftTreeShakeOptions = {
   createAPIClientFn?: QraftFactoryConfig[];
   apiClient?: QraftPrecreatedClientConfig[];
@@ -30,6 +45,7 @@ export type QraftTreeShakeOptions = {
   moduleAccess?: QraftModuleAccessOptions;
   include?: FilterPattern;
   exclude?: FilterPattern;
+  diagnostics?: DiagnosticsLevel;
   debug?: boolean;
 };
 

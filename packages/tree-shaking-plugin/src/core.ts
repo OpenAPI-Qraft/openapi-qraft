@@ -29,6 +29,8 @@ export type QraftPrecreatedClientConfig = {
   createAPIClientFnOptionsModule?: string;
 };
 
+export type DiagnosticsLevel = 'error' | 'warn' | 'off';
+
 export type {
   QraftModuleAccess,
   QraftModuleAccessOptions,
@@ -47,6 +49,7 @@ export type QraftTreeShakeOptions = {
   moduleAccess?: QraftModuleAccessOptions;
   include?: FilterPattern;
   exclude?: FilterPattern;
+  diagnostics?: DiagnosticsLevel;
   debug?: boolean;
 };
 
