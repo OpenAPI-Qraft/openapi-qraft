@@ -8,8 +8,10 @@ import type {
 } from './lib/resolvers/common.js';
 import * as generateModule from '@babel/generator';
 import { createAgnosticModuleAccess } from './lib/resolvers/agnostic.js';
+import { normalizeEntrypoints } from './lib/transform/entrypoints.js';
 import { applyTransformPlan } from './lib/transform/mutate.js';
 import { createTransformPlan } from './lib/transform/plan.js';
+import { shouldInspectSource } from './lib/transform/source-gate.js';
 
 export type FilterPattern = string | RegExp | Array<string | RegExp>;
 
@@ -91,11 +93,17 @@ export async function transformQraftTreeShaking(
           })
         : moduleAccessOrResolver;
 
-  if (!shouldTransformId(id, options)) return null;
-
-  const entrypoints = options.entrypoints ?? [];
-  if (entrypoints.length === 0) {
-    return debugSkip(options, id, 'no API clients configured');
+  const entrypoints = normalizeEntrypoints(options);
+  if (
+    !shouldInspectSource({
+      code,
+      id,
+      entrypoints,
+      include: options.include,
+      exclude: options.exclude,
+    })
+  ) {
+    return null;
   }
 
   const plan = await createTransformPlan(code, id, options, moduleAccess);
@@ -116,34 +124,6 @@ export async function transformQraftTreeShaking(
     code: result.code,
     map: result.map,
   };
-}
-
-function shouldTransformId(id: string, options: QraftTreeShakeOptions) {
-  if (id.includes('/node_modules/')) return false;
-  if (!/\.[cm]?[jt]sx?$/.test(id)) return false;
-  if (matchesPattern(id, options.exclude)) return false;
-  if (options.include && !matchesPattern(id, options.include)) return false;
-  return true;
-}
-
-function matchesPattern(
-  id: string,
-  pattern: FilterPattern | undefined
-): boolean {
-  if (!pattern) return false;
-  if (Array.isArray(pattern))
-    return pattern.some((item) => matchesPattern(id, item));
-  if (typeof pattern === 'string') return id.includes(pattern);
-  return pattern.test(id);
-}
-
-function debugSkip(options: QraftTreeShakeOptions, id: string, reason: string) {
-  if (options.debug) {
-    console.warn(
-      `[openapi-qraft/tree-shaking-plugin] skipped ${id}: ${reason}`
-    );
-  }
-  return null;
 }
 
 function resolveDefaultExport<T>(module: unknown): T {
