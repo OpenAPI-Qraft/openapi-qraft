@@ -145,7 +145,7 @@ Update `packages/tree-shaking-plugin/src/lib/transform/types.ts` using master Ta
 Required model:
 
 - `ImportTarget`;
-- `RuntimeContextConfig`;
+- `ReactContextConfig`;
 - `GeneratedFactoryEntrypoint`;
 - `PrecreatedClientEntrypoint`;
 - `ClientEntrypoint`.

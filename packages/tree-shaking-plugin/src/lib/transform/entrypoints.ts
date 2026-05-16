@@ -15,7 +15,7 @@ export function normalizeEntrypoints(
         exportName: factory.name,
         moduleSpecifier: factory.module,
       },
-      runtimeContext: factory.context
+      reactContext: factory.context
         ? {
             exportName: factory.context,
             moduleSpecifier: factory.contextModule ?? null,

@@ -432,7 +432,7 @@ describe('normalizeEntrypoints', () => {
           exportName: 'createReactAPIClient',
           moduleSpecifier: './api',
         },
-        runtimeContext: {
+        reactContext: {
           exportName: 'APIClientContext',
           moduleSpecifier: './api/APIClientContext',
         },
@@ -518,7 +518,7 @@ export type ImportTarget = {
   moduleSpecifier: string;
 };
 
-export type RuntimeContextConfig = {
+export type ReactContextConfig = {
   exportName: string;
   moduleSpecifier: string | null;
 };
@@ -527,7 +527,7 @@ export type GeneratedFactoryEntrypoint = {
   kind: 'generatedFactory';
   key: string;
   factory: ImportTarget;
-  runtimeContext: RuntimeContextConfig | null;
+  reactContext: ReactContextConfig | null;
 };
 
 export type PrecreatedClientEntrypoint = {
@@ -565,7 +565,7 @@ export function normalizeEntrypoints(
         exportName: factory.name,
         moduleSpecifier: factory.module,
       },
-      runtimeContext: factory.context
+      reactContext: factory.context
         ? {
             exportName: factory.context,
             moduleSpecifier: factory.contextModule ?? null,
@@ -995,7 +995,7 @@ describe('inspectGeneratedEntrypoints', () => {
     expect(result.metadataByEntrypointKey.get(entrypoints[0].key)).toMatchObject({
       factoryFile: path.join(root, 'src/api/index.ts'),
       servicesDir: './services',
-      runtimeContext: {
+      reactContext: {
         exportName: 'APIClientContext',
         moduleSpecifier: './APIClientContext',
       },
@@ -1122,7 +1122,7 @@ export type GeneratedClientMetadata = {
   factoryFile: string;
   servicesDir: string;
   serviceImportPaths: Record<string, string>;
-  runtimeContext: RuntimeContextConfig | null;
+  reactContext: ReactContextConfig | null;
   optionsFactory?: ImportTarget;
 };
 
@@ -1363,7 +1363,7 @@ In `packages/tree-shaking-plugin/src/lib/transform/types.ts`, add:
 ```ts
 export type RuntimeInput =
   | { kind: 'none' }
-  | { kind: 'context'; context: RuntimeContextConfig }
+  | { kind: 'context'; context: ReactContextConfig }
   | { kind: 'optionsExpression'; expression: t.Expression }
   | { kind: 'optionsFactoryCall'; target: ImportTarget };
 ```
