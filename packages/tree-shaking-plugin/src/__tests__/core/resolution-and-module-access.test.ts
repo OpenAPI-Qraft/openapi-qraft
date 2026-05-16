@@ -4,9 +4,14 @@ import path from 'node:path';
 import { describe, expect, it, vi } from 'vitest';
 import { transformQraftTreeShaking as transformQraftTreeShakingImpl } from '../../core.js';
 import {
+  createQraftModuleAccess,
+  createUserResolverStrategy,
+  createUserSourceLoaderStrategy,
+} from '../../lib/resolvers/common.js';
+import {
+  createFixtureModuleAccess,
   PRECREATED_API_INDEX_TS,
   SERVICES_INDEX_TS,
-  createFixtureModuleAccess,
 } from './fixtures.js';
 import {
   createFixture,
@@ -48,8 +53,222 @@ createAPIClient().pets.getPets.useQuery();
       name: 'QraftTreeShakeError',
       reason: expect.objectContaining({
         code: 'entrypoint-source-unavailable',
+        moduleAccessTrace: expect.arrayContaining([
+          expect.objectContaining({
+            kind: 'resolve',
+            target: './api',
+            stages: expect.arrayContaining([
+              expect.objectContaining({
+                name: 'user',
+                result: 'hit',
+                value: '/virtual/api/index.ts',
+              }),
+            ]),
+          }),
+          expect.objectContaining({
+            kind: 'load',
+            target: '/virtual/api/index.ts',
+            stages: expect.arrayContaining([
+              expect.objectContaining({
+                name: 'user',
+                result: 'miss',
+              }),
+            ]),
+          }),
+        ]),
       }),
     });
+  });
+
+  it('scopes unresolved entrypoint trace to that entrypoint', async () => {
+    const sourceFile = path.join(
+      await fs.mkdtemp(path.join(os.tmpdir(), 'qraft-tree-shaking-')),
+      'src/App.tsx'
+    );
+
+    await expect(
+      transformQraftTreeShaking(
+        `
+import { createAPIClient } from './api';
+createAPIClient().pets.getPets.useQuery();
+`,
+        sourceFile,
+        {
+          entrypoints: [
+            {
+              kind: 'clientFactory',
+              factory: {
+                exportName: 'createUnusedAPIClient',
+                moduleSpecifier: './unused-api',
+              },
+            },
+            {
+              kind: 'clientFactory',
+              factory: {
+                exportName: 'createAPIClient',
+                moduleSpecifier: './api',
+              },
+            },
+          ],
+          moduleAccess: {
+            resolve: async (specifier) =>
+              specifier === './unused-api'
+                ? '/virtual/unused-api/index.ts'
+                : '/virtual/api/index.ts',
+            load: async () => null,
+          },
+        }
+      )
+    ).rejects.toMatchObject({
+      name: 'QraftTreeShakeError',
+      reason: expect.objectContaining({
+        code: 'entrypoint-source-unavailable',
+        entrypointKey: 'generatedFactory:createAPIClient:./api',
+        moduleAccessTrace: expect.not.arrayContaining([
+          expect.objectContaining({
+            target: './unused-api',
+          }),
+          expect.objectContaining({
+            target: '/virtual/unused-api/index.ts',
+          }),
+        ]),
+      }),
+    });
+  });
+
+  it('replays cached null resolve and load trace for later unresolved diagnostics', async () => {
+    const sourceFile = path.join(
+      await fs.mkdtemp(path.join(os.tmpdir(), 'qraft-tree-shaking-')),
+      'src/App.tsx'
+    );
+    const resolve = vi.fn(async () => null);
+    const load = vi.fn(async () => null);
+    const moduleAccess = createQraftModuleAccess(
+      [createUserResolverStrategy(resolve)],
+      [createUserSourceLoaderStrategy(load)]
+    );
+
+    await expect(
+      transformQraftTreeShakingImpl(
+        `
+import { createAPIClient } from './api';
+createAPIClient().pets.getPets.useQuery();
+`,
+        sourceFile,
+        {
+          entrypoints: [
+            {
+              kind: 'clientFactory',
+              factory: {
+                exportName: 'createUnusedAPIClient',
+                moduleSpecifier: './api',
+              },
+            },
+            {
+              kind: 'clientFactory',
+              factory: {
+                exportName: 'createAPIClient',
+                moduleSpecifier: './api',
+              },
+            },
+          ],
+        },
+        moduleAccess
+      )
+    ).rejects.toMatchObject({
+      name: 'QraftTreeShakeError',
+      reason: expect.objectContaining({
+        code: 'entrypoint-source-unavailable',
+        entrypointKey: 'generatedFactory:createAPIClient:./api',
+        moduleAccessTrace: expect.arrayContaining([
+          expect.objectContaining({
+            kind: 'resolve',
+            target: './api',
+            stages: expect.arrayContaining([
+              expect.objectContaining({
+                name: 'user',
+                result: 'miss',
+              }),
+            ]),
+          }),
+        ]),
+      }),
+    });
+    expect(resolve).toHaveBeenCalledTimes(1);
+    expect(load).not.toHaveBeenCalled();
+  });
+
+  it('replays cached null load trace for later unresolved diagnostics', async () => {
+    const sourceFile = path.join(
+      await fs.mkdtemp(path.join(os.tmpdir(), 'qraft-tree-shaking-')),
+      'src/App.tsx'
+    );
+    const resolve = vi.fn(async () => '/virtual/api/index.ts');
+    const load = vi.fn(async () => null);
+    const moduleAccess = createQraftModuleAccess(
+      [createUserResolverStrategy(resolve)],
+      [createUserSourceLoaderStrategy(load)]
+    );
+
+    await expect(
+      transformQraftTreeShakingImpl(
+        `
+import { createAPIClient } from './api';
+createAPIClient().pets.getPets.useQuery();
+`,
+        sourceFile,
+        {
+          entrypoints: [
+            {
+              kind: 'clientFactory',
+              factory: {
+                exportName: 'createUnusedAPIClient',
+                moduleSpecifier: './api',
+              },
+            },
+            {
+              kind: 'clientFactory',
+              factory: {
+                exportName: 'createAPIClient',
+                moduleSpecifier: './api',
+              },
+            },
+          ],
+        },
+        moduleAccess
+      )
+    ).rejects.toMatchObject({
+      name: 'QraftTreeShakeError',
+      reason: expect.objectContaining({
+        code: 'entrypoint-source-unavailable',
+        entrypointKey: 'generatedFactory:createAPIClient:./api',
+        moduleAccessTrace: expect.arrayContaining([
+          expect.objectContaining({
+            kind: 'resolve',
+            target: './api',
+            stages: expect.arrayContaining([
+              expect.objectContaining({
+                name: 'user',
+                result: 'hit',
+                value: '/virtual/api/index.ts',
+              }),
+            ]),
+          }),
+          expect.objectContaining({
+            kind: 'load',
+            target: '/virtual/api/index.ts',
+            stages: expect.arrayContaining([
+              expect.objectContaining({
+                name: 'user',
+                result: 'miss',
+              }),
+            ]),
+          }),
+        ]),
+      }),
+    });
+    expect(resolve).toHaveBeenCalledTimes(1);
+    expect(load).toHaveBeenCalledTimes(1);
   });
 
   it('throws by default when a usage-before-declaration local client cannot load generated source', async () => {
@@ -251,6 +470,18 @@ createAPIClient().pets.getPets.useQuery();
 
       expect(warn).toHaveBeenCalledWith(
         expect.stringContaining('entrypoint-source-unavailable')
+      );
+      expect(warn).toHaveBeenCalledWith(
+        expect.stringContaining('resolve "./api" from "')
+      );
+      expect(warn).toHaveBeenCalledWith(
+        expect.stringContaining('  user: hit /virtual/api/index.ts')
+      );
+      expect(warn).toHaveBeenCalledWith(
+        expect.stringContaining('load "/virtual/api/index.ts":')
+      );
+      expect(warn).toHaveBeenCalledWith(
+        expect.stringContaining('  user: miss')
       );
     } finally {
       warn.mockRestore();
