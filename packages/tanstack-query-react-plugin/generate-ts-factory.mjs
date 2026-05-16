@@ -37,6 +37,14 @@ const serviceOperationFiles = [
 ];
 
 async function main() {
+  const generatedDir = path.join(
+    'src',
+    'ts-factory',
+    'service-operation.generated'
+  );
+
+  fs.mkdirSync(generatedDir, { recursive: true });
+
   serviceOperationFiles.forEach((file) => {
     const sourceFileFactoryCode = generateSourceFileFactoryCode(
       path.join('../tanstack-query-react-types/src/service-operation', file)
@@ -51,10 +59,7 @@ const factory = ts.factory;
 export const ${camelcase('create-' + sourceFileBaseName + '-nodes')} = () => ${sourceFileFactoryCode}
 `;
 
-    fs.writeFileSync(
-      path.join('src', 'ts-factory', 'service-operation.generated', file),
-      fileCode.trim() + '\n'
-    );
+    fs.writeFileSync(path.join(generatedDir, file), fileCode.trim() + '\n');
   });
 }
 
