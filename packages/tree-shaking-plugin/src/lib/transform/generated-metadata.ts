@@ -14,6 +14,10 @@ import * as traverseModule from '@babel/traverse';
 import * as t from '@babel/types';
 import { resolveDefaultExport } from '../interop/resolve-default-export.js';
 import {
+  getQraftModuleAccessTraceSince,
+  getQraftModuleAccessTraceSnapshot,
+} from '../resolvers/common.js';
+import {
   findExportReexport,
   findFactoryReexport,
   getObjectPropertyKey,
@@ -77,34 +81,39 @@ async function inspectEntrypoint(
   entrypoint: ClientEntrypoint,
   moduleAccess: QraftModuleAccess
 ) {
+  const traceSnapshot = getQraftModuleAccessTraceSnapshot(moduleAccess);
+
   try {
     return entrypoint.kind === 'generatedFactory'
       ? await inspectGeneratedFactoryEntrypoint(
           importerId,
           entrypoint,
-          moduleAccess
+          moduleAccess,
+          traceSnapshot
         )
       : await inspectPrecreatedClientEntrypoint(
           importerId,
           entrypoint,
-          moduleAccess
+          moduleAccess,
+          traceSnapshot
         );
   } catch {
-    return unresolvedSource(entrypoint.key);
+    return unresolvedSource(entrypoint.key, moduleAccess, traceSnapshot);
   }
 }
 
 async function inspectGeneratedFactoryEntrypoint(
   importerId: string,
   entrypoint: GeneratedFactoryEntrypoint,
-  moduleAccess: QraftModuleAccess
+  moduleAccess: QraftModuleAccess,
+  traceSnapshot: number
 ): Promise<MetadataInspection> {
   const resolved = await moduleAccess.resolve(
     entrypoint.factory.moduleSpecifier,
     importerId
   );
   if (!resolved) {
-    return unresolvedSource(entrypoint.key);
+    return unresolvedSource(entrypoint.key, moduleAccess, traceSnapshot);
   }
 
   return inspectFactoryFile({
@@ -115,13 +124,15 @@ async function inspectGeneratedFactoryEntrypoint(
     factoryExportName: entrypoint.factory.exportName,
     reactContext: entrypoint.reactContext,
     moduleAccess,
+    traceSnapshot,
   });
 }
 
 async function inspectPrecreatedClientEntrypoint(
   importerId: string,
   entrypoint: PrecreatedClientEntrypoint,
-  moduleAccess: QraftModuleAccess
+  moduleAccess: QraftModuleAccess,
+  traceSnapshot: number
 ): Promise<MetadataInspection> {
   const [resolvedClient, resolvedFactory] = await Promise.all([
     moduleAccess.resolve(entrypoint.client.moduleSpecifier, importerId),
@@ -129,7 +140,7 @@ async function inspectPrecreatedClientEntrypoint(
   ]);
 
   if (!resolvedClient || !resolvedFactory) {
-    return unresolvedSource(entrypoint.key);
+    return unresolvedSource(entrypoint.key, moduleAccess, traceSnapshot);
   }
 
   const clientFile = normalizeResolvedId(resolvedClient);
@@ -168,6 +179,7 @@ async function inspectPrecreatedClientEntrypoint(
     factoryExportName: entrypoint.factory.exportName,
     reactContext: null,
     moduleAccess,
+    traceSnapshot,
     optionsFactory: entrypoint.optionsFactory,
   });
 }
@@ -180,6 +192,7 @@ async function inspectFactoryFile({
   factoryExportName,
   reactContext,
   moduleAccess,
+  traceSnapshot,
   optionsFactory,
   seenFactoryFiles = new Set<string>(),
 }: {
@@ -190,6 +203,7 @@ async function inspectFactoryFile({
   factoryExportName: string;
   reactContext: ReactContextConfig | null;
   moduleAccess: QraftModuleAccess;
+  traceSnapshot: number;
   optionsFactory?: ImportTarget;
   seenFactoryFiles?: Set<string>;
 }): Promise<MetadataInspection> {
@@ -200,7 +214,7 @@ async function inspectFactoryFile({
 
   const source = await moduleAccess.load(factoryLoadId);
   if (source === null) {
-    return unresolvedSource(entrypoint.key);
+    return unresolvedSource(entrypoint.key, moduleAccess, traceSnapshot);
   }
 
   const ast = parse(source, {
@@ -216,7 +230,7 @@ async function inspectFactoryFile({
     if (reexportPath) {
       const resolved = await moduleAccess.resolve(reexportPath, factoryFile);
       if (!resolved) {
-        return unresolvedSource(entrypoint.key);
+        return unresolvedSource(entrypoint.key, moduleAccess, traceSnapshot);
       }
 
       const resolvedId = normalizeResolvedId(resolved);
@@ -232,6 +246,7 @@ async function inspectFactoryFile({
         factoryExportName,
         reactContext,
         moduleAccess,
+        traceSnapshot,
         optionsFactory,
         seenFactoryFiles,
       });
@@ -613,13 +628,23 @@ function unwrapStaticExpression(node: t.Expression | null | undefined) {
   return current;
 }
 
-function unresolvedSource(entrypointKey: string): MetadataInspection {
+function unresolvedSource(
+  entrypointKey: string,
+  moduleAccess: QraftModuleAccess,
+  traceSnapshot: number
+): MetadataInspection {
+  const moduleAccessTrace = getQraftModuleAccessTraceSince(
+    moduleAccess,
+    traceSnapshot
+  );
+
   return {
     reason: {
       layer: 'generated-metadata',
       code: 'entrypoint-source-unavailable',
       message: 'Generated entrypoint source is unavailable.',
       entrypointKey,
+      ...(moduleAccessTrace.length > 0 ? { moduleAccessTrace } : {}),
     },
   };
 }

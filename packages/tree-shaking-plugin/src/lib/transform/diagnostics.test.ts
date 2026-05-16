@@ -40,6 +40,74 @@ describe('tree-shaking diagnostics', () => {
     warn.mockRestore();
   });
 
+  it('formats module access trace for unresolved warnings', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const reporter = createDiagnosticReporter({ diagnostics: 'warn' });
+
+    try {
+      reporter.unresolved({
+        layer: 'generated-metadata',
+        code: 'entrypoint-source-unavailable',
+        message: 'Generated source was unavailable.',
+        moduleAccessTrace: [
+          {
+            kind: 'resolve',
+            target: './api',
+            importer: '/repo/src/App.tsx',
+            stages: [
+              { name: 'native', result: 'miss' },
+              {
+                name: 'user',
+                result: 'error',
+                message: 'Cannot resolve generated entrypoint',
+              },
+            ],
+          },
+          {
+            kind: 'load',
+            target: '/repo/src/api.ts?raw',
+            stages: [{ name: 'user', result: 'miss' }],
+          },
+        ],
+      });
+
+      expect(warn).toHaveBeenCalledWith(
+        expect.stringContaining(
+          [
+            'resolve "./api" from "/repo/src/App.tsx":',
+            '  native: miss',
+            '  user: error Cannot resolve generated entrypoint',
+            'load "/repo/src/api.ts?raw":',
+            '  user: miss',
+          ].join('\n')
+        )
+      );
+    } finally {
+      warn.mockRestore();
+    }
+  });
+
+  it('formats module access trace for unresolved errors', () => {
+    const reporter = createDiagnosticReporter({ diagnostics: 'error' });
+
+    expect(() =>
+      reporter.unresolved({
+        layer: 'generated-metadata',
+        code: 'entrypoint-source-unavailable',
+        message: 'Generated source was unavailable.',
+        moduleAccessTrace: [
+          {
+            kind: 'load',
+            target: '/repo/src/api.ts',
+            stages: [{ name: 'user', result: 'miss' }],
+          },
+        ],
+      })
+    ).toThrow(
+      /entrypoint-source-unavailable[\s\S]*load "\/repo\/src\/api\.ts":[\s\S]*user: miss/
+    );
+  });
+
   it('stays silent when diagnostics is off', () => {
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
     const reporter = createDiagnosticReporter({ diagnostics: 'off' });

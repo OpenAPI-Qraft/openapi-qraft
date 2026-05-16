@@ -24,6 +24,7 @@ import * as traverseModule from '@babel/traverse';
 import * as t from '@babel/types';
 import { resolveDefaultExport } from '../interop/resolve-default-export.js';
 import { createAgnosticModuleAccess } from '../resolvers/agnostic.js';
+import { createTraceableQraftModuleAccess } from '../resolvers/common.js';
 import {
   findExportReexport,
   findFactoryReexport,
@@ -149,13 +150,14 @@ export async function createTransformState(
   })
 ): Promise<TransformState> {
   const servicesDirName = 'services';
-  const resolveModule = moduleAccess.resolve;
+  const traceableModuleAccess = createTraceableQraftModuleAccess(moduleAccess);
+  const resolveModule = traceableModuleAccess.resolve;
   const entrypoints = normalizeEntrypoints(options);
   const diagnostics = createDiagnosticReporter(options);
   const generatedMetadata = await inspectGeneratedEntrypoints({
     importerId: id,
     entrypoints,
-    moduleAccess,
+    moduleAccess: traceableModuleAccess,
   });
   const factoryOptions: LegacyQraftFactoryConfig[] = [];
   const factoryEntrypointKeys = new Map<LegacyQraftFactoryConfig, string>();
@@ -278,7 +280,7 @@ export async function createTransformState(
             id,
             resolvedAbs,
             factory,
-            moduleAccess,
+            traceableModuleAccess,
             servicesDirName
           );
           if (info) {
@@ -368,7 +370,7 @@ export async function createTransformState(
       id,
       precreatedOptions,
       generatedMetadata.metadataByEntrypointKey,
-      moduleAccess,
+      traceableModuleAccess,
       activeProgramScope
     ))
   );
@@ -503,7 +505,7 @@ export async function createTransformState(
           id,
           client.createImportLoadId,
           client.factory,
-          moduleAccess,
+          traceableModuleAccess,
           servicesDirName
         )
       );
@@ -663,7 +665,7 @@ export async function createTransformState(
         id,
         request.createImportLoadId,
         request.factory,
-        moduleAccess,
+        traceableModuleAccess,
         servicesDirName
       )
     );
@@ -1065,7 +1067,9 @@ async function findPrecreatedClients(
     configs.map(async (config) => {
       const clientLoadId =
         (await resolveModule(config.clientModule, importerId)) ?? null;
-      const clientFile = clientLoadId ? normalizeResolvedId(clientLoadId) : null;
+      const clientFile = clientLoadId
+        ? normalizeResolvedId(clientLoadId)
+        : null;
       const factoryModuleLoadId =
         (await resolveModule(config.createAPIClientFnModule, importerId)) ??
         null;
