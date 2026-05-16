@@ -30,8 +30,7 @@ Implement:
 - `QraftTreeShakeError`;
 - structured diagnostic reasons;
 - `normalizeEntrypoints(...)`;
-- `ClientEntrypoint[]` and import-target/runtime-context config types;
-- temporary compatibility for existing `debug?: boolean`.
+- `ClientEntrypoint[]` and import-target/runtime-context config types.
 
 Do not implement:
 
