@@ -13,9 +13,16 @@ import * as traverseModule from '@babel/traverse';
 import * as t from '@babel/types';
 import { resolveDefaultExport } from '../interop/resolve-default-export.js';
 import {
+  getStaticMemberPath,
+  getStaticMemberRoot,
+  getUsageScopeKey,
+  isExpression,
+} from './ast-utils.js';
+import {
   callbackNeedsOptions,
   callbackNeedsReactRuntime,
 } from './callbacks.js';
+import { getGeneratedInfoKey } from './generated-info-key.js';
 
 const traverse =
   resolveDefaultExport<(typeof import('@babel/traverse'))['default']>(
@@ -938,16 +945,6 @@ function matchSchemaAccess(
   };
 }
 
-function getUsageScopeKey<T extends t.Node>(callPath: NodePath<T>) {
-  const functionParent = callPath.getFunctionParent();
-  if (!functionParent) {
-    return 'program';
-  }
-
-  const { node } = functionParent;
-  return [node.type, node.start ?? -1, node.end ?? -1].join(':');
-}
-
 function matchInlineClientCall(
   callee: t.Expression | t.V8IntrinsicIdentifier,
   createImports: Map<string, CreateImportEntry>
@@ -1004,42 +1001,6 @@ function matchInlineClientCall(
     operationName,
     callbackName,
   };
-}
-
-function getStaticMemberPath(
-  node: t.Expression | t.V8IntrinsicIdentifier
-): string[] | null {
-  if (t.isCallExpression(node)) return [];
-  if (t.isIdentifier(node)) return [node.name];
-  if (!t.isMemberExpression(node) && !t.isOptionalMemberExpression(node)) {
-    return null;
-  }
-  if (node.computed || !t.isIdentifier(node.property)) return null;
-
-  const objectPath = getStaticMemberPath(node.object as t.Expression);
-  if (!objectPath) return null;
-
-  return [...objectPath, node.property.name];
-}
-
-function getStaticMemberRoot(
-  node: t.Expression | t.V8IntrinsicIdentifier
-): t.Expression | t.V8IntrinsicIdentifier {
-  if (t.isMemberExpression(node) || t.isOptionalMemberExpression(node)) {
-    return getStaticMemberRoot(node.object as t.Expression);
-  }
-  return node;
-}
-
-function isExpression(node: t.Node | t.SpreadElement | t.ArgumentPlaceholder) {
-  return t.isExpression(node);
-}
-
-function getGeneratedInfoKey(
-  createImportPath: string,
-  factory: ClientBinding['factory']
-) {
-  return `${createImportPath}::${factory.context ?? ''}::${factory.contextModule ?? ''}`;
 }
 
 function findLastImportIndex(body: t.Statement[]) {

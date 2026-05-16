@@ -13,6 +13,11 @@ import { parse } from '@babel/parser';
 import * as traverseModule from '@babel/traverse';
 import * as t from '@babel/types';
 import { resolveDefaultExport } from '../interop/resolve-default-export.js';
+import {
+  findExportReexport,
+  findFactoryReexport,
+  getObjectPropertyKey,
+} from './ast-utils.js';
 import { normalizeResolvedId } from './path-rendering.js';
 
 const traverse =
@@ -509,26 +514,6 @@ function findExportedDeclaration(
   return null;
 }
 
-function findExportReexport(ast: t.File, exportName: string) {
-  for (const statement of ast.program.body) {
-    if (!t.isExportNamedDeclaration(statement) || !statement.source) continue;
-
-    for (const specifier of statement.specifiers) {
-      if (!t.isExportSpecifier(specifier)) continue;
-      if (!t.isIdentifier(specifier.exported)) continue;
-      if (specifier.exported.name !== exportName) continue;
-      if (!t.isIdentifier(specifier.local)) continue;
-
-      return {
-        source: statement.source.value,
-        localName: specifier.local.name,
-      };
-    }
-  }
-
-  return null;
-}
-
 async function matchesConfiguredBinding(
   localName: string,
   exportName: string,
@@ -549,24 +534,6 @@ async function matchesConfiguredBinding(
   if (localName !== exportName) return false;
   const importerResolvedId = normalizeResolvedId(importerId);
   return expectedResolvedIds.has(importerResolvedId);
-}
-
-function findFactoryReexport(ast: t.File, factoryName: string): string | null {
-  for (const statement of ast.program.body) {
-    if (!t.isExportNamedDeclaration(statement) || !statement.source) continue;
-
-    for (const specifier of statement.specifiers) {
-      if (
-        t.isExportSpecifier(specifier) &&
-        t.isIdentifier(specifier.exported) &&
-        specifier.exported.name === factoryName
-      ) {
-        return statement.source.value;
-      }
-    }
-  }
-
-  return null;
 }
 
 async function readServiceImportPaths(
@@ -633,12 +600,6 @@ function unwrapStaticExpression(node: t.Expression | null | undefined) {
   }
 
   return current;
-}
-
-function getObjectPropertyKey(key: t.ObjectProperty['key']) {
-  if (t.isIdentifier(key)) return key.name;
-  if (t.isStringLiteral(key)) return key.value;
-  return null;
 }
 
 function unresolvedSource(entrypointKey: string): MetadataInspection {
