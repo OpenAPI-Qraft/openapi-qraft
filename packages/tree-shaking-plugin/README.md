@@ -152,6 +152,8 @@ export default {
 };
 ```
 
+Rspack resolution is reconstructed from `compiler.options.resolve` through `@rspack/resolver`. Keep aliases, `tsConfig`, and extension aliases in Rspack config so the plugin can inspect generated modules, and prefer explicit `moduleAccess.resolve` for setups that depend on custom Rspack resolver plugins or defaults not represented in `compiler.options.resolve`.
+
 ### esbuild
 
 ```ts
@@ -252,7 +254,9 @@ entrypoints: [
 
 Normal Vite, Rollup, webpack, Rspack, and esbuild integrations do not need any extra configuration. The active bundler adapter resolves and loads generated modules for the tree-shaking transform.
 
-Use `moduleAccess.load` only when a build relies on virtual modules or a custom source provider that the bundler adapter cannot load directly:
+`moduleAccess.resolve` and `moduleAccess.load` are fallback hooks inside the active adapter. Native bundler resolution runs first; user `resolve` is used only after a native miss. Native source loading runs first when the adapter has it, then user `load`, then a non-public best-effort adapter fallback for ordinary files.
+
+Use `moduleAccess.load` when a build relies on virtual modules or a custom source provider that the bundler adapter cannot load directly:
 
 ```ts
 qraftTreeShakeVite({
@@ -275,7 +279,9 @@ qraftTreeShakeVite({
 });
 ```
 
-If a resolved module cannot be loaded through module access for a configured transform candidate, `diagnostics` controls the result: `'error'` throws, `'warn'` prints a warning and skips the candidate, and `'off'` skips it silently.
+`moduleAccess.load` receives the exact resolved id, including query/hash suffixes. The adapter-local source fallback is not configurable public API; if it misses or is unavailable, the plugin treats that as a load miss.
+
+If a resolved module cannot be loaded through module access for a configured transform candidate, `diagnostics` controls the result: `'error'` throws with a resolve/load trace, `'warn'` prints the trace and skips the candidate, and `'off'` skips it silently.
 
 #### `kind: 'precreatedClient'`
 
@@ -368,6 +374,7 @@ entrypoints: [
 ### Other options
 
 - `resolve` - custom resolver used as a fallback when the bundler cannot resolve a specifier.
+- `moduleAccess.load` - custom source provider for virtual generated modules or non-standard source storage.
 - `include` / `exclude` - filter which files are transformed.
 - `diagnostics` - controls unresolved transform candidates:
   - `'error'` (default) throws when configured source looks transformable but
