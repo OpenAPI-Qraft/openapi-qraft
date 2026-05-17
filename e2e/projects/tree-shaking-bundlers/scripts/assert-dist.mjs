@@ -1,7 +1,12 @@
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import { originalPositionFor, TraceMap } from '@jridgewell/trace-mapping';
-import { bundlers, scenarios } from './scenarios.mjs';
+import {
+  bundlers,
+  getScenario,
+  scenarios,
+  supportsScenarioBundler,
+} from './scenarios.mjs';
 import { getBundleMapPath, getBundlePath } from './shared.mjs';
 
 const modeExpectations = {
@@ -35,12 +40,24 @@ const sourceMapAssertions = {
     source: 'src/barrel-precreated-relative.ts',
     token: 'qraftAPIClient(',
   },
+  'barrel-precreated-alias': {
+    source: 'src/barrel-precreated-alias.ts',
+    token: 'qraftAPIClient(',
+  },
+  'file-context-query-hash-user-load': {
+    source: 'src/file-context-query-hash-user-load.ts',
+    token: 'qraftReactAPIClient(',
+  },
   'mixed-context-precreated-mirrors': {
     source: 'src/mixed-context-precreated-mirrors.ts',
     tokens: ['getPets.schema', 'createPet.schema', 'getStores.schema'],
   },
   'node-api-helper-selection': {
     source: 'src/node-api-helper-selection.ts',
+    token: 'qraftAPIClient(',
+  },
+  'node-api-virtual-load-only': {
+    source: 'src/node-api-virtual-load-only.ts',
     token: 'qraftAPIClient(',
   },
   'barrel-mixed-helper-selection': {
@@ -93,8 +110,19 @@ function getGeneratedPosition(bundle, traceMap, token, expectedSource) {
   );
 }
 
-for (const bundler of bundlers) {
-  for (const scenario of scenarios) {
+const selectedBundler = process.env.QRAFT_TREE_SHAKE_BUNDLER;
+const selectedScenario = process.env.QRAFT_TREE_SHAKE_SCENARIO;
+const assertedBundlers = selectedBundler ? [selectedBundler] : bundlers;
+const assertedScenarios = selectedScenario
+  ? [getScenario(selectedScenario)]
+  : scenarios;
+let assertionCount = 0;
+
+for (const bundler of assertedBundlers) {
+  for (const scenario of assertedScenarios) {
+    if (!supportsScenarioBundler(bundler, scenario)) continue;
+
+    assertionCount += 1;
     const bundlePath = getBundlePath(bundler, scenario);
     const bundle = await readFile(bundlePath, 'utf8');
     const resolvedModeExpectation = modeExpectations[scenario.mode](scenario);
@@ -152,5 +180,10 @@ for (const bundler of bundlers) {
     }
   }
 }
+
+assert.ok(
+  assertionCount > 0,
+  `Expected at least one scenario assertion, got bundler=${selectedBundler ?? '*'} scenario=${selectedScenario ?? '*'}`
+);
 
 console.log('Tree-shaking bundle assertions passed.');

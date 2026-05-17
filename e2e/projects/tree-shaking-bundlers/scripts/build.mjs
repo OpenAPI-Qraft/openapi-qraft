@@ -4,6 +4,7 @@ import {
   bundlers,
   getBundlerOutputDir,
   scenarios,
+  supportsScenarioBundler,
 } from './scenarios.mjs';
 
 const runners = {
@@ -31,6 +32,8 @@ const runners = {
 
 for (const bundler of bundlers) {
   for (const scenario of scenarios) {
+    if (!supportsScenarioBundler(bundler, scenario)) continue;
+
     console.log(`Building tree-shaking bundle: ${bundler} / ${scenario.name}`);
 
     rmSync(getBundlerOutputDir(bundler, scenario), {

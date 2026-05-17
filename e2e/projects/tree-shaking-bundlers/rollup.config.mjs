@@ -3,8 +3,8 @@ import { qraftTreeShakeRollup } from '@openapi-qraft/tree-shaking-plugin/rollup'
 import alias from '@rollup/plugin-alias';
 import nodeResolve from '@rollup/plugin-node-resolve';
 import esbuild from 'rollup-plugin-esbuild';
+import { getTreeShakePluginOptions } from './scripts/module-access-fixtures.mjs';
 import {
-  entrypoints,
   getBundlerOutputDir,
   getScenario,
   isExternalModuleRequest,
@@ -25,9 +25,7 @@ export default {
         extensions: ['.ts', '.tsx', '.mts', '.cts', '.mjs', '.js'],
       }),
     }),
-    qraftTreeShakeRollup({
-      entrypoints,
-    }),
+    qraftTreeShakeRollup(getTreeShakePluginOptions(scenario)),
     esbuild({
       include: /\.[cm]?[jt]sx?$/,
       sourceMap: true,

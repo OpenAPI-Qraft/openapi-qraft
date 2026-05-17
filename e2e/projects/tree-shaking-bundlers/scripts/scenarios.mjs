@@ -6,4 +6,5 @@ export {
   getScenario,
   isExternalModuleRequest,
   scenarios,
+  supportsScenarioBundler,
 } from './shared.mjs';
