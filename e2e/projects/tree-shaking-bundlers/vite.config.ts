@@ -1,9 +1,9 @@
 import { resolve } from 'node:path';
 import { qraftTreeShakeVite } from '@openapi-qraft/tree-shaking-plugin/vite';
 import { defineConfig } from 'vite';
+import { getTreeShakePluginOptions } from './scripts/module-access-fixtures.mjs';
 import { getScenario } from './scripts/scenarios.mjs';
 import {
-  entrypoints,
   getBundlerOutputDir,
   isExternalModuleRequest,
 } from './scripts/shared.mjs';
@@ -13,9 +13,7 @@ export default defineConfig(({ mode }) => {
 
   return {
     plugins: [
-      qraftTreeShakeVite({
-        entrypoints,
-      }),
+      qraftTreeShakeVite(getTreeShakePluginOptions(scenario)),
     ],
     resolve: {
       tsconfigPaths: true,
