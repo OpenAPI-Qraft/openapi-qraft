@@ -56,10 +56,11 @@ const mixedScenario = ({ name, entry, include, exclude }) => ({
   exclude: unique(['allCallbacks', 'petsService', 'storesService', ...exclude]),
 });
 
-const apiOnlyScenario = ({ name, entry, include, exclude }) => ({
+const apiOnlyScenario = ({ name, entry, include, exclude, ...scenario }) => ({
   name,
   mode: 'apiOnly',
   entry,
+  ...scenario,
   include: unique([qraftAPIClientPattern, ...include]),
   exclude: unique([
     qraftReactAPIClientPattern,
@@ -306,6 +307,36 @@ export const scenarios = [
     ]),
     exclude: [],
   },
+  contextScenario({
+    name: 'file-context-query-hash-user-load',
+    entry: 'src/file-context-query-hash-user-load.ts',
+    include: [
+      '@openapi-qraft/react/callbacks/useQuery',
+      /method:\s*["']get["']/,
+      'QueryHashAPIClientContext',
+    ],
+    exclude: [
+      'qraftAPIClient(',
+      'allCallbacks',
+      /method:\s*["']post["']|mediaType/,
+      'virtual:qraft-query-hash-api',
+      'createQueryHashAPIClient',
+      '@openapi-qraft/react/callbacks/useMutation',
+      'getStores',
+      'createPet',
+    ],
+  }),
+  apiOnlyScenario({
+    name: 'node-api-virtual-load-only',
+    bundlers: ['esbuild'],
+    entry: 'src/node-api-virtual-load-only.ts',
+    include: ['getQueryKey', 'invalidateQueries', 'setQueryData', 'getPets'],
+    exclude: [
+      'createVirtualNodeAPIClient',
+      'virtual:qraft-node-api',
+      'createNodeAPIClient',
+    ],
+  }),
 ];
 
 const precreatedClientEntrypoints = [
@@ -452,6 +483,10 @@ export function getScenario(name) {
   }
 
   return scenario;
+}
+
+export function supportsScenarioBundler(bundler, scenario) {
+  return !scenario.bundlers || scenario.bundlers.includes(bundler);
 }
 
 export function getBundlerOutputDir(bundler, scenario) {

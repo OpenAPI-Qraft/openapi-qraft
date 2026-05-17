@@ -1,8 +1,8 @@
 import { resolve } from 'node:path';
 import { qraftTreeShakeRspack } from '@openapi-qraft/tree-shaking-plugin/rspack';
 import TerserPlugin from 'terser-webpack-plugin';
+import { getTreeShakePluginOptions } from './scripts/module-access-fixtures.mjs';
 import {
-  entrypoints,
   getBundlerOutputDir,
   getScenario,
   isExternalModuleRequest,
@@ -90,8 +90,6 @@ export default {
     ],
   },
   plugins: [
-    qraftTreeShakeRspack({
-      entrypoints,
-    }),
+    qraftTreeShakeRspack(getTreeShakePluginOptions(scenario)),
   ],
 };

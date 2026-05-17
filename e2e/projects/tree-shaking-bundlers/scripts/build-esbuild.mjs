@@ -2,8 +2,8 @@ import { resolve } from 'node:path';
 import { TsconfigPathsPlugin } from '@esbuild-plugins/tsconfig-paths';
 import { qraftTreeShakeEsbuild } from '@openapi-qraft/tree-shaking-plugin/esbuild';
 import { build } from 'esbuild';
+import { getTreeShakePluginOptions } from './module-access-fixtures.mjs';
 import {
-  entrypoints,
   getBundlerOutputDir,
   getScenario,
   isExternalModuleRequest,
@@ -31,9 +31,7 @@ await build({
   assetNames: 'assets/[name][ext]',
   plugins: [
     TsconfigPathsPlugin({ tsconfig: resolve(process.cwd(), 'tsconfig.json') }),
-    qraftTreeShakeEsbuild({
-      entrypoints,
-    }),
+    qraftTreeShakeEsbuild(getTreeShakePluginOptions(scenario)),
     {
       name: 'external-dependencies',
       setup(build) {

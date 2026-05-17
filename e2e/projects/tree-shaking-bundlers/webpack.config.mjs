@@ -2,8 +2,8 @@ import { resolve } from 'node:path';
 import { qraftTreeShakeWebpack } from '@openapi-qraft/tree-shaking-plugin/webpack';
 import TerserPlugin from 'terser-webpack-plugin';
 import TsconfigPathsPlugin from 'tsconfig-paths-webpack-plugin';
+import { getTreeShakePluginOptions } from './scripts/module-access-fixtures.mjs';
 import {
-  entrypoints,
   getBundlerOutputDir,
   getScenario,
   isExternalModuleRequest,
@@ -99,8 +99,6 @@ export default {
     ],
   },
   plugins: [
-    qraftTreeShakeWebpack({
-      entrypoints,
-    }),
+    qraftTreeShakeWebpack(getTreeShakePluginOptions(scenario)),
   ],
 };
