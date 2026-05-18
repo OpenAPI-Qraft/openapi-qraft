@@ -3,20 +3,16 @@
   "extends": ["//"],
   "tasks": {
     "codegen": {
+      "cache": true,
       "dependsOn": [],
-      "inputs": [
-        "$TURBO_DEFAULT$",
-        "generate-factory-code-generator.mjs",
-        "src/generateSourceFileFactoryCode.ts",
-        "src/index.ts"
-      ],
+      "inputs": [],
       "outputs": ["src/generateFactoryCode.ts"]
     },
     "build": {
-      "dependsOn": ["codegen"]
-    },
-    "lint": {
-      "dependsOn": ["codegen"]
+      "cache": true,
+      "dependsOn": ["codegen"],
+      "inputs": ["src/**"],
+      "outputs": ["dist/**"]
     }
   }
 }

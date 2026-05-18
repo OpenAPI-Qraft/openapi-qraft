@@ -2,25 +2,18 @@
   "$schema": "https://turbo.build/schema.json",
   "extends": ["//"],
   "tasks": {
-    "build": {
-      "dependsOn": ["^build", "codegen", "generate:mocks"],
-      "inputs": ["$TURBO_DEFAULT$"]
-    },
     "typecheck": {
-      "dependsOn": ["^build", "codegen", "generate:mocks"],
-      "inputs": ["$TURBO_DEFAULT$"]
-    },
-    "lint": {
-      "dependsOn": ["^build", "codegen", "generate:mocks"],
-      "inputs": ["$TURBO_DEFAULT$"]
+      "cache": true,
+      "dependsOn": ["^build", "codegen", "generate:mocks"]
     },
     "codegen": {
-      "dependsOn": ["^build"],
-      "inputs": ["$TURBO_DEFAULT$", "!src/mocks/**", "!src/api/**"],
+      "cache": true,
+      "inputs": ["!src/mocks/**", "!src/api/**"],
       "outputs": ["src/api/**"]
     },
     "generate:mocks": {
-      "inputs": ["$TURBO_DEFAULT$", "!src/mocks/**", "!src/api/**"],
+      "cache": true,
+      "inputs": ["!src/mocks/**", "!src/api/**"],
       "outputs": ["src/mocks/**"]
     }
   }
