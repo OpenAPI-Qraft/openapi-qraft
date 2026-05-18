@@ -62,8 +62,8 @@ export function createRollupLikeModuleAccess(
 ): QraftModuleAccess {
   return createQraftModuleAccess(
     [
-      createRollupResolveStrategy(ctx),
       createUserResolverStrategy(userAccess.resolve),
+      createRollupResolveStrategy(ctx),
     ],
     [
       createUserSourceLoaderStrategy(userAccess.load),

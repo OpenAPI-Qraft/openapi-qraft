@@ -254,7 +254,7 @@ entrypoints: [
 
 Normal Vite, Rollup, webpack, Rspack, and esbuild integrations do not need any extra configuration. The active bundler adapter resolves and loads generated modules for the tree-shaking transform.
 
-`moduleAccess.resolve` and `moduleAccess.load` are fallback hooks inside the active adapter. Native bundler resolution runs first; user `resolve` is used only after a native miss. Native source loading runs first when the adapter has it, then user `load`, then a non-public best-effort adapter fallback for ordinary files.
+`moduleAccess.resolve` and `moduleAccess.load` are user override hooks inside the active adapter. User `resolve` runs before native bundler resolution. User `load` runs before native source loading when the adapter has it, then before a non-public best-effort adapter fallback for ordinary files. Return `null` from a user hook to continue to the next strategy.
 
 Use `moduleAccess.load` when a build relies on virtual modules or a custom source provider that the bundler adapter cannot load directly:
 
