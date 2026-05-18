@@ -67,8 +67,8 @@ export function createEsbuildModuleAccess(
 ): QraftModuleAccess {
   return createQraftModuleAccess(
     [
-      createEsbuildResolveStrategy(ctx),
       createUserResolverStrategy(userAccess.resolve),
+      createEsbuildResolveStrategy(ctx),
     ],
     [
       createUserSourceLoaderStrategy(userAccess.load),

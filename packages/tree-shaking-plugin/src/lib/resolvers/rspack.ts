@@ -188,12 +188,12 @@ export function createRspackModuleAccess(
 ): QraftModuleAccess {
   return createQraftModuleAccess(
     [
-      createRspackResolveStrategy(ctx),
       createUserResolverStrategy(userAccess.resolve),
+      createRspackResolveStrategy(ctx),
     ],
     [
-      createRspackLoadStrategy(ctx),
       createUserSourceLoaderStrategy(userAccess.load),
+      createRspackLoadStrategy(ctx),
       createRspackInputFileSystemLoadStrategy(ctx),
     ]
   );
