@@ -87,7 +87,6 @@
 ^\Q.github/workflows/spelling.yml\E$
 ^\Q.yarn/
 ^\Q.yarn/releases/yarn-4.9.1.cjs\E$
-^docs/
 ^\Qpackages/react-client/src/lib/jwt-decode/index.test.ts\E$
 ^\Qwebsite/static/.nojekyll\E$
 ^\website/static/

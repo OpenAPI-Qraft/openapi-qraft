@@ -2,27 +2,13 @@
   "$schema": "https://turbo.build/schema.json",
   "extends": ["//"],
   "tasks": {
-    "build": {
-      "dependsOn": ["^build", "codegen"]
-    },
     "codegen": {
+      "cache": true,
       "dependsOn": ["^build"],
       "outputs": [
         "src/ts-factory/service-operation.generated/**/*.ts"
       ],
-      "inputs": [
-        "$TURBO_DEFAULT$",
-        "generate-ts-factory.mjs"
-      ]
-    },
-    "typecheck": {
-      "dependsOn": ["^build", "codegen"]
-    },
-    "lint": {
-      "dependsOn": ["^build", "codegen"]
-    },
-    "test": {
-      "dependsOn": ["build"]
+      "inputs": ["generate-ts-factory.mjs"]
     }
   }
 }

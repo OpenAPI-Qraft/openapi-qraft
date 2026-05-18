@@ -3,7 +3,11 @@
   "extends": ["//"],
   "tasks": {
     "typecheck": {
-      "dependsOn": ["^build", "build"]
+      "cache": true,
+      "dependsOn": [
+        "^build",
+        "build"
+      ]
     }
   }
 }
