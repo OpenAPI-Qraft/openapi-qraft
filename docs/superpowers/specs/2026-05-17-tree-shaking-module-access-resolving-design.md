@@ -54,11 +54,11 @@ before the feature is published.
   for a resolved module id.
 
 `user load`
-: A user-provided fallback source provider. It can provide source for virtual
+: A user-provided override source provider. It can provide source for virtual
   modules or for custom generated-source stores.
 
 `adapter-local source fallback`
-: Best-effort adapter implementation detail used only after native/user loading
+: Best-effort adapter implementation detail used only after user/native loading
   misses. It may read ordinary files when an adapter can do so, but it is not a
   public API and is not configurable.
 
@@ -94,24 +94,26 @@ Rules:
 
 ## User Hook Semantics
 
-`moduleAccess.resolve` is a fallback.
+`moduleAccess.resolve` is a user override.
 
-The adapter must call user resolve only when native resolve is unavailable,
-misses, errors, or returns a module that is not inspectable by the plugin.
+The adapter must call user resolve before native resolve. If user resolve
+returns `null`, throws, or returns no usable module id, the adapter continues to
+native resolve.
 
-Successful native resolution wins. This keeps the plugin aligned with the real
-bundler graph by default.
+Successful user resolution wins. This makes explicitly configured custom module
+access stronger than bundler behavior.
 
-`moduleAccess.load` is a fallback source provider.
+`moduleAccess.load` is a user override source provider.
 
-The adapter must call user load after native loading misses or is unsupported,
-and before any adapter-local source fallback.
+The adapter must call user load before native loading and before any
+adapter-local source fallback. If user load returns `null` or throws, the
+adapter continues to native loading when available.
 
 This is a breaking standardization. The resulting contract is:
 
 ```text
-resolve: native resolve -> user resolve
-load:    native load -> user load -> adapter-local source fallback
+resolve: user resolve -> native resolve
+load:    user load -> native load -> adapter-local source fallback
 ```
 
 For adapters without a native arbitrary source-loading API, `native load` is
@@ -137,16 +139,17 @@ warns, or stays silent.
 | Adapter | Resolve order | Load order | Native resolve | Native load | Adapter-local fallback | Unsupported / weak spots |
 | --- | --- | --- | --- | --- | --- | --- |
 | Agnostic core/unit tests | user | user | none | none | none | no automatic source access |
-| Vite | `this.resolve(..., { skipSelf: true })` -> user | user -> adapter-local source fallback | Rollup-compatible plugin context | none | best-effort ordinary file read | virtual modules need user load unless source is available through the adapter fallback |
-| Rollup | `this.resolve(..., { skipSelf: true })` -> user | user -> adapter-local source fallback | Rollup plugin context | none | best-effort ordinary file read | `this.load` is intentionally not part of the current contract until proven safe |
-| webpack | `loaderContext.getResolve({ dependencyType: 'esm' })` -> user | `loadModule(id)` -> user -> adapter-local source fallback | webpack resolver | webpack loader pipeline | best-effort input filesystem read | fallback reads raw files and may diverge from loader output |
-| Rspack | `@rspack/resolver` built from `compiler.options.resolve` -> user | `loadModule(id)` -> user -> adapter-local source fallback | reconstructed Rspack resolver | Rspack loader pipeline | best-effort input filesystem read | reconstructed resolve can drift from actual Rspack plugin behavior |
-| esbuild | `build.resolve(...)` -> user | user -> adapter-local source fallback | esbuild build context | none | best-effort ordinary file read | virtual/onLoad-only modules need user load |
+| Vite | user -> `this.resolve(..., { skipSelf: true })` | user -> adapter-local source fallback | Rollup-compatible plugin context | none | best-effort ordinary file read | virtual modules need user load unless source is available through the adapter fallback |
+| Rollup | user -> `this.resolve(..., { skipSelf: true })` | user -> adapter-local source fallback | Rollup plugin context | none | best-effort ordinary file read | `this.load` is intentionally not part of the current contract until proven safe |
+| webpack | user -> `loaderContext.getResolve({ dependencyType: 'esm' })` | user -> `loadModule(id)` -> adapter-local source fallback | webpack resolver | webpack loader pipeline | best-effort input filesystem read | fallback reads raw files and may diverge from loader output |
+| Rspack | user -> `@rspack/resolver` built from `compiler.options.resolve` | user -> `loadModule(id)` -> adapter-local source fallback | reconstructed Rspack resolver | Rspack loader pipeline | best-effort input filesystem read | reconstructed resolve can drift from actual Rspack plugin behavior |
+| esbuild | user -> `build.resolve(...)` | user -> adapter-local source fallback | esbuild build context | none | best-effort ordinary file read | virtual/onLoad-only modules need user load |
 
 ### Vite/Rollup
 
-Vite and Rollup should use native resolving for identity, aliases, extension
-resolution, and barrel paths.
+Vite and Rollup should allow user resolving to override identity first, then use
+native resolving for aliases, extension resolution, and barrel paths when the
+user hook misses.
 
 They currently do not have a standardized adapter-native arbitrary load stage in
 this plugin. Until such a stage is proven against real fixtures, user load is
@@ -155,16 +158,17 @@ fallback remains an implementation detail for ordinary generated files.
 
 ### webpack
 
-webpack should prefer `loadModule(id)` for source because it is closest to the
-real loader pipeline.
+webpack should let user load override source first, then prefer `loadModule(id)`
+because it is closest to the real loader pipeline when the user hook misses.
 
-Adapter-local source fallback is allowed only after `loadModule` and user load
+Adapter-local source fallback is allowed only after user load and `loadModule`
 miss. It is a weak fallback for plain generated files, not a substitute for
 bundler source loading.
 
 ### Rspack
 
-Rspack should keep using `loadModule(id)` first for source.
+Rspack should let user load override source first, then use `loadModule(id)` for
+source when the user hook misses.
 
 Resolving is the main risk. The adapter currently reconstructs resolution with
 `@rspack/resolver` and `compiler.options.resolve`, which may diverge from actual
@@ -256,9 +260,9 @@ Resolver tests should lock the adapter contract table.
 
 Required cases:
 
-- native resolve wins over user resolve;
-- user resolve is called only after native miss/error/external/uninspectable;
-- native load wins over user load for webpack/Rspack;
+- user resolve wins over native resolve;
+- native resolve runs after user miss/error;
+- user load wins over native load for webpack/Rspack;
 - user load runs before adapter-local source fallback;
 - rejected source loading is not permanently cached;
 - exact query/hash id is passed to user load;
@@ -304,7 +308,7 @@ patches inside transform planning.
 Recommended implementation order:
 
 1. Add trace-capable strategy result types in resolver common code.
-2. Standardize adapter order to `native -> user -> adapter-local fallback`
+2. Standardize adapter order to `user -> native -> adapter-local fallback`
    according to this design.
 3. Preserve exact ids through source loading and isolate canonical id helpers.
 4. Thread trace data into unresolved diagnostics.

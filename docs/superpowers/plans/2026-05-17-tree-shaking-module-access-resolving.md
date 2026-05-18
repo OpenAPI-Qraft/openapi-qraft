@@ -18,8 +18,8 @@ Refactor `@openapi-qraft/tree-shaking-plugin` module access so resolving and
 source loading have one explicit contract:
 
 ```text
-resolve: native resolve -> user resolve
-load:    native load -> user load -> adapter-local source fallback
+resolve: user resolve -> native resolve
+load:    user load -> native load -> adapter-local source fallback
 ```
 
 Adapter-local source fallback is non-public and best-effort. Core transform must
@@ -46,18 +46,18 @@ continue to use only `moduleAccess.resolve/load`.
 - Preserve current resolver caching and rejected-load retry behavior.
 - Standardize adapter order:
   - agnostic: user resolve/load only;
-  - Vite/Rollup: native resolve -> user resolve; user load -> adapter fallback;
-  - webpack: native resolve -> user resolve; `loadModule` -> user load ->
+  - Vite/Rollup: user resolve -> native resolve; user load -> adapter fallback;
+  - webpack: user resolve -> native resolve; user load -> `loadModule` ->
     adapter fallback;
-  - Rspack: reconstructed native resolve -> user resolve; `loadModule` -> user
-    load -> adapter fallback;
-  - esbuild: native resolve -> user resolve; user load -> adapter fallback.
+  - Rspack: user resolve -> reconstructed native resolve; user load ->
+    `loadModule` -> adapter fallback;
+  - esbuild: user resolve -> native resolve; user load -> adapter fallback.
 
 **Tests:**
 
-- Native resolve wins over user resolve.
-- User resolve runs after native miss/error.
-- Webpack/Rspack native load wins over user load.
+- User resolve wins over native resolve.
+- Native resolve runs after user miss/error.
+- Webpack/Rspack user load wins over native load.
 - User load runs before adapter-local source fallback.
 - Rejected source loading is not permanently cached.
 - Exact query/hash id is passed to user load.
@@ -126,7 +126,7 @@ continue to use only `moduleAccess.resolve/load`.
 
 **Implementation:**
 
-- Document `moduleAccess.resolve` as user fallback, not override.
+- Document `moduleAccess.resolve` as user override with native fallback.
 - Document `moduleAccess.load` as the only public custom/virtual source
   provider.
 - State that adapter-local source fallback is non-public, best-effort, and not
