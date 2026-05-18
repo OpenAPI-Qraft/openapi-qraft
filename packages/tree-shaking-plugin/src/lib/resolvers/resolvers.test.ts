@@ -34,25 +34,25 @@ describe('resolver composition', () => {
     expect(
       getQraftModuleAccessStrategyMetadata(createRollupLikeModuleAccess({}))
     ).toEqual({
-      resolve: ['native', 'user'],
+      resolve: ['user', 'native'],
       load: ['user', 'adapter-fallback'],
     });
     expect(
       getQraftModuleAccessStrategyMetadata(createWebpackLikeModuleAccess({}))
     ).toEqual({
-      resolve: ['native', 'user'],
-      load: ['native', 'user', 'adapter-fallback'],
+      resolve: ['user', 'native'],
+      load: ['user', 'native', 'adapter-fallback'],
     });
     expect(
       getQraftModuleAccessStrategyMetadata(createRspackModuleAccess({}))
     ).toEqual({
-      resolve: ['native', 'user'],
-      load: ['native', 'user', 'adapter-fallback'],
+      resolve: ['user', 'native'],
+      load: ['user', 'native', 'adapter-fallback'],
     });
     expect(
       getQraftModuleAccessStrategyMetadata(createEsbuildModuleAccess({}))
     ).toEqual({
-      resolve: ['native', 'user'],
+      resolve: ['user', 'native'],
       load: ['user', 'adapter-fallback'],
     });
   });
@@ -89,47 +89,53 @@ describe('resolver composition', () => {
     expect(load).toHaveBeenCalledTimes(1);
   });
 
-  it('uses native resolve before user resolve when native resolve hits', async () => {
+  it('uses user resolve before native resolve when user resolve hits', async () => {
+    const nativeResolve = vi.fn(async () => ({
+      id: '/tmp/from-native.ts',
+      external: false,
+    }));
     const userResolve = vi.fn(async () => '/tmp/from-user.ts');
     const access = createRollupLikeModuleAccess(
-      {
-        resolve: vi.fn(async () => ({
-          id: '/tmp/from-native.ts',
-          external: false,
-        })),
-      },
+      { resolve: nativeResolve },
       { resolve: userResolve }
     );
 
     await expect(access.resolve('./api', '/tmp/App.tsx')).resolves.toBe(
-      '/tmp/from-native.ts'
+      '/tmp/from-user.ts'
     );
-    expect(userResolve).not.toHaveBeenCalled();
+    expect(nativeResolve).not.toHaveBeenCalled();
   });
 
-  it('uses user resolve after native resolve misses or errors', async () => {
+  it('uses native resolve after user resolve misses or errors', async () => {
     const importer = '/tmp/App.tsx';
     const userResolve = vi
       .fn()
-      .mockResolvedValueOnce('/tmp/from-user-after-miss.ts')
-      .mockResolvedValueOnce('/tmp/from-user-after-error.ts');
+      .mockResolvedValueOnce(null)
+      .mockRejectedValueOnce(new Error('user failed'));
     const nativeResolve = vi
       .fn()
-      .mockResolvedValueOnce(null)
-      .mockRejectedValueOnce(new Error('native failed'));
+      .mockResolvedValueOnce({
+        id: '/tmp/from-native-after-miss.ts',
+        external: false,
+      })
+      .mockResolvedValueOnce({
+        id: '/tmp/from-native-after-error.ts',
+        external: false,
+      });
     const access = createRollupLikeModuleAccess(
       { resolve: nativeResolve },
       { resolve: userResolve }
     );
 
     await expect(access.resolve('./miss', importer)).resolves.toBe(
-      '/tmp/from-user-after-miss.ts'
+      '/tmp/from-native-after-miss.ts'
     );
     await expect(access.resolve('./error', importer)).resolves.toBe(
-      '/tmp/from-user-after-error.ts'
+      '/tmp/from-native-after-error.ts'
     );
     expect(userResolve).toHaveBeenNthCalledWith(1, './miss', importer);
     expect(userResolve).toHaveBeenNthCalledWith(2, './error', importer);
+    expect(nativeResolve).toHaveBeenCalledTimes(2);
   });
 
   it('returns null from load when no source loader is configured', async () => {
@@ -354,7 +360,7 @@ describe('resolver composition', () => {
     expect(loadModule).toHaveBeenCalledTimes(1);
   });
 
-  it('uses webpack loadModule before user load', async () => {
+  it('uses webpack user load before loadModule', async () => {
     const userLoad = vi.fn(async () => 'export const fromUser = true;');
     const loadModule = vi.fn(
       (request: string, callback: (...args: unknown[]) => void) => {
@@ -378,9 +384,9 @@ describe('resolver composition', () => {
     );
 
     await expect(access.load('/tmp/generated-api/index.ts')).resolves.toBe(
-      'export const fromNative = true;'
+      'export const fromUser = true;'
     );
-    expect(userLoad).not.toHaveBeenCalled();
+    expect(loadModule).not.toHaveBeenCalled();
   });
 
   it('uses webpack user load before input filesystem fallback', async () => {
@@ -416,6 +422,7 @@ describe('resolver composition', () => {
     await expect(
       access.load('/virtual/generated-api/index.ts?raw#factory')
     ).resolves.toBe('export const fromUser = true;');
+    expect(loadModule).not.toHaveBeenCalled();
     expect(readFile).not.toHaveBeenCalled();
   });
 
@@ -486,7 +493,7 @@ describe('resolver composition', () => {
     expect(loadModule).toHaveBeenCalledTimes(1);
   });
 
-  it('uses rspack loadModule before user load', async () => {
+  it('uses rspack user load before loadModule', async () => {
     const userLoad = vi.fn(async () => 'export const fromUser = true;');
     const loadModule = vi.fn(
       (request: string, callback: (...args: unknown[]) => void) => {
@@ -510,9 +517,9 @@ describe('resolver composition', () => {
     );
 
     await expect(access.load('/tmp/generated-api/index.ts')).resolves.toBe(
-      'export const fromNative = true;'
+      'export const fromUser = true;'
     );
-    expect(userLoad).not.toHaveBeenCalled();
+    expect(loadModule).not.toHaveBeenCalled();
   });
 
   it('uses rspack user load before input filesystem fallback', async () => {
@@ -548,6 +555,7 @@ describe('resolver composition', () => {
     await expect(
       access.load('/virtual/generated-api/index.ts?raw#factory')
     ).resolves.toBe('export const fromUser = true;');
+    expect(loadModule).not.toHaveBeenCalled();
     expect(readFile).not.toHaveBeenCalled();
   });
 

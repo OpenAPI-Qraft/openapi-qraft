@@ -180,12 +180,12 @@ export function createWebpackLikeModuleAccess(
 ): QraftModuleAccess {
   return createQraftModuleAccess(
     [
-      createWebpackResolveStrategy(ctx),
       createUserResolverStrategy(userAccess.resolve),
+      createWebpackResolveStrategy(ctx),
     ],
     [
-      createWebpackLoadStrategy(ctx),
       createUserSourceLoaderStrategy(userAccess.load),
+      createWebpackLoadStrategy(ctx),
       createWebpackInputFileSystemLoadStrategy(ctx),
     ]
   );
