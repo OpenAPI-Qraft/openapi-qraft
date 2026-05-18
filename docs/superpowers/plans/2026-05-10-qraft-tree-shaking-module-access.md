@@ -1360,5 +1360,5 @@ If there are no changes after verification, do not create a commit.
 - Keep code comments in English.
 - Do not weaken bundle assertions to make a failing bundler pass. A failure after removing `fs` usually means that adapter `load()` cannot see the generated module source.
 - `plan.ts` may still parse source code with Babel. The issue this plan fixes is the source provider boundary, not AST parsing itself.
-- Keep `resolve?: QraftResolver` for compatibility during development, but treat `moduleAccess` as the stronger contract. If both are provided, `moduleAccess.resolve` wins in direct core calls; bundler entrypoints should pass `options.resolve` into their adapter as the user fallback.
+- Keep `resolve?: QraftResolver` for compatibility during development, but treat `moduleAccess` as the stronger contract. If both are provided, `moduleAccess.resolve` wins in direct core calls; bundler entrypoints should pass `options.resolve` into their adapter as the user override.
 - Esbuild is intentionally different: it has `build.resolve` but not a public arbitrary `build.load` API. Its fallback may read ordinary file paths inside `src/lib/resolvers/esbuild.ts`, but core transform must remain filesystem-free.
