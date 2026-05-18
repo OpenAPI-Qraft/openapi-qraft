@@ -1,0 +1,39 @@
+{
+  "name": "tree-shaking-bundlers",
+  "private": true,
+  "version": "1.0.0",
+  "description": "End-to-end multi-bundler fixture for @openapi-qraft/tree-shaking-plugin",
+  "type": "module",
+  "sideEffects": false,
+  "scripts": {
+    "codegen": "openapi-qraft --plugin tanstack-query-react --plugin openapi-typescript ./openapi.yaml --clean -o src/generated-api --openapi-types-import-path '../schema.ts' --openapi-types-file-name schema.ts --explicit-import-extensions --create-api-client-fn createBarrelAPIClient filename:create-barrel-api-client context:BarrelAPIClientContext --create-api-client-fn createNodeAPIClient filename:create-node-api-client --create-api-client-fn createRelativeAPIClient filename:create-relative-api-client context:RelativeAPIClientContext --create-api-client-fn createRelativeExtAPIClient filename:create-relative-ts-api-client context:RelativeExtAPIClientContext --create-api-client-fn createAliasAPIClient filename:create-alias-api-client context:AliasAPIClientContext --create-api-client-fn createAliasDirectAPIClient filename:create-alias-direct-api-client context:AliasDirectAPIClientContext --create-api-client-fn createBarrelPrecreatedAPIClient filename:create-barrel-precreated-api-client --create-api-client-fn createRelativePrecreatedAPIClient filename:create-relative-precreated-api-client --create-api-client-fn createRelativeExtPrecreatedAPIClient filename:create-relative-ts-precreated-api-client --create-api-client-fn createAliasDirectPrecreatedAPIClient filename:create-alias-direct-precreated-api-client",
+    "build": "node ./scripts/build.mjs",
+    "build:rspack": "QRAFT_TREE_SHAKE_SCENARIO=mixed-context-precreated-mirrors node ./scripts/build-rspack.mjs",
+    "e2e:pre-build": "npm run codegen",
+    "e2e:post-build": "node ./scripts/assert-dist.mjs"
+  },
+  "dependencies": {
+    "@esbuild-plugins/tsconfig-paths": "^0.1.2",
+    "@openapi-qraft/cli": "latest",
+    "@openapi-qraft/react": "latest",
+    "@openapi-qraft/tree-shaking-plugin": "latest",
+    "@rollup/plugin-alias": "^6.0.0",
+    "@rollup/plugin-node-resolve": "^16.0.3",
+    "tsconfig-paths-webpack-plugin": "^4.2.0"
+  },
+  "devDependencies": {
+    "@jridgewell/trace-mapping": "^0.3.31",
+    "@rspack/cli": "latest",
+    "@rspack/core": "latest",
+    "@types/node": "latest",
+    "esbuild": "latest",
+    "esbuild-loader": "latest",
+    "rollup": "latest",
+    "rollup-plugin-esbuild": "latest",
+    "typescript": "latest",
+    "vite": "latest",
+    "webpack": "latest",
+    "webpack-cli": "latest",
+    "@rspack/resolver": "^0.4.0"
+  }
+}

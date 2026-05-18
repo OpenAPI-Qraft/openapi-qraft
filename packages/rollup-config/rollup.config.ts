@@ -1,4 +1,11 @@
-import type { OutputOptions, Plugin, RollupLog, RollupOptions } from 'rollup';
+import type {
+  OutputOptions,
+  Plugin,
+  RollupLog,
+  RollupOptions,
+  TreeshakingOptions,
+  TreeshakingPreset,
+} from 'rollup';
 import fs from 'node:fs';
 import { dirname, extname } from 'node:path';
 import commonjs from '@rollup/plugin-commonjs';
@@ -14,6 +21,7 @@ type Options = {
   externalDependencies?: string[];
   /** Generate only ESM output (skip CommonJS) */
   esmOnly?: boolean;
+  treeshake?: boolean | TreeshakingPreset | TreeshakingOptions;
 };
 
 /**
@@ -110,7 +118,7 @@ export const rollupConfig = (
         warn(warning);
       }
     },
-    treeshake: {
+    treeshake: options.treeshake ?? {
       preset: 'recommended',
       moduleSideEffects: false,
     },

@@ -39,7 +39,7 @@ jobs:
         run: yarn install --immutable
 
       - name: Build
-        run: yarn build:publishable
+        run: yarn build:publishable --force
 
       - name: Remove Verdaccio Storage
         run: rm -rf e2e/verdaccio-storage

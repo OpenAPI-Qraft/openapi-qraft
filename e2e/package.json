@@ -9,7 +9,8 @@
     "e2e:unpublish-from-private-registry": "NPM_PUBLISH_SCOPES='openapi-qraft qraft' yarn exec bin/unpublish-from-private-registry.sh",
     "e2e:update-projects-from-private-registry": "NPM_PUBLISH_SCOPES='openapi-qraft qraft' yarn exec bin/update-projects-from-private-registry.sh",
     "e2e:build-projects": "yarn exec bin/build-projects.sh",
-    "e2e:test": "yarn e2e:publish-to-private-registry && yarn e2e:update-projects-from-private-registry && yarn e2e:build-projects && yarn e2e:unpublish-from-private-registry"
+    "e2e:test": "yarn e2e:publish-to-private-registry && yarn e2e:update-projects-from-private-registry && yarn e2e:build-projects && yarn e2e:unpublish-from-private-registry",
+    "e2e:tree-shaking-bundlers-local": "yarn exec bin/tree-shaking-bundlers-local-e2e.sh"
   },
   "packageManager": "yarn@3.5.0",
   "devDependencies": {
