@@ -35,7 +35,7 @@ const state = api.<service>.<operation>.getQueryState(parameters);
     ```tsx
     const parameters = { path: { petId: 123 } };
 
-    await api.pet.getPetById.fetchQuery(parameters);
+    await api.pet.getPetById.fetchQuery({ parameters });
 
     const state = api.pet.getPetById.getQueryState(parameters);
 
@@ -48,7 +48,7 @@ const state = api.<service>.<operation>.getQueryState(parameters);
     const parameters = { path: { petId: 123 } };
     const queryKey = api.pet.getPetById.getQueryKey(parameters);
 
-    await api.pet.getPetById.fetchQuery(parameters);
+    await api.pet.getPetById.fetchQuery({ parameters });
 
     const state = api.pet.getPetById.getQueryState(queryKey);
 
