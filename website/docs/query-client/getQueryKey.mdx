@@ -17,7 +17,8 @@ const queryKey = api.<service>.<operation>.getQueryKey(parameters);
 ### Arguments
 
 1.  - `parameters: { path, query, header, body } | void`
-      - **Optional**, OpenAPI request parameters for the query, strictly-typed ✨
+      - **Required only if OpenAPI specification defines required parameters**, strictly-typed ✨
+      - If the operation has no required parameters according to OpenAPI, you can omit this argument.
       - For operations generated with `--queryable-write-operations`, query parameters may also include `body`.
         In that mode, `body` is part of the query key and cache identity for query-client methods.
       - The returned `QueryKey` can be passed to query-client methods that accept typed query key arrays.
