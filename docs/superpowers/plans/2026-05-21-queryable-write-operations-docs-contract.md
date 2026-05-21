@@ -447,7 +447,7 @@ Expected: commit succeeds with only the four fetch and ensure docs staged.
 
 - [ ] **Step 1: Update normal query key/data/state signatures**
 
-In `getQueryKey.mdx`, `getQueryData.mdx`, `getQueryState.mdx`, and `setQueryData.mdx`, replace normal query parameter signatures and nearby QueryKey prose with:
+In `getQueryData.mdx`, `getQueryState.mdx`, and `setQueryData.mdx`, replace normal query parameter signatures and nearby QueryKey prose with:
 
 ```md
 `parameters: { path, query, header, body } | QueryKey | void`
@@ -458,6 +458,16 @@ Instead of an object with `{ path, query, header, body }`, you can pass a typed 
 ```
 
 Use `| QueryKey` without `| void` in `setQueryData.mdx` if the existing method signature does not accept `void`.
+
+In `getQueryKey.mdx`, keep the argument signature limited to operation parameters:
+
+```md
+`parameters: { path, query, header, body } | void`
+
+For operations generated with `--queryable-write-operations`, query parameters may also include `body`.
+In that mode, `body` is part of the query key and cache identity for query-client methods.
+The returned `QueryKey` can be passed to query-client methods that accept typed query key arrays.
+```
 
 - [ ] **Step 2: Add a body cache identity example to `getQueryKey`**
 
@@ -520,7 +530,7 @@ Add this tab to `website/docs/query-client/setQueryData.mdx`:
 
 - [ ] **Step 4: Update infinite key/data/state/cache signatures**
 
-In `getInfiniteQueryKey.mdx`, `getInfiniteQueryData.mdx`, `getInfiniteQueryState.mdx`, and `setInfiniteQueryData.mdx`, replace infinite query parameter signatures and nearby query key prose with:
+In `getInfiniteQueryData.mdx`, `getInfiniteQueryState.mdx`, and `setInfiniteQueryData.mdx`, replace infinite query parameter signatures and nearby query key prose with:
 
 ```md
 `parameters: { path, query, header, body } | InfiniteQueryKey | void`
@@ -531,6 +541,16 @@ Instead of an object with `{ path, query, header, body }`, you can pass a typed 
 ```
 
 Use `| InfiniteQueryKey` without `| void` in `setInfiniteQueryData.mdx` if the existing method signature does not accept `void`.
+
+In `getInfiniteQueryKey.mdx`, keep the argument signature limited to operation parameters:
+
+```md
+`parameters: { path, query, header, body } | void`
+
+For operations generated with `--queryable-write-operations`, query parameters may also include `body`.
+In that mode, `body` is part of the infinite query key and cache identity.
+The returned `InfiniteQueryKey` can be passed to query-client methods that accept typed infinite query key arrays.
+```
 
 - [ ] **Step 5: Run focused grep**
 
