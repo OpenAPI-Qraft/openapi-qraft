@@ -2,12 +2,64 @@
 sidebar_label: getQueryState()
 ---
 
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
 # getQueryState(...)
 
-See the TanStack
-[_queryClient.getQueryState(...) 🌴_](https://tanstack.com/query/latest/docs/reference/QueryClient#queryclientgetquerystate)
-documentation.
+The method enables direct access to the `QueryClient` cache state for a specific _Query_.
+It is a strictly-typed wrapper around TanStack
+[_queryClient.getQueryState(...) 🌴_](https://tanstack.com/query/latest/docs/reference/QueryClient#queryclientgetquerystate).
 
-:::info
-Documentation is actively being updated 🚧
-:::
+```ts
+const state = api.<service>.<operation>.getQueryState(parameters);
+```
+
+## Arguments
+
+1.  `parameters: { path, query, header } | QueryKey | void`
+    - Operation parameters used to build the _Query Key_, strictly-typed ✨
+    - Instead of an object with `{ path, query, header }`, you can pass a typed `QueryKey` array.
+    - For operations without required parameters, call the method without arguments.
+
+## Returns
+
+`QueryState<TData, TError> | undefined` - The current cache state for the query, or `undefined` if the query is not in the cache.
+
+## Example
+
+<Tabs>
+  <TabItem value="parameters" label="Parameters" default>
+    ```tsx
+    const parameters = { path: { petId: 123 } };
+
+    await api.pet.getPetById.fetchQuery(parameters);
+
+    const state = api.pet.getPetById.getQueryState(parameters);
+
+    expect(state?.status).toEqual('success');
+    expect(state?.data?.id).toEqual(123);
+    ```
+  </TabItem>
+  <TabItem value="query-key" label="QueryKey">
+    ```tsx
+    const parameters = { path: { petId: 123 } };
+    const queryKey = api.pet.getPetById.getQueryKey(parameters);
+
+    await api.pet.getPetById.fetchQuery(parameters);
+
+    const state = api.pet.getPetById.getQueryState(queryKey);
+
+    expect(state?.status).toEqual('success');
+    ```
+  </TabItem>
+  <TabItem value="without-parameters" label="Without parameters">
+    ```tsx
+    await api.pet.findPets.fetchQuery();
+
+    const state = api.pet.findPets.getQueryState();
+
+    expect(state?.status).toEqual('success');
+    ```
+  </TabItem>
+</Tabs>
