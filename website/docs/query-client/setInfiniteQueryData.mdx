@@ -22,9 +22,11 @@ const data = api.<service>.<operation>.setInfiniteQueryData(
 
 ## Arguments
 
-1.  `parameters: { path, query, header } | InfiniteQueryKey`
+1.  `parameters: { path, query, header, body } | InfiniteQueryKey`
     - **Required** parameters to set the data in the _Infinite Query Cache_.
-    - Instead of an object with `{ path, query, header }`, you can pass a typed infinite query key from `getInfiniteQueryKey(...)`.
+    - For operations generated with `--queryable-write-operations`, query parameters may also include `body`.
+      In that mode, `body` is part of the infinite query key and cache identity.
+    - Instead of an object with `{ path, query, header, body }`, you can pass a typed infinite query key from `getInfiniteQueryKey(...)`.
 2.  `updater: InfiniteData<TData, TPageParam> | (oldData: InfiniteData<TData, TPageParam> | undefined) => InfiniteData<TData, TPageParam> | undefined`
     - **Required** updater for the infinite-query cache data.
     - If a non-function value is passed, the data will be updated to this value.

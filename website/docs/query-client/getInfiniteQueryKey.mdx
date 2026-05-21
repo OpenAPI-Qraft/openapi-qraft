@@ -4,7 +4,7 @@ sidebar_label: getInfiniteQueryKey()
 
 # getInfiniteQueryKey(...)
 
-The method provides a standardized way to generate `QueryKey` the _Infinite Queries_.
+The method provides a standardized way to generate `InfiniteQueryKey` for _Infinite Queries_.
 See TanStack [_Query Keys 🌴_](https://tanstack.com/query/latest/docs/framework/react/guides/query-keys)
 guide for more information.
 
@@ -14,13 +14,15 @@ const queryKey = api.<service>.<operation>.getInfiniteQueryKey(parameters);
 
 ### Arguments
 
-1. -  `parameters: { path, query, header } | QueryKey | void`
+1. -  `parameters: { path, query, header, body } | void`
       - **Required**, OpenAPI request parameters for the query, strictly-typed ✨
-      - `parameters` will be used to generate the `QueryKey`
+      - For operations generated with `--queryable-write-operations`, query parameters may also include `body`.
+        In that mode, `body` is part of the infinite query key and cache identity.
+      - The returned `InfiniteQueryKey` can be passed to query-client methods that accept typed infinite query key arrays.
 
 ### Returns
 
-`QueryKey` - a query key for the _Infinite Queries_
+`InfiniteQueryKey` - an infinite query key for the _Infinite Queries_
 
 ### Example
 

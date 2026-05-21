@@ -17,9 +17,11 @@ const state = api.<service>.<operation>.getQueryState(parameters);
 
 ## Arguments
 
-1.  `parameters: { path, query, header } | QueryKey | void`
+1.  `parameters: { path, query, header, body } | QueryKey | void`
     - Operation parameters used to build the _Query Key_, strictly-typed ✨
-    - Instead of an object with `{ path, query, header }`, you can pass a typed `QueryKey` array.
+    - For operations generated with `--queryable-write-operations`, query parameters may also include `body`.
+      In that mode, `body` is part of the query key and cache identity for query-client methods.
+    - Instead of an object with `{ path, query, header, body }`, you can pass a typed `QueryKey` array.
     - For operations without required parameters, call the method without arguments.
 
 ## Returns

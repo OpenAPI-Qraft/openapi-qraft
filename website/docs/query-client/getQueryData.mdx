@@ -18,10 +18,11 @@ const data = api.<service>.<operation>.getQueryData(
 
 ## Arguments
 
-1.  `parameters: { path, query, header } | QueryKey | void`
+1.  `parameters: { path, query, header, body } | QueryKey | void`
     - **Required** parameters to retrieve the data from the _Query Cache_.
-    - Instead of an object with `{ path, query, header }`, you can pass a `QueryKey` as an array
-      which is also strictly-typed ✨
+    - For operations generated with `--queryable-write-operations`, query parameters may also include `body`.
+      In that mode, `body` is part of the query key and cache identity for query-client methods.
+    - Instead of an object with `{ path, query, header, body }`, you can pass a typed `QueryKey` array.
 
 ## Returns
 The data from the _Query Cache_ for the specific query, strictly-typed ✨
