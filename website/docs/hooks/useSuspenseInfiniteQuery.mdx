@@ -18,13 +18,15 @@ const query = api.<service>.<operation>.useSuspenseInfiniteQuery(
 
 ### Arguments
 
-1.  `parameters: { path, query, header } | QueryKey | undefined`
+1.  `parameters: { path, query, header, body } | QueryKey | undefined`
     - **Required only if OpenAPI specification defines required parameters**
     - If the operation has no required parameters according to OpenAPI, you can omit this argument
-    - `parameters` will be used to generate the `QueryKey`
-    - Instead of an object with `{path, query, header}`, you can pass a `QueryKey` as an array
+    - `parameters` will be used to generate the _Infinite Query Key_
+    - For operations generated with `--queryable-write-operations`, query parameters may also include `body`
+    - In that mode, `body` is part of the infinite query key and cache identity
+    - Mutation calls keep `body` as a separate top-level argument
+    - Instead of an object with `{ path, query, header, body }`, you can pass an infinite `QueryKey` as an array
       which is also strictly-typed ✨
-    - If operation does not require parameters, you must pass an empty object `{}` for strictness
 
 2.  `suspenseInfiniteQueryOptions?: UseSuspenseInfiniteQueryOptions`
     - **Optional**, represents the options of the
