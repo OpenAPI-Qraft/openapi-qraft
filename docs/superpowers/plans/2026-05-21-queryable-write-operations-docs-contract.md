@@ -258,7 +258,7 @@ Replace the single `### Example` code block in `website/docs/hooks/useQueries.md
       },
     };
 
-    const secondSearch = {
+    const secondSearchParameters = {
       ...firstSearch,
       body: {
         name: 'Another Name',
@@ -266,17 +266,21 @@ Replace the single `### Example` code block in `website/docs/hooks/useQueries.md
       },
     };
 
-    const secondSearchKey =
-      api.approvalPolicies.patchApprovalPoliciesId.getQueryKey(secondSearch);
+    const secondSearchQueryKey =
+      api.approvalPolicies.patchApprovalPoliciesId.getQueryKey(
+        secondSearchParameters
+      );
 
     const results = api.approvalPolicies.patchApprovalPoliciesId.useQueries({
       queries: [
         { parameters: firstSearch },
-        { queryKey: secondSearchKey },
+        { queryKey: secondSearchQueryKey },
       ],
     });
 
-    // `firstSearch.body` and `secondSearch.body` produce different cache entries.
+    // Never pass `secondSearchParameters` as `queryKey` directly.
+    // `getQueryKey(...)` builds the tuple shape TanStack Query expects.
+    // `firstSearch.body` and `secondSearchParameters.body` produce different cache entries.
     ```
   </TabItem>
 </Tabs>
