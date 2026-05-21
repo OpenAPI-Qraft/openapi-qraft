@@ -19,7 +19,8 @@ await api.<service>.<operation>.resetQueries(filters, options);
 
 1.  `filters?: QueryFiltersByParameters | QueryFiltersByQueryKey`
     - Optional [_Query Filters 🌴_](https://tanstack.com/query/latest/docs/framework/react/guides/filters#query-filters), strictly-typed ✨
-    - `filters.parameters: { path, query, header }` filters queries by operation parameters.
+    - `filters.parameters: { path, query, header, body }` filters queries by operation parameters.
+    - For operations generated with `--queryable-write-operations`, `body` can be included in `filters.parameters` and participates in query cache identity.
     - `filters.queryKey: QueryKey` filters queries by an explicit typed query key instead of parameters.
     - `filters.parameters` and `filters.queryKey` are mutually exclusive.
     - `filters.infinite: boolean` filters regular or infinite query cache entries.
