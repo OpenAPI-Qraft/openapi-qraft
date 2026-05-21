@@ -2,12 +2,85 @@
 sidebar_label: resetQueries()
 ---
 
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
 # resetQueries(...)
 
-The function is used to refetch a list of queries by their keys.
-The API is the same as [_cancelQueries(...)_](cancelQueries.mdx) Hook.
-See also the TanStack [_queryClient.resetQueries(...) 🌴_](https://tanstack.com/query/latest/docs/reference/QueryClient#queryclientresetqueries) documentation.
+The method resets matching queries in the `QueryClient` cache and refetches active queries.
+It is a strictly-typed wrapper around TanStack
+[_queryClient.resetQueries(...) 🌴_](https://tanstack.com/query/latest/docs/reference/QueryClient#queryclientresetqueries).
 
-:::info
-Documentation is actively being updated 🚧
-:::
+```ts
+await api.<service>.<operation>.resetQueries(filters, options);
+```
+
+## Arguments
+
+1.  `filters?: QueryFiltersByParameters | QueryFiltersByQueryKey`
+    - Optional [_Query Filters 🌴_](https://tanstack.com/query/latest/docs/framework/react/guides/filters#query-filters), strictly-typed ✨
+    - `filters.parameters: { path, query, header }` filters queries by operation parameters.
+    - `filters.queryKey: QueryKey` filters queries by an explicit typed query key instead of parameters.
+    - `filters.parameters` and `filters.queryKey` are mutually exclusive.
+    - `filters.infinite: boolean` filters regular or infinite query cache entries.
+    - `filters.predicate?: (query: Query) => boolean` applies custom matching after the typed filter.
+2.  `options?: ResetOptions`
+    - Optional TanStack reset options.
+    - See the TanStack [_queryClient.resetQueries(...) 🌴_](https://tanstack.com/query/latest/docs/reference/QueryClient#queryclientresetqueries) documentation for more details.
+
+## Returns
+
+`Promise<void>` - Resolves after matching active queries have been reset and refetched.
+
+## Example
+
+<Tabs>
+  <TabItem value="parameters" label="Parameters" default>
+    ```tsx
+    const parameters = { path: { petId: 123 } };
+
+    api.pet.getPetById.setQueryData(parameters, {
+      id: 123,
+      name: 'Rex',
+    });
+
+    await api.pet.getPetById.resetQueries({
+      parameters,
+      infinite: false,
+    });
+    ```
+  </TabItem>
+  <TabItem value="query-key" label="QueryKey">
+    ```tsx
+    const parameters = { path: { petId: 123 } };
+    const queryKey = api.pet.getPetById.getQueryKey(parameters);
+
+    await api.pet.getPetById.resetQueries({
+      queryKey,
+      exact: true,
+    });
+    ```
+  </TabItem>
+  <TabItem value="predicate" label="Predicate">
+    ```tsx
+    await api.pet.getPetById.resetQueries({
+      parameters: { path: { petId: 123 } },
+      infinite: false,
+      predicate: (query) => query.state.status !== 'pending',
+    });
+    ```
+  </TabItem>
+  <TabItem value="options" label="Options">
+    ```tsx
+    await api.pet.getPetById.resetQueries(
+      {
+        parameters: { path: { petId: 123 } },
+        infinite: false,
+      },
+      {
+        cancelRefetch: false,
+      }
+    );
+    ```
+  </TabItem>
+</Tabs>
