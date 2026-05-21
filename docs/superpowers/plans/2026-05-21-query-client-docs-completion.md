@@ -28,7 +28,7 @@
 **Files:**
 - Modify: `website/docs/query-client/getQueryState.mdx`
 
-- [ ] **Step 1: Replace the placeholder page with complete reference content**
+- [x] **Step 1: Replace the placeholder page with complete reference content**
 
 Replace the whole file with:
 
@@ -68,7 +68,7 @@ const state = api.<service>.<operation>.getQueryState(parameters);
     ```tsx
     const parameters = { path: { petId: 123 } };
 
-    await api.pet.getPetById.fetchQuery(parameters);
+    await api.pet.getPetById.fetchQuery({ parameters });
 
     const state = api.pet.getPetById.getQueryState(parameters);
 
@@ -81,7 +81,7 @@ const state = api.<service>.<operation>.getQueryState(parameters);
     const parameters = { path: { petId: 123 } };
     const queryKey = api.pet.getPetById.getQueryKey(parameters);
 
-    await api.pet.getPetById.fetchQuery(parameters);
+    await api.pet.getPetById.fetchQuery({ parameters });
 
     const state = api.pet.getPetById.getQueryState(queryKey);
 
@@ -100,7 +100,7 @@ const state = api.<service>.<operation>.getQueryState(parameters);
 </Tabs>
 ````
 
-- [ ] **Step 2: Check the page no longer contains the active-update notice**
+- [x] **Step 2: Check the page no longer contains the active-update notice**
 
 Run:
 
@@ -110,7 +110,7 @@ rg -n "Documentation is actively being updated" website/docs/query-client/getQue
 
 Expected: command exits with no matches.
 
-- [ ] **Step 3: Commit Task 1**
+- [x] **Step 3: Commit Task 1**
 
 Run:
 
@@ -126,7 +126,7 @@ Expected: commit succeeds with only `getQueryState.mdx` staged.
 **Files:**
 - Modify: `website/docs/query-client/getInfiniteQueryState.mdx`
 
-- [ ] **Step 1: Replace the placeholder page with complete reference content**
+- [x] **Step 1: Replace the placeholder page with complete reference content**
 
 Replace the whole file with:
 
@@ -208,7 +208,7 @@ const state = api.<service>.<operation>.getInfiniteQueryState(parameters);
 </Tabs>
 ````
 
-- [ ] **Step 2: Check the page no longer contains the active-update notice**
+- [x] **Step 2: Check the page no longer contains the active-update notice**
 
 Run:
 
@@ -218,7 +218,7 @@ rg -n "Documentation is actively being updated" website/docs/query-client/getInf
 
 Expected: command exits with no matches.
 
-- [ ] **Step 3: Commit Task 2**
+- [x] **Step 3: Commit Task 2**
 
 Run:
 
@@ -234,7 +234,7 @@ Expected: commit succeeds with only `getInfiniteQueryState.mdx` staged.
 **Files:**
 - Modify: `website/docs/query-client/setInfiniteQueryData.mdx`
 
-- [ ] **Step 1: Replace the placeholder page with complete reference content**
+- [x] **Step 1: Replace the placeholder page with complete reference content**
 
 Replace the whole file with:
 
@@ -352,7 +352,7 @@ const data = api.<service>.<operation>.setInfiniteQueryData(
 </Tabs>
 ````
 
-- [ ] **Step 2: Check line length around the long final example**
+- [x] **Step 2: Check line length around the long final example**
 
 Run:
 
@@ -368,7 +368,7 @@ expect(
 ).toHaveLength(1);
 ```
 
-- [ ] **Step 3: Check the page no longer contains the active-update notice**
+- [x] **Step 3: Check the page no longer contains the active-update notice**
 
 Run:
 
@@ -378,7 +378,7 @@ rg -n "Documentation is actively being updated" website/docs/query-client/setInf
 
 Expected: command exits with no matches.
 
-- [ ] **Step 4: Commit Task 3**
+- [x] **Step 4: Commit Task 3**
 
 Run:
 
@@ -394,7 +394,7 @@ Expected: commit succeeds with only `setInfiniteQueryData.mdx` staged.
 **Files:**
 - Modify: `website/docs/query-client/resetQueries.mdx`
 
-- [ ] **Step 1: Replace the placeholder page with complete reference content**
+- [x] **Step 1: Replace the placeholder page with complete reference content**
 
 Replace the whole file with:
 
@@ -487,7 +487,7 @@ await api.<service>.<operation>.resetQueries(filters, options);
 </Tabs>
 ````
 
-- [ ] **Step 2: Confirm the incorrect hook wording is gone**
+- [x] **Step 2: Confirm the incorrect hook wording is gone**
 
 Run:
 
@@ -497,7 +497,7 @@ rg -n "Hook|hook" website/docs/query-client/resetQueries.mdx
 
 Expected: command exits with no matches.
 
-- [ ] **Step 3: Check the page no longer contains the active-update notice**
+- [x] **Step 3: Check the page no longer contains the active-update notice**
 
 Run:
 
@@ -507,7 +507,7 @@ rg -n "Documentation is actively being updated" website/docs/query-client/resetQ
 
 Expected: command exits with no matches.
 
-- [ ] **Step 4: Commit Task 4**
+- [x] **Step 4: Commit Task 4**
 
 Run:
 
@@ -526,7 +526,7 @@ Expected: commit succeeds with only `resetQueries.mdx` staged.
 - Inspect: `website/docs/query-client/setInfiniteQueryData.mdx`
 - Inspect: `website/docs/query-client/resetQueries.mdx`
 
-- [ ] **Step 1: Confirm the active-update notice is gone from current docs only**
+- [x] **Step 1: Confirm the active-update notice is gone from current docs only**
 
 Run:
 
@@ -538,7 +538,7 @@ Expected: command exits with no matches.
 
 Do not run this check against `website/versioned_docs`; versioned docs are intentionally excluded.
 
-- [ ] **Step 2: Check MDX lint for the website**
+- [x] **Step 2: Check MDX lint for the website**
 
 Run:
 
@@ -548,7 +548,7 @@ yarn workspace openapi-qraft-website lint
 
 Expected: PASS. If it fails on pre-existing unrelated files, capture the exact unrelated failures and still run Task 5 Step 3.
 
-- [ ] **Step 3: Check the Docusaurus build**
+- [x] **Step 3: Check the Docusaurus build**
 
 Run:
 
@@ -558,7 +558,7 @@ yarn workspace openapi-qraft-website build
 
 Expected: PASS. If dependencies are unavailable in the worktree, report the missing dependency error and keep the static validation results.
 
-- [ ] **Step 4: Check whitespace**
+- [x] **Step 4: Check whitespace**
 
 Run:
 
@@ -568,7 +568,7 @@ git diff --check
 
 Expected: no output and exit code 0.
 
-- [ ] **Step 5: Commit validation-only fixes if needed**
+- [x] **Step 5: Commit validation-only fixes if needed**
 
 If Task 5 Step 2, Step 3, or Step 4 required a small docs formatting fix, commit it:
 

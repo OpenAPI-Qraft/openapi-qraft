@@ -108,7 +108,7 @@ Mutation calls keep `body` as a separate top-level argument.
 - Modify: `website/docs/hooks/useInfiniteQuery.mdx`
 - Modify: `website/docs/hooks/useSuspenseInfiniteQuery.mdx`
 
-- [ ] **Step 1: Update `useQuery` argument wording**
+- [x] **Step 1: Update `useQuery` argument wording**
 
 In `website/docs/hooks/useQuery.mdx`, replace the current first argument block with:
 
@@ -124,7 +124,7 @@ In `website/docs/hooks/useQuery.mdx`, replace the current first argument block w
       which is also strictly-typed
 ```
 
-- [ ] **Step 2: Update `useSuspenseQuery` argument wording**
+- [x] **Step 2: Update `useSuspenseQuery` argument wording**
 
 In `website/docs/hooks/useSuspenseQuery.mdx`, replace the current first argument block with:
 
@@ -140,23 +140,23 @@ In `website/docs/hooks/useSuspenseQuery.mdx`, replace the current first argument
       which is also strictly-typed ✨
 ```
 
-- [ ] **Step 3: Update infinite hook argument wording**
+- [x] **Step 3: Update infinite hook argument wording**
 
 In both `website/docs/hooks/useInfiniteQuery.mdx` and `website/docs/hooks/useSuspenseInfiniteQuery.mdx`, replace the current first argument block with:
 
 ```md
-1.  `parameters: { path, query, header, body } | QueryKey | undefined`
+1.  `parameters: { path, query, header, body } | InfiniteQueryKey | undefined`
     - **Required only if OpenAPI specification defines required parameters**
     - If the operation has no required parameters according to OpenAPI, you can omit this argument
     - `parameters` will be used to generate the _Infinite Query Key_
     - For operations generated with `--queryable-write-operations`, query parameters may also include `body`
     - In that mode, `body` is part of the infinite query key and cache identity
     - Mutation calls keep `body` as a separate top-level argument
-    - Instead of an object with `{ path, query, header, body }`, you can pass an infinite `QueryKey` as an array
+    - Instead of an object with `{ path, query, header, body }`, you can pass a typed `InfiniteQueryKey` from `getInfiniteQueryKey(...)`
       which is also strictly-typed ✨
 ```
 
-- [ ] **Step 4: Run a focused grep for old hook wording**
+- [x] **Step 4: Run a focused grep for old hook wording**
 
 Run:
 
@@ -166,7 +166,7 @@ rg -n "\\{path, query, header\\}|\\{ path, query, header \\}" website/docs/hooks
 
 Expected: no matches for the four files in this task.
 
-- [ ] **Step 5: Commit Task 1**
+- [x] **Step 5: Commit Task 1**
 
 Run:
 
@@ -183,7 +183,7 @@ Expected: commit succeeds with only the four hook docs staged.
 - Modify: `website/docs/hooks/useQueries.mdx`
 - Modify: `website/docs/hooks/useSuspenseQueries.mdx`
 
-- [ ] **Step 1: Add tab imports to `useQueries`**
+- [x] **Step 1: Add tab imports to `useQueries`**
 
 In `website/docs/hooks/useQueries.mdx`, add these imports after the frontmatter and before `# useQueries(...)`:
 
@@ -192,7 +192,7 @@ import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 ```
 
-- [ ] **Step 2: Update `useQueries` query list wording**
+- [x] **Step 2: Update `useQueries` query list wording**
 
 In `website/docs/hooks/useQueries.mdx`, replace the `options.queries` sub-bullets with:
 
@@ -205,7 +205,7 @@ In `website/docs/hooks/useQueries.mdx`, replace the `options.queries` sub-bullet
         - `queryKey` and `parameters` are mutually exclusive
 ```
 
-- [ ] **Step 3: Add a writable operation tab to `useQueries`**
+- [x] **Step 3: Add a writable operation tab to `useQueries`**
 
 Replace the single `### Example` code block in `website/docs/hooks/useQueries.mdx` with a `Tabs` block. Keep the existing GET example as the first tab and add this second tab:
 
@@ -286,7 +286,7 @@ Replace the single `### Example` code block in `website/docs/hooks/useQueries.md
 </Tabs>
 ````
 
-- [ ] **Step 4: Update `useSuspenseQueries` query list wording**
+- [x] **Step 4: Update `useSuspenseQueries` query list wording**
 
 In `website/docs/hooks/useSuspenseQueries.mdx`, replace the `options.queries` sub-bullets with:
 
@@ -299,7 +299,7 @@ In `website/docs/hooks/useSuspenseQueries.mdx`, replace the `options.queries` su
         - `queryKey` and `parameters` are mutually exclusive
 ```
 
-- [ ] **Step 5: Add a short body example note to `useSuspenseQueries`**
+- [x] **Step 5: Add a short body example note to `useSuspenseQueries`**
 
 After the existing example in `website/docs/hooks/useSuspenseQueries.mdx`, add:
 
@@ -332,7 +332,7 @@ const results = api.approvalPolicies.patchApprovalPoliciesId.useSuspenseQueries(
 ```
 ````
 
-- [ ] **Step 6: Run focused grep**
+- [x] **Step 6: Run focused grep**
 
 Run:
 
@@ -342,7 +342,7 @@ rg -n "\\{ path, query, header \\}|\\{path, query, header\\}|parameters: \\{ pat
 
 Expected: no matches.
 
-- [ ] **Step 7: Commit Task 2**
+- [x] **Step 7: Commit Task 2**
 
 Run:
 
@@ -361,7 +361,7 @@ Expected: commit succeeds with only the two multi-query docs staged.
 - Modify: `website/docs/query-client/ensureQueryData.mdx`
 - Modify: `website/docs/query-client/ensureInfiniteQueryData.mdx`
 
-- [ ] **Step 1: Update normal fetch argument blocks**
+- [x] **Step 1: Update normal fetch argument blocks**
 
 In both `fetchQuery.mdx` and `ensureQueryData.mdx`, replace the first `parameters` bullet with:
 
@@ -376,7 +376,7 @@ In both `fetchQuery.mdx` and `ensureQueryData.mdx`, replace the first `parameter
 
 Keep the existing `requestFn`, `baseUrl`, and options bullets after this block.
 
-- [ ] **Step 2: Add a writable `fetchQuery` example tab**
+- [x] **Step 2: Add a writable `fetchQuery` example tab**
 
 In `website/docs/query-client/fetchQuery.mdx`, add this tab after the existing basic tab:
 
@@ -397,12 +397,12 @@ In `website/docs/query-client/fetchQuery.mdx`, add this tab after the existing b
   </TabItem>
 ````
 
-- [ ] **Step 3: Update infinite fetch argument blocks**
+- [x] **Step 3: Update infinite fetch argument blocks**
 
 In both `fetchInfiniteQuery.mdx` and `ensureInfiniteQueryData.mdx`, replace the first `parameters` bullet with:
 
 ```md
-1.  -  `parameters: { path, query, header, body } | QueryKey | void`
+1.  -  `parameters: { path, query, header, body } | InfiniteQueryKey | void`
       - OpenAPI request parameters for the query, strictly-typed ✨
       - `parameters` will be used to generate the _Infinite Query Key_
       - For operations generated with `--queryable-write-operations`, query parameters may also include `body`
@@ -412,7 +412,7 @@ In both `fetchInfiniteQuery.mdx` and `ensureInfiniteQueryData.mdx`, replace the 
 
 Keep the existing fetch options bullets after this block.
 
-- [ ] **Step 4: Run focused grep**
+- [x] **Step 4: Run focused grep**
 
 Run:
 
@@ -422,7 +422,7 @@ rg -n "\\{ path, query, header \\}|\\{path, query, header\\}" website/docs/query
 
 Expected: no matches.
 
-- [ ] **Step 5: Commit Task 3**
+- [x] **Step 5: Commit Task 3**
 
 Run:
 
@@ -445,7 +445,7 @@ Expected: commit succeeds with only the four fetch and ensure docs staged.
 - Modify: `website/docs/query-client/setQueryData.mdx`
 - Modify: `website/docs/query-client/setInfiniteQueryData.mdx`
 
-- [ ] **Step 1: Update normal query key/data/state signatures**
+- [x] **Step 1: Update normal query key/data/state signatures**
 
 In `getQueryData.mdx`, `getQueryState.mdx`, and `setQueryData.mdx`, replace normal query parameter signatures and nearby QueryKey prose with:
 
@@ -469,7 +469,7 @@ In that mode, `body` is part of the query key and cache identity for query-clien
 The returned `QueryKey` can be passed to query-client methods that accept typed query key arrays.
 ```
 
-- [ ] **Step 2: Add a body cache identity example to `getQueryKey`**
+- [x] **Step 2: Add a body cache identity example to `getQueryKey`**
 
 Add this tab to `website/docs/query-client/getQueryKey.mdx`:
 
@@ -498,7 +498,7 @@ Add this tab to `website/docs/query-client/getQueryKey.mdx`:
   </TabItem>
 ````
 
-- [ ] **Step 3: Add a body cache write/read example to `setQueryData`**
+- [x] **Step 3: Add a body cache write/read example to `setQueryData`**
 
 Add this tab to `website/docs/query-client/setQueryData.mdx`:
 
@@ -528,7 +528,7 @@ Add this tab to `website/docs/query-client/setQueryData.mdx`:
   </TabItem>
 ````
 
-- [ ] **Step 4: Update infinite key/data/state/cache signatures**
+- [x] **Step 4: Update infinite key/data/state/cache signatures**
 
 In `getInfiniteQueryData.mdx`, `getInfiniteQueryState.mdx`, and `setInfiniteQueryData.mdx`, replace infinite query parameter signatures and nearby query key prose with:
 
@@ -552,7 +552,7 @@ In that mode, `body` is part of the infinite query key and cache identity.
 The returned `InfiniteQueryKey` can be passed to query-client methods that accept typed infinite query key arrays.
 ```
 
-- [ ] **Step 5: Run focused grep**
+- [x] **Step 5: Run focused grep**
 
 Run:
 
@@ -562,7 +562,7 @@ rg -n "\\{ path, query, header \\}|\\{path, query, header\\}" website/docs/query
 
 Expected: no stale matches. If an example intentionally shows mutation invoke arguments, keep it and note it in the task summary.
 
-- [ ] **Step 6: Commit Task 4**
+- [x] **Step 6: Commit Task 4**
 
 Run:
 
@@ -584,7 +584,7 @@ Expected: commit succeeds with only the eight query key/cache docs staged.
 - Modify: `website/docs/query-client/resetQueries.mdx`
 - Modify: `website/docs/query-client/isFetching.mdx`
 
-- [ ] **Step 1: Update filter parameter bullets across filter pages**
+- [x] **Step 1: Update filter parameter bullets across filter pages**
 
 In each file listed for this task, replace every query filter parameter bullet that currently says:
 
@@ -605,7 +605,7 @@ with:
 - For operations generated with `--queryable-write-operations`, `body` can be included in `filters.parameters` and participates in query cache identity.
 ```
 
-- [ ] **Step 2: Update setQueriesData QueryKey prose**
+- [x] **Step 2: Update setQueriesData QueryKey prose**
 
 In `website/docs/query-client/setQueriesData.mdx`, replace:
 
@@ -619,7 +619,7 @@ with:
 It's also possible to use a `QueryKey` as an array instead of an object with `{ path, query, header, body }`:
 ```
 
-- [ ] **Step 3: Add one filter example with body**
+- [x] **Step 3: Add one filter example with body**
 
 Add this short example after the first filter example in `website/docs/query-client/isFetching.mdx`:
 
@@ -639,7 +639,7 @@ Add this short example after the first filter example in `website/docs/query-cli
     ```
 ````
 
-- [ ] **Step 4: Run focused grep**
+- [x] **Step 4: Run focused grep**
 
 Run:
 
@@ -649,7 +649,7 @@ rg -n "\\{ path, query, header \\}|\\{path, query, header\\}" website/docs/query
 
 Expected: no stale query-filter matches.
 
-- [ ] **Step 5: Commit Task 5**
+- [x] **Step 5: Commit Task 5**
 
 Run:
 
@@ -666,7 +666,7 @@ Expected: commit succeeds with only the seven filter docs staged.
 - Inspect: `website/docs`
 - Do not inspect as blockers: `website/versioned_docs/*`
 
-- [ ] **Step 1: Run scoped stale wording search**
+- [x] **Step 1: Run scoped stale wording search**
 
 Run:
 
@@ -676,7 +676,7 @@ rg -n "\\{ path, query, header \\}|\\{path, query, header\\}|parameters: \\{ pat
 
 Expected: remaining matches are only mutation-specific docs or intentionally unchanged mutation examples. Record the allowed files in the final summary. Query-surface matches should be fixed before continuing.
 
-- [ ] **Step 2: Check mutation boundary wording**
+- [x] **Step 2: Check mutation boundary wording**
 
 Run:
 
@@ -686,7 +686,7 @@ rg -n "body.*separate top-level|Mutation calls keep `body`|parameters\\.body" we
 
 Expected: query-surface pages explain `parameters.body`; mutation-boundary notes say mutation calls keep `body` top-level. There should be no mutation page claiming `parameters.body` for invoke calls.
 
-- [ ] **Step 3: Run website lint**
+- [x] **Step 3: Run website lint**
 
 Run:
 
@@ -696,7 +696,7 @@ yarn workspace openapi-qraft-website lint
 
 Expected: PASS.
 
-- [ ] **Step 4: Run website build**
+- [x] **Step 4: Run website build**
 
 Run:
 
@@ -706,7 +706,7 @@ yarn workspace openapi-qraft-website build
 
 Expected: PASS.
 
-- [ ] **Step 5: Check whitespace**
+- [x] **Step 5: Check whitespace**
 
 Run:
 
@@ -716,7 +716,7 @@ git diff --check
 
 Expected: no output and exit code 0.
 
-- [ ] **Step 6: Commit validation fixes if needed**
+- [x] **Step 6: Commit validation fixes if needed**
 
 If validation required small formatting or wording fixes, commit them:
 
