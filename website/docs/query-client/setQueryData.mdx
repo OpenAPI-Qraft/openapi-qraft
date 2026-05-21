@@ -85,11 +85,12 @@ The `TData` from the updater or `undefined` if it returns nothing
     It's also possible to use a typed `QueryKey` array instead of an object with `{ path, query, header, body }`:
 
     ```tsx
+    const queryKey = qraft.pet.getPetById.getQueryKey({
+      path: { petId: 123 },
+    });
+
     const pet = qraft.pet.getPetById.setQueryData(
-      [
-        { method: 'get', url: '/pet/{petId}', infinite: false },
-        { petId: 123 },
-      ],
+      queryKey,
       { id: 123, name: 'Rex' }
     );
     ```
