@@ -1175,7 +1175,10 @@ async function run() {
     `);
   });
 
-  it('optimizes clients with a single object literal even without known option keys', async () => {
+  // Synthetic transform-shape coverage: this does not assert that `{ useQuery }`
+  // is a valid generated-client runtime options object. It verifies that a
+  // single expression argument keeps callback import/alias wiring stable.
+  it('optimizes synthetic one-arg object literals without validating options shape', async () => {
     const fixture = await createFixture();
     const sourceFile = path.join(fixture, 'src/App.tsx');
 
