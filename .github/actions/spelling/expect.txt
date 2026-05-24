@@ -75,7 +75,7 @@ radist
 reate
 redocly
 refetched
-Refetches
+refetches
 remarkjs
 remarkrc
 reqid
@@ -102,6 +102,7 @@ TMeta
 TMutation
 TOperation
 TPage
+TParameters
 TParams
 TQuery
 TRequest
