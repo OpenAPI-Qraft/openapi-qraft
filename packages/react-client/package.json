@@ -29,7 +29,7 @@
     "@openapi-qraft/rollup-config": "workspace:*",
     "@openapi-qraft/tanstack-query-react-plugin": "workspace:*",
     "@openapi-qraft/test-fixtures": "workspace:*",
-    "@tanstack/react-query": "^5.96.1",
+    "@tanstack/react-query": "^5.100.14",
     "@testing-library/dom": "^10.4.1",
     "@testing-library/react": "^16.3.2",
     "@types/jscodeshift": "^0.11.11",
