@@ -25,7 +25,8 @@ See the TanStack [_queryClient.setQueriesData 🌴_](https://tanstack.com/query/
     1.  `filters: QueryFiltersByParameters | QueryFiltersByQueryKey`
         - **Required**, represents the [_Query Filters 🌴_](https://tanstack.com/query/latest/docs/framework/react/guides/filters#query-filters)
           to be used, strictly-typed ✨
-        - `filters.parameters: { path, query, header }` will be used for filtering queries by parameters
+        - `filters.parameters: { path, query, header, body }` filters queries by operation parameters.
+        - For operations generated with `--queryable-write-operations`, `body` can be included in `filters.parameters` and participates in query cache identity.
         - `filters.infinite: boolean` will be used to filter infinite or normal queries
         - `filters.queryKey: QueryKey` will be used for filtering queries by _QueryKey_ instead of parameters
           - `filters.queryKey` and `filters.parameters` are mutually exclusive
@@ -47,7 +48,8 @@ See the TanStack [_queryClient.setQueriesData 🌴_](https://tanstack.com/query/
     1.  `filters: QueryFiltersByParameters | QueryFiltersByQueryKey`
         - **Required**, represents the [_Query Filters 🌴_](https://tanstack.com/query/latest/docs/framework/react/guides/filters#query-filters)
           to be used, strictly-typed ✨
-        - `filters.parameters: { path, query, header }` will be used for filtering queries by parameters
+        - `filters.parameters: { path, query, header, body }` filters queries by operation parameters.
+        - For operations generated with `--queryable-write-operations`, `body` can be included in `filters.parameters` and participates in query cache identity.
         - `filters.infinite: boolean` will be used to filter infinite or normal queries
         - `filters.queryKey: QueryKey` will be used for filtering queries by _QueryKey_ instead of parameters
           - `filters.queryKey` and `filters.parameters` are mutually exclusive
@@ -94,15 +96,14 @@ See the TanStack [_queryClient.setQueriesData 🌴_](https://tanstack.com/query/
     ```
   </TabItem>
   <TabItem value="with-query-key" label={<span style={{verticalAlign: 'middle'}}>With <code>QueryKey</code></span>}>
-    It's also possible to use a `QueryKey` as an array instead of an object with `{path, query, header}`:
+    It's also possible to use a typed `QueryKey` from `getQueryKey(...)` instead of an object with `{ path, query, header, body }`:
 
     ```tsx
     const pets = qraft.pet.getPetById.setQueriesData(
       {
-        queryKey: [
-          { method: 'get', url: '/pet/{petId}', infinite: false },
-          { petId: 123 },
-        ],
+        queryKey: qraft.pet.getPetById.getQueryKey({
+          path: { petId: 123 },
+        }),
       },
       { id: 123, name: 'Rex' }
     );

@@ -13,10 +13,12 @@ const data = api.<service>.<operation>.getInfiniteQueryData(parameters);
 
 ### Arguments
 
-1.  `parameters: { path, query, header } | QueryKey | void`
-    - **Required** parameters to retrieve the data from the cache.
-    - Instead of an object with `{ path, query, header }`, you can pass a `QueryKey` as an array
-      which is also strictly-typed ✨
+1.  `parameters: { path, query, header, body } | InfiniteQueryKey | void`
+    - **Required only if OpenAPI specification defines required parameters** to retrieve the data from the cache.
+    - If the operation has no required parameters according to OpenAPI, you can omit this argument.
+    - For operations generated with `--queryable-write-operations`, query parameters may also include `body`.
+      In that mode, `body` is part of the infinite query key and cache identity.
+    - Instead of an object with `{ path, query, header, body }`, you can pass a typed infinite query key from `getInfiniteQueryKey(...)`.
 
 ### Returns
 

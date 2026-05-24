@@ -23,7 +23,8 @@ const result = api.<service>.<operation>.useSuspenseQueries(
     - **Required**, represents the options for queries, see [_useSuspenseQueries(...) 🌴_](https://tanstack.com/query/latest/docs/framework/react/reference/useSuspenseQueries) documentation
     - `options.queries: QueryOptions[]`
       - **Required** array of _Queries_ to be executed
-      - `parameters: { path, query, header }` will be used for the request
+      - `parameters: { path, query, header, body }` will be used for the request
+      - For operations generated with `--queryable-write-operations`, `body` is part of the query key and cache identity
       - `queryKey: QueryKey` will be used for the request instead of the `parameters`
         - `queryKey` and `parameters` are mutually exclusive
     - `options.combine?: (result: UseQueriesResults) => TCombinedResult`
@@ -108,4 +109,31 @@ export default function() {
     </QueryClientProvider>
   )
 }
+```
+
+### Queryable Write Operations
+
+For operations generated with `--queryable-write-operations`, `useSuspenseQueries` accepts the same `parameters.body`
+shape as `useQueries`. Each distinct body is part of the query key and creates a distinct cache entry.
+
+```tsx
+const queryKey =
+  api.approvalPolicies.patchApprovalPoliciesId.getQueryKey({
+    header: { 'x-monite-version': '1' },
+    path: { approval_policy_id: '2' },
+    body: { name: 'Another Name' },
+  });
+
+const results = api.approvalPolicies.patchApprovalPoliciesId.useSuspenseQueries({
+  queries: [
+    {
+      parameters: {
+        header: { 'x-monite-version': '1' },
+        path: { approval_policy_id: '2' },
+        body: { name: 'New Name' },
+      },
+    },
+    { queryKey },
+  ],
+});
 ```

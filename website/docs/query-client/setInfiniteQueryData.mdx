@@ -2,13 +2,114 @@
 sidebar_label: setInfiniteQueryData()
 ---
 
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
 # setInfiniteQueryData(...)
 
-The method enables direct access to the `QueryClient` cache to set the data for a specific _Infinite Query_.
-The method API is the same as the [`setQueryData`](setQueryData.mdx) method, but it is specifically for _Infinite Queries_.
+The method enables direct access to the `QueryClient` cache to set data for a specific _Infinite Query_.
+It has the same role as [`setQueryData`](setQueryData.mdx), but writes infinite-query data with `pages` and `pageParams`.
 
 See the TanStack [_queryClient.setQueryData 🌴_](https://tanstack.com/query/latest/docs/reference/QueryClient#queryclientsetquerydata) documentation.
 
-:::info
-Documentation is actively being updated 🚧
-:::
+```ts
+const data = api.<service>.<operation>.setInfiniteQueryData(
+  parameters,
+  updater,
+  options
+);
+```
+
+## Arguments
+
+1.  `parameters: { path, query, header, body } | InfiniteQueryKey`
+    - **Required** parameters to set the data in the _Infinite Query Cache_.
+    - For operations generated with `--queryable-write-operations`, query parameters may also include `body`.
+      In that mode, `body` is part of the infinite query key and cache identity.
+    - Instead of an object with `{ path, query, header, body }`, you can pass a typed infinite query key from `getInfiniteQueryKey(...)`.
+2.  `updater: InfiniteData<TData, TPageParam> | (oldData: InfiniteData<TData, TPageParam> | undefined) => InfiniteData<TData, TPageParam> | undefined`
+    - **Required** updater for the infinite-query cache data.
+    - If a non-function value is passed, the data will be updated to this value.
+    - If a function is passed, it receives the old infinite-query data and must return the next value.
+3.  `options?: SetQueryDataOptions`
+    - Optional options to set the data in the cache.
+    - See the TanStack [_queryClient.setQueryData 🌴_](https://tanstack.com/query/latest/docs/reference/QueryClient#queryclientsetquerydata) documentation for more details.
+
+## Returns
+
+`InfiniteData<TData, TPageParam> | undefined` - The data that was written to the cache, or `undefined` if the updater returns `undefined`.
+
+## Example
+
+<Tabs>
+  <TabItem value="direct-value" label="Direct value" default>
+    ```tsx
+    const parameters = {
+      query: { status: 'available' },
+    };
+
+    const pets = api.pet.findPetsByStatus.setInfiniteQueryData(parameters, {
+      pages: [
+        [{ id: 1, name: 'Rex', status: 'available' }],
+      ],
+      pageParams: [parameters],
+    });
+
+    expect(pets).toEqual({
+      pages: [
+        [{ id: 1, name: 'Rex', status: 'available' }],
+      ],
+      pageParams: [parameters],
+    });
+    ```
+  </TabItem>
+  <TabItem value="updater" label="Updater">
+    ```tsx
+    const parameters = {
+      query: { status: 'available' },
+    };
+
+    api.pet.findPetsByStatus.setInfiniteQueryData(parameters, {
+      pages: [[]],
+      pageParams: [parameters],
+    });
+
+    const pets = api.pet.findPetsByStatus.setInfiniteQueryData(
+      parameters,
+      (oldData) => ({
+        pages: [
+          ...(oldData?.pages ?? []),
+          [{ id: 2, name: 'Bella', status: 'available' }],
+        ],
+        pageParams: [
+          ...(oldData?.pageParams ?? []),
+          { query: { status: 'available', page: 2 } },
+        ],
+      })
+    );
+
+    expect(pets?.pages.at(-1)).toEqual([
+      { id: 2, name: 'Bella', status: 'available' },
+    ]);
+    ```
+  </TabItem>
+  <TabItem value="query-key" label="Infinite QueryKey">
+    ```tsx
+    const parameters = {
+      query: { status: 'available' },
+    };
+    const queryKey = api.pet.findPetsByStatus.getInfiniteQueryKey(parameters);
+
+    api.pet.findPetsByStatus.setInfiniteQueryData(queryKey, {
+      pages: [
+        [{ id: 1, name: 'Rex', status: 'available' }],
+      ],
+      pageParams: [parameters],
+    });
+
+    expect(
+      api.pet.findPetsByStatus.getInfiniteQueryData(parameters)?.pages
+    ).toHaveLength(1);
+    ```
+  </TabItem>
+</Tabs>

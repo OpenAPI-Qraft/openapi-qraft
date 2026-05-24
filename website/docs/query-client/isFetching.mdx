@@ -26,7 +26,8 @@ guide for more information.
     1.  `filters: QueryFiltersByParameters | QueryFiltersByQueryKey`
         - **Required**, represents the [_Query Filters 🌴_](https://tanstack.com/query/latest/docs/framework/react/guides/filters#query-filters)
           to be used, strictly-typed ✨
-        - `filters.parameters: { path, query, header }` will be used for filtering queries by parameters
+        - `filters.parameters: { path, query, header, body }` filters queries by operation parameters.
+        - For operations generated with `--queryable-write-operations`, `body` can be included in `filters.parameters` and participates in query cache identity.
         - `filters.infinite: boolean` will be used to filter infinite or normal queries
         - `filters.queryKey: QueryKey` will be used for filtering queries by _QueryKey_ instead of parameters
           - `filters.queryKey` and `filters.parameters` are mutually exclusive
@@ -75,6 +76,20 @@ guide for more information.
     );
 
     expect(numberOfFetchingEntities).toEqual(1);
+    ```
+
+    For queryable write operations, `body` can be part of the filter parameters:
+
+    ```ts
+    const matchingPolicySearches =
+      qraft.approvalPolicies.patchApprovalPoliciesId.isFetching({
+        infinite: false,
+        parameters: {
+          header: { 'x-monite-version': '1' },
+          path: { approval_policy_id: '2' },
+          body: { name: 'New Name' },
+        },
+      });
     ```
   </TabItem>
   <TabItem value="without-filters" label={<span style={{verticalAlign: "middle"}}><code style={{textDecoration: 'line-through'}}>filters</code></span>}>

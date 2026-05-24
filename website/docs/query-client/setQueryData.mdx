@@ -20,10 +20,11 @@ const data = qraft.<service>.<operation>.setQueryData(
 
 ## Arguments
 
-1.  `parameters: { path, query, header } | QueryKey`
+1.  `parameters: { path, query, header, body } | QueryKey`
     - **Required** parameters to set the data in the _Query Cache_.
-    - Instead of an object with `{path, query, header}`, you can pass a `QueryKey` as an array
-      which is also strictly-typed ✨
+    - For operations generated with `--queryable-write-operations`, query parameters may also include `body`.
+      In that mode, `body` is part of the query key and cache identity for query-client methods.
+    - Instead of an object with `{ path, query, header, body }`, you can pass a typed `QueryKey` array.
 2.  `updater: TData | (oldData: TData | undefined) => TData | undefined`
     - **Required** updater for the cache data
     - If a non-function value is passed, the data will be updated to this value
@@ -57,15 +58,39 @@ The `TData` from the updater or `undefined` if it returns nothing
     });
     ```
   </TabItem>
+  <TabItem value="queryable-write" label={<span>With <code>body</code></span>}>
+    ```tsx
+    const parameters = {
+      header: { 'x-monite-version': '1' },
+      path: { approval_policy_id: '2' },
+      body: {
+        name: 'New Name',
+        description: 'New Description',
+      },
+    };
+
+    qraft.approvalPolicies.patchApprovalPoliciesId.setQueryData(parameters, {
+      id: '2',
+      name: 'New Name',
+      description: 'New Description',
+    });
+
+    const policy =
+      qraft.approvalPolicies.patchApprovalPoliciesId.getQueryData(parameters);
+
+    expect(policy?.name).toEqual('New Name');
+    ```
+  </TabItem>
   <TabItem value="with-query-key" label={<span style={{verticalAlign: 'middle'}}>With <code>QueryKey</code></span>}>
-    It's also possible to use a `QueryKey` as an array instead of an object with `{path, query, header}`:
+    It's also possible to use a typed `QueryKey` array instead of an object with `{ path, query, header, body }`:
 
     ```tsx
+    const queryKey = qraft.pet.getPetById.getQueryKey({
+      path: { petId: 123 },
+    });
+
     const pet = qraft.pet.getPetById.setQueryData(
-      [
-        { method: 'get', url: '/pet/{petId}', infinite: false },
-        { petId: 123 },
-      ],
+      queryKey,
       { id: 123, name: 'Rex' }
     );
     ```

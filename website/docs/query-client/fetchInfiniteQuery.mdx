@@ -26,9 +26,12 @@ const result = api.<service>.<operation>.fetchInfiniteQuery(
 
 ### Arguments
 
-1.  -  `parameters: { path, query, header } | QueryKey | void`
+1.  -  `parameters: { path, query, header, body } | InfiniteQueryKey | void`
       - OpenAPI request parameters for the query, strictly-typed ✨
-      - `parameters` will be used to generate the `QueryKey`
+      - `parameters` will be used to generate the _Infinite Query Key_
+      - For operations generated with `--queryable-write-operations`, query parameters may also include `body`
+      - In that mode, `body` is part of the infinite query key and cache identity
+      - Mutation calls keep `body` as a separate top-level argument
     -  `fetchInfiniteQueryOptions?: FetchInfiniteQueryOptions`
       - `requestFn?: RequestFn`
         - **Optional**, a function that will be used to execute the request

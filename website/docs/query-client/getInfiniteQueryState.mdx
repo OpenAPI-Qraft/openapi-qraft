@@ -2,13 +2,76 @@
 sidebar_label: getInfiniteQueryState()
 ---
 
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
 # getInfiniteQueryState(...)
 
-The method is the same as the [`getQueryState`](getQueryState.mdx) method, but for infinite queries.
-See the TanStack
-[_queryClient.getQueryState(...) 🌴_](https://tanstack.com/query/latest/docs/reference/QueryClient#queryclientgetquerystate)
-documentation.
+The method enables direct access to the `QueryClient` cache state for a specific _Infinite Query_.
+It is the infinite-query counterpart to [`getQueryState`](getQueryState.mdx): Qraft still calls TanStack
+[_queryClient.getQueryState(...) 🌴_](https://tanstack.com/query/latest/docs/reference/QueryClient#queryclientgetquerystate),
+but it builds an infinite query key and returns state for infinite cache data.
 
-:::info
-Documentation is actively being updated 🚧
-:::
+```ts
+const state = api.<service>.<operation>.getInfiniteQueryState(parameters);
+```
+
+## Arguments
+
+1.  `parameters: { path, query, header, body } | InfiniteQueryKey | void`
+    - Operation parameters used to build the _Infinite Query Key_, strictly-typed ✨
+    - For operations generated with `--queryable-write-operations`, query parameters may also include `body`.
+      In that mode, `body` is part of the infinite query key and cache identity.
+    - Instead of an object with `{ path, query, header, body }`, you can pass a typed infinite query key from `getInfiniteQueryKey(...)`.
+    - For operations without required parameters, call the method without arguments.
+
+## Returns
+
+`QueryState<OperationInfiniteData<TData, TParameters>, TError> | undefined` - The current cache state for the infinite query, or `undefined` if the infinite query is not in the cache.
+
+## Example
+
+<Tabs>
+  <TabItem value="parameters" label="Parameters" default>
+    ```tsx
+    const parameters = {
+      query: { status: 'available' },
+    };
+
+    api.pet.findPetsByStatus.setInfiniteQueryData(parameters, {
+      pages: [
+        [{ id: 1, name: 'Rex', status: 'available' }],
+      ],
+      pageParams: [parameters],
+    });
+
+    const state = api.pet.findPetsByStatus.getInfiniteQueryState(parameters);
+
+    expect(state?.data).toEqual({
+      pages: [
+        [{ id: 1, name: 'Rex', status: 'available' }],
+      ],
+      pageParams: [parameters],
+    });
+    ```
+  </TabItem>
+  <TabItem value="query-key" label="Infinite QueryKey">
+    ```tsx
+    const parameters = {
+      query: { status: 'available' },
+    };
+    const queryKey = api.pet.findPetsByStatus.getInfiniteQueryKey(parameters);
+
+    api.pet.findPetsByStatus.setInfiniteQueryData(queryKey, {
+      pages: [
+        [{ id: 1, name: 'Rex', status: 'available' }],
+      ],
+      pageParams: [parameters],
+    });
+
+    const state = api.pet.findPetsByStatus.getInfiniteQueryState(queryKey);
+
+    expect(state?.status).toEqual('success');
+    ```
+  </TabItem>
+</Tabs>
