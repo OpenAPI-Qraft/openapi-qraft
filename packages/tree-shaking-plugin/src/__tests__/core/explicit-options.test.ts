@@ -468,10 +468,11 @@ function PetUpdateForm({ petId }: { petId: number }) {
     const result = await transformQraftTreeShaking(
       `
 import { createAPIClient, APIClientContext } from './api';
+import { useContext } from 'react';
 
 async function run() {
   const api = createAPIClient();
-  const apiOptions = APIClientContext;
+  const apiOptions = useContext(APIClientContext);
   void api.pets.findPetsByStatus.invalidateQueries();
   await api.pets.findPetsByStatus.invalidateQueries();
   void createAPIClient(apiOptions!).pets.findPetsByStatus.invalidateQueries();
@@ -497,6 +498,7 @@ async function run() {
 
     expect(result?.code).toMatchInlineSnapshot(`
       "import { APIClientContext } from './api';
+      import { useContext } from 'react';
       import { qraftAPIClient } from "@openapi-qraft/react";
       import { invalidateQueries } from "@openapi-qraft/react/callbacks/invalidateQueries";
       import { findPetsByStatus } from "./api/services/PetsService";
@@ -504,7 +506,7 @@ async function run() {
         const api_pets_findPetsByStatus = qraftAPIClient(findPetsByStatus, {
           invalidateQueries
         }, APIClientContext);
-        const apiOptions = APIClientContext;
+        const apiOptions = useContext(APIClientContext);
         void api_pets_findPetsByStatus.invalidateQueries();
         await api_pets_findPetsByStatus.invalidateQueries();
         void qraftAPIClient(findPetsByStatus, {
