@@ -7,12 +7,19 @@ import path from 'node:path';
 
 export const PRECREATED_API_INDEX_TS = `
 import { qraftAPIClient } from '@openapi-qraft/react';
-import { useQuery } from '@openapi-qraft/react/callbacks/index';
+import {
+  operationInvokeFn,
+  useQuery,
+} from '@openapi-qraft/react/callbacks/index';
 import { services } from './services/index';
 
-const defaultCallbacks = { useQuery } as const;
+const defaultCallbacks = { operationInvokeFn, useQuery } as const;
 
-export function createAPIClient(options?: { queryClient: unknown }) {
+export function createAPIClient(options?: {
+  baseUrl: string;
+  queryClient: unknown;
+  requestFn: (...args: unknown[]) => Promise<unknown>;
+}) {
   return qraftAPIClient(services, defaultCallbacks, options);
 }
 `;
@@ -53,7 +60,9 @@ export const storesService = {
 
 export const DEFAULT_PRECREATED_CLIENT_OPTIONS_TS = `
 export const createAPIClientOptions = () => ({
-  queryClient: {}
+  baseUrl: 'http://localhost',
+  queryClient: {},
+  requestFn: async () => ({ data: undefined, error: undefined })
 });
 `;
 
