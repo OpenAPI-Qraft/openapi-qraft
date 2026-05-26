@@ -1,6 +1,6 @@
 {
   "name": "@openapi-qraft/tanstack-query-react-types",
-  "version": "2.14.0",
+  "version": "2.14.1",
   "scripts": {
     "build": "yarn clean && NODE_ENV=production rollup --config rollup.config.mjs && tsc --project tsconfig.build.json --emitDeclarationOnly",
     "dev": "yarn clean && tsc --project tsconfig.build.json --watch --outDir ./dist/esm --noEmitOnError false",
@@ -37,7 +37,7 @@
   "devDependencies": {
     "@openapi-qraft/eslint-config": "workspace:*",
     "@openapi-qraft/rollup-config": "workspace:*",
-    "@tanstack/react-query": "^5.80.6",
+    "@tanstack/react-query": "^5.100.14",
     "eslint": "^9.39.1",
     "rimraf": "^6.1.2",
     "rollup": "~4.22.5",
