@@ -1,1 +1,0 @@
-"use strict";(globalThis.webpackChunkopenapi_qraft_website=globalThis.webpackChunkopenapi_qraft_website||[]).push([[9074],{9074:(e,a,i)=>{i.r(a)}}]);

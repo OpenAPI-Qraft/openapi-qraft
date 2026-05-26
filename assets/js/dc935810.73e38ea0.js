@@ -1,0 +1,1 @@
+"use strict";(globalThis.webpackChunkopenapi_qraft_website=globalThis.webpackChunkopenapi_qraft_website||[]).push([[7252],{4575(a){a.exports=JSON.parse('{"metadata":{"permalink":"/openapi-qraft/blog","page":1,"postsPerPage":10,"totalPages":1,"totalCount":0,"blogDescription":"Blog","blogTitle":"Blog"}}')}}]);
