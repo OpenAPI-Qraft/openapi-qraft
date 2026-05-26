@@ -1,5 +1,11 @@
 # @openapi-qraft/tanstack-query-react-types
 
+## 2.15.0-beta.9
+
+### Patch Changes
+
+- d1af027: Fix compatibility with `@tanstack/react-query@^5.100.14` by relying on TypeScript's built-in `NoInfer` type instead of importing `NoInfer` from TanStack Query.
+
 ## 2.15.0-beta.8
 
 ### Minor Changes
