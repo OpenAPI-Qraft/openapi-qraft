@@ -1,5 +1,11 @@
 # @qraft/asyncapi-plugin
 
+## 1.0.0-beta.8
+
+### Patch Changes
+
+- @qraft/plugin@1.0.0-beta.8
+
 ## 1.0.0-beta.7
 
 ### Patch Changes
