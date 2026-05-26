@@ -3,7 +3,8 @@ name: Main Suite
 on:
   pull_request:
     branches:
-      - '*'
+      - main
+      - 'versions/**'
   push:
     branches:
       - main

@@ -3,7 +3,8 @@ name: E2E Suite
 on:
   pull_request:
     branches:
-      - '*'
+      - main
+      - 'versions/**'
   push:
     branches:
       - main
@@ -40,7 +41,7 @@ jobs:
           cp -r playground "$TEST_PROJECTS_DIR"
           cp -a e2e/projects/. "$TEST_PROJECTS_DIR/"
         env:
-          TEST_PROJECTS_DIR: "${{ runner.temp }}/projects"
+          TEST_PROJECTS_DIR: '${{ runner.temp }}/projects'
 
       - name: Remove Verdaccio Storage
         run: rm -rf e2e/verdaccio-storage
