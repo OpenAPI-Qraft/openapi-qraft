@@ -41,22 +41,6 @@ export type QraftEntrypointConfig =
   | QraftClientFactoryEntrypointConfig
   | QraftPrecreatedClientEntrypointConfig;
 
-export type LegacyQraftFactoryConfig = {
-  name: string;
-  module: string;
-  context?: string;
-  contextModule?: string;
-};
-
-export type LegacyQraftPrecreatedClientConfig = {
-  client: string;
-  clientModule: string;
-  createAPIClientFn: string;
-  createAPIClientFnModule: string;
-  createAPIClientFnOptions: string;
-  createAPIClientFnOptionsModule?: string;
-};
-
 export type DiagnosticsLevel = 'error' | 'warn' | 'off';
 
 export type ImportTarget = {
@@ -122,6 +106,7 @@ export type QraftTreeShakeOptions = {
 export type GeneratedClientInfo = {
   importerId: string;
   clientFile: string;
+  servicesModuleSpecifierBase: string;
   servicesDir: string;
   serviceImportPaths: Record<string, string>;
   contextImportPath: string | null;
@@ -154,7 +139,8 @@ export type ClientBinding = {
   clientSourceKey: string;
   createImportPath: string;
   createImportLoadId: string;
-  factory: LegacyQraftFactoryConfig;
+  factory: ClientEntrypoint['key'];
+  entrypoint: ClientEntrypoint;
   bindingNode: t.Node;
   declarationScope: Scope;
   runtimeInput: RuntimeInput;
@@ -202,14 +188,16 @@ export type SchemaUsage = {
 export type GeneratedInfoRequest = {
   createImportPath: string;
   createImportLoadId: string;
-  factory: LegacyQraftFactoryConfig;
+  factory: ClientEntrypoint['key'];
+  entrypoint: ClientEntrypoint;
 };
 
 export type CreateImportEntry = {
   sourceSpecifier: string;
   factoryFile: string;
   factoryLoadId: string;
-  factory: LegacyQraftFactoryConfig;
+  factory: GeneratedFactoryEntrypoint['key'];
+  entrypoint: GeneratedFactoryEntrypoint;
 };
 
 export type RuntimeLocalNames = {
