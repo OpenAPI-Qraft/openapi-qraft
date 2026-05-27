@@ -21,7 +21,13 @@ describe('normalizeEntrypoints', () => {
     ).toEqual([
       {
         kind: 'generatedFactory',
-        key: 'generatedFactory:createReactAPIClient:@api/my-api:@api/my-api:@api/my-api',
+        key: JSON.stringify([
+          'generatedFactory',
+          'createReactAPIClient',
+          '@api/my-api',
+          '@api/my-api',
+          '@api/my-api',
+        ]),
         factory: {
           exportName: 'createReactAPIClient',
           moduleSpecifier: '@api/my-api',
@@ -55,7 +61,13 @@ describe('normalizeEntrypoints', () => {
 
     expect(entrypoint).toMatchObject({
       kind: 'generatedFactory',
-      key: 'generatedFactory:createReactAPIClient:@api/my-api:@api/my-public-root:',
+      key: JSON.stringify([
+        'generatedFactory',
+        'createReactAPIClient',
+        '@api/my-api',
+        '@api/my-public-root',
+        '',
+      ]),
       services: {
         moduleSpecifierBase: '@api/my-public-root',
       },
@@ -86,7 +98,16 @@ describe('normalizeEntrypoints', () => {
     ).toEqual([
       {
         kind: 'precreatedClient',
-        key: 'precreatedClient:nodeAPIClient:./client:createNodeAPIClient:@api/my-api:createNodeAPIClientOptions:./client-options:@api/my-api',
+        key: JSON.stringify([
+          'precreatedClient',
+          'nodeAPIClient',
+          './client',
+          'createNodeAPIClient',
+          '@api/my-api',
+          'createNodeAPIClientOptions',
+          './client-options',
+          '@api/my-api',
+        ]),
         client: {
           exportName: 'nodeAPIClient',
           moduleSpecifier: './client',
@@ -104,5 +125,36 @@ describe('normalizeEntrypoints', () => {
         },
       },
     ]);
+  });
+
+  it('encodes generatedFactory keys without colon ambiguity', () => {
+    const [entrypoint] = normalizeEntrypoints({
+      entrypoints: [
+        {
+          kind: 'clientFactory',
+          factory: {
+            exportName: 'createAPIClient',
+            moduleSpecifier: 'npm:@scope/pkg:client',
+          },
+          services: {
+            moduleSpecifierBase: 'npm:@scope/pkg:services',
+          },
+          reactContext: {
+            exportName: 'APIClientContext',
+            moduleSpecifier: 'npm:@scope/pkg:context',
+          },
+        },
+      ],
+    });
+
+    expect(entrypoint.key).toBe(
+      JSON.stringify([
+        'generatedFactory',
+        'createAPIClient',
+        'npm:@scope/pkg:client',
+        'npm:@scope/pkg:services',
+        'npm:@scope/pkg:context',
+      ])
+    );
   });
 });
