@@ -46,7 +46,7 @@ function normalizePrecreatedEntrypoint(
 
   return {
     kind: 'precreatedClient',
-    key: [
+    key: composeEntrypointKey([
       'precreatedClient',
       config.client.exportName,
       config.client.moduleSpecifier,
@@ -55,7 +55,7 @@ function normalizePrecreatedEntrypoint(
       config.optionsFactory.exportName,
       config.optionsFactory.moduleSpecifier,
       services.moduleSpecifierBase,
-    ].join(':'),
+    ]),
     client: config.client,
     factory: config.factory,
     optionsFactory: config.optionsFactory,
@@ -69,13 +69,13 @@ function composeGeneratedFactoryEntrypointKey(
   servicesModuleSpecifierBase: string,
   contextModuleSpecifier: string
 ) {
-  return [
+  return composeEntrypointKey([
     'generatedFactory',
     exportName,
     moduleSpecifier,
     servicesModuleSpecifierBase,
     contextModuleSpecifier,
-  ].join(':');
+  ]);
 }
 
 function normalizeServices(
@@ -101,4 +101,8 @@ function normalizeReactContext(
           reactContext.moduleSpecifier ?? factoryModuleSpecifier,
       }
     : null;
+}
+
+function composeEntrypointKey(parts: string[]) {
+  return JSON.stringify(parts);
 }
