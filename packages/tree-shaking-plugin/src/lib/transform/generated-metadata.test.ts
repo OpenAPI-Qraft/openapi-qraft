@@ -52,7 +52,7 @@ describe('inspectGeneratedEntrypoints', () => {
       },
       reactContext: {
         exportName: 'APIClientContext',
-        moduleSpecifier: './APIClientContext',
+        moduleSpecifier: './api',
       },
     });
   });
@@ -212,7 +212,7 @@ describe('inspectGeneratedEntrypoints', () => {
     });
   });
 
-  it('returns unresolved reason for factories without static services imports', async () => {
+  it('assumes conventional services metadata for qraft factories without static services imports', async () => {
     const root = await createTempFixture();
     await writeFixtureFiles(root, {
       'src/api/index.ts': `
@@ -248,15 +248,22 @@ export const APIClientContext = {};
       moduleAccess: createFixtureModuleAccess(root),
     });
 
-    expect(result.metadataByEntrypointKey.get(entrypoints[0].key)).toBeNull();
-    expect(result.reasons).toEqual([
-      {
-        layer: 'generated-metadata',
-        code: 'generated-services-import-missing',
-        message: 'Generated entrypoint does not import static services.',
-        entrypointKey: entrypoints[0].key,
+    const metadata = result.metadataByEntrypointKey.get(entrypoints[0].key);
+
+    expect(result.reasons).toEqual([]);
+    expect(metadata).toMatchObject({
+      entrypoint: entrypoints[0],
+      factoryFile: path.join(root, 'src/api/index.ts'),
+      servicesDir: './services',
+      serviceImportPaths: {
+        pets: './PetsService',
+        stores: './StoresService',
       },
-    ]);
+      reactContext: {
+        exportName: 'APIClientContext',
+        moduleSpecifier: './api',
+      },
+    });
   });
 
   it('reads generated factory metadata through a re-export chain', async () => {
@@ -299,7 +306,7 @@ ${contextApiIndexTsBody('APIClientContext')}
       servicesDir: './services',
       reactContext: {
         exportName: 'APIClientContext',
-        moduleSpecifier: './APIClientContext',
+        moduleSpecifier: './api',
       },
     });
   });
