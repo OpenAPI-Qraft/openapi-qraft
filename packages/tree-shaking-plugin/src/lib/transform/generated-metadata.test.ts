@@ -52,7 +52,7 @@ describe('inspectGeneratedEntrypoints', () => {
       },
       reactContext: {
         exportName: 'APIClientContext',
-        moduleSpecifier: './api',
+        moduleSpecifier: './APIClientContext',
       },
     });
   });
@@ -229,7 +229,6 @@ export function createAPIClient(services, callbacks = defaultCallbacks) {
       'src/api/APIClientContext.ts': `
 export const APIClientContext = {};
 `,
-      'src/api/services/index.ts': SERVICES_INDEX_TS,
     });
     const importerId = path.join(root, 'src/App.tsx');
     const entrypoints = normalizeEntrypoints({
@@ -255,15 +254,51 @@ export const APIClientContext = {};
       entrypoint: entrypoints[0],
       factoryFile: path.join(root, 'src/api/index.ts'),
       servicesDir: './services',
-      serviceImportPaths: {
-        pets: './PetsService',
-        stores: './StoresService',
-      },
+      serviceImportPaths: {},
       reactContext: {
         exportName: 'APIClientContext',
-        moduleSpecifier: './api',
+        moduleSpecifier: './APIClientContext',
       },
     });
+  });
+
+  it('returns missing services reason for non-qraft files that only mention qraft helpers', async () => {
+    const root = await createTempFixture();
+    await writeFixtureFiles(root, {
+      'src/api/index.ts': `
+const helperName = 'qraftAPIClient';
+
+// qraftReactAPIClient appears in generated factories, but this is not one.
+export function createAPIClient() {
+  return {};
+}
+`,
+    });
+    const importerId = path.join(root, 'src/App.tsx');
+    const entrypoints = normalizeEntrypoints({
+      entrypoints: [
+        {
+          kind: 'clientFactory',
+          factory: { exportName: 'createAPIClient', moduleSpecifier: './api' },
+        },
+      ],
+    });
+
+    const result = await inspectGeneratedEntrypoints({
+      importerId,
+      entrypoints,
+      moduleAccess: createFixtureModuleAccess(root),
+    });
+
+    expect(result.metadataByEntrypointKey.get(entrypoints[0].key)).toBeNull();
+    expect(result.reasons).toEqual([
+      {
+        layer: 'generated-metadata',
+        code: 'generated-services-import-missing',
+        message: 'Generated entrypoint does not import static services.',
+        entrypointKey: entrypoints[0].key,
+      },
+    ]);
   });
 
   it('reads generated factory metadata through a re-export chain', async () => {
@@ -306,7 +341,7 @@ ${contextApiIndexTsBody('APIClientContext')}
       servicesDir: './services',
       reactContext: {
         exportName: 'APIClientContext',
-        moduleSpecifier: './api',
+        moduleSpecifier: './APIClientContext',
       },
     });
   });

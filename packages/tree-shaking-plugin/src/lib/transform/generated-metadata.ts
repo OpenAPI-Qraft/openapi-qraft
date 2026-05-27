@@ -49,6 +49,10 @@ type MetadataInspection =
   | { metadata: GeneratedClientMetadata }
   | { reason: DiagnosticReason };
 
+type ImportedReactContextConfig = ReactContextConfig & {
+  moduleSpecifier: string;
+};
+
 export async function inspectGeneratedEntrypoints({
   importerId,
   entrypoints,
@@ -224,7 +228,13 @@ async function inspectFactoryFile({
     plugins: ['typescript'],
   });
 
-  if (!usesQraftClientHelpers(source)) {
+  const factoryImports = readGeneratedFactoryImports(
+    ast,
+    reactContext,
+    entrypoint.factory.moduleSpecifier
+  );
+
+  if (!factoryImports.hasQraftClientCall) {
     const reexportPath = findFactoryReexport(ast, factoryExportName);
     if (reexportPath) {
       const resolved = await moduleAccess.resolve(reexportPath, factoryFile);
@@ -254,15 +264,17 @@ async function inspectFactoryFile({
     return missingServicesImport(entrypoint.key);
   }
 
-  const factoryImports = readGeneratedFactoryImports(ast, reactContext);
   const servicesDir =
     factoryImports.servicesDir ?? CONVENTIONAL_GENERATED_SERVICES_DIR;
-
-  const serviceImportPaths = await readServiceImportPaths(
-    factoryFile,
-    servicesDir,
-    moduleAccess
-  );
+  const serviceImportPaths = factoryImports.servicesDir
+    ? await readServiceImportPaths(factoryFile, servicesDir, moduleAccess)
+    : {};
+  if (
+    entrypoint.kind === 'generatedFactory' &&
+    factoryImports.usesDiscoveredContextImport
+  ) {
+    delete entrypoint.reactContext?.moduleSpecifier;
+  }
 
   return {
     metadata: {
@@ -277,25 +289,22 @@ async function inspectFactoryFile({
   };
 }
 
-function usesQraftClientHelpers(source: string) {
-  return (
-    source.includes('qraftReactAPIClient') || source.includes('qraftAPIClient')
-  );
-}
-
 function readGeneratedFactoryImports(
   ast: t.File,
-  configuredContext: ReactContextConfig | null
+  configuredContext: ReactContextConfig | null,
+  factoryModuleSpecifier: string
 ) {
   let servicesDir: string | null = null;
+  let hasQraftClientCall = false;
+  let usesDiscoveredContextImport = false;
   let inferredContext: ReactContextConfig | null = configuredContext
     ? {
         exportName: configuredContext.exportName,
         moduleSpecifier: configuredContext.moduleSpecifier,
       }
     : null;
-  const contextImportsByLocalName = new Map<string, ReactContextConfig>();
-  const reactClientLocalNames = new Set<string>();
+  const contextImportsByLocalName = new Map<string, ImportedReactContextConfig>();
+  const qraftClientLocalNames = new Set<string>();
 
   traverse(ast, {
     ImportDeclaration(importPath) {
@@ -318,7 +327,7 @@ function readGeneratedFactoryImports(
           const importedContext = {
             exportName: specifier.imported.name,
             moduleSpecifier: sourcePath,
-          } satisfies ReactContextConfig;
+          } satisfies ImportedReactContextConfig;
           contextImportsByLocalName.set(specifier.local.name, importedContext);
 
           if (
@@ -327,20 +336,26 @@ function readGeneratedFactoryImports(
           ) {
             inferredContext = {
               exportName: configuredContext.exportName,
-              moduleSpecifier: configuredContext.moduleSpecifier ?? sourcePath,
+              moduleSpecifier: resolveConfiguredContextModuleSpecifier(
+                configuredContext,
+                sourcePath
+              ),
             };
           }
 
-          if (specifier.imported.name === 'qraftReactAPIClient') {
-            reactClientLocalNames.add(specifier.local.name);
+          if (
+            specifier.imported.name === 'qraftAPIClient' ||
+            specifier.imported.name === 'qraftReactAPIClient'
+          ) {
+            qraftClientLocalNames.add(specifier.local.name);
           }
         }
       }
     },
     CallExpression(callPath) {
-      if (inferredContext?.moduleSpecifier) return;
       if (!t.isIdentifier(callPath.node.callee)) return;
-      if (!reactClientLocalNames.has(callPath.node.callee.name)) return;
+      if (!qraftClientLocalNames.has(callPath.node.callee.name)) return;
+      hasQraftClientCall = true;
 
       const contextArgument = callPath.node.arguments[2];
       if (!t.isIdentifier(contextArgument)) return;
@@ -353,7 +368,10 @@ function readGeneratedFactoryImports(
       inferredContext = configuredContext
         ? {
             exportName: configuredContext.exportName,
-            moduleSpecifier: importedContext.moduleSpecifier,
+            moduleSpecifier: resolveConfiguredContextModuleSpecifier(
+              configuredContext,
+              importedContext.moduleSpecifier
+            ),
           }
         : importedContext;
     },
@@ -362,7 +380,24 @@ function readGeneratedFactoryImports(
   return {
     servicesDir,
     reactContext: inferredContext,
+    hasQraftClientCall,
+    usesDiscoveredContextImport,
   };
+
+  function resolveConfiguredContextModuleSpecifier(
+    configuredContext: ReactContextConfig,
+    importedModuleSpecifier: string
+  ) {
+    if (
+      configuredContext.moduleSpecifier === factoryModuleSpecifier &&
+      importedModuleSpecifier !== configuredContext.moduleSpecifier
+    ) {
+      usesDiscoveredContextImport = true;
+      return importedModuleSpecifier;
+    }
+
+    return configuredContext.moduleSpecifier;
+  }
 }
 
 async function validatePrecreatedClient(
