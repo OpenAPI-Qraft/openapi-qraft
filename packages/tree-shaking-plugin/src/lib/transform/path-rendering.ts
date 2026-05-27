@@ -52,6 +52,18 @@ export function composeResolvedSourceImportPath(
   return stripIndexSourceExtension(stripSourceExtension(composed));
 }
 
+export function composeServiceOperationImportPath(
+  moduleSpecifierBase: string,
+  servicesDir: string,
+  serviceImportPath: string
+) {
+  return joinImportPathSegments(
+    moduleSpecifierBase,
+    normalizeImportSubpathSegment(servicesDir),
+    normalizeImportSubpathSegment(stripSourceExtension(serviceImportPath))
+  );
+}
+
 export function stripSourceExtension(importPath: string) {
   return importPath.replace(/\.(?:[cm]?[jt]sx?)$/, '');
 }
@@ -62,4 +74,16 @@ export function stripIndexSourceExtension(importPath: string) {
 
 function isPathLikeSpecifier(specifier: string) {
   return specifier.startsWith('.') || isAbsolute(specifier);
+}
+
+function joinImportPathSegments(...segments: string[]) {
+  const [firstSegment, ...remainingSegments] = segments;
+  return [
+    firstSegment.replace(/\/+$/, ''),
+    ...remainingSegments.map(normalizeImportSubpathSegment),
+  ].join('/');
+}
+
+function normalizeImportSubpathSegment(segment: string) {
+  return segment.replace(/^\.?\//, '').replace(/\/+$/, '');
 }
