@@ -12,10 +12,6 @@ const queryHashContextSourceFile = resolve(
   process.cwd(),
   'src/generated-api/RelativeAPIClientContext.ts'
 );
-const queryHashServicesSourceFile = resolve(
-  process.cwd(),
-  'src/generated-api/services/index.ts'
-);
 const queryHashFactoryId = `${queryHashFactorySourceFile}?tree-shaking#factory`;
 const queryHashContextId = `${queryHashContextSourceFile}?tree-shaking#context`;
 
@@ -23,10 +19,6 @@ const virtualNodeFactorySpecifier = 'virtual:qraft-node-api';
 const virtualNodeFactorySourceFile = resolve(
   process.cwd(),
   'src/generated-api/create-node-api-client.ts'
-);
-const virtualNodeServicesSourceFile = resolve(
-  process.cwd(),
-  'src/generated-api/services/index.ts'
 );
 const virtualNodeFactoryId = `${virtualNodeFactorySourceFile}?tree-shaking#factory`;
 
@@ -102,12 +94,6 @@ async function loadVirtualModule(resolvedId, scenario) {
         resolvedId === queryHashFactorySpecifier
           ? queryHashContextSourceFile
           : './QueryHashAPIClientContext.js'
-      )
-      .replaceAll(
-        './services/index.js',
-        resolvedId === queryHashFactorySpecifier
-          ? queryHashServicesSourceFile
-          : './services/index.js'
       );
   }
 
@@ -129,14 +115,10 @@ async function loadVirtualModule(resolvedId, scenario) {
       resolvedId === virtualNodeFactorySpecifier)
   ) {
     const source = await readFile(virtualNodeFactorySourceFile, 'utf8');
-    return source
-      .replaceAll('createNodeAPIClient', 'createVirtualNodeAPIClient')
-      .replaceAll(
-        './services/index.js',
-        resolvedId === virtualNodeFactorySpecifier
-          ? virtualNodeServicesSourceFile
-          : './services/index.js'
-      );
+    return source.replaceAll(
+      'createNodeAPIClient',
+      'createVirtualNodeAPIClient'
+    );
   }
 
   return null;
