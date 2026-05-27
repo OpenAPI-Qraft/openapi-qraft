@@ -133,8 +133,9 @@ for generated service-file imports.
 
 Add an entrypoint-level services import configuration for every entrypoint kind
 that can emit operation imports. This includes `clientFactory` and
-`precreatedClient`. The config should specify only the service module base
-specifier, not an export name:
+`precreatedClient`. The config should specify only the generated API public
+module specifier base, not an export name and not a concrete service index
+module:
 
 ```ts
 {
@@ -144,7 +145,7 @@ specifier, not an export name:
     moduleSpecifier: '@api/my-api',
   },
   services: {
-    moduleSpecifier: '@api/my-api/services',
+    moduleSpecifierBase: '@api/my-api',
   },
   reactContext: {
     exportName: 'APIClientContext',
@@ -153,16 +154,17 @@ specifier, not an export name:
 }
 ```
 
-Operation imports are composed from that public services base plus the generated
-service-file suffix discovered from the generated `services` object:
+Operation imports are composed from that public module specifier base plus the
+generated service-file suffix discovered from the generated `services` object:
 
 ```ts
 import { getPets } from "@api/my-api/services/PetsService";
 ```
 
-When `services.moduleSpecifier` is omitted, the transform uses
+When `services.moduleSpecifierBase` is omitted, the transform uses
 `factory.moduleSpecifier` as the public generated API root for service-file
-imports. For example:
+imports. This default is normalized up front, so internal transform code always
+has a concrete services module specifier base. For example:
 
 ```ts
 {
@@ -186,16 +188,16 @@ import { getPets } from "@api/my-api/services/PetsService";
 This default is an intentional tree-shaking layout assumption: the public
 generated API root exposes service files below the same module root. If a
 package uses a different public layout, users should configure
-`services.moduleSpecifier` explicitly.
+`services.moduleSpecifierBase` explicitly.
 
 The service export name does not need to be configurable for this design. The
 generated services object is already discovered from the generated client, and
 operation export names such as `getPets` still come from service files.
 
-For `precreatedClient` entrypoints, `services.moduleSpecifier` follows the same
-rule. If omitted, operation imports use `factory.moduleSpecifier` as the public
-generated API root; if provided, operation imports use the explicit services
-base.
+For `precreatedClient` entrypoints, `services.moduleSpecifierBase` follows the
+same rule. If omitted, operation imports use `factory.moduleSpecifier` as the
+public generated API root; if provided, operation imports use the explicit
+services base.
 
 ## Import Specifier Rules
 
@@ -203,13 +205,13 @@ The transform should prefer emitted import specifiers in this order:
 
 1. Explicit config:
    - `reactContext.moduleSpecifier` for context imports;
-   - `services.moduleSpecifier` for operation imports.
+   - `services.moduleSpecifierBase` for operation imports.
 2. Default public context import:
    - when `reactContext.exportName` is configured but
      `reactContext.moduleSpecifier` is omitted, import that context export from
      `factory.moduleSpecifier`.
 3. Default public operation import:
-   - when `services.moduleSpecifier` is omitted, compose operation imports from
+   - when `services.moduleSpecifierBase` is omitted, compose operation imports from
      `factory.moduleSpecifier` plus the service-file suffix discovered from the
      generated `services` object.
 
@@ -246,11 +248,11 @@ context export.
 - Third-party-style factory import:
   - resolver maps `@scope/api` to a fixture path under `node_modules`;
   - emitted imports do not contain `node_modules` or physical relative paths.
-- Explicit services module:
-  - `services.moduleSpecifier: '@scope/api/public-services'`;
-  - emitted operation imports use `@scope/api/public-services/PetsService`.
+- Explicit services base:
+  - `services.moduleSpecifierBase: '@scope/api/public'`;
+  - emitted operation imports use `@scope/api/public/services/PetsService`.
 - Precreated client entrypoint:
-  - `services.moduleSpecifier` works for `kind: 'precreatedClient'`;
+  - `services.moduleSpecifierBase` works for `kind: 'precreatedClient'`;
   - without it, operation imports use `factory.moduleSpecifier` as the public
     generated API root.
 - Existing local relative imports:
