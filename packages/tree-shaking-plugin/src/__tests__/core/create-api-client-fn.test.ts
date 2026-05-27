@@ -162,12 +162,11 @@ api.pets.getPets.useQuery();
     expect(result).toBeNull();
   });
 
-  it('records zero-arg clients without configured reactContext as no runtime input', async () => {
+  it('rewrites zero-arg context-free callbacks without runtime input', async () => {
     const fixture = await createFixture();
     const sourceFile = path.join(fixture, 'src/App.tsx');
-    const fixtureModuleAccess = createFixtureModuleAccess(fixture);
 
-    const state = await createTransformState(
+    const result = await transformQraftTreeShaking(
       `
 import { createAPIClient } from './api';
 
@@ -185,14 +184,18 @@ api.pets.getPets.getQueryKey();
             },
           },
         ],
-      },
-      fixtureModuleAccess
+      }
     );
 
-    expect(state.clients).toHaveLength(1);
-    expect(state.clients[0].runtimeInput).toEqual({
-      kind: 'none',
-    });
+    expect(result?.code).toMatchInlineSnapshot(`
+      "import { qraftAPIClient } from "@openapi-qraft/react";
+      import { getQueryKey } from "@openapi-qraft/react/callbacks/getQueryKey";
+      import { getPets } from "./api/services/PetsService";
+      const api_pets_getPets = qraftAPIClient(getPets, {
+        getQueryKey
+      });
+      api_pets_getPets.getQueryKey();"
+    `);
   });
 
   it('skips generic generated factories that receive services as an argument', async () => {
