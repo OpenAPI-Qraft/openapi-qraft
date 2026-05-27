@@ -366,6 +366,9 @@ const precreatedClientEntrypoints = [
       moduleSpecifier:
         './generated-api/create-relative-precreated-api-client.ts',
     },
+    services: {
+      moduleSpecifierBase: './generated-api',
+    },
     optionsFactory: {
       exportName: 'buildRelativeClientOptions',
       moduleSpecifier: './precreated/options/barrel',
@@ -382,6 +385,9 @@ const precreatedClientEntrypoints = [
       moduleSpecifier:
         './generated-api/create-alias-direct-precreated-api-client.ts',
     },
+    services: {
+      moduleSpecifierBase: './generated-api',
+    },
     optionsFactory: {
       exportName: 'createAliasDirectClientOptions',
       moduleSpecifier: '@/precreated/options',
@@ -397,6 +403,9 @@ const precreatedClientEntrypoints = [
       exportName: 'createRelativeExtPrecreatedAPIClient',
       moduleSpecifier:
         './generated-api/create-relative-ts-precreated-api-client.ts',
+    },
+    services: {
+      moduleSpecifierBase: './generated-api',
     },
     optionsFactory: {
       exportName: 'createRelativeExtClientOptions',
@@ -423,6 +432,9 @@ const clientFactoryEntrypoints = [
       exportName: 'createRelativeAPIClient',
       moduleSpecifier: '@/generated-api/create-relative-api-client',
     },
+    services: {
+      moduleSpecifierBase: '@/generated-api',
+    },
     reactContext: {
       exportName: 'RelativeAPIClientContext',
       moduleSpecifier: './generated-api/RelativeAPIClientContext',
@@ -433,6 +445,9 @@ const clientFactoryEntrypoints = [
     factory: {
       exportName: 'createRelativeExtAPIClient',
       moduleSpecifier: './generated-api/create-relative-ts-api-client.ts',
+    },
+    services: {
+      moduleSpecifierBase: './generated-api',
     },
     reactContext: {
       exportName: 'RelativeExtAPIClientContext',
@@ -456,12 +471,18 @@ const clientFactoryEntrypoints = [
       exportName: 'createNodeAPIClient',
       moduleSpecifier: './generated-api/create-node-api-client',
     },
+    services: {
+      moduleSpecifierBase: './generated-api',
+    },
   },
   {
     kind: 'clientFactory',
     factory: {
       exportName: 'createAliasDirectAPIClient',
       moduleSpecifier: './generated-api/create-alias-direct-api-client',
+    },
+    services: {
+      moduleSpecifierBase: './generated-api',
     },
     reactContext: {
       exportName: 'AliasDirectAPIClientContext',
