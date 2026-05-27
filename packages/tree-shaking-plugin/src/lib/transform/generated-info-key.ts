@@ -1,11 +1,6 @@
-type GeneratedInfoFactoryKeyParts = {
-  context?: string | null;
-  contextModule?: string | null;
-};
-
 export function getGeneratedInfoKey(
   createImportPath: string,
-  factory: GeneratedInfoFactoryKeyParts
+  entrypointKey: string
 ) {
-  return `${createImportPath}::${factory.context ?? ''}::${factory.contextModule ?? ''}`;
+  return `${createImportPath}::${entrypointKey}`;
 }

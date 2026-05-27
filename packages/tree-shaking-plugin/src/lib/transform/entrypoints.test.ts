@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { normalizeEntrypoints } from './entrypoints.js';
 
 describe('normalizeEntrypoints', () => {
-  it('normalizes clientFactory entrypoints with reactContext moduleSpecifier', () => {
+  it('normalizes omitted clientFactory services and context modules to the factory module specifier', () => {
     expect(
       normalizeEntrypoints({
         entrypoints: [
@@ -10,11 +10,10 @@ describe('normalizeEntrypoints', () => {
             kind: 'clientFactory',
             factory: {
               exportName: 'createReactAPIClient',
-              moduleSpecifier: './api',
+              moduleSpecifier: '@api/my-api',
             },
             reactContext: {
               exportName: 'APIClientContext',
-              moduleSpecifier: './api/APIClientContext',
             },
           },
         ],
@@ -22,20 +21,48 @@ describe('normalizeEntrypoints', () => {
     ).toEqual([
       {
         kind: 'generatedFactory',
-        key: 'generatedFactory:createReactAPIClient:./api',
+        key: 'generatedFactory:createReactAPIClient:@api/my-api:@api/my-api:@api/my-api',
         factory: {
           exportName: 'createReactAPIClient',
-          moduleSpecifier: './api',
+          moduleSpecifier: '@api/my-api',
+        },
+        services: {
+          moduleSpecifierBase: '@api/my-api',
         },
         reactContext: {
           exportName: 'APIClientContext',
-          moduleSpecifier: './api/APIClientContext',
+          moduleSpecifier: '@api/my-api',
         },
       },
     ]);
   });
 
-  it('normalizes precreatedClient entrypoints', () => {
+  it('preserves explicit clientFactory services moduleSpecifierBase', () => {
+    const [entrypoint] = normalizeEntrypoints({
+      entrypoints: [
+        {
+          kind: 'clientFactory',
+          factory: {
+            exportName: 'createReactAPIClient',
+            moduleSpecifier: '@api/my-api',
+          },
+          services: {
+            moduleSpecifierBase: '@api/my-public-root',
+          },
+        },
+      ],
+    });
+
+    expect(entrypoint).toMatchObject({
+      kind: 'generatedFactory',
+      key: 'generatedFactory:createReactAPIClient:@api/my-api:@api/my-public-root:',
+      services: {
+        moduleSpecifierBase: '@api/my-public-root',
+      },
+    });
+  });
+
+  it('normalizes omitted precreatedClient services to the factory module specifier', () => {
     expect(
       normalizeEntrypoints({
         entrypoints: [
@@ -47,7 +74,7 @@ describe('normalizeEntrypoints', () => {
             },
             factory: {
               exportName: 'createNodeAPIClient',
-              moduleSpecifier: './api',
+              moduleSpecifier: '@api/my-api',
             },
             optionsFactory: {
               exportName: 'createNodeAPIClientOptions',
@@ -59,45 +86,23 @@ describe('normalizeEntrypoints', () => {
     ).toEqual([
       {
         kind: 'precreatedClient',
-        key: 'precreatedClient:nodeAPIClient:./client:createNodeAPIClient:./api:createNodeAPIClientOptions:./client-options',
+        key: 'precreatedClient:nodeAPIClient:./client:createNodeAPIClient:@api/my-api:createNodeAPIClientOptions:./client-options:@api/my-api',
         client: {
           exportName: 'nodeAPIClient',
           moduleSpecifier: './client',
         },
         factory: {
           exportName: 'createNodeAPIClient',
-          moduleSpecifier: './api',
+          moduleSpecifier: '@api/my-api',
         },
         optionsFactory: {
           exportName: 'createNodeAPIClientOptions',
           moduleSpecifier: './client-options',
         },
+        services: {
+          moduleSpecifierBase: '@api/my-api',
+        },
       },
     ]);
-  });
-
-  it('normalizes omitted reactContext moduleSpecifier to null', () => {
-    const [entrypoint] = normalizeEntrypoints({
-      entrypoints: [
-        {
-          kind: 'clientFactory',
-          factory: {
-            exportName: 'createReactAPIClient',
-            moduleSpecifier: './api',
-          },
-          reactContext: {
-            exportName: 'APIClientContext',
-          },
-        },
-      ],
-    });
-
-    expect(entrypoint).toMatchObject({
-      kind: 'generatedFactory',
-      reactContext: {
-        exportName: 'APIClientContext',
-        moduleSpecifier: null,
-      },
-    });
   });
 });
