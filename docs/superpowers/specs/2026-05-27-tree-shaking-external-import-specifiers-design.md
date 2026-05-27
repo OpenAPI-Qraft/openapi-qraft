@@ -70,7 +70,34 @@ Resolver output must not, by itself, decide the import specifiers emitted into
 the transformed user module.
 
 For aliased, bare, or third-party factory imports, emitted imports should
-preserve a public/module-specifier-based boundary. With explicit config:
+preserve a public/module-specifier-based boundary. When
+`reactContext.moduleSpecifier` is omitted, the context import should come from
+the same public module specifier as `factory.moduleSpecifier`:
+
+```ts
+{
+  kind: 'clientFactory',
+  factory: {
+    exportName: 'createMyAPIClient',
+    moduleSpecifier: '@api/my-api',
+  },
+  reactContext: {
+    exportName: 'APIClientContext',
+  },
+}
+```
+
+the transform should emit:
+
+```ts
+import { getPets } from "@api/my-api/services/PetsService";
+import { APIClientContext } from "@api/my-api";
+```
+
+not physical relative paths derived from the resolver target.
+
+When the context lives in a different public module, users can configure it
+explicitly:
 
 ```ts
 {
@@ -93,7 +120,10 @@ import { getPets } from "@api/my-api/services/PetsService";
 import { APIClientContext } from "@api/my-api/APIClientContext";
 ```
 
-not physical relative paths derived from the resolver target.
+This explicit path is also the escape hatch for aliased generated factory
+internals, such as a factory that imports
+`APIClientContext as InternalContext` and passes `InternalContext` as the third
+argument to `qraftReactAPIClient(...)`.
 
 ## Service Import Configuration
 
@@ -138,24 +168,43 @@ The transform should prefer emitted import specifiers in this order:
 1. Explicit config:
    - `reactContext.moduleSpecifier` for context imports;
    - `services.moduleSpecifier` for operation imports.
-2. Safe public inference from the configured factory module specifier and the
-   generated factory's own relative imports.
-3. Existing relative source-path composition only when the configured factory
+2. Default public context import:
+   - when `reactContext.exportName` is configured but
+     `reactContext.moduleSpecifier` is omitted, import that context export from
+     `factory.moduleSpecifier`.
+3. Safe public service inference from the configured factory module specifier
+   and the generated factory's own conventional services import.
+4. Existing relative source-path composition only when the configured factory
    module specifier is itself local/path-like and the emitted file is expected
    to import the generated source tree directly.
 
 If the configured factory uses a bare specifier and the transform cannot infer a
-safe public service or context import specifier, it should skip the transform
-candidate through diagnostics rather than emit physical relative paths into
-`node_modules` or another resolved dependency location.
+safe public service import specifier, it should skip the transform candidate
+through diagnostics rather than emit physical relative paths into `node_modules`
+or another resolved dependency location.
+
+The transform should not infer emitted context import specifiers for bare
+factory imports from the generated factory's physical source file. Use
+`factory.moduleSpecifier` by default, or `reactContext.moduleSpecifier` when the
+context is not exported from the factory module.
 
 ## Test Coverage To Add
 
 - Aliased local factory import:
   - `import { createMyAPIClient } from '@api/my-api';`
   - resolver maps it to a local generated client;
-  - emitted imports use `@api/my-api/services/PetsService` and configured
-    `@api/my-api/APIClientContext`, not `./api/...`.
+  - emitted imports use `@api/my-api/services/PetsService` and
+    `@api/my-api` for the default context import, not `./api/...`.
+- Explicit context module:
+  - `reactContext.moduleSpecifier: '@api/my-api/APIClientContext'`;
+  - emitted context import uses `@api/my-api/APIClientContext`.
+- Aliased generated context internals:
+  - generated factory imports
+    `APIClientContext as InternalContext` from `./APIClientContext`;
+  - without `reactContext.moduleSpecifier`, emitted context import uses
+    `factory.moduleSpecifier`;
+  - with explicit `reactContext.moduleSpecifier`, emitted context import uses
+    that explicit module.
 - Third-party-style factory import:
   - resolver maps `@scope/api` to a fixture path under `node_modules`;
   - emitted imports do not contain `node_modules` or physical relative paths.
@@ -183,6 +232,6 @@ candidate through diagnostics rather than emit physical relative paths into
 - Decide whether safe public inference from `factory.moduleSpecifier` should be
   enabled for all non-relative specifiers or only when the generated factory's
   services import has the conventional `./services/index` shape.
-- Decide whether context imports without `reactContext.moduleSpecifier` should
-  be inferred from the factory module specifier or reported as unresolved for
-  bare/third-party factories.
+- Confirm whether default context imports from `factory.moduleSpecifier` require
+  the generated factory module to re-export the configured context symbol, or
+  whether this should be treated as a user-provided public contract.
