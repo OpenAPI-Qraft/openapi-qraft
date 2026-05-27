@@ -84,7 +84,7 @@ const entrypoints = [
     factory: { exportName: 'createReactAPIClient', moduleSpecifier: './api' },
     reactContext: {
       exportName: 'APIClientContext',
-      moduleSpecifier: './api/APIClientContext',
+      moduleSpecifier: './api',
     },
   },
 ];
@@ -179,7 +179,7 @@ qraftTreeShakeVite({
       factory: { exportName: 'createReactAPIClient', moduleSpecifier: './api' },
       reactContext: {
         exportName: 'APIClientContext',
-        moduleSpecifier: './api/APIClientContext',
+        moduleSpecifier: './api',
       },
     },
     {
@@ -188,6 +188,9 @@ qraftTreeShakeVite({
       factory: {
         exportName: 'createNodeAPIClient',
         moduleSpecifier: './create-node-api-client',
+      },
+      services: {
+        moduleSpecifierBase: './api',
       },
       optionsFactory: {
         exportName: 'createNodeAPIClientOptions',
@@ -219,7 +222,7 @@ export function App() {
 ```ts
 import { qraftReactAPIClient } from '@openapi-qraft/react';
 import { useQuery } from '@openapi-qraft/react/callbacks/useQuery';
-import { APIClientContext } from './api/APIClientContext';
+import { APIClientContext } from './api';
 import { getPets } from './api/services/PetsService';
 
 const reactAPIClient_pets_getPets = qraftReactAPIClient(
@@ -242,13 +245,15 @@ entrypoints: [
     factory: { exportName: 'createReactAPIClient', moduleSpecifier: './api' },
     reactContext: {
       exportName: 'APIClientContext',
-      moduleSpecifier: './api/APIClientContext',
+      moduleSpecifier: './api',
     },
   },
 ];
 ```
 
 `factory` points at the generated client factory export. `reactContext` is optional; use it when zero-argument React clients should keep context-backed runtime semantics. Omit `reactContext` for explicit-options clients such as `createNodeAPIClient(options)`.
+
+`services.moduleSpecifierBase` is optional. When it is omitted, operation imports inherit `factory.moduleSpecifier` as the public generated API root. For example, a factory module of `@api/my-api` emits operation imports such as `@api/my-api/services/PetsService`. Set `services.moduleSpecifierBase` when the factory is imported from a file or barrel that is not also the public root for generated service modules.
 
 ### Module access
 
@@ -356,6 +361,9 @@ entrypoints: [
     factory: {
       exportName: 'createNodeAPIClient',
       moduleSpecifier: './create-node-api-client',
+    },
+    services: {
+      moduleSpecifierBase: './api',
     },
     optionsFactory: {
       exportName: 'createNodeAPIClientOptions',
