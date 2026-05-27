@@ -36,6 +36,9 @@ const queryHashEntrypoint = {
     exportName: 'createQueryHashAPIClient',
     moduleSpecifier: queryHashFactorySpecifier,
   },
+  services: {
+    moduleSpecifierBase: './generated-api',
+  },
   reactContext: {
     exportName: 'QueryHashAPIClientContext',
     moduleSpecifier: queryHashContextSpecifier,
@@ -47,6 +50,9 @@ const virtualNodeEntrypoint = {
   factory: {
     exportName: 'createVirtualNodeAPIClient',
     moduleSpecifier: virtualNodeFactorySpecifier,
+  },
+  services: {
+    moduleSpecifierBase: './generated-api',
   },
 };
 
