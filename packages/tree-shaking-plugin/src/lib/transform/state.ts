@@ -3,22 +3,22 @@ import type { QraftModuleAccess } from '../resolvers/common.js';
 import type { DiagnosticReporter } from './diagnostics.js';
 import type {
   ClientBinding,
+  ClientEntrypoint,
   CreateImportEntry,
   DiagnosticReason,
   GeneratedClientInfo,
   GeneratedClientMetadata,
+  GeneratedFactoryEntrypoint,
   GeneratedInfoRequest,
   InlineImportRequest,
-  LegacyQraftFactoryConfig,
-  LegacyQraftPrecreatedClientConfig,
   OperationImportInfo,
   OperationUsage,
+  PrecreatedClientEntrypoint,
   QraftTreeShakeOptions,
   RuntimeLocalNames,
   SchemaUsage,
   TransformState,
 } from './types.js';
-import { dirname, resolve } from 'node:path';
 import { parse } from '@babel/parser';
 import * as traverseModule from '@babel/traverse';
 import * as t from '@babel/types';
@@ -27,7 +27,6 @@ import { createAgnosticModuleAccess } from '../resolvers/agnostic.js';
 import { createTraceableQraftModuleAccess } from '../resolvers/common.js';
 import {
   findExportReexport,
-  findFactoryReexport,
   getObjectPropertyKey,
   getStaticMemberPath,
   getStaticMemberRoot,
@@ -43,7 +42,7 @@ import { normalizeEntrypoints } from './entrypoints.js';
 import { getGeneratedInfoKey } from './generated-info-key.js';
 import { inspectGeneratedEntrypoints } from './generated-metadata.js';
 import {
-  composeImportPath,
+  composeServiceOperationImportPath,
   normalizeResolvedId,
   resolvePrecreatedOptionsImportPath,
   resolveRelativeImportPath,
@@ -149,50 +148,25 @@ export async function createTransformState(
     load: options.moduleAccess?.load,
   })
 ): Promise<TransformState> {
-  const servicesDirName = 'services';
   const traceableModuleAccess = createTraceableQraftModuleAccess(moduleAccess);
   const resolveModule = traceableModuleAccess.resolve;
   const entrypoints = normalizeEntrypoints(options);
+  const generatedFactoryEntrypoints = entrypoints.filter(
+    (entrypoint) => entrypoint.kind === 'generatedFactory'
+  );
+  const precreatedEntrypoints = entrypoints.filter(
+    (entrypoint) => entrypoint.kind === 'precreatedClient'
+  );
   const diagnostics = createDiagnosticReporter(options);
   const generatedMetadata = await inspectGeneratedEntrypoints({
     importerId: id,
     entrypoints,
     moduleAccess: traceableModuleAccess,
   });
-  const factoryOptions: LegacyQraftFactoryConfig[] = [];
-  const factoryEntrypointKeys = new Map<LegacyQraftFactoryConfig, string>();
-  const precreatedOptions: LegacyQraftPrecreatedClientConfig[] = [];
-  const precreatedEntrypointKeys = new Map<
-    LegacyQraftPrecreatedClientConfig,
-    string
-  >();
-
-  for (const entrypoint of entrypoints) {
-    if (entrypoint.kind === 'generatedFactory') {
-      const factory = {
-        name: entrypoint.factory.exportName,
-        module: entrypoint.factory.moduleSpecifier,
-        context: entrypoint.reactContext?.exportName,
-        contextModule: entrypoint.reactContext?.moduleSpecifier ?? undefined,
-      };
-      factoryOptions.push(factory);
-      factoryEntrypointKeys.set(factory, entrypoint.key);
-      continue;
-    }
-
-    const precreated = {
-      client: entrypoint.client.exportName,
-      clientModule: entrypoint.client.moduleSpecifier,
-      createAPIClientFn: entrypoint.factory.exportName,
-      createAPIClientFnModule: entrypoint.factory.moduleSpecifier,
-      createAPIClientFnOptions: entrypoint.optionsFactory.exportName,
-      createAPIClientFnOptionsModule: entrypoint.optionsFactory.moduleSpecifier,
-    };
-    precreatedOptions.push(precreated);
-    precreatedEntrypointKeys.set(precreated, entrypoint.key);
-  }
   const configuredFactoryNames = new Set(
-    factoryOptions.map((factory) => factory.name)
+    generatedFactoryEntrypoints.map(
+      (entrypoint) => entrypoint.factory.exportName
+    )
   );
 
   const ast = parse(code, {
@@ -206,26 +180,30 @@ export async function createTransformState(
   }
   const activeProgramScope = programScope;
 
-  const factoryResolvedIds = new Map<LegacyQraftFactoryConfig, string | null>();
-  for (const factory of factoryOptions) {
+  const factoryResolvedIds = new Map<GeneratedFactoryEntrypoint, string | null>();
+  for (const entrypoint of generatedFactoryEntrypoints) {
     const resolved = await resolveFactoryModule(
-      factory.module,
+      entrypoint.factory.moduleSpecifier,
       id,
       resolveModule
     );
     factoryResolvedIds.set(
-      factory,
+      entrypoint,
       resolved ? normalizeResolvedId(resolved) : null
     );
   }
   const precreatedClientResolvedIds = new Map<
-    LegacyQraftPrecreatedClientConfig,
+    PrecreatedClientEntrypoint,
     string | null
   >();
-  for (const precreated of precreatedOptions) {
+  for (const precreated of precreatedEntrypoints) {
     precreatedClientResolvedIds.set(
       precreated,
-      await resolveFactoryModule(precreated.clientModule, id, resolveModule)
+      await resolveFactoryModule(
+        precreated.client.moduleSpecifier,
+        id,
+        resolveModule
+      )
     );
   }
 
@@ -237,7 +215,7 @@ export async function createTransformState(
     generatedInfoByImport,
     generatedMetadata.metadataByEntrypointKey,
     id,
-    factoryOptions,
+    generatedFactoryEntrypoints,
     factoryResolvedIds
   );
 
@@ -256,60 +234,57 @@ export async function createTransformState(
         continue;
       }
       const importedName = specifier.imported.name;
-      const matchingFactories = factoryOptions.filter(
-        (factory) => factory.name === importedName
+      const matchingEntrypoints = generatedFactoryEntrypoints.filter(
+        (entrypoint) => entrypoint.factory.exportName === importedName
       );
-      if (matchingFactories.length === 0) continue;
+      if (matchingEntrypoints.length === 0) continue;
 
       if (resolvedAbs === undefined) {
         resolvedAbs = (await resolveModule(source, id)) ?? null;
         resolvedId = resolvedAbs ? normalizeResolvedId(resolvedAbs) : null;
       }
-      const matchedBySource = matchingFactories.find((factory) =>
+      const matchedBySource = matchingEntrypoints.find((entrypoint) =>
         entrypointModuleMatchesImportSource(
-          factory.module,
+          entrypoint.factory.moduleSpecifier,
           source,
-          factoryResolvedIds.get(factory) ?? null,
+          factoryResolvedIds.get(entrypoint) ?? null,
           resolvedId ?? null
         )
       );
-      let matched = matchedBySource;
+      let matched: GeneratedFactoryEntrypoint | null = matchedBySource ?? null;
       if (!matched && resolvedAbs) {
-        for (const factory of matchingFactories) {
-          const info = await readGeneratedClientInfo(
-            id,
-            resolvedAbs,
-            factory,
-            traceableModuleAccess,
-            servicesDirName
-          );
-          if (info) {
-            matched = factory;
-            const key = getGeneratedInfoKey(
-              resolvedId ?? normalizeResolvedId(resolvedAbs),
-              factory
-            );
-            if (!generatedInfoByImport.has(key)) {
-              generatedInfoByImport.set(key, info);
-            }
-            break;
-          }
-        }
+        matched = await matchGeneratedFactoryEntrypointByImport({
+          importedName,
+          importLoadId: resolvedAbs,
+          importResolvedId: resolvedId ?? normalizeResolvedId(resolvedAbs),
+          candidates: matchingEntrypoints,
+          metadataByEntrypointKey: generatedMetadata.metadataByEntrypointKey,
+          factoryResolvedIds,
+          moduleAccess: traceableModuleAccess,
+        });
       }
       if (!matched) continue;
 
       if (resolvedAbs) {
+        const createImportPath = resolvedId ?? normalizeResolvedId(resolvedAbs);
+        const generatedInfo = generatedInfoByEntrypoint(
+          generatedMetadata.metadataByEntrypointKey,
+          matched.key,
+          id
+        );
         createImports.set(specifier.local.name, {
           sourceSpecifier: source,
-          factoryFile: resolvedId ?? normalizeResolvedId(resolvedAbs),
+          factoryFile: createImportPath,
           factoryLoadId: resolvedAbs,
-          factory: matched,
+          factory: matched.key,
+          entrypoint: matched,
         });
-      }
-      const entrypointKey = factoryEntrypointKeys.get(matched);
-      if (entrypointKey) {
+        generatedInfoByImport.set(
+          getGeneratedInfoKey(createImportPath, matched.key),
+          generatedInfo
+        );
         factoryImportSignals.set(specifier.local.name, {
-          key: entrypointKey,
+          key: matched.key,
           bindingNode: specifier.local,
         });
       }
@@ -335,11 +310,11 @@ export async function createTransformState(
           ? normalizeOptionalResolvedId(await resolveModule(source, id))
           : resolvedId;
 
-      for (const precreated of precreatedOptions) {
-        if (precreated.client !== importedName) continue;
+      for (const precreated of precreatedEntrypoints) {
+        if (precreated.client.exportName !== importedName) continue;
         if (
           !entrypointModuleMatchesImportSource(
-            precreated.clientModule,
+            precreated.client.moduleSpecifier,
             source,
             precreatedClientResolvedIds.get(precreated) ?? null,
             importResolvedId
@@ -347,10 +322,8 @@ export async function createTransformState(
         )
           continue;
 
-        const entrypointKey = precreatedEntrypointKeys.get(precreated);
-        if (!entrypointKey) continue;
         precreatedImportSignals.set(specifier.local.name, {
-          key: entrypointKey,
+          key: precreated.key,
           bindingNode: specifier.local,
         });
       }
@@ -368,7 +341,7 @@ export async function createTransformState(
     ...(await findPrecreatedClients(
       ast,
       id,
-      precreatedOptions,
+      precreatedEntrypoints,
       generatedMetadata.metadataByEntrypointKey,
       traceableModuleAccess,
       activeProgramScope
@@ -422,7 +395,7 @@ export async function createTransformState(
       if (args.length === 0) {
         const mode = { type: 'context' } as const;
         const generatedInfo = generatedInfoByImport.get(
-          getGeneratedInfoKey(createImportPath, createImport.factory)
+          getGeneratedInfoKey(createImportPath, createImport.entrypoint.key)
         );
         const runtimeInput =
           generatedInfo?.contextName && generatedInfo.contextImportPath
@@ -444,6 +417,7 @@ export async function createTransformState(
           createImportPath,
           createImportLoadId: createImport.factoryLoadId,
           factory: createImport.factory,
+          entrypoint: createImport.entrypoint,
           bindingNode: variablePath.node.id,
           declarationScope: variablePath.parentPath.scope,
           runtimeInput,
@@ -472,6 +446,7 @@ export async function createTransformState(
           createImportPath,
           createImportLoadId: createImport.factoryLoadId,
           factory: createImport.factory,
+          entrypoint: createImport.entrypoint,
           bindingNode: variablePath.node.id,
           declarationScope: variablePath.parentPath.scope,
           runtimeInput,
@@ -496,19 +471,8 @@ export async function createTransformState(
         createImportPath: client.createImportPath,
         createImportLoadId: client.createImportLoadId,
         factory: client.factory,
+        entrypoint: client.entrypoint,
       });
-    }
-    if (!generatedInfoByImport.has(key)) {
-      generatedInfoByImport.set(
-        key,
-        await readGeneratedClientInfo(
-          id,
-          client.createImportLoadId,
-          client.factory,
-          traceableModuleAccess,
-          servicesDirName
-        )
-      );
     }
   }
 
@@ -528,6 +492,7 @@ export async function createTransformState(
             createImportPath: inlineMatch.createImportPath,
             createImportLoadId: inlineMatch.createImportLoadId,
             factory: inlineMatch.factory,
+            entrypoint: inlineMatch.entrypoint,
           });
         }
         if (!generatedInfoByImport.has(key)) {
@@ -655,22 +620,6 @@ export async function createTransformState(
     localClientNamesByOperation
   );
 
-  for (const [key, generatedInfo] of generatedInfoByImport) {
-    if (generatedInfo !== null) continue;
-    const request = generatedInfoRequests.get(key);
-    if (!request) continue;
-    generatedInfoByImport.set(
-      key,
-      await readGeneratedClientInfo(
-        id,
-        request.createImportLoadId,
-        request.factory,
-        traceableModuleAccess,
-        servicesDirName
-      )
-    );
-  }
-
   traverse(ast, {
     CallExpression(callPath) {
       const match = matchInlineClientCall(callPath.node.callee, createImports);
@@ -740,6 +689,7 @@ export async function createTransformState(
         createImportPath: match.createImportPath,
         createImportLoadId: match.createImportLoadId,
         factory: match.factory,
+        entrypoint: match.entrypoint,
       });
     }
     if (!generatedInfoByImport.has(key)) {
@@ -1052,10 +1002,58 @@ function entrypointModuleMatchesImportSource(
   return moduleSpecifier === importSource;
 }
 
+async function matchGeneratedFactoryEntrypointByImport({
+  importedName,
+  importLoadId,
+  importResolvedId,
+  candidates,
+  metadataByEntrypointKey,
+  factoryResolvedIds,
+  moduleAccess,
+}: {
+  importedName: string;
+  importLoadId: string;
+  importResolvedId: string;
+  candidates: GeneratedFactoryEntrypoint[];
+  metadataByEntrypointKey: Map<string, GeneratedClientMetadata | null>;
+  factoryResolvedIds: Map<GeneratedFactoryEntrypoint, string | null>;
+  moduleAccess: QraftModuleAccess;
+}) {
+  const resolvedExport = await readExportedDeclarationChain(
+    importLoadId,
+    importedName,
+    moduleAccess
+  );
+  if (!resolvedExport) return null;
+
+  return (
+    candidates.find((candidate) => {
+      const metadata = metadataByEntrypointKey.get(candidate.key) ?? null;
+      if (metadata?.factoryFile === resolvedExport.sourceFile) {
+        return true;
+      }
+
+      const configuredResolvedId = factoryResolvedIds.get(candidate) ?? null;
+      return configuredResolvedId === importResolvedId;
+    }) ?? null
+  );
+}
+
+function generatedInfoByEntrypoint(
+  metadataByEntrypointKey: Map<string, GeneratedClientMetadata | null>,
+  entrypointKey: string,
+  importerId: string
+) {
+  const metadata = metadataByEntrypointKey.get(entrypointKey) ?? null;
+  return metadata
+    ? toGeneratedClientInfo(metadata, metadata.entrypoint, importerId)
+    : null;
+}
+
 async function findPrecreatedClients(
   ast: t.File,
   importerId: string,
-  configs: LegacyQraftPrecreatedClientConfig[],
+  configs: PrecreatedClientEntrypoint[],
   metadataByEntrypointKey: Map<string, GeneratedClientMetadata | null>,
   moduleAccess: QraftModuleAccess,
   programScope: Scope
@@ -1066,12 +1064,12 @@ async function findPrecreatedClients(
   const resolvedConfigs = await Promise.all(
     configs.map(async (config) => {
       const clientLoadId =
-        (await resolveModule(config.clientModule, importerId)) ?? null;
+        (await resolveModule(config.client.moduleSpecifier, importerId)) ?? null;
       const clientFile = clientLoadId
         ? normalizeResolvedId(clientLoadId)
         : null;
       const factoryModuleLoadId =
-        (await resolveModule(config.createAPIClientFnModule, importerId)) ??
+        (await resolveModule(config.factory.moduleSpecifier, importerId)) ??
         null;
       const factoryModuleFile = factoryModuleLoadId
         ? normalizeResolvedId(factoryModuleLoadId)
@@ -1079,15 +1077,14 @@ async function findPrecreatedClients(
       const factoryExport = factoryModuleLoadId
         ? await readExportedDeclarationChain(
             factoryModuleLoadId,
-            config.createAPIClientFn,
+            config.factory.exportName,
             moduleAccess
           )
         : null;
       const factoryFile = factoryExport?.sourceFile ?? factoryModuleFile;
       const factoryLoadId =
         factoryExport?.sourceLoadId ?? factoryModuleLoadId ?? factoryFile;
-      const optionsModule =
-        config.createAPIClientFnOptionsModule ?? config.clientModule;
+      const optionsModule = config.optionsFactory.moduleSpecifier;
       const optionsFile = await resolveFactoryModule(
         optionsModule,
         importerId,
@@ -1116,10 +1113,7 @@ async function findPrecreatedClients(
   );
 
   const clients: ClientBinding[] = [];
-  const validated = new Map<
-    LegacyQraftPrecreatedClientConfig,
-    { factory: LegacyQraftFactoryConfig } | null
-  >();
+  const validated = new Map<PrecreatedClientEntrypoint, boolean | null>();
 
   for (const node of ast.program.body) {
     if (!t.isImportDeclaration(node)) continue;
@@ -1134,7 +1128,7 @@ async function findPrecreatedClients(
       const match = resolvedConfigs.find((item) => {
         if (item.clientResolvedId !== resolvedImportId) return false;
         if (
-          item.config.client === 'default' &&
+          item.config.client.exportName === 'default' &&
           t.isImportDefaultSpecifier(specifier)
         ) {
           return true;
@@ -1143,7 +1137,7 @@ async function findPrecreatedClients(
           t.isImportSpecifier(specifier) &&
           t.isIdentifier(specifier.imported) &&
           t.isIdentifier(specifier.local) &&
-          specifier.imported.name === item.config.client
+          specifier.imported.name === item.config.client.exportName
         );
       });
       const factoryFile = match?.metadata?.factoryFile ?? match?.factoryFile;
@@ -1158,15 +1152,10 @@ async function findPrecreatedClients(
       }
       if (!t.isIdentifier(specifier.local)) continue;
 
-      let validatedConfig = validated.get(match.config);
-      if (validatedConfig === undefined) {
+      let validatedConfig = validated.get(match.config) ?? null;
+      if (!validated.has(match.config)) {
         if (match.metadata) {
-          validatedConfig = {
-            factory: {
-              name: match.metadata.entrypoint.factory.exportName,
-              module: match.metadata.entrypoint.factory.moduleSpecifier,
-            },
-          };
+          validatedConfig = true;
         } else if (match.factoryResolvedId) {
           validatedConfig = await validatePrecreatedClientConfig(
             match.config,
@@ -1184,12 +1173,12 @@ async function findPrecreatedClients(
       const mode = {
         type: 'precreated',
         optionsImportPath: match.optionsImportPath,
-        optionsExportName: match.config.createAPIClientFnOptions,
+        optionsExportName: match.config.optionsFactory.exportName,
       } as const;
       const runtimeInput = {
         kind: 'optionsFactoryCall' as const,
         target: {
-          exportName: match.config.createAPIClientFnOptions,
+          exportName: match.config.optionsFactory.exportName,
           moduleSpecifier: match.optionsImportPath,
         },
       };
@@ -1198,12 +1187,13 @@ async function findPrecreatedClients(
         name: specifier.local.name,
         clientSourceKey: getClientSourceKey(
           factoryFile,
-          validatedConfig.factory,
+          match.config.key,
           mode
         ),
         createImportPath: factoryFile,
         createImportLoadId: factoryLoadId ?? factoryFile,
-        factory: validatedConfig.factory,
+        factory: match.config.key,
+        entrypoint: match.config,
         bindingNode: specifier.local,
         declarationScope: programScope,
         runtimeInput,
@@ -1216,40 +1206,23 @@ async function findPrecreatedClients(
 }
 
 function findPrecreatedMetadata(
-  config: LegacyQraftPrecreatedClientConfig,
+  config: PrecreatedClientEntrypoint,
   metadataByEntrypointKey: Map<string, GeneratedClientMetadata | null>
 ) {
-  for (const metadata of metadataByEntrypointKey.values()) {
-    if (!metadata || metadata.entrypoint.kind !== 'precreatedClient') continue;
-    const { entrypoint } = metadata;
-    if (
-      entrypoint.client.exportName === config.client &&
-      entrypoint.client.moduleSpecifier === config.clientModule &&
-      entrypoint.factory.exportName === config.createAPIClientFn &&
-      entrypoint.factory.moduleSpecifier === config.createAPIClientFnModule &&
-      entrypoint.optionsFactory.exportName ===
-        config.createAPIClientFnOptions &&
-      entrypoint.optionsFactory.moduleSpecifier ===
-        config.createAPIClientFnOptionsModule
-    ) {
-      return metadata;
-    }
-  }
-
-  return null;
+  return metadataByEntrypointKey.get(config.key) ?? null;
 }
 
 async function validatePrecreatedClientConfig(
-  config: LegacyQraftPrecreatedClientConfig,
+  config: PrecreatedClientEntrypoint,
   clientLoadId: string,
   factoryResolvedId: string,
   moduleAccess: QraftModuleAccess
-): Promise<{ factory: LegacyQraftFactoryConfig } | null> {
+): Promise<boolean | null> {
   const skip = (_reason: string) => null;
 
   const resolvedExport = await readExportedDeclarationChain(
     clientLoadId,
-    config.client,
+    config.client.exportName,
     moduleAccess
   );
   if (!resolvedExport) return skip('precreated client export was not found');
@@ -1264,7 +1237,7 @@ async function validatePrecreatedClientConfig(
   if (
     !(await matchesConfiguredBinding(
       init.callee.name,
-      config.createAPIClientFn,
+      config.factory.exportName,
       factoryResolvedId,
       sourceFile,
       importBindings
@@ -1273,12 +1246,7 @@ async function validatePrecreatedClientConfig(
     return skip('precreated client factory did not match configuration');
   }
 
-  return {
-    factory: {
-      name: config.createAPIClientFn,
-      module: config.createAPIClientFnModule,
-    },
-  };
+  return true;
 }
 
 async function readExportedDeclarationChain(
@@ -1515,7 +1483,8 @@ function matchSchemaAccess(
       kind: 'inline';
       createImportPath: string;
       createImportLoadId: string;
-      factory: LegacyQraftFactoryConfig;
+      factory: GeneratedFactoryEntrypoint['key'];
+      entrypoint: GeneratedFactoryEntrypoint;
       serviceName: string;
       operationName: string;
     }
@@ -1558,6 +1527,7 @@ function matchSchemaAccess(
     createImportPath: createImport.factoryFile,
     createImportLoadId: createImport.factoryLoadId,
     factory: createImport.factory,
+    entrypoint: createImport.entrypoint,
     serviceName,
     operationName,
   };
@@ -1569,7 +1539,8 @@ function matchInlineClientCall(
 ): {
   createImportPath: string;
   createImportLoadId: string;
-  factory: LegacyQraftFactoryConfig;
+  factory: GeneratedFactoryEntrypoint['key'];
+  entrypoint: GeneratedFactoryEntrypoint;
   optionsExpression: t.Expression | null;
   serviceName: string;
   operationName: string;
@@ -1604,6 +1575,7 @@ function matchInlineClientCall(
       createImportPath: createImport.factoryFile,
       createImportLoadId: createImport.factoryLoadId,
       factory: createImport.factory,
+      entrypoint: createImport.entrypoint,
       optionsExpression: null,
       serviceName,
       operationName,
@@ -1618,158 +1590,11 @@ function matchInlineClientCall(
     createImportPath: createImport.factoryFile,
     createImportLoadId: createImport.factoryLoadId,
     factory: createImport.factory,
+    entrypoint: createImport.entrypoint,
     optionsExpression: t.cloneNode(root.arguments[0], true),
     serviceName,
     operationName,
     callbackName,
-  };
-}
-
-async function readGeneratedClientInfo(
-  importerId: string,
-  clientLoadId: string,
-  factory: LegacyQraftFactoryConfig,
-  moduleAccess: QraftModuleAccess,
-  servicesDirName = 'services'
-): Promise<GeneratedClientInfo | null> {
-  const skip = (_reason: string) => null;
-  const clientFile = normalizeResolvedId(clientLoadId);
-
-  const source = await moduleAccess.load(clientLoadId);
-  if (source === null) {
-    return skip('generated client file was not readable');
-  }
-  const ast = parse(source, {
-    sourceType: 'module',
-    plugins: ['typescript'],
-  });
-
-  const usesReactClient = source.includes('qraftReactAPIClient');
-  const usesAPIClient = source.includes('qraftAPIClient');
-  if (!usesReactClient && !usesAPIClient) {
-    const reexportPath = findFactoryReexport(ast, factory.name);
-    if (reexportPath) {
-      const resolvedReexport = await moduleAccess.resolve(
-        reexportPath,
-        clientFile
-      );
-      if (resolvedReexport) {
-        const reexportId = normalizeResolvedId(resolvedReexport);
-        if (reexportId !== clientFile) {
-          return readGeneratedClientInfo(
-            importerId,
-            resolvedReexport,
-            factory,
-            moduleAccess,
-            servicesDirName
-          );
-        }
-        return skip('generated client re-export resolved to the same file');
-      }
-      return skip(
-        `generated client re-export ${reexportPath} could not be resolved`
-      );
-    }
-    return skip('generated client barrel did not re-export the factory');
-  }
-
-  let servicesDir: string | null = null;
-  let contextImportPath: string | null = null;
-  let contextName: string | null = null;
-  const contextImportPathsByLocalName = new Map<string, string>();
-  const reactClientLocalNames = new Set<string>();
-  const expectedContextName = factory.context ?? null;
-  const shouldScanContextImport =
-    usesReactClient && !factory.contextModule && expectedContextName !== null;
-
-  traverse(ast, {
-    ImportDeclaration(importPathNode) {
-      const sourcePath = importPathNode.node.source.value;
-
-      for (const specifier of importPathNode.node.specifiers) {
-        if (
-          t.isImportSpecifier(specifier) &&
-          t.isIdentifier(specifier.imported) &&
-          specifier.imported.name === servicesDirName
-        ) {
-          servicesDir = sourcePath.replace(/\/index(?:\.[cm]?[jt]s)?$/, '');
-        }
-
-        if (
-          shouldScanContextImport &&
-          t.isImportSpecifier(specifier) &&
-          t.isIdentifier(specifier.imported) &&
-          t.isIdentifier(specifier.local)
-        ) {
-          contextImportPathsByLocalName.set(specifier.local.name, sourcePath);
-
-          if (specifier.imported.name === expectedContextName) {
-            contextName = specifier.local.name;
-            contextImportPath = sourcePath;
-          }
-        }
-
-        if (
-          usesReactClient &&
-          t.isImportSpecifier(specifier) &&
-          t.isIdentifier(specifier.imported) &&
-          t.isIdentifier(specifier.local) &&
-          specifier.imported.name === 'qraftReactAPIClient'
-        ) {
-          reactClientLocalNames.add(specifier.local.name);
-        }
-      }
-    },
-    CallExpression(callPath) {
-      if (!shouldScanContextImport || contextName) return;
-      if (!t.isIdentifier(callPath.node.callee)) return;
-      if (!reactClientLocalNames.has(callPath.node.callee.name)) return;
-
-      const contextArgument = callPath.node.arguments[2];
-      if (!t.isIdentifier(contextArgument)) return;
-
-      contextName = contextArgument.name;
-      contextImportPath =
-        contextImportPathsByLocalName.get(contextArgument.name) ?? null;
-    },
-  });
-
-  if (!servicesDir) return null;
-  const serviceImportPaths = await readServiceImportPaths(
-    clientFile,
-    servicesDir,
-    moduleAccess
-  );
-
-  let resolvedContextImportPath: string | null = null;
-  if (usesReactClient && factory.contextModule) {
-    resolvedContextImportPath = resolveRelativeImportPath(
-      importerId,
-      importerId,
-      factory.contextModule
-    );
-  } else {
-    const resolvedContextImportPathValue = contextImportPath;
-    if (typeof resolvedContextImportPathValue === 'string') {
-      resolvedContextImportPath = resolveRelativeImportPath(
-        importerId,
-        clientFile,
-        resolvedContextImportPathValue
-      );
-    }
-  }
-
-  return {
-    importerId,
-    clientFile,
-    servicesDir,
-    serviceImportPaths,
-    contextImportPath: resolvedContextImportPath,
-    contextName: usesReactClient
-      ? factory.contextModule
-        ? expectedContextName
-        : contextName
-      : null,
   };
 }
 
@@ -1782,20 +1607,24 @@ function resolveOperationImport(
   reservedImportLocalNames: Set<string>,
   operationImports: Map<string, OperationImportInfo>
 ): OperationImportInfo | null {
-  const key = `${generatedInfo.clientFile}:${serviceName}:${operationName}`;
+  const key = [
+    generatedInfo.clientFile,
+    generatedInfo.servicesModuleSpecifierBase,
+    serviceName,
+    operationName,
+  ].join(':');
   const cached = operationImports.get(key);
   if (cached) return cached;
 
   const serviceImportPath =
     generatedInfo.serviceImportPaths[serviceName] ??
     `./${serviceNameToFileBase(serviceName)}`;
-  const operationFile = resolve(
-    dirname(generatedInfo.clientFile),
-    generatedInfo.servicesDir,
-    serviceImportPath
-  );
   const resolved = {
-    importPath: composeImportPath(generatedInfo.importerId, operationFile),
+    importPath: composeServiceOperationImportPath(
+      generatedInfo.servicesModuleSpecifierBase,
+      generatedInfo.servicesDir,
+      serviceImportPath
+    ),
     operationName,
     localName: createProgramUniqueName(
       programScope,
@@ -1864,106 +1693,73 @@ function seedGeneratedInfoByImport(
   generatedInfoByImport: Map<string, GeneratedClientInfo | null>,
   metadataByEntrypointKey: Map<string, GeneratedClientMetadata | null>,
   importerId: string,
-  factoryOptions: LegacyQraftFactoryConfig[],
-  factoryResolvedIds: Map<LegacyQraftFactoryConfig, string | null>
+  factoryEntrypoints: GeneratedFactoryEntrypoint[],
+  factoryResolvedIds: Map<GeneratedFactoryEntrypoint, string | null>
 ) {
-  for (const metadata of metadataByEntrypointKey.values()) {
-    if (!metadata) continue;
+  for (const entrypoint of factoryEntrypoints) {
+    const metadata = metadataByEntrypointKey.get(entrypoint.key) ?? null;
+    const generatedInfo = metadata
+      ? toGeneratedClientInfo(metadata, entrypoint, importerId)
+      : null;
+    const sourceIds = new Set<string>();
 
-    const factory = resolveLegacyFactoryForMetadata(metadata, factoryOptions);
-    const generatedInfo = toGeneratedClientInfo(metadata, factory, importerId);
-    const sourceIds = new Set([metadata.factoryFile]);
-
-    const entrypoint = metadata.entrypoint;
-    if (entrypoint.kind === 'generatedFactory') {
-      const configuredFactory = factoryOptions.find(
-        (item) =>
-          item.name === entrypoint.factory.exportName &&
-          item.module === entrypoint.factory.moduleSpecifier &&
-          item.context === (entrypoint.reactContext?.exportName ?? undefined) &&
-          item.contextModule ===
-            (entrypoint.reactContext?.moduleSpecifier ?? undefined)
-      );
-      const configuredResolvedId = configuredFactory
-        ? factoryResolvedIds.get(configuredFactory)
-        : null;
-      if (configuredResolvedId) sourceIds.add(configuredResolvedId);
+    const configuredResolvedId = factoryResolvedIds.get(entrypoint) ?? null;
+    if (configuredResolvedId) {
+      sourceIds.add(configuredResolvedId);
+    }
+    if (metadata) {
+      sourceIds.add(metadata.factoryFile);
     }
 
     for (const sourceId of sourceIds) {
       generatedInfoByImport.set(
-        getGeneratedInfoKey(sourceId, factory),
+        getGeneratedInfoKey(sourceId, entrypoint.key),
         generatedInfo
       );
     }
   }
 }
 
-function resolveLegacyFactoryForMetadata(
-  metadata: GeneratedClientMetadata,
-  factoryOptions: LegacyQraftFactoryConfig[]
-): LegacyQraftFactoryConfig {
-  const entrypoint = metadata.entrypoint;
-  if (entrypoint.kind === 'generatedFactory') {
-    return (
-      factoryOptions.find(
-        (factory) =>
-          factory.name === entrypoint.factory.exportName &&
-          factory.module === entrypoint.factory.moduleSpecifier &&
-          factory.context ===
-            (entrypoint.reactContext?.exportName ?? undefined) &&
-          factory.contextModule ===
-            (entrypoint.reactContext?.moduleSpecifier ?? undefined)
-      ) ?? {
-        name: entrypoint.factory.exportName,
-        module: entrypoint.factory.moduleSpecifier,
-        context: entrypoint.reactContext?.exportName,
-        contextModule: entrypoint.reactContext?.moduleSpecifier ?? undefined,
-      }
-    );
-  }
-
-  return {
-    name: entrypoint.factory.exportName,
-    module: entrypoint.factory.moduleSpecifier,
-  };
-}
-
 function toGeneratedClientInfo(
   metadata: GeneratedClientMetadata,
-  factory: LegacyQraftFactoryConfig,
+  entrypoint: ClientEntrypoint,
   importerId: string
 ): GeneratedClientInfo {
   return {
     importerId,
     clientFile: metadata.factoryFile,
+    servicesModuleSpecifierBase: metadata.entrypoint.services.moduleSpecifierBase,
     servicesDir: metadata.servicesDir,
     serviceImportPaths: metadata.serviceImportPaths,
     contextImportPath: resolveMetadataContextImportPath(
       metadata,
-      factory,
+      entrypoint,
       importerId
     ),
-    contextName: factory.context ?? null,
+    contextName:
+      entrypoint.kind === 'generatedFactory'
+        ? entrypoint.reactContext?.exportName ?? null
+        : null,
   };
 }
 
 function resolveMetadataContextImportPath(
   metadata: GeneratedClientMetadata,
-  factory: LegacyQraftFactoryConfig,
+  entrypoint: ClientEntrypoint,
   importerId: string
 ) {
-  if (!factory.context) return null;
+  if (entrypoint.kind !== 'generatedFactory') return null;
+  if (!entrypoint.reactContext) return null;
   if (!metadata.reactContext?.moduleSpecifier) return null;
 
   if (
-    factory.contextModule &&
-    factory.contextModule !== metadata.entrypoint.factory.moduleSpecifier
+    entrypoint.reactContext.moduleSpecifier !==
+    metadata.entrypoint.factory.moduleSpecifier
   ) {
     return resolveRelativeImportPath(
       importerId,
       importerId,
-      factory.contextModule
+      entrypoint.reactContext.moduleSpecifier
     );
   }
 
@@ -2077,7 +1873,7 @@ function createProgramUniqueName(
 
 function getClientSourceKey(
   createImportPath: string,
-  factory: LegacyQraftFactoryConfig,
+  factory: string,
   mode: ClientBinding['mode']
 ) {
   const generatedInfoKey = getGeneratedInfoKey(createImportPath, factory);
