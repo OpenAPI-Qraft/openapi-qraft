@@ -7,6 +7,10 @@ describe('transformQraftTreeShaking explicit options clients', () => {
     const fixture = await createFixture();
     const sourceFile = path.join(fixture, 'src/App.tsx');
 
+    // Synthetic transform-shape coverage: the named `api...invalidateQueries()`
+    // calls would not be valid generated-client calls for a context-based
+    // client. This test only verifies that `void` and `await` prefixes survive
+    // named and inline rewrites.
     const result = await transformQraftTreeShaking(
       `
 import { createAPIClient, APIClientContext } from './api';
