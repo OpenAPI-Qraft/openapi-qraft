@@ -3,11 +3,11 @@
 ## Purpose
 
 Capture follow-up design notes for `@openapi-qraft/tree-shaking-plugin` import
-specifier handling when a generated client factory is imported through an alias,
+specifier handling when a generated entrypoint is imported through an alias,
 bare package specifier, or third-party module.
 
-This is a temporary review spec. It records risks and target behavior before an
-implementation plan is written.
+This spec records risks and target behavior before an implementation plan is
+written.
 
 ## Problem
 
@@ -63,7 +63,8 @@ Resolver output may be used to:
 
 - validate that a configured factory points to a generated client;
 - load generated client metadata;
-- inspect the generated factory to infer services and context relationships;
+- inspect the generated factory to discover service ownership and context
+  relationships;
 - resolve local source files while analyzing the generated client.
 
 Resolver output must not, by itself, decide the import specifiers emitted into
@@ -127,12 +128,13 @@ argument to `qraftReactAPIClient(...)`.
 
 ## Service Import Configuration
 
-The plugin needs a way to describe the public module specifier used for generated
-services when it cannot safely infer that path.
+The plugin needs a way to describe the public module specifier used as the base
+for generated service-file imports.
 
-Add an entrypoint-level services import configuration for `clientFactory`
-entrypoints. The config should specify only the service module base specifier,
-not an export name:
+Add an entrypoint-level services import configuration for every entrypoint kind
+that can emit operation imports. This includes `clientFactory` and
+`precreatedClient`. The config should specify only the service module base
+specifier, not an export name:
 
 ```ts
 {
@@ -151,17 +153,51 @@ not an export name:
 }
 ```
 
-Operation imports can then be composed from that public services base:
+Operation imports are composed from that public services base plus the generated
+service-file suffix discovered from the generated `services` object:
 
 ```ts
 import { getPets } from "@api/my-api/services/PetsService";
 ```
 
+When `services.moduleSpecifier` is omitted, the transform uses
+`factory.moduleSpecifier` as the public generated API root for service-file
+imports. For example:
+
+```ts
+{
+  kind: 'clientFactory',
+  factory: {
+    exportName: 'createMyAPIClient',
+    moduleSpecifier: '@api/my-api',
+  },
+  reactContext: {
+    exportName: 'APIClientContext',
+  },
+}
+```
+
+emits:
+
+```ts
+import { getPets } from "@api/my-api/services/PetsService";
+```
+
+This default is an intentional tree-shaking layout assumption: the public
+generated API root exposes service files below the same module root. If a
+package uses a different public layout, users should configure
+`services.moduleSpecifier` explicitly.
+
 The service export name does not need to be configurable for this design. The
 generated services object is already discovered from the generated client, and
 operation export names such as `getPets` still come from service files.
 
-## Inference Rules
+For `precreatedClient` entrypoints, `services.moduleSpecifier` follows the same
+rule. If omitted, operation imports use `factory.moduleSpecifier` as the public
+generated API root; if provided, operation imports use the explicit services
+base.
+
+## Import Specifier Rules
 
 The transform should prefer emitted import specifiers in this order:
 
@@ -172,21 +208,23 @@ The transform should prefer emitted import specifiers in this order:
    - when `reactContext.exportName` is configured but
      `reactContext.moduleSpecifier` is omitted, import that context export from
      `factory.moduleSpecifier`.
-3. Safe public service inference from the configured factory module specifier
-   and the generated factory's own conventional services import.
-4. Existing relative source-path composition only when the configured factory
-   module specifier is itself local/path-like and the emitted file is expected
-   to import the generated source tree directly.
+3. Default public operation import:
+   - when `services.moduleSpecifier` is omitted, compose operation imports from
+     `factory.moduleSpecifier` plus the service-file suffix discovered from the
+     generated `services` object.
 
-If the configured factory uses a bare specifier and the transform cannot infer a
-safe public service import specifier, it should skip the transform candidate
-through diagnostics rather than emit physical relative paths into `node_modules`
-or another resolved dependency location.
+The transform should not infer emitted service or context import specifiers from
+the generated factory's physical source file. Physical paths remain analysis
+inputs only. For path-like `factory.moduleSpecifier` values such as `./api`, the
+same default rule preserves the current local-source behavior by composing
+`./api/services/PetsService`.
 
 The transform should not infer emitted context import specifiers for bare
 factory imports from the generated factory's physical source file. Use
 `factory.moduleSpecifier` by default, or `reactContext.moduleSpecifier` when the
-context is not exported from the factory module.
+context is not exported from the factory module. This treats
+`factory.moduleSpecifier` as a user-provided public contract for the configured
+context export.
 
 ## Test Coverage To Add
 
@@ -208,10 +246,13 @@ context is not exported from the factory module.
 - Third-party-style factory import:
   - resolver maps `@scope/api` to a fixture path under `node_modules`;
   - emitted imports do not contain `node_modules` or physical relative paths.
-- Missing public services config:
-  - if safe inference is unavailable for a bare factory module specifier, the
-    candidate is skipped/reported via diagnostics instead of emitting unsafe
-    imports.
+- Explicit services module:
+  - `services.moduleSpecifier: '@scope/api/public-services'`;
+  - emitted operation imports use `@scope/api/public-services/PetsService`.
+- Precreated client entrypoint:
+  - `services.moduleSpecifier` works for `kind: 'precreatedClient'`;
+  - without it, operation imports use `factory.moduleSpecifier` as the public
+    generated API root.
 - Existing local relative imports:
   - keep current relative emitted import behavior for `./api` style generated
     clients.
@@ -224,14 +265,3 @@ context is not exported from the factory module.
   should emit stable public specifiers and let the bundler resolve them.
 - Do not broaden this into a full entrypoint API redesign beyond import
   specifier ownership.
-
-## Open Review Notes
-
-- Confirm the exact config shape before implementation. This spec uses
-  `services.moduleSpecifier` as the proposed shape.
-- Decide whether safe public inference from `factory.moduleSpecifier` should be
-  enabled for all non-relative specifiers or only when the generated factory's
-  services import has the conventional `./services/index` shape.
-- Confirm whether default context imports from `factory.moduleSpecifier` require
-  the generated factory module to re-export the configured context symbol, or
-  whether this should be treated as a user-provided public contract.
