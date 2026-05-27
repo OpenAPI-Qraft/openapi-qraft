@@ -350,6 +350,9 @@ const precreatedClientEntrypoints = [
       exportName: 'createBarrelPrecreatedAPIClient',
       moduleSpecifier: '@/precreated/clients/barrel', // re-export of './generated-api/create-barrel-precreated-api-client.ts'
     },
+    services: {
+      moduleSpecifierBase: '@/generated-api',
+    },
     optionsFactory: {
       exportName: 'createBarrelClientOptions',
       moduleSpecifier: '@/precreated/clients/barrel',
