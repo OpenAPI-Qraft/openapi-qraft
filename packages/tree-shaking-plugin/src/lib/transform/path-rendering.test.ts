@@ -97,5 +97,13 @@ describe('path rendering helpers', () => {
     expect(
       composeServiceOperationImportPath('./api', './services', './PetsService')
     ).toBe('./api/services/PetsService');
+
+    expect(
+      composeServiceOperationImportPath(
+        '@api/my-api',
+        './services',
+        './PetsService/index.ts'
+      )
+    ).toBe('@api/my-api/services/PetsService');
   });
 });

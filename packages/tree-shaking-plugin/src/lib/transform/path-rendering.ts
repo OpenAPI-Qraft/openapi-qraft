@@ -60,7 +60,9 @@ export function composeServiceOperationImportPath(
   return joinImportPathSegments(
     moduleSpecifierBase,
     normalizeImportSubpathSegment(servicesDir),
-    normalizeImportSubpathSegment(stripSourceExtension(serviceImportPath))
+    normalizeImportSubpathSegment(
+      stripIndexSourceExtension(stripSourceExtension(serviceImportPath))
+    )
   );
 }
 
