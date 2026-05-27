@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   composeImportPath,
   composeResolvedSourceImportPath,
+  composeServiceOperationImportPath,
   normalizeResolvedId,
   resolvePrecreatedOptionsImportPath,
   resolveRelativeImportPath,
@@ -74,5 +75,27 @@ describe('path rendering helpers', () => {
       './services/PetsService'
     );
     expect(stripIndexSourceExtension('./services/index')).toBe('./services');
+  });
+
+  it('composes public service operation import specifiers from generated metadata', () => {
+    expect(
+      composeServiceOperationImportPath(
+        '@api/my-api',
+        './services',
+        './PetsService.ts'
+      )
+    ).toBe('@api/my-api/services/PetsService');
+
+    expect(
+      composeServiceOperationImportPath(
+        '@api/my-api/public',
+        './services',
+        './PetsService'
+      )
+    ).toBe('@api/my-api/public/services/PetsService');
+
+    expect(
+      composeServiceOperationImportPath('./api', './services', './PetsService')
+    ).toBe('./api/services/PetsService');
   });
 });
