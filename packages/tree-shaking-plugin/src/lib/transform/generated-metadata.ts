@@ -29,6 +29,8 @@ const traverse =
     traverseModule
   );
 
+const CONVENTIONAL_GENERATED_SERVICES_DIR = './services';
+
 type InspectGeneratedEntrypointsInput = {
   importerId: string;
   entrypoints: ClientEntrypoint[];
@@ -222,10 +224,7 @@ async function inspectFactoryFile({
     plugins: ['typescript'],
   });
 
-  if (
-    !source.includes('qraftReactAPIClient') &&
-    !source.includes('qraftAPIClient')
-  ) {
+  if (!usesQraftClientHelpers(source)) {
     const reexportPath = findFactoryReexport(ast, factoryExportName);
     if (reexportPath) {
       const resolved = await moduleAccess.resolve(reexportPath, factoryFile);
@@ -256,13 +255,12 @@ async function inspectFactoryFile({
   }
 
   const factoryImports = readGeneratedFactoryImports(ast, reactContext);
-  if (!factoryImports.servicesDir) {
-    return missingServicesImport(entrypoint.key);
-  }
+  const servicesDir =
+    factoryImports.servicesDir ?? CONVENTIONAL_GENERATED_SERVICES_DIR;
 
   const serviceImportPaths = await readServiceImportPaths(
     factoryFile,
-    factoryImports.servicesDir,
+    servicesDir,
     moduleAccess
   );
 
@@ -271,12 +269,18 @@ async function inspectFactoryFile({
       entrypoint,
       factoryFile,
       factoryLoadId,
-      servicesDir: factoryImports.servicesDir,
+      servicesDir,
       serviceImportPaths,
       reactContext: factoryImports.reactContext,
       ...(optionsFactory ? { optionsFactory } : {}),
     },
   };
+}
+
+function usesQraftClientHelpers(source: string) {
+  return (
+    source.includes('qraftReactAPIClient') || source.includes('qraftAPIClient')
+  );
 }
 
 function readGeneratedFactoryImports(
