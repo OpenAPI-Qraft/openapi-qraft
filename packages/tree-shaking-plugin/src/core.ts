@@ -26,9 +26,14 @@ export type ReactContextTarget = {
   moduleSpecifier?: string;
 };
 
+export type ServicesImportBaseTarget = {
+  moduleSpecifierBase: string;
+};
+
 export type QraftClientFactoryEntrypointConfig = {
   kind: 'clientFactory';
   factory: ModuleExportTarget;
+  services?: ServicesImportBaseTarget;
   reactContext?: ReactContextTarget;
 };
 
@@ -37,6 +42,7 @@ export type QraftPrecreatedClientEntrypointConfig = {
   client: ModuleExportTarget;
   factory: ModuleExportTarget;
   optionsFactory: ModuleExportTarget;
+  services?: ServicesImportBaseTarget;
 };
 
 export type QraftEntrypointConfig =
