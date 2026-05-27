@@ -41,7 +41,13 @@ describe('inspectGeneratedEntrypoints', () => {
 
     const metadata = result.metadataByEntrypointKey.get(entrypoints[0].key);
 
+    expect(entrypoints[0]).toMatchObject({
+      reactContext: {
+        moduleSpecifier: './api',
+      },
+    });
     expect(result.reasons).toEqual([]);
+    expect(metadata?.entrypoint).toEqual(entrypoints[0]);
     expect(metadata).toMatchObject({
       entrypoint: entrypoints[0],
       factoryFile: path.join(root, 'src/api/index.ts'),
@@ -271,6 +277,44 @@ const helperName = 'qraftAPIClient';
 // qraftReactAPIClient appears in generated factories, but this is not one.
 export function createAPIClient() {
   return {};
+}
+`,
+    });
+    const importerId = path.join(root, 'src/App.tsx');
+    const entrypoints = normalizeEntrypoints({
+      entrypoints: [
+        {
+          kind: 'clientFactory',
+          factory: { exportName: 'createAPIClient', moduleSpecifier: './api' },
+        },
+      ],
+    });
+
+    const result = await inspectGeneratedEntrypoints({
+      importerId,
+      entrypoints,
+      moduleAccess: createFixtureModuleAccess(root),
+    });
+
+    expect(result.metadataByEntrypointKey.get(entrypoints[0].key)).toBeNull();
+    expect(result.reasons).toEqual([
+      {
+        layer: 'generated-metadata',
+        code: 'generated-services-import-missing',
+        message: 'Generated entrypoint does not import static services.',
+        entrypointKey: entrypoints[0].key,
+      },
+    ]);
+  });
+
+  it('returns missing services reason for qraft helper names imported from other modules', async () => {
+    const root = await createTempFixture();
+    await writeFixtureFiles(root, {
+      'src/api/index.ts': `
+import { qraftAPIClient } from 'other-library';
+
+export function createAPIClient(services, callbacks) {
+  return qraftAPIClient(services, callbacks);
 }
 `,
     });

@@ -66,7 +66,7 @@ export type ImportTarget = {
 
 export type ReactContextConfig = {
   exportName: string;
-  moduleSpecifier?: string;
+  moduleSpecifier: string;
 };
 
 export type RuntimeInput =
