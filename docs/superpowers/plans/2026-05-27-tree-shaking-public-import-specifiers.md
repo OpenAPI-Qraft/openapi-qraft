@@ -19,7 +19,7 @@
 - `packages/tree-shaking-plugin/src/lib/transform/entrypoints.ts`
   - Normalize `services.moduleSpecifierBase` and `reactContext.moduleSpecifier` to concrete public module specifiers.
 - `packages/tree-shaking-plugin/src/lib/transform/generated-info-key.ts`
-  - Replace legacy-factory-shaped keys with normalized entrypoint keys.
+  - Keep a temporary legacy-factory-shaped bridge until transform state stores normalized entrypoint keys directly, then remove it in Task 4.
 - `packages/tree-shaking-plugin/src/lib/transform/path-rendering.ts`
   - Add module-specifier join helpers for service-file operation imports.
 - `packages/tree-shaking-plugin/src/lib/transform/generated-metadata.ts`
@@ -76,7 +76,13 @@ it('normalizes omitted clientFactory services and context modules to the factory
   ).toEqual([
     {
       kind: 'generatedFactory',
-      key: 'generatedFactory:createReactAPIClient:@api/my-api:@api/my-api:@api/my-api',
+      key: JSON.stringify([
+        'generatedFactory',
+        'createReactAPIClient',
+        '@api/my-api',
+        '@api/my-api',
+        '@api/my-api',
+      ]),
       factory: {
         exportName: 'createReactAPIClient',
         moduleSpecifier: '@api/my-api',
@@ -110,7 +116,13 @@ it('preserves explicit clientFactory services moduleSpecifierBase', () => {
 
   expect(entrypoint).toMatchObject({
     kind: 'generatedFactory',
-    key: 'generatedFactory:createReactAPIClient:@api/my-api:@api/my-public-root:',
+    key: JSON.stringify([
+      'generatedFactory',
+      'createReactAPIClient',
+      '@api/my-api',
+      '@api/my-public-root',
+      '',
+    ]),
     services: {
       moduleSpecifierBase: '@api/my-public-root',
     },
@@ -141,7 +153,16 @@ it('normalizes omitted precreatedClient services to the factory module specifier
   ).toEqual([
     {
       kind: 'precreatedClient',
-      key: 'precreatedClient:nodeAPIClient:./client:createNodeAPIClient:@api/my-api:createNodeAPIClientOptions:./client-options:@api/my-api',
+      key: JSON.stringify([
+        'precreatedClient',
+        'nodeAPIClient',
+        './client',
+        'createNodeAPIClient',
+        '@api/my-api',
+        'createNodeAPIClientOptions',
+        './client-options',
+        '@api/my-api',
+      ]),
       client: {
         exportName: 'nodeAPIClient',
         moduleSpecifier: './client',
@@ -284,32 +305,45 @@ function composeGeneratedFactoryEntrypointKey(
   servicesModuleSpecifierBase: string,
   contextModuleSpecifier: string
 ) {
-  return [
+  return composeEntrypointKey([
     'generatedFactory',
     exportName,
     moduleSpecifier,
     servicesModuleSpecifierBase,
     contextModuleSpecifier,
-  ].join(':');
+  ]);
+}
+
+function composeEntrypointKey(parts: string[]) {
+  return JSON.stringify(parts);
 }
 ```
 
 For `precreatedClient`, normalize `services` from `entrypoint.factory.moduleSpecifier` and append `services.moduleSpecifierBase` to the precreated key.
 
-- [ ] **Step 5: Replace generated-info keys with normalized entrypoint keys**
+- [ ] **Step 5: Keep generated-info keys type-safe during the transition**
 
 Update `packages/tree-shaking-plugin/src/lib/transform/generated-info-key.ts`:
 
 ```ts
+type LegacyGeneratedInfoFactoryKeyParts = {
+  context?: string | null;
+  contextModule?: string | null;
+};
+
 export function getGeneratedInfoKey(
   createImportPath: string,
-  entrypointKey: string
+  entrypointKey: string | LegacyGeneratedInfoFactoryKeyParts
 ) {
-  return `${createImportPath}::${entrypointKey}`;
+  if (typeof entrypointKey === 'string') {
+    return `${createImportPath}::${entrypointKey}`;
+  }
+
+  return `${createImportPath}::${entrypointKey.context ?? ''}::${entrypointKey.contextModule ?? ''}`;
 }
 ```
 
-This intentionally stops accepting legacy-factory-shaped objects.
+Task 4 removes the legacy object branch once all call sites pass normalized entrypoint keys. This keeps Task 1 independently typecheckable while still making normalized keys available.
 
 - [ ] **Step 6: Run normalization tests**
 
@@ -619,6 +653,7 @@ git commit -m "refactor: simplify generated tree-shaking metadata"
 **Files:**
 - Modify: `packages/tree-shaking-plugin/src/lib/transform/types.ts`
 - Modify: `packages/tree-shaking-plugin/src/lib/transform/state.ts`
+- Modify: `packages/tree-shaking-plugin/src/lib/transform/generated-info-key.ts`
 
 - [ ] **Step 1: Replace legacy factory types in transform types**
 
@@ -718,6 +753,17 @@ getGeneratedInfoKey(createImportPath, entrypoint.key)
 ```
 
 For precreated clients, use the normalized precreated entrypoint key. For generated factories, use the normalized generated factory entrypoint key.
+
+After those call sites are migrated, narrow `getGeneratedInfoKey` to accept only a normalized entrypoint key:
+
+```ts
+export function getGeneratedInfoKey(
+  createImportPath: string,
+  entrypointKey: string
+) {
+  return `${createImportPath}::${entrypointKey}`;
+}
+```
 
 - [ ] **Step 5: Rewrite metadata seeding without legacy factories**
 
