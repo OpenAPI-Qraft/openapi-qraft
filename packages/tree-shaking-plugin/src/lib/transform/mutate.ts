@@ -381,7 +381,7 @@ function insertImports(
         ? generatedInfoByImport.get(
             getGeneratedInfoKey(
               usage.client.createImportPath,
-              usage.client.factory
+              usage.client.entrypointKey
             )
           )
         : null;
@@ -951,7 +951,7 @@ function matchInlineClientCall(
   createImports: Map<string, CreateImportEntry>
 ): {
   createImportPath: string;
-  factory: ClientBinding['factory'];
+  entrypointKey: ClientBinding['entrypointKey'];
   optionsExpression: t.Expression | null;
   serviceName: string;
   operationName: string;
@@ -983,7 +983,7 @@ function matchInlineClientCall(
     if (callbackNeedsOptions(callbackName)) return null;
     return {
       createImportPath: createImport.factoryFile,
-      factory: createImport.factory,
+      entrypointKey: createImport.entrypointKey,
       optionsExpression: null,
       serviceName,
       operationName,
@@ -996,7 +996,7 @@ function matchInlineClientCall(
 
   return {
     createImportPath: createImport.factoryFile,
-    factory: createImport.factory,
+    entrypointKey: createImport.entrypointKey,
     optionsExpression: t.cloneNode(root.arguments[0], true),
     serviceName,
     operationName,

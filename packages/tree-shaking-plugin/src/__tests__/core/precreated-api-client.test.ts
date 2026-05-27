@@ -371,7 +371,7 @@ APIClient.pets.getPets.useQuery();
       `);
   });
 
-  it('optimizes a precreated client imported through a barrel entrypoint', async () => {
+  it('optimizes a precreated client imported through a barrel entrypoint when services.moduleSpecifierBase is configured', async () => {
     const root = await fs.mkdtemp(
       path.join(os.tmpdir(), 'qraft-tree-shaking-')
     );
@@ -430,6 +430,9 @@ BarrelClient.pets.getPets.useQuery();
             optionsFactory: {
               exportName: 'createOptions',
               moduleSpecifier: './barrel',
+            },
+            services: {
+              moduleSpecifierBase: '.',
             },
           },
         ],
@@ -552,7 +555,7 @@ APIClient.pets.getPets.useQuery();
     expect(result).toBeNull();
   });
 
-  it('skips a precreated client whose generated factory has no static services import', async () => {
+  it('rewrites a precreated client whose generated factory has no static services import when services.moduleSpecifierBase is configured', async () => {
     const root = await fs.mkdtemp(
       path.join(os.tmpdir(), 'qraft-tree-shaking-')
     );
@@ -613,12 +616,24 @@ APIClient.pets.getPets.useQuery();
               exportName: 'createAPIClientOptions',
               moduleSpecifier: './client-options',
             },
+            services: {
+              moduleSpecifierBase: './api',
+            },
           },
         ],
       }
     );
 
-    expect(result).toBeNull();
+    expect(result?.code).toMatchInlineSnapshot(`
+      "import { qraftAPIClient } from "@openapi-qraft/react";
+      import { useQuery } from "@openapi-qraft/react/callbacks/useQuery";
+      import { getPets } from "./api/services/PetsService";
+      import { createAPIClientOptions } from "./client-options";
+      const APIClient_pets_getPets = qraftAPIClient(getPets, {
+        useQuery
+      }, createAPIClientOptions());
+      APIClient_pets_getPets.useQuery();"
+    `);
   });
 
   it('skips a precreated client when the imported factory module does not match the configured one', async () => {

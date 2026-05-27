@@ -134,10 +134,13 @@ export type OperationImportInfo = {
   localName: string;
 };
 
-type EntrypointKeyCompatibility = Record<'factory', ClientEntrypoint['key']>;
+type EntrypointKeyCompatibility = Record<
+  'entrypointKey',
+  ClientEntrypoint['key']
+>;
 
 type GeneratedFactoryEntrypointKeyCompatibility = Record<
-  'factory',
+  'entrypointKey',
   GeneratedFactoryEntrypoint['key']
 >;
 
