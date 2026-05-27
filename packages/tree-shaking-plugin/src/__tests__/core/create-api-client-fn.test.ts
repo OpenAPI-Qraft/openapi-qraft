@@ -1053,6 +1053,10 @@ api.stores.getStores.useQuery();
     const fixture = await createFixture();
     const sourceFile = path.join(fixture, 'src/App.tsx');
 
+    // Synthetic transform-shape coverage: `api.pets.getPets.invalidateQueries()`
+    // would not be a valid generated-client call for a context-based client.
+    // This test only verifies that named and inline clients for the same
+    // operation do not collide when rewritten in the same scope.
     const result = await transformQraftTreeShaking(
       `
 import { createAPIClient, APIClientContext } from './api';
