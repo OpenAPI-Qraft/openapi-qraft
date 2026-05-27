@@ -97,7 +97,7 @@ export function App() {
       import { qraftReactAPIClient } from "@openapi-qraft/react";
       import { useQuery } from "@openapi-qraft/react/callbacks/useQuery";
       import { getPets } from "./context-api/services/PetsService";
-      import { ContextAPIClientContext } from "./context-api/ContextAPIClientContext";
+      import { ContextAPIClientContext } from "./context-api";
       import { invalidateQueries } from "@openapi-qraft/react/callbacks/invalidateQueries";
       import { getPets as _getPets } from "./precreated-api/services/PetsService";
       import { createAPIClientOptions } from "./precreated-client-options";
@@ -685,7 +685,7 @@ export function App() {
       import { qraftReactAPIClient } from "@openapi-qraft/react";
       import { useQuery } from "@openapi-qraft/react/callbacks/useQuery";
       import { getPets } from "./context-api/services/PetsService";
-      import { ContextAPIClientContext } from "./context-api/ContextAPIClientContext";
+      import { ContextAPIClientContext } from "./context-api";
       import { findPetsByStatus } from "./context-api/services/PetsService";
       import { getStores } from "./precreated-api/services/StoresService";
       import { createAPIClientOptions } from "./precreated-client-options";

@@ -90,7 +90,61 @@ export function App() {
       "import { qraftReactAPIClient } from "@openapi-qraft/react";
       import { useQuery } from "@openapi-qraft/react/callbacks/useQuery";
       import { getPets } from "./api/services/PetsService";
-      import { APIClientContext } from "./api/APIClientContext";
+      import { APIClientContext } from "./api";
+      const api_pets_getPets = qraftReactAPIClient(getPets, {
+        useQuery
+      }, APIClientContext);
+      export function App() {
+        return api_pets_getPets.useQuery();
+      }"
+      `);
+  });
+
+  it('uses explicit public service and context module specifiers for a generated factory', async () => {
+    const fixture = await createFixture();
+    const sourceFile = path.join(fixture, 'src/App.tsx');
+    const apiIndex = path.join(fixture, 'src/api/index.ts');
+
+    const result = await transformQraftTreeShaking(
+      `
+import { createAPIClient } from '@api/internal/my-api';
+
+const api = createAPIClient();
+
+export function App() {
+  return api.pets.getPets.useQuery();
+}
+`,
+      sourceFile,
+      {
+        entrypoints: [
+          {
+            kind: 'clientFactory',
+            factory: {
+              exportName: 'createAPIClient',
+              moduleSpecifier: '@api/internal/my-api',
+            },
+            services: {
+              moduleSpecifierBase: '@api/my-api',
+            },
+            reactContext: {
+              exportName: 'APIClientContext',
+              moduleSpecifier: '@api/my-api',
+            },
+          },
+        ],
+        async resolve(specifier) {
+          if (specifier === '@api/internal/my-api') return apiIndex;
+          return null;
+        },
+      }
+    );
+
+    expect(result?.code).toMatchInlineSnapshot(`
+      "import { qraftReactAPIClient } from "@openapi-qraft/react";
+      import { useQuery } from "@openapi-qraft/react/callbacks/useQuery";
+      import { getPets } from "@api/my-api/services/PetsService";
+      import { APIClientContext } from "@api/my-api";
       const api_pets_getPets = qraftReactAPIClient(getPets, {
         useQuery
       }, APIClientContext);
@@ -198,7 +252,7 @@ api.pets.getPets.getQueryKey();
     `);
   });
 
-  it('skips generic generated factories that receive services as an argument', async () => {
+  it('rewrites generated factories that receive services as an argument when services.moduleSpecifierBase is configured', async () => {
     const fixture = await fs.mkdtemp(
       path.join(os.tmpdir(), 'qraft-tree-shaking-')
     );
@@ -242,15 +296,29 @@ export function App() {
               exportName: 'createAPIClient',
               moduleSpecifier: './api/createAPIClient',
             },
+            services: {
+              moduleSpecifierBase: './api',
+            },
           },
         ],
       }
     );
 
-    expect(result).toBeNull();
+    expect(result?.code).toMatchInlineSnapshot(`
+      "import { services } from './api/services/index';
+      import { qraftAPIClient } from "@openapi-qraft/react";
+      import { getQueryKey } from "@openapi-qraft/react/callbacks/getQueryKey";
+      import { getPets } from "./api/services/PetsService";
+      const api_pets_getPets = qraftAPIClient(getPets, {
+        getQueryKey
+      }, services);
+      export function App() {
+        return api_pets_getPets.getQueryKey();
+      }"
+    `);
   });
 
-  it('skips generated factories that receive an operation argument without services imports', async () => {
+  it('rewrites generated factories that receive an operation argument when services.moduleSpecifierBase is configured', async () => {
     const fixture = await fs.mkdtemp(
       path.join(os.tmpdir(), 'qraft-tree-shaking-')
     );
@@ -290,12 +358,26 @@ export function App() {
               exportName: 'createAPIClient',
               moduleSpecifier: './api/createAPIClient',
             },
+            services: {
+              moduleSpecifierBase: './api',
+            },
           },
         ],
       }
     );
 
-    expect(result).toBeNull();
+    expect(result?.code).toMatchInlineSnapshot(`
+      "import { getPets } from './api/services/PetsService';
+      import { qraftAPIClient } from "@openapi-qraft/react";
+      import { getQueryKey } from "@openapi-qraft/react/callbacks/getQueryKey";
+      import { getPets as _getPets } from "./api/services/PetsService";
+      const api_pets_getPets = qraftAPIClient(_getPets, {
+        getQueryKey
+      }, getPets);
+      export function App() {
+        return api_pets_getPets.getQueryKey();
+      }"
+    `);
   });
 
   it('aliases an imported operation when a local binding uses the same name', async () => {
@@ -338,7 +420,7 @@ export function App() {
       "import { qraftReactAPIClient } from "@openapi-qraft/react";
       import { useQuery } from "@openapi-qraft/react/callbacks/useQuery";
       import { getPets as _getPets2 } from "./api/services/PetsService";
-      import { APIClientContext } from "./api/APIClientContext";
+      import { APIClientContext } from "./api";
       const _api_pets_getPets2 = qraftReactAPIClient(_getPets2, {
         useQuery
       }, APIClientContext);
@@ -393,7 +475,7 @@ export function App() {
       "import { qraftReactAPIClient } from "@openapi-qraft/react";
       import { useQuery } from "@openapi-qraft/react/callbacks/useQuery";
       import { getPets } from "./api/services/PetsService";
-      import { APIClientContext } from "./api/APIClientContext";
+      import { APIClientContext } from "./api";
       const api_pets_getPets = qraftReactAPIClient(getPets, {
         useQuery
       }, APIClientContext);
@@ -445,7 +527,7 @@ export function App() {
       "import { qraftReactAPIClient } from "@openapi-qraft/react";
       import { useQuery } from "@openapi-qraft/react/callbacks/useQuery";
       import { getPets } from "./api/services/PetsService";
-      import { MyAPIContext } from "./api/MyAPIContext";
+      import { MyAPIContext } from "./api";
       const api_pets_getPets = qraftReactAPIClient(getPets, {
         useQuery
       }, MyAPIContext);
@@ -506,7 +588,7 @@ export function App() {
       "import { qraftReactAPIClient } from "@openapi-qraft/react";
       import { useQuery } from "@openapi-qraft/react/callbacks/useQuery";
       import { getPets } from "./api/services/PetsService";
-      import { InternalContext } from "./api/APIClientContext";
+      import { InternalContext } from "./api";
       const api_pets_getPets = qraftReactAPIClient(getPets, {
         useQuery
       }, InternalContext);
@@ -981,7 +1063,7 @@ export function App() {
       import { findPetsByStatus } from "./api/services/PetsService";
       import { useQuery } from "@openapi-qraft/react/callbacks/useQuery";
       import { getPets } from "./api/services/PetsService";
-      import { APIClientContext } from "./api/APIClientContext";
+      import { APIClientContext } from "./api";
       const api_pets_findPetsByStatus = qraftAPIClient(findPetsByStatus, {
         getQueryKey
       });
@@ -1030,7 +1112,7 @@ api.stores.getStores.useQuery();
       "import { qraftReactAPIClient } from "@openapi-qraft/react";
       import { useQuery } from "@openapi-qraft/react/callbacks/useQuery";
       import { getPets } from "./api/services/PetsService";
-      import { APIClientContext } from "./api/APIClientContext";
+      import { APIClientContext } from "./api";
       import { useMutation } from "@openapi-qraft/react/callbacks/useMutation";
       import { createPet } from "./api/services/PetsService";
       import { getStores } from "./api/services/StoresService";
@@ -1190,8 +1272,8 @@ export function App() {
     expect(result?.code).toMatchInlineSnapshot(`
       "import { qraftReactAPIClient } from "@openapi-qraft/react";
       import { useQuery } from "@openapi-qraft/react/callbacks/useQuery";
-      import { getPets } from "./api/services/PetsService";
-      import { APIClientContext } from "./api/APIClientContext";
+      import { getPets } from "@api/my-api/services/PetsService";
+      import { APIClientContext } from "@api/my-api";
       const api_pets_getPets = qraftReactAPIClient(getPets, {
         useQuery
       }, APIClientContext);
@@ -1248,7 +1330,7 @@ export function App() {
       "import { qraftReactAPIClient } from "@openapi-qraft/react";
       import { useQuery } from "@openapi-qraft/react/callbacks/useQuery";
       import { getPets } from "./api/services/PetsService";
-      import { APIClientContext } from "./api/APIClientContext";
+      import { APIClientContext } from "./api";
       const api_pets_getPets = qraftReactAPIClient(getPets, {
         useQuery
       }, APIClientContext);
@@ -1298,7 +1380,7 @@ export function App() {
       "import { qraftReactAPIClient } from "@openapi-qraft/react";
       import { useSuspenseQuery } from "@openapi-qraft/react/callbacks/useSuspenseQuery";
       import { getPets } from "./api/services/PetsService";
-      import { APIClientContext } from "./api/APIClientContext";
+      import { APIClientContext } from "./api";
       import { useInfiniteQuery } from "@openapi-qraft/react/callbacks/useInfiniteQuery";
       import { findPetsByStatus } from "./api/services/PetsService";
       const reactApi_pets_getPets = qraftReactAPIClient(getPets, {

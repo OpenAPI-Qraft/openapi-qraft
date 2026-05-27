@@ -102,7 +102,7 @@ export function App() {
       `);
   });
 
-  it('skips schema access for generic factories that do not import services', async () => {
+  it('rewrites schema access for generic factories when services.moduleSpecifierBase is configured', async () => {
     const root = await fs.mkdtemp(
       path.join(os.tmpdir(), 'qraft-tree-shaking-')
     );
@@ -136,12 +136,19 @@ api.pets.getPets.schema;
               exportName: 'createAPIClient',
               moduleSpecifier: './api/createAPIClient',
             },
+            services: {
+              moduleSpecifierBase: './api',
+            },
           },
         ],
       }
     );
 
-    expect(result).toBeNull();
+    expect(result?.code).toMatchInlineSnapshot(`
+      "import { getPets } from './api/services/PetsService';
+      import { getPets as _getPets } from "./api/services/PetsService";
+      _getPets.schema;"
+    `);
   });
 
   it('aliases same-named schema operation imports from different generated roots', async () => {
