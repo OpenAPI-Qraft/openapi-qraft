@@ -134,12 +134,18 @@ export type OperationImportInfo = {
   localName: string;
 };
 
-export type ClientBinding = {
+type EntrypointKeyCompatibility = Record<'factory', ClientEntrypoint['key']>;
+
+type GeneratedFactoryEntrypointKeyCompatibility = Record<
+  'factory',
+  GeneratedFactoryEntrypoint['key']
+>;
+
+export type ClientBinding = EntrypointKeyCompatibility & {
   name: string;
   clientSourceKey: string;
   createImportPath: string;
   createImportLoadId: string;
-  factory: ClientEntrypoint['key'];
   entrypoint: ClientEntrypoint;
   bindingNode: t.Node;
   declarationScope: Scope;
@@ -188,15 +194,13 @@ export type SchemaUsage = {
 export type GeneratedInfoRequest = {
   createImportPath: string;
   createImportLoadId: string;
-  factory: ClientEntrypoint['key'];
   entrypoint: ClientEntrypoint;
 };
 
-export type CreateImportEntry = {
+export type CreateImportEntry = GeneratedFactoryEntrypointKeyCompatibility & {
   sourceSpecifier: string;
   factoryFile: string;
   factoryLoadId: string;
-  factory: GeneratedFactoryEntrypoint['key'];
   entrypoint: GeneratedFactoryEntrypoint;
 };
 

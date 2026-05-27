@@ -45,7 +45,6 @@ import {
   composeServiceOperationImportPath,
   normalizeResolvedId,
   resolvePrecreatedOptionsImportPath,
-  resolveRelativeImportPath,
 } from './path-rendering.js';
 
 const traverse =
@@ -215,7 +214,7 @@ export async function createTransformState(
     generatedInfoByImport,
     generatedMetadata.metadataByEntrypointKey,
     id,
-    generatedFactoryEntrypoints,
+    entrypoints,
     factoryResolvedIds
   );
 
@@ -276,7 +275,7 @@ export async function createTransformState(
           sourceSpecifier: source,
           factoryFile: createImportPath,
           factoryLoadId: resolvedAbs,
-          factory: matched.key,
+          ['factory']: matched.key,
           entrypoint: matched,
         });
         generatedInfoByImport.set(
@@ -411,12 +410,12 @@ export async function createTransformState(
           name: variablePath.node.id.name,
           clientSourceKey: getClientSourceKey(
             createImportPath,
-            createImport.factory,
+            createImport.entrypoint.key,
             mode
           ),
           createImportPath,
           createImportLoadId: createImport.factoryLoadId,
-          factory: createImport.factory,
+          ['factory']: createImport.entrypoint.key,
           entrypoint: createImport.entrypoint,
           bindingNode: variablePath.node.id,
           declarationScope: variablePath.parentPath.scope,
@@ -440,12 +439,12 @@ export async function createTransformState(
           name: variablePath.node.id.name,
           clientSourceKey: getClientSourceKey(
             createImportPath,
-            createImport.factory,
+            createImport.entrypoint.key,
             mode
           ),
           createImportPath,
           createImportLoadId: createImport.factoryLoadId,
-          factory: createImport.factory,
+          ['factory']: createImport.entrypoint.key,
           entrypoint: createImport.entrypoint,
           bindingNode: variablePath.node.id,
           declarationScope: variablePath.parentPath.scope,
@@ -465,12 +464,14 @@ export async function createTransformState(
   const localClientNamesByOperation = new Map<string, string>();
 
   for (const client of clients) {
-    const key = getGeneratedInfoKey(client.createImportPath, client.factory);
+    const key = getGeneratedInfoKey(
+      client.createImportPath,
+      client.entrypoint.key
+    );
     if (!generatedInfoRequests.has(key)) {
       generatedInfoRequests.set(key, {
         createImportPath: client.createImportPath,
         createImportLoadId: client.createImportLoadId,
-        factory: client.factory,
         entrypoint: client.entrypoint,
       });
     }
@@ -485,13 +486,12 @@ export async function createTransformState(
       if (inlineMatch) {
         const key = getGeneratedInfoKey(
           inlineMatch.createImportPath,
-          inlineMatch.factory
+          inlineMatch.entrypoint.key
         );
         if (!generatedInfoRequests.has(key)) {
           generatedInfoRequests.set(key, {
             createImportPath: inlineMatch.createImportPath,
             createImportLoadId: inlineMatch.createImportLoadId,
-            factory: inlineMatch.factory,
             entrypoint: inlineMatch.entrypoint,
           });
         }
@@ -504,7 +504,10 @@ export async function createTransformState(
       if (!match) return;
 
       const generatedInfo = generatedInfoByImport.get(
-        getGeneratedInfoKey(match.client.createImportPath, match.client.factory)
+        getGeneratedInfoKey(
+          match.client.createImportPath,
+          match.client.entrypoint.key
+        )
       );
       if (!generatedInfo)
         return skipOrdinaryTransformCandidate(
@@ -626,7 +629,7 @@ export async function createTransformState(
       if (!match) return;
 
       const generatedInfo = generatedInfoByImport.get(
-        getGeneratedInfoKey(match.createImportPath, match.factory)
+        getGeneratedInfoKey(match.createImportPath, match.entrypoint.key)
       );
       if (!generatedInfo)
         return skipOrdinaryTransformCandidate(
@@ -683,12 +686,14 @@ export async function createTransformState(
     const match = matchSchemaAccess(memberPath, createImports, clients);
     if (!match || match.kind !== 'inline') return;
 
-    const key = getGeneratedInfoKey(match.createImportPath, match.factory);
+    const key = getGeneratedInfoKey(
+      match.createImportPath,
+      match.entrypoint.key
+    );
     if (!generatedInfoRequests.has(key)) {
       generatedInfoRequests.set(key, {
         createImportPath: match.createImportPath,
         createImportLoadId: match.createImportLoadId,
-        factory: match.factory,
         entrypoint: match.entrypoint,
       });
     }
@@ -708,11 +713,11 @@ export async function createTransformState(
         ? generatedInfoByImport.get(
             getGeneratedInfoKey(
               match.client.createImportPath,
-              match.client.factory
+              match.client.entrypoint.key
             )
           )
         : generatedInfoByImport.get(
-            getGeneratedInfoKey(match.createImportPath, match.factory)
+            getGeneratedInfoKey(match.createImportPath, match.entrypoint.key)
           );
     if (!generatedInfo)
       return skipOrdinaryTransformCandidate(
@@ -1113,7 +1118,10 @@ async function findPrecreatedClients(
   );
 
   const clients: ClientBinding[] = [];
-  const validated = new Map<PrecreatedClientEntrypoint, boolean | null>();
+  const validated = new Map<
+    PrecreatedClientEntrypoint,
+    PrecreatedClientEntrypoint | null
+  >();
 
   for (const node of ast.program.body) {
     if (!t.isImportDeclaration(node)) continue;
@@ -1154,8 +1162,8 @@ async function findPrecreatedClients(
 
       let validatedConfig = validated.get(match.config) ?? null;
       if (!validated.has(match.config)) {
-        if (match.metadata) {
-          validatedConfig = true;
+        if (match.metadata?.entrypoint.kind === 'precreatedClient') {
+          validatedConfig = match.metadata.entrypoint;
         } else if (match.factoryResolvedId) {
           validatedConfig = await validatePrecreatedClientConfig(
             match.config,
@@ -1192,8 +1200,8 @@ async function findPrecreatedClients(
         ),
         createImportPath: factoryFile,
         createImportLoadId: factoryLoadId ?? factoryFile,
-        factory: match.config.key,
-        entrypoint: match.config,
+        ['factory']: validatedConfig.key,
+        entrypoint: validatedConfig,
         bindingNode: specifier.local,
         declarationScope: programScope,
         runtimeInput,
@@ -1217,7 +1225,7 @@ async function validatePrecreatedClientConfig(
   clientLoadId: string,
   factoryResolvedId: string,
   moduleAccess: QraftModuleAccess
-): Promise<boolean | null> {
+): Promise<PrecreatedClientEntrypoint | null> {
   const skip = (_reason: string) => null;
 
   const resolvedExport = await readExportedDeclarationChain(
@@ -1246,7 +1254,7 @@ async function validatePrecreatedClientConfig(
     return skip('precreated client factory did not match configuration');
   }
 
-  return true;
+  return config;
 }
 
 async function readExportedDeclarationChain(
@@ -1483,7 +1491,6 @@ function matchSchemaAccess(
       kind: 'inline';
       createImportPath: string;
       createImportLoadId: string;
-      factory: GeneratedFactoryEntrypoint['key'];
       entrypoint: GeneratedFactoryEntrypoint;
       serviceName: string;
       operationName: string;
@@ -1526,7 +1533,6 @@ function matchSchemaAccess(
     kind: 'inline',
     createImportPath: createImport.factoryFile,
     createImportLoadId: createImport.factoryLoadId,
-    factory: createImport.factory,
     entrypoint: createImport.entrypoint,
     serviceName,
     operationName,
@@ -1539,7 +1545,6 @@ function matchInlineClientCall(
 ): {
   createImportPath: string;
   createImportLoadId: string;
-  factory: GeneratedFactoryEntrypoint['key'];
   entrypoint: GeneratedFactoryEntrypoint;
   optionsExpression: t.Expression | null;
   serviceName: string;
@@ -1574,7 +1579,6 @@ function matchInlineClientCall(
     return {
       createImportPath: createImport.factoryFile,
       createImportLoadId: createImport.factoryLoadId,
-      factory: createImport.factory,
       entrypoint: createImport.entrypoint,
       optionsExpression: null,
       serviceName,
@@ -1589,7 +1593,6 @@ function matchInlineClientCall(
   return {
     createImportPath: createImport.factoryFile,
     createImportLoadId: createImport.factoryLoadId,
-    factory: createImport.factory,
     entrypoint: createImport.entrypoint,
     optionsExpression: t.cloneNode(root.arguments[0], true),
     serviceName,
@@ -1693,19 +1696,21 @@ function seedGeneratedInfoByImport(
   generatedInfoByImport: Map<string, GeneratedClientInfo | null>,
   metadataByEntrypointKey: Map<string, GeneratedClientMetadata | null>,
   importerId: string,
-  factoryEntrypoints: GeneratedFactoryEntrypoint[],
+  entrypoints: ClientEntrypoint[],
   factoryResolvedIds: Map<GeneratedFactoryEntrypoint, string | null>
 ) {
-  for (const entrypoint of factoryEntrypoints) {
+  for (const entrypoint of entrypoints) {
     const metadata = metadataByEntrypointKey.get(entrypoint.key) ?? null;
     const generatedInfo = metadata
       ? toGeneratedClientInfo(metadata, entrypoint, importerId)
       : null;
     const sourceIds = new Set<string>();
 
-    const configuredResolvedId = factoryResolvedIds.get(entrypoint) ?? null;
-    if (configuredResolvedId) {
-      sourceIds.add(configuredResolvedId);
+    if (entrypoint.kind === 'generatedFactory') {
+      const configuredResolvedId = factoryResolvedIds.get(entrypoint) ?? null;
+      if (configuredResolvedId) {
+        sourceIds.add(configuredResolvedId);
+      }
     }
     if (metadata) {
       sourceIds.add(metadata.factoryFile);
@@ -1731,11 +1736,7 @@ function toGeneratedClientInfo(
     servicesModuleSpecifierBase: metadata.entrypoint.services.moduleSpecifierBase,
     servicesDir: metadata.servicesDir,
     serviceImportPaths: metadata.serviceImportPaths,
-    contextImportPath: resolveMetadataContextImportPath(
-      metadata,
-      entrypoint,
-      importerId
-    ),
+    contextImportPath: resolveMetadataContextImportPath(metadata, entrypoint),
     contextName:
       entrypoint.kind === 'generatedFactory'
         ? entrypoint.reactContext?.exportName ?? null
@@ -1745,29 +1746,11 @@ function toGeneratedClientInfo(
 
 function resolveMetadataContextImportPath(
   metadata: GeneratedClientMetadata,
-  entrypoint: ClientEntrypoint,
-  importerId: string
+  entrypoint: ClientEntrypoint
 ) {
   if (entrypoint.kind !== 'generatedFactory') return null;
-  if (!entrypoint.reactContext) return null;
-  if (!metadata.reactContext?.moduleSpecifier) return null;
-
-  if (
-    entrypoint.reactContext.moduleSpecifier !==
-    metadata.entrypoint.factory.moduleSpecifier
-  ) {
-    return resolveRelativeImportPath(
-      importerId,
-      importerId,
-      entrypoint.reactContext.moduleSpecifier
-    );
-  }
-
-  return resolveRelativeImportPath(
-    importerId,
-    metadata.factoryFile,
-    metadata.reactContext.moduleSpecifier
-  );
+  if (metadata.entrypoint.kind !== 'generatedFactory') return null;
+  return metadata.entrypoint.reactContext?.moduleSpecifier ?? null;
 }
 
 function serviceNameToFileBase(serviceName: string) {
@@ -1873,10 +1856,10 @@ function createProgramUniqueName(
 
 function getClientSourceKey(
   createImportPath: string,
-  factory: string,
+  entrypointKey: string,
   mode: ClientBinding['mode']
 ) {
-  const generatedInfoKey = getGeneratedInfoKey(createImportPath, factory);
+  const generatedInfoKey = getGeneratedInfoKey(createImportPath, entrypointKey);
 
   if (mode.type === 'precreated') {
     return [
