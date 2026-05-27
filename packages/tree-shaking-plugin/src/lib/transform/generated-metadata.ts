@@ -30,6 +30,7 @@ const traverse =
   );
 
 const CONVENTIONAL_GENERATED_SERVICES_DIR = './services';
+const QRAFT_REACT_RUNTIME_MODULE = '@openapi-qraft/react';
 
 type InspectGeneratedEntrypointsInput = {
   importerId: string;
@@ -269,12 +270,6 @@ async function inspectFactoryFile({
   const serviceImportPaths = factoryImports.servicesDir
     ? await readServiceImportPaths(factoryFile, servicesDir, moduleAccess)
     : {};
-  if (
-    entrypoint.kind === 'generatedFactory' &&
-    factoryImports.usesDiscoveredContextImport
-  ) {
-    delete entrypoint.reactContext?.moduleSpecifier;
-  }
 
   return {
     metadata: {
@@ -296,7 +291,6 @@ function readGeneratedFactoryImports(
 ) {
   let servicesDir: string | null = null;
   let hasQraftClientCall = false;
-  let usesDiscoveredContextImport = false;
   let inferredContext: ReactContextConfig | null = configuredContext
     ? {
         exportName: configuredContext.exportName,
@@ -344,8 +338,9 @@ function readGeneratedFactoryImports(
           }
 
           if (
-            specifier.imported.name === 'qraftAPIClient' ||
-            specifier.imported.name === 'qraftReactAPIClient'
+            sourcePath === QRAFT_REACT_RUNTIME_MODULE &&
+            (specifier.imported.name === 'qraftAPIClient' ||
+              specifier.imported.name === 'qraftReactAPIClient')
           ) {
             qraftClientLocalNames.add(specifier.local.name);
           }
@@ -381,7 +376,6 @@ function readGeneratedFactoryImports(
     servicesDir,
     reactContext: inferredContext,
     hasQraftClientCall,
-    usesDiscoveredContextImport,
   };
 
   function resolveConfiguredContextModuleSpecifier(
@@ -392,7 +386,6 @@ function readGeneratedFactoryImports(
       configuredContext.moduleSpecifier === factoryModuleSpecifier &&
       importedModuleSpecifier !== configuredContext.moduleSpecifier
     ) {
-      usesDiscoveredContextImport = true;
       return importedModuleSpecifier;
     }
 

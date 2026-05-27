@@ -1956,7 +1956,10 @@ function resolveMetadataContextImportPath(
   if (!factory.context) return null;
   if (!metadata.reactContext?.moduleSpecifier) return null;
 
-  if (factory.contextModule) {
+  if (
+    factory.contextModule &&
+    factory.contextModule !== metadata.entrypoint.factory.moduleSpecifier
+  ) {
     return resolveRelativeImportPath(
       importerId,
       importerId,
