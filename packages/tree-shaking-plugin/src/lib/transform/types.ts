@@ -122,7 +122,6 @@ export type GeneratedClientMetadata = {
   entrypoint: ClientEntrypoint;
   factoryFile: string;
   factoryLoadId: string;
-  reactContext: ReactContextConfig | null;
   optionsFactory?: ImportTarget;
 };
 
