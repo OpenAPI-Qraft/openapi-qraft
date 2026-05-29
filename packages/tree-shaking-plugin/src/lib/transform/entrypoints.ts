@@ -2,7 +2,10 @@ import type {
   ClientEntrypoint,
   QraftPrecreatedClientEntrypointConfig,
   QraftTreeShakeOptions,
+  ServicesTarget,
 } from './types.js';
+
+export const CONVENTIONAL_GENERATED_SERVICES_DIR = './services';
 
 export function normalizeEntrypoints(
   options: Pick<QraftTreeShakeOptions, 'entrypoints'>
@@ -24,6 +27,7 @@ export function normalizeEntrypoints(
           entrypoint.factory.exportName,
           entrypoint.factory.moduleSpecifier,
           services.moduleSpecifierBase,
+          services.directory,
           reactContext?.moduleSpecifier ?? ''
         ),
         factory: entrypoint.factory,
@@ -55,6 +59,7 @@ function normalizePrecreatedEntrypoint(
       config.optionsFactory.exportName,
       config.optionsFactory.moduleSpecifier,
       services.moduleSpecifierBase,
+      services.directory,
     ]),
     client: config.client,
     factory: config.factory,
@@ -67,6 +72,7 @@ function composeGeneratedFactoryEntrypointKey(
   exportName: string,
   moduleSpecifier: string,
   servicesModuleSpecifierBase: string,
+  servicesDirectory: string,
   contextModuleSpecifier: string
 ) {
   return composeEntrypointKey([
@@ -74,17 +80,19 @@ function composeGeneratedFactoryEntrypointKey(
     exportName,
     moduleSpecifier,
     servicesModuleSpecifierBase,
+    servicesDirectory,
     contextModuleSpecifier,
   ]);
 }
 
 function normalizeServices(
   factoryModuleSpecifier: string,
-  services: { moduleSpecifierBase: string } | undefined
+  services: ServicesTarget | undefined
 ) {
   return {
     moduleSpecifierBase:
       services?.moduleSpecifierBase ?? factoryModuleSpecifier,
+    directory: services?.directory ?? CONVENTIONAL_GENERATED_SERVICES_DIR,
   };
 }
 

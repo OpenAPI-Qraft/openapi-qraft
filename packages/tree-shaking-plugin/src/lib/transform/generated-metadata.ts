@@ -29,7 +29,6 @@ const traverse =
     traverseModule
   );
 
-const CONVENTIONAL_GENERATED_SERVICES_DIR = './services';
 const QRAFT_REACT_RUNTIME_MODULE = '@openapi-qraft/react';
 
 type InspectGeneratedEntrypointsInput = {
@@ -265,11 +264,12 @@ async function inspectFactoryFile({
     return missingServicesImport(entrypoint.key);
   }
 
-  const servicesDir =
-    factoryImports.servicesDir ?? CONVENTIONAL_GENERATED_SERVICES_DIR;
-  const serviceImportPaths = factoryImports.servicesDir
-    ? await readServiceImportPaths(factoryFile, servicesDir, moduleAccess)
-    : {};
+  const servicesDir = entrypoint.services.directory;
+  const serviceImportPaths = await readServiceImportPaths(
+    factoryFile,
+    servicesDir,
+    moduleAccess
+  );
 
   return {
     metadata: {
@@ -289,7 +289,6 @@ function readGeneratedFactoryImports(
   configuredContext: ReactContextConfig | null,
   factoryModuleSpecifier: string
 ) {
-  let servicesDir: string | null = null;
   let hasQraftClientCall = false;
   let inferredContext: ReactContextConfig | null = configuredContext
     ? {
@@ -305,14 +304,6 @@ function readGeneratedFactoryImports(
       const sourcePath = importPath.node.source.value;
 
       for (const specifier of importPath.node.specifiers) {
-        if (
-          t.isImportSpecifier(specifier) &&
-          t.isIdentifier(specifier.imported) &&
-          specifier.imported.name === 'services'
-        ) {
-          servicesDir = sourcePath.replace(/\/index(?:\.[cm]?[jt]s)?$/, '');
-        }
-
         if (
           t.isImportSpecifier(specifier) &&
           t.isIdentifier(specifier.imported) &&
@@ -373,7 +364,6 @@ function readGeneratedFactoryImports(
   });
 
   return {
-    servicesDir,
     reactContext: inferredContext,
     hasQraftClientCall,
   };

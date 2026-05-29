@@ -191,6 +191,7 @@ qraftTreeShakeVite({
       },
       services: {
         moduleSpecifierBase: './api',
+        directory: './services',
       },
       optionsFactory: {
         exportName: 'createNodeAPIClientOptions',
@@ -253,7 +254,7 @@ entrypoints: [
 
 `factory` points at the generated client factory export. `reactContext` is optional; use it when zero-argument React clients should keep context-backed runtime semantics. Omit `reactContext` for explicit-options clients such as `createNodeAPIClient(options)`.
 
-`services.moduleSpecifierBase` is optional. When it is omitted, operation imports inherit `factory.moduleSpecifier` as the public generated API root. For example, a factory module of `@api/my-api` emits operation imports such as `@api/my-api/services/PetsService`. Set `services.moduleSpecifierBase` when the factory is imported from a file or barrel that is not also the public root for generated service modules.
+`services` is optional. When `services.moduleSpecifierBase` is omitted, operation imports inherit `factory.moduleSpecifier` as the public generated API root. When `services.directory` is omitted, the plugin assumes generated service modules live under `./services`. For example, a factory module of `@api/my-api` emits operation imports such as `@api/my-api/services/PetsService`. Set `services.moduleSpecifierBase` when the factory is imported from a file or barrel that is not also the public root for generated service modules, and set `services.directory` only when generated service modules live below a different directory.
 
 ### Module access
 
@@ -364,6 +365,7 @@ entrypoints: [
     },
     services: {
       moduleSpecifierBase: './api',
+      directory: './services',
     },
     optionsFactory: {
       exportName: 'createNodeAPIClientOptions',

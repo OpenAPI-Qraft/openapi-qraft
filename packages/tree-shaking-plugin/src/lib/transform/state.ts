@@ -264,6 +264,11 @@ export async function createTransformState(
       }
       if (!matched) continue;
 
+      factoryImportSignals.set(specifier.local.name, {
+        key: matched.key,
+        bindingNode: specifier.local,
+      });
+
       if (resolvedAbs) {
         const createImportPath = resolvedId ?? normalizeResolvedId(resolvedAbs);
         const generatedInfo = generatedInfoByEntrypoint(
@@ -282,10 +287,6 @@ export async function createTransformState(
           getGeneratedInfoKey(createImportPath, matched.key),
           generatedInfo
         );
-        factoryImportSignals.set(specifier.local.name, {
-          key: matched.key,
-          bindingNode: specifier.local,
-        });
       }
     }
 

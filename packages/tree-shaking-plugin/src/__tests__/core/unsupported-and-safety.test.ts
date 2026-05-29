@@ -40,7 +40,7 @@ api.pets.getPets.useQuery();
       import { qraftReactAPIClient } from "@openapi-qraft/react";
       import { useQuery } from "@openapi-qraft/react/callbacks/useQuery";
       import { getPets } from "./api/services/PetsService";
-      import { APIClientContext } from "./api/APIClientContext";
+      import { APIClientContext } from "./api";
       const api_pets_getPets = qraftReactAPIClient(getPets, {
         useQuery
       }, APIClientContext);

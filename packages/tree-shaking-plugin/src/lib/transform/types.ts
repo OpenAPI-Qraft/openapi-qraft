@@ -18,14 +18,20 @@ export type ReactContextTarget = {
   moduleSpecifier?: string;
 };
 
-export type ServicesImportBaseTarget = {
+export type ServicesTarget = {
+  moduleSpecifierBase?: string;
+  directory?: string;
+};
+
+export type ServicesConfig = {
   moduleSpecifierBase: string;
+  directory: string;
 };
 
 export type QraftClientFactoryEntrypointConfig = {
   kind: 'clientFactory';
   factory: ModuleExportTarget;
-  services?: ServicesImportBaseTarget;
+  services?: ServicesTarget;
   reactContext?: ReactContextTarget;
 };
 
@@ -34,7 +40,7 @@ export type QraftPrecreatedClientEntrypointConfig = {
   client: ModuleExportTarget;
   factory: ModuleExportTarget;
   optionsFactory: ModuleExportTarget;
-  services?: ServicesImportBaseTarget;
+  services?: ServicesTarget;
 };
 
 export type QraftEntrypointConfig =
@@ -63,7 +69,7 @@ export type GeneratedFactoryEntrypoint = {
   kind: 'generatedFactory';
   key: string;
   factory: ImportTarget;
-  services: ServicesImportBaseTarget;
+  services: ServicesConfig;
   reactContext: ReactContextConfig | null;
 };
 
@@ -73,7 +79,7 @@ export type PrecreatedClientEntrypoint = {
   client: ImportTarget;
   factory: ImportTarget;
   optionsFactory: ImportTarget;
-  services: ServicesImportBaseTarget;
+  services: ServicesConfig;
 };
 
 export type ClientEntrypoint =
