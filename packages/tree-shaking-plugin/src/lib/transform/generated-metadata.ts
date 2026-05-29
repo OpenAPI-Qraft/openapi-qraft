@@ -16,10 +16,7 @@ import {
   getQraftModuleAccessTraceSince,
   getQraftModuleAccessTraceSnapshot,
 } from '../resolvers/common.js';
-import {
-  findExportReexport,
-  findFactoryReexport,
-} from './ast-utils.js';
+import { findExportReexport, findFactoryReexport } from './ast-utils.js';
 import { normalizeResolvedId } from './path-rendering.js';
 
 const traverse =
@@ -117,7 +114,6 @@ async function inspectGeneratedFactoryEntrypoint(
   }
 
   return inspectFactoryFile({
-    importerId,
     entrypoint,
     factoryFile: normalizeResolvedId(resolved),
     factoryLoadId: resolved,
@@ -171,7 +167,6 @@ async function inspectPrecreatedClientEntrypoint(
   }
 
   return inspectFactoryFile({
-    importerId,
     entrypoint,
     factoryFile,
     factoryLoadId,
@@ -183,7 +178,6 @@ async function inspectPrecreatedClientEntrypoint(
 }
 
 async function inspectFactoryFile({
-  importerId,
   entrypoint,
   factoryFile,
   factoryLoadId,
@@ -193,7 +187,6 @@ async function inspectFactoryFile({
   optionsFactory,
   seenFactoryFiles = new Set<string>(),
 }: {
-  importerId: string;
   entrypoint: ClientEntrypoint;
   factoryFile: string;
   factoryLoadId: string;
@@ -234,7 +227,6 @@ async function inspectFactoryFile({
       }
 
       return inspectFactoryFile({
-        importerId,
         entrypoint,
         factoryFile: resolvedId,
         factoryLoadId: resolved,
