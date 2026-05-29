@@ -263,14 +263,11 @@ async function inspectFactoryFile({
     return missingServicesImport(entrypoint.key);
   }
 
-  const servicesDir = entrypoint.services.directory;
-
   return {
     metadata: {
       entrypoint,
       factoryFile,
       factoryLoadId,
-      servicesDir,
       reactContext: factoryImports.reactContext,
       ...(optionsFactory ? { optionsFactory } : {}),
     },

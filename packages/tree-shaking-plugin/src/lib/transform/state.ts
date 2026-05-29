@@ -1681,7 +1681,7 @@ function toGeneratedClientInfo(
     importerId,
     clientFile: metadata.factoryFile,
     servicesModuleSpecifierBase: metadata.entrypoint.services.moduleSpecifierBase,
-    servicesDir: metadata.servicesDir,
+    servicesDir: metadata.entrypoint.services.directory,
     contextImportPath: resolveMetadataContextImportPath(metadata, entrypoint),
     contextName:
       entrypoint.kind === 'generatedFactory'
