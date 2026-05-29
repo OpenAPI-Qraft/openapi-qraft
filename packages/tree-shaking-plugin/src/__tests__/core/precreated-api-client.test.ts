@@ -432,7 +432,7 @@ BarrelClient.pets.getPets.useQuery();
               moduleSpecifier: './barrel',
             },
             services: {
-              moduleSpecifierBase: '.',
+              moduleSpecifierBase: './api',
             },
           },
         ],

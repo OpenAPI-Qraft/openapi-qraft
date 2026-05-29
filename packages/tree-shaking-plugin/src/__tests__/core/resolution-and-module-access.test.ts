@@ -123,7 +123,14 @@ createAPIClient().pets.getPets.useQuery();
       name: 'QraftTreeShakeError',
       reason: expect.objectContaining({
         code: 'entrypoint-source-unavailable',
-        entrypointKey: 'generatedFactory:createAPIClient:./api',
+        entrypointKey: JSON.stringify([
+          'generatedFactory',
+          'createAPIClient',
+          './api',
+          './api',
+          './services',
+          '',
+        ]),
         moduleAccessTrace: expect.not.arrayContaining([
           expect.objectContaining({
             target: './unused-api',
@@ -179,7 +186,14 @@ createAPIClient().pets.getPets.useQuery();
       name: 'QraftTreeShakeError',
       reason: expect.objectContaining({
         code: 'entrypoint-source-unavailable',
-        entrypointKey: 'generatedFactory:createAPIClient:./api',
+        entrypointKey: JSON.stringify([
+          'generatedFactory',
+          'createAPIClient',
+          './api',
+          './api',
+          './services',
+          '',
+        ]),
         moduleAccessTrace: expect.arrayContaining([
           expect.objectContaining({
             kind: 'resolve',
@@ -241,7 +255,14 @@ createAPIClient().pets.getPets.useQuery();
       name: 'QraftTreeShakeError',
       reason: expect.objectContaining({
         code: 'entrypoint-source-unavailable',
-        entrypointKey: 'generatedFactory:createAPIClient:./api',
+        entrypointKey: JSON.stringify([
+          'generatedFactory',
+          'createAPIClient',
+          './api',
+          './api',
+          './services',
+          '',
+        ]),
         moduleAccessTrace: expect.arrayContaining([
           expect.objectContaining({
             kind: 'resolve',
@@ -624,7 +645,7 @@ export function App() {
       "import { qraftReactAPIClient } from "@openapi-qraft/react";
       import { useQuery } from "@openapi-qraft/react/callbacks/useQuery";
       import { getPets } from "./generated-api/services/PetsService";
-      import { APIClientContext } from "./generated-api/APIClientContext";
+      import { APIClientContext } from "./generated-api";
       const api_pets_getPets = qraftReactAPIClient(getPets, {
         useQuery
       }, APIClientContext);

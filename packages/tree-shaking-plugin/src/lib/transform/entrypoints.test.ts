@@ -26,6 +26,7 @@ describe('normalizeEntrypoints', () => {
           'createReactAPIClient',
           '@api/my-api',
           '@api/my-api',
+          './services',
           '@api/my-api',
         ]),
         factory: {
@@ -34,6 +35,7 @@ describe('normalizeEntrypoints', () => {
         },
         services: {
           moduleSpecifierBase: '@api/my-api',
+          directory: './services',
         },
         reactContext: {
           exportName: 'APIClientContext',
@@ -66,10 +68,45 @@ describe('normalizeEntrypoints', () => {
         'createReactAPIClient',
         '@api/my-api',
         '@api/my-public-root',
+        './services',
         '',
       ]),
       services: {
         moduleSpecifierBase: '@api/my-public-root',
+        directory: './services',
+      },
+    });
+  });
+
+  it('preserves explicit clientFactory services directory', () => {
+    const [entrypoint] = normalizeEntrypoints({
+      entrypoints: [
+        {
+          kind: 'clientFactory',
+          factory: {
+            exportName: 'createReactAPIClient',
+            moduleSpecifier: '@api/my-api',
+          },
+          services: {
+            directory: './generated-services',
+          },
+        },
+      ],
+    });
+
+    expect(entrypoint).toMatchObject({
+      kind: 'generatedFactory',
+      key: JSON.stringify([
+        'generatedFactory',
+        'createReactAPIClient',
+        '@api/my-api',
+        '@api/my-api',
+        './generated-services',
+        '',
+      ]),
+      services: {
+        moduleSpecifierBase: '@api/my-api',
+        directory: './generated-services',
       },
     });
   });
@@ -107,6 +144,7 @@ describe('normalizeEntrypoints', () => {
           'createNodeAPIClientOptions',
           './client-options',
           '@api/my-api',
+          './services',
         ]),
         client: {
           exportName: 'nodeAPIClient',
@@ -122,6 +160,7 @@ describe('normalizeEntrypoints', () => {
         },
         services: {
           moduleSpecifierBase: '@api/my-api',
+          directory: './services',
         },
       },
     ]);
@@ -138,6 +177,7 @@ describe('normalizeEntrypoints', () => {
           },
           services: {
             moduleSpecifierBase: 'npm:@scope/pkg:services',
+            directory: './client/services',
           },
           reactContext: {
             exportName: 'APIClientContext',
@@ -153,6 +193,7 @@ describe('normalizeEntrypoints', () => {
         'createAPIClient',
         'npm:@scope/pkg:client',
         'npm:@scope/pkg:services',
+        './client/services',
         'npm:@scope/pkg:context',
       ])
     );

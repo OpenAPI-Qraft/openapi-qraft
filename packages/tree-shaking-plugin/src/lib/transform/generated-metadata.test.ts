@@ -63,6 +63,99 @@ describe('inspectGeneratedEntrypoints', () => {
     });
   });
 
+  it('uses the conventional generated services directory instead of inferring it from factory imports', async () => {
+    const root = await createTempFixture();
+    await writeFixtureFiles(root, {
+      ...getContextFixtureFiles('APIClientContext', './APIClientContext', true),
+      'src/api/index.ts': `
+import { qraftReactAPIClient } from '@openapi-qraft/react';
+import { useQuery } from '@openapi-qraft/react/callbacks/index';
+import { APIClientContext } from './APIClientContext';
+import { services } from './private-runtime/client-services/index';
+
+const defaultCallbacks = { useQuery } as const;
+
+export function createAPIClient(callbacks = defaultCallbacks) {
+  return qraftReactAPIClient(services, callbacks, APIClientContext);
+}
+`,
+    });
+    const importerId = path.join(root, 'src/App.tsx');
+    const entrypoints = normalizeEntrypoints({
+      entrypoints: [
+        {
+          kind: 'clientFactory',
+          factory: { exportName: 'createAPIClient', moduleSpecifier: './api' },
+          reactContext: { exportName: 'APIClientContext' },
+        },
+      ],
+    });
+
+    const result = await inspectGeneratedEntrypoints({
+      importerId,
+      entrypoints,
+      moduleAccess: createFixtureModuleAccess(root),
+    });
+
+    const metadata = result.metadataByEntrypointKey.get(entrypoints[0].key);
+
+    expect(result.reasons).toEqual([]);
+    expect(metadata).toMatchObject({
+      servicesDir: './services',
+      serviceImportPaths: {
+        pets: './PetsService',
+        stores: './StoresService',
+      },
+    });
+  });
+
+  it('uses configured services directory for generated service metadata', async () => {
+    const root = await createTempFixture();
+    await writeFixtureFiles(root, {
+      ...getContextFixtureFiles('APIClientContext', './APIClientContext', true),
+      'src/api/services/index.ts': `
+export const services = {} as const;
+`,
+      'src/api/generated-services/index.ts': SERVICES_INDEX_TS,
+      'src/api/generated-services/PetsService.ts': `
+export const petsService = {};
+`,
+      'src/api/generated-services/StoresService.ts': `
+export const storesService = {};
+`,
+    });
+    const importerId = path.join(root, 'src/App.tsx');
+    const entrypoints = normalizeEntrypoints({
+      entrypoints: [
+        {
+          kind: 'clientFactory',
+          factory: { exportName: 'createAPIClient', moduleSpecifier: './api' },
+          services: {
+            directory: './generated-services',
+          },
+          reactContext: { exportName: 'APIClientContext' },
+        },
+      ],
+    });
+
+    const result = await inspectGeneratedEntrypoints({
+      importerId,
+      entrypoints,
+      moduleAccess: createFixtureModuleAccess(root),
+    });
+
+    const metadata = result.metadataByEntrypointKey.get(entrypoints[0].key);
+
+    expect(result.reasons).toEqual([]);
+    expect(metadata).toMatchObject({
+      servicesDir: './generated-services',
+      serviceImportPaths: {
+        pets: './PetsService',
+        stores: './StoresService',
+      },
+    });
+  });
+
   it('returns unresolved reason when generated source is unavailable', async () => {
     const importerId = '/virtual/src/App.tsx';
     const resolvedFactoryId = '/virtual/src/api/index.ts?client#factory';
