@@ -114,7 +114,6 @@ export type GeneratedClientInfo = {
   clientFile: string;
   servicesModuleSpecifierBase: string;
   servicesDir: string;
-  serviceImportPaths: Record<string, string>;
   contextImportPath: string | null;
   contextName: string | null;
 };
@@ -124,7 +123,6 @@ export type GeneratedClientMetadata = {
   factoryFile: string;
   factoryLoadId: string;
   servicesDir: string;
-  serviceImportPaths: Record<string, string>;
   reactContext: ReactContextConfig | null;
   optionsFactory?: ImportTarget;
 };

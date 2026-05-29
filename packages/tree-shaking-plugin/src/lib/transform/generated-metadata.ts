@@ -20,7 +20,6 @@ import {
 import {
   findExportReexport,
   findFactoryReexport,
-  getObjectPropertyKey,
 } from './ast-utils.js';
 import { normalizeResolvedId } from './path-rendering.js';
 
@@ -265,11 +264,6 @@ async function inspectFactoryFile({
   }
 
   const servicesDir = entrypoint.services.directory;
-  const serviceImportPaths = await readServiceImportPaths(
-    factoryFile,
-    servicesDir,
-    moduleAccess
-  );
 
   return {
     metadata: {
@@ -277,7 +271,6 @@ async function inspectFactoryFile({
       factoryFile,
       factoryLoadId,
       servicesDir,
-      serviceImportPaths,
       reactContext: factoryImports.reactContext,
       ...(optionsFactory ? { optionsFactory } : {}),
     },
@@ -582,72 +575,6 @@ async function matchesConfiguredBinding(
   if (localName !== exportName) return false;
   const importerResolvedId = normalizeResolvedId(importerId);
   return expectedResolvedIds.has(importerResolvedId);
-}
-
-async function readServiceImportPaths(
-  clientFile: string,
-  servicesDir: string,
-  moduleAccess: QraftModuleAccess
-): Promise<Record<string, string>> {
-  const servicesIndexFile =
-    (await moduleAccess.resolve(`${servicesDir}/index`, clientFile)) ??
-    (await moduleAccess.resolve(servicesDir, clientFile));
-  if (!servicesIndexFile) return {};
-
-  const source = await moduleAccess.load(servicesIndexFile);
-  if (source === null) {
-    return {};
-  }
-  const ast = parse(source, {
-    sourceType: 'module',
-    plugins: ['typescript'],
-  });
-  const localImports = new Map<string, string>();
-  const serviceImportPaths: Record<string, string> = {};
-
-  traverse(ast, {
-    ImportDeclaration(importPath) {
-      const sourcePath = importPath.node.source.value;
-      for (const specifier of importPath.node.specifiers) {
-        if (t.isImportSpecifier(specifier) && t.isIdentifier(specifier.local)) {
-          localImports.set(specifier.local.name, sourcePath);
-        }
-      }
-    },
-    VariableDeclarator(variablePath) {
-      if (!t.isIdentifier(variablePath.node.id)) return;
-      if (variablePath.node.id.name !== 'services') return;
-      const servicesExpression = unwrapStaticExpression(variablePath.node.init);
-      if (!t.isObjectExpression(servicesExpression)) return;
-
-      for (const property of servicesExpression.properties) {
-        if (!t.isObjectProperty(property)) continue;
-        if (!t.isIdentifier(property.value)) continue;
-
-        const serviceName = getObjectPropertyKey(property.key);
-        if (!serviceName) continue;
-
-        const importPath = localImports.get(property.value.name);
-        if (importPath) serviceImportPaths[serviceName] = importPath;
-      }
-    },
-  });
-
-  return serviceImportPaths;
-}
-
-function unwrapStaticExpression(node: t.Expression | null | undefined) {
-  let current = node ?? null;
-
-  while (
-    t.isTSAsExpression(current) ||
-    t.isTSSatisfiesExpression(current) ||
-    t.isTSTypeAssertion(current)
-  ) {
-    current = current.expression;
-  }
-
-  return current;
 }
 
 function unresolvedSource(

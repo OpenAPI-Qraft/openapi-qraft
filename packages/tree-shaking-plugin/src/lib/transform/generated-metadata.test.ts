@@ -8,7 +8,6 @@ import {
   createPrecreatedFixtureFiles,
   getContextFixtureFiles,
   PRECREATED_API_INDEX_TS,
-  SERVICES_INDEX_TS,
   writeFixtureFiles,
 } from '../../__tests__/core/fixtures.js';
 import { normalizeEntrypoints } from './entrypoints.js';
@@ -52,10 +51,6 @@ describe('inspectGeneratedEntrypoints', () => {
       entrypoint: entrypoints[0],
       factoryFile: path.join(root, 'src/api/index.ts'),
       servicesDir: './services',
-      serviceImportPaths: {
-        pets: './PetsService',
-        stores: './StoresService',
-      },
       reactContext: {
         exportName: 'APIClientContext',
         moduleSpecifier: './APIClientContext',
@@ -102,10 +97,6 @@ export function createAPIClient(callbacks = defaultCallbacks) {
     expect(result.reasons).toEqual([]);
     expect(metadata).toMatchObject({
       servicesDir: './services',
-      serviceImportPaths: {
-        pets: './PetsService',
-        stores: './StoresService',
-      },
     });
   });
 
@@ -115,13 +106,6 @@ export function createAPIClient(callbacks = defaultCallbacks) {
       ...getContextFixtureFiles('APIClientContext', './APIClientContext', true),
       'src/api/services/index.ts': `
 export const services = {} as const;
-`,
-      'src/api/generated-services/index.ts': SERVICES_INDEX_TS,
-      'src/api/generated-services/PetsService.ts': `
-export const petsService = {};
-`,
-      'src/api/generated-services/StoresService.ts': `
-export const storesService = {};
 `,
     });
     const importerId = path.join(root, 'src/App.tsx');
@@ -149,10 +133,6 @@ export const storesService = {};
     expect(result.reasons).toEqual([]);
     expect(metadata).toMatchObject({
       servicesDir: './generated-services',
-      serviceImportPaths: {
-        pets: './PetsService',
-        stores: './StoresService',
-      },
     });
   });
 
@@ -193,13 +173,9 @@ export const storesService = {};
   it('loads generated factory metadata through exact query and hash ids', async () => {
     const importerId = '/virtual/src/App.tsx';
     const factoryId = '/virtual/src/api/index.ts?client#factory';
-    const servicesId = '/virtual/src/api/services/index.ts?client#services';
     const load = vi.fn(async (id: string) => {
       if (id === factoryId) {
         return contextApiIndexTsBody('APIClientContext');
-      }
-      if (id === servicesId) {
-        return SERVICES_INDEX_TS;
       }
       return null;
     });
@@ -219,7 +195,6 @@ export const storesService = {};
       moduleAccess: {
         resolve: async (specifier) => {
           if (specifier === './api') return factoryId;
-          if (specifier === './services/index') return servicesId;
           return null;
         },
         load,
@@ -230,14 +205,10 @@ export const storesService = {};
 
     expect(result.reasons).toEqual([]);
     expect(load).toHaveBeenCalledWith(factoryId);
-    expect(load).toHaveBeenCalledWith(servicesId);
+    expect(load).toHaveBeenCalledTimes(1);
     expect(metadata).toMatchObject({
       factoryFile: '/virtual/src/api/index.ts',
       factoryLoadId: factoryId,
-      serviceImportPaths: {
-        pets: './PetsService',
-        stores: './StoresService',
-      },
     });
   });
 
@@ -246,14 +217,12 @@ export const storesService = {};
     const indexId = '/virtual/src/api/index.ts?entry#client';
     const barrelId = '/virtual/src/api/barrel.ts?barrel#client';
     const factoryId = '/virtual/src/api/createAPIClient.ts?factory#client';
-    const servicesId = '/virtual/src/api/services/index.ts?services#client';
     const load = vi.fn(async (id: string) => {
       if (id === indexId) return `export { createAPIClient } from './barrel';`;
       if (id === barrelId) {
         return `export { createAPIClient } from './createAPIClient';`;
       }
       if (id === factoryId) return contextApiIndexTsBody('APIClientContext');
-      if (id === servicesId) return SERVICES_INDEX_TS;
       return null;
     });
     const entrypoints = normalizeEntrypoints({
@@ -288,7 +257,7 @@ export const storesService = {};
             specifier === './services/index' &&
             importer === '/virtual/src/api/createAPIClient.ts'
           ) {
-            return servicesId;
+            throw new Error('services index should not be resolved');
           }
           return null;
         },
@@ -303,7 +272,6 @@ export const storesService = {};
       indexId,
       barrelId,
       factoryId,
-      servicesId,
     ]);
     expect(metadata).toMatchObject({
       factoryFile: '/virtual/src/api/createAPIClient.ts',
@@ -353,7 +321,6 @@ export const APIClientContext = {};
       entrypoint: entrypoints[0],
       factoryFile: path.join(root, 'src/api/index.ts'),
       servicesDir: './services',
-      serviceImportPaths: {},
       reactContext: {
         exportName: 'APIClientContext',
         moduleSpecifier: './APIClientContext',
@@ -522,10 +489,6 @@ export const APIClient = createAPIClient(createAPIClientOptions());
       entrypoint: entrypoints[0],
       factoryFile: path.join(root, 'src/api/index.ts'),
       servicesDir: './services',
-      serviceImportPaths: {
-        pets: './PetsService',
-        stores: './StoresService',
-      },
       reactContext: null,
       optionsFactory: {
         exportName: 'createAPIClientOptions',

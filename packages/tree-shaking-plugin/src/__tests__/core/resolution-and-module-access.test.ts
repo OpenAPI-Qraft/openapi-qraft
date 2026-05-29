@@ -11,7 +11,6 @@ import {
 import {
   createFixtureModuleAccess,
   PRECREATED_API_INDEX_TS,
-  SERVICES_INDEX_TS,
 } from './fixtures.js';
 import {
   createFixture,
@@ -554,10 +553,8 @@ export function App() {
   it('optimizes when generated source is available only through exact resolved ids', async () => {
     const sourceFile = '/virtual/src/App.tsx';
     const factoryId = '/virtual/src/api/index.ts?generated#factory';
-    const servicesId = '/virtual/src/api/services/index.ts?generated#services';
     const load = vi.fn(async (id: string) => {
       if (id === factoryId) return PRECREATED_API_INDEX_TS;
-      if (id === servicesId) return SERVICES_INDEX_TS;
       return null;
     });
 
@@ -589,7 +586,7 @@ export function App() {
               specifier === './services/index' &&
               importer === '/virtual/src/api/index.ts'
             ) {
-              return servicesId;
+              throw new Error('services index should not be resolved');
             }
             return null;
           },
@@ -602,7 +599,7 @@ export function App() {
       'import { getPets } from "./api/services/PetsService";'
     );
     expect(result?.code).not.toContain('?generated');
-    expect(load.mock.calls.map(([id]) => id)).toEqual([factoryId, servicesId]);
+    expect(load.mock.calls.map(([id]) => id)).toEqual([factoryId]);
   });
 
   it('resolves a factory module through the fixture resolver when the bundler cannot', async () => {

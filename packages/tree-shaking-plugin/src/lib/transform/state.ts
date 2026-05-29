@@ -27,7 +27,6 @@ import { createAgnosticModuleAccess } from '../resolvers/agnostic.js';
 import { createTraceableQraftModuleAccess } from '../resolvers/common.js';
 import {
   findExportReexport,
-  getObjectPropertyKey,
   getStaticMemberPath,
   getStaticMemberRoot,
   getUsageScopeKey,
@@ -1620,9 +1619,7 @@ function resolveOperationImport(
   const cached = operationImports.get(key);
   if (cached) return cached;
 
-  const serviceImportPath =
-    generatedInfo.serviceImportPaths[serviceName] ??
-    `./${serviceNameToFileBase(serviceName)}`;
+  const serviceImportPath = `./${serviceNameToFileBase(serviceName)}`;
   const resolved = {
     importPath: composeServiceOperationImportPath(
       generatedInfo.servicesModuleSpecifierBase,
@@ -1640,57 +1637,6 @@ function resolveOperationImport(
   reservedImportLocalNames.add(resolved.localName);
   operationImports.set(key, resolved);
   return resolved;
-}
-
-async function readServiceImportPaths(
-  clientFile: string,
-  servicesDir: string,
-  moduleAccess: QraftModuleAccess
-): Promise<Record<string, string>> {
-  const servicesIndexFile =
-    (await moduleAccess.resolve(`${servicesDir}/index`, clientFile)) ??
-    (await moduleAccess.resolve(servicesDir, clientFile));
-  if (!servicesIndexFile) return {};
-
-  const source = await moduleAccess.load(servicesIndexFile);
-  if (source === null) {
-    return {};
-  }
-  const ast = parse(source, {
-    sourceType: 'module',
-    plugins: ['typescript'],
-  });
-  const localImports = new Map<string, string>();
-  const serviceImportPaths: Record<string, string> = {};
-
-  traverse(ast, {
-    ImportDeclaration(importPathNode) {
-      const sourcePath = importPathNode.node.source.value;
-      for (const specifier of importPathNode.node.specifiers) {
-        if (t.isImportSpecifier(specifier) && t.isIdentifier(specifier.local)) {
-          localImports.set(specifier.local.name, sourcePath);
-        }
-      }
-    },
-    VariableDeclarator(variablePath) {
-      if (!t.isIdentifier(variablePath.node.id)) return;
-      if (variablePath.node.id.name !== 'services') return;
-      if (!t.isObjectExpression(variablePath.node.init)) return;
-
-      for (const property of variablePath.node.init.properties) {
-        if (!t.isObjectProperty(property)) continue;
-        if (!t.isIdentifier(property.value)) continue;
-
-        const serviceName = getObjectPropertyKey(property.key);
-        if (!serviceName) continue;
-
-        const importPath = localImports.get(property.value.name);
-        if (importPath) serviceImportPaths[serviceName] = importPath;
-      }
-    },
-  });
-
-  return serviceImportPaths;
 }
 
 function seedGeneratedInfoByImport(
@@ -1736,7 +1682,6 @@ function toGeneratedClientInfo(
     clientFile: metadata.factoryFile,
     servicesModuleSpecifierBase: metadata.entrypoint.services.moduleSpecifierBase,
     servicesDir: metadata.servicesDir,
-    serviceImportPaths: metadata.serviceImportPaths,
     contextImportPath: resolveMetadataContextImportPath(metadata, entrypoint),
     contextName:
       entrypoint.kind === 'generatedFactory'
