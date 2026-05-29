@@ -50,7 +50,6 @@ describe('inspectGeneratedEntrypoints', () => {
     expect(metadata).toMatchObject({
       entrypoint: entrypoints[0],
       factoryFile: path.join(root, 'src/api/index.ts'),
-      servicesDir: './services',
       reactContext: {
         exportName: 'APIClientContext',
         moduleSpecifier: './APIClientContext',
@@ -95,9 +94,7 @@ export function createAPIClient(callbacks = defaultCallbacks) {
     const metadata = result.metadataByEntrypointKey.get(entrypoints[0].key);
 
     expect(result.reasons).toEqual([]);
-    expect(metadata).toMatchObject({
-      servicesDir: './services',
-    });
+    expect(metadata?.entrypoint.services.directory).toBe('./services');
   });
 
   it('uses configured services directory for generated service metadata', async () => {
@@ -131,9 +128,9 @@ export const services = {} as const;
     const metadata = result.metadataByEntrypointKey.get(entrypoints[0].key);
 
     expect(result.reasons).toEqual([]);
-    expect(metadata).toMatchObject({
-      servicesDir: './generated-services',
-    });
+    expect(metadata?.entrypoint.services.directory).toBe(
+      './generated-services'
+    );
   });
 
   it('returns unresolved reason when generated source is unavailable', async () => {
@@ -320,7 +317,6 @@ export const APIClientContext = {};
     expect(metadata).toMatchObject({
       entrypoint: entrypoints[0],
       factoryFile: path.join(root, 'src/api/index.ts'),
-      servicesDir: './services',
       reactContext: {
         exportName: 'APIClientContext',
         moduleSpecifier: './APIClientContext',
@@ -442,7 +438,6 @@ ${contextApiIndexTsBody('APIClientContext')}
     expect(result.reasons).toEqual([]);
     expect(metadata).toMatchObject({
       factoryFile: path.join(root, 'src/api/createAPIClient.ts'),
-      servicesDir: './services',
       reactContext: {
         exportName: 'APIClientContext',
         moduleSpecifier: './APIClientContext',
@@ -488,7 +483,6 @@ export const APIClient = createAPIClient(createAPIClientOptions());
     expect(metadata).toMatchObject({
       entrypoint: entrypoints[0],
       factoryFile: path.join(root, 'src/api/index.ts'),
-      servicesDir: './services',
       reactContext: null,
       optionsFactory: {
         exportName: 'createAPIClientOptions',
@@ -542,7 +536,6 @@ export { createAPIClient } from './createAPIClient';
     expect(result.reasons).toEqual([]);
     expect(metadata).toMatchObject({
       factoryFile: path.join(root, 'src/api/createAPIClient.ts'),
-      servicesDir: './services',
       reactContext: null,
     });
   });
