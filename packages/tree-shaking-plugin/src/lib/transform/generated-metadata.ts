@@ -5,7 +5,6 @@ import type {
   GeneratedClientMetadata,
   GeneratedFactoryEntrypoint,
   GeneratedMetadataResult,
-  ImportTarget,
   PrecreatedClientEntrypoint,
 } from './types.js';
 import { parse } from '@babel/parser';
@@ -173,7 +172,6 @@ async function inspectPrecreatedClientEntrypoint(
     factoryExportName: entrypoint.factory.exportName,
     moduleAccess,
     traceSnapshot,
-    optionsFactory: entrypoint.optionsFactory,
   });
 }
 
@@ -184,7 +182,6 @@ async function inspectFactoryFile({
   factoryExportName,
   moduleAccess,
   traceSnapshot,
-  optionsFactory,
   seenFactoryFiles = new Set<string>(),
 }: {
   entrypoint: ClientEntrypoint;
@@ -193,7 +190,6 @@ async function inspectFactoryFile({
   factoryExportName: string;
   moduleAccess: QraftModuleAccess;
   traceSnapshot: number;
-  optionsFactory?: ImportTarget;
   seenFactoryFiles?: Set<string>;
 }): Promise<MetadataInspection> {
   if (seenFactoryFiles.has(factoryFile)) {
@@ -233,7 +229,6 @@ async function inspectFactoryFile({
         factoryExportName,
         moduleAccess,
         traceSnapshot,
-        optionsFactory,
         seenFactoryFiles,
       });
     }
@@ -246,7 +241,6 @@ async function inspectFactoryFile({
       entrypoint,
       factoryFile,
       factoryLoadId,
-      ...(optionsFactory ? { optionsFactory } : {}),
     },
   };
 }

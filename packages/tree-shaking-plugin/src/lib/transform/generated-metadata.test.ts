@@ -474,11 +474,8 @@ export const APIClient = createAPIClient(createAPIClientOptions());
     expect(metadata).toMatchObject({
       entrypoint: entrypoints[0],
       factoryFile: path.join(root, 'src/api/index.ts'),
-      optionsFactory: {
-        exportName: 'createAPIClientOptions',
-        moduleSpecifier: './client-options',
-      },
     });
+    expect(metadata).not.toHaveProperty('optionsFactory');
     expect(metadata).not.toHaveProperty('reactContext');
   });
 
