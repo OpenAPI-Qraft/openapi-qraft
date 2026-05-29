@@ -133,7 +133,6 @@ async function inspectPrecreatedClientEntrypoint(
     return unresolvedSource(entrypoint.key, moduleAccess, traceSnapshot);
   }
 
-  const clientFile = normalizeResolvedId(resolvedClient);
   const factoryModuleFile = normalizeResolvedId(resolvedFactory);
   const factoryExport = await readExportedDeclarationChain(
     resolvedFactory,
@@ -145,7 +144,6 @@ async function inspectPrecreatedClientEntrypoint(
 
   const validClient = await validatePrecreatedClient(
     entrypoint,
-    clientFile,
     resolvedClient,
     new Set([factoryModuleFile, normalizeResolvedId(factoryFile)]),
     moduleAccess
@@ -279,7 +277,6 @@ function readGeneratedFactoryImports(ast: t.File) {
 
 async function validatePrecreatedClient(
   entrypoint: PrecreatedClientEntrypoint,
-  clientFile: string,
   clientLoadId: string,
   factoryResolvedIds: Set<string>,
   moduleAccess: QraftModuleAccess
