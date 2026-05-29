@@ -436,6 +436,47 @@ ${contextApiIndexTsBody('APIClientContext')}
     expect(metadata).not.toHaveProperty('reactContext');
   });
 
+  it('reads generated factory metadata through an aliased re-export chain', async () => {
+    const root = await createTempFixture();
+    await writeFixtureFiles(root, {
+      ...getContextFixtureFiles('APIClientContext', './APIClientContext', true),
+      'src/api/index.ts': `
+export { createAPIClient as myAPIClient } from './barrel';
+`,
+      'src/api/barrel.ts': `
+export { createAPIClient } from './createAPIClient';
+`,
+      'src/api/createAPIClient.ts': `
+import { APIClientContext } from './APIClientContext';
+${contextApiIndexTsBody('APIClientContext')}
+`,
+    });
+    const importerId = path.join(root, 'src/App.tsx');
+    const entrypoints = normalizeEntrypoints({
+      entrypoints: [
+        {
+          kind: 'clientFactory',
+          factory: { exportName: 'myAPIClient', moduleSpecifier: './api' },
+          reactContext: { exportName: 'APIClientContext' },
+        },
+      ],
+    });
+
+    const result = await inspectGeneratedEntrypoints({
+      importerId,
+      entrypoints,
+      moduleAccess: createFixtureModuleAccess(root),
+    });
+
+    const metadata = result.metadataByEntrypointKey.get(entrypoints[0].key);
+
+    expect(result.reasons).toEqual([]);
+    expect(metadata).toMatchObject({
+      factoryFile: path.join(root, 'src/api/createAPIClient.ts'),
+    });
+    expect(metadata).not.toHaveProperty('reactContext');
+  });
+
   it('validates precreated clients against configured factory', async () => {
     const root = await createTempFixture();
     await writeFixtureFiles(

@@ -21,27 +21,6 @@ export function findExportReexport(ast: t.File, exportName: string) {
   return null;
 }
 
-export function findFactoryReexport(
-  ast: t.File,
-  factoryName: string
-): string | null {
-  for (const statement of ast.program.body) {
-    if (!t.isExportNamedDeclaration(statement) || !statement.source) continue;
-
-    for (const specifier of statement.specifiers) {
-      if (
-        t.isExportSpecifier(specifier) &&
-        t.isIdentifier(specifier.exported) &&
-        specifier.exported.name === factoryName
-      ) {
-        return statement.source.value;
-      }
-    }
-  }
-
-  return null;
-}
-
 export function getObjectPropertyKey(key: t.ObjectProperty['key']) {
   if (t.isIdentifier(key)) return key.name;
   if (t.isStringLiteral(key)) return key.value;

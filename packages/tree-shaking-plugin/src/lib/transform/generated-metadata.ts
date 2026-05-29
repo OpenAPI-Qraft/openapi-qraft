@@ -15,7 +15,7 @@ import {
   getQraftModuleAccessTraceSince,
   getQraftModuleAccessTraceSnapshot,
 } from '../resolvers/common.js';
-import { findExportReexport, findFactoryReexport } from './ast-utils.js';
+import { findExportReexport } from './ast-utils.js';
 import { normalizeResolvedId } from './path-rendering.js';
 
 const traverse =
@@ -210,9 +210,9 @@ async function inspectFactoryFile({
   const factoryImports = readGeneratedFactoryImports(ast);
 
   if (!factoryImports.hasQraftClientCall) {
-    const reexportPath = findFactoryReexport(ast, factoryExportName);
-    if (reexportPath) {
-      const resolved = await moduleAccess.resolve(reexportPath, factoryFile);
+    const reexport = findExportReexport(ast, factoryExportName);
+    if (reexport) {
+      const resolved = await moduleAccess.resolve(reexport.source, factoryFile);
       if (!resolved) {
         return unresolvedSource(entrypoint.key, moduleAccess, traceSnapshot);
       }
@@ -226,7 +226,7 @@ async function inspectFactoryFile({
         entrypoint,
         factoryFile: resolvedId,
         factoryLoadId: resolved,
-        factoryExportName,
+        factoryExportName: reexport.localName,
         moduleAccess,
         traceSnapshot,
         seenFactoryFiles,
