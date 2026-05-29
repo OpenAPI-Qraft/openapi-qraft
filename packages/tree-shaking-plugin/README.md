@@ -252,7 +252,7 @@ entrypoints: [
 ];
 ```
 
-`factory` points at the generated client factory export. `reactContext` is optional; use it when zero-argument React clients should keep context-backed runtime semantics. Omit `reactContext` for explicit-options clients such as `createNodeAPIClient(options)`.
+`factory` points at the generated client factory export. `reactContext` is optional; use it when zero-argument React clients should keep context-backed runtime semantics. Omit `reactContext` for explicit-options clients such as `createNodeAPIClient(options)`. When `reactContext.moduleSpecifier` is omitted, context imports inherit `factory.moduleSpecifier`; the plugin does not infer the context module from generated factory source.
 
 `services` is optional. When `services.moduleSpecifierBase` is omitted, operation imports inherit `factory.moduleSpecifier` as the public generated API root. When `services.directory` is omitted, the plugin assumes generated service modules live under `./services`. For example, a factory module of `@api/my-api` emits operation imports such as `@api/my-api/services/PetsService`. Set `services.moduleSpecifierBase` when the factory is imported from a file or barrel that is not also the public root for generated service modules, and set `services.directory` only when generated service modules live below a different directory.
 

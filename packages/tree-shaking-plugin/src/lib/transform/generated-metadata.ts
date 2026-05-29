@@ -7,7 +7,6 @@ import type {
   GeneratedMetadataResult,
   ImportTarget,
   PrecreatedClientEntrypoint,
-  ReactContextConfig,
 } from './types.js';
 import { parse } from '@babel/parser';
 import * as traverseModule from '@babel/traverse';
@@ -47,10 +46,6 @@ type ExportedDeclarationResolution = {
 type MetadataInspection =
   | { metadata: GeneratedClientMetadata }
   | { reason: DiagnosticReason };
-
-type ImportedReactContextConfig = ReactContextConfig & {
-  moduleSpecifier: string;
-};
 
 export async function inspectGeneratedEntrypoints({
   importerId,
@@ -127,7 +122,6 @@ async function inspectGeneratedFactoryEntrypoint(
     factoryFile: normalizeResolvedId(resolved),
     factoryLoadId: resolved,
     factoryExportName: entrypoint.factory.exportName,
-    reactContext: entrypoint.reactContext,
     moduleAccess,
     traceSnapshot,
   });
@@ -182,7 +176,6 @@ async function inspectPrecreatedClientEntrypoint(
     factoryFile,
     factoryLoadId,
     factoryExportName: entrypoint.factory.exportName,
-    reactContext: null,
     moduleAccess,
     traceSnapshot,
     optionsFactory: entrypoint.optionsFactory,
@@ -195,7 +188,6 @@ async function inspectFactoryFile({
   factoryFile,
   factoryLoadId,
   factoryExportName,
-  reactContext,
   moduleAccess,
   traceSnapshot,
   optionsFactory,
@@ -206,7 +198,6 @@ async function inspectFactoryFile({
   factoryFile: string;
   factoryLoadId: string;
   factoryExportName: string;
-  reactContext: ReactContextConfig | null;
   moduleAccess: QraftModuleAccess;
   traceSnapshot: number;
   optionsFactory?: ImportTarget;
@@ -227,11 +218,7 @@ async function inspectFactoryFile({
     plugins: ['typescript'],
   });
 
-  const factoryImports = readGeneratedFactoryImports(
-    ast,
-    reactContext,
-    entrypoint.factory.moduleSpecifier
-  );
+  const factoryImports = readGeneratedFactoryImports(ast);
 
   if (!factoryImports.hasQraftClientCall) {
     const reexportPath = findFactoryReexport(ast, factoryExportName);
@@ -252,7 +239,6 @@ async function inspectFactoryFile({
         factoryFile: resolvedId,
         factoryLoadId: resolved,
         factoryExportName,
-        reactContext,
         moduleAccess,
         traceSnapshot,
         optionsFactory,
@@ -268,25 +254,13 @@ async function inspectFactoryFile({
       entrypoint,
       factoryFile,
       factoryLoadId,
-      reactContext: factoryImports.reactContext,
       ...(optionsFactory ? { optionsFactory } : {}),
     },
   };
 }
 
-function readGeneratedFactoryImports(
-  ast: t.File,
-  configuredContext: ReactContextConfig | null,
-  factoryModuleSpecifier: string
-) {
+function readGeneratedFactoryImports(ast: t.File) {
   let hasQraftClientCall = false;
-  let inferredContext: ReactContextConfig | null = configuredContext
-    ? {
-        exportName: configuredContext.exportName,
-        moduleSpecifier: configuredContext.moduleSpecifier,
-      }
-    : null;
-  const contextImportsByLocalName = new Map<string, ImportedReactContextConfig>();
   const qraftClientLocalNames = new Set<string>();
 
   traverse(ast, {
@@ -299,25 +273,6 @@ function readGeneratedFactoryImports(
           t.isIdentifier(specifier.imported) &&
           t.isIdentifier(specifier.local)
         ) {
-          const importedContext = {
-            exportName: specifier.imported.name,
-            moduleSpecifier: sourcePath,
-          } satisfies ImportedReactContextConfig;
-          contextImportsByLocalName.set(specifier.local.name, importedContext);
-
-          if (
-            configuredContext &&
-            specifier.imported.name === configuredContext.exportName
-          ) {
-            inferredContext = {
-              exportName: configuredContext.exportName,
-              moduleSpecifier: resolveConfiguredContextModuleSpecifier(
-                configuredContext,
-                sourcePath
-              ),
-            };
-          }
-
           if (
             sourcePath === QRAFT_REACT_RUNTIME_MODULE &&
             (specifier.imported.name === 'qraftAPIClient' ||
@@ -332,45 +287,12 @@ function readGeneratedFactoryImports(
       if (!t.isIdentifier(callPath.node.callee)) return;
       if (!qraftClientLocalNames.has(callPath.node.callee.name)) return;
       hasQraftClientCall = true;
-
-      const contextArgument = callPath.node.arguments[2];
-      if (!t.isIdentifier(contextArgument)) return;
-
-      const importedContext = contextImportsByLocalName.get(
-        contextArgument.name
-      );
-      if (!importedContext) return;
-
-      inferredContext = configuredContext
-        ? {
-            exportName: configuredContext.exportName,
-            moduleSpecifier: resolveConfiguredContextModuleSpecifier(
-              configuredContext,
-              importedContext.moduleSpecifier
-            ),
-          }
-        : importedContext;
     },
   });
 
   return {
-    reactContext: inferredContext,
     hasQraftClientCall,
   };
-
-  function resolveConfiguredContextModuleSpecifier(
-    configuredContext: ReactContextConfig,
-    importedModuleSpecifier: string
-  ) {
-    if (
-      configuredContext.moduleSpecifier === factoryModuleSpecifier &&
-      importedModuleSpecifier !== configuredContext.moduleSpecifier
-    ) {
-      return importedModuleSpecifier;
-    }
-
-    return configuredContext.moduleSpecifier;
-  }
 }
 
 async function validatePrecreatedClient(

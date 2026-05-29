@@ -50,11 +50,8 @@ describe('inspectGeneratedEntrypoints', () => {
     expect(metadata).toMatchObject({
       entrypoint: entrypoints[0],
       factoryFile: path.join(root, 'src/api/index.ts'),
-      reactContext: {
-        exportName: 'APIClientContext',
-        moduleSpecifier: './APIClientContext',
-      },
     });
+    expect(metadata).not.toHaveProperty('reactContext');
   });
 
   it('uses the conventional generated services directory instead of inferring it from factory imports', async () => {
@@ -317,11 +314,8 @@ export const APIClientContext = {};
     expect(metadata).toMatchObject({
       entrypoint: entrypoints[0],
       factoryFile: path.join(root, 'src/api/index.ts'),
-      reactContext: {
-        exportName: 'APIClientContext',
-        moduleSpecifier: './APIClientContext',
-      },
     });
+    expect(metadata).not.toHaveProperty('reactContext');
   });
 
   it('returns missing services reason for non-qraft files that only mention qraft helpers', async () => {
@@ -438,11 +432,8 @@ ${contextApiIndexTsBody('APIClientContext')}
     expect(result.reasons).toEqual([]);
     expect(metadata).toMatchObject({
       factoryFile: path.join(root, 'src/api/createAPIClient.ts'),
-      reactContext: {
-        exportName: 'APIClientContext',
-        moduleSpecifier: './APIClientContext',
-      },
     });
+    expect(metadata).not.toHaveProperty('reactContext');
   });
 
   it('validates precreated clients against configured factory', async () => {
@@ -483,12 +474,12 @@ export const APIClient = createAPIClient(createAPIClientOptions());
     expect(metadata).toMatchObject({
       entrypoint: entrypoints[0],
       factoryFile: path.join(root, 'src/api/index.ts'),
-      reactContext: null,
       optionsFactory: {
         exportName: 'createAPIClientOptions',
         moduleSpecifier: './client-options',
       },
     });
+    expect(metadata).not.toHaveProperty('reactContext');
   });
 
   it('validates precreated clients that import the configured factory barrel', async () => {
@@ -536,8 +527,8 @@ export { createAPIClient } from './createAPIClient';
     expect(result.reasons).toEqual([]);
     expect(metadata).toMatchObject({
       factoryFile: path.join(root, 'src/api/createAPIClient.ts'),
-      reactContext: null,
     });
+    expect(metadata).not.toHaveProperty('reactContext');
   });
 
   it('returns mismatch reason when a precreated client uses another factory', async () => {
