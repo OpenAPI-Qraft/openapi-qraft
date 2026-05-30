@@ -11,7 +11,10 @@ import {
   writeFixtureFiles,
 } from '../../__tests__/core/fixtures.js';
 import { normalizeEntrypoints } from './entrypoints.js';
-import { inspectGeneratedEntrypoints } from './generated-metadata.js';
+import {
+  createGeneratedMetadataCache,
+  inspectGeneratedEntrypoints,
+} from './generated-metadata.js';
 import { createTransformState } from './state.js';
 
 describe('inspectGeneratedEntrypoints', () => {
@@ -664,6 +667,105 @@ api.pets.getPets.useQuery();
     );
 
     expect(state.namedUsages).toHaveLength(1);
+    expect(factoryLoadCount).toBe(1);
+  });
+
+  it('reuses generated factory inspection across importers', async () => {
+    const root = await createTempFixture();
+    await writeFixtureFiles(
+      root,
+      getContextFixtureFiles('APIClientContext', './APIClientContext', true)
+    );
+    const factoryFile = path.join(root, 'src/api/index.ts');
+    const fixtureModuleAccess = createFixtureModuleAccess(root);
+    const cache = createGeneratedMetadataCache();
+    let factoryLoadCount = 0;
+    const moduleAccess = {
+      resolve: fixtureModuleAccess.resolve,
+      load: async (id: string) => {
+        if (id === factoryFile) factoryLoadCount += 1;
+        return fixtureModuleAccess.load(id);
+      },
+    };
+    const entrypoints = normalizeEntrypoints({
+      entrypoints: [
+        {
+          kind: 'clientFactory',
+          factory: { exportName: 'createAPIClient', moduleSpecifier: './api' },
+          reactContext: { exportName: 'APIClientContext' },
+        },
+      ],
+    });
+
+    await inspectGeneratedEntrypoints({
+      importerId: path.join(root, 'src/App.tsx'),
+      entrypoints,
+      moduleAccess,
+      cache,
+    });
+    await inspectGeneratedEntrypoints({
+      importerId: path.join(root, 'src/Other.tsx'),
+      entrypoints,
+      moduleAccess,
+      cache,
+    });
+
+    expect(factoryLoadCount).toBe(1);
+  });
+
+  it('reuses precreated client validation and factory inspection across importers', async () => {
+    const root = await createTempFixture();
+    await writeFixtureFiles(
+      root,
+      createPrecreatedFixtureFiles(`
+import { createAPIClient } from './api';
+import { createAPIClientOptions } from './client-options';
+
+export const APIClient = createAPIClient(createAPIClientOptions());
+`)
+    );
+    const clientFile = path.join(root, 'src/client.ts');
+    const factoryFile = path.join(root, 'src/api/index.ts');
+    const fixtureModuleAccess = createFixtureModuleAccess(root);
+    const cache = createGeneratedMetadataCache();
+    let clientLoadCount = 0;
+    let factoryLoadCount = 0;
+    const moduleAccess = {
+      resolve: fixtureModuleAccess.resolve,
+      load: async (id: string) => {
+        if (id === clientFile) clientLoadCount += 1;
+        if (id === factoryFile) factoryLoadCount += 1;
+        return fixtureModuleAccess.load(id);
+      },
+    };
+    const entrypoints = normalizeEntrypoints({
+      entrypoints: [
+        {
+          kind: 'precreatedClient',
+          client: { exportName: 'APIClient', moduleSpecifier: './client' },
+          factory: { exportName: 'createAPIClient', moduleSpecifier: './api' },
+          optionsFactory: {
+            exportName: 'createAPIClientOptions',
+            moduleSpecifier: './client-options',
+          },
+        },
+      ],
+    });
+
+    await inspectGeneratedEntrypoints({
+      importerId: path.join(root, 'src/App.tsx'),
+      entrypoints,
+      moduleAccess,
+      cache,
+    });
+    await inspectGeneratedEntrypoints({
+      importerId: path.join(root, 'src/Other.tsx'),
+      entrypoints,
+      moduleAccess,
+      cache,
+    });
+
+    expect(clientLoadCount).toBe(1);
     expect(factoryLoadCount).toBe(1);
   });
 });
