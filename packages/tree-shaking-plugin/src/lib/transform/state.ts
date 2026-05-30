@@ -42,7 +42,10 @@ import {
   readExportedDeclarationChain,
 } from './exported-declarations.js';
 import { getGeneratedInfoKey } from './generated-info-key.js';
-import { inspectGeneratedEntrypoints } from './generated-metadata.js';
+import {
+  type GeneratedMetadataCache,
+  inspectGeneratedEntrypoints,
+} from './generated-metadata.js';
 import {
   composeServiceOperationImportPath,
   normalizeResolvedId,
@@ -139,7 +142,8 @@ export async function createTransformState(
   moduleAccess: QraftModuleAccess = createAgnosticModuleAccess({
     resolve: options.moduleAccess?.resolve ?? options.resolve,
     load: options.moduleAccess?.load,
-  })
+  }),
+  generatedMetadataCache?: GeneratedMetadataCache
 ): Promise<TransformState> {
   const traceableModuleAccess = createTraceableQraftModuleAccess(moduleAccess);
   const resolveModule = traceableModuleAccess.resolve;
@@ -155,6 +159,7 @@ export async function createTransformState(
     importerId: id,
     entrypoints,
     moduleAccess: traceableModuleAccess,
+    cache: generatedMetadataCache,
   });
   const configuredFactoryNames = new Set(
     generatedFactoryEntrypoints.map(

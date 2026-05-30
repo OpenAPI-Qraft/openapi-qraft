@@ -9,6 +9,7 @@ import type {
 import * as generateModule from '@babel/generator';
 import { resolveDefaultExport } from './lib/interop/resolve-default-export.js';
 import { createAgnosticModuleAccess } from './lib/resolvers/agnostic.js';
+import { type GeneratedMetadataCache } from './lib/transform/generated-metadata.js';
 import { normalizeEntrypoints } from './lib/transform/entrypoints.js';
 import { applyTransformMutations } from './lib/transform/mutate.js';
 import { shouldInspectSource } from './lib/transform/source-gate.js';
@@ -85,7 +86,8 @@ export async function transformQraftTreeShaking(
   id: string,
   options: QraftTreeShakeOptions,
   moduleAccessOrResolver?: QraftModuleAccessInput,
-  inputSourceMap?: SourceMapInput
+  inputSourceMap?: SourceMapInput,
+  generatedMetadataCache?: GeneratedMetadataCache
 ) {
   const moduleAccess =
     moduleAccessOrResolver === undefined
@@ -113,7 +115,13 @@ export async function transformQraftTreeShaking(
     return null;
   }
 
-  const state = await createTransformState(code, id, options, moduleAccess);
+  const state = await createTransformState(
+    code,
+    id,
+    options,
+    moduleAccess,
+    generatedMetadataCache
+  );
   if (!state.namedUsages.length && !state.inlineUsages.length) return null;
 
   applyTransformMutations(state);

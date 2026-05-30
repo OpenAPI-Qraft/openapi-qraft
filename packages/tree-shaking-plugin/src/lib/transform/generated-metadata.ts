@@ -33,16 +33,76 @@ type InspectGeneratedEntrypointsInput = {
   importerId: string;
   entrypoints: ClientEntrypoint[];
   moduleAccess: QraftModuleAccess;
+  cache?: GeneratedMetadataCache;
 };
 
 type MetadataInspection =
   | { metadata: GeneratedClientMetadata }
   | { reason: DiagnosticReason };
 
+type FactoryInspectionOutcome =
+  | { kind: 'valid'; factoryFile: string; factoryLoadId: string }
+  | {
+      kind: 'missingFactoryRuntime';
+      factoryFile: string;
+      factoryLoadId: string;
+    }
+  | { kind: 'unresolvedSource' };
+
+type PrecreatedClientValidationOutcome =
+  | { kind: 'valid' }
+  | { kind: 'factoryMismatch' };
+
+export type GeneratedMetadataCache = {
+  factoryInspectionByKey: Map<string, FactoryInspectionOutcome>;
+  precreatedClientValidationByKey: Map<
+    string,
+    PrecreatedClientValidationOutcome
+  >;
+  clear(): void;
+};
+
+export function createGeneratedMetadataCache(): GeneratedMetadataCache {
+  const factoryInspectionByKey = new Map<string, FactoryInspectionOutcome>();
+  const precreatedClientValidationByKey = new Map<
+    string,
+    PrecreatedClientValidationOutcome
+  >();
+
+  return {
+    factoryInspectionByKey,
+    precreatedClientValidationByKey,
+    clear() {
+      factoryInspectionByKey.clear();
+      precreatedClientValidationByKey.clear();
+    },
+  };
+}
+
+/**
+ * Resolve and inspect configured generated-client entrypoints before the main
+ * usage collection pass.
+ *
+ * For a generated factory entrypoint, this resolves the factory module, follows
+ * re-exports when needed, loads the source, and verifies that the factory calls
+ * the OpenAPI Qraft runtime helper. For a precreated client entrypoint, it also
+ * resolves the configured client module and checks that the exported client is
+ * created by the configured factory.
+ *
+ * The result keeps one map entry per configured entrypoint key. A valid
+ * entrypoint stores metadata needed later to emit optimized imports; an
+ * invalid or unavailable entrypoint stores `null` and contributes a diagnostic
+ * reason. Module access traces collected during failed resolution/loading are
+ * attached to those diagnostics when available.
+ *
+ * The optional cache is shared across transform calls so repeated inspection of
+ * the same generated modules can reuse settled outcomes.
+ */
 export async function inspectGeneratedEntrypoints({
   importerId,
   entrypoints,
   moduleAccess,
+  cache = createGeneratedMetadataCache(),
 }: InspectGeneratedEntrypointsInput): Promise<GeneratedMetadataResult> {
   const metadataByEntrypointKey = new Map<
     string,
@@ -54,7 +114,8 @@ export async function inspectGeneratedEntrypoints({
     const result = await inspectEntrypoint(
       importerId,
       entrypoint,
-      moduleAccess
+      moduleAccess,
+      cache
     );
 
     if ('metadata' in result) {
@@ -68,10 +129,15 @@ export async function inspectGeneratedEntrypoints({
   return { metadataByEntrypointKey, reasons };
 }
 
+/**
+ * Inspect one configured entrypoint and normalize unexpected resolution or
+ * loading failures into an unresolved-source diagnostic.
+ */
 async function inspectEntrypoint(
   importerId: string,
   entrypoint: ClientEntrypoint,
-  moduleAccess: QraftModuleAccess
+  moduleAccess: QraftModuleAccess,
+  cache: GeneratedMetadataCache
 ) {
   const traceSnapshot = getQraftModuleAccessTraceSnapshot(moduleAccess);
 
@@ -81,13 +147,15 @@ async function inspectEntrypoint(
           importerId,
           entrypoint,
           moduleAccess,
-          traceSnapshot
+          traceSnapshot,
+          cache
         )
       : await inspectPrecreatedClientEntrypoint(
           importerId,
           entrypoint,
           moduleAccess,
-          traceSnapshot
+          traceSnapshot,
+          cache
         );
   } catch {
     return unresolvedSource(entrypoint.key, moduleAccess, traceSnapshot);
@@ -98,7 +166,8 @@ async function inspectGeneratedFactoryEntrypoint(
   importerId: string,
   entrypoint: GeneratedFactoryEntrypoint,
   moduleAccess: QraftModuleAccess,
-  traceSnapshot: number
+  traceSnapshot: number,
+  cache: GeneratedMetadataCache
 ): Promise<MetadataInspection> {
   const resolved = await moduleAccess.resolve(
     entrypoint.factory.moduleSpecifier,
@@ -108,21 +177,27 @@ async function inspectGeneratedFactoryEntrypoint(
     return unresolvedSource(entrypoint.key, moduleAccess, traceSnapshot);
   }
 
-  return inspectFactoryFile({
-    entrypoint,
+  const outcome = await inspectFactoryFileCached({
+    cache,
     factoryFile: normalizeResolvedId(resolved),
     factoryLoadId: resolved,
     factoryExportName: entrypoint.factory.exportName,
     moduleAccess,
-    traceSnapshot,
   });
+  return factoryOutcomeToInspection(
+    entrypoint,
+    outcome,
+    moduleAccess,
+    traceSnapshot
+  );
 }
 
 async function inspectPrecreatedClientEntrypoint(
   importerId: string,
   entrypoint: PrecreatedClientEntrypoint,
   moduleAccess: QraftModuleAccess,
-  traceSnapshot: number
+  traceSnapshot: number,
+  cache: GeneratedMetadataCache
 ): Promise<MetadataInspection> {
   const [resolvedClient, resolvedFactory] = await Promise.all([
     moduleAccess.resolve(entrypoint.client.moduleSpecifier, importerId),
@@ -134,66 +209,130 @@ async function inspectPrecreatedClientEntrypoint(
   }
 
   const factoryModuleFile = normalizeResolvedId(resolvedFactory);
-  const factoryExport = await readExportedDeclarationChain(
-    resolvedFactory,
-    entrypoint.factory.exportName,
-    moduleAccess
-  );
-  const factoryFile = factoryExport?.sourceFile ?? factoryModuleFile;
-  const factoryLoadId = factoryExport?.sourceLoadId ?? resolvedFactory;
-
-  const validClient = await validatePrecreatedClient(
-    entrypoint,
-    resolvedClient,
-    new Set([factoryModuleFile, normalizeResolvedId(factoryFile)]),
-    moduleAccess
-  );
-  if (!validClient) {
-    return {
-      reason: {
-        layer: 'generated-metadata',
-        code: 'precreated-client-factory-mismatch',
-        message: 'Precreated client export does not match configured factory.',
-        entrypointKey: entrypoint.key,
-      },
-    };
-  }
-
-  return inspectFactoryFile({
-    entrypoint,
-    factoryFile,
-    factoryLoadId,
+  const factoryOutcome = await inspectFactoryFileCached({
+    cache,
+    factoryFile: factoryModuleFile,
+    factoryLoadId: resolvedFactory,
     factoryExportName: entrypoint.factory.exportName,
     moduleAccess,
-    traceSnapshot,
   });
+  const expectedFactoryResolvedIds = new Set([factoryModuleFile]);
+  if (factoryOutcome.kind !== 'unresolvedSource') {
+    expectedFactoryResolvedIds.add(factoryOutcome.factoryFile);
+  }
+
+  const clientOutcome = await validatePrecreatedClientCached({
+    cache,
+    moduleAccess,
+    entrypoint,
+    clientLoadId: resolvedClient,
+    expectedFactoryResolvedIds,
+  });
+  if (clientOutcome.kind === 'factoryMismatch') {
+    return precreatedClientFactoryMismatch(entrypoint.key);
+  }
+
+  return factoryOutcomeToInspection(
+    entrypoint,
+    factoryOutcome,
+    moduleAccess,
+    traceSnapshot
+  );
 }
 
-async function inspectFactoryFile({
-  entrypoint,
+async function inspectFactoryFileCached({
+  cache,
   factoryFile,
   factoryLoadId,
   factoryExportName,
   moduleAccess,
-  traceSnapshot,
-  seenFactoryFiles = new Set<string>(),
 }: {
-  entrypoint: ClientEntrypoint;
+  cache: GeneratedMetadataCache;
   factoryFile: string;
   factoryLoadId: string;
   factoryExportName: string;
   moduleAccess: QraftModuleAccess;
-  traceSnapshot: number;
+}): Promise<FactoryInspectionOutcome> {
+  const key = JSON.stringify([factoryLoadId, factoryFile, factoryExportName]);
+  const cached = cache.factoryInspectionByKey.get(key);
+  if (cached) return cached;
+
+  // Webpack loadModule can re-enter this transform while an inspection is in
+  // flight, so cache only settled outcomes instead of sharing pending promises.
+  const outcome = await inspectFactoryFile({
+    factoryFile,
+    factoryLoadId,
+    factoryExportName,
+    moduleAccess,
+  });
+  if (outcome.kind !== 'unresolvedSource') {
+    cache.factoryInspectionByKey.set(key, outcome);
+  }
+
+  return outcome;
+}
+
+async function validatePrecreatedClientCached({
+  cache,
+  entrypoint,
+  clientLoadId,
+  expectedFactoryResolvedIds,
+  moduleAccess,
+}: {
+  cache: GeneratedMetadataCache;
+  entrypoint: PrecreatedClientEntrypoint;
+  clientLoadId: string;
+  expectedFactoryResolvedIds: Set<string>;
+  moduleAccess: QraftModuleAccess;
+}): Promise<PrecreatedClientValidationOutcome> {
+  const key = JSON.stringify([
+    clientLoadId,
+    entrypoint.client.exportName,
+    entrypoint.factory.exportName,
+    [...expectedFactoryResolvedIds].sort(),
+  ]);
+  const cached = cache.precreatedClientValidationByKey.get(key);
+  if (cached) return cached;
+
+  // Keep this cache settled-only for the same webpack re-entrancy reason as
+  // factory inspection caching above.
+  const valid = await validatePrecreatedClient(
+    entrypoint,
+    clientLoadId,
+    expectedFactoryResolvedIds,
+    moduleAccess
+  );
+  const outcome = valid
+    ? ({ kind: 'valid' } satisfies PrecreatedClientValidationOutcome)
+    : ({
+        kind: 'factoryMismatch',
+      } satisfies PrecreatedClientValidationOutcome);
+  cache.precreatedClientValidationByKey.set(key, outcome);
+
+  return outcome;
+}
+
+async function inspectFactoryFile({
+  factoryFile,
+  factoryLoadId,
+  factoryExportName,
+  moduleAccess,
+  seenFactoryFiles = new Set<string>(),
+}: {
+  factoryFile: string;
+  factoryLoadId: string;
+  factoryExportName: string;
+  moduleAccess: QraftModuleAccess;
   seenFactoryFiles?: Set<string>;
-}): Promise<MetadataInspection> {
+}): Promise<FactoryInspectionOutcome> {
   if (seenFactoryFiles.has(factoryFile)) {
-    return missingServicesImport(entrypoint.key);
+    return { kind: 'missingFactoryRuntime', factoryFile, factoryLoadId };
   }
   seenFactoryFiles.add(factoryFile);
 
   const source = await moduleAccess.load(factoryLoadId);
   if (source === null) {
-    return unresolvedSource(entrypoint.key, moduleAccess, traceSnapshot);
+    return { kind: 'unresolvedSource' };
   }
 
   const ast = parse(source, {
@@ -208,33 +347,51 @@ async function inspectFactoryFile({
     if (reexport) {
       const resolved = await moduleAccess.resolve(reexport.source, factoryFile);
       if (!resolved) {
-        return unresolvedSource(entrypoint.key, moduleAccess, traceSnapshot);
+        return { kind: 'unresolvedSource' };
       }
 
       const resolvedId = normalizeResolvedId(resolved);
       if (resolvedId === factoryFile) {
-        return missingServicesImport(entrypoint.key);
+        return { kind: 'missingFactoryRuntime', factoryFile, factoryLoadId };
       }
 
       return inspectFactoryFile({
-        entrypoint,
         factoryFile: resolvedId,
         factoryLoadId: resolved,
         factoryExportName: reexport.localName,
         moduleAccess,
-        traceSnapshot,
         seenFactoryFiles,
       });
     }
 
+    return { kind: 'missingFactoryRuntime', factoryFile, factoryLoadId };
+  }
+
+  return {
+    kind: 'valid',
+    factoryFile,
+    factoryLoadId,
+  };
+}
+
+function factoryOutcomeToInspection(
+  entrypoint: ClientEntrypoint,
+  outcome: FactoryInspectionOutcome,
+  moduleAccess: QraftModuleAccess,
+  traceSnapshot: number
+): MetadataInspection {
+  if (outcome.kind === 'unresolvedSource') {
+    return unresolvedSource(entrypoint.key, moduleAccess, traceSnapshot);
+  }
+  if (outcome.kind === 'missingFactoryRuntime') {
     return missingServicesImport(entrypoint.key);
   }
 
   return {
     metadata: {
       entrypoint,
-      factoryFile,
-      factoryLoadId,
+      factoryFile: outcome.factoryFile,
+      factoryLoadId: outcome.factoryLoadId,
     },
   };
 }
@@ -327,6 +484,19 @@ function missingServicesImport(entrypointKey: string): MetadataInspection {
       layer: 'generated-metadata',
       code: 'generated-services-import-missing',
       message: 'Generated entrypoint does not import static services.',
+      entrypointKey,
+    },
+  };
+}
+
+function precreatedClientFactoryMismatch(
+  entrypointKey: string
+): MetadataInspection {
+  return {
+    reason: {
+      layer: 'generated-metadata',
+      code: 'precreated-client-factory-mismatch',
+      message: 'Precreated client export does not match configured factory.',
       entrypointKey,
     },
   };
