@@ -9,8 +9,8 @@ import type {
 import * as generateModule from '@babel/generator';
 import { resolveDefaultExport } from './lib/interop/resolve-default-export.js';
 import { createAgnosticModuleAccess } from './lib/resolvers/agnostic.js';
-import { type GeneratedMetadataCache } from './lib/transform/generated-metadata.js';
 import { normalizeEntrypoints } from './lib/transform/entrypoints.js';
+import { type GeneratedMetadataCache } from './lib/transform/generated-metadata.js';
 import { applyTransformMutations } from './lib/transform/mutate.js';
 import { shouldInspectSource } from './lib/transform/source-gate.js';
 import { createTransformState } from './lib/transform/state.js';
@@ -109,7 +109,7 @@ export async function transformQraftTreeShaking(
       id,
       entrypoints,
       include: options.include,
-      exclude: options.exclude,
+      exclude: options.exclude ?? /node_modules/,
     })
   ) {
     return null;
