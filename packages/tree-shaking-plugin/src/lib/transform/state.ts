@@ -1,6 +1,7 @@
 import type { NodePath, Scope } from '@babel/traverse';
 import type { QraftModuleAccess } from '../resolvers/common.js';
 import type { DiagnosticReporter } from './diagnostics.js';
+import type { GeneratedMetadataCache } from './generated-metadata.js';
 import type {
   ClientBinding,
   ClientEntrypoint,
@@ -42,10 +43,7 @@ import {
   readExportedDeclarationChain,
 } from './exported-declarations.js';
 import { getGeneratedInfoKey } from './generated-info-key.js';
-import {
-  type GeneratedMetadataCache,
-  inspectGeneratedEntrypoints,
-} from './generated-metadata.js';
+import { inspectGeneratedEntrypoints } from './generated-metadata.js';
 import {
   composeServiceOperationImportPath,
   normalizeResolvedId,
@@ -178,7 +176,10 @@ export async function createTransformState(
   }
   const activeProgramScope = programScope;
 
-  const factoryResolvedIds = new Map<GeneratedFactoryEntrypoint, string | null>();
+  const factoryResolvedIds = new Map<
+    GeneratedFactoryEntrypoint,
+    string | null
+  >();
   for (const entrypoint of generatedFactoryEntrypoints) {
     const resolved = await resolveFactoryModule(
       entrypoint.factory.moduleSpecifier,
@@ -1069,7 +1070,8 @@ async function findPrecreatedClients(
   const resolvedConfigs = await Promise.all(
     configs.map(async (config) => {
       const clientLoadId =
-        (await resolveModule(config.client.moduleSpecifier, importerId)) ?? null;
+        (await resolveModule(config.client.moduleSpecifier, importerId)) ??
+        null;
       const clientFile = clientLoadId
         ? normalizeResolvedId(clientLoadId)
         : null;
@@ -1499,12 +1501,13 @@ function toGeneratedClientInfo(
   return {
     importerId,
     clientFile: metadata.factoryFile,
-    servicesModuleSpecifierBase: metadata.entrypoint.services.moduleSpecifierBase,
+    servicesModuleSpecifierBase:
+      metadata.entrypoint.services.moduleSpecifierBase,
     servicesDir: metadata.entrypoint.services.directory,
     contextImportPath: resolveMetadataContextImportPath(metadata, entrypoint),
     contextName:
       entrypoint.kind === 'generatedFactory'
-        ? entrypoint.reactContext?.exportName ?? null
+        ? (entrypoint.reactContext?.exportName ?? null)
         : null,
   };
 }

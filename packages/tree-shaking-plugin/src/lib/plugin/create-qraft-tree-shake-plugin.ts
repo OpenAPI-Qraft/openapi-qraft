@@ -4,7 +4,7 @@ import { createUnplugin } from 'unplugin';
 import { transformQraftTreeShaking } from '../../core.js';
 import { type QraftModuleAccessFactory } from '../resolvers/common.js';
 import { createGeneratedMetadataCache } from '../transform/generated-metadata.js';
-import { resolveSourceFilterOptions } from '../transform/source-gate.js';
+import { type SourceFilterOptions } from '../transform/source-gate.js';
 
 export const QRAFT_TREE_SHAKE_PLUGIN_NAME =
   '@openapi-qraft/tree-shaking-plugin';
@@ -25,6 +25,21 @@ export type QraftTreeShakePluginHooksFactory = (
   context: QraftTreeShakePluginHooksContext
 ) => Partial<QraftTreeShakePluginHooks>;
 
+const defaultPluginSourceFilters = {
+  include: [/\.[cm]?[jt]sx?$/],
+  exclude: /node_modules/,
+} satisfies Required<SourceFilterOptions>;
+
+export function resolvePluginSourceFilterOptions({
+  include,
+  exclude,
+}: SourceFilterOptions): Required<SourceFilterOptions> {
+  return {
+    include: include ?? defaultPluginSourceFilters.include,
+    exclude: exclude ?? defaultPluginSourceFilters.exclude,
+  };
+}
+
 export const createBuildStartHooks: QraftTreeShakePluginHooksFactory = ({
   clearGeneratedMetadataCache,
 }) => ({
@@ -37,7 +52,7 @@ export function createQraftTreeShakePlugin<TRuntimeContext = unknown>(
 ) {
   const factory: UnpluginFactory<QraftTreeShakeOptions> = (options) => {
     const generatedMetadataCache = createGeneratedMetadataCache();
-    const sourceFilters = resolveSourceFilterOptions(options);
+    const sourceFilters = resolvePluginSourceFilterOptions(options);
     const clearGeneratedMetadataCache = () => {
       generatedMetadataCache.clear();
     };
@@ -63,7 +78,8 @@ export function createQraftTreeShakePlugin<TRuntimeContext = unknown>(
             options,
             moduleAccess,
             this.inputSourceMap,
-            generatedMetadataCache
+            generatedMetadataCache,
+            sourceFilters
           );
         },
       },

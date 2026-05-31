@@ -1,6 +1,9 @@
 import type { UnpluginContextMeta } from 'unplugin';
 import { describe, expect, it } from 'vitest';
-import { createQraftTreeShakePlugin } from './create-qraft-tree-shake-plugin.js';
+import {
+  createQraftTreeShakePlugin,
+  resolvePluginSourceFilterOptions,
+} from './create-qraft-tree-shake-plugin.js';
 
 describe('createQraftTreeShakePlugin', () => {
   it('does not infer bundler lifecycle hooks from unplugin metadata', () => {
@@ -35,5 +38,22 @@ describe('createQraftTreeShakePlugin', () => {
     if (Array.isArray(plugin)) return;
 
     expect(plugin.vite).toHaveProperty('handleHotUpdate');
+  });
+
+  it('resolves default source filters at the plugin entrypoint', () => {
+    expect(resolvePluginSourceFilterOptions({})).toEqual({
+      include: [/\.[cm]?[jt]sx?$/],
+      exclude: /node_modules/,
+    });
+
+    expect(
+      resolvePluginSourceFilterOptions({
+        include: /\.custom$/,
+        exclude: /vendor/,
+      })
+    ).toEqual({
+      include: /\.custom$/,
+      exclude: /vendor/,
+    });
   });
 });

@@ -1,9 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { normalizeEntrypoints } from './entrypoints.js';
-import {
-  resolveSourceFilterOptions,
-  shouldInspectSource,
-} from './source-gate.js';
+import { shouldInspectSource } from './source-gate.js';
 
 describe('shouldInspectSource', () => {
   const entrypoints = normalizeEntrypoints({
@@ -49,7 +46,7 @@ api.pets.getPets.useQuery();
         code: `createAPIClient().pets.getPets.useQuery()`,
         id: '/virtual/src/styles.css',
         entrypoints,
-        include: resolveSourceFilterOptions({}).include,
+        include: [/\.[cm]?[jt]sx?$/],
       })
     ).toBe(false);
   });
@@ -62,23 +59,6 @@ api.pets.getPets.useQuery();
         entrypoints,
       })
     ).toBe(true);
-  });
-
-  it('resolves default source filters in one place', () => {
-    expect(resolveSourceFilterOptions({})).toEqual({
-      include: [/\.[cm]?[jt]sx?$/],
-      exclude: /node_modules/,
-    });
-
-    expect(
-      resolveSourceFilterOptions({
-        include: /\.custom$/,
-        exclude: /vendor/,
-      })
-    ).toEqual({
-      include: /\.custom$/,
-      exclude: /vendor/,
-    });
   });
 
   it('uses configured exclude filters for node_modules ids', () => {
