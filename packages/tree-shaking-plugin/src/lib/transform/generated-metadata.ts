@@ -257,7 +257,7 @@ async function inspectFactoryFileCached({
   const cached = cache.factoryInspectionByKey.get(key);
   if (cached) return cached;
 
-  // Webpack loadModule can re-enter this transform while an inspection is in
+  // Module loaders can re-enter this transform while an inspection is in
   // flight, so cache only settled outcomes instead of sharing pending promises.
   const outcome = await inspectFactoryFile({
     factoryFile,
@@ -294,7 +294,7 @@ async function validatePrecreatedClientCached({
   const cached = cache.precreatedClientValidationByKey.get(key);
   if (cached) return cached;
 
-  // Keep this cache settled-only for the same webpack re-entrancy reason as
+  // Keep this cache settled-only for the same loader re-entrancy reason as
   // factory inspection caching above.
   const valid = await validatePrecreatedClient(
     entrypoint,

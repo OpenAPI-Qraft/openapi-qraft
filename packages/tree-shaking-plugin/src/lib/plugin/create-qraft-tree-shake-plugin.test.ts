@@ -17,4 +17,23 @@ describe('createQraftTreeShakePlugin', () => {
     expect(plugin).not.toHaveProperty('buildStart');
     expect(plugin).not.toHaveProperty('webpack');
   });
+
+  it('passes cache clearing to adapter-specific hooks', () => {
+    const plugin = createQraftTreeShakePlugin(
+      () => ({
+        resolve: async () => null,
+        load: async () => null,
+      }),
+      ({ clearGeneratedMetadataCache }) => ({
+        vite: {
+          handleHotUpdate: clearGeneratedMetadataCache,
+        },
+      })
+    ).raw({}, { framework: 'vite' });
+
+    expect(Array.isArray(plugin)).toBe(false);
+    if (Array.isArray(plugin)) return;
+
+    expect(plugin.vite).toHaveProperty('handleHotUpdate');
+  });
 });
