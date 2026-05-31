@@ -40,12 +40,23 @@ api.pets.getPets.useQuery();
     ).toBe(false);
   });
 
-  it('skips non-source ids and node_modules ids', () => {
+  it('skips non-source ids', () => {
     expect(
       shouldInspectSource({
         code: `createAPIClient().pets.getPets.useQuery()`,
         id: '/virtual/src/styles.css',
         entrypoints,
+      })
+    ).toBe(false);
+  });
+
+  it('uses configured exclude filters for node_modules ids', () => {
+    expect(
+      shouldInspectSource({
+        code: `createAPIClient().pets.getPets.useQuery()`,
+        id: '/virtual/node_modules/pkg/index.ts',
+        entrypoints,
+        exclude: /node_modules/,
       })
     ).toBe(false);
 
@@ -55,7 +66,7 @@ api.pets.getPets.useQuery();
         id: '/virtual/node_modules/pkg/index.ts',
         entrypoints,
       })
-    ).toBe(false);
+    ).toBe(true);
   });
 
   it('requires a configured entrypoint signal', () => {

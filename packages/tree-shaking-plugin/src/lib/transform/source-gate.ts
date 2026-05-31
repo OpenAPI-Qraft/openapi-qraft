@@ -18,7 +18,6 @@ export function shouldInspectSource({
   exclude,
 }: ShouldInspectSourceInput): boolean {
   if (entrypoints.length === 0) return false;
-  if (id.includes('/node_modules/')) return false;
   if (!sourceIdPattern.test(id)) return false;
   if (matchesPattern(id, exclude)) return false;
   if (include && !matchesPattern(id, include)) return false;
