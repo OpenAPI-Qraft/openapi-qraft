@@ -4,6 +4,7 @@ import { createUnplugin } from 'unplugin';
 import { transformQraftTreeShaking } from '../../core.js';
 import { type QraftModuleAccessFactory } from '../resolvers/common.js';
 import { createGeneratedMetadataCache } from '../transform/generated-metadata.js';
+import { resolveSourceFilterOptions } from '../transform/source-gate.js';
 
 export const QRAFT_TREE_SHAKE_PLUGIN_NAME =
   '@openapi-qraft/tree-shaking-plugin';
@@ -36,6 +37,7 @@ export function createQraftTreeShakePlugin<TRuntimeContext = unknown>(
 ) {
   const factory: UnpluginFactory<QraftTreeShakeOptions> = (options) => {
     const generatedMetadataCache = createGeneratedMetadataCache();
+    const sourceFilters = resolveSourceFilterOptions(options);
     const clearGeneratedMetadataCache = () => {
       generatedMetadataCache.clear();
     };
@@ -46,8 +48,8 @@ export function createQraftTreeShakePlugin<TRuntimeContext = unknown>(
       transform: {
         filter: {
           id: {
-            include: options.include ?? [/\.[cm]?[jt]sx?$/],
-            exclude: options.exclude ?? /node_modules/,
+            include: sourceFilters.include,
+            exclude: sourceFilters.exclude,
           },
         },
         handler(this: any, code, id) {

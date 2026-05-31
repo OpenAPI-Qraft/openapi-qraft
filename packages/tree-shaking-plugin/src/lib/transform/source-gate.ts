@@ -1,6 +1,8 @@
 import type { ClientEntrypoint, FilterPattern } from './types.js';
 
 const sourceIdPattern = /\.[cm]?[jt]sx?$/;
+const defaultSourceInclude = [sourceIdPattern] satisfies FilterPattern;
+const defaultSourceExclude = /node_modules/;
 
 type ShouldInspectSourceInput = {
   code: string;
@@ -10,6 +12,21 @@ type ShouldInspectSourceInput = {
   exclude?: FilterPattern;
 };
 
+type SourceFilterOptions = Pick<
+  ShouldInspectSourceInput,
+  'include' | 'exclude'
+>;
+
+export function resolveSourceFilterOptions({
+  include,
+  exclude,
+}: SourceFilterOptions): Required<SourceFilterOptions> {
+  return {
+    include: include ?? defaultSourceInclude,
+    exclude: exclude ?? defaultSourceExclude,
+  };
+}
+
 export function shouldInspectSource({
   code,
   id,
@@ -18,7 +35,6 @@ export function shouldInspectSource({
   exclude,
 }: ShouldInspectSourceInput): boolean {
   if (entrypoints.length === 0) return false;
-  if (!sourceIdPattern.test(id)) return false;
   if (matchesPattern(id, exclude)) return false;
   if (include && !matchesPattern(id, include)) return false;
 
