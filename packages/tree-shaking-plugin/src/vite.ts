@@ -8,5 +8,10 @@ import { createRollupLikeModuleAccess } from './lib/resolvers/rollup-like.js';
 export const qraftTreeShakeVite =
   createQraftTreeShakePlugin<BundlerResolveContext>(
     createRollupLikeModuleAccess,
-    createBuildStartHooks
+    (context) => ({
+      ...createBuildStartHooks(context),
+      vite: {
+        handleHotUpdate: context.clearGeneratedMetadataCache,
+      },
+    })
   ).vite;
