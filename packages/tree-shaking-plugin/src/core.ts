@@ -12,7 +12,10 @@ import { createAgnosticModuleAccess } from './lib/resolvers/agnostic.js';
 import { normalizeEntrypoints } from './lib/transform/entrypoints.js';
 import { type GeneratedMetadataCache } from './lib/transform/generated-metadata.js';
 import { applyTransformMutations } from './lib/transform/mutate.js';
-import { shouldInspectSource } from './lib/transform/source-gate.js';
+import {
+  resolveSourceFilterOptions,
+  shouldInspectSource,
+} from './lib/transform/source-gate.js';
 import { createTransformState } from './lib/transform/state.js';
 
 export type FilterPattern = string | RegExp | Array<string | RegExp>;
@@ -103,13 +106,14 @@ export async function transformQraftTreeShaking(
         : moduleAccessOrResolver;
 
   const entrypoints = normalizeEntrypoints(options);
+  const sourceFilters = resolveSourceFilterOptions(options);
   if (
     !shouldInspectSource({
       code,
       id,
       entrypoints,
-      include: options.include,
-      exclude: options.exclude ?? /node_modules/,
+      include: sourceFilters.include,
+      exclude: sourceFilters.exclude,
     })
   ) {
     return null;
