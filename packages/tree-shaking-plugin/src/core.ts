@@ -6,16 +6,14 @@ import type {
   QraftModuleAccessOptions,
   QraftResolver,
 } from './lib/resolvers/common.js';
+import type { SourceFilterOptions } from './lib/transform/source-gate.js';
 import * as generateModule from '@babel/generator';
 import { resolveDefaultExport } from './lib/interop/resolve-default-export.js';
 import { createAgnosticModuleAccess } from './lib/resolvers/agnostic.js';
 import { normalizeEntrypoints } from './lib/transform/entrypoints.js';
 import { type GeneratedMetadataCache } from './lib/transform/generated-metadata.js';
 import { applyTransformMutations } from './lib/transform/mutate.js';
-import {
-  resolveSourceFilterOptions,
-  shouldInspectSource,
-} from './lib/transform/source-gate.js';
+import { shouldInspectSource } from './lib/transform/source-gate.js';
 import { createTransformState } from './lib/transform/state.js';
 
 export type FilterPattern = string | RegExp | Array<string | RegExp>;
@@ -90,7 +88,8 @@ export async function transformQraftTreeShaking(
   options: QraftTreeShakeOptions,
   moduleAccessOrResolver?: QraftModuleAccessInput,
   inputSourceMap?: SourceMapInput,
-  generatedMetadataCache?: GeneratedMetadataCache
+  generatedMetadataCache?: GeneratedMetadataCache,
+  sourceFilters?: SourceFilterOptions
 ) {
   const moduleAccess =
     moduleAccessOrResolver === undefined
@@ -106,14 +105,13 @@ export async function transformQraftTreeShaking(
         : moduleAccessOrResolver;
 
   const entrypoints = normalizeEntrypoints(options);
-  const sourceFilters = resolveSourceFilterOptions(options);
   if (
     !shouldInspectSource({
       code,
       id,
       entrypoints,
-      include: sourceFilters.include,
-      exclude: sourceFilters.exclude,
+      include: sourceFilters?.include,
+      exclude: sourceFilters?.exclude,
     })
   ) {
     return null;

@@ -98,15 +98,12 @@ function normalizeServices(
 
 function normalizeReactContext(
   factoryModuleSpecifier: string,
-  reactContext:
-    | { exportName: string; moduleSpecifier?: string }
-    | undefined
+  reactContext: { exportName: string; moduleSpecifier?: string } | undefined
 ) {
   return reactContext
     ? {
         exportName: reactContext.exportName,
-        moduleSpecifier:
-          reactContext.moduleSpecifier ?? factoryModuleSpecifier,
+        moduleSpecifier: reactContext.moduleSpecifier ?? factoryModuleSpecifier,
       }
     : null;
 }
