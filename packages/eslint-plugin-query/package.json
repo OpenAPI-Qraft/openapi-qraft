@@ -13,6 +13,9 @@
     "url": "git+https://github.com/OpenAPI-Qraft/openapi-qraft.git",
     "directory": "packages/eslint-plugin-query"
   },
+  "bugs": {
+    "url": "https://github.com/OpenAPI-Qraft/openapi-qraft/issues"
+  },
   "scripts": {
     "build": "yarn clean && NODE_ENV=production rollup --config rollup.config.mjs && tsc --project tsconfig.build.json --emitDeclarationOnly",
     "typecheck": "tsc --noEmit",
