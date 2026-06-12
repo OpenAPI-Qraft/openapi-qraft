@@ -9,10 +9,7 @@ import {
 } from './agnostic.js';
 import { getQraftModuleAccessStrategyMetadata } from './common.js';
 import { createEsbuildModuleAccess } from './esbuild.js';
-import {
-  createRollupLikeModuleAccess,
-  createRollupLikeResolver,
-} from './rollup-like.js';
+import { createRollupLikeModuleAccess } from './rollup-like.js';
 import { createRspackModuleAccess, createRspackResolver } from './rspack.js';
 import {
   createWebpackLikeModuleAccess,
@@ -174,26 +171,6 @@ describe('resolver composition', () => {
     await expect(access.load('/tmp/src/api/index.ts')).resolves.toBe('');
     await expect(access.load('/tmp/src/api/index.ts')).resolves.toBe('');
     expect(load).toHaveBeenCalledTimes(1);
-  });
-
-  it('uses the rollup-like bundler resolver', async () => {
-    const ctx: BundlerResolveContext = {
-      resolve: vi.fn(async (source, importer, options) => {
-        expect(source).toBe('./resolved.js');
-        expect(importer).toBe('/tmp/src.ts');
-        expect(options).toEqual({ skipSelf: true });
-        return {
-          id: '/tmp/resolved.ts?query=1',
-          external: false,
-        };
-      }),
-    };
-
-    const resolver = createRollupLikeResolver(ctx);
-    await expect(resolver('./resolved.js', '/tmp/src.ts')).resolves.toBe(
-      '/tmp/resolved.ts'
-    );
-    expect(ctx.resolve).toHaveBeenCalledTimes(1);
   });
 
   it('uses the webpack loader resolver', async () => {

@@ -3,7 +3,6 @@ import type {
   LoadStrategy,
   QraftModuleAccess,
   QraftModuleAccessOptions,
-  QraftResolver,
   ResolveStrategy,
 } from './common.js';
 import {
@@ -70,18 +69,4 @@ export function createRollupLikeModuleAccess(
       createRollupFsLoadStrategy(ctx),
     ]
   );
-}
-
-export function createRollupLikeResolver(
-  ctx: BundlerResolveContext,
-  userResolve?: QraftResolver
-): QraftResolver {
-  const resolve = createRollupLikeModuleAccess(ctx, {
-    resolve: userResolve,
-  }).resolve;
-
-  return async (specifier, importer) => {
-    const resolved = await resolve(specifier, importer);
-    return resolved ? stripQueryAndHash(resolved) : null;
-  };
 }
