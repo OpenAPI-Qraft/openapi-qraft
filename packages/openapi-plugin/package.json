@@ -1,6 +1,7 @@
 {
   "name": "@openapi-qraft/plugin",
   "version": "2.15.0-beta.9",
+  "license": "MIT",
   "packageManager": "yarn@4.0.2",
   "type": "module",
   "scripts": {
