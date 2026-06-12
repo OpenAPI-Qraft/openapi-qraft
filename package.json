@@ -53,6 +53,7 @@
     "follow-redirects@npm:^1.0.0": "npm:^1.16.0",
     "ip-address@npm:^10.0.1": "npm:^10.1.1",
     "jest-util@npm:29.7.0/picomatch": "npm:^2.3.2",
+    "joi@npm:^17.9.2": "npm:18.2.1",
     "minimatch@npm:10.2.5/brace-expansion": "npm:^5.0.6",
     "minimatch@npm:3.1.5/brace-expansion": "npm:^1.1.13",
     "msw-auto-mock@npm:0.32.0/lodash": "npm:^4.18.0",
