@@ -3,18 +3,12 @@ import fs from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 import { describe, expect, it, vi } from 'vitest';
-import {
-  createAgnosticModuleAccess,
-  createAgnosticResolver,
-} from './agnostic.js';
+import { createAgnosticModuleAccess } from './agnostic.js';
 import { getQraftModuleAccessStrategyMetadata } from './common.js';
 import { createEsbuildModuleAccess } from './esbuild.js';
 import { createRollupLikeModuleAccess } from './rollup-like.js';
-import { createRspackModuleAccess, createRspackResolver } from './rspack.js';
-import {
-  createWebpackLikeModuleAccess,
-  createWebpackLikeResolver,
-} from './webpack-like.js';
+import { createRspackModuleAccess } from './rspack.js';
+import { createWebpackLikeModuleAccess } from './webpack-like.js';
 
 async function mktemp() {
   return fs.mkdtemp(path.join(os.tmpdir(), 'qraft-resolver-'));
@@ -54,12 +48,12 @@ describe('resolver composition', () => {
     });
   });
 
-  it('uses only the custom resolver in the agnostic resolver chain', async () => {
+  it('uses only the custom resolver in agnostic module access', async () => {
     const importer = path.join(await mktemp(), 'src.ts');
     const customResolve = vi.fn(async () => null);
-    const resolver = createAgnosticResolver(customResolve);
+    const access = createAgnosticModuleAccess({ resolve: customResolve });
 
-    await expect(resolver('./fallback', importer)).resolves.toBeNull();
+    await expect(access.resolve('./fallback', importer)).resolves.toBeNull();
     expect(customResolve).toHaveBeenCalledWith('./fallback', importer);
   });
 
@@ -193,10 +187,10 @@ describe('resolver composition', () => {
       },
     };
 
-    const resolver = createWebpackLikeResolver(ctx);
-    await expect(resolver('@/generated-api', '/tmp/src/app.ts')).resolves.toBe(
-      '/tmp/generated-api/index.ts'
-    );
+    const access = createWebpackLikeModuleAccess(ctx);
+    await expect(
+      access.resolve('@/generated-api', '/tmp/src/app.ts')
+    ).resolves.toBe('/tmp/generated-api/index.ts');
     expect(resolve).toHaveBeenCalledTimes(1);
   });
 
@@ -222,7 +216,7 @@ describe('resolver composition', () => {
     );
     await fs.writeFile(path.join(srcDir, 'index.ts'), '');
 
-    const resolver = createRspackResolver({
+    const access = createRspackModuleAccess({
       getNativeBuildContext() {
         return {
           framework: 'rspack',
@@ -239,7 +233,7 @@ describe('resolver composition', () => {
 
     const expected = await fs.realpath(path.join(srcDir, 'index.ts'));
     await expect(
-      resolver('@/generated-api', path.join(dir, 'src', 'app.ts'))
+      access.resolve('@/generated-api', path.join(dir, 'src', 'app.ts'))
     ).resolves.toBe(expected);
   });
 

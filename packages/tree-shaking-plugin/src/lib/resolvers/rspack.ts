@@ -4,7 +4,6 @@ import type {
   LoadStrategy,
   QraftModuleAccess,
   QraftModuleAccessOptions,
-  QraftResolver,
   ResolveStrategy,
 } from './common.js';
 import path from 'node:path';
@@ -197,11 +196,4 @@ export function createRspackModuleAccess(
       createRspackInputFileSystemLoadStrategy(ctx),
     ]
   );
-}
-
-export function createRspackResolver(
-  ctx: BundlerResolveContext,
-  userResolve?: QraftResolver
-): QraftResolver {
-  return createRspackModuleAccess(ctx, { resolve: userResolve }).resolve;
 }

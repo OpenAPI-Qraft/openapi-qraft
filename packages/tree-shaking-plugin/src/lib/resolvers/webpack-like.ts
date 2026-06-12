@@ -3,7 +3,6 @@ import type {
   LoadStrategy,
   QraftModuleAccess,
   QraftModuleAccessOptions,
-  QraftResolver,
   ResolveStrategy,
 } from './common.js';
 import path from 'node:path';
@@ -189,11 +188,4 @@ export function createWebpackLikeModuleAccess(
       createWebpackInputFileSystemLoadStrategy(ctx),
     ]
   );
-}
-
-export function createWebpackLikeResolver(
-  ctx: WebpackLoaderContextLike,
-  userResolve?: QraftResolver
-): QraftResolver {
-  return createWebpackLikeModuleAccess(ctx, { resolve: userResolve }).resolve;
 }

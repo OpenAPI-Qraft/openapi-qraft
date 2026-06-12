@@ -3,7 +3,6 @@ import type {
   LoadStrategy,
   QraftModuleAccess,
   QraftModuleAccessOptions,
-  QraftResolver,
   ResolveStrategy,
 } from './common.js';
 import fs from 'node:fs/promises';
@@ -75,11 +74,4 @@ export function createEsbuildModuleAccess(
       createEsbuildFileLoadStrategy(),
     ]
   );
-}
-
-export function createEsbuildResolver(
-  ctx: BundlerResolveContext,
-  userResolve?: QraftResolver
-): QraftResolver {
-  return createEsbuildModuleAccess(ctx, { resolve: userResolve }).resolve;
 }
