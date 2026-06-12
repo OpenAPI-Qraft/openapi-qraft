@@ -1,5 +1,19 @@
 # @qraft/cli
 
+## 1.0.0-beta.9
+
+### Patch Changes
+
+- 3901553: Add MIT license metadata to package manifests.
+- Updated dependencies [3901553]
+  - @openapi-qraft/plugin@2.15.0-beta.10
+  - @openapi-qraft/openapi-typescript-plugin@2.15.0-beta.10
+  - @openapi-qraft/tanstack-query-react-plugin@2.15.0-beta.10
+  - @qraft/asyncapi-plugin@1.0.0-beta.9
+  - @qraft/asyncapi-typescript-plugin@1.0.0-beta.9
+  - @qraft/cli-utils@1.0.0-beta.9
+  - @qraft/plugin@1.0.0-beta.9
+
 ## 1.0.0-beta.8
 
 ### Patch Changes

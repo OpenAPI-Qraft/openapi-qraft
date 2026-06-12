@@ -24,6 +24,7 @@
     "@qraft/asyncapi-typescript-plugin": "0.0.0"
   },
   "changesets": [
+    "add-license-metadata",
     "cold-pets-design",
     "deep-boxes-tan",
     "dirty-horses-nail",

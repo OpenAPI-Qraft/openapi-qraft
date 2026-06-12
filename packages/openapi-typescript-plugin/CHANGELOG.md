@@ -1,5 +1,15 @@
 # @openapi-qraft/openapi-typescript
 
+## 2.15.0-beta.10
+
+### Patch Changes
+
+- 3901553: Add MIT license metadata to package manifests.
+- Updated dependencies [3901553]
+  - @openapi-qraft/plugin@2.15.0-beta.10
+  - @qraft/cli-utils@1.0.0-beta.9
+  - @qraft/plugin@1.0.0-beta.9
+
 ## 2.15.0-beta.9
 
 ### Patch Changes
