@@ -24,7 +24,6 @@ import { parse } from '@babel/parser';
 import * as traverseModule from '@babel/traverse';
 import * as t from '@babel/types';
 import { resolveDefaultExport } from '../interop/resolve-default-export.js';
-import { createAgnosticModuleAccess } from '../resolvers/agnostic.js';
 import { createTraceableQraftModuleAccess } from '../resolvers/common.js';
 import {
   getStaticMemberPath,
@@ -137,10 +136,7 @@ export async function createTransformState(
   code: string,
   id: string,
   options: QraftTreeShakeOptions,
-  moduleAccess: QraftModuleAccess = createAgnosticModuleAccess({
-    resolve: options.moduleAccess?.resolve ?? options.resolve,
-    load: options.moduleAccess?.load,
-  }),
+  moduleAccess: QraftModuleAccess,
   generatedMetadataCache?: GeneratedMetadataCache
 ): Promise<TransformState> {
   const traceableModuleAccess = createTraceableQraftModuleAccess(moduleAccess);

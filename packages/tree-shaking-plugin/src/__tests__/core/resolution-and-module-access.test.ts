@@ -508,7 +508,7 @@ createAPIClient().pets.getPets.useQuery();
     }
   });
 
-  it('uses module access from options by default when creating a transform state', async () => {
+  it('uses explicit module access when creating a transform state', async () => {
     const fixture = await createFixture();
     const sourceFile = path.join(fixture, 'src/App.tsx');
     const fixtureModuleAccess = createFixtureModuleAccess(fixture);
@@ -538,10 +538,10 @@ export function App() {
             },
           },
         ],
-        moduleAccess: {
-          resolve: fixtureModuleAccess.resolve,
-          load,
-        },
+      },
+      {
+        resolve: fixtureModuleAccess.resolve,
+        load,
       }
     );
 
@@ -695,93 +695,6 @@ export function App() {
     } finally {
       readFileSpy.mockRestore();
     }
-  });
-
-  it('supports a legacy resolver 4th argument together with module access load options', async () => {
-    const fixture = await createFixture();
-    const sourceFile = path.join(fixture, 'src/App.tsx');
-    const fixtureModuleAccess = createFixtureModuleAccess(fixture);
-    const load = vi.fn(fixtureModuleAccess.load);
-
-    const result = await transformQraftTreeShakingImpl(
-      `
-import { createAPIClient } from './api';
-
-const api = createAPIClient();
-
-export function App() {
-  return api.pets.getPets.useQuery();
-}
-`,
-      sourceFile,
-      {
-        entrypoints: [
-          {
-            kind: 'clientFactory',
-            factory: {
-              exportName: 'createAPIClient',
-              moduleSpecifier: './api',
-            },
-            reactContext: {
-              exportName: 'APIClientContext',
-            },
-          },
-        ],
-        moduleAccess: {
-          load,
-        },
-      },
-      fixtureModuleAccess.resolve
-    );
-
-    expect(result?.code).toContain('api_pets_getPets.useQuery()');
-    expect(load).toHaveBeenCalledWith(path.join(fixture, 'src/api/index.ts'));
-  });
-
-  it('prefers module access resolve from options over a conflicting legacy resolver 4th argument', async () => {
-    const fixture = await createFixture();
-    const sourceFile = path.join(fixture, 'src/App.tsx');
-    const fixtureModuleAccess = createFixtureModuleAccess(fixture);
-    const load = vi.fn(fixtureModuleAccess.load);
-    const legacyResolver = vi.fn(async () => {
-      throw new Error('legacy resolver should not be called');
-    });
-
-    const result = await transformQraftTreeShakingImpl(
-      `
-import { createAPIClient } from './api';
-
-const api = createAPIClient();
-
-export function App() {
-  return api.pets.getPets.useQuery();
-}
-`,
-      sourceFile,
-      {
-        entrypoints: [
-          {
-            kind: 'clientFactory',
-            factory: {
-              exportName: 'createAPIClient',
-              moduleSpecifier: './api',
-            },
-            reactContext: {
-              exportName: 'APIClientContext',
-            },
-          },
-        ],
-        moduleAccess: {
-          resolve: fixtureModuleAccess.resolve,
-          load,
-        },
-      },
-      legacyResolver
-    );
-
-    expect(result?.code).toContain('api_pets_getPets.useQuery()');
-    expect(legacyResolver).not.toHaveBeenCalled();
-    expect(load).toHaveBeenCalledWith(path.join(fixture, 'src/api/index.ts'));
   });
 
   it('does not match a same-named import that resolves to a different module', async () => {

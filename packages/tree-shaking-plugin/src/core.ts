@@ -9,7 +9,6 @@ import type {
 import type { SourceFilterOptions } from './lib/transform/source-gate.js';
 import * as generateModule from '@babel/generator';
 import { resolveDefaultExport } from './lib/interop/resolve-default-export.js';
-import { createAgnosticModuleAccess } from './lib/resolvers/agnostic.js';
 import { normalizeEntrypoints } from './lib/transform/entrypoints.js';
 import { type GeneratedMetadataCache } from './lib/transform/generated-metadata.js';
 import { applyTransformMutations } from './lib/transform/mutate.js';
@@ -78,7 +77,6 @@ type GenerateFn = (typeof import('@babel/generator'))['default'];
 type GeneratorOptions = Omit<BabelGeneratorOptions, 'inputSourceMap'> & {
   inputSourceMap?: SourceMapInput;
 };
-type QraftModuleAccessInput = QraftModuleAccess | QraftResolver;
 
 const generate = resolveDefaultExport<GenerateFn>(generateModule);
 
@@ -86,24 +84,11 @@ export async function transformQraftTreeShaking(
   code: string,
   id: string,
   options: QraftTreeShakeOptions,
-  moduleAccessOrResolver?: QraftModuleAccessInput,
+  moduleAccess: QraftModuleAccess,
   inputSourceMap?: SourceMapInput,
   generatedMetadataCache?: GeneratedMetadataCache,
   sourceFilters?: SourceFilterOptions
 ) {
-  const moduleAccess =
-    moduleAccessOrResolver === undefined
-      ? createAgnosticModuleAccess({
-          resolve: options.moduleAccess?.resolve ?? options.resolve,
-          load: options.moduleAccess?.load,
-        })
-      : typeof moduleAccessOrResolver === 'function'
-        ? createAgnosticModuleAccess({
-            resolve: options.moduleAccess?.resolve ?? moduleAccessOrResolver,
-            load: options.moduleAccess?.load,
-          })
-        : moduleAccessOrResolver;
-
   const entrypoints = normalizeEntrypoints(options);
   if (
     !shouldInspectSource({
