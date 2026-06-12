@@ -8,6 +8,7 @@ import {
   createUserResolverStrategy,
   createUserSourceLoaderStrategy,
 } from '../../lib/resolvers/common.js';
+import { createGeneratedMetadataCache } from '../../lib/transform/generated-metadata.js';
 import {
   createFixtureModuleAccess,
   PRECREATED_API_INDEX_TS,
@@ -179,7 +180,10 @@ createAPIClient().pets.getPets.useQuery();
             },
           ],
         },
-        moduleAccess
+        moduleAccess,
+        undefined,
+        createGeneratedMetadataCache(),
+        {}
       )
     ).rejects.toMatchObject({
       name: 'QraftTreeShakeError',
@@ -248,7 +252,10 @@ createAPIClient().pets.getPets.useQuery();
             },
           ],
         },
-        moduleAccess
+        moduleAccess,
+        undefined,
+        createGeneratedMetadataCache(),
+        {}
       )
     ).rejects.toMatchObject({
       name: 'QraftTreeShakeError',
@@ -686,7 +693,10 @@ export function App() {
         {
           resolve: fixtureResolver,
           load,
-        }
+        },
+        undefined,
+        createGeneratedMetadataCache(),
+        {}
       );
 
       expect(result).toBeNull();

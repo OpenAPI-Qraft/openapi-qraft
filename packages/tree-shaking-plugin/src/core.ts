@@ -85,9 +85,9 @@ export async function transformQraftTreeShaking(
   id: string,
   options: QraftTreeShakeOptions,
   moduleAccess: QraftModuleAccess,
-  inputSourceMap?: SourceMapInput,
-  generatedMetadataCache?: GeneratedMetadataCache,
-  sourceFilters?: SourceFilterOptions
+  inputSourceMap: SourceMapInput | undefined,
+  generatedMetadataCache: GeneratedMetadataCache,
+  sourceFilters: SourceFilterOptions
 ) {
   const entrypoints = normalizeEntrypoints(options);
   if (
@@ -95,8 +95,8 @@ export async function transformQraftTreeShaking(
       code,
       id,
       entrypoints,
-      include: sourceFilters?.include,
-      exclude: sourceFilters?.exclude,
+      include: sourceFilters.include,
+      exclude: sourceFilters.exclude,
     })
   ) {
     return null;

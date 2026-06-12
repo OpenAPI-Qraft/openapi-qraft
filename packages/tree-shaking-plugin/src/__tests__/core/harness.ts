@@ -4,6 +4,7 @@ import fs from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 import { transformQraftTreeShaking as transformQraftTreeShakingImpl } from '../../core.js';
+import { createGeneratedMetadataCache } from '../../lib/transform/generated-metadata.js';
 import { createTransformState } from '../../lib/transform/state.js';
 import {
   createFixtureModuleAccess,
@@ -32,6 +33,8 @@ export async function transformQraftTreeShaking(
   const moduleAccess = createFixtureModuleAccess(fixtureRoot, {
     resolve: options.moduleAccess?.resolve ?? options.resolve,
   });
+  const generatedMetadataCache = createGeneratedMetadataCache();
+  const sourceFilters = {};
 
   if (options.moduleAccess?.load) {
     return transformQraftTreeShakingImpl(
@@ -42,7 +45,9 @@ export async function transformQraftTreeShaking(
         ...moduleAccess,
         load: options.moduleAccess.load,
       },
-      inputSourceMap
+      inputSourceMap,
+      generatedMetadataCache,
+      sourceFilters
     );
   }
 
@@ -51,7 +56,9 @@ export async function transformQraftTreeShaking(
     id,
     options,
     moduleAccess,
-    inputSourceMap
+    inputSourceMap,
+    generatedMetadataCache,
+    sourceFilters
   );
 }
 
