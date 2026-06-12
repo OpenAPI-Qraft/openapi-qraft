@@ -1,6 +1,6 @@
 {
   "name": "@qraft/cli",
-  "version": "1.0.0-beta.8",
+  "version": "1.0.0-beta.9",
   "license": "MIT",
   "description": "CLI tool for generating type-safe code from OpenAPI and AsyncAPI specifications",
   "scripts": {

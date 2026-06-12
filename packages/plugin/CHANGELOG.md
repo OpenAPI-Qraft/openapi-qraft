@@ -1,5 +1,11 @@
 # @qraft/plugin
 
+## 1.0.0-beta.9
+
+### Patch Changes
+
+- 3901553: Add MIT license metadata to package manifests.
+
 ## 1.0.0-beta.8
 
 ## 1.0.0-beta.7
