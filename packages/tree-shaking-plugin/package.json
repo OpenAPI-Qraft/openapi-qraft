@@ -1,0 +1,118 @@
+{
+  "name": "@openapi-qraft/tree-shaking-plugin",
+  "version": "2.15.0-beta.7",
+  "description": "Build plugin for optimizing OpenAPI Qraft context API clients for tree-shaking.",
+  "scripts": {
+    "build": "yarn clean && NODE_ENV=production rollup --config rollup.config.mjs && tsc --project tsconfig.build.json --emitDeclarationOnly",
+    "dev": "yarn build --watch --noEmitOnError false",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint --max-warnings 0",
+    "clean": "rimraf dist/"
+  },
+  "sideEffects": false,
+  "publishConfig": {
+    "access": "public"
+  },
+  "type": "module",
+  "module": "dist/esm/index.js",
+  "types": "dist/types/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/types/index.d.ts",
+      "import": "./dist/esm/index.js",
+      "require": "./dist/cjs/index.cjs"
+    },
+    "./vite": {
+      "types": "./dist/types/vite.d.ts",
+      "import": "./dist/esm/vite.js",
+      "require": "./dist/cjs/vite.cjs"
+    },
+    "./rollup": {
+      "types": "./dist/types/rollup.d.ts",
+      "import": "./dist/esm/rollup.js",
+      "require": "./dist/cjs/rollup.cjs"
+    },
+    "./webpack": {
+      "types": "./dist/types/webpack.d.ts",
+      "import": "./dist/esm/webpack.js",
+      "require": "./dist/cjs/webpack.cjs"
+    },
+    "./rspack": {
+      "types": "./dist/types/rspack.d.ts",
+      "import": "./dist/esm/rspack.js",
+      "require": "./dist/cjs/rspack.cjs"
+    },
+    "./esbuild": {
+      "types": "./dist/types/esbuild.d.ts",
+      "import": "./dist/esm/esbuild.js",
+      "require": "./dist/cjs/esbuild.cjs"
+    },
+    "./package.json": "./package.json"
+  },
+  "typesVersions": {
+    "*": {
+      "*": [
+        "dist/types/*"
+      ]
+    }
+  },
+  "dependencies": {
+    "@babel/generator": "^7.29.0",
+    "@babel/parser": "^7.29.0",
+    "@babel/traverse": "^7.29.0",
+    "@babel/types": "^7.29.0",
+    "unplugin": "^2.3.10"
+  },
+  "peerDependencies": {
+    "@rspack/resolver": "^0.4.0"
+  },
+  "peerDependenciesMeta": {
+    "@rspack/resolver": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@jridgewell/trace-mapping": "^0.3.31",
+    "@openapi-qraft/eslint-config": "workspace:*",
+    "@openapi-qraft/rollup-config": "workspace:*",
+    "@qraft/test-utils": "workspace:*",
+    "@rspack/resolver": "^0.4.0",
+    "@types/babel__generator": "^7.27.0",
+    "@types/babel__traverse": "^7.28.0",
+    "@types/node": "^22.19.17",
+    "eslint": "^10.2.0",
+    "rimraf": "^6.1.3",
+    "rollup": "~4.60.1",
+    "typescript": "^5.9.3",
+    "vitest": "^4.1.4"
+  },
+  "files": [
+    "dist",
+    "src",
+    "!dist/**/*.test.*",
+    "!dist/**/*.spec.*",
+    "!src/**/*.test.*",
+    "!src/**/*.spec.*"
+  ],
+  "packageManager": "yarn@4.0.2",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/OpenAPI-Qraft/openapi-qraft.git",
+    "directory": "packages/tree-shaking-plugin"
+  },
+  "bugs": {
+    "url": "https://github.com/OpenAPI-Qraft/openapi-qraft/issues"
+  },
+  "homepage": "https://openapi-qraft.github.io/openapi-qraft/",
+  "keywords": [
+    "openapi",
+    "qraft",
+    "tree-shaking",
+    "vite",
+    "webpack",
+    "rspack",
+    "esbuild",
+    "unplugin"
+  ]
+}

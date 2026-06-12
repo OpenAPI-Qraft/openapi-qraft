@@ -1,0 +1,82 @@
+openapi: 3.1.0
+info:
+  title: Tree Shaking Vite Fixture
+  version: 1.0.0
+paths:
+  /pets:
+    get:
+      operationId: getPets
+      tags:
+        - pets
+      responses:
+        '200':
+          description: Pets list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Pet'
+    post:
+      operationId: createPet
+      tags:
+        - pets
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewPet'
+      responses:
+        '200':
+          description: Created pet
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Pet'
+  /stores:
+    get:
+      operationId: getStores
+      tags:
+        - stores
+      responses:
+        '200':
+          description: Stores list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Store'
+components:
+  schemas:
+    Pet:
+      type: object
+      additionalProperties: false
+      required:
+        - id
+        - name
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+    NewPet:
+      type: object
+      additionalProperties: false
+      required:
+        - name
+      properties:
+        name:
+          type: string
+    Store:
+      type: object
+      additionalProperties: false
+      required:
+        - id
+        - title
+      properties:
+        id:
+          type: integer
+        title:
+          type: string

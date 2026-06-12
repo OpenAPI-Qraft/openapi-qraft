@@ -22,7 +22,7 @@ unpublish_from_registry() {
 
   sh -c "(cd '$(monorepo_root)' && yarn workspaces foreach --recursive -t --no-private \
    $from_flags \
-   exec npm unpublish --force --registry '${NPM_PUBLISH_REGISTRY:-http://localhost:4873/}')"
+   exec npm unpublish --force --registry '${NPM_PUBLISH_REGISTRY:-http://localhost:4873/}') || true"
 }
 
 # Cleanup on exit or interrupt
