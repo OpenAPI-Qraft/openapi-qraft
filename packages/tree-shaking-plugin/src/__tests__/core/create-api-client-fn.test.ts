@@ -252,7 +252,7 @@ api.pets.getPets.getQueryKey();
     `);
   });
 
-  it('rewrites generated factories that receive services as an argument when services.moduleSpecifierBase is configured', async () => {
+  it('documents a misconfigured factory that receives services as an argument when services.moduleSpecifierBase is configured', async () => {
     const fixture = await fs.mkdtemp(
       path.join(os.tmpdir(), 'qraft-tree-shaking-')
     );
@@ -304,6 +304,9 @@ export function App() {
       }
     );
 
+    // This documents unsupported user configuration, not recommended output.
+    // The transform treats a single createAPIClient argument as runtime options,
+    // so external-services factories can produce semantically invalid rewrites.
     expect(result?.code).toMatchInlineSnapshot(`
       "import { services } from './api/services/index';
       import { qraftAPIClient } from "@openapi-qraft/react";
@@ -318,7 +321,7 @@ export function App() {
     `);
   });
 
-  it('rewrites generated factories that receive an operation argument when services.moduleSpecifierBase is configured', async () => {
+  it('documents a misconfigured factory that receives an operation argument when services.moduleSpecifierBase is configured', async () => {
     const fixture = await fs.mkdtemp(
       path.join(os.tmpdir(), 'qraft-tree-shaking-')
     );
@@ -366,6 +369,9 @@ export function App() {
       }
     );
 
+    // This documents unsupported user configuration, not recommended output.
+    // The transform treats a single createAPIClient argument as runtime options,
+    // so external-operation factories can produce semantically invalid rewrites.
     expect(result?.code).toMatchInlineSnapshot(`
       "import { getPets } from './api/services/PetsService';
       import { qraftAPIClient } from "@openapi-qraft/react";
