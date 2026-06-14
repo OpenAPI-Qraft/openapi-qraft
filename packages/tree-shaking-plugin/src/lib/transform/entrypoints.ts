@@ -1,5 +1,6 @@
 import type {
   ClientEntrypoint,
+  QraftClientFactoryEntrypointConfig,
   QraftPrecreatedClientEntrypointConfig,
   QraftTreeShakeOptions,
   ServicesTarget,
@@ -12,32 +13,38 @@ export function normalizeEntrypoints(
 ): ClientEntrypoint[] {
   return (options.entrypoints ?? []).map((entrypoint) => {
     if (entrypoint.kind === 'clientFactory') {
-      const services = normalizeServices(
-        entrypoint.factory.moduleSpecifier,
-        entrypoint.services
-      );
-      const reactContext = normalizeReactContext(
-        entrypoint.factory.moduleSpecifier,
-        entrypoint.reactContext
-      );
-
-      return {
-        kind: 'generatedFactory',
-        key: composeGeneratedFactoryEntrypointKey(
-          entrypoint.factory.exportName,
-          entrypoint.factory.moduleSpecifier,
-          services.moduleSpecifierBase,
-          services.directory,
-          reactContext?.moduleSpecifier ?? ''
-        ),
-        factory: entrypoint.factory,
-        services,
-        reactContext,
-      };
+      return normalizeClientFactoryEntrypoint(entrypoint);
     }
 
     return normalizePrecreatedEntrypoint(entrypoint);
   });
+}
+
+function normalizeClientFactoryEntrypoint(
+  config: QraftClientFactoryEntrypointConfig
+): ClientEntrypoint {
+  const services = normalizeServices(
+    config.factory.moduleSpecifier,
+    config.services
+  );
+  const reactContext = normalizeReactContext(
+    config.factory.moduleSpecifier,
+    config.reactContext
+  );
+
+  return {
+    kind: 'generatedFactory',
+    key: composeGeneratedFactoryEntrypointKey(
+      config.factory.exportName,
+      config.factory.moduleSpecifier,
+      services.moduleSpecifierBase,
+      services.directory,
+      reactContext?.moduleSpecifier ?? ''
+    ),
+    factory: config.factory,
+    services,
+    reactContext,
+  };
 }
 
 function normalizePrecreatedEntrypoint(
