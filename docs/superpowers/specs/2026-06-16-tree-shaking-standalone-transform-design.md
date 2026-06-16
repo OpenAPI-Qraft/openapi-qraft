@@ -284,3 +284,8 @@ Task 1 implemented the Node module access adapter as an internal resolver module
 backed by `oxc-resolver`. The adapter is intentionally not documented as public
 API yet; the public surface should be decided together with the standalone
 project transform utility in Task 2.
+
+Task 2 implemented the standalone project transform API and `qraft-tree-shake`
+CLI. The implementation reuses the Node module access adapter from Task 1, keeps
+the Babel transform semantics unchanged, and uses real filesystem tests to
+validate resolver, glob, config, CLI, and write behavior.

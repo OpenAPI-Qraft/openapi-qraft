@@ -392,6 +392,49 @@ entrypoints: [
   - `'warn'` prints a warning and skips the candidate.
   - `'off'` skips unresolved candidates silently.
 
+## Standalone transform
+
+Use `qraft-tree-shake` when you want to inspect or write the same transform
+without wiring a bundler plugin.
+
+```bash
+qraft-tree-shake
+```
+
+Preview mode is the default and does not write files. To rewrite changed source
+files in place, pass `--write`:
+
+```bash
+qraft-tree-shake --write
+```
+
+Create `qraft-tree-shake.config.ts` in the project root:
+
+```ts
+import type { QraftTreeShakeProjectConfig } from '@openapi-qraft/tree-shaking-plugin/standalone';
+
+export default {
+  include: ['src/**/*.{ts,tsx}'],
+  treeShakeOptions: {
+    entrypoints: [
+      {
+        kind: 'clientFactory',
+        factory: {
+          moduleSpecifier: '@api/my-api',
+          exportName: 'createReactAPIClient',
+        },
+        reactContext: {
+          exportName: 'APIClientContext',
+        },
+      },
+    ],
+  },
+} satisfies QraftTreeShakeProjectConfig;
+```
+
+The CLI prints a compact summary of changed, skipped, written, and failed files.
+It returns a non-zero exit code when at least one file fails to transform.
+
 ## Transformation Examples
 
 ### Context-based factories
