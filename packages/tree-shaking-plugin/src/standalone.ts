@@ -11,6 +11,7 @@ export {
   transformQraftProject,
 } from './lib/standalone/project.js';
 export {
+  defaultTransformQraftProjectConfigFiles,
   findTransformQraftProjectConfig,
   loadTransformQraftProjectConfig,
 } from './lib/standalone/config.js';

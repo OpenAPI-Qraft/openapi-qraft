@@ -4,14 +4,14 @@ import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { createJiti } from 'jiti';
 
-export const defaultTransformQraftProjectConfigFiles = [
+export const defaultTransformQraftProjectConfigFiles = Object.freeze([
   'qraft-tree-shake.config.ts',
   'qraft-tree-shake.config.mts',
   'qraft-tree-shake.config.js',
   'qraft-tree-shake.config.mjs',
   'qraft-tree-shake.config.cjs',
   'qraft-tree-shake.config.cts',
-];
+]) satisfies readonly string[];
 
 export async function findTransformQraftProjectConfig(
   root = process.cwd()

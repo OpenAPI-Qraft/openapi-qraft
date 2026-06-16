@@ -104,6 +104,40 @@ describe('findTransformQraftProjectConfig', () => {
 
     await expect(findTransformQraftProjectConfig(root)).resolves.toBeNull();
   });
+
+  it('resolves relative roots from the current working directory', async () => {
+    const parentRoot = await createConfigFixtureRoot();
+    const relativeRoot = path.join('packages', 'app');
+    const configName = defaultTransformQraftProjectConfigFiles[0];
+    const cwd = process.cwd();
+    await writeConfigFile(parentRoot, path.join(relativeRoot, configName));
+
+    try {
+      process.chdir(parentRoot);
+      const configFile = await findTransformQraftProjectConfig(relativeRoot);
+
+      expect(configFile).toBe(
+        path.resolve(parentRoot, relativeRoot, configName)
+      );
+      expect(path.isAbsolute(configFile ?? '')).toBe(true);
+    } finally {
+      process.chdir(cwd);
+    }
+  });
+});
+
+describe('defaultTransformQraftProjectConfigFiles', () => {
+  it('is immutable at runtime', () => {
+    expect(Object.isFrozen(defaultTransformQraftProjectConfigFiles)).toBe(true);
+  });
+
+  it('is exported from the public standalone entrypoint', async () => {
+    const publicStandalone = await import('../../standalone.js');
+
+    expect(publicStandalone.defaultTransformQraftProjectConfigFiles).toBe(
+      defaultTransformQraftProjectConfigFiles
+    );
+  });
 });
 
 describe('loadTransformQraftProjectConfig', () => {
