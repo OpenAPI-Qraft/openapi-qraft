@@ -5,7 +5,7 @@ import type {
 } from './project.js';
 import os from 'node:os';
 import path from 'node:path';
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import {
   formatTransformQraftProjectSummary,
   transformQraftProject,
@@ -14,10 +14,14 @@ import {
 const realFs =
   await vi.importActual<typeof import('node:fs/promises')>('node:fs/promises');
 
+const fixtureRoots: string[] = [];
+
 async function createProjectFixtureRoot() {
-  return realFs.realpath(
+  const root = await realFs.realpath(
     await realFs.mkdtemp(path.join(os.tmpdir(), 'qraft-project-transform-'))
   );
+  fixtureRoots.push(root);
+  return root;
 }
 
 async function writeProjectFile(
@@ -137,6 +141,14 @@ function relativeProjectFiles(
 function slash(filePath: string) {
   return filePath.split(path.sep).join('/');
 }
+
+afterEach(async () => {
+  await Promise.all(
+    fixtureRoots
+      .splice(0)
+      .map((root) => realFs.rm(root, { force: true, recursive: true }))
+  );
+});
 
 describe('transformQraftProject', () => {
   it('transforms changed files in preview mode and does not write to disk', async () => {

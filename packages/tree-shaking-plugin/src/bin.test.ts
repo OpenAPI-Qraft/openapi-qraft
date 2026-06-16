@@ -141,6 +141,37 @@ module.exports = {
   );
 }
 
+async function writeProjectConfigWithMode(
+  root: string,
+  relativePath: string,
+  mode: 'preview' | 'write'
+) {
+  return writeFile(
+    root,
+    relativePath,
+    `
+module.exports = {
+  include: ['src/App.tsx'],
+  mode: '${mode}',
+  treeShakeOptions: {
+    entrypoints: [
+      {
+        kind: 'clientFactory',
+        factory: {
+          exportName: 'createReactAPIClient',
+          moduleSpecifier: '@api/my-api',
+        },
+        reactContext: {
+          exportName: 'APIClientContext',
+        },
+      },
+    ],
+  },
+};
+`
+  );
+}
+
 async function writeTransformableProject(root: string) {
   await writeGeneratedApiFixture(root);
   await writeProjectConfig(root, 'qraft-tree-shake.config.cjs');
@@ -215,6 +246,29 @@ describe('main', () => {
     await expect(readFile(appFile)).resolves.toContain(
       'from "@api/my-api/services/PetsService"'
     );
+  });
+
+  it('keeps preview mode unless --write is passed even when config requests write mode', async () => {
+    const root = await createFixtureRoot();
+    await writeGeneratedApiFixture(root);
+    await writeProjectConfigWithMode(
+      root,
+      'qraft-tree-shake.config.cjs',
+      'write'
+    );
+    const appFile = await writeFile(root, 'src/App.tsx', appUsingPetsSource());
+    const originalCode = await readFile(appFile);
+    const io = createIo();
+
+    await expect(main(argv('--root', root), io)).resolves.toBe(0);
+
+    expect(io.log).toHaveBeenCalledWith(
+      expect.stringContaining(
+        'Processed 1 files: 1 changed, 0 skipped, 0 failed, 0 written.'
+      )
+    );
+    expect(io.error).not.toHaveBeenCalled();
+    await expect(readFile(appFile)).resolves.toBe(originalCode);
   });
 
   it('returns 1 and prints the summary to stderr when a transform fails', async () => {

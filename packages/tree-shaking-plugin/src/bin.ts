@@ -55,7 +55,7 @@ export async function main(
     const projectOptions = {
       ...config,
       root,
-      mode: values.write ? 'write' : (config.mode ?? 'preview'),
+      mode: values.write ? 'write' : 'preview',
     } satisfies QraftTreeShakeProjectConfig;
     const result = await transformQraftProject(projectOptions);
     const summary = formatTransformQraftProjectSummary(result);
