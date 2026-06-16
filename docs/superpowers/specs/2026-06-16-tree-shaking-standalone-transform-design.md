@@ -277,3 +277,10 @@ can use it for generated-source analysis.
 Task 2 is successful when users can run a preview of the current tree-shaking
 transform against a source tree, inspect what would change, and explicitly opt
 into writing the optimized TypeScript back to disk.
+
+## Implementation Notes
+
+Task 1 implemented the Node module access adapter as an internal resolver module
+backed by `oxc-resolver`. The adapter is intentionally not documented as public
+API yet; the public surface should be decided together with the standalone
+project transform utility in Task 2.
