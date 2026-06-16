@@ -1,6 +1,7 @@
 import type { QraftTreeShakeProjectConfig } from './standalone.js';
 import path from 'node:path';
 import process from 'node:process';
+import { parseArgs as parseNodeArgs } from 'node:util';
 import {
   findTransformQraftProjectConfig,
   formatTransformQraftProjectSummary,
@@ -73,50 +74,24 @@ export async function main(
 }
 
 function parseArgs(args: string[]): CliValues {
-  const values: CliValues = {
-    help: false,
-    write: false,
+  const { values } = parseNodeArgs({
+    args,
+    options: {
+      help: { type: 'boolean' },
+      config: { type: 'string' },
+      root: { type: 'string' },
+      write: { type: 'boolean' },
+    },
+    strict: true,
+    allowPositionals: false,
+  });
+
+  return {
+    config: values.config,
+    help: values.help ?? false,
+    root: values.root,
+    write: values.write ?? false,
   };
-
-  for (let index = 0; index < args.length; index += 1) {
-    const arg = args[index];
-
-    if (arg === '--help') {
-      values.help = true;
-      continue;
-    }
-
-    if (arg === '--write') {
-      values.write = true;
-      continue;
-    }
-
-    if (arg === '--config') {
-      values.config = readOptionValue(args, index, '--config');
-      index += 1;
-      continue;
-    }
-
-    if (arg === '--root') {
-      values.root = readOptionValue(args, index, '--root');
-      index += 1;
-      continue;
-    }
-
-    throw new Error(`Unknown option: ${arg}`);
-  }
-
-  return values;
-}
-
-function readOptionValue(args: string[], index: number, option: string) {
-  const value = args[index + 1];
-
-  if (!value || value.startsWith('--')) {
-    throw new Error(`Missing value for ${option}.`);
-  }
-
-  return value;
 }
 
 function resolveConfigPath(root: string, configPath: string) {

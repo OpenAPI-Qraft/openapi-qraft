@@ -274,4 +274,52 @@ describe('main', () => {
     expect(io.error).not.toHaveBeenCalled();
     await expect(readFile(appFile)).resolves.toBe(originalCode);
   });
+
+  it('loads an explicit config path from --config=path', async () => {
+    const root = await createFixtureRoot();
+    await writeGeneratedApiFixture(root);
+    const appFile = await writeFile(root, 'src/App.tsx', appUsingPetsSource());
+    const originalCode = await readFile(appFile);
+    await writeProjectConfig(root, 'configs/tree-shake.cjs');
+    const io = createIo();
+
+    await expect(
+      main(argv('--root', root, '--config=configs/tree-shake.cjs'), io)
+    ).resolves.toBe(0);
+
+    expect(io.log).toHaveBeenCalledWith(
+      expect.stringContaining(
+        'Processed 1 files: 1 changed, 0 skipped, 0 failed, 0 written.'
+      )
+    );
+    expect(io.error).not.toHaveBeenCalled();
+    await expect(readFile(appFile)).resolves.toBe(originalCode);
+  });
+
+  it('returns 1 and prints an error for unknown options', async () => {
+    const io = createIo();
+
+    await expect(main(argv('--unknown'), io)).resolves.toBe(1);
+
+    expect(io.error).toHaveBeenCalledWith(expect.stringContaining('unknown'));
+    expect(io.log).not.toHaveBeenCalled();
+  });
+
+  it('returns 1 and prints an error for a missing --config value', async () => {
+    const io = createIo();
+
+    await expect(main(argv('--config'), io)).resolves.toBe(1);
+
+    expect(io.error).toHaveBeenCalledWith(expect.stringContaining('config'));
+    expect(io.log).not.toHaveBeenCalled();
+  });
+
+  it('returns 1 and prints an error for a missing --root value', async () => {
+    const io = createIo();
+
+    await expect(main(argv('--root'), io)).resolves.toBe(1);
+
+    expect(io.error).toHaveBeenCalledWith(expect.stringContaining('root'));
+    expect(io.log).not.toHaveBeenCalled();
+  });
 });
