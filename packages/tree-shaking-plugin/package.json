@@ -17,6 +17,9 @@
   "type": "module",
   "module": "dist/esm/index.js",
   "types": "dist/types/index.d.ts",
+  "bin": {
+    "qraft-tree-shake": "./bin.mjs"
+  },
   "exports": {
     ".": {
       "types": "./dist/types/index.d.ts",
@@ -48,6 +51,11 @@
       "import": "./dist/esm/esbuild.js",
       "require": "./dist/cjs/esbuild.cjs"
     },
+    "./standalone": {
+      "types": "./dist/types/standalone.d.ts",
+      "import": "./dist/esm/standalone.js",
+      "require": "./dist/cjs/standalone.cjs"
+    },
     "./package.json": "./package.json"
   },
   "typesVersions": {
@@ -62,7 +70,9 @@
     "@babel/parser": "^7.29.0",
     "@babel/traverse": "^7.29.0",
     "@babel/types": "^7.29.0",
+    "jiti": "^2.7.0",
     "oxc-resolver": "^11.20.0",
+    "tinyglobby": "^0.2.17",
     "unplugin": "^2.3.10"
   },
   "peerDependencies": {
