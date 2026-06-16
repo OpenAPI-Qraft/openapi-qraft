@@ -6,9 +6,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { createNodeModuleAccess } from './node.js';
 
 const realFs =
-  await vi.importActual<typeof import('node:fs/promises')>(
-    'node:fs/promises'
-  );
+  await vi.importActual<typeof import('node:fs/promises')>('node:fs/promises');
 
 async function createResolverFixtureRoot() {
   return realFs.realpath(
@@ -39,10 +37,6 @@ async function readResolverFile(filePath: string) {
   return realFs.readFile(filePath, 'utf8');
 }
 
-function slash(filePath: string) {
-  return filePath.split(path.sep).join('/');
-}
-
 describe('createNodeModuleAccess', () => {
   it('loads files through the virtual filesystem mock', async () => {
     const virtualFile = '/virtual/qraft-node-resolver/src/api.ts';
@@ -70,9 +64,7 @@ describe('createNodeModuleAccess', () => {
     const apiSource = await writeResolverFile(root, 'src/api.ts');
     const access = createNodeModuleAccess({ root });
 
-    await expect(access.resolve('./api.js', importer)).resolves.toBe(
-      apiSource
-    );
+    await expect(access.resolve('./api.js', importer)).resolves.toBe(apiSource);
   });
 
   it('resolves TypeScript path aliases through tsconfig auto discovery', async () => {
