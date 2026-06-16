@@ -4537,6 +4537,8 @@ __metadata:
   peerDependenciesMeta:
     "@rspack/resolver":
       optional: true
+  bin:
+    qraft-tree-shake: ./bin.mjs
   languageName: unknown
   linkType: soft
 
