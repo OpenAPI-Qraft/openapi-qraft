@@ -271,7 +271,9 @@ describe('transformQraftProject', () => {
     if (!(file.error instanceof Error)) throw new Error('Expected Error');
     expect(file.error.name).toBe('QraftTreeShakeError');
     expect(file.error.message).toContain('entrypoint-source-unavailable');
-    expect(formatTransformQraftProjectSummary(result)).toContain('src/App.tsx');
+    expect(formatTransformQraftProjectSummary(result)).toContain(
+      'src/App.tsx: QraftTreeShakeError: [openapi-qraft/tree-shaking-plugin]'
+    );
   });
 
   it('uses explicit files without glob discovery', async () => {
@@ -299,6 +301,96 @@ describe('transformQraftProject', () => {
     expect(result.files).toHaveLength(1);
     expect(result.files[0]?.filePath).toBe(appFile);
     expect(result.summary.total).toBe(1);
+  });
+
+  it('dedupes and sorts explicit relative and absolute files', async () => {
+    const root = await createProjectFixtureRoot();
+    await writeGeneratedApiFixture(root);
+    const appFile = await writeProjectFile(
+      root,
+      'src/App.tsx',
+      appUsingPetsSource()
+    );
+    const unchangedFile = await writeProjectFile(
+      root,
+      'src/unchanged.ts',
+      'export const unchanged = true;\n'
+    );
+    const options = {
+      root,
+      files: [
+        path.join(root, 'src/unchanged.ts'),
+        'src/App.tsx',
+        'src/unchanged.ts',
+      ],
+      treeShakeOptions: projectTreeShakeOptions(),
+    } satisfies TransformQraftProjectOptions;
+
+    const result = await transformQraftProject(options);
+
+    expect(result.files.map((file) => file.filePath)).toEqual([
+      appFile,
+      unchangedFile,
+    ]);
+    expect(result.summary.total).toBe(2);
+  });
+
+  it('returns no results for an empty explicit files list', async () => {
+    const root = await createProjectFixtureRoot();
+    const options = {
+      root,
+      files: [],
+      treeShakeOptions: projectTreeShakeOptions(),
+    } satisfies TransformQraftProjectOptions;
+
+    const result = await transformQraftProject(options);
+
+    expect(result.files).toEqual([]);
+    expect(result.summary).toEqual({
+      total: 0,
+      changed: 0,
+      skipped: 0,
+      failed: 0,
+      written: 0,
+    });
+  });
+
+  it('continues processing files after a read failure', async () => {
+    const root = await createProjectFixtureRoot();
+    const unchangedFile = await writeProjectFile(
+      root,
+      'src/unchanged.ts',
+      'export const unchanged = true;\n'
+    );
+    const missingFile = path.join(root, 'src/missing.ts');
+    const options = {
+      root,
+      files: ['src/missing.ts', 'src/unchanged.ts'],
+      treeShakeOptions: projectTreeShakeOptions(),
+    } satisfies TransformQraftProjectOptions;
+
+    const result = await transformQraftProject(options);
+
+    expect(result.summary).toEqual({
+      total: 2,
+      changed: 0,
+      skipped: 1,
+      failed: 1,
+      written: 0,
+    });
+    expect(result.files).toHaveLength(2);
+    expect(result.files[0]).toMatchObject({
+      status: 'failed',
+      filePath: missingFile,
+      code: '',
+      written: false,
+    });
+    expect(result.files[1]).toEqual({
+      status: 'skipped',
+      filePath: unchangedFile,
+      code: 'export const unchanged = true;\n',
+      written: false,
+    });
   });
 
   it('discovers included source files and applies default project excludes', async () => {

@@ -157,7 +157,7 @@ export function formatTransformQraftProjectSummary(
 
   if (failedFiles.length) {
     lines.push('', `Failed (${failedFiles.length}):`);
-    lines.push(...formatFileList(result.root, failedFiles));
+    lines.push(...formatFailedFileList(result.root, failedFiles));
   }
 
   return lines.join('\n');
@@ -228,4 +228,26 @@ function formatFileList(
   files: Array<Pick<TransformQraftProjectFileResult, 'filePath'>>
 ) {
   return files.map((file) => `- ${path.relative(root, file.filePath)}`);
+}
+
+function formatFailedFileList(
+  root: string,
+  files: Array<
+    Pick<
+      Extract<TransformQraftProjectFileResult, { status: 'failed' }>,
+      'filePath' | 'error'
+    >
+  >
+) {
+  return files.map(
+    (file) =>
+      `- ${path.relative(root, file.filePath)}: ${formatOneLineError(file.error)}`
+  );
+}
+
+function formatOneLineError(error: unknown) {
+  const message =
+    error instanceof Error ? `${error.name}: ${error.message}` : String(error);
+
+  return message.replace(/\s+/g, ' ').trim();
 }
