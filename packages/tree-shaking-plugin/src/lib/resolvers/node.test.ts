@@ -157,20 +157,34 @@ describe('createNodeModuleAccess', () => {
   it('uses user resolve and load hooks before native strategies', async () => {
     const root = await createResolverFixtureRoot();
     const importer = await writeResolverFile(root, 'src/App.ts');
-    const resolve = vi.fn(async () => '/virtual/api.ts');
+    const nativeApiFile = await writeResolverFile(
+      root,
+      'src/native-api.ts',
+      'export const fromNative = true;'
+    );
+    const userApiFile = await writeResolverFile(
+      root,
+      'src/user-api.ts',
+      'export const fromUser = true;'
+    );
+    const resolve = vi.fn(async () => userApiFile);
     const load = vi.fn(async () => 'export const virtualApi = true;');
     const access = createNodeModuleAccess({
       root,
       moduleAccess: { resolve, load },
     });
 
-    await expect(access.resolve('virtual:api', importer)).resolves.toBe(
-      '/virtual/api.ts'
-    );
-    await expect(access.load('/virtual/api.ts')).resolves.toBe(
+    const resolvedApiFile = await access.resolve('./native-api', importer);
+
+    expect(resolvedApiFile).toBe(userApiFile);
+    expect(resolvedApiFile).not.toBe(nativeApiFile);
+    await expect(access.load(userApiFile)).resolves.toBe(
       'export const virtualApi = true;'
     );
-    expect(resolve).toHaveBeenCalledWith('virtual:api', importer);
-    expect(load).toHaveBeenCalledWith('/virtual/api.ts');
+    await expect(readResolverFile(userApiFile)).resolves.toBe(
+      'export const fromUser = true;'
+    );
+    expect(resolve).toHaveBeenCalledWith('./native-api', importer);
+    expect(load).toHaveBeenCalledWith(userApiFile);
   });
 });
