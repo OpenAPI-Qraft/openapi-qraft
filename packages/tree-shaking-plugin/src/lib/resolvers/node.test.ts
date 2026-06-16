@@ -3,6 +3,8 @@ import fs from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 import { describe, expect, it, vi } from 'vitest';
+import { transformQraftTreeShaking } from '../../core.js';
+import { createGeneratedMetadataCache } from '../transform/generated-metadata.js';
 import { createNodeModuleAccess } from './node.js';
 
 const realFs =
@@ -35,6 +37,65 @@ async function writeResolverJson(
 
 async function readResolverFile(filePath: string) {
   return realFs.readFile(filePath, 'utf8');
+}
+
+async function writeGeneratedApiFixture(root: string) {
+  await writeResolverJson(root, 'tsconfig.json', {
+    compilerOptions: {
+      baseUrl: '.',
+      paths: {
+        '@api/my-api': ['src/api/index.ts'],
+        '@api/my-api/*': ['src/api/*'],
+      },
+    },
+  });
+  await writeResolverFile(
+    root,
+    'src/api/index.ts',
+    `
+import { qraftReactAPIClient } from '@openapi-qraft/react';
+import { useQuery } from '@openapi-qraft/react/callbacks/index';
+import { APIClientContext } from './APIClientContext';
+import { services } from './services/index';
+
+const defaultCallbacks = { useQuery } as const;
+
+export function createReactAPIClient(callbacks = defaultCallbacks) {
+  return qraftReactAPIClient(services, callbacks, APIClientContext);
+}
+`
+  );
+  await writeResolverFile(
+    root,
+    'src/api/APIClientContext.ts',
+    'export const APIClientContext = {};'
+  );
+  await writeResolverFile(
+    root,
+    'src/api/services/index.ts',
+    `
+import { petsService } from './PetsService';
+
+export const services = {
+  pets: petsService,
+} as const;
+`
+  );
+  await writeResolverFile(
+    root,
+    'src/api/services/PetsService.ts',
+    `
+export const getPets = { schema: { method: 'get', url: '/pets' } };
+
+export const petsService = {
+  getPets,
+} as const;
+`
+  );
+}
+
+function slash(filePath: string) {
+  return filePath.split(path.sep).join('/');
 }
 
 describe('createNodeModuleAccess', () => {
@@ -178,5 +239,52 @@ describe('createNodeModuleAccess', () => {
     );
     expect(resolve).toHaveBeenCalledWith('./native-api', importer);
     expect(load).toHaveBeenCalledWith(userApiFile);
+  });
+
+  it('supports core transform analysis without leaking physical paths into emitted imports', async () => {
+    const root = await createResolverFixtureRoot();
+    await writeGeneratedApiFixture(root);
+    const appFile = await writeResolverFile(
+      root,
+      'src/App.tsx',
+      `
+import { createReactAPIClient } from '@api/my-api';
+
+const reactAPIClient = createReactAPIClient();
+
+export function App() {
+  return reactAPIClient.pets.getPets.useQuery();
+}
+`
+    );
+    const code = await readResolverFile(appFile);
+    const access = createNodeModuleAccess({ root });
+
+    const result = await transformQraftTreeShaking(
+      code,
+      appFile,
+      {
+        entrypoints: [
+          {
+            kind: 'clientFactory',
+            factory: {
+              exportName: 'createReactAPIClient',
+              moduleSpecifier: '@api/my-api',
+            },
+            reactContext: {
+              exportName: 'APIClientContext',
+            },
+          },
+        ],
+      },
+      access,
+      undefined,
+      createGeneratedMetadataCache(),
+      {}
+    );
+
+    expect(result?.code).toContain('from "@api/my-api/services/PetsService"');
+    expect(result?.code).toContain('from "@api/my-api"');
+    expect(slash(result?.code ?? '')).not.toContain(slash(root));
   });
 });
