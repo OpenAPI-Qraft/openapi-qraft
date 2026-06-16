@@ -6,6 +6,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { createAgnosticModuleAccess } from './agnostic.js';
 import { getQraftModuleAccessStrategyMetadata } from './common.js';
 import { createEsbuildModuleAccess } from './esbuild.js';
+import { createNodeModuleAccess } from './node.js';
 import { createRollupLikeModuleAccess } from './rollup-like.js';
 import { createRspackModuleAccess } from './rspack.js';
 import { createWebpackLikeModuleAccess } from './webpack-like.js';
@@ -21,6 +22,12 @@ describe('resolver composition', () => {
     ).toEqual({
       resolve: ['user'],
       load: ['user'],
+    });
+    expect(
+      getQraftModuleAccessStrategyMetadata(createNodeModuleAccess())
+    ).toEqual({
+      resolve: ['user', 'native'],
+      load: ['user', 'adapter-fallback'],
     });
     expect(
       getQraftModuleAccessStrategyMetadata(createRollupLikeModuleAccess({}))

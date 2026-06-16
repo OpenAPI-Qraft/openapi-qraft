@@ -25,6 +25,7 @@ const config = entries.map((entry) =>
         '@babel/traverse',
         '@babel/types',
         '@rspack/resolver',
+        'oxc-resolver',
         'unplugin',
       ],
     }
