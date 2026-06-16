@@ -10,3 +10,7 @@ export {
   formatTransformQraftProjectSummary,
   transformQraftProject,
 } from './lib/standalone/project.js';
+export {
+  findTransformQraftProjectConfig,
+  loadTransformQraftProjectConfig,
+} from './lib/standalone/config.js';
