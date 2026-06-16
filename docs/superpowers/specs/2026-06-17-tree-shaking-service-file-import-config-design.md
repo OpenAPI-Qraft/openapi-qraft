@@ -312,11 +312,11 @@ only if the implementation touches standalone-specific behavior. The public
 standalone config uses the same `QraftTreeShakeOptions` type, so core transform
 tests are the primary contract.
 
-## React Client Fixture Config
+## Example Generated Layout Config
 
-After the transform supports the new fields,
-`packages/react-client/qraft-tree-shake.config.ts` should configure the
-embedded files API entrypoint with:
+For a generated API root where service files are emitted without the default
+`Service` postfix and public ESM imports require `.js`, configure the
+entrypoint explicitly:
 
 ```ts
 services: {
@@ -325,15 +325,15 @@ services: {
 },
 reactContext: {
   exportName: "InternalReactAPIClientContext",
-  moduleSpecifier: `${filesApiModule}/index`,
+  moduleSpecifier: "./generated-api/index",
   importExtension: ".js",
 }
 ```
 
 This mirrors the generated fixture shape where files live at
-`services/Files.ts` and public ESM imports point at `services/Files.js`.
-The context module also needs an emitted `.js` specifier when configured through
-a path-like generated-client module.
+`services/Files.ts` and public ESM imports point at `services/Files.js`. The
+context module also needs an emitted `.js` specifier when configured through a
+path-like generated-client module.
 
 ## Success Criteria
 
