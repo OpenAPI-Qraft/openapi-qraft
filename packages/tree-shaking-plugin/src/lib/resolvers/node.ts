@@ -18,7 +18,10 @@ type ResolverFactoryOptions = NonNullable<
   ConstructorParameters<typeof ResolverFactory>[0]
 >;
 
-export type NodeResolverOptions = Partial<ResolverFactoryOptions>;
+export type NodeResolverOptions = Omit<
+  Partial<ResolverFactoryOptions>,
+  'tsconfig'
+>;
 
 export type NodeModuleAccessOptions = {
   root?: string;
