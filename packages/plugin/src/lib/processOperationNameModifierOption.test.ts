@@ -68,6 +68,83 @@ describe('# processOperationNameModifierOption', () => {
   });
 
   describe('processOperationNameModifierOption(...)', () => {
+    it('applies method-scoped modifiers only to matching operations with the same normalized name', () => {
+      const sourceServices = getServices({
+        ...openAPI,
+        paths: {
+          '/items': {
+            get: {
+              operationId: 'getItems',
+              responses: { default: { description: 'Successful response' } },
+            },
+            post: {
+              operationId: 'get_items',
+              responses: { default: { description: 'Successful response' } },
+            },
+          },
+        },
+      });
+
+      expect(sourceServices[0].operations.map(({ name }) => name)).toEqual([
+        'getItems',
+        'getItems',
+      ]);
+
+      const { services, errors } = processOperationNameModifierOption(
+        parseOperationNameModifier('post /**:^getItems$ ==> createItems'),
+        sourceServices
+      );
+
+      expect(errors).toEqual([]);
+      expect(
+        services[0].operations.map(({ method, path, name }) => ({
+          method,
+          path,
+          name,
+        }))
+      ).toEqual([
+        { method: 'get', path: '/items', name: 'getItems' },
+        { method: 'post', path: '/items', name: 'createItems' },
+      ]);
+    });
+
+    it('applies path-scoped modifiers only to matching operations with the same normalized name', () => {
+      const { services, errors } = processOperationNameModifierOption(
+        parseOperationNameModifier(
+          '/items/archived:^getItems$ ==> getArchivedItems'
+        ),
+        getServices({
+          ...openAPI,
+          paths: {
+            '/items': {
+              get: {
+                operationId: 'getItems',
+                responses: { default: { description: 'Successful response' } },
+              },
+            },
+            '/items/archived': {
+              get: {
+                operationId: 'get_items',
+                responses: { default: { description: 'Successful response' } },
+              },
+            },
+          },
+        })
+      );
+
+      expect(errors).toEqual([]);
+      expect(
+        services[0].operations.map(({ method, path, name }) => ({
+          method,
+          path,
+          name,
+        }))
+      ).toEqual([
+        { method: 'get', path: '/items', name: 'getItems' },
+        { method: 'get', path: '/items/archived', name: 'getArchivedItems' },
+      ]);
+    });
+
     it('processes operation name modifier with single modifier', () => {
       const { services, errors } = processOperationNameModifierOption(
         parseOperationNameModifier(
