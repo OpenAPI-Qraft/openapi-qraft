@@ -27,7 +27,7 @@
   "devDependencies": {
     "@docusaurus/module-type-aliases": "3.9.2",
     "@docusaurus/types": "3.9.2",
-    "editorconfig-checker": "^5.1.9",
+    "editorconfig-checker": "^6.2.0",
     "prettier": "^3.7.3",
     "remark-cli": "12.0.1",
     "remark-heading-id": "^1.0.1",

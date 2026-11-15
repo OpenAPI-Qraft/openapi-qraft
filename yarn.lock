@@ -9368,13 +9368,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"editorconfig-checker@npm:^5.1.9":
-  version: 5.1.9
-  resolution: "editorconfig-checker@npm:5.1.9"
+"editorconfig-checker@npm:^6.2.0":
+  version: 6.2.0
+  resolution: "editorconfig-checker@npm:6.2.0"
   bin:
     ec: dist/index.js
     editorconfig-checker: dist/index.js
-  checksum: 10c0/369f679baf1dd0a9b5b7e83b6918efbfd4d6523d1027ea121306b2ef72a0ed6821a84a5c08cc91688efb242f5fd188d3411363e0289844e5b8f5019364a19869
+  checksum: 10c0/be501bbfe12381e5cd95137aede46ed4f4755d0b7a2b7ab2c3f06b34f66fea583713f45f67a28784a070db0db6cd39faa9b78a0fb1385d771429111e40dfb4d9
   languageName: node
   linkType: hard
 
@@ -15281,7 +15281,7 @@ __metadata:
     "@docusaurus/types": "npm:3.9.2"
     "@mdx-js/react": "npm:^3.1.1"
     clsx: "npm:^2.1.1"
-    editorconfig-checker: "npm:^5.1.9"
+    editorconfig-checker: "npm:^6.2.0"
     prettier: "npm:^3.7.3"
     prism-react-renderer: "npm:^2.4.1"
     react: "npm:^19.0.0"
