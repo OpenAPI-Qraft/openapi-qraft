@@ -34,7 +34,10 @@ import {
   processOperationNameModifierOption,
 } from './processOperationNameModifierOption.js';
 import { splitCommaSeparatedGlobs } from './splitCommaSeparatedGlobs.js';
-import { validateServiceOperationNames } from './validateServiceOperationNames.js';
+import {
+  ServiceOperationNameValidationError,
+  validateServiceOperationNames,
+} from './validateServiceOperationNames.js';
 
 export { splitOptionFlags };
 
@@ -202,7 +205,14 @@ export class QraftCommand extends QraftCommandBase<OpenAPIQraftCommandActionOpti
       services = modifiedServicesOperationNames;
     }
 
-    validateServiceOperationNames(services);
+    try {
+      validateServiceOperationNames(services);
+    } catch (error) {
+      if (!(error instanceof ServiceOperationNameValidationError)) throw error;
+
+      spinner.fail(c.red(error.message));
+      process.exit(1);
+    }
 
     const outputDir = normalizeOutputDirPath(args.outputDir);
 
