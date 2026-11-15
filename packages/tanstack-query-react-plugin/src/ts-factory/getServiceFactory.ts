@@ -8,6 +8,7 @@ import camelCase from 'camelcase';
 import ts from 'typescript';
 import { createOperationCommonTSDoc } from '../lib/createOperationCommonTSDoc.js';
 import { filterUnusedTypes } from './filterUnusedTypes.js';
+import { getOperationVariableNames } from './getOperationVariableNames.js';
 import { getOverriddenImportDeclarationsFactory } from './getOverriddenImportDeclarationsFactory.js';
 import {
   createServicesMutationOperationNodes,
@@ -40,11 +41,30 @@ export const getServiceFactory = (
     | OverrideImportType[keyof OverrideImportType]
     | undefined
 ) => {
+  const allModuleTypeImports = getModuleTypeImports(operations, options);
+  const operationVariableNames = getOperationVariableNames(
+    operations.map((operation) => operation.name),
+    [
+      service.variableName,
+      service.typeName,
+      'paths',
+      'QraftServiceOperationsToken',
+      ...Object.values(allModuleTypeImports).flat(),
+    ]
+  );
   const operationVariables = operations.map((operation) =>
-    getServiceOperationVariableFactory(service.typeName, operation)
+    getServiceOperationVariableFactory(
+      service.typeName,
+      operation,
+      operationVariableNames.get(operation.name)!
+    )
   );
 
-  const serviceVariable = getServiceVariableFactory(service, operations);
+  const serviceVariable = getServiceVariableFactory(
+    service,
+    operations,
+    operationVariableNames
+  );
 
   const operationsTypesResult = getOperationsTypes(operations, options);
 
@@ -55,10 +75,7 @@ export const getServiceFactory = (
     ...operationsTypesResult.nodes,
   ];
 
-  const moduleTypeImports = filterUnusedTypes(
-    getModuleTypeImports(operations, options),
-    mainNodes
-  );
+  const moduleTypeImports = filterUnusedTypes(allModuleTypeImports, mainNodes);
 
   // Add ParametersWrapper imports
   for (const [importPath, types] of Object.entries(
@@ -578,7 +595,8 @@ const createParametersWrapperTypeFactory = (
 
 const getServiceVariableFactory = (
   service: Service,
-  operations: ServiceOperation[]
+  operations: ServiceOperation[],
+  operationVariableNames: Map<string, string>
 ) => {
   return factory.createVariableStatement(
     [factory.createToken(ts.SyntaxKind.ExportKeyword)],
@@ -590,12 +608,18 @@ const getServiceVariableFactory = (
           undefined,
           factory.createAsExpression(
             factory.createObjectLiteralExpression(
-              operations.map((operation) =>
-                factory.createShorthandPropertyAssignment(
-                  factory.createIdentifier(operation.name),
-                  undefined
-                )
-              ),
+              operations.map((operation) => {
+                const variableName = operationVariableNames.get(
+                  operation.name
+                )!;
+
+                return variableName === operation.name
+                  ? factory.createShorthandPropertyAssignment(operation.name)
+                  : factory.createPropertyAssignment(
+                      operation.name,
+                      factory.createIdentifier(variableName)
+                    );
+              }),
               true
             ),
             factory.createTypeReferenceNode(
@@ -797,14 +821,15 @@ const getOperationBodyTypeName = (operation: ServiceOperation) =>
 
 const getServiceOperationVariableFactory = (
   serviceName: string,
-  operation: ServiceOperation
+  operation: ServiceOperation,
+  variableName: string
 ) => {
   const variableNode = factory.createVariableStatement(
     [factory.createToken(ts.SyntaxKind.ExportKeyword)],
     factory.createVariableDeclarationList(
       [
         factory.createVariableDeclaration(
-          factory.createIdentifier(operation.name),
+          factory.createIdentifier(variableName),
           undefined,
           undefined,
           factory.createAsExpression(
