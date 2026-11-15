@@ -1,6 +1,6 @@
 ---
-'@openapi-qraft/plugin': minor
-'@openapi-qraft/tanstack-query-react-plugin': minor
+'@openapi-qraft/plugin': patch
+'@openapi-qraft/tanstack-query-react-plugin': patch
 ---
 
 Fix operation naming collisions during code generation:
