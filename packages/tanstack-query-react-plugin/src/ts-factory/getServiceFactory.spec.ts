@@ -12,6 +12,18 @@ import { describe, expect, it } from 'vitest';
 import { astToString } from './astToString.js';
 import { getServiceFactory } from './getServiceFactory.js';
 
+const compilerOptions: ts.CompilerOptions = {
+  strict: true,
+  noEmit: true,
+  skipLibCheck: true,
+  module: ts.ModuleKind.ESNext,
+  moduleResolution: ts.ModuleResolutionKind.Bundler,
+  target: ts.ScriptTarget.ES2022,
+};
+
+// Disk sources stay unchanged within this suite; virtual files belong to each case.
+const sourceFileCache = new Map<string, ts.SourceFile>();
+
 // TypeScript compiler checks can exceed the default 5s timeout on CI runners.
 describe('service operation variable names', { timeout: 30_000 }, () => {
   it('compiles reserved words while preserving public operation names', () => {
@@ -194,6 +206,30 @@ describe('service operation variable names', { timeout: 30_000 }, () => {
       }
     );
   });
+
+  it('keeps virtual files and type errors isolated between compilations', () => {
+    const globalsPath = path.resolve('globals.d.ts');
+    const stringDeclaration = 'declare const caseOnlyValue: string;';
+    const files = new Map([
+      [path.resolve('usage.ts'), 'const value: string = caseOnlyValue;'],
+      [globalsPath, stringDeclaration],
+    ]);
+
+    expect(getCompilationDiagnostics(files)).toEqual([]);
+
+    files.set(globalsPath, 'declare const caseOnlyValue: number;');
+    expect(getCompilationDiagnostics(files)).toEqual([
+      "Type 'number' is not assignable to type 'string'.",
+    ]);
+
+    files.delete(globalsPath);
+    expect(getCompilationDiagnostics(files)).toEqual([
+      "Cannot find name 'caseOnlyValue'.",
+    ]);
+
+    files.set(globalsPath, stringDeclaration);
+    expect(getCompilationDiagnostics(files)).toEqual([]);
+  });
 });
 
 function createService(operationIds: string[]): OpenAPIService {
@@ -275,15 +311,13 @@ function expectCompiles(
     files.set(path.resolve(fileName), content);
   }
 
-  const options: ts.CompilerOptions = {
-    strict: true,
-    noEmit: true,
-    skipLibCheck: true,
-    module: ts.ModuleKind.ESNext,
-    moduleResolution: ts.ModuleResolutionKind.Bundler,
-    target: ts.ScriptTarget.ES2022,
-  };
-  const host = ts.createCompilerHost(options);
+  expect(getCompilationDiagnostics(files)).toEqual([]);
+}
+
+function getCompilationDiagnostics(
+  files: ReadonlyMap<string, string>
+): string[] {
+  const host = ts.createCompilerHost(compilerOptions);
   const { fileExists, readFile, getSourceFile } = host;
 
   host.fileExists = (fileName) => files.has(fileName) || fileExists(fileName);
@@ -296,22 +330,27 @@ function expectCompiles(
   ) => {
     const content = files.get(fileName);
 
-    return content === undefined
-      ? getSourceFile(
-          fileName,
-          languageVersion,
-          onError,
-          shouldCreateNewSourceFile
-        )
-      : ts.createSourceFile(fileName, content, languageVersion, true);
+    if (content !== undefined) {
+      return ts.createSourceFile(fileName, content, languageVersion, true);
+    }
+
+    const cached = sourceFileCache.get(fileName);
+    if (cached && !shouldCreateNewSourceFile) return cached;
+
+    const sourceFile = getSourceFile(
+      fileName,
+      languageVersion,
+      onError,
+      shouldCreateNewSourceFile
+    );
+    if (sourceFile) sourceFileCache.set(fileName, sourceFile);
+    return sourceFile;
   };
 
-  const program = ts.createProgram([...files.keys()], options, host);
-  const diagnostics = ts
+  const program = ts.createProgram([...files.keys()], compilerOptions, host);
+  return ts
     .getPreEmitDiagnostics(program)
     .map((diagnostic) =>
       ts.flattenDiagnosticMessageText(diagnostic.messageText, '\n')
     );
-
-  expect(diagnostics).toEqual([]);
 }
