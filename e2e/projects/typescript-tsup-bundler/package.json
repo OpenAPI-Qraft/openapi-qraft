@@ -16,10 +16,10 @@
     "@openapi-qraft/cli": "latest",
     "@openapi-qraft/react": "latest",
     "@types/node": "latest",
-    "typescript": "latest"
+    "typescript": "^5.6.2"
   },
   "devDependencies": {
-    "tsup": "latest"
+    "tsup": "8.5.1"
   },
   "repository": {
     "type": "git",
