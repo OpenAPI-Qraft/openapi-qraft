@@ -34,6 +34,7 @@ import {
   processOperationNameModifierOption,
 } from './processOperationNameModifierOption.js';
 import { splitCommaSeparatedGlobs } from './splitCommaSeparatedGlobs.js';
+import { validateServiceOperationNames } from './validateServiceOperationNames.js';
 
 export { splitOptionFlags };
 
@@ -200,6 +201,8 @@ export class QraftCommand extends QraftCommandBase<OpenAPIQraftCommandActionOpti
 
       services = modifiedServicesOperationNames;
     }
+
+    validateServiceOperationNames(services);
 
     const outputDir = normalizeOutputDirPath(args.outputDir);
 
