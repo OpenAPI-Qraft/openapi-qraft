@@ -12,7 +12,8 @@ import { describe, expect, it } from 'vitest';
 import { astToString } from './astToString.js';
 import { getServiceFactory } from './getServiceFactory.js';
 
-describe('service operation variable names', () => {
+// TypeScript compiler checks can exceed the default 5s timeout on CI runners.
+describe('service operation variable names', { timeout: 30_000 }, () => {
   it('compiles reserved words while preserving public operation names', () => {
     const service = createService([
       'arguments',
