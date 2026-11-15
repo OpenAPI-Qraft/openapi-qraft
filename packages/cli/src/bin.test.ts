@@ -1,17 +1,18 @@
-import { exec } from 'node:child_process';
+import { execFile } from 'node:child_process';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { promisify } from 'node:util';
 import { describe, expect, it } from 'vitest';
 
-const execAsync = promisify(exec);
+const execFileAsync = promisify(execFile);
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 const packageRoot = dirname(__dirname);
 const binPath = join(packageRoot, 'bin.mjs');
 
-describe('CLI binary help output', () => {
+// Allow slow CLI startup on shared runners while keeping the child timeout shorter.
+describe('CLI binary help output', { timeout: 30_000 }, () => {
   it('should display main help', async () => {
     const output = await executeBin(['--help']);
     expect(output).toMatchInlineSnapshot(`
@@ -366,19 +367,15 @@ function stripVersionLine(str: string): string {
 }
 
 async function executeBin(args: string[]): Promise<string> {
-  const command = `node ${binPath} ${args.join(' ')}`;
-  try {
-    const { stdout, stderr } = await execAsync(command, {
+  const { stdout, stderr } = await execFileAsync(
+    process.execPath,
+    [binPath, ...args],
+    {
       cwd: packageRoot,
       encoding: 'utf-8',
-    });
-    const output = (stderr ? stderr + '\n' : '') + (stdout || '');
-    return stripVersionLine(stripAnsiCodes(output.trimEnd()));
-  } catch (error: any) {
-    const output =
-      (error.stderr ? error.stderr + '\n' : '') +
-      (error.stdout || '') +
-      (error.message || '');
-    return stripVersionLine(stripAnsiCodes(output.trimEnd()));
-  }
+      timeout: 25_000,
+    }
+  );
+  const output = (stderr ? stderr + '\n' : '') + stdout;
+  return stripVersionLine(stripAnsiCodes(output.trimEnd()));
 }
