@@ -1,5 +1,20 @@
 # @openapi-qraft/plugin
 
+## 2.15.0-beta.10
+
+### Minor Changes
+
+- d151af4: Fix operation naming collisions during code generation:
+  - Apply operation name modifiers only to operations matching their method and path filters.
+  - Reject empty or duplicate normalized operation names within a service before generating or writing files.
+  - Generate safe operation variable names when names conflict with reserved words, imports, or service declarations, while preserving operation names on the service object.
+
+### Patch Changes
+
+- 3901553: Add MIT license metadata to package manifests.
+- Updated dependencies [3901553]
+  - @qraft/plugin@1.0.0-beta.9
+
 ## 2.15.0-beta.9
 
 ### Patch Changes

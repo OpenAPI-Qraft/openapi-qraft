@@ -1,6 +1,6 @@
 {
   "name": "@openapi-qraft/openapi-typescript-plugin",
-  "version": "2.15.0-beta.9",
+  "version": "2.15.0-beta.10",
   "license": "MIT",
   "type": "module",
   "scripts": {

@@ -24,6 +24,7 @@
     "@qraft/asyncapi-typescript-plugin": "0.0.0"
   },
   "changesets": [
+    "add-license-metadata",
     "cold-pets-design",
     "deep-boxes-tan",
     "dirty-horses-nail",
@@ -33,6 +34,7 @@
     "public-lies-sell",
     "request-fn-source-info",
     "ripe-parks-notice",
+    "safe-operation-names",
     "short-suits-shine",
     "silver-cooks-camp",
     "slow-carrots-fold",
