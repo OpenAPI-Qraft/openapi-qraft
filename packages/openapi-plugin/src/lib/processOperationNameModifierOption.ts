@@ -25,84 +25,70 @@ export const processOperationNameModifierOption = (
   }));
 
   type ServiceName = string;
-  type ReplacedOperationNameMap = string;
+  type ReplacedOperationName = string;
   type OriginalOperationName = string;
 
   const serviceOperationReplacements = new Map<
     ServiceName,
     Map<
-      ReplacedOperationNameMap,
+      ReplacedOperationName,
       Map<OriginalOperationName, OperationNameModifier[]>
     >
   >();
 
   const processedOperationNameModifiers = new Set<(typeof modifiers)[number]>();
 
-  for (const service of services) {
-    serviceOperationReplacements.set(service.name, new Map());
+  const replacedOperationNamesServices = services.map((service) => {
+    const operationReplacements = new Map<
+      ReplacedOperationName,
+      Map<OriginalOperationName, OperationNameModifier[]>
+    >();
+    serviceOperationReplacements.set(service.name, operationReplacements);
 
-    for (const operation of service.operations) {
-      const operationReplacements = serviceOperationReplacements.get(
-        service.name
-      );
-
-      if (!operationReplacements)
-        throw new Error('operationReplacements not found');
-
-      const operationNameModifiers = availableOperationNameModifiers.filter(
-        (modifier) =>
-          modifier.isPathMatch(operation.path) &&
-          (modifier.methods === undefined ||
-            modifier.methods.includes(operation.method)) &&
-          normalizeOperationNameModifierRegex(
-            modifier.operationNameModifierRegex
-          ).test(operation.name)
-      );
-
-      const replacedOperationName = getOperationIdName(
-        operationNameModifiers.reduce((operationNameAcc, modifier) => {
-          processedOperationNameModifiers.add(modifier);
-
-          return operationNameAcc.replace(
+    return {
+      ...service,
+      operations: service.operations.map((operation) => {
+        const operationNameModifiers = availableOperationNameModifiers.filter(
+          (modifier) =>
+            modifier.isPathMatch(operation.path) &&
+            (modifier.methods === undefined ||
+              modifier.methods.includes(operation.method)) &&
             normalizeOperationNameModifierRegex(
               modifier.operationNameModifierRegex
-            ),
-            modifier.operationNameModifierReplace
-          );
-        }, operation.name)
-      );
-
-      if (replacedOperationName !== operation.name) {
-        if (!operationReplacements.has(replacedOperationName))
-          operationReplacements.set(replacedOperationName, new Map());
-        operationReplacements.get(replacedOperationName)?.set(
-          operation.name,
-          operationNameModifiers.map(
-            ({ isPathMatch: _, ...operationModifiersRest }) =>
-              operationModifiersRest
-          )
+            ).test(operation.name)
         );
-      }
-    }
-  }
 
-  const replacedOperationNamesServices = services.map((service) => ({
-    ...service,
-    operations: service.operations.map((operation) => {
-      const operationReplacements = serviceOperationReplacements.get(
-        service.name
-      );
-      if (!operationReplacements) return operation;
+        const replacedOperationName = getOperationIdName(
+          operationNameModifiers.reduce((operationNameAcc, modifier) => {
+            processedOperationNameModifiers.add(modifier);
 
-      for (const [replacedName, originalMap] of operationReplacements) {
-        if (originalMap.has(operation.name)) {
-          return { ...operation, name: replacedName };
+            return operationNameAcc.replace(
+              normalizeOperationNameModifierRegex(
+                modifier.operationNameModifierRegex
+              ),
+              modifier.operationNameModifierReplace
+            );
+          }, operation.name)
+        );
+
+        if (replacedOperationName !== operation.name) {
+          if (!operationReplacements.has(replacedOperationName))
+            operationReplacements.set(replacedOperationName, new Map());
+          operationReplacements.get(replacedOperationName)?.set(
+            operation.name,
+            operationNameModifiers.map(
+              ({ isPathMatch: _, ...operationModifiersRest }) =>
+                operationModifiersRest
+            )
+          );
+
+          return { ...operation, name: replacedOperationName };
         }
-      }
 
-      return operation;
-    }),
-  }));
+        return operation;
+      }),
+    };
+  });
 
   const errors: Array<
     | {
