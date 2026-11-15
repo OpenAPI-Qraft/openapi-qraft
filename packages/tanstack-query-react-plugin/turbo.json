@@ -2,12 +2,16 @@
   "$schema": "https://turbo.build/schema.json",
   "extends": ["//"],
   "tasks": {
+    "build": {
+      "outputs": ["dist/**"]
+    },
+    "test": {
+      "dependsOn": ["$TURBO_EXTENDS$", "codegen"]
+    },
     "codegen": {
       "cache": true,
       "dependsOn": ["^build"],
-      "outputs": [
-        "src/ts-factory/service-operation.generated/**/*.ts"
-      ],
+      "outputs": ["src/ts-factory/service-operation.generated/**/*.ts"],
       "inputs": ["generate-ts-factory.mjs"]
     }
   }
