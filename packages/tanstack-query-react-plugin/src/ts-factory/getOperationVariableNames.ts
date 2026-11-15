@@ -53,11 +53,12 @@ export function getOperationVariableNames(
   operationNames: string[],
   reservedNames: string[]
 ): Map<string, string> {
+  const unavailableNames = new Set([...reservedBindingNames, ...reservedNames]);
   const usedNames = new Set([...operationNames, ...reservedNames]);
   const variableNames = new Map<string, string>();
 
   for (const name of operationNames) {
-    if (!reservedBindingNames.has(name) && !reservedNames.includes(name)) {
+    if (!unavailableNames.has(name)) {
       variableNames.set(name, name);
       continue;
     }
