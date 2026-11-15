@@ -235,6 +235,8 @@ function expectCompiles(
     strict: true,
     noEmit: true,
     skipLibCheck: true,
+    // Exclude unrelated ambient types from the workspace.
+    types: [],
     module: ts.ModuleKind.ESNext,
     moduleResolution: ts.ModuleResolutionKind.Bundler,
     target: ts.ScriptTarget.ES2022,
