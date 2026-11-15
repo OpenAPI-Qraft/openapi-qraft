@@ -1,5 +1,6 @@
 import type { OpenAPISchemaType } from '@openapi-qraft/plugin/lib/open-api/OpenAPISchemaType';
 import type { OpenAPIService } from '@openapi-qraft/plugin/lib/open-api/OpenAPIService';
+import type { ServiceFactoryOptions } from './getServiceFactory.js';
 import path from 'node:path';
 import { getServices } from '@openapi-qraft/plugin/lib/open-api/getServices';
 import {
@@ -164,6 +165,34 @@ describe('service operation variable names', () => {
     `
     );
   });
+
+  it('reserves custom parameter wrapper imports when allocating variable names', () => {
+    const service = createService(['wrapper', 'delete']);
+    const source = generateService(service, {
+      operationParametersTypeWrapper: {
+        '/items/wrapper': { type: 'wrapper', import: './wrapper' },
+        '/items/delete': { type: 'deleteOperation', import: './wrapper' },
+      },
+    });
+
+    expect(source).toContain('wrapper: wrapperOperation');
+    expect(source).toContain('delete: deleteOperation2');
+    expectCompiles(
+      service,
+      source,
+      `
+        import { wrapperOperation, deleteOperation2, itemsService } from './ItemsService';
+        const wrapper: typeof wrapperOperation = itemsService.wrapper;
+        const deletion: typeof deleteOperation2 = itemsService.delete;
+      `,
+      {
+        'wrapper.ts': `
+          export type wrapper<TSchema, TOperation, TData, TError> = undefined;
+          export type deleteOperation<TSchema, TOperation, TData, TError> = undefined;
+        `,
+      }
+    );
+  });
 });
 
 function createService(operationIds: string[]): OpenAPIService {
@@ -193,12 +222,20 @@ function createService(operationIds: string[]): OpenAPIService {
   return getServices(schema)[0];
 }
 
-function generateService(service: OpenAPIService): string {
+function generateService(
+  service: OpenAPIService,
+  options: Partial<ServiceFactoryOptions> = {}
+): string {
   return astToString(
     getServiceFactory(
       service,
       service.operations,
-      { openapiTypesImportPath: './openapi', queryableWriteOperations: false },
+      {
+        openapiTypesImportPath: './openapi',
+        queryableWriteOperations: false,
+        operationParametersTypeWrapper: undefined,
+        ...options,
+      },
       undefined
     )
   );
@@ -207,7 +244,8 @@ function generateService(service: OpenAPIService): string {
 function expectCompiles(
   service: OpenAPIService,
   source: string,
-  usage = ''
+  usage = '',
+  additionalFiles: Record<string, string> = {}
 ): void {
   const files = new Map([
     [path.resolve('ItemsService.ts'), source],
@@ -231,6 +269,11 @@ function expectCompiles(
     `,
     ],
   ]);
+
+  for (const [fileName, content] of Object.entries(additionalFiles)) {
+    files.set(path.resolve(fileName), content);
+  }
+
   const options: ts.CompilerOptions = {
     strict: true,
     noEmit: true,

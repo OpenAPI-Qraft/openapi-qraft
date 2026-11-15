@@ -42,6 +42,7 @@ export const getServiceFactory = (
     | undefined
 ) => {
   const allModuleTypeImports = getModuleTypeImports(operations, options);
+  const operationsTypesResult = getOperationsTypes(operations, options);
   const operationVariableNames = getOperationVariableNames(
     operations.map((operation) => operation.name),
     [
@@ -50,6 +51,7 @@ export const getServiceFactory = (
       'paths',
       'QraftServiceOperationsToken',
       ...Object.values(allModuleTypeImports).flat(),
+      ...Object.values(operationsTypesResult.imports).flat(),
     ]
   );
   const operationVariables = operations.map((operation) =>
@@ -65,8 +67,6 @@ export const getServiceFactory = (
     operations,
     operationVariableNames
   );
-
-  const operationsTypesResult = getOperationsTypes(operations, options);
 
   const mainNodes = [
     getServiceInterfaceFactory(service, operations, options),

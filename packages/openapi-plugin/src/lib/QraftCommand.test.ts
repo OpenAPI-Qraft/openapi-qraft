@@ -1,9 +1,9 @@
 import type { OpenAPISchemaType } from './open-api/OpenAPISchemaType.js';
 import type { QraftCommandActionCallback } from './QraftCommand.js';
+import { writeGeneratorFiles } from '@qraft/plugin/lib/writeGeneratorFiles';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { readSchema } from './open-api/readSchema.js';
 import { QraftCommand, splitOptionFlags } from './QraftCommand.js';
-import { writeGeneratorFiles } from '@qraft/plugin/lib/writeGeneratorFiles';
 
 vi.mock('./open-api/readSchema.js');
 vi.mock('@qraft/plugin/lib/writeGeneratorFiles');
