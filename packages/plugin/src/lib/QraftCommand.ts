@@ -27,7 +27,10 @@ import {
 } from './processOperationNameModifierOption.js';
 import { redoclyOption } from './RedoclyConfigCommand.js';
 import { splitCommaSeparatedGlobs } from './splitCommaSeparatedGlobs.js';
-import { validateServiceOperationNames } from './validateServiceOperationNames.js';
+import {
+  ServiceOperationNameValidationError,
+  validateServiceOperationNames,
+} from './validateServiceOperationNames.js';
 import { writeGeneratorFiles } from './writeGeneratorFiles.js';
 
 export class QraftCommand extends Command {
@@ -223,7 +226,14 @@ export class QraftCommand extends Command {
       services = modifiedServicesOperationNames;
     }
 
-    validateServiceOperationNames(services);
+    try {
+      validateServiceOperationNames(services);
+    } catch (error) {
+      if (!(error instanceof ServiceOperationNameValidationError)) throw error;
+
+      spinner.fail(c.red(error.message));
+      process.exit(1);
+    }
 
     spinner.text = 'Generating code...';
 

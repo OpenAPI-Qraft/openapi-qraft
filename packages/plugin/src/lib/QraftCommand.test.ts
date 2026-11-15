@@ -110,10 +110,16 @@ describe('QraftCommand', () => {
   });
 
   describe('final operation name validation', () => {
+    const exitError = new Error('Process exited');
+
     beforeEach(() => {
       vi.clearAllMocks();
       vi.spyOn(QraftCommand.spinner, 'start').mockReturnThis();
       vi.spyOn(QraftCommand.spinner, 'succeed').mockReturnThis();
+      vi.spyOn(QraftCommand.spinner, 'fail').mockReturnThis();
+      vi.spyOn(process, 'exit').mockImplementation(() => {
+        throw exitError;
+      });
     });
 
     afterEach(() => {
@@ -141,9 +147,14 @@ describe('QraftCommand', () => {
           outputDir: '/generated',
           clean: true,
         })
-      ).rejects.toThrow(
-        'Operation name collision in service "items" for normalized name "getItems": GET /items, POST /items/search.'
+      ).rejects.toBe(exitError);
+
+      expect(QraftCommand.spinner.fail).toHaveBeenCalledExactlyOnceWith(
+        expect.stringContaining(
+          'Operation name collision in service "items" for normalized name "getItems": GET /items, POST /items/search.'
+        )
       );
+      expect(process.exit).toHaveBeenCalledExactlyOnceWith(1);
 
       expect(pluginAction).not.toHaveBeenCalled();
       expect(writeGeneratorFiles).not.toHaveBeenCalled();
@@ -170,9 +181,14 @@ describe('QraftCommand', () => {
           outputDir: '/generated',
           operationNameModifier: '/items/search:searchItems ==> get_items',
         })
-      ).rejects.toThrow(
-        'Operation name collision in service "items" for normalized name "getItems": GET /items, POST /items/search.'
+      ).rejects.toBe(exitError);
+
+      expect(QraftCommand.spinner.fail).toHaveBeenCalledExactlyOnceWith(
+        expect.stringContaining(
+          'Operation name collision in service "items" for normalized name "getItems": GET /items, POST /items/search.'
+        )
       );
+      expect(process.exit).toHaveBeenCalledExactlyOnceWith(1);
 
       expect(pluginAction).not.toHaveBeenCalled();
       expect(writeGeneratorFiles).not.toHaveBeenCalled();
@@ -248,10 +264,33 @@ describe('QraftCommand', () => {
 
       await expect(
         command.actionCallback('schema.json', { outputDir: '/generated' })
-      ).rejects.toThrow(
-        'Empty normalized operation name in service "items": GET /items.'
-      );
+      ).rejects.toBe(exitError);
 
+      expect(QraftCommand.spinner.fail).toHaveBeenCalledExactlyOnceWith(
+        expect.stringContaining(
+          'Empty normalized operation name in service "items": GET /items.'
+        )
+      );
+      expect(process.exit).toHaveBeenCalledExactlyOnceWith(1);
+
+      expect(pluginAction).not.toHaveBeenCalled();
+      expect(writeGeneratorFiles).not.toHaveBeenCalled();
+    });
+
+    it('preserves unexpected schema errors without logging them as naming errors', async () => {
+      const error = new Error('Unexpected schema failure');
+      vi.mocked(readSchema).mockRejectedValue(error);
+      const pluginAction = vi.fn<QraftCommandActionCallback>(
+        async (_options, resolve) => resolve([])
+      );
+      const command = new QraftCommand().action(pluginAction);
+
+      await expect(
+        command.actionCallback('schema.json', { outputDir: '/generated' })
+      ).rejects.toBe(error);
+
+      expect(QraftCommand.spinner.fail).not.toHaveBeenCalled();
+      expect(process.exit).not.toHaveBeenCalled();
       expect(pluginAction).not.toHaveBeenCalled();
       expect(writeGeneratorFiles).not.toHaveBeenCalled();
     });

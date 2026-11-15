@@ -3,6 +3,10 @@ import type {
   ServiceOperation,
 } from './open-api/OpenAPIService.js';
 
+export class ServiceOperationNameValidationError extends Error {
+  override name = 'ServiceOperationNameValidationError';
+}
+
 export function validateServiceOperationNames(
   services: OpenAPIService[]
 ): void {
@@ -35,6 +39,6 @@ export function validateServiceOperationNames(
   }
 
   if (errors.length) {
-    throw new Error(errors.join('\n'));
+    throw new ServiceOperationNameValidationError(errors.join('\n'));
   }
 }

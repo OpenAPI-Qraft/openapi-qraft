@@ -3,7 +3,10 @@ import type {
   ServiceOperation,
 } from './open-api/OpenAPIService.js';
 import { describe, expect, it } from 'vitest';
-import { validateServiceOperationNames } from './validateServiceOperationNames.js';
+import {
+  ServiceOperationNameValidationError,
+  validateServiceOperationNames,
+} from './validateServiceOperationNames.js';
 
 describe('validateServiceOperationNames', () => {
   it('reports every conflicting endpoint and normalized name per service', () => {
@@ -21,6 +24,9 @@ describe('validateServiceOperationNames', () => {
       ]),
     ];
 
+    expect(() => validateServiceOperationNames(services)).toThrow(
+      ServiceOperationNameValidationError
+    );
     expect(() => validateServiceOperationNames(services)).toThrow(
       [
         'Operation name collision in service "items" for normalized name "getItems": GET /items, POST /items/search, GET /items/all. Use distinct operationIds or operation name modifiers.',
