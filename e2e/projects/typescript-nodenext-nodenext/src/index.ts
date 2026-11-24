@@ -1,4 +1,6 @@
+import type { MutationFunctionContext } from '@tanstack/react-query';
 import type { components, paths } from './api/index.js';
+import { createRequire } from 'node:module';
 import { requestFn } from '@openapi-qraft/react';
 import * as callbacksIndex from '@openapi-qraft/react/callbacks';
 import * as callbacks from '@openapi-qraft/react/callbacks/index';
@@ -8,8 +10,14 @@ import {
   createSecureRequestFn,
   QraftSecureRequestFn,
 } from '@openapi-qraft/react/Unstable_QraftSecureRequestFn';
-import { QueryClient } from '@tanstack/react-query';
+import { QueryClient, skipToken } from '@tanstack/react-query';
 import { createAPIClient as createAPIClientMjs } from './api/index.js';
+
+const require = createRequire(import.meta.url);
+const tanstackQueryPkg = require('@tanstack/react-query/package.json') as {
+  version: string;
+};
+console.log(`Resolved @tanstack/react-query@${tanstackQueryPkg.version}`);
 
 console.log({} satisfies Partial<components>);
 console.log({} satisfies Partial<paths>);
@@ -74,6 +82,89 @@ function useTsCheck() {
     requestFn,
   });
 
+  type _MutationContext = MutationFunctionContext;
+
+  // fetchInfiniteQuery: 5.108.1+ requires getNextPageParam even when params are all-optional
+  // @ts-expect-error - getNextPageParam is required in TanStack Query 5.108.1+
+  void client.pet.findPetsByStatus.fetchInfiniteQuery();
+  // @ts-expect-error - getNextPageParam is required in TanStack Query 5.108.1+
+  void client.pet.findPetsByStatus.fetchInfiniteQuery({});
+  void client.pet.findPetsByStatus.fetchInfiniteQuery({
+    initialPageParam: {
+      query: {
+        status: 'sold',
+      },
+    },
+    getNextPageParam: () => undefined,
+    queryFn: ({ pageParam }) => {
+      pageParam.query?.status satisfies
+        | 'available'
+        | 'pending'
+        | 'sold'
+        | undefined;
+      return Promise.resolve([]);
+    },
+  });
+
+  // isFetching / useIsFetching: fetchStatus forbidden; parameters and queryKey mutually exclusive
+  client.pet.findPetsByStatus.isFetching({ stale: true, parameters: {} });
+  client.pet.findPetsByStatus.useIsFetching({ stale: true, parameters: {} });
+  // @ts-expect-error - fetchStatus is forbidden on isFetching
+  client.pet.findPetsByStatus.isFetching({ fetchStatus: 'fetching' });
+  // @ts-expect-error - fetchStatus is forbidden on useIsFetching
+  client.pet.findPetsByStatus.useIsFetching({ fetchStatus: 'fetching' });
+  client.pet.findPetsByStatus.isFetching({
+    parameters: {},
+    // @ts-expect-error - parameters and queryKey are mutually exclusive on isFetching
+    queryKey: client.pet.findPetsByStatus.getQueryKey(),
+  });
+  client.pet.findPetsByStatus.useIsFetching({
+    parameters: {},
+    // @ts-expect-error - parameters and queryKey are mutually exclusive on useIsFetching
+    queryKey: client.pet.findPetsByStatus.getQueryKey(),
+  });
+
+  // isMutating / useIsMutating / getMutationCache: status forbidden; parameters and mutationKey mutually exclusive
+  client.pet.deletePet.isMutating({
+    exact: true,
+    parameters: { path: { petId: 1 } },
+  });
+  client.pet.deletePet.useIsMutating({
+    exact: true,
+    parameters: { path: { petId: 1 } },
+  });
+  // @ts-expect-error - status is forbidden on isMutating
+  client.pet.deletePet.isMutating({ status: 'pending' });
+  // @ts-expect-error - status is forbidden on useIsMutating
+  client.pet.deletePet.useIsMutating({ status: 'pending' });
+  client.pet.deletePet.isMutating({
+    parameters: { path: { petId: 1 } },
+    // @ts-expect-error - parameters and mutationKey are mutually exclusive on isMutating
+    mutationKey: client.pet.deletePet.getMutationKey({ path: { petId: 1 } }),
+  });
+  client.pet.deletePet.useIsMutating({
+    parameters: { path: { petId: 1 } },
+    // @ts-expect-error - parameters and mutationKey are mutually exclusive on useIsMutating
+    mutationKey: client.pet.deletePet.getMutationKey({ path: { petId: 1 } }),
+  });
+  client.pet.deletePet.getMutationCache().findAll({ exact: true });
+
+  // useSuspenseQueries: defined data in combine; skipToken disallowed
+  client.pet.findPetsByStatus.useSuspenseQueries({
+    queries: [{ parameters: {} }],
+    combine: (results) => results.map((result) => result.data),
+  }) satisfies Array<typeof client.pet.findPetsByStatus.types.data>;
+  client.pet.findPetsByStatus.useSuspenseQueries({
+    queries: [
+      {
+        parameters: {},
+        // @ts-expect-error - skipToken is not allowed in useSuspenseQueries
+        queryFn: skipToken,
+      },
+    ],
+  });
+
+  // useSuspenseInfiniteQuery: default, select, and 2-arg explicit generic call
   const query = client.pet.findPetsByStatus.useSuspenseInfiniteQuery(
     {},
     {
@@ -105,4 +196,70 @@ function useTsCheck() {
   query.data.pages[0] satisfies typeof client.pet.findPetsByStatus.types.data;
   // @ts-expect-error - should not be never or any
   query.data.pages[0] satisfies never;
+
+  client.pet.findPetsByStatus.useSuspenseInfiniteQuery(
+    {},
+    {
+      initialPageParam: {},
+      getNextPageParam: () => undefined,
+      select: (data) => data.pages.length,
+    }
+  ).data satisfies number;
+
+  client.pet.findPetsByStatus.useSuspenseInfiniteQuery<
+    typeof client.pet.findPetsByStatus.types.parameters,
+    { custom: string }
+  >(
+    {},
+    {
+      initialPageParam: {},
+      getNextPageParam: (lastPage) => {
+        lastPage satisfies { custom: string };
+        return undefined;
+      },
+    }
+  ).data.pages satisfies Array<{ custom: string }>;
+
+  // setQueriesData: tuple return type and infinite: true branching
+  client.pet.findPetsByStatus.setQueriesData({ parameters: {} }, (prev) => {
+    prev satisfies typeof client.pet.findPetsByStatus.types.data | undefined;
+    return prev;
+  }) satisfies Array<
+    [
+      queryKey: ReturnType<typeof client.pet.findPetsByStatus.getQueryKey>,
+      data: typeof client.pet.findPetsByStatus.types.data | undefined,
+    ]
+  >;
+
+  client.pet.findPetsByStatus.setQueriesData(
+    { parameters: {}, infinite: true },
+    (prev) => {
+      prev satisfies ReturnType<
+        typeof client.pet.findPetsByStatus.getInfiniteQueryData
+      >;
+      return prev;
+    }
+  ) satisfies Array<
+    [
+      queryKey: ReturnType<
+        typeof client.pet.findPetsByStatus.getInfiniteQueryKey
+      >,
+      data: ReturnType<typeof client.pet.findPetsByStatus.getInfiniteQueryData>,
+    ]
+  >;
+
+  // useQueries: top-level subscribed allowed, per-query subscribed disallowed
+  client.pet.findPetsByStatus.useQueries({
+    subscribed: false,
+    queries: [{ parameters: {} }],
+  });
+  client.pet.findPetsByStatus.useQueries({
+    queries: [
+      {
+        parameters: {},
+        // @ts-expect-error - subscribed is only allowed at top-level in useQueries
+        subscribed: false,
+      },
+    ],
+  });
 }
