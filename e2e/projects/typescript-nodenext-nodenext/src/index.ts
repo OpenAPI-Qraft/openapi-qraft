@@ -84,7 +84,7 @@ function useTsCheck() {
 
   type _MutationContext = MutationFunctionContext;
 
-  // fetchInfiniteQuery: 5.108.1+ requires getNextPageParam even when params are all-optional
+  // fetchInfiniteQuery / prefetchInfiniteQuery / ensureInfiniteQueryData: 5.108.1+ requires getNextPageParam even when params are all-optional
   // @ts-expect-error - getNextPageParam is required in TanStack Query 5.108.1+
   void client.pet.findPetsByStatus.fetchInfiniteQuery();
   // @ts-expect-error - getNextPageParam is required in TanStack Query 5.108.1+
@@ -104,6 +104,30 @@ function useTsCheck() {
         | undefined;
       return Promise.resolve([]);
     },
+  });
+  // @ts-expect-error - getNextPageParam is required in TanStack Query 5.108.1+
+  void client.pet.findPetsByStatus.prefetchInfiniteQuery();
+  // @ts-expect-error - getNextPageParam is required in TanStack Query 5.108.1+
+  void client.pet.findPetsByStatus.prefetchInfiniteQuery({});
+  void client.pet.findPetsByStatus.prefetchInfiniteQuery({
+    initialPageParam: {
+      query: {
+        status: 'sold',
+      },
+    },
+    getNextPageParam: () => undefined,
+  });
+  // @ts-expect-error - getNextPageParam is required in TanStack Query 5.108.1+
+  void client.pet.findPetsByStatus.ensureInfiniteQueryData();
+  // @ts-expect-error - getNextPageParam is required in TanStack Query 5.108.1+
+  void client.pet.findPetsByStatus.ensureInfiniteQueryData({});
+  void client.pet.findPetsByStatus.ensureInfiniteQueryData({
+    initialPageParam: {
+      query: {
+        status: 'sold',
+      },
+    },
+    getNextPageParam: () => undefined,
   });
 
   // isFetching / useIsFetching: fetchStatus forbidden; parameters and queryKey mutually exclusive
@@ -160,6 +184,15 @@ function useTsCheck() {
         parameters: {},
         // @ts-expect-error - skipToken is not allowed in useSuspenseQueries
         queryFn: skipToken,
+      },
+      {
+        parameters: {},
+        // @ts-expect-error - enabled is not allowed in useSuspenseQueries
+        enabled: false,
+        // @ts-expect-error - throwOnError is not allowed in useSuspenseQueries
+        throwOnError: false,
+        // @ts-expect-error - placeholderData is not allowed in useSuspenseQueries
+        placeholderData: [],
       },
     ],
   });

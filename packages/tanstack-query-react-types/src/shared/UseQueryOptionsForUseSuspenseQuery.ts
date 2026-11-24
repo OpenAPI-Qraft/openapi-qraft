@@ -16,8 +16,11 @@ export type UseQueryOptionsForUseSuspenseQuery<
     ServiceOperationQueryKey<TSchema, TParams>
   >,
   'queryKey'
-> &
-  (
+> & {
+  enabled?: never;
+  throwOnError?: never;
+  placeholderData?: never;
+} & (
     | {
         parameters: DeepReadonly<TParams>;
         queryKey?: never;

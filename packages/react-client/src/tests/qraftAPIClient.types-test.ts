@@ -386,6 +386,24 @@ client.files.deleteFiles.useMutation(undefined, {
 //// IsFetching / IsMutating filters ////
 client.files.getFiles.isFetching({ stale: true, parameters });
 client.files.getFiles.useIsFetching({ stale: true, parameters });
+// @ts-expect-error - exact: true requires parameters or queryKey
+client.files.getFiles.isFetching({ exact: true });
+// @ts-expect-error - exact: true requires parameters or queryKey
+client.files.getFiles.useIsFetching({ exact: true });
+client.files.getFiles.isFetching({
+  infinite: true,
+  predicate: (query) => {
+    query.state.data?.pages;
+    return true;
+  },
+});
+client.files.getFiles.useIsFetching({
+  infinite: true,
+  predicate: (query) => {
+    query.state.data?.pages;
+    return true;
+  },
+});
 client.files.getFiles.invalidateQueries({ fetchStatus: 'fetching' });
 // @ts-expect-error - fetchStatus is forbidden on isFetching
 client.files.getFiles.isFetching({ fetchStatus: 'fetching' });
@@ -433,6 +451,15 @@ client.files.getFiles.useSuspenseQueries({
       // @ts-expect-error - skipToken is not allowed in useSuspenseQueries
       queryFn: skipToken,
     },
+    {
+      parameters,
+      // @ts-expect-error - enabled is not allowed in useSuspenseQueries
+      enabled: false,
+      // @ts-expect-error - throwOnError is not allowed in useSuspenseQueries
+      throwOnError: false,
+      // @ts-expect-error - placeholderData is not allowed in useSuspenseQueries
+      placeholderData: parameters,
+    },
   ],
 });
 
@@ -469,6 +496,21 @@ client.files.getFiles.setQueriesData({ parameters, infinite: true }, (prev) => {
   prev satisfies ReturnType<typeof client.files.getFiles.getInfiniteQueryData>;
   return prev;
 }) satisfies Array<
+  [
+    queryKey: ReturnType<typeof client.files.getFiles.getInfiniteQueryKey>,
+    data: ReturnType<typeof client.files.getFiles.getInfiniteQueryData>,
+  ]
+>;
+
+client.files.getFiles.setQueriesData(
+  { queryKey: client.files.getFiles.getInfiniteQueryKey(parameters) },
+  (prev) => {
+    prev satisfies ReturnType<
+      typeof client.files.getFiles.getInfiniteQueryData
+    >;
+    return prev;
+  }
+) satisfies Array<
   [
     queryKey: ReturnType<typeof client.files.getFiles.getInfiniteQueryKey>,
     data: ReturnType<typeof client.files.getFiles.getInfiniteQueryData>,

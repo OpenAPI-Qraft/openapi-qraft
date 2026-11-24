@@ -14,7 +14,14 @@ import type { RequestFn } from './RequestFn.js';
 import type { ServiceOperationInfiniteQueryKey } from './ServiceOperationKey.js';
 
 type IsFetchInfiniteQueryNextPageParamRequired =
-  'getNextPageParam' extends keyof FetchInfiniteQueryOptions ? true : false;
+  'getNextPageParam' extends keyof FetchInfiniteQueryOptions
+    ? Record<never, never> extends Pick<
+        FetchInfiniteQueryOptions,
+        'getNextPageParam'
+      >
+      ? false
+      : true
+    : false;
 
 export type ServiceOperationFetchInfiniteQueryVoidOption =
   IsFetchInfiniteQueryNextPageParamRequired extends true ? never : void;
