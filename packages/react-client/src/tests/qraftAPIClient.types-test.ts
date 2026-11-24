@@ -1,5 +1,6 @@
 import type { CreateAPIQueryClientOptions } from '@openapi-qraft/react';
 import type { RequestFnInfo } from '@openapi-qraft/tanstack-query-react-types';
+import type { MutationFunctionContext } from '@tanstack/react-query';
 import {
   qraftAPIClient,
   qraftReactAPIClient,
@@ -360,3 +361,24 @@ declare const requestInfo: RequestFnInfo;
 
 // @ts-expect-error - RequestFnInfo does not expose source metadata
 void requestInfo.source;
+
+client.files.deleteFiles.useMutation(undefined, {
+  onMutate(_variables, context) {
+    context satisfies MutationFunctionContext;
+    context.client satisfies QueryClient;
+    void context.meta;
+    void context.mutationKey;
+  },
+  onSuccess(_data, _variables, _onMutateResult, context) {
+    context satisfies MutationFunctionContext;
+    context.client satisfies QueryClient;
+  },
+  onError(_error, _variables, _onMutateResult, context) {
+    context satisfies MutationFunctionContext;
+    context.client satisfies QueryClient;
+  },
+  onSettled(_data, _error, _variables, _onMutateResult, context) {
+    context satisfies MutationFunctionContext;
+    context.client satisfies QueryClient;
+  },
+});

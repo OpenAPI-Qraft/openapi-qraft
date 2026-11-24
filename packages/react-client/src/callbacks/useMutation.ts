@@ -5,7 +5,11 @@ import type {
   ServiceOperationMutationKey,
   ServiceOperationUseMutationOptions,
 } from '@openapi-qraft/tanstack-query-react-types';
-import type { DefaultError, UseMutationResult } from '@tanstack/react-query';
+import type {
+  DefaultError,
+  MutationFunctionContext,
+  UseMutationResult,
+} from '@tanstack/react-query';
 import type { CreateAPIQueryClientOptions } from '../qraftAPIClient.js';
 import { useMutation as useMutationBase } from '@tanstack/react-query';
 import { useMemo } from 'react';
@@ -86,13 +90,15 @@ function qraftMutationFn(
     | {
         body: unknown;
       }
-    | undefined
+    | undefined,
+  context?: MutationFunctionContext
 ) {
   if (parameters) {
     return requestFn(schema, {
       parameters,
       baseUrl,
       body: mutationVariables as never,
+      meta: context?.meta,
     }).then(requestFnResponseResolver, requestFnResponseRejecter);
   }
 
@@ -107,5 +113,6 @@ function qraftMutationFn(
     parameters: mutationParameters,
     baseUrl,
     body,
+    meta: context?.meta,
   } as never).then(requestFnResponseResolver, requestFnResponseRejecter);
 }
