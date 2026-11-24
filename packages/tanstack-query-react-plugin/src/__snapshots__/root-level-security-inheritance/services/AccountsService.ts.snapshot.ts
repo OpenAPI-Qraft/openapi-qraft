@@ -115,6 +115,7 @@ export interface AccountsService {
         useQueries<T extends Array<UseQueryOptionsForUseQueries<GetAccountsSchema, GetAccountsParameters, GetAccountsData, GetAccountsError>>, TCombinedResult = Array<UseQueryResult<GetAccountsData, GetAccountsError>>>(options: {
             queries: T;
             combine?: (results: Array<UseQueryResult<GetAccountsData, GetAccountsError>>) => TCombinedResult;
+            subscribed?: boolean;
         }): TCombinedResult;
         /**
          * Performs asynchronous data fetching with Suspense support.
@@ -344,6 +345,7 @@ export interface AccountsService {
         useQueries<T extends Array<UseQueryOptionsForUseQueries<GetAccountProfileSchema, GetAccountProfileParameters, GetAccountProfileData, GetAccountProfileError>>, TCombinedResult = Array<UseQueryResult<GetAccountProfileData, GetAccountProfileError>>>(options: {
             queries: T;
             combine?: (results: Array<UseQueryResult<GetAccountProfileData, GetAccountProfileError>>) => TCombinedResult;
+            subscribed?: boolean;
         }): TCombinedResult;
         /**
          * Performs asynchronous data fetching with Suspense support.

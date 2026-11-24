@@ -200,6 +200,7 @@ export interface FilesService {
         useQueries<T extends Array<UseQueryOptionsForUseQueries<GetFilesSchema, GetFilesParameters, GetFilesData, GetFilesError>>, TCombinedResult = Array<UseQueryResult<GetFilesData, GetFilesError>>>(options: {
             queries: T;
             combine?: (results: Array<UseQueryResult<GetFilesData, GetFilesError>>) => TCombinedResult;
+            subscribed?: boolean;
         }): TCombinedResult;
         /**
          * Performs asynchronous data fetching with Suspense support.
@@ -512,6 +513,7 @@ export interface FilesService {
         useQueries<T extends Array<UseQueryOptionsForUseQueries<PostFilesSchema, PostFilesQueryParameters, PostFilesData, PostFilesError>>, TCombinedResult = Array<UseQueryResult<PostFilesData, PostFilesError>>>(options: {
             queries: T;
             combine?: (results: Array<UseQueryResult<PostFilesData, PostFilesError>>) => TCombinedResult;
+            subscribed?: boolean;
         }): TCombinedResult;
         /**
          * Performs asynchronous data fetching with Suspense support.
@@ -929,6 +931,7 @@ export interface FilesService {
         useQueries<T extends Array<UseQueryOptionsForUseQueries<DeleteFilesSchema, DeleteFilesParameters, DeleteFilesData, DeleteFilesError>>, TCombinedResult = Array<UseQueryResult<DeleteFilesData, DeleteFilesError>>>(options: {
             queries: T;
             combine?: (results: Array<UseQueryResult<DeleteFilesData, DeleteFilesError>>) => TCombinedResult;
+            subscribed?: boolean;
         }): TCombinedResult;
         /**
          * Performs asynchronous data fetching with Suspense support.
@@ -1384,6 +1387,7 @@ export interface FilesService {
         useQueries<T extends Array<UseQueryOptionsForUseQueries<TrashFilesSchema, TrashFilesParameters, TrashFilesData, TrashFilesError>>, TCombinedResult = Array<UseQueryResult<TrashFilesData, TrashFilesError>>>(options: {
             queries: T;
             combine?: (results: Array<UseQueryResult<TrashFilesData, TrashFilesError>>) => TCombinedResult;
+            subscribed?: boolean;
         }): TCombinedResult;
         /**
          * Performs asynchronous data fetching with Suspense support.
@@ -1892,6 +1896,7 @@ export interface FilesService {
         useQueries<T extends Array<UseQueryOptionsForUseQueries<GetFileListSchema, GetFileListParameters, GetFileListData, GetFileListError>>, TCombinedResult = Array<UseQueryResult<GetFileListData, GetFileListError>>>(options: {
             queries: T;
             combine?: (results: Array<UseQueryResult<GetFileListData, GetFileListError>>) => TCombinedResult;
+            subscribed?: boolean;
         }): TCombinedResult;
         /**
          * Performs asynchronous data fetching with Suspense support.

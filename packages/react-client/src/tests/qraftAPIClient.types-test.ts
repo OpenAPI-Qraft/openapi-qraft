@@ -478,3 +478,18 @@ client.files.getFiles.setQueriesData({ parameters, infinite: true }, (prev) => {
 //// ServiceOperationMutation getMutationCache ////
 client.files.deleteFiles.getMutationCache().find({ parameters: {} });
 client.files.deleteFiles.getMutationCache().findAll({ exact: true });
+
+//// useQueries subscribed ////
+client.files.getFiles.useQueries({
+  subscribed: false,
+  queries: [{ parameters }],
+});
+client.files.getFiles.useQueries({
+  queries: [
+    {
+      parameters,
+      // @ts-expect-error - subscribed is only allowed at top-level in useQueries
+      subscribed: false,
+    },
+  ],
+});

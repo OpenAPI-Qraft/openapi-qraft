@@ -22,5 +22,6 @@ export interface ServiceOperationUseQueries<
     combine?: (
       results: Array<UseQueryResult<TOperationQueryFnData, TError>>
     ) => TCombinedResult;
+    subscribed?: boolean;
   }): TCombinedResult;
 }

@@ -248,6 +248,7 @@ export interface ApprovalPoliciesService {
         useQueries<T extends Array<UseQueryOptionsForUseQueries<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdParameters, GetApprovalPoliciesIdData, GetApprovalPoliciesIdError>>, TCombinedResult = Array<UseQueryResult<GetApprovalPoliciesIdData, GetApprovalPoliciesIdError>>>(options: {
             queries: T;
             combine?: (results: Array<UseQueryResult<GetApprovalPoliciesIdData, GetApprovalPoliciesIdError>>) => TCombinedResult;
+            subscribed?: boolean;
         }): TCombinedResult;
         /**
          * Performs asynchronous data fetching with Suspense support.
@@ -734,6 +735,7 @@ export interface ApprovalPoliciesService {
         useQueries<T extends Array<UseQueryOptionsForUseQueries<DeleteApprovalPoliciesIdSchema, DeleteApprovalPoliciesIdParameters, DeleteApprovalPoliciesIdData, DeleteApprovalPoliciesIdError>>, TCombinedResult = Array<UseQueryResult<DeleteApprovalPoliciesIdData, DeleteApprovalPoliciesIdError>>>(options: {
             queries: T;
             combine?: (results: Array<UseQueryResult<DeleteApprovalPoliciesIdData, DeleteApprovalPoliciesIdError>>) => TCombinedResult;
+            subscribed?: boolean;
         }): TCombinedResult;
         /**
          * Performs asynchronous data fetching with Suspense support.
@@ -1435,6 +1437,7 @@ export interface ApprovalPoliciesService {
         useQueries<T extends Array<UseQueryOptionsForUseQueries<PatchApprovalPoliciesIdSchema, PatchApprovalPoliciesIdQueryParameters, PatchApprovalPoliciesIdData, PatchApprovalPoliciesIdError>>, TCombinedResult = Array<UseQueryResult<PatchApprovalPoliciesIdData, PatchApprovalPoliciesIdError>>>(options: {
             queries: T;
             combine?: (results: Array<UseQueryResult<PatchApprovalPoliciesIdData, PatchApprovalPoliciesIdError>>) => TCombinedResult;
+            subscribed?: boolean;
         }): TCombinedResult;
         /**
          * Performs asynchronous data fetching with Suspense support.
