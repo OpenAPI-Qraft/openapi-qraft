@@ -19,6 +19,11 @@ const tanstackQueryPkg = require('@tanstack/react-query/package.json') as {
 };
 console.log(`Resolved @tanstack/react-query@${tanstackQueryPkg.version}`);
 
+const typescriptPkg = require('typescript/package.json') as {
+  version: string;
+};
+console.log(`Resolved typescript@${typescriptPkg.version}`);
+
 console.log({} satisfies Partial<components>);
 console.log({} satisfies Partial<paths>);
 

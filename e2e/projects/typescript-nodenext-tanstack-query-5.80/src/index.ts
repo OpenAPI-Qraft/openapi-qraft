@@ -25,6 +25,16 @@ if (tanstackQueryPkg.version !== '5.80.0') {
 }
 console.log(`Resolved @tanstack/react-query@${tanstackQueryPkg.version}`);
 
+const typescriptPkg = require('typescript/package.json') as {
+  version: string;
+};
+
+if (typescriptPkg.version !== '5.4.2') {
+  console.error(`Expected typescript@5.4.2, got ${typescriptPkg.version}`);
+  process.exit(1);
+}
+console.log(`Resolved typescript@${typescriptPkg.version}`);
+
 console.log({} satisfies Partial<components>);
 console.log({} satisfies Partial<paths>);
 

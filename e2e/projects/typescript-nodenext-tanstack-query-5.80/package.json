@@ -16,7 +16,7 @@
     "@openapi-qraft/react": "latest",
     "@tanstack/react-query": "5.80.0",
     "@types/node": "latest",
-    "typescript": "latest"
+    "typescript": "5.4.2"
   },
   "repository": {
     "type": "git",
