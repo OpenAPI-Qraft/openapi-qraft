@@ -1,5 +1,15 @@
 # @openapi-qraft/react
 
+## 2.15.0-beta.11
+
+### Patch Changes
+
+- 7280c6e: Forward `meta` from TanStack Query's `MutationFunctionContext` to `requestFn` in `useMutation`.
+- b6d976b: Remove the experimental `source` metadata field from `RequestFnInfo` and `requestFn` calls introduced in `2.15.0-beta.8`, while keeping lazy `signal` forwarding for query requests.
+- Updated dependencies [2440e9a]
+- Updated dependencies [b6d976b]
+  - @openapi-qraft/tanstack-query-react-types@2.15.0-beta.11
+
 ## 2.15.0-beta.10
 
 ### Patch Changes
