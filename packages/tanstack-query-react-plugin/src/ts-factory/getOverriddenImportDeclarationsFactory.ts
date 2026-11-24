@@ -1,6 +1,6 @@
 import type { ImportDeclaration } from 'typescript';
 import type { OverrideImportType } from './OverrideImportType.js';
-import { factory } from 'typescript';
+import ts from 'typescript';
 
 export function getOverriddenImportDeclarationsFactory(
   moduleImports: Record<string, string[]>,
@@ -26,22 +26,22 @@ export function getOverriddenImportDeclarationsFactory(
 
         Object.entries(importsByPath).forEach(([customPath, specifiers]) => {
           customImportDeclarations.push(
-            factory.createImportDeclaration(
+            ts.factory.createImportDeclaration(
               undefined,
-              factory.createImportClause(
+              ts.factory.createImportClause(
                 true,
                 undefined,
-                factory.createNamedImports(
+                ts.factory.createNamedImports(
                   specifiers.map((specifier) =>
-                    factory.createImportSpecifier(
+                    ts.factory.createImportSpecifier(
                       false,
                       undefined,
-                      factory.createIdentifier(specifier)
+                      ts.factory.createIdentifier(specifier)
                     )
                   )
                 )
               ),
-              factory.createStringLiteral(customPath)
+              ts.factory.createStringLiteral(customPath)
             )
           );
         });
