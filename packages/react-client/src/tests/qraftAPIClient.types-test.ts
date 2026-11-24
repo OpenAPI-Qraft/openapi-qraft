@@ -1,9 +1,5 @@
 import type { CreateAPIQueryClientOptions } from '@openapi-qraft/react';
-import type {
-  OperationSchema,
-  RequestFnInfo,
-  ServiceOperationMutationKey,
-} from '@openapi-qraft/tanstack-query-react-types';
+import type { RequestFnInfo } from '@openapi-qraft/tanstack-query-react-types';
 import {
   qraftAPIClient,
   qraftReactAPIClient,
@@ -362,21 +358,5 @@ directReactQueryClientApi.files.deleteFiles.useMutationState();
 
 declare const requestInfo: RequestFnInfo;
 
-if (requestInfo.source?.type === 'mutation') {
-  const mutationKey = requestInfo.source
-    .mutationKey satisfies ServiceOperationMutationKey<
-    OperationSchema,
-    unknown
-  >;
-  void mutationKey;
-}
-
-if (requestInfo.source?.type === 'query') {
-  void requestInfo.source.context.queryKey;
-  void requestInfo.source.context.meta;
-}
-
-if (requestInfo.source?.type === 'invoke') {
-  // @ts-expect-error - invoke source does not expose query context
-  void requestInfo.source.context;
-}
+// @ts-expect-error - RequestFnInfo does not expose source metadata
+void requestInfo.source;

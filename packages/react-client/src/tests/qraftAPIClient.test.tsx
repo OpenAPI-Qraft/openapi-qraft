@@ -59,40 +59,8 @@ const createClient = ({
   };
 };
 
-describe('requestFn', () => {
-  it('does not forward qraft request source metadata to fetch', async () => {
-    const fetchImplementation = (async (..._args: Parameters<typeof fetch>) =>
-      Response.json({ ok: true })) satisfies typeof fetch;
-    const fetchSpy = vi.fn(fetchImplementation);
-
-    await requestFn(
-      { url: '/ok', method: 'get' },
-      {
-        baseUrl: 'https://api.sandbox.monite.com/v1',
-        source: { type: 'invoke' },
-      },
-      { fetch: fetchSpy }
-    );
-
-    expect(fetchSpy).toHaveBeenCalledTimes(1);
-
-    const [fetchUrl, fetchInit] = fetchSpy.mock.calls[0] satisfies Parameters<
-      typeof fetch
-    >;
-
-    expect(fetchUrl).toBe('https://api.sandbox.monite.com/v1/ok');
-    expect(fetchInit).toBeDefined();
-    if (!fetchInit) {
-      throw new Error('fetch init should be defined');
-    }
-    expect(Object.prototype.hasOwnProperty.call(fetchInit, 'source')).toBe(
-      false
-    );
-  });
-});
-
 describe('createQueryRequestFnInfo', () => {
-  it('keeps query request source signal lazy', () => {
+  it('keeps query request signal lazy', () => {
     let signalReads = 0;
     const signal = new AbortController().signal;
     const client = new QueryClient();
@@ -114,10 +82,9 @@ describe('createQueryRequestFnInfo', () => {
     });
 
     expect(signalReads).toBe(0);
-    expect(requestInfo.source).toEqual({
-      type: 'query',
-      context,
-    });
+    expect(Object.prototype.hasOwnProperty.call(requestInfo, 'source')).toBe(
+      false
+    );
     expect(signalReads).toBe(0);
     expect(requestInfo.signal).toBe(signal);
     expect(signalReads).toBe(1);
@@ -173,28 +140,6 @@ describe('Qraft uses singular Query', () => {
         },
       });
     });
-  });
-
-  it('passes original query function context as request source for useQuery', async () => {
-    const requestFnSpy = vi.fn(requestFn);
-    const { qraft, queryClient } = createClient({ requestFn: requestFnSpy });
-
-    renderHook(() => qraft.files.findAll.useQuery(), {
-      wrapper: (props) => <Providers queryClient={queryClient} {...props} />,
-    });
-
-    await waitFor(() => expect(requestFnSpy).toHaveBeenCalled());
-
-    const requestInfo = requestFnSpy.mock.calls[0]?.[1];
-
-    expect(requestInfo?.source?.type).toBe('query');
-    if (requestInfo?.source?.type !== 'query') {
-      throw new Error('Expected query source');
-    }
-    expect(requestInfo.source.context.queryKey).toEqual(
-      qraft.files.findAll.getQueryKey()
-    );
-    expect(requestInfo.source.context.meta).toBeUndefined();
   });
 
   it('supports useQuery with QueryClient from context', async () => {
@@ -489,38 +434,6 @@ describe('Qraft uses Queries', () => {
       ]);
     });
   });
-
-  it('passes original query function context as request source for useQueries', async () => {
-    const requestFnSpy = vi.fn(requestFn);
-    const { qraft, queryClient } = createClient({ requestFn: requestFnSpy });
-
-    renderHook(
-      () =>
-        qraft.files.findAll.useQueries({
-          queries: [
-            {
-              queryKey: qraft.files.findAll.getQueryKey(),
-            },
-          ],
-        }),
-      {
-        wrapper: (props) => <Providers queryClient={queryClient} {...props} />,
-      }
-    );
-
-    await waitFor(() => expect(requestFnSpy).toHaveBeenCalled());
-
-    const requestInfo = requestFnSpy.mock.calls[0]?.[1];
-
-    expect(requestInfo?.source?.type).toBe('query');
-    if (requestInfo?.source?.type !== 'query') {
-      throw new Error('Expected query source');
-    }
-    expect(requestInfo.source.context.queryKey).toEqual(
-      qraft.files.findAll.getQueryKey()
-    );
-    expect(requestInfo.source.context.meta).toBeUndefined();
-  });
 });
 
 describe('Qraft uses Suspense Queries', () => {
@@ -623,43 +536,6 @@ describe('Qraft uses Suspense Queries', () => {
         ['asc', 'desc'],
       ]);
     });
-  });
-
-  it('passes original query function context as request source for useSuspenseQueries', async () => {
-    const requestFnSpy = vi.fn(requestFn);
-    const { qraft, queryClient } = createClient({ requestFn: requestFnSpy });
-
-    const hook = () => {
-      try {
-        return qraft.files.findAll.useSuspenseQueries({
-          queries: [
-            {
-              queryKey: qraft.files.findAll.getQueryKey(),
-            },
-          ],
-        });
-      } catch (error) {
-        return error as Promise<void>;
-      }
-    };
-
-    const { result: resultWithErrorPromise } = renderHook(hook, {
-      wrapper: (props) => <Providers {...props} queryClient={queryClient} />,
-    });
-
-    expect(resultWithErrorPromise.current).toBeInstanceOf(Promise);
-    await resultWithErrorPromise.current;
-
-    const requestInfo = requestFnSpy.mock.calls[0]?.[1];
-
-    expect(requestInfo?.source?.type).toBe('query');
-    if (requestInfo?.source?.type !== 'query') {
-      throw new Error('Expected query source');
-    }
-    expect(requestInfo.source.context.queryKey).toEqual(
-      qraft.files.findAll.getQueryKey()
-    );
-    expect(requestInfo.source.context.meta).toBeUndefined();
   });
 });
 
@@ -1530,36 +1406,6 @@ describe('Qraft uses Mutations', () => {
     });
   });
 
-  it('passes mutation variables and mutationKey as request source', async () => {
-    const requestFnSpy = vi.fn(requestFn);
-    const { qraft, queryClient } = createClient({ requestFn: requestFnSpy });
-    const mutationKey = qraft.files.deleteFiles.getMutationKey({
-      query: { all: true },
-    });
-    const variables = {
-      body: { ok: true },
-    } satisfies { body: { ok: boolean } };
-
-    const { result } = renderHook(
-      () =>
-        qraft.files.deleteFiles.useMutation(undefined, {
-          mutationKey,
-        }),
-      {
-        wrapper: (props) => <Providers queryClient={queryClient} {...props} />,
-      }
-    );
-
-    await act(() => result.current.mutateAsync(variables as never));
-
-    const requestInfo = requestFnSpy.mock.calls[0]![1];
-    expect(requestInfo.source).toEqual({
-      type: 'mutation',
-      variables,
-      mutationKey,
-    });
-  });
-
   it('supports useMutation with form data and plain data', async () => {
     const { qraft, queryClient } = createClient();
 
@@ -2356,13 +2202,7 @@ describe('Qraft uses Operation Query Function', () => {
 
     expect(requestFnSpy).toHaveBeenCalledWith(
       qraft.approvalPolicies.getApprovalPoliciesId.schema,
-      {
-        parameters,
-        baseUrl: 'https://foo.bar.baz/v1',
-        source: {
-          type: 'invoke',
-        },
-      }
+      { parameters, baseUrl: 'https://foo.bar.baz/v1' }
     );
   });
 
@@ -2482,24 +2322,6 @@ describe('Qraft uses "fetchQuery(...) & "prefetchQuery(...)" & "ensureQueryData(
     const result = qraft.files.findAll.fetchQuery();
 
     await expect(result).resolves.toEqual(filesFindAllResponsePayloadFixtures);
-  });
-
-  it('passes original query function context as request source for fetchQuery', async () => {
-    const requestFnSpy = vi.fn(requestFn);
-    const { qraft } = createClient({ requestFn: requestFnSpy });
-
-    await qraft.files.findAll.fetchQuery();
-
-    const requestInfo = requestFnSpy.mock.calls[0]?.[1];
-
-    expect(requestInfo?.source?.type).toBe('query');
-    if (requestInfo?.source?.type !== 'query') {
-      throw new Error('Expected query source');
-    }
-    expect(requestInfo.source.context.queryKey).toEqual(
-      qraft.files.findAll.getQueryKey()
-    );
-    expect(requestInfo.source.context.meta).toBeUndefined();
   });
 
   it('emits type and response error required `parameters` are omitted', async () => {
@@ -3102,20 +2924,6 @@ describe('Custom Callbacks support', () => {
           | Services['approvalPolicies']['getApprovalPoliciesId']['types']['data']
           | undefined
       ).toEqual(parameters);
-    });
-
-    it('passes invoke source for direct operation calls', async () => {
-      const requestFnSpy = vi.fn(requestFn) as typeof requestFn;
-      const { qraft } = createClient({ requestFn: requestFnSpy });
-
-      await qraft.files.findAll(undefined, requestFnSpy);
-
-      expect(requestFnSpy).toHaveBeenCalledWith(
-        qraft.files.findAll.schema,
-        expect.objectContaining({
-          source: { type: 'invoke' },
-        })
-      );
     });
 
     it('supports POST "operationInvokeFn" if callback provided', async () => {
