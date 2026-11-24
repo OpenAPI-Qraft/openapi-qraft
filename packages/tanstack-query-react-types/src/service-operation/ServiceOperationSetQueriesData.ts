@@ -1,6 +1,10 @@
 import type {
+  DeepReadonly,
+  OperationInfiniteData,
   QueryFiltersByParameters,
   QueryFiltersByQueryKey,
+  ServiceOperationInfiniteQueryKey,
+  ServiceOperationQueryKey,
 } from '@openapi-qraft/tanstack-query-react-types';
 import type { SetDataOptions, Updater } from '@tanstack/react-query';
 
@@ -26,10 +30,37 @@ export interface ServiceOperationSetQueriesData<
           TQueryParams,
           TError
         >,
-    updater: Updater<
-      NoInfer<TOperationQueryFnData> | undefined,
-      NoInfer<TOperationQueryFnData> | undefined
-    >,
+    updater: TInfinite extends true
+      ? Updater<
+          | NoInfer<OperationInfiniteData<TOperationQueryFnData, TQueryParams>>
+          | undefined,
+          | NoInfer<
+              DeepReadonly<
+                OperationInfiniteData<TOperationQueryFnData, TQueryParams>
+              >
+            >
+          | undefined
+        >
+      : Updater<
+          NoInfer<TOperationQueryFnData> | undefined,
+          NoInfer<DeepReadonly<TOperationQueryFnData>> | undefined
+        >,
     options?: SetDataOptions
-  ): Array<TOperationQueryFnData | undefined>;
+  ): TInfinite extends true
+    ? Array<
+        [
+          queryKey: ServiceOperationInfiniteQueryKey<TSchema, TQueryParams>,
+          data:
+            | NoInfer<
+                OperationInfiniteData<TOperationQueryFnData, TQueryParams>
+              >
+            | undefined,
+        ]
+      >
+    : Array<
+        [
+          queryKey: ServiceOperationQueryKey<TSchema, TQueryParams>,
+          data: TOperationQueryFnData | undefined,
+        ]
+      >;
 }

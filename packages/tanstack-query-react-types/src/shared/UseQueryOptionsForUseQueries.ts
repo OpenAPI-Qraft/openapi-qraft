@@ -18,9 +18,10 @@ export type UseQueryOptionsForUseQueries<
     TData,
     ServiceOperationQueryKey<TSchema, TParams>
   >,
-  'placeholderData' | 'suspense' | 'queryKey'
-> &
-  (
+  'placeholderData' | 'subscribed' | 'queryKey'
+> & {
+  subscribed?: never;
+} & (
     | {
         parameters: DeepReadonly<TParams>;
         placeholderData?:

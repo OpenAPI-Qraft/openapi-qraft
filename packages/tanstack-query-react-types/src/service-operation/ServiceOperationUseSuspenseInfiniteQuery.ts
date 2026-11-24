@@ -20,7 +20,8 @@ export interface ServiceOperationUseSuspenseInfiniteQuery<
 > {
   useSuspenseInfiniteQuery<
     TPageParam extends TQueryParams,
-    TData = TOperationQueryFnData,
+    TQueryFnData = TOperationQueryFnData,
+    TData = OperationInfiniteData<TQueryFnData, TQueryParams>,
   >(
     parameters:
       | ServiceOperationInfiniteQueryKey<TSchema, TQueryParams>
@@ -29,9 +30,9 @@ export interface ServiceOperationUseSuspenseInfiniteQuery<
           : DeepReadonly<TQueryParams>),
     options: Omit<
       UseSuspenseInfiniteQueryOptions<
-        TOperationQueryFnData,
+        TQueryFnData,
         TError,
-        OperationInfiniteData<TData, TQueryParams>,
+        TData,
         ServiceOperationInfiniteQueryKey<TSchema, TQueryParams>,
         PartialParameters<DeepReadonly<TPageParam>>
       >,
@@ -41,11 +42,8 @@ export interface ServiceOperationUseSuspenseInfiniteQuery<
       | 'initialPageParam'
     > &
       InfiniteQueryPageParamsOptions<
-        TOperationQueryFnData,
+        TQueryFnData,
         PartialParameters<DeepReadonly<TPageParam>>
       >
-  ): UseSuspenseInfiniteQueryResult<
-    OperationInfiniteData<TData, TQueryParams>,
-    OperationError<TError>
-  >;
+  ): UseSuspenseInfiniteQueryResult<TData, OperationError<TError>>;
 }

@@ -3,15 +3,11 @@ import type { QueryFunctionContext } from '@tanstack/react-query';
 
 export function createQueryRequestFnInfo(
   context: QueryFunctionContext,
-  requestInfo: Omit<RequestFnInfo, 'signal' | 'source'>
+  requestInfo: Omit<RequestFnInfo, 'signal'>
 ): RequestFnInfo {
   return Object.defineProperty(
     {
       ...requestInfo,
-      source: {
-        type: 'query',
-        context,
-      },
     } satisfies Omit<RequestFnInfo, 'signal'>,
     'signal',
     {

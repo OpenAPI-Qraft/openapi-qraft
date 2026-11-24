@@ -1,4 +1,4 @@
-import type { UseQueryOptions } from '@tanstack/react-query';
+import type { UseSuspenseQueryOptions } from '@tanstack/react-query';
 import type { DeepReadonly } from './DeepReadonly.js';
 import type { ServiceOperationQueryKey } from './ServiceOperationKey.js';
 
@@ -9,15 +9,18 @@ export type UseQueryOptionsForUseSuspenseQuery<
   TError,
   TData = TQueryFnData,
 > = Omit<
-  UseQueryOptions<
+  UseSuspenseQueryOptions<
     TQueryFnData,
     TError,
     TData,
     ServiceOperationQueryKey<TSchema, TParams>
   >,
-  'enabled' | 'throwOnError' | 'placeholderData' | 'queryKey'
-> &
-  (
+  'queryKey'
+> & {
+  enabled?: never;
+  throwOnError?: never;
+  placeholderData?: never;
+} & (
     | {
         parameters: DeepReadonly<TParams>;
         queryKey?: never;

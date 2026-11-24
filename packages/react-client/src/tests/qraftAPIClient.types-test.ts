@@ -1,16 +1,13 @@
 import type { CreateAPIQueryClientOptions } from '@openapi-qraft/react';
-import type {
-  OperationSchema,
-  RequestFnInfo,
-  ServiceOperationMutationKey,
-} from '@openapi-qraft/tanstack-query-react-types';
+import type { RequestFnInfo } from '@openapi-qraft/tanstack-query-react-types';
+import type { MutationFunctionContext } from '@tanstack/react-query';
 import {
   qraftAPIClient,
   qraftReactAPIClient,
   requestFn,
 } from '@openapi-qraft/react';
 import * as callbacks from '@openapi-qraft/react/callbacks/index';
-import { QueryClient } from '@tanstack/react-query';
+import { QueryClient, skipToken } from '@tanstack/react-query';
 import { createContext } from 'react';
 import { services } from './fixtures/api/index.js';
 import {
@@ -362,21 +359,179 @@ directReactQueryClientApi.files.deleteFiles.useMutationState();
 
 declare const requestInfo: RequestFnInfo;
 
-if (requestInfo.source?.type === 'mutation') {
-  const mutationKey = requestInfo.source
-    .mutationKey satisfies ServiceOperationMutationKey<
-    OperationSchema,
-    unknown
-  >;
-  void mutationKey;
-}
+// @ts-expect-error - RequestFnInfo does not expose source metadata
+void requestInfo.source;
 
-if (requestInfo.source?.type === 'query') {
-  void requestInfo.source.context.queryKey;
-  void requestInfo.source.context.meta;
-}
+client.files.deleteFiles.useMutation(undefined, {
+  onMutate(_variables, context) {
+    context satisfies MutationFunctionContext;
+    context.client satisfies QueryClient;
+    void context.meta;
+    void context.mutationKey;
+  },
+  onSuccess(_data, _variables, _onMutateResult, context) {
+    context satisfies MutationFunctionContext;
+    context.client satisfies QueryClient;
+  },
+  onError(_error, _variables, _onMutateResult, context) {
+    context satisfies MutationFunctionContext;
+    context.client satisfies QueryClient;
+  },
+  onSettled(_data, _error, _variables, _onMutateResult, context) {
+    context satisfies MutationFunctionContext;
+    context.client satisfies QueryClient;
+  },
+});
 
-if (requestInfo.source?.type === 'invoke') {
-  // @ts-expect-error - invoke source does not expose query context
-  void requestInfo.source.context;
-}
+//// IsFetching / IsMutating filters ////
+client.files.getFiles.isFetching({ stale: true, parameters });
+client.files.getFiles.useIsFetching({ stale: true, parameters });
+// @ts-expect-error - exact: true requires parameters or queryKey
+client.files.getFiles.isFetching({ exact: true });
+// @ts-expect-error - exact: true requires parameters or queryKey
+client.files.getFiles.useIsFetching({ exact: true });
+client.files.getFiles.isFetching({
+  infinite: true,
+  predicate: (query) => {
+    query.state.data?.pages;
+    return true;
+  },
+});
+client.files.getFiles.useIsFetching({
+  infinite: true,
+  predicate: (query) => {
+    query.state.data?.pages;
+    return true;
+  },
+});
+client.files.getFiles.invalidateQueries({ fetchStatus: 'fetching' });
+// @ts-expect-error - fetchStatus is forbidden on isFetching
+client.files.getFiles.isFetching({ fetchStatus: 'fetching' });
+// @ts-expect-error - fetchStatus is forbidden on useIsFetching
+client.files.getFiles.useIsFetching({ fetchStatus: 'fetching' });
+client.files.getFiles.isFetching({
+  parameters,
+  // @ts-expect-error - parameters and queryKey are mutually exclusive on isFetching
+  queryKey: client.files.getFiles.getQueryKey(parameters),
+});
+client.files.getFiles.useIsFetching({
+  parameters,
+  // @ts-expect-error - parameters and queryKey are mutually exclusive on useIsFetching
+  queryKey: client.files.getFiles.getQueryKey(parameters),
+});
+
+client.files.deleteFiles.isMutating({ exact: true, parameters: {} });
+client.files.deleteFiles.useIsMutating({ exact: true, parameters: {} });
+client.files.deleteFiles.useMutationState({ filters: { status: 'pending' } });
+// @ts-expect-error - status is forbidden on isMutating
+client.files.deleteFiles.isMutating({ status: 'pending' });
+// @ts-expect-error - status is forbidden on useIsMutating
+client.files.deleteFiles.useIsMutating({ status: 'pending' });
+client.files.deleteFiles.isMutating({
+  parameters: {},
+  // @ts-expect-error - parameters and mutationKey are mutually exclusive on isMutating
+  mutationKey: client.files.deleteFiles.getMutationKey(),
+});
+client.files.deleteFiles.useIsMutating({
+  parameters: {},
+  // @ts-expect-error - parameters and mutationKey are mutually exclusive on useIsMutating
+  mutationKey: client.files.deleteFiles.getMutationKey(),
+});
+
+//// useSuspenseQueries ////
+client.files.getFiles.useSuspenseQueries({
+  queries: [{ parameters }],
+  combine: (results) => results.map((result) => result.data),
+}) satisfies Array<typeof client.files.getFiles.types.data>;
+
+client.files.getFiles.useSuspenseQueries({
+  queries: [
+    {
+      parameters,
+      // @ts-expect-error - skipToken is not allowed in useSuspenseQueries
+      queryFn: skipToken,
+    },
+    {
+      parameters,
+      // @ts-expect-error - enabled is not allowed in useSuspenseQueries
+      enabled: false,
+      // @ts-expect-error - throwOnError is not allowed in useSuspenseQueries
+      throwOnError: false,
+      // @ts-expect-error - placeholderData is not allowed in useSuspenseQueries
+      placeholderData: parameters,
+    },
+  ],
+});
+
+//// useSuspenseInfiniteQuery ////
+client.files.getFiles.useSuspenseInfiniteQuery(parameters, {
+  getNextPageParam: () => undefined,
+  initialPageParam: parameters,
+  select: (data) => data.pages.length,
+}).data satisfies number;
+
+client.files.getFiles.useSuspenseInfiniteQuery<
+  typeof client.files.getFiles.types.parameters,
+  { custom: string }
+>(parameters, {
+  getNextPageParam: (lastPage) => {
+    lastPage satisfies { custom: string };
+    return undefined;
+  },
+  initialPageParam: parameters,
+}).data.pages satisfies Array<{ custom: string }>;
+
+//// setQueriesData ////
+client.files.getFiles.setQueriesData({ parameters }, (prev) => {
+  prev satisfies typeof client.files.getFiles.types.data | undefined;
+  return prev;
+}) satisfies Array<
+  [
+    queryKey: ReturnType<typeof client.files.getFiles.getQueryKey>,
+    data: typeof client.files.getFiles.types.data | undefined,
+  ]
+>;
+
+client.files.getFiles.setQueriesData({ parameters, infinite: true }, (prev) => {
+  prev satisfies ReturnType<typeof client.files.getFiles.getInfiniteQueryData>;
+  return prev;
+}) satisfies Array<
+  [
+    queryKey: ReturnType<typeof client.files.getFiles.getInfiniteQueryKey>,
+    data: ReturnType<typeof client.files.getFiles.getInfiniteQueryData>,
+  ]
+>;
+
+client.files.getFiles.setQueriesData(
+  { queryKey: client.files.getFiles.getInfiniteQueryKey(parameters) },
+  (prev) => {
+    prev satisfies ReturnType<
+      typeof client.files.getFiles.getInfiniteQueryData
+    >;
+    return prev;
+  }
+) satisfies Array<
+  [
+    queryKey: ReturnType<typeof client.files.getFiles.getInfiniteQueryKey>,
+    data: ReturnType<typeof client.files.getFiles.getInfiniteQueryData>,
+  ]
+>;
+
+//// ServiceOperationMutation getMutationCache ////
+client.files.deleteFiles.getMutationCache().find({ parameters: {} });
+client.files.deleteFiles.getMutationCache().findAll({ exact: true });
+
+//// useQueries subscribed ////
+client.files.getFiles.useQueries({
+  subscribed: false,
+  queries: [{ parameters }],
+});
+client.files.getFiles.useQueries({
+  queries: [
+    {
+      parameters,
+      // @ts-expect-error - subscribed is only allowed at top-level in useQueries
+      subscribed: false,
+    },
+  ],
+});

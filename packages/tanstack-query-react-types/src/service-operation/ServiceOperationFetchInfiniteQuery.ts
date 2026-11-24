@@ -4,6 +4,7 @@ import type {
   OperationInfiniteData,
   ServiceOperationEnsureInfiniteQueryDataOptions,
   ServiceOperationFetchInfiniteQueryOptions,
+  ServiceOperationFetchInfiniteQueryVoidOption,
 } from '@openapi-qraft/tanstack-query-react-types';
 
 export interface ServiceOperationFetchInfiniteQuery<
@@ -14,13 +15,15 @@ export interface ServiceOperationFetchInfiniteQuery<
 > {
   fetchInfiniteQuery<TPageParam extends TQueryParams>(
     options: AreAllOptional<TQueryParams> extends true
-      ? ServiceOperationFetchInfiniteQueryOptions<
-          TSchema,
-          TOperationQueryFnData,
-          TQueryParams,
-          DeepReadonly<TPageParam>,
-          TError
-        > | void
+      ?
+          | ServiceOperationFetchInfiniteQueryOptions<
+              TSchema,
+              TOperationQueryFnData,
+              TQueryParams,
+              DeepReadonly<TPageParam>,
+              TError
+            >
+          | ServiceOperationFetchInfiniteQueryVoidOption
       : ServiceOperationFetchInfiniteQueryOptions<
           TSchema,
           TOperationQueryFnData,
@@ -32,13 +35,15 @@ export interface ServiceOperationFetchInfiniteQuery<
 
   prefetchInfiniteQuery<TPageParam extends TQueryParams>(
     options: AreAllOptional<TQueryParams> extends true
-      ? ServiceOperationFetchInfiniteQueryOptions<
-          TSchema,
-          TOperationQueryFnData,
-          TQueryParams,
-          DeepReadonly<TPageParam>,
-          TError
-        > | void
+      ?
+          | ServiceOperationFetchInfiniteQueryOptions<
+              TSchema,
+              TOperationQueryFnData,
+              TQueryParams,
+              DeepReadonly<TPageParam>,
+              TError
+            >
+          | ServiceOperationFetchInfiniteQueryVoidOption
       : ServiceOperationFetchInfiniteQueryOptions<
           TSchema,
           TOperationQueryFnData,
@@ -50,13 +55,15 @@ export interface ServiceOperationFetchInfiniteQuery<
 
   ensureInfiniteQueryData<TPageParam extends TQueryParams>(
     options: AreAllOptional<TQueryParams> extends true
-      ? ServiceOperationEnsureInfiniteQueryDataOptions<
-          TSchema,
-          TOperationQueryFnData,
-          TQueryParams,
-          DeepReadonly<TPageParam>,
-          TError
-        > | void
+      ?
+          | ServiceOperationEnsureInfiniteQueryDataOptions<
+              TSchema,
+              TOperationQueryFnData,
+              TQueryParams,
+              DeepReadonly<TPageParam>,
+              TError
+            >
+          | ServiceOperationFetchInfiniteQueryVoidOption
       : ServiceOperationEnsureInfiniteQueryDataOptions<
           TSchema,
           TOperationQueryFnData,

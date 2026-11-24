@@ -33,6 +33,12 @@ essential for handling server state in React applications:
 npm install @tanstack/react-query
 ```
 
+## Requirements
+
+- **React** `>= 18`
+- **@tanstack/react-query** `>= 5.80.0`
+- **TypeScript** `>= 5.4.0`
+
 ## Getting Started
 
 To get started with OpenAPI Qraft, you need to generate types and service definitions from your OpenAPI Document.

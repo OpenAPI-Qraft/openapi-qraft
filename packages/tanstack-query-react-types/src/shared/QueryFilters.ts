@@ -1,4 +1,8 @@
-import type { DefaultError, FetchStatus, Query } from '@tanstack/react-query';
+import type {
+  DefaultError,
+  Query,
+  QueryFilters as TanStackQueryFilters,
+} from '@tanstack/react-query';
 import type { DeepReadonly } from './DeepReadonly.js';
 import type { OperationInfiniteData } from './OperationInfiniteData.js';
 import type { PartialParameters } from './PartialParameters.js';
@@ -16,7 +20,7 @@ interface QueryFiltersBase<
   TInfinite extends boolean,
   TParams = {},
   TError = DefaultError,
-> {
+> extends Omit<TanStackQueryFilters, 'queryKey' | 'exact' | 'predicate'> {
   /**
    * Include queries matching this predicate function
    */
@@ -25,21 +29,6 @@ interface QueryFiltersBase<
     : TInfinite extends false
       ? QueryFilterRegularPredicate<TSchema, TData, TParams, TError>
       : (query: string) => boolean;
-
-  /**
-   * Filter to active queries, inactive queries or all queries
-   */
-  type?: QueryTypeFilter;
-
-  /**
-   * Include or exclude stale queries
-   */
-  stale?: boolean;
-
-  /**
-   * Include queries matching their fetchStatus
-   */
-  fetchStatus?: FetchStatus;
 }
 
 interface QueryFiltersByQueryKeyBase<
@@ -187,6 +176,30 @@ export type QueryFiltersByParameters<
 > =
   | QueryFiltersByExactParameters<TSchema, TData, TInfinite, TParams, TError>
   | QueryFiltersByWeakParameters<TSchema, TData, TInfinite, TParams, TError>;
+
+export type IsFetchingQueryFilters<
+  TSchema extends { url: string; method: string },
+  TData,
+  TInfinite extends boolean,
+  TParams = {},
+  TError = DefaultError,
+> =
+  | Omit<
+      QueryFiltersByExactParameters<TSchema, TData, TInfinite, TParams, TError>,
+      'fetchStatus'
+    >
+  | Omit<
+      QueryFiltersByWeakParameters<TSchema, TData, TInfinite, TParams, TError>,
+      'fetchStatus'
+    >
+  | Omit<
+      QueryFiltersByExactQueryKey<TSchema, TData, TInfinite, TParams, TError>,
+      'fetchStatus'
+    >
+  | Omit<
+      QueryFiltersWeakExactQueryKey<TSchema, TData, TInfinite, TParams, TError>,
+      'fetchStatus'
+    >;
 
 interface QueryFilterInfinitePredicate<
   TSchema extends { url: string; method: string },

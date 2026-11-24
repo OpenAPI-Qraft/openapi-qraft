@@ -53,13 +53,7 @@ export async function baseRequestFn<TData, TError>(
   requestInfo: RequestFnInfo,
   options: WithRequired<RequestFnOptions, 'urlSerializer' | 'bodySerializer'>
 ): Promise<RequestFnResponse<TData, TError>> {
-  const {
-    parameters,
-    headers,
-    body,
-    source: _source,
-    ...requestInfoRest
-  } = requestInfo;
+  const { parameters, headers, body, ...requestInfoRest } = requestInfo;
 
   const requestPayload = options.bodySerializer(requestSchema, body);
 

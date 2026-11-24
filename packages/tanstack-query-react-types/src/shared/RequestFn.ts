@@ -1,6 +1,4 @@
-import type { QueryFunctionContext } from '@tanstack/react-query';
 import type { OperationError } from './OperationError.js';
-import type { ServiceOperationMutationKey } from './ServiceOperationKey.js';
 
 /**
  * The `RequestFn` is the wrapper on top of the `fetch` function that simplifies
@@ -50,23 +48,6 @@ export interface OperationSchema {
   readonly security?: string[];
 }
 
-export type RequestFnSource =
-  | {
-      readonly type: 'query';
-      readonly context: QueryFunctionContext;
-    }
-  | {
-      readonly type: 'mutation';
-      readonly variables: unknown;
-      readonly mutationKey: ServiceOperationMutationKey<
-        OperationSchema,
-        unknown
-      >;
-    }
-  | {
-      readonly type: 'invoke';
-    };
-
 export interface RequestFnInfo extends Omit<
   RequestInit,
   'headers' | 'method' | 'body' | 'signal'
@@ -109,11 +90,6 @@ export interface RequestFnInfo extends Omit<
 
   /** An AbortSignal to set request's signal. */
   readonly signal?: AbortSignal | null;
-
-  /**
-   * Original qraft request source metadata.
-   */
-  readonly source?: RequestFnSource;
 }
 
 /**

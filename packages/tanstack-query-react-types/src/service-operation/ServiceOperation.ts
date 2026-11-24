@@ -2,6 +2,7 @@ import type { ServiceOperationCancelQueries } from './ServiceOperationCancelQuer
 import type { ServiceOperationFetchInfiniteQuery } from './ServiceOperationFetchInfiniteQuery.js';
 import type { ServiceOperationFetchQuery } from './ServiceOperationFetchQuery.js';
 import type { ServiceOperationGetInfiniteQueryData } from './ServiceOperationGetInfiniteQueryData.js';
+import type { ServiceOperationGetMutationCache } from './ServiceOperationGetMutationCache.js';
 import type { ServiceOperationGetQueriesData } from './ServiceOperationGetQueriesData.js';
 import type { ServiceOperationGetQueryData } from './ServiceOperationGetQueryData.js';
 import type { ServiceOperationGetQueryState } from './ServiceOperationGetQueryState.js';
@@ -77,6 +78,7 @@ export interface ServiceOperationMutation<
     ServiceOperationUseIsMutating<TSchema, TBody, TData, TParams, TError>,
     ServiceOperationUseMutationState<TSchema, TBody, TData, TParams, TError>,
     ServiceOperationIsMutatingQueries<TSchema, TBody, TData, TParams, TError>,
+    ServiceOperationGetMutationCache<TSchema, TBody, TData, TParams, TError>,
     ServiceOperationMutationFn<TSchema, TBody, TData, TParams, TError> {
   schema: TSchema;
   types: {
