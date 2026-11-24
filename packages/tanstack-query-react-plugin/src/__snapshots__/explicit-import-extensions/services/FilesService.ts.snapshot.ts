@@ -4,7 +4,7 @@
  */
 
 import type { paths } from "../../openapi.js";
-import type { DeepReadonly, InvalidateQueryFilters, IsFetchingQueryFilters, IsMutatingMutationFilters, MutationFiltersByMutationKey, MutationFiltersByParameters, MutationVariables, OperationError, OperationInfiniteData, PartialParameters, QueryFiltersByParameters, QueryFiltersByQueryKey, QueryFnOptions, QueryFnOptionsByParameters, QueryFnOptionsByQueryKey, RequestFnResponse, ServiceOperationEnsureInfiniteQueryDataOptions, ServiceOperationEnsureQueryDataOptions, ServiceOperationFetchInfiniteQueryOptions, ServiceOperationFetchInfiniteQueryVoidOption, ServiceOperationFetchQueryOptions, ServiceOperationInfiniteQueryKey, ServiceOperationMutationFnOptions, ServiceOperationMutationKey, ServiceOperationQueryKey, ServiceOperationUseMutationOptions, UseQueryOptionsForUseQueries, UseQueryOptionsForUseSuspenseQuery, WithOptional, QraftServiceOperationsToken } from "@openapi-qraft/tanstack-query-react-types";
+import type { DeepReadonly, InvalidateQueryFilters, IsFetchingQueryFilters, IsMutatingMutationFilters, MutationFiltersByMutationKey, MutationFiltersByParameters, MutationVariables, OperationError, OperationInfiniteData, PartialParameters, QueryFiltersByParameters, QueryFiltersByQueryKey, QueryFnOptions, QueryFnOptionsByParameters, QueryFnOptionsByQueryKey, RequestFnResponse, ServiceOperationEnsureInfiniteQueryDataOptions, ServiceOperationEnsureQueryDataOptions, ServiceOperationFetchInfiniteQueryOptions, ServiceOperationFetchInfiniteQueryVoidOption, ServiceOperationFetchQueryOptions, ServiceOperationInfiniteQueryKey, ServiceOperationMutationFnOptions, ServiceOperationMutationKey, ServiceOperationQueryKey, ServiceOperationUseMutationOptions, UseQueryOptionsForUseQueries, UseQueryOptionsForUseSuspenseQuery, QraftServiceOperationsToken } from "@openapi-qraft/tanstack-query-react-types";
 import type { CancelOptions, DefinedInitialDataInfiniteOptions, DefinedInitialDataOptions, DefinedUseInfiniteQueryResult, DefinedUseQueryResult, InfiniteQueryPageParamsOptions, InvalidateOptions, Mutation, MutationCache, MutationState, QueryState, RefetchOptions, ResetOptions, SetDataOptions, UndefinedInitialDataInfiniteOptions, UndefinedInitialDataOptions, Updater, UseInfiniteQueryResult, UseMutationResult, UseQueryResult, UseSuspenseInfiniteQueryOptions, UseSuspenseInfiniteQueryResult, UseSuspenseQueryOptions, UseSuspenseQueryResult } from "@tanstack/react-query";
 export interface FilesService {
     /** @summary Get a files by ID */
@@ -250,7 +250,7 @@ export interface FilesService {
          * fetchNextPage(); // Fetch the next page
          * ```
          */
-        useSuspenseInfiniteQuery<TPageParam extends GetFilesParameters, TData = GetFilesData>(parameters: ServiceOperationInfiniteQueryKey<GetFilesSchema, GetFilesParameters> | (DeepReadonly<GetFilesParameters>), options: Omit<UseSuspenseInfiniteQueryOptions<GetFilesData, GetFilesError, OperationInfiniteData<TData, GetFilesParameters>, ServiceOperationInfiniteQueryKey<GetFilesSchema, GetFilesParameters>, PartialParameters<DeepReadonly<TPageParam>>>, "queryKey" | "getPreviousPageParam" | "getNextPageParam" | "initialPageParam"> & InfiniteQueryPageParamsOptions<GetFilesData, PartialParameters<DeepReadonly<TPageParam>>>): UseSuspenseInfiniteQueryResult<OperationInfiniteData<TData, GetFilesParameters>, OperationError<GetFilesError>>;
+        useSuspenseInfiniteQuery<TPageParam extends GetFilesParameters, TQueryFnData = GetFilesData, TData = OperationInfiniteData<TQueryFnData, GetFilesParameters>>(parameters: ServiceOperationInfiniteQueryKey<GetFilesSchema, GetFilesParameters> | (DeepReadonly<GetFilesParameters>), options: Omit<UseSuspenseInfiniteQueryOptions<TQueryFnData, GetFilesError, TData, ServiceOperationInfiniteQueryKey<GetFilesSchema, GetFilesParameters>, PartialParameters<DeepReadonly<TPageParam>>>, "queryKey" | "getPreviousPageParam" | "getNextPageParam" | "initialPageParam"> & InfiniteQueryPageParamsOptions<TQueryFnData, PartialParameters<DeepReadonly<TPageParam>>>): UseSuspenseInfiniteQueryResult<TData, OperationError<GetFilesError>>;
         /**
          * Allows you to execute multiple asynchronous data fetching operations concurrently with Suspense support.
          * Similar to useQueries but integrates with React Suspense for loading states.
@@ -309,7 +309,7 @@ export interface FilesService {
          */
         useSuspenseQueries<T extends Array<UseQueryOptionsForUseSuspenseQuery<GetFilesSchema, GetFilesParameters, GetFilesData, GetFilesError>>, TCombinedResult = Array<UseSuspenseQueryResult<GetFilesData, GetFilesError>>>(options: {
             queries: T;
-            combine?: (results: Array<WithOptional<UseSuspenseQueryResult<GetFilesData, GetFilesError>, "data">>) => TCombinedResult;
+            combine?: (results: Array<UseSuspenseQueryResult<GetFilesData, GetFilesError>>) => TCombinedResult;
         }): TCombinedResult;
         /** @summary Get a files by ID */
         fetchQuery(options: ServiceOperationFetchQueryOptions<GetFilesSchema, GetFilesData, GetFilesParameters, GetFilesError>): Promise<GetFilesData>;
@@ -344,7 +344,13 @@ export interface FilesService {
         /** @summary Get a files by ID */
         setInfiniteQueryData(parameters: (DeepReadonly<GetFilesParameters>) | ServiceOperationInfiniteQueryKey<GetFilesSchema, GetFilesParameters>, updater: Updater<NoInfer<OperationInfiniteData<GetFilesData, GetFilesParameters>> | undefined, NoInfer<DeepReadonly<OperationInfiniteData<GetFilesData, GetFilesParameters>>> | undefined>, options?: SetDataOptions): OperationInfiniteData<GetFilesData, GetFilesParameters> | undefined;
         /** @summary Get a files by ID */
-        setQueriesData<TInfinite extends boolean = false>(filters: QueryFiltersByParameters<GetFilesSchema, GetFilesData, TInfinite, GetFilesParameters, GetFilesError> | QueryFiltersByQueryKey<GetFilesSchema, GetFilesData, TInfinite, GetFilesParameters, GetFilesError>, updater: Updater<NoInfer<GetFilesData> | undefined, NoInfer<GetFilesData> | undefined>, options?: SetDataOptions): Array<GetFilesData | undefined>;
+        setQueriesData<TInfinite extends boolean = false>(filters: QueryFiltersByParameters<GetFilesSchema, GetFilesData, TInfinite, GetFilesParameters, GetFilesError> | QueryFiltersByQueryKey<GetFilesSchema, GetFilesData, TInfinite, GetFilesParameters, GetFilesError>, updater: TInfinite extends true ? Updater<NoInfer<OperationInfiniteData<GetFilesData, GetFilesParameters>> | undefined, NoInfer<DeepReadonly<OperationInfiniteData<GetFilesData, GetFilesParameters>>> | undefined> : Updater<NoInfer<GetFilesData> | undefined, NoInfer<DeepReadonly<GetFilesData>> | undefined>, options?: SetDataOptions): TInfinite extends true ? Array<[
+            queryKey: ServiceOperationInfiniteQueryKey<GetFilesSchema, GetFilesParameters>,
+            data: NoInfer<OperationInfiniteData<GetFilesData, GetFilesParameters>> | undefined
+        ]> : Array<[
+            queryKey: ServiceOperationQueryKey<GetFilesSchema, GetFilesParameters>,
+            data: GetFilesData | undefined
+        ]>;
         /** @summary Get a files by ID */
         invalidateQueries<TInfinite extends boolean = false>(filters?: InvalidateQueryFilters<GetFilesSchema, GetFilesData, TInfinite, GetFilesParameters, GetFilesError>, options?: InvalidateOptions): Promise<void>;
         /** @summary Get a files by ID */
@@ -1060,7 +1066,7 @@ export interface FilesService {
          * fetchNextPage(); // Fetch the next page
          * ```
          */
-        useSuspenseInfiniteQuery<TPageParam extends GetFileListParameters, TData = GetFileListData>(parameters: ServiceOperationInfiniteQueryKey<GetFileListSchema, GetFileListParameters> | (DeepReadonly<GetFileListParameters> | void), options: Omit<UseSuspenseInfiniteQueryOptions<GetFileListData, GetFileListError, OperationInfiniteData<TData, GetFileListParameters>, ServiceOperationInfiniteQueryKey<GetFileListSchema, GetFileListParameters>, PartialParameters<DeepReadonly<TPageParam>>>, "queryKey" | "getPreviousPageParam" | "getNextPageParam" | "initialPageParam"> & InfiniteQueryPageParamsOptions<GetFileListData, PartialParameters<DeepReadonly<TPageParam>>>): UseSuspenseInfiniteQueryResult<OperationInfiniteData<TData, GetFileListParameters>, OperationError<GetFileListError>>;
+        useSuspenseInfiniteQuery<TPageParam extends GetFileListParameters, TQueryFnData = GetFileListData, TData = OperationInfiniteData<TQueryFnData, GetFileListParameters>>(parameters: ServiceOperationInfiniteQueryKey<GetFileListSchema, GetFileListParameters> | (DeepReadonly<GetFileListParameters> | void), options: Omit<UseSuspenseInfiniteQueryOptions<TQueryFnData, GetFileListError, TData, ServiceOperationInfiniteQueryKey<GetFileListSchema, GetFileListParameters>, PartialParameters<DeepReadonly<TPageParam>>>, "queryKey" | "getPreviousPageParam" | "getNextPageParam" | "initialPageParam"> & InfiniteQueryPageParamsOptions<TQueryFnData, PartialParameters<DeepReadonly<TPageParam>>>): UseSuspenseInfiniteQueryResult<TData, OperationError<GetFileListError>>;
         /**
          * Allows you to execute multiple asynchronous data fetching operations concurrently with Suspense support.
          * Similar to useQueries but integrates with React Suspense for loading states.
@@ -1120,7 +1126,7 @@ export interface FilesService {
          */
         useSuspenseQueries<T extends Array<UseQueryOptionsForUseSuspenseQuery<GetFileListSchema, GetFileListParameters, GetFileListData, GetFileListError>>, TCombinedResult = Array<UseSuspenseQueryResult<GetFileListData, GetFileListError>>>(options: {
             queries: T;
-            combine?: (results: Array<WithOptional<UseSuspenseQueryResult<GetFileListData, GetFileListError>, "data">>) => TCombinedResult;
+            combine?: (results: Array<UseSuspenseQueryResult<GetFileListData, GetFileListError>>) => TCombinedResult;
         }): TCombinedResult;
         /**
          * @deprecated
@@ -1197,7 +1203,13 @@ export interface FilesService {
          * @deprecated
          * @summary Get a file list
          */
-        setQueriesData<TInfinite extends boolean = false>(filters: QueryFiltersByParameters<GetFileListSchema, GetFileListData, TInfinite, GetFileListParameters, GetFileListError> | QueryFiltersByQueryKey<GetFileListSchema, GetFileListData, TInfinite, GetFileListParameters, GetFileListError>, updater: Updater<NoInfer<GetFileListData> | undefined, NoInfer<GetFileListData> | undefined>, options?: SetDataOptions): Array<GetFileListData | undefined>;
+        setQueriesData<TInfinite extends boolean = false>(filters: QueryFiltersByParameters<GetFileListSchema, GetFileListData, TInfinite, GetFileListParameters, GetFileListError> | QueryFiltersByQueryKey<GetFileListSchema, GetFileListData, TInfinite, GetFileListParameters, GetFileListError>, updater: TInfinite extends true ? Updater<NoInfer<OperationInfiniteData<GetFileListData, GetFileListParameters>> | undefined, NoInfer<DeepReadonly<OperationInfiniteData<GetFileListData, GetFileListParameters>>> | undefined> : Updater<NoInfer<GetFileListData> | undefined, NoInfer<DeepReadonly<GetFileListData>> | undefined>, options?: SetDataOptions): TInfinite extends true ? Array<[
+            queryKey: ServiceOperationInfiniteQueryKey<GetFileListSchema, GetFileListParameters>,
+            data: NoInfer<OperationInfiniteData<GetFileListData, GetFileListParameters>> | undefined
+        ]> : Array<[
+            queryKey: ServiceOperationQueryKey<GetFileListSchema, GetFileListParameters>,
+            data: GetFileListData | undefined
+        ]>;
         /**
          * @deprecated
          * @summary Get a file list

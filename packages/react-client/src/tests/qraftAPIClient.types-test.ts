@@ -7,7 +7,7 @@ import {
   requestFn,
 } from '@openapi-qraft/react';
 import * as callbacks from '@openapi-qraft/react/callbacks/index';
-import { QueryClient } from '@tanstack/react-query';
+import { QueryClient, skipToken } from '@tanstack/react-query';
 import { createContext } from 'react';
 import { services } from './fixtures/api/index.js';
 import {
@@ -419,3 +419,62 @@ client.files.deleteFiles.useIsMutating({
   // @ts-expect-error - parameters and mutationKey are mutually exclusive on useIsMutating
   mutationKey: client.files.deleteFiles.getMutationKey(),
 });
+
+//// useSuspenseQueries ////
+client.files.getFiles.useSuspenseQueries({
+  queries: [{ parameters }],
+  combine: (results) => results.map((result) => result.data),
+}) satisfies Array<typeof client.files.getFiles.types.data>;
+
+client.files.getFiles.useSuspenseQueries({
+  queries: [
+    {
+      parameters,
+      // @ts-expect-error - skipToken is not allowed in useSuspenseQueries
+      queryFn: skipToken,
+    },
+  ],
+});
+
+//// useSuspenseInfiniteQuery ////
+client.files.getFiles.useSuspenseInfiniteQuery(parameters, {
+  getNextPageParam: () => undefined,
+  initialPageParam: parameters,
+  select: (data) => data.pages.length,
+}).data satisfies number;
+
+client.files.getFiles.useSuspenseInfiniteQuery<
+  typeof client.files.getFiles.types.parameters,
+  { custom: string }
+>(parameters, {
+  getNextPageParam: (lastPage) => {
+    lastPage satisfies { custom: string };
+    return undefined;
+  },
+  initialPageParam: parameters,
+}).data.pages satisfies Array<{ custom: string }>;
+
+//// setQueriesData ////
+client.files.getFiles.setQueriesData({ parameters }, (prev) => {
+  prev satisfies typeof client.files.getFiles.types.data | undefined;
+  return prev;
+}) satisfies Array<
+  [
+    queryKey: ReturnType<typeof client.files.getFiles.getQueryKey>,
+    data: typeof client.files.getFiles.types.data | undefined,
+  ]
+>;
+
+client.files.getFiles.setQueriesData({ parameters, infinite: true }, (prev) => {
+  prev satisfies ReturnType<typeof client.files.getFiles.getInfiniteQueryData>;
+  return prev;
+}) satisfies Array<
+  [
+    queryKey: ReturnType<typeof client.files.getFiles.getInfiniteQueryKey>,
+    data: ReturnType<typeof client.files.getFiles.getInfiniteQueryData>,
+  ]
+>;
+
+//// ServiceOperationMutation getMutationCache ////
+client.files.deleteFiles.getMutationCache().find({ parameters: {} });
+client.files.deleteFiles.getMutationCache().findAll({ exact: true });

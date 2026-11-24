@@ -4,7 +4,7 @@
  */
 
 import type { paths } from "../../openapi.d.ts";
-import type { DeepReadonly, InvalidateQueryFilters, IsFetchingQueryFilters, OperationError, OperationInfiniteData, PartialParameters, QueryFiltersByParameters, QueryFiltersByQueryKey, QueryFnOptions, QueryFnOptionsByParameters, QueryFnOptionsByQueryKey, RequestFnResponse, ServiceOperationEnsureInfiniteQueryDataOptions, ServiceOperationEnsureQueryDataOptions, ServiceOperationFetchInfiniteQueryOptions, ServiceOperationFetchInfiniteQueryVoidOption, ServiceOperationFetchQueryOptions, ServiceOperationInfiniteQueryKey, ServiceOperationQueryKey, UseQueryOptionsForUseQueries, UseQueryOptionsForUseSuspenseQuery, WithOptional, QraftServiceOperationsToken } from "@openapi-qraft/tanstack-query-react-types";
+import type { DeepReadonly, InvalidateQueryFilters, IsFetchingQueryFilters, OperationError, OperationInfiniteData, PartialParameters, QueryFiltersByParameters, QueryFiltersByQueryKey, QueryFnOptions, QueryFnOptionsByParameters, QueryFnOptionsByQueryKey, RequestFnResponse, ServiceOperationEnsureInfiniteQueryDataOptions, ServiceOperationEnsureQueryDataOptions, ServiceOperationFetchInfiniteQueryOptions, ServiceOperationFetchInfiniteQueryVoidOption, ServiceOperationFetchQueryOptions, ServiceOperationInfiniteQueryKey, ServiceOperationQueryKey, UseQueryOptionsForUseQueries, UseQueryOptionsForUseSuspenseQuery, QraftServiceOperationsToken } from "@openapi-qraft/tanstack-query-react-types";
 import type { CancelOptions, DefinedInitialDataInfiniteOptions, DefinedInitialDataOptions, DefinedUseInfiniteQueryResult, DefinedUseQueryResult, InfiniteQueryPageParamsOptions, InvalidateOptions, QueryState, RefetchOptions, ResetOptions, SetDataOptions, UndefinedInitialDataInfiniteOptions, UndefinedInitialDataOptions, Updater, UseInfiniteQueryResult, UseQueryResult, UseSuspenseInfiniteQueryOptions, UseSuspenseInfiniteQueryResult, UseSuspenseQueryOptions, UseSuspenseQueryResult } from "@tanstack/react-query";
 export interface AccountsService {
     getAccounts: {
@@ -145,7 +145,7 @@ export interface AccountsService {
          * fetchNextPage(); // Fetch the next page
          * ```
          */
-        useSuspenseInfiniteQuery<TPageParam extends GetAccountsParameters, TData = GetAccountsData>(parameters: ServiceOperationInfiniteQueryKey<GetAccountsSchema, GetAccountsParameters> | (DeepReadonly<GetAccountsParameters> | void), options: Omit<UseSuspenseInfiniteQueryOptions<GetAccountsData, GetAccountsError, OperationInfiniteData<TData, GetAccountsParameters>, ServiceOperationInfiniteQueryKey<GetAccountsSchema, GetAccountsParameters>, PartialParameters<DeepReadonly<TPageParam>>>, "queryKey" | "getPreviousPageParam" | "getNextPageParam" | "initialPageParam"> & InfiniteQueryPageParamsOptions<GetAccountsData, PartialParameters<DeepReadonly<TPageParam>>>): UseSuspenseInfiniteQueryResult<OperationInfiniteData<TData, GetAccountsParameters>, OperationError<GetAccountsError>>;
+        useSuspenseInfiniteQuery<TPageParam extends GetAccountsParameters, TQueryFnData = GetAccountsData, TData = OperationInfiniteData<TQueryFnData, GetAccountsParameters>>(parameters: ServiceOperationInfiniteQueryKey<GetAccountsSchema, GetAccountsParameters> | (DeepReadonly<GetAccountsParameters> | void), options: Omit<UseSuspenseInfiniteQueryOptions<TQueryFnData, GetAccountsError, TData, ServiceOperationInfiniteQueryKey<GetAccountsSchema, GetAccountsParameters>, PartialParameters<DeepReadonly<TPageParam>>>, "queryKey" | "getPreviousPageParam" | "getNextPageParam" | "initialPageParam"> & InfiniteQueryPageParamsOptions<TQueryFnData, PartialParameters<DeepReadonly<TPageParam>>>): UseSuspenseInfiniteQueryResult<TData, OperationError<GetAccountsError>>;
         /**
          * Allows you to execute multiple asynchronous data fetching operations concurrently with Suspense support.
          * Similar to useQueries but integrates with React Suspense for loading states.
@@ -175,7 +175,7 @@ export interface AccountsService {
          */
         useSuspenseQueries<T extends Array<UseQueryOptionsForUseSuspenseQuery<GetAccountsSchema, GetAccountsParameters, GetAccountsData, GetAccountsError>>, TCombinedResult = Array<UseSuspenseQueryResult<GetAccountsData, GetAccountsError>>>(options: {
             queries: T;
-            combine?: (results: Array<WithOptional<UseSuspenseQueryResult<GetAccountsData, GetAccountsError>, "data">>) => TCombinedResult;
+            combine?: (results: Array<UseSuspenseQueryResult<GetAccountsData, GetAccountsError>>) => TCombinedResult;
         }): TCombinedResult;
         /**/
         fetchQuery(options: ServiceOperationFetchQueryOptions<GetAccountsSchema, GetAccountsData, GetAccountsParameters, GetAccountsError> | void): Promise<GetAccountsData>;
@@ -210,7 +210,13 @@ export interface AccountsService {
         /**/
         setInfiniteQueryData(parameters: (DeepReadonly<GetAccountsParameters> | undefined) | ServiceOperationInfiniteQueryKey<GetAccountsSchema, GetAccountsParameters>, updater: Updater<NoInfer<OperationInfiniteData<GetAccountsData, GetAccountsParameters>> | undefined, NoInfer<DeepReadonly<OperationInfiniteData<GetAccountsData, GetAccountsParameters>>> | undefined>, options?: SetDataOptions): OperationInfiniteData<GetAccountsData, GetAccountsParameters> | undefined;
         /**/
-        setQueriesData<TInfinite extends boolean = false>(filters: QueryFiltersByParameters<GetAccountsSchema, GetAccountsData, TInfinite, GetAccountsParameters, GetAccountsError> | QueryFiltersByQueryKey<GetAccountsSchema, GetAccountsData, TInfinite, GetAccountsParameters, GetAccountsError>, updater: Updater<NoInfer<GetAccountsData> | undefined, NoInfer<GetAccountsData> | undefined>, options?: SetDataOptions): Array<GetAccountsData | undefined>;
+        setQueriesData<TInfinite extends boolean = false>(filters: QueryFiltersByParameters<GetAccountsSchema, GetAccountsData, TInfinite, GetAccountsParameters, GetAccountsError> | QueryFiltersByQueryKey<GetAccountsSchema, GetAccountsData, TInfinite, GetAccountsParameters, GetAccountsError>, updater: TInfinite extends true ? Updater<NoInfer<OperationInfiniteData<GetAccountsData, GetAccountsParameters>> | undefined, NoInfer<DeepReadonly<OperationInfiniteData<GetAccountsData, GetAccountsParameters>>> | undefined> : Updater<NoInfer<GetAccountsData> | undefined, NoInfer<DeepReadonly<GetAccountsData>> | undefined>, options?: SetDataOptions): TInfinite extends true ? Array<[
+            queryKey: ServiceOperationInfiniteQueryKey<GetAccountsSchema, GetAccountsParameters>,
+            data: NoInfer<OperationInfiniteData<GetAccountsData, GetAccountsParameters>> | undefined
+        ]> : Array<[
+            queryKey: ServiceOperationQueryKey<GetAccountsSchema, GetAccountsParameters>,
+            data: GetAccountsData | undefined
+        ]>;
         /**/
         invalidateQueries<TInfinite extends boolean = false>(filters?: InvalidateQueryFilters<GetAccountsSchema, GetAccountsData, TInfinite, GetAccountsParameters, GetAccountsError>, options?: InvalidateOptions): Promise<void>;
         /**/
@@ -368,7 +374,7 @@ export interface AccountsService {
          * fetchNextPage(); // Fetch the next page
          * ```
          */
-        useSuspenseInfiniteQuery<TPageParam extends GetAccountProfileParameters, TData = GetAccountProfileData>(parameters: ServiceOperationInfiniteQueryKey<GetAccountProfileSchema, GetAccountProfileParameters> | (DeepReadonly<GetAccountProfileParameters> | void), options: Omit<UseSuspenseInfiniteQueryOptions<GetAccountProfileData, GetAccountProfileError, OperationInfiniteData<TData, GetAccountProfileParameters>, ServiceOperationInfiniteQueryKey<GetAccountProfileSchema, GetAccountProfileParameters>, PartialParameters<DeepReadonly<TPageParam>>>, "queryKey" | "getPreviousPageParam" | "getNextPageParam" | "initialPageParam"> & InfiniteQueryPageParamsOptions<GetAccountProfileData, PartialParameters<DeepReadonly<TPageParam>>>): UseSuspenseInfiniteQueryResult<OperationInfiniteData<TData, GetAccountProfileParameters>, OperationError<GetAccountProfileError>>;
+        useSuspenseInfiniteQuery<TPageParam extends GetAccountProfileParameters, TQueryFnData = GetAccountProfileData, TData = OperationInfiniteData<TQueryFnData, GetAccountProfileParameters>>(parameters: ServiceOperationInfiniteQueryKey<GetAccountProfileSchema, GetAccountProfileParameters> | (DeepReadonly<GetAccountProfileParameters> | void), options: Omit<UseSuspenseInfiniteQueryOptions<TQueryFnData, GetAccountProfileError, TData, ServiceOperationInfiniteQueryKey<GetAccountProfileSchema, GetAccountProfileParameters>, PartialParameters<DeepReadonly<TPageParam>>>, "queryKey" | "getPreviousPageParam" | "getNextPageParam" | "initialPageParam"> & InfiniteQueryPageParamsOptions<TQueryFnData, PartialParameters<DeepReadonly<TPageParam>>>): UseSuspenseInfiniteQueryResult<TData, OperationError<GetAccountProfileError>>;
         /**
          * Allows you to execute multiple asynchronous data fetching operations concurrently with Suspense support.
          * Similar to useQueries but integrates with React Suspense for loading states.
@@ -398,7 +404,7 @@ export interface AccountsService {
          */
         useSuspenseQueries<T extends Array<UseQueryOptionsForUseSuspenseQuery<GetAccountProfileSchema, GetAccountProfileParameters, GetAccountProfileData, GetAccountProfileError>>, TCombinedResult = Array<UseSuspenseQueryResult<GetAccountProfileData, GetAccountProfileError>>>(options: {
             queries: T;
-            combine?: (results: Array<WithOptional<UseSuspenseQueryResult<GetAccountProfileData, GetAccountProfileError>, "data">>) => TCombinedResult;
+            combine?: (results: Array<UseSuspenseQueryResult<GetAccountProfileData, GetAccountProfileError>>) => TCombinedResult;
         }): TCombinedResult;
         /**/
         fetchQuery(options: ServiceOperationFetchQueryOptions<GetAccountProfileSchema, GetAccountProfileData, GetAccountProfileParameters, GetAccountProfileError> | void): Promise<GetAccountProfileData>;
@@ -433,7 +439,13 @@ export interface AccountsService {
         /**/
         setInfiniteQueryData(parameters: (DeepReadonly<GetAccountProfileParameters> | undefined) | ServiceOperationInfiniteQueryKey<GetAccountProfileSchema, GetAccountProfileParameters>, updater: Updater<NoInfer<OperationInfiniteData<GetAccountProfileData, GetAccountProfileParameters>> | undefined, NoInfer<DeepReadonly<OperationInfiniteData<GetAccountProfileData, GetAccountProfileParameters>>> | undefined>, options?: SetDataOptions): OperationInfiniteData<GetAccountProfileData, GetAccountProfileParameters> | undefined;
         /**/
-        setQueriesData<TInfinite extends boolean = false>(filters: QueryFiltersByParameters<GetAccountProfileSchema, GetAccountProfileData, TInfinite, GetAccountProfileParameters, GetAccountProfileError> | QueryFiltersByQueryKey<GetAccountProfileSchema, GetAccountProfileData, TInfinite, GetAccountProfileParameters, GetAccountProfileError>, updater: Updater<NoInfer<GetAccountProfileData> | undefined, NoInfer<GetAccountProfileData> | undefined>, options?: SetDataOptions): Array<GetAccountProfileData | undefined>;
+        setQueriesData<TInfinite extends boolean = false>(filters: QueryFiltersByParameters<GetAccountProfileSchema, GetAccountProfileData, TInfinite, GetAccountProfileParameters, GetAccountProfileError> | QueryFiltersByQueryKey<GetAccountProfileSchema, GetAccountProfileData, TInfinite, GetAccountProfileParameters, GetAccountProfileError>, updater: TInfinite extends true ? Updater<NoInfer<OperationInfiniteData<GetAccountProfileData, GetAccountProfileParameters>> | undefined, NoInfer<DeepReadonly<OperationInfiniteData<GetAccountProfileData, GetAccountProfileParameters>>> | undefined> : Updater<NoInfer<GetAccountProfileData> | undefined, NoInfer<DeepReadonly<GetAccountProfileData>> | undefined>, options?: SetDataOptions): TInfinite extends true ? Array<[
+            queryKey: ServiceOperationInfiniteQueryKey<GetAccountProfileSchema, GetAccountProfileParameters>,
+            data: NoInfer<OperationInfiniteData<GetAccountProfileData, GetAccountProfileParameters>> | undefined
+        ]> : Array<[
+            queryKey: ServiceOperationQueryKey<GetAccountProfileSchema, GetAccountProfileParameters>,
+            data: GetAccountProfileData | undefined
+        ]>;
         /**/
         invalidateQueries<TInfinite extends boolean = false>(filters?: InvalidateQueryFilters<GetAccountProfileSchema, GetAccountProfileData, TInfinite, GetAccountProfileParameters, GetAccountProfileError>, options?: InvalidateOptions): Promise<void>;
         /**/

@@ -516,7 +516,7 @@ describe('Qraft uses Suspense Queries', () => {
             },
           ],
           combine: (results) =>
-            results.map((result) => result.data?.query?.items_order),
+            results.map((result) => result.data.query?.items_order),
         });
       } catch (error) {
         return error as Promise<void>;
@@ -3520,14 +3520,52 @@ describe('Qraft uses "setQueriesData(...)"', () => {
     // set `setQueriesData` does not create a new query, only updates the data
     qraft.files.getFiles.setQueryData(parameters, parameters);
 
-    qraft.files.getFiles.setQueriesData(
-      {},
-      { ...parameters, header: { 'x-monite-version': '2.0.0' } }
-    );
+    const updated = { ...parameters, header: { 'x-monite-version': '2.0.0' } };
 
-    expect(qraft.files.getFiles.getQueryData(parameters)).toEqual({
+    expect(qraft.files.getFiles.setQueriesData({}, updated)).toEqual([
+      [qraft.files.getFiles.getQueryKey(parameters), updated],
+    ]);
+
+    expect(qraft.files.getFiles.getQueryData(parameters)).toEqual(updated);
+  });
+
+  it('uses setQueriesData Infinite Queries', async () => {
+    const { qraft } = createClient();
+
+    qraft.files.getFiles.setInfiniteQueryData(parameters, {
+      pages: [parameters],
+      pageParams: [parameters],
+    });
+
+    const updatedPage = {
       ...parameters,
       header: { 'x-monite-version': '2.0.0' },
+    };
+
+    const result = qraft.files.getFiles.setQueriesData(
+      { parameters, infinite: true },
+      (prev) =>
+        prev
+          ? {
+              ...prev,
+              pages: [updatedPage],
+            }
+          : undefined
+    );
+
+    expect(result).toEqual([
+      [
+        qraft.files.getFiles.getInfiniteQueryKey(parameters),
+        {
+          pages: [updatedPage],
+          pageParams: [parameters],
+        },
+      ],
+    ]);
+
+    expect(qraft.files.getFiles.getInfiniteQueryData(parameters)).toEqual({
+      pages: [updatedPage],
+      pageParams: [parameters],
     });
   });
 });

@@ -1,7 +1,4 @@
-import type {
-  UseQueryOptionsForUseSuspenseQuery,
-  WithOptional,
-} from '@openapi-qraft/tanstack-query-react-types';
+import type { UseQueryOptionsForUseSuspenseQuery } from '@openapi-qraft/tanstack-query-react-types';
 import type { UseSuspenseQueryResult } from '@tanstack/react-query';
 
 export interface ServiceOperationUseSuspenseQueries<
@@ -25,12 +22,7 @@ export interface ServiceOperationUseSuspenseQueries<
   >(options: {
     queries: T;
     combine?: (
-      results: Array<
-        WithOptional<
-          UseSuspenseQueryResult<TOperationQueryFnData, TError>,
-          'data'
-        >
-      >
+      results: Array<UseSuspenseQueryResult<TOperationQueryFnData, TError>>
     ) => TCombinedResult;
   }): TCombinedResult;
 }

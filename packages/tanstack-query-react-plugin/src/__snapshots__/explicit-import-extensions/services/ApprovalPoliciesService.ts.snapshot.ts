@@ -4,7 +4,7 @@
  */
 
 import type { paths } from "../../openapi.js";
-import type { DeepReadonly, InvalidateQueryFilters, IsFetchingQueryFilters, IsMutatingMutationFilters, MutationFiltersByMutationKey, MutationFiltersByParameters, MutationVariables, OperationError, OperationInfiniteData, PartialParameters, QueryFiltersByParameters, QueryFiltersByQueryKey, QueryFnOptionsByParameters, QueryFnOptionsByQueryKey, RequestFnResponse, ServiceOperationEnsureInfiniteQueryDataOptions, ServiceOperationEnsureQueryDataOptions, ServiceOperationFetchInfiniteQueryOptions, ServiceOperationFetchQueryOptions, ServiceOperationInfiniteQueryKey, ServiceOperationMutationFnOptions, ServiceOperationMutationKey, ServiceOperationQueryKey, ServiceOperationUseMutationOptions, UseQueryOptionsForUseQueries, UseQueryOptionsForUseSuspenseQuery, WithOptional, QraftServiceOperationsToken } from "@openapi-qraft/tanstack-query-react-types";
+import type { DeepReadonly, InvalidateQueryFilters, IsFetchingQueryFilters, IsMutatingMutationFilters, MutationFiltersByMutationKey, MutationFiltersByParameters, MutationVariables, OperationError, OperationInfiniteData, PartialParameters, QueryFiltersByParameters, QueryFiltersByQueryKey, QueryFnOptionsByParameters, QueryFnOptionsByQueryKey, RequestFnResponse, ServiceOperationEnsureInfiniteQueryDataOptions, ServiceOperationEnsureQueryDataOptions, ServiceOperationFetchInfiniteQueryOptions, ServiceOperationFetchQueryOptions, ServiceOperationInfiniteQueryKey, ServiceOperationMutationFnOptions, ServiceOperationMutationKey, ServiceOperationQueryKey, ServiceOperationUseMutationOptions, UseQueryOptionsForUseQueries, UseQueryOptionsForUseSuspenseQuery, QraftServiceOperationsToken } from "@openapi-qraft/tanstack-query-react-types";
 import type { CancelOptions, DefinedInitialDataInfiniteOptions, DefinedInitialDataOptions, DefinedUseInfiniteQueryResult, DefinedUseQueryResult, InfiniteQueryPageParamsOptions, InvalidateOptions, Mutation, MutationCache, MutationState, QueryState, RefetchOptions, ResetOptions, SetDataOptions, UndefinedInitialDataInfiniteOptions, UndefinedInitialDataOptions, Updater, UseInfiniteQueryResult, UseMutationResult, UseQueryResult, UseSuspenseInfiniteQueryOptions, UseSuspenseInfiniteQueryResult, UseSuspenseQueryOptions, UseSuspenseQueryResult } from "@tanstack/react-query";
 export interface ApprovalPoliciesService {
     /**
@@ -305,7 +305,7 @@ export interface ApprovalPoliciesService {
          * fetchNextPage(); // Fetch the next page
          * ```
          */
-        useSuspenseInfiniteQuery<TPageParam extends GetApprovalPoliciesIdParameters, TData = GetApprovalPoliciesIdData>(parameters: ServiceOperationInfiniteQueryKey<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdParameters> | (DeepReadonly<GetApprovalPoliciesIdParameters>), options: Omit<UseSuspenseInfiniteQueryOptions<GetApprovalPoliciesIdData, GetApprovalPoliciesIdError, OperationInfiniteData<TData, GetApprovalPoliciesIdParameters>, ServiceOperationInfiniteQueryKey<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdParameters>, PartialParameters<DeepReadonly<TPageParam>>>, "queryKey" | "getPreviousPageParam" | "getNextPageParam" | "initialPageParam"> & InfiniteQueryPageParamsOptions<GetApprovalPoliciesIdData, PartialParameters<DeepReadonly<TPageParam>>>): UseSuspenseInfiniteQueryResult<OperationInfiniteData<TData, GetApprovalPoliciesIdParameters>, OperationError<GetApprovalPoliciesIdError>>;
+        useSuspenseInfiniteQuery<TPageParam extends GetApprovalPoliciesIdParameters, TQueryFnData = GetApprovalPoliciesIdData, TData = OperationInfiniteData<TQueryFnData, GetApprovalPoliciesIdParameters>>(parameters: ServiceOperationInfiniteQueryKey<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdParameters> | (DeepReadonly<GetApprovalPoliciesIdParameters>), options: Omit<UseSuspenseInfiniteQueryOptions<TQueryFnData, GetApprovalPoliciesIdError, TData, ServiceOperationInfiniteQueryKey<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdParameters>, PartialParameters<DeepReadonly<TPageParam>>>, "queryKey" | "getPreviousPageParam" | "getNextPageParam" | "initialPageParam"> & InfiniteQueryPageParamsOptions<TQueryFnData, PartialParameters<DeepReadonly<TPageParam>>>): UseSuspenseInfiniteQueryResult<TData, OperationError<GetApprovalPoliciesIdError>>;
         /**
          * Allows you to execute multiple asynchronous data fetching operations concurrently with Suspense support.
          * Similar to useQueries but integrates with React Suspense for loading states.
@@ -381,7 +381,7 @@ export interface ApprovalPoliciesService {
          */
         useSuspenseQueries<T extends Array<UseQueryOptionsForUseSuspenseQuery<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdParameters, GetApprovalPoliciesIdData, GetApprovalPoliciesIdError>>, TCombinedResult = Array<UseSuspenseQueryResult<GetApprovalPoliciesIdData, GetApprovalPoliciesIdError>>>(options: {
             queries: T;
-            combine?: (results: Array<WithOptional<UseSuspenseQueryResult<GetApprovalPoliciesIdData, GetApprovalPoliciesIdError>, "data">>) => TCombinedResult;
+            combine?: (results: Array<UseSuspenseQueryResult<GetApprovalPoliciesIdData, GetApprovalPoliciesIdError>>) => TCombinedResult;
         }): TCombinedResult;
         /**
          * @summary Get an approval policy by ID
@@ -458,7 +458,13 @@ export interface ApprovalPoliciesService {
          * @summary Get an approval policy by ID
          * @description Retrieve a specific approval policy.
          */
-        setQueriesData<TInfinite extends boolean = false>(filters: QueryFiltersByParameters<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdData, TInfinite, GetApprovalPoliciesIdParameters, GetApprovalPoliciesIdError> | QueryFiltersByQueryKey<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdData, TInfinite, GetApprovalPoliciesIdParameters, GetApprovalPoliciesIdError>, updater: Updater<NoInfer<GetApprovalPoliciesIdData> | undefined, NoInfer<GetApprovalPoliciesIdData> | undefined>, options?: SetDataOptions): Array<GetApprovalPoliciesIdData | undefined>;
+        setQueriesData<TInfinite extends boolean = false>(filters: QueryFiltersByParameters<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdData, TInfinite, GetApprovalPoliciesIdParameters, GetApprovalPoliciesIdError> | QueryFiltersByQueryKey<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdData, TInfinite, GetApprovalPoliciesIdParameters, GetApprovalPoliciesIdError>, updater: TInfinite extends true ? Updater<NoInfer<OperationInfiniteData<GetApprovalPoliciesIdData, GetApprovalPoliciesIdParameters>> | undefined, NoInfer<DeepReadonly<OperationInfiniteData<GetApprovalPoliciesIdData, GetApprovalPoliciesIdParameters>>> | undefined> : Updater<NoInfer<GetApprovalPoliciesIdData> | undefined, NoInfer<DeepReadonly<GetApprovalPoliciesIdData>> | undefined>, options?: SetDataOptions): TInfinite extends true ? Array<[
+            queryKey: ServiceOperationInfiniteQueryKey<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdParameters>,
+            data: NoInfer<OperationInfiniteData<GetApprovalPoliciesIdData, GetApprovalPoliciesIdParameters>> | undefined
+        ]> : Array<[
+            queryKey: ServiceOperationQueryKey<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdParameters>,
+            data: GetApprovalPoliciesIdData | undefined
+        ]>;
         /**
          * @summary Get an approval policy by ID
          * @description Retrieve a specific approval policy.
