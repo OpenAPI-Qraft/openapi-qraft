@@ -1,5 +1,16 @@
 # @openapi-qraft/tanstack-query-react-plugin
 
+## 2.15.0-beta.11
+
+### Patch Changes
+
+- 2440e9a: Remove `fetchStatus` from `isFetching` / `useIsFetching` filter types and `status` from `isMutating` / `useIsMutating` filter types, and derive query/mutation filter bases directly from TanStack Query's `QueryFilters` and `MutationFilters`.
+
+  Previously, Qraft mirrored older TanStack Query filter types that still included `fetchStatus` and `status` on these methods, even though TanStack Query's runtime always overwrote them (`fetchStatus: 'fetching'` / `status: 'pending'`) so those options never had any effect. Aligning with TanStack Query `5.105.1+` removes these non-functional fields from the filter types.
+  - @openapi-qraft/plugin@2.15.0-beta.11
+  - @qraft/cli-utils@1.0.0-beta.10
+  - @qraft/plugin@1.0.0-beta.10
+
 ## 2.15.0-beta.10
 
 ### Minor Changes
