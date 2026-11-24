@@ -136,7 +136,25 @@ const createFullClient = () =>
   void qraft.files.getFiles.fetchInfiniteQuery({
     parameters,
     initialPageParam: pageParam,
-    getNextPageParam: () => pageParam,
+    getNextPageParam: (lastPage) => {
+      lastPage satisfies typeof qraft.files.getFiles.types.data;
+      // @ts-expect-error - lastPage should not be never or any
+      lastPage satisfies never;
+      return pageParam;
+    },
+  });
+  void qraft.files.getFiles.fetchInfiniteQuery({
+    parameters,
+    initialPageParam: pageParam,
+    getNextPageParam: () => undefined,
+    queryFn: (ctx) => {
+      void (ctx.pageParam.query?.id__in satisfies
+        | readonly string[]
+        | undefined);
+      // @ts-expect-error - pageParam should not be never or any
+      ctx.pageParam satisfies never;
+      return { query: { id__in: ['1'] } };
+    },
   });
   void qraft.files.getFiles({ parameters });
 
@@ -164,6 +182,15 @@ const createFullClient = () =>
   void qraft.files.findAll.fetchInfiniteQuery({
     pages: 1,
     getNextPageParam: () => pageParam,
+  });
+  void qraft.files.findAll.fetchInfiniteQuery({
+    initialPageParam: pageParam,
+    getNextPageParam: (lastPage) => {
+      lastPage satisfies typeof qraft.files.findAll.types.data;
+      // @ts-expect-error - lastPage should not be never or any
+      lastPage satisfies never;
+      return pageParam;
+    },
   });
   void qraft.files.findAll.fetchInfiniteQuery({});
   void qraft.files.findAll.fetchInfiniteQuery();

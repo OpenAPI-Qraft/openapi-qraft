@@ -4,7 +4,7 @@
  */
 
 import type { paths } from "../../openapi.d.ts";
-import type { DeepReadonly, InvalidateQueryFilters, OperationError, OperationInfiniteData, PartialParameters, QueryFiltersByParameters, QueryFiltersByQueryKey, QueryFnOptions, QueryFnOptionsByParameters, QueryFnOptionsByQueryKey, RequestFnResponse, ServiceOperationEnsureInfiniteQueryDataOptions, ServiceOperationEnsureQueryDataOptions, ServiceOperationFetchInfiniteQueryOptions, ServiceOperationFetchQueryOptions, ServiceOperationInfiniteQueryKey, ServiceOperationQueryKey, UseQueryOptionsForUseQueries, UseQueryOptionsForUseSuspenseQuery, WithOptional, QraftServiceOperationsToken } from "@openapi-qraft/tanstack-query-react-types";
+import type { DeepReadonly, InvalidateQueryFilters, OperationError, OperationInfiniteData, PartialParameters, QueryFiltersByParameters, QueryFiltersByQueryKey, QueryFnOptions, QueryFnOptionsByParameters, QueryFnOptionsByQueryKey, RequestFnResponse, ServiceOperationEnsureInfiniteQueryDataOptions, ServiceOperationEnsureQueryDataOptions, ServiceOperationFetchInfiniteQueryOptions, ServiceOperationFetchInfiniteQueryVoidOption, ServiceOperationFetchQueryOptions, ServiceOperationInfiniteQueryKey, ServiceOperationQueryKey, UseQueryOptionsForUseQueries, UseQueryOptionsForUseSuspenseQuery, WithOptional, QraftServiceOperationsToken } from "@openapi-qraft/tanstack-query-react-types";
 import type { CancelOptions, DefinedInitialDataInfiniteOptions, DefinedInitialDataOptions, DefinedUseInfiniteQueryResult, DefinedUseQueryResult, InfiniteQueryPageParamsOptions, InvalidateOptions, QueryState, RefetchOptions, ResetOptions, SetDataOptions, UndefinedInitialDataInfiniteOptions, UndefinedInitialDataOptions, Updater, UseInfiniteQueryResult, UseQueryResult, UseSuspenseInfiniteQueryOptions, UseSuspenseInfiniteQueryResult, UseSuspenseQueryOptions, UseSuspenseQueryResult } from "@tanstack/react-query";
 export interface AccountsService {
     getAccounts: {
@@ -184,11 +184,11 @@ export interface AccountsService {
         /**/
         ensureQueryData(options: ServiceOperationEnsureQueryDataOptions<GetAccountsSchema, GetAccountsData, GetAccountsParameters, GetAccountsError> | void): Promise<GetAccountsData>;
         /**/
-        fetchInfiniteQuery<TPageParam extends GetAccountsParameters>(options: ServiceOperationFetchInfiniteQueryOptions<GetAccountsSchema, GetAccountsData, GetAccountsParameters, DeepReadonly<TPageParam>, GetAccountsError> | void): Promise<OperationInfiniteData<GetAccountsData, GetAccountsParameters>>;
+        fetchInfiniteQuery<TPageParam extends GetAccountsParameters>(options: ServiceOperationFetchInfiniteQueryOptions<GetAccountsSchema, GetAccountsData, GetAccountsParameters, DeepReadonly<TPageParam>, GetAccountsError> | ServiceOperationFetchInfiniteQueryVoidOption): Promise<OperationInfiniteData<GetAccountsData, GetAccountsParameters>>;
         /**/
-        prefetchInfiniteQuery<TPageParam extends GetAccountsParameters>(options: ServiceOperationFetchInfiniteQueryOptions<GetAccountsSchema, GetAccountsData, GetAccountsParameters, DeepReadonly<TPageParam>, GetAccountsError> | void): Promise<void>;
+        prefetchInfiniteQuery<TPageParam extends GetAccountsParameters>(options: ServiceOperationFetchInfiniteQueryOptions<GetAccountsSchema, GetAccountsData, GetAccountsParameters, DeepReadonly<TPageParam>, GetAccountsError> | ServiceOperationFetchInfiniteQueryVoidOption): Promise<void>;
         /**/
-        ensureInfiniteQueryData<TPageParam extends GetAccountsParameters>(options: ServiceOperationEnsureInfiniteQueryDataOptions<GetAccountsSchema, GetAccountsData, GetAccountsParameters, DeepReadonly<TPageParam>, GetAccountsError> | void): Promise<OperationInfiniteData<GetAccountsData, GetAccountsParameters>>;
+        ensureInfiniteQueryData<TPageParam extends GetAccountsParameters>(options: ServiceOperationEnsureInfiniteQueryDataOptions<GetAccountsSchema, GetAccountsData, GetAccountsParameters, DeepReadonly<TPageParam>, GetAccountsError> | ServiceOperationFetchInfiniteQueryVoidOption): Promise<OperationInfiniteData<GetAccountsData, GetAccountsParameters>>;
         /**/
         getQueryData(parameters: ServiceOperationQueryKey<GetAccountsSchema, GetAccountsParameters> | (DeepReadonly<GetAccountsParameters> | void)): GetAccountsData | undefined;
         /**/
@@ -407,11 +407,11 @@ export interface AccountsService {
         /**/
         ensureQueryData(options: ServiceOperationEnsureQueryDataOptions<GetAccountProfileSchema, GetAccountProfileData, GetAccountProfileParameters, GetAccountProfileError> | void): Promise<GetAccountProfileData>;
         /**/
-        fetchInfiniteQuery<TPageParam extends GetAccountProfileParameters>(options: ServiceOperationFetchInfiniteQueryOptions<GetAccountProfileSchema, GetAccountProfileData, GetAccountProfileParameters, DeepReadonly<TPageParam>, GetAccountProfileError> | void): Promise<OperationInfiniteData<GetAccountProfileData, GetAccountProfileParameters>>;
+        fetchInfiniteQuery<TPageParam extends GetAccountProfileParameters>(options: ServiceOperationFetchInfiniteQueryOptions<GetAccountProfileSchema, GetAccountProfileData, GetAccountProfileParameters, DeepReadonly<TPageParam>, GetAccountProfileError> | ServiceOperationFetchInfiniteQueryVoidOption): Promise<OperationInfiniteData<GetAccountProfileData, GetAccountProfileParameters>>;
         /**/
-        prefetchInfiniteQuery<TPageParam extends GetAccountProfileParameters>(options: ServiceOperationFetchInfiniteQueryOptions<GetAccountProfileSchema, GetAccountProfileData, GetAccountProfileParameters, DeepReadonly<TPageParam>, GetAccountProfileError> | void): Promise<void>;
+        prefetchInfiniteQuery<TPageParam extends GetAccountProfileParameters>(options: ServiceOperationFetchInfiniteQueryOptions<GetAccountProfileSchema, GetAccountProfileData, GetAccountProfileParameters, DeepReadonly<TPageParam>, GetAccountProfileError> | ServiceOperationFetchInfiniteQueryVoidOption): Promise<void>;
         /**/
-        ensureInfiniteQueryData<TPageParam extends GetAccountProfileParameters>(options: ServiceOperationEnsureInfiniteQueryDataOptions<GetAccountProfileSchema, GetAccountProfileData, GetAccountProfileParameters, DeepReadonly<TPageParam>, GetAccountProfileError> | void): Promise<OperationInfiniteData<GetAccountProfileData, GetAccountProfileParameters>>;
+        ensureInfiniteQueryData<TPageParam extends GetAccountProfileParameters>(options: ServiceOperationEnsureInfiniteQueryDataOptions<GetAccountProfileSchema, GetAccountProfileData, GetAccountProfileParameters, DeepReadonly<TPageParam>, GetAccountProfileError> | ServiceOperationFetchInfiniteQueryVoidOption): Promise<OperationInfiniteData<GetAccountProfileData, GetAccountProfileParameters>>;
         /**/
         getQueryData(parameters: ServiceOperationQueryKey<GetAccountProfileSchema, GetAccountProfileParameters> | (DeepReadonly<GetAccountProfileParameters> | void)): GetAccountProfileData | undefined;
         /**/
