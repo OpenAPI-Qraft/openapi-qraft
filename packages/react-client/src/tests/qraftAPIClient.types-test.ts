@@ -382,3 +382,40 @@ client.files.deleteFiles.useMutation(undefined, {
     context.client satisfies QueryClient;
   },
 });
+
+//// IsFetching / IsMutating filters ////
+client.files.getFiles.isFetching({ stale: true, parameters });
+client.files.getFiles.useIsFetching({ stale: true, parameters });
+client.files.getFiles.invalidateQueries({ fetchStatus: 'fetching' });
+// @ts-expect-error - fetchStatus is forbidden on isFetching
+client.files.getFiles.isFetching({ fetchStatus: 'fetching' });
+// @ts-expect-error - fetchStatus is forbidden on useIsFetching
+client.files.getFiles.useIsFetching({ fetchStatus: 'fetching' });
+client.files.getFiles.isFetching({
+  parameters,
+  // @ts-expect-error - parameters and queryKey are mutually exclusive on isFetching
+  queryKey: client.files.getFiles.getQueryKey(parameters),
+});
+client.files.getFiles.useIsFetching({
+  parameters,
+  // @ts-expect-error - parameters and queryKey are mutually exclusive on useIsFetching
+  queryKey: client.files.getFiles.getQueryKey(parameters),
+});
+
+client.files.deleteFiles.isMutating({ exact: true, parameters: {} });
+client.files.deleteFiles.useIsMutating({ exact: true, parameters: {} });
+client.files.deleteFiles.useMutationState({ filters: { status: 'pending' } });
+// @ts-expect-error - status is forbidden on isMutating
+client.files.deleteFiles.isMutating({ status: 'pending' });
+// @ts-expect-error - status is forbidden on useIsMutating
+client.files.deleteFiles.useIsMutating({ status: 'pending' });
+client.files.deleteFiles.isMutating({
+  parameters: {},
+  // @ts-expect-error - parameters and mutationKey are mutually exclusive on isMutating
+  mutationKey: client.files.deleteFiles.getMutationKey(),
+});
+client.files.deleteFiles.useIsMutating({
+  parameters: {},
+  // @ts-expect-error - parameters and mutationKey are mutually exclusive on useIsMutating
+  mutationKey: client.files.deleteFiles.getMutationKey(),
+});

@@ -1,7 +1,7 @@
 import type {
   DefaultError,
   Mutation,
-  MutationStatus,
+  MutationFilters as TanStackMutationFilters,
   UseMutationOptions,
 } from '@tanstack/react-query';
 import type { AreAllOptional } from './AreAllOptional.js';
@@ -15,11 +15,7 @@ interface UseMutationStateFiltersBase<
   TParams,
   TError = DefaultError,
   TContext = unknown,
-> {
-  /**
-   * Match mutation key exactly
-   */
-  exact?: boolean;
+> extends Omit<TanStackMutationFilters, 'mutationKey' | 'predicate'> {
   /**
    * Include mutations matching this predicate function
    */
@@ -31,11 +27,6 @@ interface UseMutationStateFiltersBase<
       TContext
     >
   ) => boolean;
-
-  /**
-   * Filter by mutation status
-   */
-  status?: MutationStatus;
 }
 
 export interface MutationFiltersByParameters<
@@ -69,6 +60,30 @@ export interface MutationFiltersByMutationKey<
   >;
   parameters?: never;
 }
+
+export type IsMutatingMutationFilters<
+  TSchema extends { url: string; method: string },
+  TBody,
+  TData,
+  TParams,
+  TError = DefaultError,
+  TContext = unknown,
+> =
+  | Omit<
+      MutationFiltersByParameters<TBody, TData, TParams, TError, TContext>,
+      'status'
+    >
+  | Omit<
+      MutationFiltersByMutationKey<
+        TSchema,
+        TBody,
+        TData,
+        TParams,
+        TError,
+        TContext
+      >,
+      'status'
+    >;
 
 export type MutationVariables<TBody, TParams> = TBody extends FormData
   ? { body: TBody } & NonNullableObject<TParams>

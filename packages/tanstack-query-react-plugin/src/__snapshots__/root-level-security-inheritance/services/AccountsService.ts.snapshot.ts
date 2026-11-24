@@ -4,7 +4,7 @@
  */
 
 import type { paths } from "../../openapi.d.ts";
-import type { DeepReadonly, InvalidateQueryFilters, OperationError, OperationInfiniteData, PartialParameters, QueryFiltersByParameters, QueryFiltersByQueryKey, QueryFnOptions, QueryFnOptionsByParameters, QueryFnOptionsByQueryKey, RequestFnResponse, ServiceOperationEnsureInfiniteQueryDataOptions, ServiceOperationEnsureQueryDataOptions, ServiceOperationFetchInfiniteQueryOptions, ServiceOperationFetchInfiniteQueryVoidOption, ServiceOperationFetchQueryOptions, ServiceOperationInfiniteQueryKey, ServiceOperationQueryKey, UseQueryOptionsForUseQueries, UseQueryOptionsForUseSuspenseQuery, WithOptional, QraftServiceOperationsToken } from "@openapi-qraft/tanstack-query-react-types";
+import type { DeepReadonly, InvalidateQueryFilters, IsFetchingQueryFilters, OperationError, OperationInfiniteData, PartialParameters, QueryFiltersByParameters, QueryFiltersByQueryKey, QueryFnOptions, QueryFnOptionsByParameters, QueryFnOptionsByQueryKey, RequestFnResponse, ServiceOperationEnsureInfiniteQueryDataOptions, ServiceOperationEnsureQueryDataOptions, ServiceOperationFetchInfiniteQueryOptions, ServiceOperationFetchInfiniteQueryVoidOption, ServiceOperationFetchQueryOptions, ServiceOperationInfiniteQueryKey, ServiceOperationQueryKey, UseQueryOptionsForUseQueries, UseQueryOptionsForUseSuspenseQuery, WithOptional, QraftServiceOperationsToken } from "@openapi-qraft/tanstack-query-react-types";
 import type { CancelOptions, DefinedInitialDataInfiniteOptions, DefinedInitialDataOptions, DefinedUseInfiniteQueryResult, DefinedUseQueryResult, InfiniteQueryPageParamsOptions, InvalidateOptions, QueryState, RefetchOptions, ResetOptions, SetDataOptions, UndefinedInitialDataInfiniteOptions, UndefinedInitialDataOptions, Updater, UseInfiniteQueryResult, UseQueryResult, UseSuspenseInfiniteQueryOptions, UseSuspenseInfiniteQueryResult, UseSuspenseQueryOptions, UseSuspenseQueryResult } from "@tanstack/react-query";
 export interface AccountsService {
     getAccounts: {
@@ -85,7 +85,7 @@ export interface AccountsService {
          * const getAccountsTotal = qraft.accounts.getAccounts.useIsFetching()
          * ```
          */
-        useIsFetching<TInfinite extends boolean = false>(filters?: QueryFiltersByParameters<GetAccountsSchema, GetAccountsData, TInfinite, GetAccountsParameters, GetAccountsError> | QueryFiltersByQueryKey<GetAccountsSchema, GetAccountsData, TInfinite, GetAccountsParameters, GetAccountsError>): number;
+        useIsFetching<TInfinite extends boolean = false>(filters?: IsFetchingQueryFilters<GetAccountsSchema, GetAccountsData, TInfinite, GetAccountsParameters, GetAccountsError>): number;
         /**
          * Allows you to execute multiple asynchronous data fetching operations concurrently. This is especially useful for managing complex data dependencies in parallel.
          *
@@ -222,7 +222,7 @@ export interface AccountsService {
         /**/
         resetQueries<TInfinite extends boolean = false>(filters?: QueryFiltersByParameters<GetAccountsSchema, GetAccountsData, TInfinite, GetAccountsParameters, GetAccountsError> | QueryFiltersByQueryKey<GetAccountsSchema, GetAccountsData, TInfinite, GetAccountsParameters, GetAccountsError>, options?: ResetOptions): Promise<void>;
         /**/
-        isFetching<TInfinite extends boolean = false>(filters?: QueryFiltersByParameters<GetAccountsSchema, GetAccountsData, TInfinite, GetAccountsParameters, GetAccountsError> | QueryFiltersByQueryKey<GetAccountsSchema, GetAccountsData, TInfinite, GetAccountsParameters, GetAccountsError>): number;
+        isFetching<TInfinite extends boolean = false>(filters?: IsFetchingQueryFilters<GetAccountsSchema, GetAccountsData, TInfinite, GetAccountsParameters, GetAccountsError>): number;
         schema: GetAccountsSchema;
         types: {
             parameters: GetAccountsParameters;
@@ -308,7 +308,7 @@ export interface AccountsService {
          * const getAccountProfileTotal = qraft.accounts.getAccountProfile.useIsFetching()
          * ```
          */
-        useIsFetching<TInfinite extends boolean = false>(filters?: QueryFiltersByParameters<GetAccountProfileSchema, GetAccountProfileData, TInfinite, GetAccountProfileParameters, GetAccountProfileError> | QueryFiltersByQueryKey<GetAccountProfileSchema, GetAccountProfileData, TInfinite, GetAccountProfileParameters, GetAccountProfileError>): number;
+        useIsFetching<TInfinite extends boolean = false>(filters?: IsFetchingQueryFilters<GetAccountProfileSchema, GetAccountProfileData, TInfinite, GetAccountProfileParameters, GetAccountProfileError>): number;
         /**
          * Allows you to execute multiple asynchronous data fetching operations concurrently. This is especially useful for managing complex data dependencies in parallel.
          *
@@ -445,7 +445,7 @@ export interface AccountsService {
         /**/
         resetQueries<TInfinite extends boolean = false>(filters?: QueryFiltersByParameters<GetAccountProfileSchema, GetAccountProfileData, TInfinite, GetAccountProfileParameters, GetAccountProfileError> | QueryFiltersByQueryKey<GetAccountProfileSchema, GetAccountProfileData, TInfinite, GetAccountProfileParameters, GetAccountProfileError>, options?: ResetOptions): Promise<void>;
         /**/
-        isFetching<TInfinite extends boolean = false>(filters?: QueryFiltersByParameters<GetAccountProfileSchema, GetAccountProfileData, TInfinite, GetAccountProfileParameters, GetAccountProfileError> | QueryFiltersByQueryKey<GetAccountProfileSchema, GetAccountProfileData, TInfinite, GetAccountProfileParameters, GetAccountProfileError>): number;
+        isFetching<TInfinite extends boolean = false>(filters?: IsFetchingQueryFilters<GetAccountProfileSchema, GetAccountProfileData, TInfinite, GetAccountProfileParameters, GetAccountProfileError>): number;
         schema: GetAccountProfileSchema;
         types: {
             parameters: GetAccountProfileParameters;

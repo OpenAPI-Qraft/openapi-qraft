@@ -1,6 +1,5 @@
 import type {
-  MutationFiltersByMutationKey,
-  MutationFiltersByParameters,
+  IsMutatingMutationFilters,
   OperationError,
 } from '@openapi-qraft/tanstack-query-react-types';
 
@@ -11,22 +10,14 @@ export interface ServiceOperationIsMutatingQueries<
   TMutationParams,
   TError,
 > {
-  isMutating<TContext>(
-    filters?:
-      | MutationFiltersByParameters<
-          TBody,
-          TMutationData,
-          TMutationParams,
-          OperationError<TError>,
-          TContext
-        >
-      | MutationFiltersByMutationKey<
-          TSchema,
-          TBody,
-          TMutationData,
-          TMutationParams,
-          OperationError<TError>,
-          TContext
-        >
+  isMutating<TContext = unknown>(
+    filters?: IsMutatingMutationFilters<
+      TSchema,
+      TBody,
+      TMutationData,
+      TMutationParams,
+      OperationError<TError>,
+      TContext
+    >
   ): number;
 }

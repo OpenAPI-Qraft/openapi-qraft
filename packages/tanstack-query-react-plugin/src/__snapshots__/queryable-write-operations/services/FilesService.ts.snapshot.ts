@@ -4,7 +4,7 @@
  */
 
 import type { paths } from "../../openapi.d.ts";
-import type { DeepReadonly, InvalidateQueryFilters, MutationFiltersByMutationKey, MutationFiltersByParameters, MutationVariables, OperationError, OperationInfiniteData, PartialParameters, QueryFiltersByParameters, QueryFiltersByQueryKey, QueryFnOptions, QueryFnOptionsByParameters, QueryFnOptionsByQueryKey, RequestFnResponse, ServiceOperationEnsureInfiniteQueryDataOptions, ServiceOperationEnsureQueryDataOptions, ServiceOperationFetchInfiniteQueryOptions, ServiceOperationFetchInfiniteQueryVoidOption, ServiceOperationFetchQueryOptions, ServiceOperationInfiniteQueryKey, ServiceOperationMutationFnOptions, ServiceOperationMutationKey, ServiceOperationQueryKey, ServiceOperationUseMutationOptions, UseQueryOptionsForUseQueries, UseQueryOptionsForUseSuspenseQuery, WithOptional, QraftServiceOperationsToken } from "@openapi-qraft/tanstack-query-react-types";
+import type { DeepReadonly, InvalidateQueryFilters, IsFetchingQueryFilters, IsMutatingMutationFilters, MutationFiltersByMutationKey, MutationFiltersByParameters, MutationVariables, OperationError, OperationInfiniteData, PartialParameters, QueryFiltersByParameters, QueryFiltersByQueryKey, QueryFnOptions, QueryFnOptionsByParameters, QueryFnOptionsByQueryKey, RequestFnResponse, ServiceOperationEnsureInfiniteQueryDataOptions, ServiceOperationEnsureQueryDataOptions, ServiceOperationFetchInfiniteQueryOptions, ServiceOperationFetchInfiniteQueryVoidOption, ServiceOperationFetchQueryOptions, ServiceOperationInfiniteQueryKey, ServiceOperationMutationFnOptions, ServiceOperationMutationKey, ServiceOperationQueryKey, ServiceOperationUseMutationOptions, UseQueryOptionsForUseQueries, UseQueryOptionsForUseSuspenseQuery, WithOptional, QraftServiceOperationsToken } from "@openapi-qraft/tanstack-query-react-types";
 import type { CancelOptions, DefinedInitialDataInfiniteOptions, DefinedInitialDataOptions, DefinedUseInfiniteQueryResult, DefinedUseQueryResult, InfiniteQueryPageParamsOptions, InvalidateOptions, Mutation, MutationCache, MutationState, QueryState, RefetchOptions, ResetOptions, SetDataOptions, UndefinedInitialDataInfiniteOptions, UndefinedInitialDataOptions, Updater, UseInfiniteQueryResult, UseMutationResult, UseQueryResult, UseSuspenseInfiniteQueryOptions, UseSuspenseInfiniteQueryResult, UseSuspenseQueryOptions, UseSuspenseQueryResult } from "@tanstack/react-query";
 export interface FilesService {
     /** @summary Get a files by ID */
@@ -141,7 +141,7 @@ export interface FilesService {
          * })
          * ```
          */
-        useIsFetching<TInfinite extends boolean = false>(filters?: QueryFiltersByParameters<GetFilesSchema, GetFilesData, TInfinite, GetFilesParameters, GetFilesError> | QueryFiltersByQueryKey<GetFilesSchema, GetFilesData, TInfinite, GetFilesParameters, GetFilesError>): number;
+        useIsFetching<TInfinite extends boolean = false>(filters?: IsFetchingQueryFilters<GetFilesSchema, GetFilesData, TInfinite, GetFilesParameters, GetFilesError>): number;
         /**
          * Allows you to execute multiple asynchronous data fetching operations concurrently. This is especially useful for managing complex data dependencies in parallel.
          *
@@ -356,7 +356,7 @@ export interface FilesService {
         /** @summary Get a files by ID */
         resetQueries<TInfinite extends boolean = false>(filters?: QueryFiltersByParameters<GetFilesSchema, GetFilesData, TInfinite, GetFilesParameters, GetFilesError> | QueryFiltersByQueryKey<GetFilesSchema, GetFilesData, TInfinite, GetFilesParameters, GetFilesError>, options?: ResetOptions): Promise<void>;
         /** @summary Get a files by ID */
-        isFetching<TInfinite extends boolean = false>(filters?: QueryFiltersByParameters<GetFilesSchema, GetFilesData, TInfinite, GetFilesParameters, GetFilesError> | QueryFiltersByQueryKey<GetFilesSchema, GetFilesData, TInfinite, GetFilesParameters, GetFilesError>): number;
+        isFetching<TInfinite extends boolean = false>(filters?: IsFetchingQueryFilters<GetFilesSchema, GetFilesData, TInfinite, GetFilesParameters, GetFilesError>): number;
         schema: GetFilesSchema;
         types: {
             parameters: GetFilesParameters;
@@ -467,7 +467,7 @@ export interface FilesService {
          * })
          * ```
          */
-        useIsFetching<TInfinite extends boolean = false>(filters?: QueryFiltersByParameters<PostFilesSchema, PostFilesData, TInfinite, PostFilesQueryParameters, PostFilesError> | QueryFiltersByQueryKey<PostFilesSchema, PostFilesData, TInfinite, PostFilesQueryParameters, PostFilesError>): number;
+        useIsFetching<TInfinite extends boolean = false>(filters?: IsFetchingQueryFilters<PostFilesSchema, PostFilesData, TInfinite, PostFilesQueryParameters, PostFilesError>): number;
         /**
          * Allows you to execute multiple asynchronous data fetching operations concurrently. This is especially useful for managing complex data dependencies in parallel.
          *
@@ -632,7 +632,7 @@ export interface FilesService {
         /** @summary Upload a files by ID */
         resetQueries<TInfinite extends boolean = false>(filters?: QueryFiltersByParameters<PostFilesSchema, PostFilesData, TInfinite, PostFilesQueryParameters, PostFilesError> | QueryFiltersByQueryKey<PostFilesSchema, PostFilesData, TInfinite, PostFilesQueryParameters, PostFilesError>, options?: ResetOptions): Promise<void>;
         /** @summary Upload a files by ID */
-        isFetching<TInfinite extends boolean = false>(filters?: QueryFiltersByParameters<PostFilesSchema, PostFilesData, TInfinite, PostFilesQueryParameters, PostFilesError> | QueryFiltersByQueryKey<PostFilesSchema, PostFilesData, TInfinite, PostFilesQueryParameters, PostFilesError>): number;
+        isFetching<TInfinite extends boolean = false>(filters?: IsFetchingQueryFilters<PostFilesSchema, PostFilesData, TInfinite, PostFilesQueryParameters, PostFilesError>): number;
         /** @summary Upload a files by ID */
         <TMeta extends Record<string, any>, TSignal extends AbortSignal = AbortSignal>(options: ServiceOperationMutationFnOptions<PostFilesBody, PostFilesMutationParameters, TMeta, TSignal>, client?: (schema: PostFilesSchema, options: ServiceOperationMutationFnOptions<PostFilesBody, PostFilesMutationParameters, TMeta, TSignal>) => Promise<RequestFnResponse<PostFilesData, PostFilesError>>): Promise<RequestFnResponse<PostFilesData, PostFilesError>>;
         /** @summary Upload a files by ID */
@@ -693,7 +693,7 @@ export interface FilesService {
          * })
          * ```
          */
-        useIsMutating<TContext = unknown>(filters?: MutationFiltersByParameters<PostFilesBody, PostFilesData, PostFilesMutationParameters, OperationError<PostFilesError>, TContext> | MutationFiltersByMutationKey<PostFilesSchema, PostFilesBody, PostFilesData, PostFilesMutationParameters, OperationError<PostFilesError>, TContext>): number;
+        useIsMutating<TContext = unknown>(filters?: IsMutatingMutationFilters<PostFilesSchema, PostFilesBody, PostFilesData, PostFilesMutationParameters, OperationError<PostFilesError>, TContext>): number;
         /**
          * Provides access to the current state of a mutation, including its status, any resulting data, and associated errors.
          *
@@ -723,7 +723,7 @@ export interface FilesService {
             select?: (mutation: Mutation<PostFilesData, OperationError<PostFilesError>, MutationVariables<PostFilesBody, PostFilesMutationParameters>, TContext>) => TResult;
         }): Array<TResult>;
         /** @summary Upload a files by ID */
-        isMutating<TContext>(filters?: MutationFiltersByParameters<PostFilesBody, PostFilesData, PostFilesMutationParameters, OperationError<PostFilesError>, TContext> | MutationFiltersByMutationKey<PostFilesSchema, PostFilesBody, PostFilesData, PostFilesMutationParameters, OperationError<PostFilesError>, TContext>): number;
+        isMutating<TContext = unknown>(filters?: IsMutatingMutationFilters<PostFilesSchema, PostFilesBody, PostFilesData, PostFilesMutationParameters, OperationError<PostFilesError>, TContext>): number;
         /**
          * Returns a `MutationCache` object that provides access to mutation cache operations
          * for the specific endpoint.
@@ -870,7 +870,7 @@ export interface FilesService {
          * })
          * ```
          */
-        useIsFetching<TInfinite extends boolean = false>(filters?: QueryFiltersByParameters<DeleteFilesSchema, DeleteFilesData, TInfinite, DeleteFilesParameters, DeleteFilesError> | QueryFiltersByQueryKey<DeleteFilesSchema, DeleteFilesData, TInfinite, DeleteFilesParameters, DeleteFilesError>): number;
+        useIsFetching<TInfinite extends boolean = false>(filters?: IsFetchingQueryFilters<DeleteFilesSchema, DeleteFilesData, TInfinite, DeleteFilesParameters, DeleteFilesError>): number;
         /**
          * Allows you to execute multiple asynchronous data fetching operations concurrently. This is especially useful for managing complex data dependencies in parallel.
          *
@@ -1055,7 +1055,7 @@ export interface FilesService {
         /** @summary Delete all files */
         resetQueries<TInfinite extends boolean = false>(filters?: QueryFiltersByParameters<DeleteFilesSchema, DeleteFilesData, TInfinite, DeleteFilesParameters, DeleteFilesError> | QueryFiltersByQueryKey<DeleteFilesSchema, DeleteFilesData, TInfinite, DeleteFilesParameters, DeleteFilesError>, options?: ResetOptions): Promise<void>;
         /** @summary Delete all files */
-        isFetching<TInfinite extends boolean = false>(filters?: QueryFiltersByParameters<DeleteFilesSchema, DeleteFilesData, TInfinite, DeleteFilesParameters, DeleteFilesError> | QueryFiltersByQueryKey<DeleteFilesSchema, DeleteFilesData, TInfinite, DeleteFilesParameters, DeleteFilesError>): number;
+        isFetching<TInfinite extends boolean = false>(filters?: IsFetchingQueryFilters<DeleteFilesSchema, DeleteFilesData, TInfinite, DeleteFilesParameters, DeleteFilesError>): number;
         /** @summary Delete all files */
         <TMeta extends Record<string, any>, TSignal extends AbortSignal = AbortSignal>(options: ServiceOperationMutationFnOptions<DeleteFilesBody, DeleteFilesParameters, TMeta, TSignal>, client?: (schema: DeleteFilesSchema, options: ServiceOperationMutationFnOptions<DeleteFilesBody, DeleteFilesParameters, TMeta, TSignal>) => Promise<RequestFnResponse<DeleteFilesData, DeleteFilesError>>): Promise<RequestFnResponse<DeleteFilesData, DeleteFilesError>>;
         /** @summary Delete all files */
@@ -1134,7 +1134,7 @@ export interface FilesService {
          * })
          * ```
          */
-        useIsMutating<TContext = unknown>(filters?: MutationFiltersByParameters<DeleteFilesBody, DeleteFilesData, DeleteFilesParameters, OperationError<DeleteFilesError>, TContext> | MutationFiltersByMutationKey<DeleteFilesSchema, DeleteFilesBody, DeleteFilesData, DeleteFilesParameters, OperationError<DeleteFilesError>, TContext>): number;
+        useIsMutating<TContext = unknown>(filters?: IsMutatingMutationFilters<DeleteFilesSchema, DeleteFilesBody, DeleteFilesData, DeleteFilesParameters, OperationError<DeleteFilesError>, TContext>): number;
         /**
          * Provides access to the current state of a mutation, including its status, any resulting data, and associated errors.
          *
@@ -1168,7 +1168,7 @@ export interface FilesService {
             select?: (mutation: Mutation<DeleteFilesData, OperationError<DeleteFilesError>, MutationVariables<DeleteFilesBody, DeleteFilesParameters>, TContext>) => TResult;
         }): Array<TResult>;
         /** @summary Delete all files */
-        isMutating<TContext>(filters?: MutationFiltersByParameters<DeleteFilesBody, DeleteFilesData, DeleteFilesParameters, OperationError<DeleteFilesError>, TContext> | MutationFiltersByMutationKey<DeleteFilesSchema, DeleteFilesBody, DeleteFilesData, DeleteFilesParameters, OperationError<DeleteFilesError>, TContext>): number;
+        isMutating<TContext = unknown>(filters?: IsMutatingMutationFilters<DeleteFilesSchema, DeleteFilesBody, DeleteFilesData, DeleteFilesParameters, OperationError<DeleteFilesError>, TContext>): number;
         /**
          * Returns a `MutationCache` object that provides access to mutation cache operations
          * for the specific endpoint.
@@ -1319,7 +1319,7 @@ export interface FilesService {
          * })
          * ```
          */
-        useIsFetching<TInfinite extends boolean = false>(filters?: QueryFiltersByParameters<TrashFilesSchema, TrashFilesData, TInfinite, TrashFilesParameters, TrashFilesError> | QueryFiltersByQueryKey<TrashFilesSchema, TrashFilesData, TInfinite, TrashFilesParameters, TrashFilesError>): number;
+        useIsFetching<TInfinite extends boolean = false>(filters?: IsFetchingQueryFilters<TrashFilesSchema, TrashFilesData, TInfinite, TrashFilesParameters, TrashFilesError>): number;
         /**
          * Allows you to execute multiple asynchronous data fetching operations concurrently. This is especially useful for managing complex data dependencies in parallel.
          *
@@ -1504,7 +1504,7 @@ export interface FilesService {
         /** @summary Trash files */
         resetQueries<TInfinite extends boolean = false>(filters?: QueryFiltersByParameters<TrashFilesSchema, TrashFilesData, TInfinite, TrashFilesParameters, TrashFilesError> | QueryFiltersByQueryKey<TrashFilesSchema, TrashFilesData, TInfinite, TrashFilesParameters, TrashFilesError>, options?: ResetOptions): Promise<void>;
         /** @summary Trash files */
-        isFetching<TInfinite extends boolean = false>(filters?: QueryFiltersByParameters<TrashFilesSchema, TrashFilesData, TInfinite, TrashFilesParameters, TrashFilesError> | QueryFiltersByQueryKey<TrashFilesSchema, TrashFilesData, TInfinite, TrashFilesParameters, TrashFilesError>): number;
+        isFetching<TInfinite extends boolean = false>(filters?: IsFetchingQueryFilters<TrashFilesSchema, TrashFilesData, TInfinite, TrashFilesParameters, TrashFilesError>): number;
         /** @summary Trash files */
         <TMeta extends Record<string, any>, TSignal extends AbortSignal = AbortSignal>(options: ServiceOperationMutationFnOptions<TrashFilesBody, TrashFilesParameters, TMeta, TSignal>, client?: (schema: TrashFilesSchema, options: ServiceOperationMutationFnOptions<TrashFilesBody, TrashFilesParameters, TMeta, TSignal>) => Promise<RequestFnResponse<TrashFilesData, TrashFilesError>>): Promise<RequestFnResponse<TrashFilesData, TrashFilesError>>;
         /** @summary Trash files */
@@ -1583,7 +1583,7 @@ export interface FilesService {
          * })
          * ```
          */
-        useIsMutating<TContext = unknown>(filters?: MutationFiltersByParameters<TrashFilesBody, TrashFilesData, TrashFilesParameters, OperationError<TrashFilesError>, TContext> | MutationFiltersByMutationKey<TrashFilesSchema, TrashFilesBody, TrashFilesData, TrashFilesParameters, OperationError<TrashFilesError>, TContext>): number;
+        useIsMutating<TContext = unknown>(filters?: IsMutatingMutationFilters<TrashFilesSchema, TrashFilesBody, TrashFilesData, TrashFilesParameters, OperationError<TrashFilesError>, TContext>): number;
         /**
          * Provides access to the current state of a mutation, including its status, any resulting data, and associated errors.
          *
@@ -1617,7 +1617,7 @@ export interface FilesService {
             select?: (mutation: Mutation<TrashFilesData, OperationError<TrashFilesError>, MutationVariables<TrashFilesBody, TrashFilesParameters>, TContext>) => TResult;
         }): Array<TResult>;
         /** @summary Trash files */
-        isMutating<TContext>(filters?: MutationFiltersByParameters<TrashFilesBody, TrashFilesData, TrashFilesParameters, OperationError<TrashFilesError>, TContext> | MutationFiltersByMutationKey<TrashFilesSchema, TrashFilesBody, TrashFilesData, TrashFilesParameters, OperationError<TrashFilesError>, TContext>): number;
+        isMutating<TContext = unknown>(filters?: IsMutatingMutationFilters<TrashFilesSchema, TrashFilesBody, TrashFilesData, TrashFilesParameters, OperationError<TrashFilesError>, TContext>): number;
         /**
          * Returns a `MutationCache` object that provides access to mutation cache operations
          * for the specific endpoint.
@@ -1808,7 +1808,7 @@ export interface FilesService {
          * })
          * ```
          */
-        useIsFetching<TInfinite extends boolean = false>(filters?: QueryFiltersByParameters<GetFileListSchema, GetFileListData, TInfinite, GetFileListParameters, GetFileListError> | QueryFiltersByQueryKey<GetFileListSchema, GetFileListData, TInfinite, GetFileListParameters, GetFileListError>): number;
+        useIsFetching<TInfinite extends boolean = false>(filters?: IsFetchingQueryFilters<GetFileListSchema, GetFileListData, TInfinite, GetFileListParameters, GetFileListError>): number;
         /**
          * Allows you to execute multiple asynchronous data fetching operations concurrently. This is especially useful for managing complex data dependencies in parallel.
          *
@@ -2088,7 +2088,7 @@ export interface FilesService {
          * @deprecated
          * @summary Get a file list
          */
-        isFetching<TInfinite extends boolean = false>(filters?: QueryFiltersByParameters<GetFileListSchema, GetFileListData, TInfinite, GetFileListParameters, GetFileListError> | QueryFiltersByQueryKey<GetFileListSchema, GetFileListData, TInfinite, GetFileListParameters, GetFileListError>): number;
+        isFetching<TInfinite extends boolean = false>(filters?: IsFetchingQueryFilters<GetFileListSchema, GetFileListData, TInfinite, GetFileListParameters, GetFileListError>): number;
         schema: GetFileListSchema;
         types: {
             parameters: GetFileListParameters;

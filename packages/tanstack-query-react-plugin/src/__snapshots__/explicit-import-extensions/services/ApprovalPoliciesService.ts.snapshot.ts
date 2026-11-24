@@ -4,7 +4,7 @@
  */
 
 import type { paths } from "../../openapi.js";
-import type { DeepReadonly, InvalidateQueryFilters, MutationFiltersByMutationKey, MutationFiltersByParameters, MutationVariables, OperationError, OperationInfiniteData, PartialParameters, QueryFiltersByParameters, QueryFiltersByQueryKey, QueryFnOptionsByParameters, QueryFnOptionsByQueryKey, RequestFnResponse, ServiceOperationEnsureInfiniteQueryDataOptions, ServiceOperationEnsureQueryDataOptions, ServiceOperationFetchInfiniteQueryOptions, ServiceOperationFetchQueryOptions, ServiceOperationInfiniteQueryKey, ServiceOperationMutationFnOptions, ServiceOperationMutationKey, ServiceOperationQueryKey, ServiceOperationUseMutationOptions, UseQueryOptionsForUseQueries, UseQueryOptionsForUseSuspenseQuery, WithOptional, QraftServiceOperationsToken } from "@openapi-qraft/tanstack-query-react-types";
+import type { DeepReadonly, InvalidateQueryFilters, IsFetchingQueryFilters, IsMutatingMutationFilters, MutationFiltersByMutationKey, MutationFiltersByParameters, MutationVariables, OperationError, OperationInfiniteData, PartialParameters, QueryFiltersByParameters, QueryFiltersByQueryKey, QueryFnOptionsByParameters, QueryFnOptionsByQueryKey, RequestFnResponse, ServiceOperationEnsureInfiniteQueryDataOptions, ServiceOperationEnsureQueryDataOptions, ServiceOperationFetchInfiniteQueryOptions, ServiceOperationFetchQueryOptions, ServiceOperationInfiniteQueryKey, ServiceOperationMutationFnOptions, ServiceOperationMutationKey, ServiceOperationQueryKey, ServiceOperationUseMutationOptions, UseQueryOptionsForUseQueries, UseQueryOptionsForUseSuspenseQuery, WithOptional, QraftServiceOperationsToken } from "@openapi-qraft/tanstack-query-react-types";
 import type { CancelOptions, DefinedInitialDataInfiniteOptions, DefinedInitialDataOptions, DefinedUseInfiniteQueryResult, DefinedUseQueryResult, InfiniteQueryPageParamsOptions, InvalidateOptions, Mutation, MutationCache, MutationState, QueryState, RefetchOptions, ResetOptions, SetDataOptions, UndefinedInitialDataInfiniteOptions, UndefinedInitialDataOptions, Updater, UseInfiniteQueryResult, UseMutationResult, UseQueryResult, UseSuspenseInfiniteQueryOptions, UseSuspenseInfiniteQueryResult, UseSuspenseQueryOptions, UseSuspenseQueryResult } from "@tanstack/react-query";
 export interface ApprovalPoliciesService {
     /**
@@ -172,7 +172,7 @@ export interface ApprovalPoliciesService {
          * })
          * ```
          */
-        useIsFetching<TInfinite extends boolean = false>(filters?: QueryFiltersByParameters<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdData, TInfinite, GetApprovalPoliciesIdParameters, GetApprovalPoliciesIdError> | QueryFiltersByQueryKey<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdData, TInfinite, GetApprovalPoliciesIdParameters, GetApprovalPoliciesIdError>): number;
+        useIsFetching<TInfinite extends boolean = false>(filters?: IsFetchingQueryFilters<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdData, TInfinite, GetApprovalPoliciesIdParameters, GetApprovalPoliciesIdError>): number;
         /**
          * Allows you to execute multiple asynchronous data fetching operations concurrently. This is especially useful for managing complex data dependencies in parallel.
          *
@@ -488,7 +488,7 @@ export interface ApprovalPoliciesService {
          * @summary Get an approval policy by ID
          * @description Retrieve a specific approval policy.
          */
-        isFetching<TInfinite extends boolean = false>(filters?: QueryFiltersByParameters<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdData, TInfinite, GetApprovalPoliciesIdParameters, GetApprovalPoliciesIdError> | QueryFiltersByQueryKey<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdData, TInfinite, GetApprovalPoliciesIdParameters, GetApprovalPoliciesIdError>): number;
+        isFetching<TInfinite extends boolean = false>(filters?: IsFetchingQueryFilters<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdData, TInfinite, GetApprovalPoliciesIdParameters, GetApprovalPoliciesIdError>): number;
         schema: GetApprovalPoliciesIdSchema;
         types: {
             parameters: GetApprovalPoliciesIdParameters;
@@ -623,7 +623,7 @@ export interface ApprovalPoliciesService {
          * })
          * ```
          */
-        useIsMutating<TContext = unknown>(filters?: MutationFiltersByParameters<DeleteApprovalPoliciesIdBody, DeleteApprovalPoliciesIdData, DeleteApprovalPoliciesIdParameters, OperationError<DeleteApprovalPoliciesIdError>, TContext> | MutationFiltersByMutationKey<DeleteApprovalPoliciesIdSchema, DeleteApprovalPoliciesIdBody, DeleteApprovalPoliciesIdData, DeleteApprovalPoliciesIdParameters, OperationError<DeleteApprovalPoliciesIdError>, TContext>): number;
+        useIsMutating<TContext = unknown>(filters?: IsMutatingMutationFilters<DeleteApprovalPoliciesIdSchema, DeleteApprovalPoliciesIdBody, DeleteApprovalPoliciesIdData, DeleteApprovalPoliciesIdParameters, OperationError<DeleteApprovalPoliciesIdError>, TContext>): number;
         /**
          * Provides access to the current state of a mutation, including its status, any resulting data, and associated errors.
          *
@@ -668,7 +668,7 @@ export interface ApprovalPoliciesService {
          * @summary Delete an approval policy
          * @description Delete an existing approval policy.
          */
-        isMutating<TContext>(filters?: MutationFiltersByParameters<DeleteApprovalPoliciesIdBody, DeleteApprovalPoliciesIdData, DeleteApprovalPoliciesIdParameters, OperationError<DeleteApprovalPoliciesIdError>, TContext> | MutationFiltersByMutationKey<DeleteApprovalPoliciesIdSchema, DeleteApprovalPoliciesIdBody, DeleteApprovalPoliciesIdData, DeleteApprovalPoliciesIdParameters, OperationError<DeleteApprovalPoliciesIdError>, TContext>): number;
+        isMutating<TContext = unknown>(filters?: IsMutatingMutationFilters<DeleteApprovalPoliciesIdSchema, DeleteApprovalPoliciesIdBody, DeleteApprovalPoliciesIdData, DeleteApprovalPoliciesIdParameters, OperationError<DeleteApprovalPoliciesIdError>, TContext>): number;
         /**
          * Returns a `MutationCache` object that provides access to mutation cache operations
          * for the specific endpoint.
@@ -841,7 +841,7 @@ export interface ApprovalPoliciesService {
          * })
          * ```
          */
-        useIsMutating<TContext = unknown>(filters?: MutationFiltersByParameters<PatchApprovalPoliciesIdBody, PatchApprovalPoliciesIdData, PatchApprovalPoliciesIdParameters, OperationError<PatchApprovalPoliciesIdError>, TContext> | MutationFiltersByMutationKey<PatchApprovalPoliciesIdSchema, PatchApprovalPoliciesIdBody, PatchApprovalPoliciesIdData, PatchApprovalPoliciesIdParameters, OperationError<PatchApprovalPoliciesIdError>, TContext>): number;
+        useIsMutating<TContext = unknown>(filters?: IsMutatingMutationFilters<PatchApprovalPoliciesIdSchema, PatchApprovalPoliciesIdBody, PatchApprovalPoliciesIdData, PatchApprovalPoliciesIdParameters, OperationError<PatchApprovalPoliciesIdError>, TContext>): number;
         /**
          * Provides access to the current state of a mutation, including its status, any resulting data, and associated errors.
          *
@@ -886,7 +886,7 @@ export interface ApprovalPoliciesService {
          * @summary Update an approval policy
          * @description Update an existing approval policy.
          */
-        isMutating<TContext>(filters?: MutationFiltersByParameters<PatchApprovalPoliciesIdBody, PatchApprovalPoliciesIdData, PatchApprovalPoliciesIdParameters, OperationError<PatchApprovalPoliciesIdError>, TContext> | MutationFiltersByMutationKey<PatchApprovalPoliciesIdSchema, PatchApprovalPoliciesIdBody, PatchApprovalPoliciesIdData, PatchApprovalPoliciesIdParameters, OperationError<PatchApprovalPoliciesIdError>, TContext>): number;
+        isMutating<TContext = unknown>(filters?: IsMutatingMutationFilters<PatchApprovalPoliciesIdSchema, PatchApprovalPoliciesIdBody, PatchApprovalPoliciesIdData, PatchApprovalPoliciesIdParameters, OperationError<PatchApprovalPoliciesIdError>, TContext>): number;
         /**
          * Returns a `MutationCache` object that provides access to mutation cache operations
          * for the specific endpoint.
