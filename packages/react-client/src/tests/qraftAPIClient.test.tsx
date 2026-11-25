@@ -2783,6 +2783,7 @@ describe('Qraft uses "fetchInfiniteQuery(...) & "prefetchInfiniteQuery(...)"', (
             items_order: ['asc', 'asc', 'asc'],
           },
         },
+        getNextPageParam: () => undefined,
       });
 
     await expect(result).resolves.toBeUndefined();
@@ -2823,6 +2824,7 @@ describe('Qraft uses "fetchInfiniteQuery(...) & "prefetchInfiniteQuery(...)"', (
             items_order: ['asc', 'asc', 'asc'],
           },
         },
+        getNextPageParam: () => undefined,
       });
 
     await expect(result).resolves.toEqual({
@@ -2843,6 +2845,335 @@ describe('Qraft uses "fetchInfiniteQuery(...) & "prefetchInfiniteQuery(...)"', (
         },
       ],
     });
+  });
+});
+
+describe('Qraft uses "query(...)"', () => {
+  const parameters: Services['approvalPolicies']['getApprovalPoliciesId']['types']['parameters'] =
+    {
+      header: {
+        'x-monite-version': '1.0.0',
+      },
+      path: {
+        approval_policy_id: '1',
+      },
+      query: {
+        items_order: ['asc', 'desc'],
+      },
+    };
+
+  it('uses query with parameters', async () => {
+    const { qraft } = createClient();
+
+    const result = await qraft.approvalPolicies.getApprovalPoliciesId.query({
+      requestFn,
+      baseUrl: 'https://api.sandbox.monite.com/v1',
+      parameters,
+    });
+
+    expect(result).toEqual(parameters);
+  });
+
+  it('uses query without arguments', async () => {
+    const { qraft } = createClient();
+
+    const result = await qraft.files.findAll.query();
+
+    expect(result).toEqual(filesFindAllResponsePayloadFixtures);
+  });
+
+  it("supports select and staleTime: 'static' without refetching cached data", async () => {
+    const requestFnSpy = vi.fn(requestFn);
+    const { qraft } = createClient({ requestFn: requestFnSpy });
+
+    await qraft.approvalPolicies.getApprovalPoliciesId.query({ parameters });
+    expect(requestFnSpy).toHaveBeenCalledTimes(1);
+
+    await qraft.approvalPolicies.getApprovalPoliciesId.query({ parameters });
+    expect(requestFnSpy).toHaveBeenCalledTimes(2);
+
+    const selected = await qraft.approvalPolicies.getApprovalPoliciesId.query({
+      parameters,
+      staleTime: 'static',
+      select: (data) => data.path?.approval_policy_id,
+    });
+
+    expect(selected satisfies string | undefined).toBe('1');
+    expect(requestFnSpy).toHaveBeenCalledTimes(2);
+  });
+
+  it('emits type and response error when required parameters are omitted', async () => {
+    const { qraft } = createClient();
+
+    await expect(
+      // @ts-expect-error - `parameters` is required for the operation
+      qraft.approvalPolicies.getApprovalPoliciesId.query()
+    ).rejects.toEqual({ error: { message: 'approval_policy_id is required' } });
+  });
+
+  it('throws an error if requestFn is not provided', async () => {
+    const qraft = createAPIClient({
+      queryClient: new QueryClient(),
+      // @ts-expect-error - incorrect usage case, `requestFn` is not defined
+      requestFn: undefined,
+      baseUrl: 'http://any',
+    });
+
+    await expect(() => qraft.files.findAll.query()).rejects.toThrow(
+      new Error(
+        `Missing queryFn: '${hashKey(qraft.files.findAll.getQueryKey())}'`
+      )
+    );
+  });
+
+  it('uses query with custom baseUrl and requestFn', async () => {
+    const requestFnClientSpy = vi.fn(requestFn) as typeof requestFn;
+    const requestFnCustomSpy = vi.fn(requestFn) as typeof requestFn;
+
+    const { qraft } = createClient({
+      requestFn: requestFnClientSpy,
+    });
+
+    await qraft.approvalPolicies.getApprovalPoliciesId.query({
+      baseUrl: 'https://api.sandbox.monite.com/v333',
+      requestFn: requestFnCustomSpy,
+      parameters,
+    });
+
+    expect(requestFnClientSpy).not.toHaveBeenCalled();
+    expect(requestFnCustomSpy).toHaveBeenCalledWith(
+      {
+        url: '/approval_policies/{approval_policy_id}',
+        method: 'get',
+        security: ['partnerToken'],
+      },
+      expect.objectContaining({
+        baseUrl: 'https://api.sandbox.monite.com/v333',
+        body: undefined,
+        meta: undefined,
+        parameters,
+        signal: expect.any(AbortSignal),
+      })
+    );
+  });
+
+  it('uses query with queryKey', async () => {
+    const { qraft } = createClient();
+
+    const result = await qraft.approvalPolicies.getApprovalPoliciesId.query({
+      requestFn,
+      baseUrl: 'https://api.sandbox.monite.com/v1',
+      queryKey:
+        qraft.approvalPolicies.getApprovalPoliciesId.getQueryKey(parameters),
+    });
+
+    expect(result).toEqual(parameters);
+  });
+
+  it('uses query with queryFn', async () => {
+    const { qraft } = createClient();
+
+    const customResult: typeof qraft.approvalPolicies.getApprovalPoliciesId.types.parameters =
+      {
+        ...parameters,
+        header: { 'x-monite-version': '2.0.0' },
+      };
+
+    const queryFnSpy = vi.fn(() => Promise.resolve(customResult));
+    const result = await qraft.approvalPolicies.getApprovalPoliciesId.query({
+      queryFn: queryFnSpy,
+      queryKey:
+        qraft.approvalPolicies.getApprovalPoliciesId.getQueryKey(parameters),
+    });
+
+    expect(result).toEqual(customResult);
+    expect(queryFnSpy).toHaveBeenCalled();
+  });
+});
+
+describe('Qraft uses "infiniteQuery(...)"', () => {
+  const parameters: Services['approvalPolicies']['getApprovalPoliciesId']['types']['parameters'] =
+    {
+      header: {
+        'x-monite-version': '1.0.0',
+      },
+      path: {
+        approval_policy_id: '1',
+      },
+      query: {
+        items_order: ['asc', 'desc'],
+      },
+    };
+
+  it('uses infiniteQuery with multiple pages', async () => {
+    const { qraft } = createClient();
+
+    const result =
+      await qraft.approvalPolicies.getApprovalPoliciesId.infiniteQuery({
+        requestFn,
+        baseUrl: 'https://api.sandbox.monite.com/v1',
+        parameters,
+        initialPageParam: {
+          query: {
+            items_order: ['asc', 'asc', 'asc'],
+          },
+        },
+        pages: 2,
+        getNextPageParam: (_lastPage, _allPages, params) => ({
+          query: {
+            items_order: [...(params.query?.items_order || []), 'desc'],
+          },
+        }),
+      });
+
+    expect(result).toEqual({
+      pageParams: [
+        {
+          query: {
+            items_order: ['asc', 'asc', 'asc'],
+          },
+        },
+        {
+          query: {
+            items_order: ['asc', 'asc', 'asc', 'desc'],
+          },
+        },
+      ],
+      pages: [
+        {
+          ...parameters,
+          query: {
+            ...parameters.query,
+            items_order: ['asc', 'asc', 'asc'],
+          },
+        },
+        {
+          ...parameters,
+          query: {
+            ...parameters.query,
+            items_order: ['asc', 'asc', 'asc', 'desc'],
+          },
+        },
+      ],
+    });
+  });
+
+  it("supports select and staleTime: 'static' without refetching cached infinite data", async () => {
+    const requestFnSpy = vi.fn(requestFn);
+    const { qraft } = createClient({ requestFn: requestFnSpy });
+
+    await qraft.approvalPolicies.getApprovalPoliciesId.infiniteQuery({
+      parameters,
+      initialPageParam: {
+        query: {
+          items_order: ['asc', 'asc', 'asc'],
+        },
+      },
+      getNextPageParam: () => undefined,
+    });
+    expect(requestFnSpy).toHaveBeenCalledTimes(1);
+
+    const pageCount =
+      await qraft.approvalPolicies.getApprovalPoliciesId.infiniteQuery({
+        parameters,
+        initialPageParam: {
+          query: {
+            items_order: ['asc', 'asc', 'asc'],
+          },
+        },
+        getNextPageParam: () => undefined,
+        staleTime: 'static',
+        select: (data) => data.pages.length,
+      });
+
+    expect(pageCount satisfies number).toBe(1);
+    expect(requestFnSpy).toHaveBeenCalledTimes(1);
+  });
+
+  it('uses infiniteQuery with queryKey', async () => {
+    const { qraft } = createClient();
+
+    const result =
+      await qraft.approvalPolicies.getApprovalPoliciesId.infiniteQuery({
+        queryKey:
+          qraft.approvalPolicies.getApprovalPoliciesId.getInfiniteQueryKey(
+            parameters
+          ),
+        initialPageParam: {
+          query: {
+            items_order: ['asc', 'asc', 'asc'],
+          },
+        },
+        getNextPageParam: () => undefined,
+      });
+
+    expect(result).toEqual({
+      pageParams: [
+        {
+          query: {
+            items_order: ['asc', 'asc', 'asc'],
+          },
+        },
+      ],
+      pages: [
+        {
+          ...parameters,
+          query: {
+            ...parameters.query,
+            items_order: ['asc', 'asc', 'asc'],
+          },
+        },
+      ],
+    });
+  });
+
+  it('uses infiniteQuery with queryFn', async () => {
+    const { qraft } = createClient();
+
+    const customPage: typeof qraft.approvalPolicies.getApprovalPoliciesId.types.parameters =
+      {
+        ...parameters,
+        header: { 'x-monite-version': '2.0.0' },
+      };
+
+    const queryFnSpy = vi.fn(() => Promise.resolve(customPage));
+    const result =
+      await qraft.approvalPolicies.getApprovalPoliciesId.infiniteQuery({
+        parameters,
+        initialPageParam: {
+          query: {
+            items_order: ['asc'],
+          },
+        },
+        getNextPageParam: () => undefined,
+        queryFn: queryFnSpy,
+      });
+
+    expect(result).toEqual({
+      pageParams: [{ query: { items_order: ['asc'] } }],
+      pages: [customPage],
+    });
+    expect(queryFnSpy).toHaveBeenCalledTimes(1);
+  });
+
+  it('throws an error if requestFn is not provided', async () => {
+    const qraft = createAPIClient({
+      queryClient: new QueryClient(),
+      // @ts-expect-error - incorrect usage case, `requestFn` is not defined
+      requestFn: undefined,
+      baseUrl: 'http://any',
+    });
+
+    await expect(() =>
+      qraft.files.findAll.infiniteQuery({
+        initialPageParam: {},
+        getNextPageParam: () => undefined,
+      })
+    ).rejects.toThrow(
+      new Error(
+        `Missing queryFn: '${hashKey(qraft.files.findAll.getInfiniteQueryKey())}'`
+      )
+    );
   });
 });
 
@@ -5210,6 +5541,36 @@ describe('Qraft is type-safe if client created without options', () => {
         `'qraft.<service>.<operation>.fetchQuery()' requires 'queryClient' in 'createAPIClient(...)' options.`
       )
     );
+
+    expect(() =>
+      // @ts-expect-error - no options provided (not required, no QueryClient) - must emit an error
+      qraft.approvalPolicies.getApprovalPoliciesId.query({
+        parameters: {
+          header: { 'x-monite-version': '1.0.0' },
+          path: { approval_policy_id: '1' },
+        },
+      })
+    ).toThrow(
+      new Error(
+        `'qraft.<service>.<operation>.query()' requires 'queryClient' in 'createAPIClient(...)' options.`
+      )
+    );
+
+    expect(() =>
+      // @ts-expect-error - no options provided (not required, no QueryClient) - must emit an error
+      qraft.approvalPolicies.getApprovalPoliciesId.infiniteQuery({
+        parameters: {
+          header: { 'x-monite-version': '1.0.0' },
+          path: { approval_policy_id: '1' },
+        },
+        initialPageParam: {},
+        getNextPageParam: () => undefined,
+      })
+    ).toThrow(
+      new Error(
+        `'qraft.<service>.<operation>.infiniteQuery()' requires 'queryClient' in 'createAPIClient(...)' options.`
+      )
+    );
   });
 
   it('does not throw an error', () => {
@@ -5259,6 +5620,19 @@ describe('Qraft is type-safe if client created with "QueryClient" only', () => {
     await expect(() =>
       // @ts-expect-error - no options provided for the request - must emit an error
       qraft.files.findAll.fetchQuery()
+    ).rejects.toThrow();
+
+    await expect(() =>
+      // @ts-expect-error - no options provided for the request - must emit an error
+      qraft.files.findAll.query()
+    ).rejects.toThrow();
+
+    await expect(() =>
+      // @ts-expect-error - no options provided for the request - must emit an error
+      qraft.files.findAll.infiniteQuery({
+        initialPageParam: {},
+        getNextPageParam: () => undefined,
+      })
     ).rejects.toThrow();
   });
 });

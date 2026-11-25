@@ -122,6 +122,8 @@ describe('CLI binary help output', { timeout: 30_000 }, () => {
           --create-api-client-fn <functionName> [options...]            Configure API client creation function. Allows specifying the function name, included services, and callbacks. Can be specified multiple times to generate several different API client functions from a single OpenAPI document. (default: null)
           --override-import-type <pathname overrides...>                Override import paths for specific types in generated files. This allows using custom type implementations instead of the default ones. Expected format: filepath originalModule:importTypeName:customImportPath
           --operation-parameters-type-wrapper <parameters wrappers...>  Configure ParametersWrapper types for specific operation patterns. Expected format: pattern type:TypeName import:ImportPath. Can be specified multiple times for different patterns.
+          --tanstack-query-version <version>                            Target @tanstack/react-query version (e.g., "5.80.0", "5.108.1"). Auto-detected from installed dependencies or package.json if omitted.
+          --tanstack-query-deprecations [bool]                          Emit @deprecated JSDoc tags for methods deprecated in the target @tanstack/react-query version. Defaults to true when deprecations apply to the target version, false otherwise.
           -h, --help                                                    display help for command"
       `);
     });
@@ -220,6 +222,8 @@ describe('CLI binary help output', { timeout: 30_000 }, () => {
           --create-api-client-fn <functionName> [options...]            Configure API client creation function. Allows specifying the function name, included services, and callbacks. Can be specified multiple times to generate several different API client functions from a single OpenAPI document. (default: null)
           --override-import-type <pathname overrides...>                Override import paths for specific types in generated files. This allows using custom type implementations instead of the default ones. Expected format: filepath originalModule:importTypeName:customImportPath
           --operation-parameters-type-wrapper <parameters wrappers...>  Configure ParametersWrapper types for specific operation patterns. Expected format: pattern type:TypeName import:ImportPath. Can be specified multiple times for different patterns.
+          --tanstack-query-version <version>                            Target @tanstack/react-query version (e.g., "5.80.0", "5.108.1"). Auto-detected from installed dependencies or package.json if omitted.
+          --tanstack-query-deprecations [bool]                          Emit @deprecated JSDoc tags for methods deprecated in the target @tanstack/react-query version. Defaults to true when deprecations apply to the target version, false otherwise.
           --openapi-types-file-name <path>                              OpenAPI Schema types file name, e.g.: "schema.d.ts" (default: "schema.ts")
           --enum                                                        Export true TS enums instead of unions
           --enum-values                                                 Export enum values as arrays.

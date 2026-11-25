@@ -135,6 +135,66 @@ function useTsCheck() {
     getNextPageParam: () => undefined,
   });
 
+  // query / infiniteQuery (5.108.1+ imperative methods)
+  void client.pet.findPetsByStatus.query();
+  void (client.pet.findPetsByStatus.query({
+    parameters: {
+      query: {
+        status: 'available',
+      },
+    },
+    staleTime: 'static',
+    select: (data) => data.length,
+  }) satisfies Promise<number>);
+  // @ts-expect-error - parameters and queryKey are mutually exclusive
+  void client.pet.findPetsByStatus.query({
+    parameters: {
+      query: {
+        status: 'available',
+      },
+    },
+    queryKey: client.pet.findPetsByStatus.getQueryKey(),
+  });
+
+  // @ts-expect-error - getNextPageParam is required in TanStack Query 5.108.1+
+  void client.pet.findPetsByStatus.infiniteQuery();
+  // @ts-expect-error - getNextPageParam is required in TanStack Query 5.108.1+
+  void client.pet.findPetsByStatus.infiniteQuery({});
+  void (client.pet.findPetsByStatus.infiniteQuery({
+    initialPageParam: {
+      query: {
+        status: 'sold',
+      },
+    },
+    pages: 2,
+    staleTime: 'static',
+    getNextPageParam: (lastPage, _allPages, lastPageParam) => {
+      lastPageParam.query?.status satisfies
+        | 'available'
+        | 'pending'
+        | 'sold'
+        | undefined;
+      return lastPage.length > 0 ? { query: { status: 'pending' } } : undefined;
+    },
+    select: (data) => data.pages.flat().length,
+  }) satisfies Promise<number>);
+  void client.pet.findPetsByStatus.infiniteQuery({
+    initialPageParam: {
+      query: {
+        status: 'sold',
+      },
+    },
+    getNextPageParam: () => undefined,
+    queryFn: ({ pageParam }) => {
+      pageParam.query?.status satisfies
+        | 'available'
+        | 'pending'
+        | 'sold'
+        | undefined;
+      return Promise.resolve([]);
+    },
+  });
+
   // isFetching / useIsFetching: fetchStatus forbidden; parameters and queryKey mutually exclusive
   client.pet.findPetsByStatus.isFetching({ stale: true, parameters: {} });
   client.pet.findPetsByStatus.useIsFetching({ stale: true, parameters: {} });

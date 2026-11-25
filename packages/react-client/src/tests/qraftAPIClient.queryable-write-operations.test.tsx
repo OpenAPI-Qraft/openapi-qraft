@@ -249,6 +249,7 @@ describe('Queryable write operations', () => {
             trigger: true,
           },
         },
+        getNextPageParam: () => undefined,
       });
 
     await waitFor(() => {
@@ -263,6 +264,81 @@ describe('Queryable write operations', () => {
           },
         ],
       });
+    });
+  });
+
+  it('queries writable operations with a specific body for query', async () => {
+    const queryClient = new QueryClient();
+    const qraft = createAPIClient({
+      requestFn,
+      baseUrl,
+      queryClient,
+    });
+
+    const result = await qraft.approvalPolicies.patchApprovalPoliciesId.query({
+      parameters: {
+        header: {
+          'x-monite-version': '1',
+          'x-monite-entity-id': '2',
+        },
+        path: {
+          approval_policy_id: '2',
+        },
+        body: {
+          name: 'New Name',
+          description: 'New Description',
+        },
+      },
+    });
+
+    expect(result).toEqual({
+      id: '2',
+      name: 'New Name',
+      description: 'New Description',
+    });
+  });
+
+  it('queries writable operations with a specific body for infiniteQuery', async () => {
+    const queryClient = new QueryClient();
+    const qraft = createAPIClient({
+      requestFn,
+      baseUrl,
+      queryClient,
+    });
+
+    const result =
+      await qraft.approvalPolicies.patchApprovalPoliciesId.infiniteQuery({
+        parameters: {
+          header: {
+            'x-monite-version': '1',
+            'x-monite-entity-id': '2',
+          },
+          path: {
+            approval_policy_id: '2',
+          },
+          body: {
+            name: 'New Name',
+            description: 'New Description',
+          },
+        },
+        initialPageParam: {
+          body: {
+            trigger: true,
+          },
+        },
+        getNextPageParam: () => undefined,
+      });
+
+    expect(result).toEqual({
+      pageParams: [{ body: { trigger: true } }],
+      pages: [
+        {
+          id: '2',
+          name: 'New Name',
+          description: 'New Description',
+          trigger: true,
+        },
+      ],
     });
   });
 

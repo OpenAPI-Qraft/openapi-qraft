@@ -172,6 +172,14 @@ queryClientOnlyApi.files.getFiles({ parameters });
 queryClientOnlyApi.files.getFiles.useQuery(parameters);
 // @ts-expect-error - queryClient-only client cannot run request methods without requestFn
 queryClientOnlyApi.files.getFiles.fetchQuery({ parameters });
+// @ts-expect-error - queryClient-only client cannot run request methods without requestFn
+queryClientOnlyApi.files.getFiles.query({ parameters });
+// @ts-expect-error - queryClient-only client cannot run request methods without requestFn
+queryClientOnlyApi.files.getFiles.infiniteQuery({
+  parameters,
+  initialPageParam: parameters,
+  getNextPageParam: () => undefined,
+});
 // @ts-expect-error - queryClient-only client cannot run mutation hooks without requestFn
 queryClientOnlyApi.files.deleteFiles.useMutation({ query: { all: true } });
 
@@ -214,6 +222,14 @@ noQueryClientRequestApi.files.getFiles.invalidateQueries();
 noQueryClientRequestApi.files.getFiles.fetchQuery({ parameters });
 // @ts-expect-error - request-only client cannot use imperative QueryClient request methods
 noQueryClientRequestApi.files.getFiles.ensureQueryData({ parameters });
+// @ts-expect-error - request-only client cannot use imperative QueryClient request methods
+noQueryClientRequestApi.files.getFiles.query({ parameters });
+// @ts-expect-error - request-only client cannot use imperative QueryClient request methods
+noQueryClientRequestApi.files.getFiles.infiniteQuery({
+  parameters,
+  initialPageParam: parameters,
+  getNextPageParam: () => undefined,
+});
 
 const noQueryClientNoRequestApi = qraftAPIClient(services, callbacks);
 
@@ -239,6 +255,14 @@ noQueryClientNoRequestApi.files.deleteFiles.useMutation({
 noQueryClientNoRequestApi.files.getFiles.getQueryData(parameters);
 // @ts-expect-error - utility client without options cannot use QueryClient methods
 noQueryClientNoRequestApi.files.getFiles.invalidateQueries();
+// @ts-expect-error - utility client without options cannot use imperative QueryClient request methods
+noQueryClientNoRequestApi.files.getFiles.query({ parameters });
+// @ts-expect-error - utility client without options cannot use imperative QueryClient request methods
+noQueryClientNoRequestApi.files.getFiles.infiniteQuery({
+  parameters,
+  initialPageParam: parameters,
+  getNextPageParam: () => undefined,
+});
 
 const APIClientContext = createContext<CreateAPIQueryClientOptions | undefined>(
   undefined
@@ -264,6 +288,16 @@ contextReactApi.files.getFiles.setQueryData(parameters, { query: {} });
 contextReactApi.files.getFiles.getQueryData(parameters);
 // @ts-expect-error - context client exposes hooks, not imperative QueryClient methods
 contextReactApi.files.getFiles.invalidateQueries();
+// @ts-expect-error - context client exposes hooks, not imperative QueryClient methods
+contextReactApi.files.getFiles.fetchQuery({ parameters });
+// @ts-expect-error - context client exposes hooks, not imperative QueryClient methods
+contextReactApi.files.getFiles.query({ parameters });
+// @ts-expect-error - context client exposes hooks, not imperative QueryClient methods
+contextReactApi.files.getFiles.infiniteQuery({
+  parameters,
+  initialPageParam: parameters,
+  getNextPageParam: () => undefined,
+});
 
 const directReactUtilityApi = qraftReactAPIClient(services, callbacks);
 
@@ -282,6 +316,14 @@ directReactUtilityApi.files.deleteFiles.useMutationState();
 directReactUtilityApi.files.getFiles.invalidateQueries();
 // @ts-expect-error - direct React utility client without options cannot invoke operations
 directReactUtilityApi.files.getFiles({ parameters });
+// @ts-expect-error - direct React utility client without options exposes key helpers only
+directReactUtilityApi.files.getFiles.query({ parameters });
+// @ts-expect-error - direct React utility client without options exposes key helpers only
+directReactUtilityApi.files.getFiles.infiniteQuery({
+  parameters,
+  initialPageParam: parameters,
+  getNextPageParam: () => undefined,
+});
 
 const directReactRequestOnlyApi = qraftReactAPIClient(services, callbacks, {
   requestFn,
@@ -308,6 +350,14 @@ directReactRequestOnlyApi.files.deleteFiles.useIsMutating();
 directReactRequestOnlyApi.files.deleteFiles.useMutationState();
 // @ts-expect-error - direct React request-only object options do not expose QueryClient methods
 directReactRequestOnlyApi.files.getFiles.invalidateQueries();
+// @ts-expect-error - direct React request-only object options do not expose imperative QueryClient request methods
+directReactRequestOnlyApi.files.getFiles.query({ parameters });
+// @ts-expect-error - direct React request-only object options do not expose imperative QueryClient request methods
+directReactRequestOnlyApi.files.getFiles.infiniteQuery({
+  parameters,
+  initialPageParam: parameters,
+  getNextPageParam: () => undefined,
+});
 
 const directReactQueryClientOnlyApi = qraftReactAPIClient(services, callbacks, {
   queryClient: new QueryClient(),
@@ -332,6 +382,14 @@ directReactQueryClientOnlyApi.files.deleteFiles.useMutation({
 directReactQueryClientOnlyApi.files.deleteFiles.useIsMutating();
 // @ts-expect-error - direct React queryClient-only object options do not expose state hooks
 directReactQueryClientOnlyApi.files.deleteFiles.useMutationState();
+// @ts-expect-error - direct React queryClient-only object options cannot run imperative QueryClient request methods without requestFn
+directReactQueryClientOnlyApi.files.getFiles.query({ parameters });
+// @ts-expect-error - direct React queryClient-only object options cannot run imperative QueryClient request methods without requestFn
+directReactQueryClientOnlyApi.files.getFiles.infiniteQuery({
+  parameters,
+  initialPageParam: parameters,
+  getNextPageParam: () => undefined,
+});
 
 const directReactQueryClientApi = qraftReactAPIClient(services, callbacks, {
   queryClient: new QueryClient(),
@@ -342,6 +400,12 @@ const directReactQueryClientApi = qraftReactAPIClient(services, callbacks, {
 directReactQueryClientApi.files.getFiles.getQueryKey(parameters);
 directReactQueryClientApi.files.getFiles.getQueryData(parameters);
 directReactQueryClientApi.files.getFiles.invalidateQueries();
+directReactQueryClientApi.files.getFiles.query({ parameters });
+directReactQueryClientApi.files.getFiles.infiniteQuery({
+  parameters,
+  initialPageParam: parameters,
+  getNextPageParam: () => undefined,
+});
 directReactQueryClientApi.files.deleteFiles.getMutationKey();
 directReactQueryClientApi.files.deleteFiles.getMutationCache();
 // @ts-expect-error - direct object options do not wrap React hooks with context
@@ -535,3 +599,87 @@ client.files.getFiles.useQueries({
     },
   ],
 });
+
+//// ServiceOperationImperativeQuery & ServiceOperationImperativeInfiniteQuery ////
+client.files.getFiles.query({ parameters }) satisfies Promise<
+  typeof client.files.getFiles.types.data
+>;
+client.files.findAll.query();
+client.files.getFiles.query({
+  parameters,
+  staleTime: 'static',
+  select: (data) => data.query?.id__in?.length ?? 0,
+}) satisfies Promise<number>;
+client.files.getFiles.query({
+  queryKey: client.files.getFiles.getQueryKey(parameters),
+});
+// @ts-expect-error - parameters and queryKey are mutually exclusive
+client.files.getFiles.query({
+  parameters,
+  queryKey: client.files.getFiles.getQueryKey(parameters),
+});
+// @ts-expect-error - requestFn and queryFn are mutually exclusive
+client.files.getFiles.query({
+  parameters,
+  requestFn,
+  queryFn: () => Promise.resolve({}),
+});
+// @ts-expect-error - baseUrl and queryFn are mutually exclusive
+client.files.getFiles.query({
+  parameters,
+  baseUrl: 'https://example.com',
+  queryFn: () => Promise.resolve({}),
+});
+// @ts-expect-error - deleteFiles is not a queryable operation
+client.files.deleteFiles.query;
+
+// @ts-expect-error - getNextPageParam is required on infiniteQuery
+client.files.findAll.infiniteQuery();
+// @ts-expect-error - getNextPageParam is required on infiniteQuery
+client.files.findAll.infiniteQuery({});
+client.files.getFiles.infiniteQuery({
+  parameters,
+  initialPageParam: parameters,
+  pages: 2,
+  staleTime: 'static',
+  getNextPageParam: (_lastPage, _allPages, lastPageParam) => {
+    lastPageParam.query?.id__in satisfies readonly string[] | undefined;
+    return undefined;
+  },
+  select: (data) => data.pages.length,
+}) satisfies Promise<number>;
+client.files.getFiles.infiniteQuery<
+  typeof client.files.getFiles.types.parameters,
+  { custom: number }
+>({
+  parameters,
+  initialPageParam: parameters,
+  getNextPageParam: () => undefined,
+  select: (data) => ({ custom: data.pages.length }),
+}) satisfies Promise<{ custom: number }>;
+client.files.getFiles.infiniteQuery({
+  queryKey: client.files.getFiles.getInfiniteQueryKey(parameters),
+  initialPageParam: parameters,
+  getNextPageParam: () => undefined,
+  queryFn: ({ pageParam }) => {
+    pageParam.query?.id__in satisfies readonly string[] | undefined;
+    return Promise.resolve({});
+  },
+});
+// @ts-expect-error - parameters and queryKey are mutually exclusive
+client.files.getFiles.infiniteQuery({
+  parameters,
+  initialPageParam: parameters,
+  getNextPageParam: () => undefined,
+  queryKey: client.files.getFiles.getInfiniteQueryKey(parameters),
+});
+// @ts-expect-error - requestFn and queryFn are mutually exclusive
+client.files.getFiles.infiniteQuery({
+  parameters,
+  initialPageParam: parameters,
+  getNextPageParam: () => undefined,
+  requestFn,
+  queryFn: () => Promise.resolve({}),
+});
+// @ts-expect-error - deleteFiles is not a queryable operation
+client.files.deleteFiles.infiniteQuery;

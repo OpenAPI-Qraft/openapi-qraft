@@ -138,6 +138,19 @@ function useTsCheck() {
     getNextPageParam: () => undefined,
   });
 
+  // query / infiniteQuery are not available on @tanstack/react-query < 5.108.1
+  // @ts-expect-error - query() requires TanStack Query >= 5.108.1
+  void client.pet.findPetsByStatus.query();
+  // @ts-expect-error - infiniteQuery() requires TanStack Query >= 5.108.1
+  void client.pet.findPetsByStatus.infiniteQuery({
+    initialPageParam: {
+      query: {
+        status: 'sold',
+      },
+    },
+    getNextPageParam: () => undefined,
+  });
+
   // isFetching / useIsFetching: fetchStatus forbidden; parameters and queryKey mutually exclusive
   client.pet.findPetsByStatus.isFetching({ stale: true, parameters: {} });
   client.pet.findPetsByStatus.useIsFetching({ stale: true, parameters: {} });
