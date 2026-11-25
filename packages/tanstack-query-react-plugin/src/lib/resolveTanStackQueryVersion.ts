@@ -228,10 +228,10 @@ function pickMinimumVersion(
     return { kind: 'latest' };
   }
 
-  const semvers = versions.filter(
+  const semverVersions = versions.filter(
     (version): version is SemverVersion => version.kind === 'semver'
   );
-  return semvers.reduce((min, current) =>
+  return semverVersions.reduce((min, current) =>
     compareSemver(current, min) < 0 ? current : min
   );
 }

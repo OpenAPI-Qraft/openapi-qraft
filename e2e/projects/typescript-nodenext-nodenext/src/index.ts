@@ -183,8 +183,19 @@ function useTsCheck() {
       query: {
         status: 'sold',
       },
+    } as const,
+    getNextPageParam: (_lastPage, _allPages, lastPageParam) => {
+      lastPageParam.query?.status satisfies
+        | 'available'
+        | 'pending'
+        | 'sold'
+        | undefined;
+      return {
+        query: {
+          status: 'available',
+        },
+      };
     },
-    getNextPageParam: () => undefined,
     queryFn: ({ pageParam }) => {
       pageParam.query?.status satisfies
         | 'available'

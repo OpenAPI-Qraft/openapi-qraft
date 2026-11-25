@@ -340,17 +340,16 @@ describe('resolveTanStackQueryVersion', () => {
     });
   });
 
-  it('uses resolvePackageJson hook (e.g., PnP) when node_modules folder is absent', () => {
+  it('uses resolvePackageJson hook (e.g., custom module resolver) when node_modules folder is absent', () => {
     const io = {
       ...createMemoryIO({
-        '/pnp-store/@tanstack-react-query-5.109.0/package.json': JSON.stringify(
-          {
+        '/custom-store/@tanstack-react-query-5.109.0/package.json':
+          JSON.stringify({
             version: '5.109.0',
-          }
-        ),
+          }),
       }),
       resolvePackageJson: () =>
-        '/pnp-store/@tanstack-react-query-5.109.0/package.json',
+        '/custom-store/@tanstack-react-query-5.109.0/package.json',
     };
 
     expect(

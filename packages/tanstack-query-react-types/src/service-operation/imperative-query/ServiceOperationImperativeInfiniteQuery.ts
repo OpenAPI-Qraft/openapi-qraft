@@ -11,14 +11,14 @@ export interface ServiceOperationImperativeInfiniteQuery<
   TError,
 > {
   infiniteQuery<
-    TPageParam extends TQueryParams,
-    TData = OperationInfiniteData<TOperationQueryFnData, TQueryParams>,
+    TPageParam extends TQueryParams = TQueryParams,
+    TData = OperationInfiniteData<TOperationQueryFnData, TPageParam>,
   >(
     options: ServiceOperationImperativeInfiniteQueryOptions<
       TSchema,
       TOperationQueryFnData,
       TQueryParams,
-      DeepReadonly<TPageParam>,
+      NoInfer<DeepReadonly<TPageParam>>,
       TError,
       TData
     >

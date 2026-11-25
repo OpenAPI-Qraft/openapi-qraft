@@ -361,6 +361,61 @@ const createFullClient = () =>
     },
   });
 
+  // NoInfer prevents initialPageParam literal/partial keys from narrowing TPageParam
+  void qraft.files.findAll.infiniteQuery({
+    initialPageParam: {
+      query: { id__in: ['1'] },
+    } as const,
+    getNextPageParam: (_lastPage, _allPages, lastPageParam) => {
+      lastPageParam.query?.id__in satisfies readonly string[] | undefined;
+      return {
+        query: {
+          id__in: ['2'],
+        },
+      };
+    },
+    queryFn: ({ pageParam }) => {
+      pageParam.query?.id__in satisfies readonly string[] | undefined;
+      return Promise.resolve({ data: [] });
+    },
+  });
+
+  void qraft.files.findAll.infiniteQuery({
+    initialPageParam: {},
+    getNextPageParam: () => ({
+      query: { id__in: ['2'] },
+    }),
+  });
+
+  void qraft.files.getFiles.infiniteQuery({
+    parameters: constParameters,
+    initialPageParam: {
+      query: { id__in: ['1'] },
+    } as const,
+    getNextPageParam: (_lastPage, _allPages, lastPageParam) => {
+      lastPageParam.query?.id__in satisfies readonly string[] | undefined;
+      lastPageParam.query?.page satisfies string | undefined;
+      return {
+        query: {
+          id__in: ['2'],
+          page: '2',
+        },
+      };
+    },
+    queryFn: ({ pageParam }) => {
+      pageParam.query?.page satisfies string | undefined;
+      return Promise.resolve({});
+    },
+  });
+
+  void qraft.files.getFiles.infiniteQuery({
+    parameters: constParameters,
+    initialPageParam: {},
+    getNextPageParam: () => ({
+      query: { page: '2' },
+    }),
+  });
+
   // @ts-expect-error - getNextPageParam is required in infiniteQuery
   void qraft.files.findAll.infiniteQuery();
   // @ts-expect-error - getNextPageParam is required in infiniteQuery
