@@ -17,6 +17,11 @@
       "import": "./dist/esm/index.js",
       "require": "./dist/cjs/index.cjs"
     },
+    "./imperative-query": {
+      "types": "./dist/types/service-operation/imperative-query/index.d.ts",
+      "import": "./dist/esm/service-operation/imperative-query/index.js",
+      "require": "./dist/cjs/service-operation/imperative-query/index.cjs"
+    },
     "./shared/*": {
       "types": "./dist/types/shared/*.d.ts",
       "import": "./dist/esm/shared/*.js",
@@ -26,6 +31,9 @@
   },
   "typesVersions": {
     "*": {
+      "imperative-query": [
+        "dist/types/service-operation/imperative-query/index.d.ts"
+      ],
       "*": [
         "dist/types/*"
       ]

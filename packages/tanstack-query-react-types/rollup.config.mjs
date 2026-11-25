@@ -6,6 +6,11 @@ const moduleDist = {
   require: packageJson['exports']['.']['require'],
 };
 
-const config = [rollupConfig(moduleDist, { input: 'src/index.ts' })];
+const config = [
+  rollupConfig(moduleDist, { input: 'src/index.ts' }),
+  rollupConfig(moduleDist, {
+    input: 'src/service-operation/imperative-query/index.ts',
+  }),
+];
 
 export default config;
