@@ -4,6 +4,12 @@ sidebar_label: ensureQueryData()
 
 # ensureQueryData(...)
 
+:::warning Deprecated in `@tanstack/react-query >= 5.108.1`
+
+Use [`query(...)`](./query.mdx) with `staleTime: 'static'` instead (or `staleTime` with `revalidateIfStale: true` migration semantics from TanStack Query). `ensureQueryData` remains supported when targeting `@tanstack/react-query >= 5.80.0` (`< 5.108.1`), or when deprecations are disabled via `--no-tanstack-query-deprecations`.
+
+:::
+
 The `ensureQueryData` method retrieves cached data for a given query or fetches it if the data is not already available
 in the cache. This ensures that data is prepared and cached ahead of time, improving efficiency and performance.
 

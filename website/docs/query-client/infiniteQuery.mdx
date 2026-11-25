@@ -1,0 +1,104 @@
+---
+sidebar_label: infiniteQuery()
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# infiniteQuery(...)
+
+The method executes an imperative _Infinite Query_ using `QueryClient` for paginated data, without React Hooks.
+In `@tanstack/react-query >= 5.108.1`, `infiniteQuery` is the unified replacement for [`fetchInfiniteQuery`](./fetchInfiniteQuery.mdx), [`prefetchInfiniteQuery`](./prefetchInfiniteQuery.mdx) (via `.catch(() => {})`), and [`ensureInfiniteQueryData`](./ensureInfiniteQueryData.mdx) (via `staleTime: 'static'`).
+See the TanStack [_queryClient.infiniteQuery 🌴_](https://tanstack.com/query/latest/docs/reference/QueryClient#queryclientinfinitequery) documentation.
+
+:::info Requirements
+
+- Requires `@tanstack/react-query >= 5.108.1`.
+- Code generation emits `infiniteQuery` when the detected or configured `--tanstack-query-version` is `5.108.1` or higher. If you upgrade `@tanstack/react-query` from `< 5.108.1` to `>= 5.108.1`, regenerate your API client or pass `--tanstack-query-version 5.108.1`.
+
+:::
+
+```ts
+const data = await api.<service>.<operation>.infiniteQuery({
+  parameters,
+  initialPageParam,
+  getNextPageParam,
+  pages,
+  staleTime,
+  select,
+});
+```
+
+## Arguments
+
+- `options: { parameters, queryKey, initialPageParam, getNextPageParam, pages, requestFn, baseUrl, queryFn, select, staleTime, ... }`
+  - Pass either `parameters` (`{ path, query, header, body }`) or a typed infinite `queryKey` (mutually exclusive).
+  - For operations generated with `--queryable-write-operations`, `parameters` may also include `body`.
+    In that mode, `body` is part of the query key and cache identity for query-client methods.
+  - **`getNextPageParam` is required** in `@tanstack/react-query >= 5.108.1`.
+  - **`initialPageParam`**: required if OpenAPI defines required parameters for the operation; optional if all parameters are optional.
+  - Pass `pages` to control how many pages are fetched into the cache.
+  - Pass `staleTime: 'static'` to return cached infinite data when present without refetching (replacing `ensureInfiniteQueryData`).
+  - Pass `select` to transform the resolved `InfiniteData` without modifying what is stored in the query cache.
+  - Pass either `requestFn` / `baseUrl` or a custom `queryFn` (mutually exclusive).
+
+## Returns
+
+`Promise<TData>`: resolves with `InfiniteData` (or the return type of `select` if provided), strictly-typed ✨
+
+## Examples
+
+<Tabs>
+  <TabItem value="parameters" label="Fetch multiple pages">
+    ```tsx
+    const result = await api.pet.findPetsByStatus.infiniteQuery({
+      parameters: { query: { status: 'available' } },
+      initialPageParam: { query: { page: 1 } },
+      pages: 3,
+      getNextPageParam: (_lastPage, _allPages, lastPageParam) => {
+        const nextPage = (lastPageParam.query?.page ?? 1) + 1;
+        return nextPage <= 3 ? { query: { page: nextPage } } : undefined;
+      },
+    });
+    ```
+  </TabItem>
+  <TabItem value="static" label="Ensure cached data (staleTime: 'static')">
+    ```tsx
+    // Returns cached pages if available without refetching
+    const totalPets = await api.pet.findPetsByStatus.infiniteQuery({
+      parameters: { query: { status: 'available' } },
+      initialPageParam: { query: { page: 1 } },
+      getNextPageParam: () => undefined,
+      staleTime: 'static',
+      select: (data) => data.pages.flat().length,
+    });
+    ```
+  </TabItem>
+  <TabItem value="prefetch" label="Prefetch (fire and forget)">
+    ```tsx
+    // Swallows errors just like prefetchInfiniteQuery
+    api.pet.findPetsByStatus
+      .infiniteQuery({
+        parameters: { query: { status: 'available' } },
+        initialPageParam: { query: { page: 1 } },
+        getNextPageParam: () => undefined,
+      })
+      .catch(() => {});
+    ```
+  </TabItem>
+  <TabItem value="query-key" label="Custom queryKey & queryFn">
+    ```tsx
+    const queryKey = api.pet.findPetsByStatus.getInfiniteQueryKey({
+      query: { status: 'available' },
+    });
+
+    const result = await api.pet.findPetsByStatus.infiniteQuery({
+      queryKey,
+      initialPageParam: { query: { page: 1 } },
+      getNextPageParam: () => undefined,
+      queryFn: ({ pageParam, signal }) =>
+        fetchPetsByStatus(pageParam, { signal }),
+    });
+    ```
+  </TabItem>
+</Tabs>

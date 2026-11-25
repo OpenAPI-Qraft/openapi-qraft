@@ -4,6 +4,12 @@ sidebar_label: fetchInfiniteQuery()
 
 # fetchInfiniteQuery(...)
 
+:::warning Deprecated in `@tanstack/react-query >= 5.108.1`
+
+Use [`infiniteQuery(...)`](./infiniteQuery.mdx) instead. `fetchInfiniteQuery` remains supported when targeting `@tanstack/react-query >= 5.80.0` (`< 5.108.1`), or when deprecations are disabled via `--no-tanstack-query-deprecations`.
+
+:::
+
 The method facilitates the fetching of paginated data.
 See TanStack [_queryClient.fetchInfiniteQuery 🌴_](https://tanstack.com/query/latest/docs/reference/QueryClient#queryclientfetchinfinitequery)
 documentation for more details.
@@ -26,22 +32,22 @@ const result = api.<service>.<operation>.fetchInfiniteQuery(
 
 ### Arguments
 
-1.  -  `parameters: { path, query, header, body } | InfiniteQueryKey | void`
-      - OpenAPI request parameters for the query, strictly-typed ✨
-      - `parameters` will be used to generate the _Infinite Query Key_
-      - For operations generated with `--queryable-write-operations`, query parameters may also include `body`
-      - In that mode, `body` is part of the infinite query key and cache identity
-      - Mutation calls keep `body` as a separate top-level argument
-    -  `fetchInfiniteQueryOptions?: FetchInfiniteQueryOptions`
-      - `requestFn?: RequestFn`
-        - **Optional**, a function that will be used to execute the request
-        - The function should be provided, otherwise it will throw an error if default `queryFn` is not set previously using `QueryClient.setDefaultOptions(...)` method
-      - `baseUrl?: string`
-        - **Optional**, the base URL of the API
-    -  `...fetchInfiniteQueryOptions?: FetchInfiniteQueryOptions`
-      - **Optional**, represents the rest options of the [_fetchInfiniteQuery(...) 🌴_](https://tanstack.com/query/latest/docs/reference/QueryClient#queryclientfetchinfinitequery) method
-        - `queryOptions.queryFn` could be provided instead of ~~`requestFn`~~
-        - `queryOptions.queryKey` could be provided instead of ~~`parameters`~~
+1.  - `parameters: { path, query, header, body } | InfiniteQueryKey | void`
+    - OpenAPI request parameters for the query, strictly-typed ✨
+    - `parameters` will be used to generate the _Infinite Query Key_
+    - For operations generated with `--queryable-write-operations`, query parameters may also include `body`
+    - In that mode, `body` is part of the infinite query key and cache identity
+    - Mutation calls keep `body` as a separate top-level argument
+    - `fetchInfiniteQueryOptions?: FetchInfiniteQueryOptions`
+    - `requestFn?: RequestFn`
+      - **Optional**, a function that will be used to execute the request
+      - The function should be provided, otherwise it will throw an error if default `queryFn` is not set previously using `QueryClient.setDefaultOptions(...)` method
+    - `baseUrl?: string`
+      - **Optional**, the base URL of the API
+    - `...fetchInfiniteQueryOptions?: FetchInfiniteQueryOptions`
+    - **Optional**, represents the rest options of the [_fetchInfiniteQuery(...) 🌴_](https://tanstack.com/query/latest/docs/reference/QueryClient#queryclientfetchinfinitequery) method
+      - `queryOptions.queryFn` could be provided instead of ~~`requestFn`~~
+      - `queryOptions.queryKey` could be provided instead of ~~`parameters`~~
 
 ### Returns
 
@@ -70,18 +76,16 @@ const api = createAPIClient({
   baseUrl: 'https://api.sandbox.monite.com/v1',
 });
 
-const posts = api.posts.getPosts.fetchInfiniteQuery(
-  {
-    parameters: { query: { limit: 10 } },
-    pages: 2, // How many pages to fetch
-    initialPageParam: {
-      query: { pagination_token: undefined }, // will be used in initial request
-    },
-    getNextPageParam: (lastPage, allPages, lastPageParam) => ({
-      query: { pagination_token: lastPage.next_pagination_token },
-    }),
-  }
-);
+const posts = api.posts.getPosts.fetchInfiniteQuery({
+  parameters: { query: { limit: 10 } },
+  pages: 2, // How many pages to fetch
+  initialPageParam: {
+    query: { pagination_token: undefined }, // will be used in initial request
+  },
+  getNextPageParam: (lastPage, allPages, lastPageParam) => ({
+    query: { pagination_token: lastPage.next_pagination_token },
+  }),
+});
 
 console.log(
   posts.pages, // all fetched pages

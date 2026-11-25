@@ -4,6 +4,12 @@ sidebar_label: prefetchQuery()
 
 # prefetchQuery(...)
 
+:::warning Deprecated in `@tanstack/react-query >= 5.108.1`
+
+Use `api.<service>.<operation>.query(...).catch(() => {})` via [`query(...)`](./query.mdx) instead. `prefetchQuery` remains supported when targeting `@tanstack/react-query >= 5.80.0` (`< 5.108.1`), or when deprecations are disabled via `--no-tanstack-query-deprecations`.
+
+:::
+
 The method allows you to fetch data and cache it before it's needed.
 To understand how `prefetchQuery` handles data and cache management,
 refer to the TanStack [_queryClient.prefetchQuery 🌴_](https://tanstack.com/query/latest/docs/reference/QueryClient#queryclientprefetchquery) documentation.

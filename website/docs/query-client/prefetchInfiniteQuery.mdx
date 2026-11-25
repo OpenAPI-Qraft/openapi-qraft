@@ -4,6 +4,12 @@ sidebar_label: prefetchInfiniteQuery()
 
 # prefetchInfiniteQuery(...)
 
+:::warning Deprecated in `@tanstack/react-query >= 5.108.1`
+
+Use `api.<service>.<operation>.infiniteQuery(...).catch(() => {})` via [`infiniteQuery(...)`](./infiniteQuery.mdx) instead. `prefetchInfiniteQuery` remains supported when targeting `@tanstack/react-query >= 5.80.0` (`< 5.108.1`), or when deprecations are disabled via `--no-tanstack-query-deprecations`.
+
+:::
+
 The method facilitates the fetching of paginated data.
 See TanStack [_queryClient.prefetchInfiniteQuery 🌴_](https://tanstack.com/query/latest/docs/reference/QueryClient#queryclientprefetchinfinitequery)
 documentation for more details.
