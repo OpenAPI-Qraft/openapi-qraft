@@ -8,21 +8,78 @@ import { createOperationMethodBodyParametersExampleNode } from './lib/createOper
 import { createOperationMethodCallExpressionExampleNode } from './lib/createOperationMethodCallExpressionExampleNode.js';
 import { createOperationMethodParametersExampleNodes } from './lib/createOperationMethodParametersExampleNodes.js';
 
+type InfiniteQueryMethodName =
+  | 'infiniteQuery'
+  | 'fetchInfiniteQuery'
+  | 'prefetchInfiniteQuery'
+  | 'ensureInfiniteQueryData';
+
+const INFINITE_QUERY_METHOD_METADATA: Record<
+  InfiniteQueryMethodName,
+  {
+    summary: string[];
+    docsPath: string;
+    exampleTitle: string;
+    returnsData: boolean;
+  }
+> = {
+  infiniteQuery: {
+    summary: [
+      'Performs an asynchronous paginated data fetching operation and caches the pages.',
+      'Returns cached pages when fresh, or fetches and resolves with the latest paginated result.',
+    ],
+    docsPath: 'infiniteQuery',
+    exampleTitle: 'Infinite Query',
+    returnsData: true,
+  },
+  fetchInfiniteQuery: {
+    summary: [
+      'Performs an asynchronous paginated data fetching operation, caches the pages, and returns the result.',
+    ],
+    docsPath: 'fetchInfiniteQuery',
+    exampleTitle: 'Fetch Infinite Query',
+    returnsData: true,
+  },
+  prefetchInfiniteQuery: {
+    summary: [
+      'Preloads and caches paginated data before it is needed.',
+      'Resolves when the request completes without returning the cached pages.',
+    ],
+    docsPath: 'prefetchInfiniteQuery',
+    exampleTitle: 'Prefetch Infinite Query',
+    returnsData: false,
+  },
+  ensureInfiniteQueryData: {
+    summary: [
+      'Returns existing cached paginated data if available, or fetches and caches it otherwise.',
+    ],
+    docsPath: 'ensureInfiniteQueryData',
+    exampleTitle: 'Ensure Infinite Query Data',
+    returnsData: true,
+  },
+};
+
 export const createInfiniteQueryOperationTSDocExample = (
   operation: ServiceOperation,
   serviceVariableName: string,
   {
     queryableWriteOperations,
-  }: Pick<ServiceFactoryOptions, 'queryableWriteOperations'>
+    operationMethodName = 'infiniteQuery',
+    deprecationReason,
+  }: Pick<ServiceFactoryOptions, 'queryableWriteOperations'> & {
+    operationMethodName?: InfiniteQueryMethodName;
+    deprecationReason?: string;
+  }
 ): string[] => {
   const factory = ts.factory;
+  const metadata = INFINITE_QUERY_METHOD_METADATA[operationMethodName];
+  const callPrefix = metadata.returnsData ? 'const data = await ' : 'await ';
 
   const commonTSDoc = [
-    'Performs an asynchronous paginated query using `QueryClient.infiniteQuery(...)`.',
-    'Fetches and caches infinite query pages and returns the result.',
+    ...metadata.summary,
     '',
-    ...createOperationCommonTSDoc(operation),
-    '@see {@link https://openapi-qraft.github.io/openapi-qraft/docs/query-client/infiniteQuery|`infiniteQuery(...)` documentation}',
+    ...createOperationCommonTSDoc(operation, deprecationReason),
+    `@see {@link https://openapi-qraft.github.io/openapi-qraft/docs/query-client/${metadata.docsPath}|\`${operationMethodName}(...)\` documentation}`,
     '',
   ];
 
@@ -52,16 +109,16 @@ export const createInfiniteQueryOperationTSDocExample = (
 
   return [
     ...commonTSDoc,
-    '@example Infinite Query',
+    `@example ${metadata.exampleTitle}`,
     '```ts',
     ...(
-      'const data = await ' +
+      callPrefix +
       astToString(
         createOperationMethodCallExpressionExampleNode(
           operation,
           {
             serviceVariableName,
-            operationMethodName: 'infiniteQuery',
+            operationMethodName,
           },
           [
             factory.createObjectLiteralExpression(
@@ -87,8 +144,7 @@ export const createInfiniteQueryOperationTSDocExample = (
     )
       .trim()
       .split('\n'),
-    '',
-    'console.log(data.pages);',
+    ...(metadata.returnsData ? ['', 'console.log(data.pages);'] : []),
     '```',
   ];
 };

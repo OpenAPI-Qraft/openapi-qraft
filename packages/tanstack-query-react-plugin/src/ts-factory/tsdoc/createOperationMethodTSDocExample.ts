@@ -45,31 +45,36 @@ export const createOperationMethodTSDocExample = (
     'queryableWriteOperations' | 'deprecatedMethods'
   >
 ) => {
-  if (
-    options.deprecatedMethods?.has(
-      operationMethodName as DeprecatedTanStackQueryMethod
-    )
-  ) {
-    return createOperationCommonTSDoc(
-      operation,
-      DEPRECATED_METHOD_MESSAGES[
+  const deprecationReason = options.deprecatedMethods?.has(
+    operationMethodName as DeprecatedTanStackQueryMethod
+  )
+    ? DEPRECATED_METHOD_MESSAGES[
         operationMethodName as DeprecatedTanStackQueryMethod
       ]
-    );
-  }
+    : undefined;
 
   switch (operationMethodName) {
     case 'query':
-      return createQueryOperationTSDocExample(
-        operation,
-        serviceVariableName,
-        options
-      );
+    case 'fetchQuery':
+    case 'prefetchQuery':
+    case 'ensureQueryData':
+      return createQueryOperationTSDocExample(operation, serviceVariableName, {
+        ...options,
+        operationMethodName,
+        deprecationReason,
+      });
     case 'infiniteQuery':
+    case 'fetchInfiniteQuery':
+    case 'prefetchInfiniteQuery':
+    case 'ensureInfiniteQueryData':
       return createInfiniteQueryOperationTSDocExample(
         operation,
         serviceVariableName,
-        options
+        {
+          ...options,
+          operationMethodName,
+          deprecationReason,
+        }
       );
     case 'useQuery':
       return createUseQueryOperationTSDocExample(
@@ -134,6 +139,8 @@ export const createOperationMethodTSDocExample = (
         options
       );
     default:
-      return undefined;
+      return deprecationReason
+        ? createOperationCommonTSDoc(operation, deprecationReason)
+        : undefined;
   }
 };

@@ -466,11 +466,13 @@ describe(
         '@deprecated This operation is deprecated. Use `infiniteQuery(...)` instead.'
       );
 
+      const fetchQuerySignatureIndex = source.indexOf('fetchQuery(options:');
       const fetchQueryBlock = source.slice(
-        source.indexOf(
-          '/**\n         * @deprecated This operation is deprecated. Use `query(...)`'
-        ),
-        source.indexOf('fetchQuery(')
+        source.lastIndexOf('/**', fetchQuerySignatureIndex),
+        fetchQuerySignatureIndex
+      );
+      expect(fetchQueryBlock).toContain(
+        '@deprecated This operation is deprecated. Use `query(...)` instead.'
       );
       expect(fetchQueryBlock.match(/@deprecated/g)).toHaveLength(1);
     });

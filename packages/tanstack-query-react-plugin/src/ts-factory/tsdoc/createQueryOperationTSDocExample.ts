@@ -7,19 +7,78 @@ import { createOperationMethodBodyParametersExampleNode } from './lib/createOper
 import { createOperationMethodCallExpressionExampleNode } from './lib/createOperationMethodCallExpressionExampleNode.js';
 import { createOperationMethodParametersExampleNodes } from './lib/createOperationMethodParametersExampleNodes.js';
 
+type QueryMethodName =
+  | 'query'
+  | 'fetchQuery'
+  | 'prefetchQuery'
+  | 'ensureQueryData';
+
+const QUERY_METHOD_METADATA: Record<
+  QueryMethodName,
+  {
+    summary: string[];
+    docsPath: string;
+    exampleTitlePrefix: string;
+    returnsData: boolean;
+  }
+> = {
+  query: {
+    summary: [
+      'Performs an asynchronous data fetching operation and caches the result.',
+      'Returns cached data when fresh, or fetches and resolves with the latest data otherwise.',
+    ],
+    docsPath: 'query',
+    exampleTitlePrefix: 'Query',
+    returnsData: true,
+  },
+  fetchQuery: {
+    summary: [
+      'Performs an asynchronous data fetching operation, caches the result, and returns the fetched data.',
+      'Useful for imperative fetching outside of React components or when fresh data is needed on demand.',
+    ],
+    docsPath: 'fetchQuery',
+    exampleTitlePrefix: 'Fetch query',
+    returnsData: true,
+  },
+  prefetchQuery: {
+    summary: [
+      'Preloads and caches data before it is needed.',
+      'Resolves when the request completes without returning the cached data.',
+    ],
+    docsPath: 'prefetchQuery',
+    exampleTitlePrefix: 'Prefetch query',
+    returnsData: false,
+  },
+  ensureQueryData: {
+    summary: [
+      'Returns existing cached data if available, or fetches and caches it otherwise.',
+    ],
+    docsPath: 'ensureQueryData',
+    exampleTitlePrefix: 'Ensure query data',
+    returnsData: true,
+  },
+};
+
 export const createQueryOperationTSDocExample = (
   operation: ServiceOperation,
   serviceVariableName: string,
   {
     queryableWriteOperations,
-  }: Pick<ServiceFactoryOptions, 'queryableWriteOperations'>
+    operationMethodName = 'query',
+    deprecationReason,
+  }: Pick<ServiceFactoryOptions, 'queryableWriteOperations'> & {
+    operationMethodName?: QueryMethodName;
+    deprecationReason?: string;
+  }
 ) => {
+  const metadata = QUERY_METHOD_METADATA[operationMethodName];
+  const callPrefix = metadata.returnsData ? 'const data = await ' : 'await ';
+
   const example: string[] = [
-    'Performs an asynchronous query using `QueryClient.query(...)`.',
-    'Returns cached data when fresh, or fetches and caches it otherwise.',
+    ...metadata.summary,
     '',
-    ...createOperationCommonTSDoc(operation),
-    '@see {@link https://openapi-qraft.github.io/openapi-qraft/docs/query-client/query|`query(...)` documentation}',
+    ...createOperationCommonTSDoc(operation, deprecationReason),
+    `@see {@link https://openapi-qraft.github.io/openapi-qraft/docs/query-client/${metadata.docsPath}|\`${operationMethodName}(...)\` documentation}`,
   ];
 
   if (
@@ -27,16 +86,16 @@ export const createQueryOperationTSDocExample = (
     !(queryableWriteOperations && operation.requestBody?.required)
   ) {
     example.push(
-      '@example Query without parameters',
+      `@example ${metadata.exampleTitlePrefix} without parameters`,
       '```ts',
       ...(
-        'const data = await ' +
+        callPrefix +
         astToString(
           createOperationMethodCallExpressionExampleNode(
             operation,
             {
               serviceVariableName,
-              operationMethodName: 'query',
+              operationMethodName,
             },
             undefined
           )
@@ -55,16 +114,16 @@ export const createQueryOperationTSDocExample = (
     const factory = ts.factory;
 
     example.push(
-      '@example Query with parameters',
+      `@example ${metadata.exampleTitlePrefix} with parameters`,
       '```ts',
       ...(
-        'const data = await ' +
+        callPrefix +
         astToString(
           createOperationMethodCallExpressionExampleNode(
             operation,
             {
               serviceVariableName,
-              operationMethodName: 'query',
+              operationMethodName,
             },
             [
               factory.createObjectLiteralExpression(

@@ -791,6 +791,9 @@ describe('TanStack Query React Client Generation', () => {
       expect(filesService).not.toContain('Use `query(...)` instead');
       expect(filesService).not.toContain('Use `infiniteQuery(...)` instead');
       expect(filesService).toContain('fetchQuery(');
+      expect(filesService).toContain('`fetchQuery(...)` documentation');
+      expect(filesService).toContain('@example Fetch query without parameters');
+      expect(filesService).toContain('@example Fetch Infinite Query');
     });
 
     test('generates query/infiniteQuery without deprecation tags when --tanstack-query-deprecations is false', async () => {
@@ -876,12 +879,16 @@ describe('TanStack Query React Client Generation', () => {
         serviceCode.indexOf('getFileList: {'),
         serviceCode.indexOf('schema: GetFileListSchema;')
       );
-      const fetchQueryIndex = getFileListSection.indexOf('fetchQuery(');
+      const fetchQueryIndex = getFileListSection.indexOf('fetchQuery(options:');
       const fetchQueryComment = getFileListSection.slice(
         getFileListSection.lastIndexOf('/**', fetchQueryIndex),
         fetchQueryIndex
       );
       expect(fetchQueryComment.match(/@deprecated/g)).toHaveLength(1);
+      expect(fetchQueryComment).toContain('@see');
+      expect(fetchQueryComment).toContain(
+        '@example Fetch query without parameters'
+      );
     });
 
     test('auto-detects @tanstack/react-query 5.80.0 from outputDir package.json', async () => {
