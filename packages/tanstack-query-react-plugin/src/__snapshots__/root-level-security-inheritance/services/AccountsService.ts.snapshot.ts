@@ -6,6 +6,7 @@
 import type { paths } from "../../openapi.d.ts";
 import type { DeepReadonly, InvalidateQueryFilters, IsFetchingQueryFilters, OperationError, OperationInfiniteData, PartialParameters, QueryFiltersByParameters, QueryFiltersByQueryKey, QueryFnOptions, QueryFnOptionsByParameters, QueryFnOptionsByQueryKey, RequestFnResponse, ServiceOperationEnsureInfiniteQueryDataOptions, ServiceOperationEnsureQueryDataOptions, ServiceOperationFetchInfiniteQueryOptions, ServiceOperationFetchInfiniteQueryVoidOption, ServiceOperationFetchQueryOptions, ServiceOperationInfiniteQueryKey, ServiceOperationQueryKey, UseQueryOptionsForUseQueries, UseQueryOptionsForUseSuspenseQuery, QraftServiceOperationsToken } from "@openapi-qraft/tanstack-query-react-types";
 import type { CancelOptions, DefinedInitialDataInfiniteOptions, DefinedInitialDataOptions, DefinedUseInfiniteQueryResult, DefinedUseQueryResult, InfiniteQueryPageParamsOptions, InvalidateOptions, QueryState, RefetchOptions, ResetOptions, SetDataOptions, UndefinedInitialDataInfiniteOptions, UndefinedInitialDataOptions, Updater, UseInfiniteQueryResult, UseQueryResult, UseSuspenseInfiniteQueryOptions, UseSuspenseInfiniteQueryResult, UseSuspenseQueryOptions, UseSuspenseQueryResult } from "@tanstack/react-query";
+import type { ServiceOperationImperativeInfiniteQueryOptions, ServiceOperationImperativeQueryOptions } from "@openapi-qraft/tanstack-query-react-types/imperative-query";
 export interface AccountsService {
     getAccounts: {
         /**/
@@ -178,17 +179,45 @@ export interface AccountsService {
             queries: T;
             combine?: (results: Array<UseSuspenseQueryResult<GetAccountsData, GetAccountsError>>) => TCombinedResult;
         }): TCombinedResult;
-        /**/
+        /**
+         * Performs an asynchronous query using `QueryClient.query(...)`.
+         * Returns cached data when fresh, or fetches and caches it otherwise.
+         *
+         * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/query-client/query|`query(...)` documentation}
+         * @example Query without parameters
+         * ```ts
+         * const data = await qraft.accounts.getAccounts.query()
+         * ```
+         */
+        query<TData = GetAccountsData>(options: ServiceOperationImperativeQueryOptions<GetAccountsSchema, GetAccountsData, GetAccountsParameters, GetAccountsError, TData> | void): Promise<TData>;
+        /**
+         * Performs an asynchronous paginated query using `QueryClient.infiniteQuery(...)`.
+         * Fetches and caches infinite query pages and returns the result.
+         *
+         * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/query-client/infiniteQuery|`infiniteQuery(...)` documentation}
+         *
+         * @example Infinite Query
+         * ```ts
+         * const data = await qraft.accounts.getAccounts.infiniteQuery({
+         *     initialPageParam: {},
+         *     getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) => getNextPageParams(lastPage)
+         * })
+         *
+         * console.log(data.pages);
+         * ```
+         */
+        infiniteQuery<TPageParam extends GetAccountsParameters, TData = OperationInfiniteData<GetAccountsData, GetAccountsParameters>>(options: ServiceOperationImperativeInfiniteQueryOptions<GetAccountsSchema, GetAccountsData, GetAccountsParameters, DeepReadonly<TPageParam>, GetAccountsError, TData>): Promise<TData>;
+        /** @deprecated Use `query(...)` instead. */
         fetchQuery(options: ServiceOperationFetchQueryOptions<GetAccountsSchema, GetAccountsData, GetAccountsParameters, GetAccountsError> | void): Promise<GetAccountsData>;
-        /**/
+        /** @deprecated Use `query(...)` instead (e.g., `query(...).catch(() => {})` if you want to ignore errors). */
         prefetchQuery(options: ServiceOperationFetchQueryOptions<GetAccountsSchema, GetAccountsData, GetAccountsParameters, GetAccountsError> | void): Promise<void>;
-        /**/
+        /** @deprecated Use `query({ ...options, staleTime: 'static' })` instead. */
         ensureQueryData(options: ServiceOperationEnsureQueryDataOptions<GetAccountsSchema, GetAccountsData, GetAccountsParameters, GetAccountsError> | void): Promise<GetAccountsData>;
-        /**/
+        /** @deprecated Use `infiniteQuery(...)` instead. */
         fetchInfiniteQuery<TPageParam extends GetAccountsParameters>(options: ServiceOperationFetchInfiniteQueryOptions<GetAccountsSchema, GetAccountsData, GetAccountsParameters, DeepReadonly<TPageParam>, GetAccountsError> | ServiceOperationFetchInfiniteQueryVoidOption): Promise<OperationInfiniteData<GetAccountsData, GetAccountsParameters>>;
-        /**/
+        /** @deprecated Use `infiniteQuery(...)` instead (e.g., `infiniteQuery(...).catch(() => {})` if you want to ignore errors). */
         prefetchInfiniteQuery<TPageParam extends GetAccountsParameters>(options: ServiceOperationFetchInfiniteQueryOptions<GetAccountsSchema, GetAccountsData, GetAccountsParameters, DeepReadonly<TPageParam>, GetAccountsError> | ServiceOperationFetchInfiniteQueryVoidOption): Promise<void>;
-        /**/
+        /** @deprecated Use `infiniteQuery({ ...options, staleTime: 'static' })` instead. */
         ensureInfiniteQueryData<TPageParam extends GetAccountsParameters>(options: ServiceOperationEnsureInfiniteQueryDataOptions<GetAccountsSchema, GetAccountsData, GetAccountsParameters, DeepReadonly<TPageParam>, GetAccountsError> | ServiceOperationFetchInfiniteQueryVoidOption): Promise<OperationInfiniteData<GetAccountsData, GetAccountsParameters>>;
         /**/
         getQueryData(parameters: ServiceOperationQueryKey<GetAccountsSchema, GetAccountsParameters> | (DeepReadonly<GetAccountsParameters> | void)): GetAccountsData | undefined;
@@ -408,17 +437,45 @@ export interface AccountsService {
             queries: T;
             combine?: (results: Array<UseSuspenseQueryResult<GetAccountProfileData, GetAccountProfileError>>) => TCombinedResult;
         }): TCombinedResult;
-        /**/
+        /**
+         * Performs an asynchronous query using `QueryClient.query(...)`.
+         * Returns cached data when fresh, or fetches and caches it otherwise.
+         *
+         * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/query-client/query|`query(...)` documentation}
+         * @example Query without parameters
+         * ```ts
+         * const data = await qraft.accounts.getAccountProfile.query()
+         * ```
+         */
+        query<TData = GetAccountProfileData>(options: ServiceOperationImperativeQueryOptions<GetAccountProfileSchema, GetAccountProfileData, GetAccountProfileParameters, GetAccountProfileError, TData> | void): Promise<TData>;
+        /**
+         * Performs an asynchronous paginated query using `QueryClient.infiniteQuery(...)`.
+         * Fetches and caches infinite query pages and returns the result.
+         *
+         * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/query-client/infiniteQuery|`infiniteQuery(...)` documentation}
+         *
+         * @example Infinite Query
+         * ```ts
+         * const data = await qraft.accounts.getAccountProfile.infiniteQuery({
+         *     initialPageParam: {},
+         *     getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) => getNextPageParams(lastPage)
+         * })
+         *
+         * console.log(data.pages);
+         * ```
+         */
+        infiniteQuery<TPageParam extends GetAccountProfileParameters, TData = OperationInfiniteData<GetAccountProfileData, GetAccountProfileParameters>>(options: ServiceOperationImperativeInfiniteQueryOptions<GetAccountProfileSchema, GetAccountProfileData, GetAccountProfileParameters, DeepReadonly<TPageParam>, GetAccountProfileError, TData>): Promise<TData>;
+        /** @deprecated Use `query(...)` instead. */
         fetchQuery(options: ServiceOperationFetchQueryOptions<GetAccountProfileSchema, GetAccountProfileData, GetAccountProfileParameters, GetAccountProfileError> | void): Promise<GetAccountProfileData>;
-        /**/
+        /** @deprecated Use `query(...)` instead (e.g., `query(...).catch(() => {})` if you want to ignore errors). */
         prefetchQuery(options: ServiceOperationFetchQueryOptions<GetAccountProfileSchema, GetAccountProfileData, GetAccountProfileParameters, GetAccountProfileError> | void): Promise<void>;
-        /**/
+        /** @deprecated Use `query({ ...options, staleTime: 'static' })` instead. */
         ensureQueryData(options: ServiceOperationEnsureQueryDataOptions<GetAccountProfileSchema, GetAccountProfileData, GetAccountProfileParameters, GetAccountProfileError> | void): Promise<GetAccountProfileData>;
-        /**/
+        /** @deprecated Use `infiniteQuery(...)` instead. */
         fetchInfiniteQuery<TPageParam extends GetAccountProfileParameters>(options: ServiceOperationFetchInfiniteQueryOptions<GetAccountProfileSchema, GetAccountProfileData, GetAccountProfileParameters, DeepReadonly<TPageParam>, GetAccountProfileError> | ServiceOperationFetchInfiniteQueryVoidOption): Promise<OperationInfiniteData<GetAccountProfileData, GetAccountProfileParameters>>;
-        /**/
+        /** @deprecated Use `infiniteQuery(...)` instead (e.g., `infiniteQuery(...).catch(() => {})` if you want to ignore errors). */
         prefetchInfiniteQuery<TPageParam extends GetAccountProfileParameters>(options: ServiceOperationFetchInfiniteQueryOptions<GetAccountProfileSchema, GetAccountProfileData, GetAccountProfileParameters, DeepReadonly<TPageParam>, GetAccountProfileError> | ServiceOperationFetchInfiniteQueryVoidOption): Promise<void>;
-        /**/
+        /** @deprecated Use `infiniteQuery({ ...options, staleTime: 'static' })` instead. */
         ensureInfiniteQueryData<TPageParam extends GetAccountProfileParameters>(options: ServiceOperationEnsureInfiniteQueryDataOptions<GetAccountProfileSchema, GetAccountProfileData, GetAccountProfileParameters, DeepReadonly<TPageParam>, GetAccountProfileError> | ServiceOperationFetchInfiniteQueryVoidOption): Promise<OperationInfiniteData<GetAccountProfileData, GetAccountProfileParameters>>;
         /**/
         getQueryData(parameters: ServiceOperationQueryKey<GetAccountProfileSchema, GetAccountProfileParameters> | (DeepReadonly<GetAccountProfileParameters> | void)): GetAccountProfileData | undefined;

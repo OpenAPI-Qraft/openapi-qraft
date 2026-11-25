@@ -753,4 +753,261 @@ describe('TanStack Query React Client Generation', () => {
       );
     });
   });
+
+  describe('--tanstack-query-version and --tanstack-query-deprecations', () => {
+    test('omits query/infiniteQuery and deprecation tags when --tanstack-query-version is 5.80.0', async () => {
+      const { QraftCommand } =
+        await import('@openapi-qraft/plugin/lib/QraftCommand');
+      const { plugin } = await import('./plugin.js');
+      const command = new QraftCommand(undefined, {
+        defaultFileHeader: createFileHeader('@openapi-qraft/cli'),
+      });
+      plugin.setupCommand(command);
+
+      await command.parseAsync([
+        'dummy-node',
+        'dummy-qraft-bin',
+        openAPIDocumentFixturePath,
+        '--clean',
+        '-o',
+        '/mock-fs/tq-5-80',
+        '--openapi-types-import-path',
+        '../../openapi.js',
+        '--explicit-import-extensions',
+        '--tanstack-query-version',
+        '5.80.0',
+        '--filter-services',
+        '/files/**',
+      ]);
+
+      const filesService = fs.readFileSync(
+        '/mock-fs/tq-5-80/services/FilesService.ts',
+        'utf-8'
+      );
+
+      expect(filesService).not.toContain('imperative-query');
+      expect(filesService).not.toContain('query<');
+      expect(filesService).not.toContain('infiniteQuery<');
+      expect(filesService).not.toContain('Use `query(...)` instead');
+      expect(filesService).not.toContain('Use `infiniteQuery(...)` instead');
+      expect(filesService).toContain('fetchQuery(');
+    });
+
+    test('generates query/infiniteQuery without deprecation tags when --tanstack-query-deprecations is false', async () => {
+      const { QraftCommand } =
+        await import('@openapi-qraft/plugin/lib/QraftCommand');
+      const { plugin } = await import('./plugin.js');
+      const command = new QraftCommand(undefined, {
+        defaultFileHeader: createFileHeader('@openapi-qraft/cli'),
+      });
+      plugin.setupCommand(command);
+
+      await command.parseAsync([
+        'dummy-node',
+        'dummy-qraft-bin',
+        openAPIDocumentFixturePath,
+        '--clean',
+        '-o',
+        '/mock-fs/tq-no-deprecations',
+        '--openapi-types-import-path',
+        '../../openapi.js',
+        '--tanstack-query-version',
+        '5.108.1',
+        '--tanstack-query-deprecations',
+        'false',
+        '--filter-services',
+        '/files/**',
+      ]);
+
+      const serviceCode = fs.readFileSync(
+        '/mock-fs/tq-no-deprecations/services/FilesService.ts',
+        'utf-8'
+      );
+
+      expect(serviceCode).toContain(
+        'from "@openapi-qraft/tanstack-query-react-types/imperative-query"'
+      );
+      expect(serviceCode).toContain('query<TData = GetFileListData>(');
+      expect(serviceCode).toContain('infiniteQuery<TPageParam extends');
+      expect(serviceCode).not.toContain('Use `query(...)` instead');
+      expect(serviceCode).not.toContain('Use `infiniteQuery(...)` instead');
+      // OpenAPI operation-level @deprecated on getFileList is preserved.
+      expect(serviceCode).toContain('@deprecated');
+    });
+
+    test('merges @deprecated cleanly when both operation and TanStack Query method are deprecated', async () => {
+      const { QraftCommand } =
+        await import('@openapi-qraft/plugin/lib/QraftCommand');
+      const { plugin } = await import('./plugin.js');
+      const command = new QraftCommand(undefined, {
+        defaultFileHeader: createFileHeader('@openapi-qraft/cli'),
+      });
+      plugin.setupCommand(command);
+
+      await command.parseAsync([
+        'dummy-node',
+        'dummy-qraft-bin',
+        openAPIDocumentFixturePath,
+        '--clean',
+        '-o',
+        '/mock-fs/tq-merged-deprecations',
+        '--openapi-types-import-path',
+        '../../openapi.js',
+        '--tanstack-query-version',
+        '5.108.1',
+        '--tanstack-query-deprecations',
+        'true',
+        '--filter-services',
+        '/files/**',
+      ]);
+
+      const serviceCode = fs.readFileSync(
+        '/mock-fs/tq-merged-deprecations/services/FilesService.ts',
+        'utf-8'
+      );
+
+      // getFileList in openapi.json has deprecated: true, whereas getFiles is not deprecated.
+      expect(serviceCode).toContain(
+        '@deprecated This operation is deprecated. Use `query(...)` instead.'
+      );
+      expect(serviceCode).toContain('@deprecated Use `query(...)` instead.');
+
+      const getFileListSection = serviceCode.slice(
+        serviceCode.indexOf('getFileList: {'),
+        serviceCode.indexOf('schema: GetFileListSchema;')
+      );
+      const fetchQueryIndex = getFileListSection.indexOf('fetchQuery(');
+      const fetchQueryComment = getFileListSection.slice(
+        getFileListSection.lastIndexOf('/**', fetchQueryIndex),
+        fetchQueryIndex
+      );
+      expect(fetchQueryComment.match(/@deprecated/g)).toHaveLength(1);
+    });
+
+    test('auto-detects @tanstack/react-query 5.80.0 from outputDir package.json', async () => {
+      const { QraftCommand } =
+        await import('@openapi-qraft/plugin/lib/QraftCommand');
+      const { plugin } = await import('./plugin.js');
+      const command = new QraftCommand(undefined, {
+        defaultFileHeader: createFileHeader('@openapi-qraft/cli'),
+      });
+      plugin.setupCommand(command);
+
+      fs.mkdirSync('/mock-fs/legacy-project/src/api', { recursive: true });
+      fs.writeFileSync(
+        '/mock-fs/legacy-project/package.json',
+        JSON.stringify({
+          name: 'legacy-project',
+          dependencies: {
+            '@tanstack/react-query': '5.80.0',
+          },
+        })
+      );
+
+      await command.parseAsync([
+        'dummy-node',
+        'dummy-qraft-bin',
+        openAPIDocumentFixturePath,
+        '--clean',
+        '-o',
+        '/mock-fs/legacy-project/src/api',
+        '--openapi-types-import-path',
+        '../../openapi.js',
+        '--filter-services',
+        '/files/**',
+      ]);
+
+      const filesService = fs.readFileSync(
+        '/mock-fs/legacy-project/src/api/services/FilesService.ts',
+        'utf-8'
+      );
+
+      expect(filesService).not.toContain('imperative-query');
+      expect(filesService).not.toContain('query<');
+      expect(filesService).not.toContain('infiniteQuery<');
+    });
+
+    test('throws when --tanstack-query-deprecations true is used with version < 5.108.1', async () => {
+      const { QraftCommand } =
+        await import('@openapi-qraft/plugin/lib/QraftCommand');
+      const { plugin } = await import('./plugin.js');
+      const command = new QraftCommand(undefined, {
+        defaultFileHeader: createFileHeader('@openapi-qraft/cli'),
+      });
+      plugin.setupCommand(command);
+
+      await expect(
+        command.parseAsync([
+          'dummy-node',
+          'dummy-qraft-bin',
+          openAPIDocumentFixturePath,
+          '-o',
+          '/mock-fs/tq-err-dep',
+          '--openapi-types-import-path',
+          '../../openapi.js',
+          '--tanstack-query-version',
+          '5.80.0',
+          '--tanstack-query-deprecations',
+          'true',
+        ])
+      ).rejects.toMatchObject({
+        code: 'ERR_UNSUPPORTED_TANSTACK_QUERY_DEPRECATIONS',
+      });
+    });
+
+    test('throws when query or infiniteQuery callback is requested with version < 5.108.1 regardless of flag order', async () => {
+      const { QraftCommand } =
+        await import('@openapi-qraft/plugin/lib/QraftCommand');
+      const { plugin } = await import('./plugin.js');
+      const command = new QraftCommand(undefined, {
+        defaultFileHeader: createFileHeader('@openapi-qraft/cli'),
+      });
+      plugin.setupCommand(command);
+
+      await expect(
+        command.parseAsync([
+          'dummy-node',
+          'dummy-qraft-bin',
+          openAPIDocumentFixturePath,
+          '-o',
+          '/mock-fs/tq-err-cb',
+          '--openapi-types-import-path',
+          '../../openapi.js',
+          '--create-api-client-fn',
+          'createAPIClient',
+          'callbacks:query,infiniteQuery',
+          '--tanstack-query-version',
+          '5.80.0',
+        ])
+      ).rejects.toMatchObject({
+        code: 'ERR_UNSUPPORTED_CALLBACK',
+      });
+    });
+
+    test('throws on invalid --tanstack-query-version', async () => {
+      const { QraftCommand } =
+        await import('@openapi-qraft/plugin/lib/QraftCommand');
+      const { plugin } = await import('./plugin.js');
+      const command = new QraftCommand(undefined, {
+        defaultFileHeader: createFileHeader('@openapi-qraft/cli'),
+      });
+      plugin.setupCommand(command);
+
+      await expect(
+        command.parseAsync([
+          'dummy-node',
+          'dummy-qraft-bin',
+          openAPIDocumentFixturePath,
+          '-o',
+          '/mock-fs/tq-err-ver',
+          '--openapi-types-import-path',
+          '../../openapi.js',
+          '--tanstack-query-version',
+          'invalid-version',
+        ])
+      ).rejects.toMatchObject({
+        code: 'ERR_INVALID_TANSTACK_QUERY_VERSION',
+      });
+    });
+  });
 });

@@ -6,6 +6,8 @@ import { createServiceOperationGetMutationCacheNodes } from './service-operation
 import { createServiceOperationGetQueriesDataNodes } from './service-operation.generated/ServiceOperationGetQueriesData.js';
 import { createServiceOperationGetQueryDataNodes } from './service-operation.generated/ServiceOperationGetQueryData.js';
 import { createServiceOperationGetQueryStateNodes } from './service-operation.generated/ServiceOperationGetQueryState.js';
+import { createServiceOperationImperativeInfiniteQueryNodes } from './service-operation.generated/ServiceOperationImperativeInfiniteQuery.js';
+import { createServiceOperationImperativeQueryNodes } from './service-operation.generated/ServiceOperationImperativeQuery.js';
 import { createServiceOperationInvalidateQueriesNodes } from './service-operation.generated/ServiceOperationInvalidateQueries.js';
 import { createServiceOperationIsFetchingQueriesNodes } from './service-operation.generated/ServiceOperationIsFetchingQueries.js';
 import { createServiceOperationIsMutatingQueriesNodes } from './service-operation.generated/ServiceOperationIsMutatingQueries.js';
@@ -33,8 +35,10 @@ import { createServiceOperationUseSuspenseQueryNodes } from './service-operation
  */
 export const createServicesQueryOperationNodes = ({
   omitOperationQueryFnNodes,
+  imperativeQuery = false,
 }: {
   omitOperationQueryFnNodes: boolean;
+  imperativeQuery?: boolean;
 }) => [
   // Core methods
   ...(omitOperationQueryFnNodes ? [] : createServiceOperationQueryFnNodes()),
@@ -49,6 +53,12 @@ export const createServicesQueryOperationNodes = ({
   ...createServiceOperationUseSuspenseQueriesNodes(),
 
   // Query client methods
+  ...(imperativeQuery
+    ? [
+        ...createServiceOperationImperativeQueryNodes(),
+        ...createServiceOperationImperativeInfiniteQueryNodes(),
+      ]
+    : []),
   ...createServiceOperationFetchQueryNodes(),
   ...createServiceOperationFetchInfiniteQueryNodes(),
 

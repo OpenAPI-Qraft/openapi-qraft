@@ -7,6 +7,7 @@ import { splitCommaSeparatedGlobs } from '@openapi-qraft/plugin/lib/splitCommaSe
 import camelCase from 'camelcase';
 import ts from 'typescript';
 import { createOperationCommonTSDoc } from '../lib/createOperationCommonTSDoc.js';
+import { DeprecatedTanStackQueryMethod } from '../lib/resolveTanStackQueryVersion.js';
 import { filterUnusedTypes } from './filterUnusedTypes.js';
 import { getOperationVariableNames } from './getOperationVariableNames.js';
 import { getOverriddenImportDeclarationsFactory } from './getOverriddenImportDeclarationsFactory.js';
@@ -29,6 +30,8 @@ export type ServiceFactoryOptions = {
   openapiTypesImportPath: string;
   queryableWriteOperations: boolean;
   operationParametersTypeWrapper: OperationParametersTypeOption | undefined;
+  imperativeQuery?: boolean;
+  deprecatedMethods?: ReadonlySet<DeprecatedTanStackQueryMethod>;
 };
 
 type Service = { name: string; typeName: string; variableName: string };
@@ -177,7 +180,10 @@ const getServiceOperationImportsFactory = (
 const getServiceInterfaceFactory = (
   service: Service,
   operations: ServiceOperation[],
-  options: Pick<ServiceFactoryOptions, 'queryableWriteOperations'>
+  options: Pick<
+    ServiceFactoryOptions,
+    'queryableWriteOperations' | 'imperativeQuery' | 'deprecatedMethods'
+  >
 ) => {
   return factory.createInterfaceDeclaration(
     [factory.createToken(ts.SyntaxKind.ExportKeyword)],
@@ -193,15 +199,22 @@ const getServiceInterfaceFactory = (
 const getServiceInterfaceOperationFactory = (
   operation: ServiceOperation,
   service: Service,
-  options: Pick<ServiceFactoryOptions, 'queryableWriteOperations'>
+  options: Pick<
+    ServiceFactoryOptions,
+    'queryableWriteOperations' | 'imperativeQuery' | 'deprecatedMethods'
+  >
 ) => {
   const operationMethodNodes = getMethodSignatureNodes(
     isReadOnlyOperation(operation)
-      ? createServicesQueryOperationNodes({ omitOperationQueryFnNodes: false })
+      ? createServicesQueryOperationNodes({
+          omitOperationQueryFnNodes: false,
+          imperativeQuery: options.imperativeQuery,
+        })
       : options.queryableWriteOperations
         ? [
             ...createServicesQueryOperationNodes({
               omitOperationQueryFnNodes: true,
+              imperativeQuery: options.imperativeQuery,
             }),
             ...createServicesMutationOperationNodes(),
           ]
@@ -974,7 +987,10 @@ const getMethodSignatureNodes = (
  */
 const getModuleTypeImports = (
   operations: ServiceOperation[],
-  options: Pick<ServiceFactoryOptions, 'queryableWriteOperations'>
+  options: Pick<
+    ServiceFactoryOptions,
+    'queryableWriteOperations' | 'imperativeQuery'
+  >
 ) => {
   const nodes = [];
 
@@ -984,6 +1000,7 @@ const getModuleTypeImports = (
     nodes.push(
       ...createServicesQueryOperationNodes({
         omitOperationQueryFnNodes: !hasReadOnlyOperations,
+        imperativeQuery: options.imperativeQuery,
       })
     );
   }

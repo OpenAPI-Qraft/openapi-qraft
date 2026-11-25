@@ -32,9 +32,14 @@ function extractMethodNamesFromInterfaces(nodes: ts.Node[]): string[] {
 /**
  * Returns a list of all available callback function names
  */
-export function getAllAvailableCallbackNames(): string[] {
+export function getAllAvailableCallbackNames({
+  imperativeQuery = true,
+}: {
+  imperativeQuery?: boolean;
+} = {}): string[] {
   const queryNodes = createServicesQueryOperationNodes({
     omitOperationQueryFnNodes: true,
+    imperativeQuery,
   });
   const mutationNodes = createServicesMutationOperationNodes();
 

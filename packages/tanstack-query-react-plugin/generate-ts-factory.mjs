@@ -5,41 +5,43 @@ import { generateSourceFileFactoryCode } from '@openapi-qraft/ts-factory-code-ge
 import camelcase from 'camelcase';
 
 const serviceOperationFiles = [
-  'ServiceOperationCancelQueries.ts',
-  'ServiceOperationFetchInfiniteQuery.ts',
-  'ServiceOperationFetchQuery.ts',
-  'ServiceOperationGetInfiniteQueryData.ts',
-  'ServiceOperationGetQueriesData.ts',
-  'ServiceOperationGetQueryData.ts',
-  'ServiceOperationGetQueryState.ts',
-  'ServiceOperationInvalidateQueries.ts',
-  'ServiceOperationIsFetchingQueries.ts',
-  'ServiceOperationIsMutatingQueries.ts',
-  'ServiceOperationMutationFn.ts',
-  'ServiceOperationQueryFn.ts',
-  'ServiceOperationRefetchQueries.ts',
-  'ServiceOperationRemoveQueries.ts',
-  'ServiceOperationResetQueries.ts',
-  'ServiceOperationSetInfiniteQueryData.ts',
-  'ServiceOperationSetQueriesData.ts',
-  'ServiceOperationSetQueryData.ts',
-  'ServiceOperationUseInfiniteQuery.ts',
-  'ServiceOperationUseIsFetchingQueries.ts',
-  'ServiceOperationUseIsMutating.ts',
-  'ServiceOperationUseMutation.ts',
-  'ServiceOperationUseMutationState.ts',
-  'ServiceOperationGetMutationCache.ts',
-  'ServiceOperationUseQueries.ts',
-  'ServiceOperationUseQuery.ts',
-  'ServiceOperationUseSuspenseInfiniteQuery.ts',
-  'ServiceOperationUseSuspenseQueries.ts',
-  'ServiceOperationUseSuspenseQuery.ts',
+  'service-operation/ServiceOperationCancelQueries.ts',
+  'service-operation/ServiceOperationFetchInfiniteQuery.ts',
+  'service-operation/ServiceOperationFetchQuery.ts',
+  'service-operation/ServiceOperationGetInfiniteQueryData.ts',
+  'service-operation/ServiceOperationGetQueriesData.ts',
+  'service-operation/ServiceOperationGetQueryData.ts',
+  'service-operation/ServiceOperationGetQueryState.ts',
+  'service-operation/ServiceOperationInvalidateQueries.ts',
+  'service-operation/ServiceOperationIsFetchingQueries.ts',
+  'service-operation/ServiceOperationIsMutatingQueries.ts',
+  'service-operation/ServiceOperationMutationFn.ts',
+  'service-operation/ServiceOperationQueryFn.ts',
+  'service-operation/ServiceOperationRefetchQueries.ts',
+  'service-operation/ServiceOperationRemoveQueries.ts',
+  'service-operation/ServiceOperationResetQueries.ts',
+  'service-operation/ServiceOperationSetInfiniteQueryData.ts',
+  'service-operation/ServiceOperationSetQueriesData.ts',
+  'service-operation/ServiceOperationSetQueryData.ts',
+  'service-operation/ServiceOperationUseInfiniteQuery.ts',
+  'service-operation/ServiceOperationUseIsFetchingQueries.ts',
+  'service-operation/ServiceOperationUseIsMutating.ts',
+  'service-operation/ServiceOperationUseMutation.ts',
+  'service-operation/ServiceOperationUseMutationState.ts',
+  'service-operation/ServiceOperationGetMutationCache.ts',
+  'service-operation/ServiceOperationUseQueries.ts',
+  'service-operation/ServiceOperationUseQuery.ts',
+  'service-operation/ServiceOperationUseSuspenseInfiniteQuery.ts',
+  'service-operation/ServiceOperationUseSuspenseQueries.ts',
+  'service-operation/ServiceOperationUseSuspenseQuery.ts',
+  'service-operation/imperative-query/ServiceOperationImperativeInfiniteQuery.ts',
+  'service-operation/imperative-query/ServiceOperationImperativeQuery.ts',
 ];
 
 async function main() {
   serviceOperationFiles.forEach((file) => {
     const sourceFileFactoryCode = generateSourceFileFactoryCode(
-      path.join('../tanstack-query-react-types/src/service-operation', file)
+      path.join('../tanstack-query-react-types/src', file)
     );
 
     const sourceFileBaseName = path.basename(file, path.extname(file));
@@ -52,7 +54,12 @@ export const ${camelcase('create-' + sourceFileBaseName + '-nodes')} = () => ${s
 `;
 
     fs.writeFileSync(
-      path.join('src', 'ts-factory', 'service-operation.generated', file),
+      path.join(
+        'src',
+        'ts-factory',
+        'service-operation.generated',
+        path.basename(file)
+      ),
       fileCode.trim() + '\n'
     );
   });

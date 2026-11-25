@@ -6,6 +6,7 @@
 import type { paths } from "../../openapi.d.ts";
 import type { DeepReadonly, InvalidateQueryFilters, IsFetchingQueryFilters, IsMutatingMutationFilters, MutationFiltersByMutationKey, MutationFiltersByParameters, MutationVariables, OperationError, OperationInfiniteData, PartialParameters, QueryFiltersByParameters, QueryFiltersByQueryKey, QueryFnOptions, QueryFnOptionsByParameters, QueryFnOptionsByQueryKey, RequestFnResponse, ServiceOperationEnsureInfiniteQueryDataOptions, ServiceOperationEnsureQueryDataOptions, ServiceOperationFetchInfiniteQueryOptions, ServiceOperationFetchInfiniteQueryVoidOption, ServiceOperationFetchQueryOptions, ServiceOperationInfiniteQueryKey, ServiceOperationMutationFnOptions, ServiceOperationMutationKey, ServiceOperationQueryKey, ServiceOperationUseMutationOptions, UseQueryOptionsForUseQueries, UseQueryOptionsForUseSuspenseQuery, QraftServiceOperationsToken } from "@openapi-qraft/tanstack-query-react-types";
 import type { CancelOptions, DefinedInitialDataInfiniteOptions, DefinedInitialDataOptions, DefinedUseInfiniteQueryResult, DefinedUseQueryResult, InfiniteQueryPageParamsOptions, InvalidateOptions, Mutation, MutationCache, MutationState, QueryState, RefetchOptions, ResetOptions, SetDataOptions, UndefinedInitialDataInfiniteOptions, UndefinedInitialDataOptions, Updater, UseInfiniteQueryResult, UseMutationResult, UseQueryResult, UseSuspenseInfiniteQueryOptions, UseSuspenseInfiniteQueryResult, UseSuspenseQueryOptions, UseSuspenseQueryResult } from "@tanstack/react-query";
+import type { ServiceOperationImperativeInfiniteQueryOptions, ServiceOperationImperativeQueryOptions } from "@openapi-qraft/tanstack-query-react-types/imperative-query";
 export interface FilesService {
     /** @summary Get a files by ID */
     getFiles: {
@@ -312,17 +313,86 @@ export interface FilesService {
             queries: T;
             combine?: (results: Array<UseSuspenseQueryResult<GetFilesData, GetFilesError>>) => TCombinedResult;
         }): TCombinedResult;
-        /** @summary Get a files by ID */
+        /**
+         * Performs an asynchronous query using `QueryClient.query(...)`.
+         * Returns cached data when fresh, or fetches and caches it otherwise.
+         *
+         * @summary Get a files by ID
+         * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/query-client/query|`query(...)` documentation}
+         * @example Query with parameters
+         * ```ts
+         * const data = await qraft.files.getFiles.query({
+         *     parameters: {
+         *         header: {
+         *             "x-monite-version": "2023-06-04"
+         *         },
+         *         query: {
+         *             id__in: idIn
+         *         }
+         *     }
+         * })
+         * ```
+         */
+        query<TData = GetFilesData>(options: ServiceOperationImperativeQueryOptions<GetFilesSchema, GetFilesData, GetFilesParameters, GetFilesError, TData>): Promise<TData>;
+        /**
+         * Performs an asynchronous paginated query using `QueryClient.infiniteQuery(...)`.
+         * Fetches and caches infinite query pages and returns the result.
+         *
+         * @summary Get a files by ID
+         * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/query-client/infiniteQuery|`infiniteQuery(...)` documentation}
+         *
+         * @example Infinite Query
+         * ```ts
+         * const data = await qraft.files.getFiles.infiniteQuery({
+         *     parameters: {
+         *         header: {
+         *             "x-monite-version": "2023-06-04"
+         *         },
+         *         query: {
+         *             id__in: idIn
+         *         }
+         *     },
+         *     initialPageParam: {
+         *         query: {
+         *             id__in: initialIdIn
+         *         }
+         *     },
+         *     getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) => getNextPageParams(lastPage)
+         * })
+         *
+         * console.log(data.pages);
+         * ```
+         */
+        infiniteQuery<TPageParam extends GetFilesParameters, TData = OperationInfiniteData<GetFilesData, GetFilesParameters>>(options: ServiceOperationImperativeInfiniteQueryOptions<GetFilesSchema, GetFilesData, GetFilesParameters, DeepReadonly<TPageParam>, GetFilesError, TData>): Promise<TData>;
+        /**
+         * @deprecated Use `query(...)` instead.
+         * @summary Get a files by ID
+         */
         fetchQuery(options: ServiceOperationFetchQueryOptions<GetFilesSchema, GetFilesData, GetFilesParameters, GetFilesError>): Promise<GetFilesData>;
-        /** @summary Get a files by ID */
+        /**
+         * @deprecated Use `query(...)` instead (e.g., `query(...).catch(() => {})` if you want to ignore errors).
+         * @summary Get a files by ID
+         */
         prefetchQuery(options: ServiceOperationFetchQueryOptions<GetFilesSchema, GetFilesData, GetFilesParameters, GetFilesError>): Promise<void>;
-        /** @summary Get a files by ID */
+        /**
+         * @deprecated Use `query({ ...options, staleTime: 'static' })` instead.
+         * @summary Get a files by ID
+         */
         ensureQueryData(options: ServiceOperationEnsureQueryDataOptions<GetFilesSchema, GetFilesData, GetFilesParameters, GetFilesError>): Promise<GetFilesData>;
-        /** @summary Get a files by ID */
+        /**
+         * @deprecated Use `infiniteQuery(...)` instead.
+         * @summary Get a files by ID
+         */
         fetchInfiniteQuery<TPageParam extends GetFilesParameters>(options: ServiceOperationFetchInfiniteQueryOptions<GetFilesSchema, GetFilesData, GetFilesParameters, DeepReadonly<TPageParam>, GetFilesError>): Promise<OperationInfiniteData<GetFilesData, GetFilesParameters>>;
-        /** @summary Get a files by ID */
+        /**
+         * @deprecated Use `infiniteQuery(...)` instead (e.g., `infiniteQuery(...).catch(() => {})` if you want to ignore errors).
+         * @summary Get a files by ID
+         */
         prefetchInfiniteQuery<TPageParam extends GetFilesParameters>(options: ServiceOperationFetchInfiniteQueryOptions<GetFilesSchema, GetFilesData, GetFilesParameters, DeepReadonly<TPageParam>, GetFilesError>): Promise<void>;
-        /** @summary Get a files by ID */
+        /**
+         * @deprecated Use `infiniteQuery({ ...options, staleTime: 'static' })` instead.
+         * @summary Get a files by ID
+         */
         ensureInfiniteQueryData<TPageParam extends GetFilesParameters>(options: ServiceOperationEnsureInfiniteQueryDataOptions<GetFilesSchema, GetFilesData, GetFilesParameters, DeepReadonly<TPageParam>, GetFilesError>): Promise<OperationInfiniteData<GetFilesData, GetFilesParameters>>;
         /** @summary Get a files by ID */
         getQueryData(parameters: ServiceOperationQueryKey<GetFilesSchema, GetFilesParameters> | (DeepReadonly<GetFilesParameters>)): GetFilesData | undefined;
@@ -595,17 +665,76 @@ export interface FilesService {
             queries: T;
             combine?: (results: Array<UseSuspenseQueryResult<PostFilesData, PostFilesError>>) => TCombinedResult;
         }): TCombinedResult;
-        /** @summary Upload a files by ID */
+        /**
+         * Performs an asynchronous query using `QueryClient.query(...)`.
+         * Returns cached data when fresh, or fetches and caches it otherwise.
+         *
+         * @summary Upload a files by ID
+         * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/query-client/query|`query(...)` documentation}
+         * @example Query without parameters
+         * ```ts
+         * const data = await qraft.files.postFiles.query()
+         * ```
+         * @example Query with parameters
+         * ```ts
+         * const data = await qraft.files.postFiles.query({
+         *     parameters: {
+         *         body: queryBody
+         *     }
+         * })
+         * ```
+         */
+        query<TData = PostFilesData>(options: ServiceOperationImperativeQueryOptions<PostFilesSchema, PostFilesData, PostFilesQueryParameters, PostFilesError, TData> | void): Promise<TData>;
+        /**
+         * Performs an asynchronous paginated query using `QueryClient.infiniteQuery(...)`.
+         * Fetches and caches infinite query pages and returns the result.
+         *
+         * @summary Upload a files by ID
+         * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/query-client/infiniteQuery|`infiniteQuery(...)` documentation}
+         *
+         * @example Infinite Query
+         * ```ts
+         * const data = await qraft.files.postFiles.infiniteQuery({
+         *     parameters: {
+         *         body: queryBody
+         *     },
+         *     initialPageParam: {},
+         *     getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) => getNextPageParams(lastPage)
+         * })
+         *
+         * console.log(data.pages);
+         * ```
+         */
+        infiniteQuery<TPageParam extends PostFilesQueryParameters, TData = OperationInfiniteData<PostFilesData, PostFilesQueryParameters>>(options: ServiceOperationImperativeInfiniteQueryOptions<PostFilesSchema, PostFilesData, PostFilesQueryParameters, DeepReadonly<TPageParam>, PostFilesError, TData>): Promise<TData>;
+        /**
+         * @deprecated Use `query(...)` instead.
+         * @summary Upload a files by ID
+         */
         fetchQuery(options: ServiceOperationFetchQueryOptions<PostFilesSchema, PostFilesData, PostFilesQueryParameters, PostFilesError> | void): Promise<PostFilesData>;
-        /** @summary Upload a files by ID */
+        /**
+         * @deprecated Use `query(...)` instead (e.g., `query(...).catch(() => {})` if you want to ignore errors).
+         * @summary Upload a files by ID
+         */
         prefetchQuery(options: ServiceOperationFetchQueryOptions<PostFilesSchema, PostFilesData, PostFilesQueryParameters, PostFilesError> | void): Promise<void>;
-        /** @summary Upload a files by ID */
+        /**
+         * @deprecated Use `query({ ...options, staleTime: 'static' })` instead.
+         * @summary Upload a files by ID
+         */
         ensureQueryData(options: ServiceOperationEnsureQueryDataOptions<PostFilesSchema, PostFilesData, PostFilesQueryParameters, PostFilesError> | void): Promise<PostFilesData>;
-        /** @summary Upload a files by ID */
+        /**
+         * @deprecated Use `infiniteQuery(...)` instead.
+         * @summary Upload a files by ID
+         */
         fetchInfiniteQuery<TPageParam extends PostFilesQueryParameters>(options: ServiceOperationFetchInfiniteQueryOptions<PostFilesSchema, PostFilesData, PostFilesQueryParameters, DeepReadonly<TPageParam>, PostFilesError> | ServiceOperationFetchInfiniteQueryVoidOption): Promise<OperationInfiniteData<PostFilesData, PostFilesQueryParameters>>;
-        /** @summary Upload a files by ID */
+        /**
+         * @deprecated Use `infiniteQuery(...)` instead (e.g., `infiniteQuery(...).catch(() => {})` if you want to ignore errors).
+         * @summary Upload a files by ID
+         */
         prefetchInfiniteQuery<TPageParam extends PostFilesQueryParameters>(options: ServiceOperationFetchInfiniteQueryOptions<PostFilesSchema, PostFilesData, PostFilesQueryParameters, DeepReadonly<TPageParam>, PostFilesError> | ServiceOperationFetchInfiniteQueryVoidOption): Promise<void>;
-        /** @summary Upload a files by ID */
+        /**
+         * @deprecated Use `infiniteQuery({ ...options, staleTime: 'static' })` instead.
+         * @summary Upload a files by ID
+         */
         ensureInfiniteQueryData<TPageParam extends PostFilesQueryParameters>(options: ServiceOperationEnsureInfiniteQueryDataOptions<PostFilesSchema, PostFilesData, PostFilesQueryParameters, DeepReadonly<TPageParam>, PostFilesError> | ServiceOperationFetchInfiniteQueryVoidOption): Promise<OperationInfiniteData<PostFilesData, PostFilesQueryParameters>>;
         /** @summary Upload a files by ID */
         getQueryData(parameters: ServiceOperationQueryKey<PostFilesSchema, PostFilesQueryParameters> | (DeepReadonly<PostFilesQueryParameters> | void)): PostFilesData | undefined;
@@ -1025,17 +1154,79 @@ export interface FilesService {
             queries: T;
             combine?: (results: Array<UseSuspenseQueryResult<DeleteFilesData, DeleteFilesError>>) => TCombinedResult;
         }): TCombinedResult;
-        /** @summary Delete all files */
+        /**
+         * Performs an asynchronous query using `QueryClient.query(...)`.
+         * Returns cached data when fresh, or fetches and caches it otherwise.
+         *
+         * @summary Delete all files
+         * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/query-client/query|`query(...)` documentation}
+         * @example Query without parameters
+         * ```ts
+         * const data = await qraft.files.deleteFiles.query()
+         * ```
+         * @example Query with parameters
+         * ```ts
+         * const data = await qraft.files.deleteFiles.query({
+         *     parameters: {
+         *         query: {
+         *             all: all
+         *         }
+         *     }
+         * })
+         * ```
+         */
+        query<TData = DeleteFilesData>(options: ServiceOperationImperativeQueryOptions<DeleteFilesSchema, DeleteFilesData, DeleteFilesParameters, DeleteFilesError, TData> | void): Promise<TData>;
+        /**
+         * Performs an asynchronous paginated query using `QueryClient.infiniteQuery(...)`.
+         * Fetches and caches infinite query pages and returns the result.
+         *
+         * @summary Delete all files
+         * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/query-client/infiniteQuery|`infiniteQuery(...)` documentation}
+         *
+         * @example Infinite Query
+         * ```ts
+         * const data = await qraft.files.deleteFiles.infiniteQuery({
+         *     initialPageParam: {
+         *         query: {
+         *             all: initialAll
+         *         }
+         *     },
+         *     getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) => getNextPageParams(lastPage)
+         * })
+         *
+         * console.log(data.pages);
+         * ```
+         */
+        infiniteQuery<TPageParam extends DeleteFilesParameters, TData = OperationInfiniteData<DeleteFilesData, DeleteFilesParameters>>(options: ServiceOperationImperativeInfiniteQueryOptions<DeleteFilesSchema, DeleteFilesData, DeleteFilesParameters, DeepReadonly<TPageParam>, DeleteFilesError, TData>): Promise<TData>;
+        /**
+         * @deprecated Use `query(...)` instead.
+         * @summary Delete all files
+         */
         fetchQuery(options: ServiceOperationFetchQueryOptions<DeleteFilesSchema, DeleteFilesData, DeleteFilesParameters, DeleteFilesError> | void): Promise<DeleteFilesData>;
-        /** @summary Delete all files */
+        /**
+         * @deprecated Use `query(...)` instead (e.g., `query(...).catch(() => {})` if you want to ignore errors).
+         * @summary Delete all files
+         */
         prefetchQuery(options: ServiceOperationFetchQueryOptions<DeleteFilesSchema, DeleteFilesData, DeleteFilesParameters, DeleteFilesError> | void): Promise<void>;
-        /** @summary Delete all files */
+        /**
+         * @deprecated Use `query({ ...options, staleTime: 'static' })` instead.
+         * @summary Delete all files
+         */
         ensureQueryData(options: ServiceOperationEnsureQueryDataOptions<DeleteFilesSchema, DeleteFilesData, DeleteFilesParameters, DeleteFilesError> | void): Promise<DeleteFilesData>;
-        /** @summary Delete all files */
+        /**
+         * @deprecated Use `infiniteQuery(...)` instead.
+         * @summary Delete all files
+         */
         fetchInfiniteQuery<TPageParam extends DeleteFilesParameters>(options: ServiceOperationFetchInfiniteQueryOptions<DeleteFilesSchema, DeleteFilesData, DeleteFilesParameters, DeepReadonly<TPageParam>, DeleteFilesError> | ServiceOperationFetchInfiniteQueryVoidOption): Promise<OperationInfiniteData<DeleteFilesData, DeleteFilesParameters>>;
-        /** @summary Delete all files */
+        /**
+         * @deprecated Use `infiniteQuery(...)` instead (e.g., `infiniteQuery(...).catch(() => {})` if you want to ignore errors).
+         * @summary Delete all files
+         */
         prefetchInfiniteQuery<TPageParam extends DeleteFilesParameters>(options: ServiceOperationFetchInfiniteQueryOptions<DeleteFilesSchema, DeleteFilesData, DeleteFilesParameters, DeepReadonly<TPageParam>, DeleteFilesError> | ServiceOperationFetchInfiniteQueryVoidOption): Promise<void>;
-        /** @summary Delete all files */
+        /**
+         * @deprecated Use `infiniteQuery({ ...options, staleTime: 'static' })` instead.
+         * @summary Delete all files
+         */
         ensureInfiniteQueryData<TPageParam extends DeleteFilesParameters>(options: ServiceOperationEnsureInfiniteQueryDataOptions<DeleteFilesSchema, DeleteFilesData, DeleteFilesParameters, DeepReadonly<TPageParam>, DeleteFilesError> | ServiceOperationFetchInfiniteQueryVoidOption): Promise<OperationInfiniteData<DeleteFilesData, DeleteFilesParameters>>;
         /** @summary Delete all files */
         getQueryData(parameters: ServiceOperationQueryKey<DeleteFilesSchema, DeleteFilesParameters> | (DeepReadonly<DeleteFilesParameters> | void)): DeleteFilesData | undefined;
@@ -1481,17 +1672,79 @@ export interface FilesService {
             queries: T;
             combine?: (results: Array<UseSuspenseQueryResult<TrashFilesData, TrashFilesError>>) => TCombinedResult;
         }): TCombinedResult;
-        /** @summary Trash files */
+        /**
+         * Performs an asynchronous query using `QueryClient.query(...)`.
+         * Returns cached data when fresh, or fetches and caches it otherwise.
+         *
+         * @summary Trash files
+         * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/query-client/query|`query(...)` documentation}
+         * @example Query without parameters
+         * ```ts
+         * const data = await qraft.files.trashFiles.query()
+         * ```
+         * @example Query with parameters
+         * ```ts
+         * const data = await qraft.files.trashFiles.query({
+         *     parameters: {
+         *         query: {
+         *             pendingOnly: pendingOnly
+         *         }
+         *     }
+         * })
+         * ```
+         */
+        query<TData = TrashFilesData>(options: ServiceOperationImperativeQueryOptions<TrashFilesSchema, TrashFilesData, TrashFilesParameters, TrashFilesError, TData> | void): Promise<TData>;
+        /**
+         * Performs an asynchronous paginated query using `QueryClient.infiniteQuery(...)`.
+         * Fetches and caches infinite query pages and returns the result.
+         *
+         * @summary Trash files
+         * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/query-client/infiniteQuery|`infiniteQuery(...)` documentation}
+         *
+         * @example Infinite Query
+         * ```ts
+         * const data = await qraft.files.trashFiles.infiniteQuery({
+         *     initialPageParam: {
+         *         query: {
+         *             pendingOnly: initialPendingOnly
+         *         }
+         *     },
+         *     getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) => getNextPageParams(lastPage)
+         * })
+         *
+         * console.log(data.pages);
+         * ```
+         */
+        infiniteQuery<TPageParam extends TrashFilesParameters, TData = OperationInfiniteData<TrashFilesData, TrashFilesParameters>>(options: ServiceOperationImperativeInfiniteQueryOptions<TrashFilesSchema, TrashFilesData, TrashFilesParameters, DeepReadonly<TPageParam>, TrashFilesError, TData>): Promise<TData>;
+        /**
+         * @deprecated Use `query(...)` instead.
+         * @summary Trash files
+         */
         fetchQuery(options: ServiceOperationFetchQueryOptions<TrashFilesSchema, TrashFilesData, TrashFilesParameters, TrashFilesError> | void): Promise<TrashFilesData>;
-        /** @summary Trash files */
+        /**
+         * @deprecated Use `query(...)` instead (e.g., `query(...).catch(() => {})` if you want to ignore errors).
+         * @summary Trash files
+         */
         prefetchQuery(options: ServiceOperationFetchQueryOptions<TrashFilesSchema, TrashFilesData, TrashFilesParameters, TrashFilesError> | void): Promise<void>;
-        /** @summary Trash files */
+        /**
+         * @deprecated Use `query({ ...options, staleTime: 'static' })` instead.
+         * @summary Trash files
+         */
         ensureQueryData(options: ServiceOperationEnsureQueryDataOptions<TrashFilesSchema, TrashFilesData, TrashFilesParameters, TrashFilesError> | void): Promise<TrashFilesData>;
-        /** @summary Trash files */
+        /**
+         * @deprecated Use `infiniteQuery(...)` instead.
+         * @summary Trash files
+         */
         fetchInfiniteQuery<TPageParam extends TrashFilesParameters>(options: ServiceOperationFetchInfiniteQueryOptions<TrashFilesSchema, TrashFilesData, TrashFilesParameters, DeepReadonly<TPageParam>, TrashFilesError> | ServiceOperationFetchInfiniteQueryVoidOption): Promise<OperationInfiniteData<TrashFilesData, TrashFilesParameters>>;
-        /** @summary Trash files */
+        /**
+         * @deprecated Use `infiniteQuery(...)` instead (e.g., `infiniteQuery(...).catch(() => {})` if you want to ignore errors).
+         * @summary Trash files
+         */
         prefetchInfiniteQuery<TPageParam extends TrashFilesParameters>(options: ServiceOperationFetchInfiniteQueryOptions<TrashFilesSchema, TrashFilesData, TrashFilesParameters, DeepReadonly<TPageParam>, TrashFilesError> | ServiceOperationFetchInfiniteQueryVoidOption): Promise<void>;
-        /** @summary Trash files */
+        /**
+         * @deprecated Use `infiniteQuery({ ...options, staleTime: 'static' })` instead.
+         * @summary Trash files
+         */
         ensureInfiniteQueryData<TPageParam extends TrashFilesParameters>(options: ServiceOperationEnsureInfiniteQueryDataOptions<TrashFilesSchema, TrashFilesData, TrashFilesParameters, DeepReadonly<TPageParam>, TrashFilesError> | ServiceOperationFetchInfiniteQueryVoidOption): Promise<OperationInfiniteData<TrashFilesData, TrashFilesParameters>>;
         /** @summary Trash files */
         getQueryData(parameters: ServiceOperationQueryKey<TrashFilesSchema, TrashFilesParameters> | (DeepReadonly<TrashFilesParameters> | void)): TrashFilesData | undefined;
@@ -2013,32 +2266,86 @@ export interface FilesService {
             combine?: (results: Array<UseSuspenseQueryResult<GetFileListData, GetFileListError>>) => TCombinedResult;
         }): TCombinedResult;
         /**
+         * Performs an asynchronous query using `QueryClient.query(...)`.
+         * Returns cached data when fresh, or fetches and caches it otherwise.
+         *
          * @deprecated
+         * @summary Get a file list
+         * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/query-client/query|`query(...)` documentation}
+         * @example Query without parameters
+         * ```ts
+         * const data = await qraft.files.getFileList.query()
+         * ```
+         * @example Query with parameters
+         * ```ts
+         * const data = await qraft.files.getFileList.query({
+         *     parameters: {
+         *         header: {
+         *             "x-monite-version": "2023-06-04"
+         *         },
+         *         query: {
+         *             id__in: idIn
+         *         }
+         *     }
+         * })
+         * ```
+         */
+        query<TData = GetFileListData>(options: ServiceOperationImperativeQueryOptions<GetFileListSchema, GetFileListData, GetFileListParameters, GetFileListError, TData> | void): Promise<TData>;
+        /**
+         * Performs an asynchronous paginated query using `QueryClient.infiniteQuery(...)`.
+         * Fetches and caches infinite query pages and returns the result.
+         *
+         * @deprecated
+         * @summary Get a file list
+         * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/query-client/infiniteQuery|`infiniteQuery(...)` documentation}
+         *
+         * @example Infinite Query
+         * ```ts
+         * const data = await qraft.files.getFileList.infiniteQuery({
+         *     parameters: {
+         *         header: {
+         *             "x-monite-version": "2023-06-04"
+         *         }
+         *     },
+         *     initialPageParam: {
+         *         query: {
+         *             id__in: initialIdIn
+         *         }
+         *     },
+         *     getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) => getNextPageParams(lastPage)
+         * })
+         *
+         * console.log(data.pages);
+         * ```
+         */
+        infiniteQuery<TPageParam extends GetFileListParameters, TData = OperationInfiniteData<GetFileListData, GetFileListParameters>>(options: ServiceOperationImperativeInfiniteQueryOptions<GetFileListSchema, GetFileListData, GetFileListParameters, DeepReadonly<TPageParam>, GetFileListError, TData>): Promise<TData>;
+        /**
+         * @deprecated This operation is deprecated. Use `query(...)` instead.
          * @summary Get a file list
          */
         fetchQuery(options: ServiceOperationFetchQueryOptions<GetFileListSchema, GetFileListData, GetFileListParameters, GetFileListError> | void): Promise<GetFileListData>;
         /**
-         * @deprecated
+         * @deprecated This operation is deprecated. Use `query(...)` instead (e.g., `query(...).catch(() => {})` if you want to ignore errors).
          * @summary Get a file list
          */
         prefetchQuery(options: ServiceOperationFetchQueryOptions<GetFileListSchema, GetFileListData, GetFileListParameters, GetFileListError> | void): Promise<void>;
         /**
-         * @deprecated
+         * @deprecated This operation is deprecated. Use `query({ ...options, staleTime: 'static' })` instead.
          * @summary Get a file list
          */
         ensureQueryData(options: ServiceOperationEnsureQueryDataOptions<GetFileListSchema, GetFileListData, GetFileListParameters, GetFileListError> | void): Promise<GetFileListData>;
         /**
-         * @deprecated
+         * @deprecated This operation is deprecated. Use `infiniteQuery(...)` instead.
          * @summary Get a file list
          */
         fetchInfiniteQuery<TPageParam extends GetFileListParameters>(options: ServiceOperationFetchInfiniteQueryOptions<GetFileListSchema, GetFileListData, GetFileListParameters, DeepReadonly<TPageParam>, GetFileListError> | ServiceOperationFetchInfiniteQueryVoidOption): Promise<OperationInfiniteData<GetFileListData, GetFileListParameters>>;
         /**
-         * @deprecated
+         * @deprecated This operation is deprecated. Use `infiniteQuery(...)` instead (e.g., `infiniteQuery(...).catch(() => {})` if you want to ignore errors).
          * @summary Get a file list
          */
         prefetchInfiniteQuery<TPageParam extends GetFileListParameters>(options: ServiceOperationFetchInfiniteQueryOptions<GetFileListSchema, GetFileListData, GetFileListParameters, DeepReadonly<TPageParam>, GetFileListError> | ServiceOperationFetchInfiniteQueryVoidOption): Promise<void>;
         /**
-         * @deprecated
+         * @deprecated This operation is deprecated. Use `infiniteQuery({ ...options, staleTime: 'static' })` instead.
          * @summary Get a file list
          */
         ensureInfiniteQueryData<TPageParam extends GetFileListParameters>(options: ServiceOperationEnsureInfiniteQueryDataOptions<GetFileListSchema, GetFileListData, GetFileListParameters, DeepReadonly<TPageParam>, GetFileListError> | ServiceOperationFetchInfiniteQueryVoidOption): Promise<OperationInfiniteData<GetFileListData, GetFileListParameters>>;

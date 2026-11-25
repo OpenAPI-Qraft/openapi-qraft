@@ -1,4 +1,5 @@
 import type { OverrideImportType } from './ts-factory/OverrideImportType.js';
+import { fileURLToPath } from 'node:url';
 import {
   createPredefinedParametersGlobs,
   parseOperationPredefinedParametersOption,
@@ -9,6 +10,11 @@ import { CommanderError, Option } from 'commander';
 import { generateCode } from './generateCode.js';
 import { applyRootSecurityToServices } from './lib/applyRootSecurityToServices.js';
 import { parseOptionSubValues } from './lib/parseOptionSubValues.js';
+import {
+  formatResolvedTanStackQueryVersion,
+  resolveTanStackQueryCapabilities,
+  resolveTanStackQueryVersion,
+} from './lib/resolveTanStackQueryVersion.js';
 import { getAllAvailableCallbackNames } from './ts-factory/getCallbackNames.js';
 import { CreateAPIClientFnOptions } from './ts-factory/getIndexFactory.js';
 
@@ -70,7 +76,74 @@ export const plugin: QraftCommandPlugin = {
           'Configure ParametersWrapper types for specific operation patterns. Expected format: pattern type:TypeName import:ImportPath. Can be specified multiple times for different patterns.'
         ).argParser(parseOperationParametersType)
       )
+      .option(
+        '--tanstack-query-version <version>',
+        'Target @tanstack/react-query version (e.g., "5.80.0", "5.108.1"). Auto-detected from installed dependencies or package.json if omitted.'
+      )
+      .option(
+        '--tanstack-query-deprecations [bool]',
+        'Emit @deprecated JSDoc tags for methods deprecated in the target @tanstack/react-query version. Defaults to true when deprecations apply to the target version, false otherwise.',
+        parseBooleanOption
+      )
       .action(async ({ spinner, output, args, services, schema }, resolve) => {
+        const resolvedTanStackQueryVersion = resolveTanStackQueryVersion({
+          explicitVersion: args.tanstackQueryVersion,
+          outputDir: fileURLToPath(output.dir),
+          cwd: process.cwd(),
+        });
+        const capabilities = resolveTanStackQueryCapabilities(
+          resolvedTanStackQueryVersion.version
+        );
+
+        spinner.info(
+          formatResolvedTanStackQueryVersion(resolvedTanStackQueryVersion)
+        );
+
+        if (
+          args.tanstackQueryDeprecations === true &&
+          capabilities.deprecatedMethods.size === 0
+        ) {
+          throw new CommanderError(
+            1,
+            'ERR_UNSUPPORTED_TANSTACK_QUERY_DEPRECATIONS',
+            `--tanstack-query-deprecations cannot be enabled for @tanstack/react-query ${resolvedTanStackQueryVersion.raw ?? '< 5.108.1'} because there are no deprecated methods for this version.`
+          );
+        }
+
+        const emitDeprecations =
+          args.tanstackQueryDeprecations ??
+          capabilities.deprecatedMethods.size > 0;
+
+        const normalizedCreateApiClientFn = normalizeCreateApiClientFn(
+          args.createApiClientFn
+        );
+
+        const supportedCallbacks = new Set([
+          'all',
+          'none',
+          'operationInvokeFn',
+          ...getAllAvailableCallbackNames({
+            imperativeQuery: capabilities.imperativeQuery,
+          }),
+        ]);
+
+        for (const [
+          functionName,
+          clientOptions,
+        ] of normalizedCreateApiClientFn) {
+          const unsupportedCallback = clientOptions.callbacks.find(
+            (callbackName) => !supportedCallbacks.has(callbackName)
+          );
+
+          if (unsupportedCallback) {
+            throw new CommanderError(
+              1,
+              'ERR_UNSUPPORTED_CALLBACK',
+              `Callback '${unsupportedCallback}' in --create-api-client-fn '${functionName}' requires @tanstack/react-query >= 5.108.1 (target resolved as ${resolvedTanStackQueryVersion.raw ?? '< 5.108.1'}).`
+            );
+          }
+        }
+
         const resolvedServices = args.rootSecurity
           ? applyRootSecurityToServices({ services, schema })
           : services;
@@ -81,6 +154,10 @@ export const plugin: QraftCommandPlugin = {
           serviceOptions: {
             openapiTypesImportPath: args.openapiTypesImportPath,
             queryableWriteOperations: args.queryableWriteOperations,
+            imperativeQuery: capabilities.imperativeQuery,
+            deprecatedMethods: emitDeprecations
+              ? capabilities.deprecatedMethods
+              : new Set(),
             operationParametersTypeWrapper: Array.isArray(
               args.operationParametersTypeWrapper
             )
@@ -104,9 +181,7 @@ export const plugin: QraftCommandPlugin = {
                   )
                 )
               : undefined, // This value is inherited from the `--operation-predefined-parameters` option
-            createApiClientFn: normalizeCreateApiClientFn(
-              args.createApiClientFn
-            ),
+            createApiClientFn: normalizedCreateApiClientFn,
           },
         }).then(resolve));
       });
