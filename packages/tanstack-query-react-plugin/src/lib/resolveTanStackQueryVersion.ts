@@ -56,11 +56,16 @@ const MIN_IMPERATIVE_QUERY_SEMVER: SemverVersion = {
   patch: 1,
 };
 
-const COMPARATOR_TOKEN_RE =
-  /^(>=|>|\^|~|=|v)?(\d+)(?:\.(\d+|x|\*))?(?:\.(\d+|x|\*))?(?:-([0-9A-Za-z.-]+))?(?:\+[0-9A-Za-z.-]+)?$/i;
+const BARE_VERSION_TOKEN_RE =
+  /^v?(\d+)(?:\.(\d+|x|\*))?(?:\.(\d+|x|\*))?(?:-([0-9A-Za-z.-]+))?(?:\+[0-9A-Za-z.-]+)?$/i;
 
-const UPPER_BOUND_TOKEN_RE =
-  /^<=?\d+(?:\.(?:\d+|x|\*))?(?:\.(?:\d+|x|\*))?(?:-[0-9A-Za-z.-]+)?(?:\+[0-9A-Za-z.-]+)?$/i;
+const COMPARATOR_TOKEN_RE = /^(>=|>|\^|~|=)?(.+)$/;
+
+type ParsedBareVersion = {
+  version: SemverVersion;
+  hasExplicitMinor: boolean;
+  hasExplicitPatch: boolean;
+};
 
 /**
  * Parses a TanStack Query version string or simple semver range into a comparable lower-bound version.
@@ -70,10 +75,6 @@ export function parseTanStackQueryVersion(
 ): ParsedTanStackQueryVersion | null {
   const trimmed = raw.trim();
   if (!trimmed) return null;
-
-  if (trimmed.toLowerCase() === 'latest' || trimmed === '*') {
-    return { kind: 'latest' };
-  }
 
   const orBranches = trimmed.split('||');
   const parsedBranches: ParsedTanStackQueryVersion[] = [];
@@ -87,19 +88,53 @@ export function parseTanStackQueryVersion(
   return pickMinimumVersion(parsedBranches);
 }
 
+function parseBareVersionToken(raw: string): ParsedBareVersion | null {
+  const match = BARE_VERSION_TOKEN_RE.exec(raw.trim());
+  if (!match) return null;
+
+  const [, majorRaw, minorRaw, patchRaw, prerelease] = match;
+  const hasExplicitMinor =
+    minorRaw !== undefined &&
+    minorRaw.toLowerCase() !== 'x' &&
+    minorRaw !== '*';
+  const hasExplicitPatch =
+    patchRaw !== undefined &&
+    patchRaw.toLowerCase() !== 'x' &&
+    patchRaw !== '*';
+
+  // Reject partial wildcards that skip minor while specifying patch (e.g. "5.x.1", "5.*.1").
+  if (!hasExplicitMinor && hasExplicitPatch) return null;
+
+  // Prerelease identifiers are only valid on full major.minor.patch versions.
+  if (prerelease && (!hasExplicitMinor || !hasExplicitPatch)) return null;
+
+  return {
+    version: {
+      kind: 'semver',
+      major: Number(majorRaw),
+      minor: hasExplicitMinor ? Number(minorRaw) : 0,
+      patch: hasExplicitPatch ? Number(patchRaw) : 0,
+      ...(prerelease ? { prerelease } : {}),
+    },
+    hasExplicitMinor,
+    hasExplicitPatch,
+  };
+}
+
 function parseComparatorBranch(
   branch: string
 ): ParsedTanStackQueryVersion | null {
   const trimmed = branch.trim();
   if (!trimmed) return null;
 
-  // Handle hyphen ranges such as "5.80.0 - 5.108.4" using the lower bound,
-  // while validating that the upper bound is also well-formed.
+  // Handle hyphen ranges such as "5.80.0 - 5.108.4" using bare versions only.
   const hyphenParts = trimmed.split(/\s+-\s+/);
   if (hyphenParts.length > 2) return null;
   if (hyphenParts.length === 2) {
-    if (!parseSingleComparatorGroup(hyphenParts[1])) return null;
-    return parseSingleComparatorGroup(hyphenParts[0]);
+    const left = parseBareVersionToken(hyphenParts[0]);
+    const right = parseBareVersionToken(hyphenParts[1]);
+    if (!left || !right) return null;
+    return left.version;
   }
 
   return parseSingleComparatorGroup(trimmed);
@@ -111,7 +146,7 @@ function parseSingleComparatorGroup(
   const trimmed = group.trim();
   if (!trimmed) return null;
 
-  if (trimmed.toLowerCase() === 'latest' || trimmed === '*') {
+  if (trimmed.toLowerCase() === 'latest') {
     return { kind: 'latest' };
   }
 
@@ -121,59 +156,60 @@ function parseSingleComparatorGroup(
   const lowerBounds: SemverVersion[] = [];
 
   for (const token of tokens) {
-    if (token === '*') continue;
-    if (UPPER_BOUND_TOKEN_RE.test(token)) continue;
+    if (token === '*' || token.toLowerCase() === 'x') {
+      lowerBounds.push({
+        kind: 'semver',
+        major: 0,
+        minor: 0,
+        patch: 0,
+      });
+      continue;
+    }
 
-    const match = COMPARATOR_TOKEN_RE.exec(token);
-    if (!match) return null;
+    if (token.startsWith('<=') || token.startsWith('<')) {
+      const upperBound = token.replace(/^<=?/, '');
+      if (!parseBareVersionToken(upperBound)) return null;
+      continue;
+    }
 
-    const [, operator, majorRaw, minorRaw, patchRaw, prerelease] = match;
-    const major = Number(majorRaw);
-    const hasExplicitMinor =
-      minorRaw !== undefined &&
-      minorRaw.toLowerCase() !== 'x' &&
-      minorRaw !== '*';
-    const hasExplicitPatch =
-      patchRaw !== undefined &&
-      patchRaw.toLowerCase() !== 'x' &&
-      patchRaw !== '*';
+    const comparatorMatch = COMPARATOR_TOKEN_RE.exec(token);
+    if (!comparatorMatch) return null;
 
-    const minor = hasExplicitMinor ? Number(minorRaw) : 0;
-    const patch = hasExplicitPatch ? Number(patchRaw) : 0;
+    const [, operator, versionToken] = comparatorMatch;
+    const parsed = parseBareVersionToken(versionToken);
+    if (!parsed) return null;
 
     if (operator === '>') {
-      if (!hasExplicitMinor) {
+      // With a prerelease (e.g. ">5.108.0-alpha.1"), keep the conservative base
+      // because the stable release (5.108.0) satisfies the comparator.
+      if (parsed.version.prerelease) {
+        lowerBounds.push(parsed.version);
+      } else if (!parsed.hasExplicitMinor) {
         lowerBounds.push({
           kind: 'semver',
-          major: major + 1,
+          major: parsed.version.major + 1,
           minor: 0,
           patch: 0,
         });
-      } else if (!hasExplicitPatch) {
+      } else if (!parsed.hasExplicitPatch) {
         lowerBounds.push({
           kind: 'semver',
-          major,
-          minor: minor + 1,
+          major: parsed.version.major,
+          minor: parsed.version.minor + 1,
           patch: 0,
         });
       } else {
         lowerBounds.push({
           kind: 'semver',
-          major,
-          minor,
-          patch: patch + 1,
+          major: parsed.version.major,
+          minor: parsed.version.minor,
+          patch: parsed.version.patch + 1,
         });
       }
       continue;
     }
 
-    lowerBounds.push({
-      kind: 'semver',
-      major,
-      minor,
-      patch,
-      ...(prerelease ? { prerelease } : {}),
-    });
+    lowerBounds.push(parsed.version);
   }
 
   if (lowerBounds.length === 0) return null;

@@ -78,7 +78,44 @@ describe('parseTanStackQueryVersion', () => {
       patch: 1,
     });
     expect(parseTanStackQueryVersion('latest')).toEqual({ kind: 'latest' });
-    expect(parseTanStackQueryVersion('*')).toEqual({ kind: 'latest' });
+    expect(parseTanStackQueryVersion('*')).toEqual({
+      kind: 'semver',
+      major: 0,
+      minor: 0,
+      patch: 0,
+    });
+    expect(parseTanStackQueryVersion('* >=5.108.1')).toEqual({
+      kind: 'semver',
+      major: 5,
+      minor: 108,
+      patch: 1,
+    });
+    expect(parseTanStackQueryVersion('* || ^5.108.1')).toEqual({
+      kind: 'semver',
+      major: 0,
+      minor: 0,
+      patch: 0,
+    });
+    expect(parseTanStackQueryVersion('^5.108.1 || *')).toEqual({
+      kind: 'semver',
+      major: 0,
+      minor: 0,
+      patch: 0,
+    });
+    expect(parseTanStackQueryVersion('>5.108.0-alpha.1')).toEqual({
+      kind: 'semver',
+      major: 5,
+      minor: 108,
+      patch: 0,
+      prerelease: 'alpha.1',
+    });
+    expect(parseTanStackQueryVersion('>5.108.2-alpha.1')).toEqual({
+      kind: 'semver',
+      major: 5,
+      minor: 108,
+      patch: 2,
+      prerelease: 'alpha.1',
+    });
   });
 
   it('returns null for invalid, empty, or upper-bound-only inputs', () => {
@@ -88,6 +125,10 @@ describe('parseTanStackQueryVersion', () => {
     expect(parseTanStackQueryVersion('catalog:')).toBeNull();
     expect(parseTanStackQueryVersion('<5.108.1')).toBeNull();
     expect(parseTanStackQueryVersion('5.108.1 - invalid')).toBeNull();
+    expect(parseTanStackQueryVersion('* - 5.108.1')).toBeNull();
+    expect(parseTanStackQueryVersion('^5.108.1 - 5.110.0')).toBeNull();
+    expect(parseTanStackQueryVersion('5.x.1')).toBeNull();
+    expect(parseTanStackQueryVersion('5.*.1')).toBeNull();
     expect(parseTanStackQueryVersion('5.80.0.1')).toBeNull();
   });
 });
@@ -133,6 +174,35 @@ describe('compareSemver & resolveTanStackQueryCapabilities', () => {
       imperativeQuery: false,
       deprecatedMethods: new Set(),
     });
+
+    expect(
+      resolveTanStackQueryCapabilities(
+        parseTanStackQueryVersion('>5.108.0-alpha.1')
+      ).imperativeQuery
+    ).toBe(false);
+
+    expect(
+      resolveTanStackQueryCapabilities(
+        parseTanStackQueryVersion('>5.108.1-alpha.1')
+      ).imperativeQuery
+    ).toBe(false);
+
+    expect(
+      resolveTanStackQueryCapabilities(
+        parseTanStackQueryVersion('>5.108.2-alpha.1')
+      ).imperativeQuery
+    ).toBe(true);
+
+    expect(
+      resolveTanStackQueryCapabilities(parseTanStackQueryVersion('*'))
+        .imperativeQuery
+    ).toBe(false);
+
+    expect(
+      resolveTanStackQueryCapabilities(
+        parseTanStackQueryVersion('* || ^5.108.1')
+      ).imperativeQuery
+    ).toBe(false);
 
     const v51081 = resolveTanStackQueryCapabilities(
       parseTanStackQueryVersion('5.108.1')

@@ -37,6 +37,19 @@ export const createInfiniteQueryOperationTSDocExample = (
     }),
   ].filter((node) => !!node);
 
+  const hasOperationParameters =
+    Boolean(operation.parameters?.length) ||
+    Boolean(queryableWriteOperations && operation.requestBody);
+
+  const infiniteQueryOptionProperties =
+    createInfiniteQueryOptionsArgumentExamplePropertyAssignmentNodes(
+      operation
+    ).filter(
+      (node) =>
+        hasOperationParameters ||
+        !(ts.isIdentifier(node.name) && node.name.text === 'initialPageParam')
+    );
+
   return [
     ...commonTSDoc,
     '@example Infinite Query',
@@ -64,9 +77,7 @@ export const createInfiniteQueryOperationTSDocExample = (
                       ),
                     ]
                   : []),
-                ...createInfiniteQueryOptionsArgumentExamplePropertyAssignmentNodes(
-                  operation
-                ),
+                ...infiniteQueryOptionProperties,
               ],
               true
             ),

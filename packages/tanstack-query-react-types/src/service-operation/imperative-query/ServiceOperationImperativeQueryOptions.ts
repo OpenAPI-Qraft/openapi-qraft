@@ -23,9 +23,9 @@ export type ServiceOperationImperativeQueryOptions<
 type ImperativeQueryOptionsBase<
   TSchema extends { url: string; method: string },
   TQueryFnData,
-  TParams = {},
-  TError = DefaultError,
-  TData = TQueryFnData,
+  TParams,
+  TError,
+  TData,
 > = Omit<
   QueryExecuteOptions<
     TQueryFnData,

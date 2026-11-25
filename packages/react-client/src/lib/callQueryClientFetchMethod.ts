@@ -86,7 +86,7 @@ export function callQueryClientMethodWithQueryKey<
 }
 
 // Keep option/method types decoupled from QueryClient.prototype so emitted .d.ts
-// stays compatible with @tanstack/react-query < 5.102 (e.g., 5.80.0).
+// stays compatible with @tanstack/react-query < 5.108.1 (e.g., 5.80.0).
 type QueryClientFetchMethodOptions = Record<string, any> & {
   queryKey?: unknown;
   queryFn?: (...args: any[]) => unknown;

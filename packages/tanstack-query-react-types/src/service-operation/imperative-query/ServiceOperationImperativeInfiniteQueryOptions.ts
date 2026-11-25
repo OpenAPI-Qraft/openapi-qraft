@@ -8,7 +8,6 @@ import type {
 } from '@openapi-qraft/tanstack-query-react-types';
 import type {
   DefaultError,
-  GetNextPageParamFunction,
   InfiniteQueryExecuteOptions,
   InitialPageParam,
   QueryFunction,
@@ -42,9 +41,9 @@ type ImperativeInfiniteQueryOptionsBase<
   TSchema extends { url: string; method: string },
   TQueryFnData,
   TParams,
-  TPageParam = unknown,
-  TError = DefaultError,
-  TData = OperationInfiniteData<TQueryFnData, TParams>,
+  TPageParam,
+  TError,
+  TData,
 > = Omit<
   InfiniteQueryExecuteOptions<
     TQueryFnData,
@@ -53,24 +52,11 @@ type ImperativeInfiniteQueryOptionsBase<
     ServiceOperationInfiniteQueryKey<TSchema, TParams>,
     PartialParameters<DeepReadonly<TPageParam>>
   >,
-  'queryKey' | 'queryFn' | 'initialPageParam' | 'pages' | 'getNextPageParam'
+  'queryKey' | 'queryFn' | 'initialPageParam'
 > &
   (AreAllOptional<TParams> extends true
     ? Partial<InitialPageParam<PartialParameters<DeepReadonly<TPageParam>>>>
-    : InitialPageParam<PartialParameters<DeepReadonly<TPageParam>>>) & {
-    /**
-     * The number of pages to fetch. Defaults to the number of cached pages,
-     * or one page if the cache has no pages.
-     */
-    pages?: number;
-    /**
-     * This function can be set to automatically get the next cursor for infinite queries.
-     */
-    getNextPageParam: GetNextPageParamFunction<
-      PartialParameters<DeepReadonly<TPageParam>>,
-      TQueryFnData
-    >;
-  };
+    : InitialPageParam<PartialParameters<DeepReadonly<TPageParam>>>);
 
 type ImperativeInfiniteQueryOptionsTarget<
   TSchema extends { url: string; method: string },

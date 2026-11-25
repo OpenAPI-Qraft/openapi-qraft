@@ -199,7 +199,6 @@ export interface AccountsService {
          * @example Infinite Query
          * ```ts
          * const data = await qraft.accounts.getAccounts.infiniteQuery({
-         *     initialPageParam: {},
          *     getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) => getNextPageParams(lastPage)
          * })
          *
@@ -457,7 +456,6 @@ export interface AccountsService {
          * @example Infinite Query
          * ```ts
          * const data = await qraft.accounts.getAccountProfile.infiniteQuery({
-         *     initialPageParam: {},
          *     getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) => getNextPageParams(lastPage)
          * })
          *
