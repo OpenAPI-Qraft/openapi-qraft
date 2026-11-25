@@ -146,13 +146,13 @@ function useTsCheck() {
     staleTime: 'static',
     select: (data) => data.length,
   }) satisfies Promise<number>);
-  // @ts-expect-error - parameters and queryKey are mutually exclusive
   void client.pet.findPetsByStatus.query({
     parameters: {
       query: {
         status: 'available',
       },
     },
+    // @ts-expect-error - parameters and queryKey are mutually exclusive
     queryKey: client.pet.findPetsByStatus.getQueryKey(),
   });
 
