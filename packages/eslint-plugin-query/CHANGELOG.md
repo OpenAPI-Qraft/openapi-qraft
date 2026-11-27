@@ -1,5 +1,7 @@
 # @openapi-qraft/eslint-plugin-query
 
+## 2.15.0-beta.12
+
 ## 2.15.0-beta.11
 
 ## 2.15.0-beta.10
