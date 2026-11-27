@@ -205,7 +205,7 @@ export interface AccountsService {
          * console.log(data.pages);
          * ```
          */
-        infiniteQuery<TPageParam extends GetAccountsParameters = GetAccountsParameters, TData = OperationInfiniteData<GetAccountsData, TPageParam>>(options: ServiceOperationImperativeInfiniteQueryOptions<GetAccountsSchema, GetAccountsData, GetAccountsParameters, NoInfer<DeepReadonly<TPageParam>>, GetAccountsError, TData>): Promise<TData>;
+        infiniteQuery<TPageParam extends GetAccountsParameters = GetAccountsParameters, TData = OperationInfiniteData<GetAccountsData, TPageParam>>(options: ServiceOperationImperativeInfiniteQueryOptions<GetAccountsSchema, GetAccountsData, GetAccountsParameters, NoInfer<TPageParam>, GetAccountsError, TData>): Promise<TData>;
         /**
          * Performs an asynchronous data fetching operation, caches the result, and returns the fetched data.
          * Useful for imperative fetching outside of React components or when fresh data is needed on demand.
@@ -256,7 +256,7 @@ export interface AccountsService {
          * console.log(data.pages);
          * ```
          */
-        fetchInfiniteQuery<TPageParam extends GetAccountsParameters>(options: ServiceOperationFetchInfiniteQueryOptions<GetAccountsSchema, GetAccountsData, GetAccountsParameters, DeepReadonly<TPageParam>, GetAccountsError> | ServiceOperationFetchInfiniteQueryVoidOption): Promise<OperationInfiniteData<GetAccountsData, GetAccountsParameters>>;
+        fetchInfiniteQuery<TPageParam extends GetAccountsParameters>(options: ServiceOperationFetchInfiniteQueryOptions<GetAccountsSchema, GetAccountsData, GetAccountsParameters, TPageParam, GetAccountsError> | ServiceOperationFetchInfiniteQueryVoidOption): Promise<OperationInfiniteData<GetAccountsData, GetAccountsParameters>>;
         /**
          * Preloads and caches paginated data before it is needed.
          * Resolves when the request completes without returning the cached pages.
@@ -271,7 +271,7 @@ export interface AccountsService {
          * })
          * ```
          */
-        prefetchInfiniteQuery<TPageParam extends GetAccountsParameters>(options: ServiceOperationFetchInfiniteQueryOptions<GetAccountsSchema, GetAccountsData, GetAccountsParameters, DeepReadonly<TPageParam>, GetAccountsError> | ServiceOperationFetchInfiniteQueryVoidOption): Promise<void>;
+        prefetchInfiniteQuery<TPageParam extends GetAccountsParameters>(options: ServiceOperationFetchInfiniteQueryOptions<GetAccountsSchema, GetAccountsData, GetAccountsParameters, TPageParam, GetAccountsError> | ServiceOperationFetchInfiniteQueryVoidOption): Promise<void>;
         /**
          * Returns existing cached paginated data if available, or fetches and caches it otherwise.
          *
@@ -287,7 +287,7 @@ export interface AccountsService {
          * console.log(data.pages);
          * ```
          */
-        ensureInfiniteQueryData<TPageParam extends GetAccountsParameters>(options: ServiceOperationEnsureInfiniteQueryDataOptions<GetAccountsSchema, GetAccountsData, GetAccountsParameters, DeepReadonly<TPageParam>, GetAccountsError> | ServiceOperationFetchInfiniteQueryVoidOption): Promise<OperationInfiniteData<GetAccountsData, GetAccountsParameters>>;
+        ensureInfiniteQueryData<TPageParam extends GetAccountsParameters>(options: ServiceOperationEnsureInfiniteQueryDataOptions<GetAccountsSchema, GetAccountsData, GetAccountsParameters, TPageParam, GetAccountsError> | ServiceOperationFetchInfiniteQueryVoidOption): Promise<OperationInfiniteData<GetAccountsData, GetAccountsParameters>>;
         /**/
         getQueryData(parameters: ServiceOperationQueryKey<GetAccountsSchema, GetAccountsParameters> | (DeepReadonly<GetAccountsParameters> | void)): GetAccountsData | undefined;
         /**/
@@ -532,7 +532,7 @@ export interface AccountsService {
          * console.log(data.pages);
          * ```
          */
-        infiniteQuery<TPageParam extends GetAccountProfileParameters = GetAccountProfileParameters, TData = OperationInfiniteData<GetAccountProfileData, TPageParam>>(options: ServiceOperationImperativeInfiniteQueryOptions<GetAccountProfileSchema, GetAccountProfileData, GetAccountProfileParameters, NoInfer<DeepReadonly<TPageParam>>, GetAccountProfileError, TData>): Promise<TData>;
+        infiniteQuery<TPageParam extends GetAccountProfileParameters = GetAccountProfileParameters, TData = OperationInfiniteData<GetAccountProfileData, TPageParam>>(options: ServiceOperationImperativeInfiniteQueryOptions<GetAccountProfileSchema, GetAccountProfileData, GetAccountProfileParameters, NoInfer<TPageParam>, GetAccountProfileError, TData>): Promise<TData>;
         /**
          * Performs an asynchronous data fetching operation, caches the result, and returns the fetched data.
          * Useful for imperative fetching outside of React components or when fresh data is needed on demand.
@@ -583,7 +583,7 @@ export interface AccountsService {
          * console.log(data.pages);
          * ```
          */
-        fetchInfiniteQuery<TPageParam extends GetAccountProfileParameters>(options: ServiceOperationFetchInfiniteQueryOptions<GetAccountProfileSchema, GetAccountProfileData, GetAccountProfileParameters, DeepReadonly<TPageParam>, GetAccountProfileError> | ServiceOperationFetchInfiniteQueryVoidOption): Promise<OperationInfiniteData<GetAccountProfileData, GetAccountProfileParameters>>;
+        fetchInfiniteQuery<TPageParam extends GetAccountProfileParameters>(options: ServiceOperationFetchInfiniteQueryOptions<GetAccountProfileSchema, GetAccountProfileData, GetAccountProfileParameters, TPageParam, GetAccountProfileError> | ServiceOperationFetchInfiniteQueryVoidOption): Promise<OperationInfiniteData<GetAccountProfileData, GetAccountProfileParameters>>;
         /**
          * Preloads and caches paginated data before it is needed.
          * Resolves when the request completes without returning the cached pages.
@@ -598,7 +598,7 @@ export interface AccountsService {
          * })
          * ```
          */
-        prefetchInfiniteQuery<TPageParam extends GetAccountProfileParameters>(options: ServiceOperationFetchInfiniteQueryOptions<GetAccountProfileSchema, GetAccountProfileData, GetAccountProfileParameters, DeepReadonly<TPageParam>, GetAccountProfileError> | ServiceOperationFetchInfiniteQueryVoidOption): Promise<void>;
+        prefetchInfiniteQuery<TPageParam extends GetAccountProfileParameters>(options: ServiceOperationFetchInfiniteQueryOptions<GetAccountProfileSchema, GetAccountProfileData, GetAccountProfileParameters, TPageParam, GetAccountProfileError> | ServiceOperationFetchInfiniteQueryVoidOption): Promise<void>;
         /**
          * Returns existing cached paginated data if available, or fetches and caches it otherwise.
          *
@@ -614,7 +614,7 @@ export interface AccountsService {
          * console.log(data.pages);
          * ```
          */
-        ensureInfiniteQueryData<TPageParam extends GetAccountProfileParameters>(options: ServiceOperationEnsureInfiniteQueryDataOptions<GetAccountProfileSchema, GetAccountProfileData, GetAccountProfileParameters, DeepReadonly<TPageParam>, GetAccountProfileError> | ServiceOperationFetchInfiniteQueryVoidOption): Promise<OperationInfiniteData<GetAccountProfileData, GetAccountProfileParameters>>;
+        ensureInfiniteQueryData<TPageParam extends GetAccountProfileParameters>(options: ServiceOperationEnsureInfiniteQueryDataOptions<GetAccountProfileSchema, GetAccountProfileData, GetAccountProfileParameters, TPageParam, GetAccountProfileError> | ServiceOperationFetchInfiniteQueryVoidOption): Promise<OperationInfiniteData<GetAccountProfileData, GetAccountProfileParameters>>;
         /**/
         getQueryData(parameters: ServiceOperationQueryKey<GetAccountProfileSchema, GetAccountProfileParameters> | (DeepReadonly<GetAccountProfileParameters> | void)): GetAccountProfileData | undefined;
         /**/

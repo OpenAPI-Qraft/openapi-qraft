@@ -667,6 +667,29 @@ describe('shared service operation option aliases', { timeout: 30_000 }, () => {
     );
   });
 
+  it('does not double-wrap TPageParam with DeepReadonly in generated infinite query signatures', () => {
+    const service = createQueryAndMutationService();
+    const sourceWithoutImperative = generateService(service, {
+      imperativeQuery: false,
+    });
+    const sourceWithImperative = generateService(service, {
+      imperativeQuery: true,
+    });
+
+    for (const source of [sourceWithoutImperative, sourceWithImperative]) {
+      expect(source).not.toContain('DeepReadonly<TPageParam>');
+      expect(source).toContain('ServiceOperationFetchInfiniteQueryOptions<');
+      expect(source).toContain(
+        'ServiceOperationEnsureInfiniteQueryDataOptions<'
+      );
+    }
+
+    expect(sourceWithImperative).toContain(
+      'ServiceOperationImperativeInfiniteQueryOptions<'
+    );
+    expect(sourceWithImperative).toContain('NoInfer<TPageParam>');
+  });
+
   it('preserves overload resolution, select, TPageParam, OperationError, and MutationCache inference', () => {
     const service = createQueryAndMutationService();
     const source = generateService(service);
@@ -871,14 +894,48 @@ describe('shared service operation option aliases', { timeout: 30_000 }, () => {
 
       const imperativeUsage = imperativeQuery
         ? `
-          import type { ServiceOperationImperativeQueryOptions } from '@openapi-qraft/tanstack-query-react-types/imperative-query';
+          import type {
+            ServiceOperationImperativeInfiniteQueryOptions,
+            ServiceOperationImperativeQueryOptions,
+          } from '@openapi-qraft/tanstack-query-react-types/imperative-query';
           type _ImperativeAlias = ServiceOperationImperativeQueryOptions<
             { url: '/items'; method: 'get' },
             string,
             { query?: { cursor?: string } }
           >;
+          const _directImperativeInfiniteOptions: ServiceOperationImperativeInfiniteQueryOptions<
+            { url: '/items'; method: 'get' },
+            string,
+            { query?: { cursor?: string } },
+            { query?: { cursor?: string } }
+          > = {
+            parameters: constParams,
+            initialPageParam: constPageParam,
+            getNextPageParam: (_lastPage, _allPages, lastPageParam) => {
+              lastPageParam.query?.cursor satisfies string | undefined;
+              return constPageParam;
+            },
+          };
           const _imperativeResult: Promise<string> = items.listItems.query();
-          void _imperativeResult;
+          const _imperativeInfiniteResult: Promise<number> =
+            items.listItems.infiniteQuery({
+              parameters: constParams,
+              initialPageParam: constPageParam,
+              getNextPageParam: (_lastPage, _allPages, lastPageParam) => {
+                lastPageParam.query?.cursor satisfies string | undefined;
+                return constPageParam;
+              },
+              queryFn: ({ pageParam }) => {
+                pageParam.query?.cursor satisfies string | undefined;
+                return Promise.resolve('page');
+              },
+              select: (data) => data.pages.length,
+            });
+          void [
+            _imperativeResult,
+            _directImperativeInfiniteOptions,
+            _imperativeInfiniteResult,
+          ];
         `
         : '';
 
@@ -889,6 +946,8 @@ describe('shared service operation option aliases', { timeout: 30_000 }, () => {
           path.resolve('usage.ts'),
           `
             import type {
+              ServiceOperationEnsureInfiniteQueryDataOptions,
+              ServiceOperationFetchInfiniteQueryOptions,
               ServiceOperationMutationCacheBase,
               ServiceOperationUseInfiniteQueryDefinedOptions,
               ServiceOperationUseInfiniteQueryUndefinedOptions,
@@ -900,6 +959,9 @@ describe('shared service operation option aliases', { timeout: 30_000 }, () => {
             import type { ItemsService } from '${serviceImportPath}';
 
             declare const items: ItemsService;
+
+            const constParams = { query: { cursor: '1' } } as const;
+            const constPageParam = { query: { cursor: '0' } } as const;
 
             type _SharedAliases = [
               ServiceOperationMutationCacheBase,
@@ -938,9 +1000,71 @@ describe('shared service operation option aliases', { timeout: 30_000 }, () => {
               >,
             ];
 
+            const _directFetchInfiniteOptions: ServiceOperationFetchInfiniteQueryOptions<
+              { url: '/items'; method: 'get' },
+              string,
+              { query?: { cursor?: string } },
+              { query?: { cursor?: string } }
+            > = {
+              parameters: constParams,
+              initialPageParam: constPageParam,
+              getNextPageParam: (_lastPage, _allPages, lastPageParam) => {
+                lastPageParam.query?.cursor satisfies string | undefined;
+                return constPageParam;
+              },
+            };
+
+            const _directEnsureInfiniteOptions: ServiceOperationEnsureInfiniteQueryDataOptions<
+              { url: '/items'; method: 'get' },
+              string,
+              { query?: { cursor?: string } },
+              { query?: { cursor?: string } }
+            > = {
+              parameters: constParams,
+              initialPageParam: constPageParam,
+              getNextPageParam: () => constPageParam,
+              revalidateIfStale: true,
+            };
+
+            const _fetchInfiniteResult = items.listItems.fetchInfiniteQuery({
+              parameters: constParams,
+              initialPageParam: constPageParam,
+              getNextPageParam: (_lastPage, _allPages, lastPageParam) => {
+                lastPageParam.query?.cursor satisfies string | undefined;
+                return constPageParam;
+              },
+              queryFn: ({ pageParam }) => {
+                pageParam.query?.cursor satisfies string | undefined;
+                return Promise.resolve('page');
+              },
+            });
+
+            const _prefetchInfiniteResult: Promise<void> =
+              items.listItems.prefetchInfiniteQuery({
+                parameters: constParams,
+                initialPageParam: constPageParam,
+                getNextPageParam: () => undefined,
+              });
+
+            const _ensureInfiniteResult =
+              items.listItems.ensureInfiniteQueryData({
+                parameters: constParams,
+                initialPageParam: constPageParam,
+                getNextPageParam: () => undefined,
+                revalidateIfStale: false,
+              });
+
             const queryResult = items.listItems.useQuery();
             const mutationCache = items.deleteItem.getMutationCache();
-            void [queryResult, mutationCache];
+            void [
+              queryResult,
+              mutationCache,
+              _directFetchInfiniteOptions,
+              _directEnsureInfiniteOptions,
+              _fetchInfiniteResult,
+              _prefetchInfiniteResult,
+              _ensureInfiniteResult,
+            ];
             ${imperativeUsage}
           `,
         ],

@@ -442,7 +442,7 @@ export interface ApprovalPoliciesService {
          * console.log(data.pages);
          * ```
          */
-        infiniteQuery<TPageParam extends GetApprovalPoliciesIdParameters = GetApprovalPoliciesIdParameters, TData = OperationInfiniteData<GetApprovalPoliciesIdData, TPageParam>>(options: ServiceOperationImperativeInfiniteQueryOptions<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdData, GetApprovalPoliciesIdParameters, NoInfer<DeepReadonly<TPageParam>>, GetApprovalPoliciesIdError, TData>): Promise<TData>;
+        infiniteQuery<TPageParam extends GetApprovalPoliciesIdParameters = GetApprovalPoliciesIdParameters, TData = OperationInfiniteData<GetApprovalPoliciesIdData, TPageParam>>(options: ServiceOperationImperativeInfiniteQueryOptions<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdData, GetApprovalPoliciesIdParameters, NoInfer<TPageParam>, GetApprovalPoliciesIdError, TData>): Promise<TData>;
         /**
          * Performs an asynchronous data fetching operation, caches the result, and returns the fetched data.
          * Useful for imperative fetching outside of React components or when fresh data is needed on demand.
@@ -554,7 +554,7 @@ export interface ApprovalPoliciesService {
          * console.log(data.pages);
          * ```
          */
-        fetchInfiniteQuery<TPageParam extends GetApprovalPoliciesIdParameters>(options: ServiceOperationFetchInfiniteQueryOptions<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdData, GetApprovalPoliciesIdParameters, DeepReadonly<TPageParam>, GetApprovalPoliciesIdError>): Promise<OperationInfiniteData<GetApprovalPoliciesIdData, GetApprovalPoliciesIdParameters>>;
+        fetchInfiniteQuery<TPageParam extends GetApprovalPoliciesIdParameters>(options: ServiceOperationFetchInfiniteQueryOptions<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdData, GetApprovalPoliciesIdParameters, TPageParam, GetApprovalPoliciesIdError>): Promise<OperationInfiniteData<GetApprovalPoliciesIdData, GetApprovalPoliciesIdParameters>>;
         /**
          * Preloads and caches paginated data before it is needed.
          * Resolves when the request completes without returning the cached pages.
@@ -585,7 +585,7 @@ export interface ApprovalPoliciesService {
          * })
          * ```
          */
-        prefetchInfiniteQuery<TPageParam extends GetApprovalPoliciesIdParameters>(options: ServiceOperationFetchInfiniteQueryOptions<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdData, GetApprovalPoliciesIdParameters, DeepReadonly<TPageParam>, GetApprovalPoliciesIdError>): Promise<void>;
+        prefetchInfiniteQuery<TPageParam extends GetApprovalPoliciesIdParameters>(options: ServiceOperationFetchInfiniteQueryOptions<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdData, GetApprovalPoliciesIdParameters, TPageParam, GetApprovalPoliciesIdError>): Promise<void>;
         /**
          * Returns existing cached paginated data if available, or fetches and caches it otherwise.
          *
@@ -617,7 +617,7 @@ export interface ApprovalPoliciesService {
          * console.log(data.pages);
          * ```
          */
-        ensureInfiniteQueryData<TPageParam extends GetApprovalPoliciesIdParameters>(options: ServiceOperationEnsureInfiniteQueryDataOptions<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdData, GetApprovalPoliciesIdParameters, DeepReadonly<TPageParam>, GetApprovalPoliciesIdError>): Promise<OperationInfiniteData<GetApprovalPoliciesIdData, GetApprovalPoliciesIdParameters>>;
+        ensureInfiniteQueryData<TPageParam extends GetApprovalPoliciesIdParameters>(options: ServiceOperationEnsureInfiniteQueryDataOptions<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdData, GetApprovalPoliciesIdParameters, TPageParam, GetApprovalPoliciesIdError>): Promise<OperationInfiniteData<GetApprovalPoliciesIdData, GetApprovalPoliciesIdParameters>>;
         /**
          * @summary Get an approval policy by ID
          * @description Retrieve a specific approval policy.

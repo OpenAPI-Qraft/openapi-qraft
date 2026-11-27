@@ -1,3 +1,9 @@
+import type {
+  OperationInfiniteData,
+  ServiceOperationEnsureInfiniteQueryDataOptions,
+  ServiceOperationFetchInfiniteQueryOptions,
+} from '@openapi-qraft/tanstack-query-react-types';
+import type { ServiceOperationImperativeInfiniteQueryOptions } from '@openapi-qraft/tanstack-query-react-types/imperative-query';
 import { QueryClient } from '@tanstack/react-query';
 import { requestFn } from '../index.js';
 import { createAPIClient } from './fixtures/api/index.js';
@@ -156,6 +162,36 @@ const createFullClient = () =>
       return { query: { id__in: ['1'] } };
     },
   });
+  void (qraft.files.getFiles.prefetchInfiniteQuery({
+    parameters,
+    initialPageParam: pageParam,
+    getNextPageParam: (_lastPage, _allPages, lastPageParam) => {
+      lastPageParam.query?.id__in satisfies readonly string[] | undefined;
+      return pageParam;
+    },
+    queryFn: ({ pageParam: fnPageParam }) => {
+      fnPageParam.query?.id__in satisfies readonly string[] | undefined;
+      return { query: { id__in: ['1'] } };
+    },
+  }) satisfies Promise<void>);
+  void (qraft.files.getFiles.ensureInfiniteQueryData({
+    parameters,
+    initialPageParam: pageParam,
+    revalidateIfStale: true,
+    getNextPageParam: (_lastPage, _allPages, lastPageParam) => {
+      lastPageParam.query?.id__in satisfies readonly string[] | undefined;
+      return pageParam;
+    },
+    queryFn: ({ pageParam: fnPageParam }) => {
+      fnPageParam.query?.id__in satisfies readonly string[] | undefined;
+      return { query: { id__in: ['1'] } };
+    },
+  }) satisfies Promise<
+    OperationInfiniteData<
+      typeof qraft.files.getFiles.types.data,
+      typeof qraft.files.getFiles.types.parameters
+    >
+  >);
   void qraft.files.getFiles({ parameters });
 
   // 3.2 findAll methods
@@ -425,4 +461,73 @@ const createFullClient = () =>
     parameters: constParameters,
     initialPageParam: constParameters,
   });
+
+  void (qraft.files.getFiles.infiniteQuery({
+    parameters: constParameters,
+    initialPageParam: {
+      query: { id__in: ['1'] },
+    } as const,
+    getNextPageParam: () => undefined,
+  }) satisfies Promise<
+    OperationInfiniteData<
+      typeof qraft.files.getFiles.types.data,
+      typeof qraft.files.getFiles.types.parameters
+    >
+  >);
+
+  const directPageParam = {
+    query: { id__in: ['1'] },
+  } as const;
+
+  const directFetchInfiniteOptions: ServiceOperationFetchInfiniteQueryOptions<
+    typeof qraft.files.getFiles.schema,
+    typeof qraft.files.getFiles.types.data,
+    typeof qraft.files.getFiles.types.parameters,
+    typeof qraft.files.getFiles.types.parameters,
+    typeof qraft.files.getFiles.types.error
+  > = {
+    parameters: constParameters,
+    initialPageParam: directPageParam,
+    getNextPageParam: (_lastPage, _allPages, lastPageParam) => {
+      lastPageParam.query?.id__in satisfies readonly string[] | undefined;
+      return directPageParam;
+    },
+  };
+
+  const directEnsureInfiniteOptions: ServiceOperationEnsureInfiniteQueryDataOptions<
+    typeof qraft.files.getFiles.schema,
+    typeof qraft.files.getFiles.types.data,
+    typeof qraft.files.getFiles.types.parameters,
+    typeof qraft.files.getFiles.types.parameters,
+    typeof qraft.files.getFiles.types.error
+  > = {
+    parameters: constParameters,
+    initialPageParam: directPageParam,
+    revalidateIfStale: true,
+    getNextPageParam: (_lastPage, _allPages, lastPageParam) => {
+      lastPageParam.query?.id__in satisfies readonly string[] | undefined;
+      return directPageParam;
+    },
+  };
+
+  const directImperativeInfiniteOptions: ServiceOperationImperativeInfiniteQueryOptions<
+    typeof qraft.files.getFiles.schema,
+    typeof qraft.files.getFiles.types.data,
+    typeof qraft.files.getFiles.types.parameters,
+    typeof qraft.files.getFiles.types.parameters,
+    typeof qraft.files.getFiles.types.error
+  > = {
+    parameters: constParameters,
+    initialPageParam: directPageParam,
+    getNextPageParam: (_lastPage, _allPages, lastPageParam) => {
+      lastPageParam.query?.id__in satisfies readonly string[] | undefined;
+      return directPageParam;
+    },
+  };
+
+  void [
+    directFetchInfiniteOptions,
+    directEnsureInfiniteOptions,
+    directImperativeInfiniteOptions,
+  ];
 }

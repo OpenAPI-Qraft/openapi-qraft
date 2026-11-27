@@ -363,7 +363,7 @@ export interface FilesService {
          * console.log(data.pages);
          * ```
          */
-        infiniteQuery<TPageParam extends GetFilesParameters = GetFilesParameters, TData = OperationInfiniteData<GetFilesData, TPageParam>>(options: ServiceOperationImperativeInfiniteQueryOptions<GetFilesSchema, GetFilesData, GetFilesParameters, NoInfer<DeepReadonly<TPageParam>>, GetFilesError, TData>): Promise<TData>;
+        infiniteQuery<TPageParam extends GetFilesParameters = GetFilesParameters, TData = OperationInfiniteData<GetFilesData, TPageParam>>(options: ServiceOperationImperativeInfiniteQueryOptions<GetFilesSchema, GetFilesData, GetFilesParameters, NoInfer<TPageParam>, GetFilesError, TData>): Promise<TData>;
         /**
          * Performs an asynchronous data fetching operation, caches the result, and returns the fetched data.
          * Useful for imperative fetching outside of React components or when fresh data is needed on demand.
@@ -458,7 +458,7 @@ export interface FilesService {
          * console.log(data.pages);
          * ```
          */
-        fetchInfiniteQuery<TPageParam extends GetFilesParameters>(options: ServiceOperationFetchInfiniteQueryOptions<GetFilesSchema, GetFilesData, GetFilesParameters, DeepReadonly<TPageParam>, GetFilesError>): Promise<OperationInfiniteData<GetFilesData, GetFilesParameters>>;
+        fetchInfiniteQuery<TPageParam extends GetFilesParameters>(options: ServiceOperationFetchInfiniteQueryOptions<GetFilesSchema, GetFilesData, GetFilesParameters, TPageParam, GetFilesError>): Promise<OperationInfiniteData<GetFilesData, GetFilesParameters>>;
         /**
          * Preloads and caches paginated data before it is needed.
          * Resolves when the request completes without returning the cached pages.
@@ -487,7 +487,7 @@ export interface FilesService {
          * })
          * ```
          */
-        prefetchInfiniteQuery<TPageParam extends GetFilesParameters>(options: ServiceOperationFetchInfiniteQueryOptions<GetFilesSchema, GetFilesData, GetFilesParameters, DeepReadonly<TPageParam>, GetFilesError>): Promise<void>;
+        prefetchInfiniteQuery<TPageParam extends GetFilesParameters>(options: ServiceOperationFetchInfiniteQueryOptions<GetFilesSchema, GetFilesData, GetFilesParameters, TPageParam, GetFilesError>): Promise<void>;
         /**
          * Returns existing cached paginated data if available, or fetches and caches it otherwise.
          *
@@ -517,7 +517,7 @@ export interface FilesService {
          * console.log(data.pages);
          * ```
          */
-        ensureInfiniteQueryData<TPageParam extends GetFilesParameters>(options: ServiceOperationEnsureInfiniteQueryDataOptions<GetFilesSchema, GetFilesData, GetFilesParameters, DeepReadonly<TPageParam>, GetFilesError>): Promise<OperationInfiniteData<GetFilesData, GetFilesParameters>>;
+        ensureInfiniteQueryData<TPageParam extends GetFilesParameters>(options: ServiceOperationEnsureInfiniteQueryDataOptions<GetFilesSchema, GetFilesData, GetFilesParameters, TPageParam, GetFilesError>): Promise<OperationInfiniteData<GetFilesData, GetFilesParameters>>;
         /** @summary Get a files by ID */
         getQueryData(parameters: ServiceOperationQueryKey<GetFilesSchema, GetFilesParameters> | (DeepReadonly<GetFilesParameters>)): GetFilesData | undefined;
         /** @summary Get a files by ID */
@@ -1377,7 +1377,7 @@ export interface FilesService {
          * console.log(data.pages);
          * ```
          */
-        infiniteQuery<TPageParam extends GetFileListParameters = GetFileListParameters, TData = OperationInfiniteData<GetFileListData, TPageParam>>(options: ServiceOperationImperativeInfiniteQueryOptions<GetFileListSchema, GetFileListData, GetFileListParameters, NoInfer<DeepReadonly<TPageParam>>, GetFileListError, TData>): Promise<TData>;
+        infiniteQuery<TPageParam extends GetFileListParameters = GetFileListParameters, TData = OperationInfiniteData<GetFileListData, TPageParam>>(options: ServiceOperationImperativeInfiniteQueryOptions<GetFileListSchema, GetFileListData, GetFileListParameters, NoInfer<TPageParam>, GetFileListError, TData>): Promise<TData>;
         /**
          * Performs an asynchronous data fetching operation, caches the result, and returns the fetched data.
          * Useful for imperative fetching outside of React components or when fresh data is needed on demand.
@@ -1481,7 +1481,7 @@ export interface FilesService {
          * console.log(data.pages);
          * ```
          */
-        fetchInfiniteQuery<TPageParam extends GetFileListParameters>(options: ServiceOperationFetchInfiniteQueryOptions<GetFileListSchema, GetFileListData, GetFileListParameters, DeepReadonly<TPageParam>, GetFileListError> | ServiceOperationFetchInfiniteQueryVoidOption): Promise<OperationInfiniteData<GetFileListData, GetFileListParameters>>;
+        fetchInfiniteQuery<TPageParam extends GetFileListParameters>(options: ServiceOperationFetchInfiniteQueryOptions<GetFileListSchema, GetFileListData, GetFileListParameters, TPageParam, GetFileListError> | ServiceOperationFetchInfiniteQueryVoidOption): Promise<OperationInfiniteData<GetFileListData, GetFileListParameters>>;
         /**
          * Preloads and caches paginated data before it is needed.
          * Resolves when the request completes without returning the cached pages.
@@ -1507,7 +1507,7 @@ export interface FilesService {
          * })
          * ```
          */
-        prefetchInfiniteQuery<TPageParam extends GetFileListParameters>(options: ServiceOperationFetchInfiniteQueryOptions<GetFileListSchema, GetFileListData, GetFileListParameters, DeepReadonly<TPageParam>, GetFileListError> | ServiceOperationFetchInfiniteQueryVoidOption): Promise<void>;
+        prefetchInfiniteQuery<TPageParam extends GetFileListParameters>(options: ServiceOperationFetchInfiniteQueryOptions<GetFileListSchema, GetFileListData, GetFileListParameters, TPageParam, GetFileListError> | ServiceOperationFetchInfiniteQueryVoidOption): Promise<void>;
         /**
          * Returns existing cached paginated data if available, or fetches and caches it otherwise.
          *
@@ -1534,7 +1534,7 @@ export interface FilesService {
          * console.log(data.pages);
          * ```
          */
-        ensureInfiniteQueryData<TPageParam extends GetFileListParameters>(options: ServiceOperationEnsureInfiniteQueryDataOptions<GetFileListSchema, GetFileListData, GetFileListParameters, DeepReadonly<TPageParam>, GetFileListError> | ServiceOperationFetchInfiniteQueryVoidOption): Promise<OperationInfiniteData<GetFileListData, GetFileListParameters>>;
+        ensureInfiniteQueryData<TPageParam extends GetFileListParameters>(options: ServiceOperationEnsureInfiniteQueryDataOptions<GetFileListSchema, GetFileListData, GetFileListParameters, TPageParam, GetFileListError> | ServiceOperationFetchInfiniteQueryVoidOption): Promise<OperationInfiniteData<GetFileListData, GetFileListParameters>>;
         /**
          * @deprecated
          * @summary Get a file list
