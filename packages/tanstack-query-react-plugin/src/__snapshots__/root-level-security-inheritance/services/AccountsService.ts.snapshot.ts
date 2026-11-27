@@ -205,7 +205,7 @@ export interface AccountsService {
          * console.log(data.pages);
          * ```
          */
-        infiniteQuery<TPageParam extends GetAccountsParameters = GetAccountsParameters, TData = OperationInfiniteData<GetAccountsData, TPageParam>>(options: ServiceOperationImperativeInfiniteQueryOptions<GetAccountsSchema, GetAccountsData, GetAccountsParameters, NoInfer<TPageParam>, GetAccountsError, TData>): Promise<TData>;
+        infiniteQuery<TPageParam extends GetAccountsParameters = GetAccountsParameters, TData = OperationInfiniteData<GetAccountsData, GetAccountsParameters>>(options: ServiceOperationImperativeInfiniteQueryOptions<GetAccountsSchema, GetAccountsData, GetAccountsParameters, NoInfer<TPageParam>, GetAccountsError, TData>): Promise<TData>;
         /**
          * Performs an asynchronous data fetching operation, caches the result, and returns the fetched data.
          * Useful for imperative fetching outside of React components or when fresh data is needed on demand.
@@ -532,7 +532,7 @@ export interface AccountsService {
          * console.log(data.pages);
          * ```
          */
-        infiniteQuery<TPageParam extends GetAccountProfileParameters = GetAccountProfileParameters, TData = OperationInfiniteData<GetAccountProfileData, TPageParam>>(options: ServiceOperationImperativeInfiniteQueryOptions<GetAccountProfileSchema, GetAccountProfileData, GetAccountProfileParameters, NoInfer<TPageParam>, GetAccountProfileError, TData>): Promise<TData>;
+        infiniteQuery<TPageParam extends GetAccountProfileParameters = GetAccountProfileParameters, TData = OperationInfiniteData<GetAccountProfileData, GetAccountProfileParameters>>(options: ServiceOperationImperativeInfiniteQueryOptions<GetAccountProfileSchema, GetAccountProfileData, GetAccountProfileParameters, NoInfer<TPageParam>, GetAccountProfileError, TData>): Promise<TData>;
         /**
          * Performs an asynchronous data fetching operation, caches the result, and returns the fetched data.
          * Useful for imperative fetching outside of React components or when fresh data is needed on demand.

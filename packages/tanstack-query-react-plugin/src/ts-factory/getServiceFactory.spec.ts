@@ -306,11 +306,17 @@ describe(
       const service = getServices(schema)[0];
       const source = generateService(service, { imperativeQuery: true });
 
+      expect(source).toContain(
+        'TData = OperationInfiniteData<ListPagedItemsData, ListPagedItemsParameters>'
+      );
+
       const files = new Map([
         [path.resolve('ItemsService.ts'), source],
         [
           path.resolve('usage.ts'),
           `
+        import type { OperationInfiniteData } from '@openapi-qraft/tanstack-query-react-types';
+        import type { ServiceOperationImperativeInfiniteQueryOptions } from '@openapi-qraft/tanstack-query-react-types/imperative-query';
         import type { ItemsService } from './ItemsService';
         declare const items: ItemsService;
 
@@ -325,7 +331,29 @@ describe(
           select: (data) => data.pages.length,
         });
         const checkSelected: Promise<number> = withEmptyPageParam;
-        void [withPageParam, checkSelected];
+
+        type NarrowCursorParam = { query: { cursor: 'a' | 'b' } };
+        const narrowOpts: ServiceOperationImperativeInfiniteQueryOptions<
+          typeof items.listPagedItems.schema,
+          typeof items.listPagedItems.types.data,
+          typeof items.listPagedItems.types.parameters,
+          NarrowCursorParam,
+          typeof items.listPagedItems.types.error
+        > = {
+          initialPageParam: { query: { cursor: 'a' } },
+          getNextPageParam: (_lastPage, _allPages, lastPageParam) => {
+            lastPageParam.query?.cursor satisfies 'a' | 'b' | undefined;
+            return { query: { cursor: 'b' } };
+          },
+        };
+        const withNarrowOpts: Promise<
+          OperationInfiniteData<
+            typeof items.listPagedItems.types.data,
+            typeof items.listPagedItems.types.parameters
+          >
+        > = items.listPagedItems.infiniteQuery<NarrowCursorParam>(narrowOpts);
+
+        void [withPageParam, checkSelected, withNarrowOpts];
       `,
         ],
         [

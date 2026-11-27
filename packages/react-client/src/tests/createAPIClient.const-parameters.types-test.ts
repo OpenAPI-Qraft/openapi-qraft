@@ -525,6 +525,35 @@ const createFullClient = () =>
     },
   };
 
+  type NarrowGetFilesParameters = {
+    header: { 'x-monite-version': '1.0.0' };
+    query: { id__in: ('1' | '2')[]; page: 'p1' | 'p2' };
+  };
+
+  const directNarrowImperativeInfiniteOptions: ServiceOperationImperativeInfiniteQueryOptions<
+    typeof qraft.files.getFiles.schema,
+    typeof qraft.files.getFiles.types.data,
+    typeof qraft.files.getFiles.types.parameters,
+    NarrowGetFilesParameters,
+    typeof qraft.files.getFiles.types.error
+  > = {
+    parameters: constParameters,
+    initialPageParam: { query: { page: 'p1' } },
+    getNextPageParam: (_lastPage, _allPages, lastPageParam) => {
+      lastPageParam.query?.page satisfies 'p1' | 'p2' | undefined;
+      return { query: { page: 'p2' } };
+    },
+  };
+
+  void (qraft.files.getFiles.infiniteQuery<NarrowGetFilesParameters>(
+    directNarrowImperativeInfiniteOptions
+  ) satisfies Promise<
+    OperationInfiniteData<
+      typeof qraft.files.getFiles.types.data,
+      typeof qraft.files.getFiles.types.parameters
+    >
+  >);
+
   void [
     directFetchInfiniteOptions,
     directEnsureInfiniteOptions,

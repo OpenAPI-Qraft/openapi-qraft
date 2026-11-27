@@ -9,7 +9,7 @@ export interface ServiceOperationImperativeInfiniteQuery<
 > {
   infiniteQuery<
     TPageParam extends TQueryParams = TQueryParams,
-    TData = OperationInfiniteData<TOperationQueryFnData, TPageParam>,
+    TData = OperationInfiniteData<TOperationQueryFnData, TQueryParams>,
   >(
     options: ServiceOperationImperativeInfiniteQueryOptions<
       TSchema,

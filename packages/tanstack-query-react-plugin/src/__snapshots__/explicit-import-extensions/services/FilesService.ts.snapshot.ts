@@ -363,7 +363,7 @@ export interface FilesService {
          * console.log(data.pages);
          * ```
          */
-        infiniteQuery<TPageParam extends GetFilesParameters = GetFilesParameters, TData = OperationInfiniteData<GetFilesData, TPageParam>>(options: ServiceOperationImperativeInfiniteQueryOptions<GetFilesSchema, GetFilesData, GetFilesParameters, NoInfer<TPageParam>, GetFilesError, TData>): Promise<TData>;
+        infiniteQuery<TPageParam extends GetFilesParameters = GetFilesParameters, TData = OperationInfiniteData<GetFilesData, GetFilesParameters>>(options: ServiceOperationImperativeInfiniteQueryOptions<GetFilesSchema, GetFilesData, GetFilesParameters, NoInfer<TPageParam>, GetFilesError, TData>): Promise<TData>;
         /**
          * Performs an asynchronous data fetching operation, caches the result, and returns the fetched data.
          * Useful for imperative fetching outside of React components or when fresh data is needed on demand.
@@ -1377,7 +1377,7 @@ export interface FilesService {
          * console.log(data.pages);
          * ```
          */
-        infiniteQuery<TPageParam extends GetFileListParameters = GetFileListParameters, TData = OperationInfiniteData<GetFileListData, TPageParam>>(options: ServiceOperationImperativeInfiniteQueryOptions<GetFileListSchema, GetFileListData, GetFileListParameters, NoInfer<TPageParam>, GetFileListError, TData>): Promise<TData>;
+        infiniteQuery<TPageParam extends GetFileListParameters = GetFileListParameters, TData = OperationInfiniteData<GetFileListData, GetFileListParameters>>(options: ServiceOperationImperativeInfiniteQueryOptions<GetFileListSchema, GetFileListData, GetFileListParameters, NoInfer<TPageParam>, GetFileListError, TData>): Promise<TData>;
         /**
          * Performs an asynchronous data fetching operation, caches the result, and returns the fetched data.
          * Useful for imperative fetching outside of React components or when fresh data is needed on demand.

@@ -442,7 +442,7 @@ export interface ApprovalPoliciesService {
          * console.log(data.pages);
          * ```
          */
-        infiniteQuery<TPageParam extends GetApprovalPoliciesIdParameters = GetApprovalPoliciesIdParameters, TData = OperationInfiniteData<GetApprovalPoliciesIdData, TPageParam>>(options: ServiceOperationImperativeInfiniteQueryOptions<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdData, GetApprovalPoliciesIdParameters, NoInfer<TPageParam>, GetApprovalPoliciesIdError, TData>): Promise<TData>;
+        infiniteQuery<TPageParam extends GetApprovalPoliciesIdParameters = GetApprovalPoliciesIdParameters, TData = OperationInfiniteData<GetApprovalPoliciesIdData, GetApprovalPoliciesIdParameters>>(options: ServiceOperationImperativeInfiniteQueryOptions<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdData, GetApprovalPoliciesIdParameters, NoInfer<TPageParam>, GetApprovalPoliciesIdError, TData>): Promise<TData>;
         /**
          * Performs an asynchronous data fetching operation, caches the result, and returns the fetched data.
          * Useful for imperative fetching outside of React components or when fresh data is needed on demand.
@@ -1132,7 +1132,7 @@ export interface ApprovalPoliciesService {
          * console.log(data.pages);
          * ```
          */
-        infiniteQuery<TPageParam extends DeleteApprovalPoliciesIdParameters = DeleteApprovalPoliciesIdParameters, TData = OperationInfiniteData<DeleteApprovalPoliciesIdData, TPageParam>>(options: ServiceOperationImperativeInfiniteQueryOptions<DeleteApprovalPoliciesIdSchema, DeleteApprovalPoliciesIdData, DeleteApprovalPoliciesIdParameters, NoInfer<TPageParam>, DeleteApprovalPoliciesIdError, TData>): Promise<TData>;
+        infiniteQuery<TPageParam extends DeleteApprovalPoliciesIdParameters = DeleteApprovalPoliciesIdParameters, TData = OperationInfiniteData<DeleteApprovalPoliciesIdData, DeleteApprovalPoliciesIdParameters>>(options: ServiceOperationImperativeInfiniteQueryOptions<DeleteApprovalPoliciesIdSchema, DeleteApprovalPoliciesIdData, DeleteApprovalPoliciesIdParameters, NoInfer<TPageParam>, DeleteApprovalPoliciesIdError, TData>): Promise<TData>;
         /**
          * Performs an asynchronous data fetching operation, caches the result, and returns the fetched data.
          * Useful for imperative fetching outside of React components or when fresh data is needed on demand.
@@ -2045,7 +2045,7 @@ export interface ApprovalPoliciesService {
          * console.log(data.pages);
          * ```
          */
-        infiniteQuery<TPageParam extends PatchApprovalPoliciesIdQueryParameters = PatchApprovalPoliciesIdQueryParameters, TData = OperationInfiniteData<PatchApprovalPoliciesIdData, TPageParam>>(options: ServiceOperationImperativeInfiniteQueryOptions<PatchApprovalPoliciesIdSchema, PatchApprovalPoliciesIdData, PatchApprovalPoliciesIdQueryParameters, NoInfer<TPageParam>, PatchApprovalPoliciesIdError, TData>): Promise<TData>;
+        infiniteQuery<TPageParam extends PatchApprovalPoliciesIdQueryParameters = PatchApprovalPoliciesIdQueryParameters, TData = OperationInfiniteData<PatchApprovalPoliciesIdData, PatchApprovalPoliciesIdQueryParameters>>(options: ServiceOperationImperativeInfiniteQueryOptions<PatchApprovalPoliciesIdSchema, PatchApprovalPoliciesIdData, PatchApprovalPoliciesIdQueryParameters, NoInfer<TPageParam>, PatchApprovalPoliciesIdError, TData>): Promise<TData>;
         /**
          * Performs an asynchronous data fetching operation, caches the result, and returns the fetched data.
          * Useful for imperative fetching outside of React components or when fresh data is needed on demand.

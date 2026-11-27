@@ -428,7 +428,7 @@ export interface ApprovalPoliciesService {
          * console.log(data.pages);
          * ```
          */
-        infiniteQuery<TPageParam extends GetApprovalPoliciesIdParameters = GetApprovalPoliciesIdParameters, TData = OperationInfiniteData<GetApprovalPoliciesIdData, TPageParam>>(options: ServiceOperationImperativeInfiniteQueryOptions<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdData, GetApprovalPoliciesIdParameters, NoInfer<TPageParam>, GetApprovalPoliciesIdError, TData>): Promise<TData>;
+        infiniteQuery<TPageParam extends GetApprovalPoliciesIdParameters = GetApprovalPoliciesIdParameters, TData = OperationInfiniteData<GetApprovalPoliciesIdData, GetApprovalPoliciesIdParameters>>(options: ServiceOperationImperativeInfiniteQueryOptions<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdData, GetApprovalPoliciesIdParameters, NoInfer<TPageParam>, GetApprovalPoliciesIdError, TData>): Promise<TData>;
         /**
          * Performs an asynchronous data fetching operation, caches the result, and returns the fetched data.
          * Useful for imperative fetching outside of React components or when fresh data is needed on demand.
