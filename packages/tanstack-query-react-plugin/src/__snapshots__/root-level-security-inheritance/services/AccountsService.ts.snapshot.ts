@@ -6,6 +6,7 @@
 import type { paths } from "../../openapi.d.ts";
 import type { DeepReadonly, InvalidateQueryFilters, IsFetchingQueryFilters, OperationError, OperationInfiniteData, PartialParameters, QueryFiltersByParameters, QueryFiltersByQueryKey, QueryFnOptions, QueryFnOptionsByParameters, QueryFnOptionsByQueryKey, RequestFnResponse, ServiceOperationEnsureInfiniteQueryDataOptions, ServiceOperationEnsureQueryDataOptions, ServiceOperationFetchInfiniteQueryOptions, ServiceOperationFetchInfiniteQueryVoidOption, ServiceOperationFetchQueryOptions, ServiceOperationInfiniteQueryKey, ServiceOperationQueryKey, UseQueryOptionsForUseQueries, UseQueryOptionsForUseSuspenseQuery, QraftServiceOperationsToken } from "@openapi-qraft/tanstack-query-react-types";
 import type { CancelOptions, DefinedInitialDataInfiniteOptions, DefinedInitialDataOptions, DefinedUseInfiniteQueryResult, DefinedUseQueryResult, InfiniteQueryPageParamsOptions, InvalidateOptions, QueryState, RefetchOptions, ResetOptions, SetDataOptions, UndefinedInitialDataInfiniteOptions, UndefinedInitialDataOptions, Updater, UseInfiniteQueryResult, UseQueryResult, UseSuspenseInfiniteQueryOptions, UseSuspenseInfiniteQueryResult, UseSuspenseQueryOptions, UseSuspenseQueryResult } from "@tanstack/react-query";
+import type { ServiceOperationImperativeInfiniteQueryOptions, ServiceOperationImperativeQueryOptions } from "@openapi-qraft/tanstack-query-react-types/imperative-query";
 export interface AccountsService {
     getAccounts: {
         /**/
@@ -178,17 +179,114 @@ export interface AccountsService {
             queries: T;
             combine?: (results: Array<UseSuspenseQueryResult<GetAccountsData, GetAccountsError>>) => TCombinedResult;
         }): TCombinedResult;
-        /**/
+        /**
+         * Performs an asynchronous data fetching operation and caches the result.
+         * Returns cached data when fresh, or fetches and resolves with the latest data otherwise.
+         *
+         * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/query-client/query|`query(...)` documentation}
+         * @example Query without parameters
+         * ```ts
+         * const data = await qraft.accounts.getAccounts.query()
+         * ```
+         */
+        query<TData = GetAccountsData>(options: ServiceOperationImperativeQueryOptions<GetAccountsSchema, GetAccountsData, GetAccountsParameters, GetAccountsError, TData> | void): Promise<TData>;
+        /**
+         * Performs an asynchronous paginated data fetching operation and caches the pages.
+         * Returns cached pages when fresh, or fetches and resolves with the latest paginated result.
+         *
+         * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/query-client/infiniteQuery|`infiniteQuery(...)` documentation}
+         *
+         * @example Infinite Query
+         * ```ts
+         * const data = await qraft.accounts.getAccounts.infiniteQuery({
+         *     getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) => getNextPageParams(lastPage)
+         * })
+         *
+         * console.log(data.pages);
+         * ```
+         */
+        infiniteQuery<TPageParam extends GetAccountsParameters = GetAccountsParameters, TData = OperationInfiniteData<GetAccountsData, TPageParam>>(options: ServiceOperationImperativeInfiniteQueryOptions<GetAccountsSchema, GetAccountsData, GetAccountsParameters, NoInfer<DeepReadonly<TPageParam>>, GetAccountsError, TData>): Promise<TData>;
+        /**
+         * Performs an asynchronous data fetching operation, caches the result, and returns the fetched data.
+         * Useful for imperative fetching outside of React components or when fresh data is needed on demand.
+         *
+         * @deprecated Use `query(...)` instead.
+         * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/query-client/fetchQuery|`fetchQuery(...)` documentation}
+         * @example Fetch query without parameters
+         * ```ts
+         * const data = await qraft.accounts.getAccounts.fetchQuery()
+         * ```
+         */
         fetchQuery(options: ServiceOperationFetchQueryOptions<GetAccountsSchema, GetAccountsData, GetAccountsParameters, GetAccountsError> | void): Promise<GetAccountsData>;
-        /**/
+        /**
+         * Preloads and caches data before it is needed.
+         * Resolves when the request completes without returning the cached data.
+         *
+         * @deprecated Use `query(...)` instead (e.g., `query(...).catch(() => {})` if you want to ignore errors).
+         * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/query-client/prefetchQuery|`prefetchQuery(...)` documentation}
+         * @example Prefetch query without parameters
+         * ```ts
+         * await qraft.accounts.getAccounts.prefetchQuery()
+         * ```
+         */
         prefetchQuery(options: ServiceOperationFetchQueryOptions<GetAccountsSchema, GetAccountsData, GetAccountsParameters, GetAccountsError> | void): Promise<void>;
-        /**/
+        /**
+         * Returns existing cached data if available, or fetches and caches it otherwise.
+         *
+         * @deprecated Use `query({ ...options, staleTime: 'static' })` instead.
+         * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/query-client/ensureQueryData|`ensureQueryData(...)` documentation}
+         * @example Ensure query data without parameters
+         * ```ts
+         * const data = await qraft.accounts.getAccounts.ensureQueryData()
+         * ```
+         */
         ensureQueryData(options: ServiceOperationEnsureQueryDataOptions<GetAccountsSchema, GetAccountsData, GetAccountsParameters, GetAccountsError> | void): Promise<GetAccountsData>;
-        /**/
+        /**
+         * Performs an asynchronous paginated data fetching operation, caches the pages, and returns the result.
+         *
+         * @deprecated Use `infiniteQuery(...)` instead.
+         * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/query-client/fetchInfiniteQuery|`fetchInfiniteQuery(...)` documentation}
+         *
+         * @example Fetch Infinite Query
+         * ```ts
+         * const data = await qraft.accounts.getAccounts.fetchInfiniteQuery({
+         *     getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) => getNextPageParams(lastPage)
+         * })
+         *
+         * console.log(data.pages);
+         * ```
+         */
         fetchInfiniteQuery<TPageParam extends GetAccountsParameters>(options: ServiceOperationFetchInfiniteQueryOptions<GetAccountsSchema, GetAccountsData, GetAccountsParameters, DeepReadonly<TPageParam>, GetAccountsError> | ServiceOperationFetchInfiniteQueryVoidOption): Promise<OperationInfiniteData<GetAccountsData, GetAccountsParameters>>;
-        /**/
+        /**
+         * Preloads and caches paginated data before it is needed.
+         * Resolves when the request completes without returning the cached pages.
+         *
+         * @deprecated Use `infiniteQuery(...)` instead (e.g., `infiniteQuery(...).catch(() => {})` if you want to ignore errors).
+         * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/query-client/prefetchInfiniteQuery|`prefetchInfiniteQuery(...)` documentation}
+         *
+         * @example Prefetch Infinite Query
+         * ```ts
+         * await qraft.accounts.getAccounts.prefetchInfiniteQuery({
+         *     getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) => getNextPageParams(lastPage)
+         * })
+         * ```
+         */
         prefetchInfiniteQuery<TPageParam extends GetAccountsParameters>(options: ServiceOperationFetchInfiniteQueryOptions<GetAccountsSchema, GetAccountsData, GetAccountsParameters, DeepReadonly<TPageParam>, GetAccountsError> | ServiceOperationFetchInfiniteQueryVoidOption): Promise<void>;
-        /**/
+        /**
+         * Returns existing cached paginated data if available, or fetches and caches it otherwise.
+         *
+         * @deprecated Use `infiniteQuery({ ...options, staleTime: 'static' })` instead.
+         * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/query-client/ensureInfiniteQueryData|`ensureInfiniteQueryData(...)` documentation}
+         *
+         * @example Ensure Infinite Query Data
+         * ```ts
+         * const data = await qraft.accounts.getAccounts.ensureInfiniteQueryData({
+         *     getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) => getNextPageParams(lastPage)
+         * })
+         *
+         * console.log(data.pages);
+         * ```
+         */
         ensureInfiniteQueryData<TPageParam extends GetAccountsParameters>(options: ServiceOperationEnsureInfiniteQueryDataOptions<GetAccountsSchema, GetAccountsData, GetAccountsParameters, DeepReadonly<TPageParam>, GetAccountsError> | ServiceOperationFetchInfiniteQueryVoidOption): Promise<OperationInfiniteData<GetAccountsData, GetAccountsParameters>>;
         /**/
         getQueryData(parameters: ServiceOperationQueryKey<GetAccountsSchema, GetAccountsParameters> | (DeepReadonly<GetAccountsParameters> | void)): GetAccountsData | undefined;
@@ -408,17 +506,114 @@ export interface AccountsService {
             queries: T;
             combine?: (results: Array<UseSuspenseQueryResult<GetAccountProfileData, GetAccountProfileError>>) => TCombinedResult;
         }): TCombinedResult;
-        /**/
+        /**
+         * Performs an asynchronous data fetching operation and caches the result.
+         * Returns cached data when fresh, or fetches and resolves with the latest data otherwise.
+         *
+         * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/query-client/query|`query(...)` documentation}
+         * @example Query without parameters
+         * ```ts
+         * const data = await qraft.accounts.getAccountProfile.query()
+         * ```
+         */
+        query<TData = GetAccountProfileData>(options: ServiceOperationImperativeQueryOptions<GetAccountProfileSchema, GetAccountProfileData, GetAccountProfileParameters, GetAccountProfileError, TData> | void): Promise<TData>;
+        /**
+         * Performs an asynchronous paginated data fetching operation and caches the pages.
+         * Returns cached pages when fresh, or fetches and resolves with the latest paginated result.
+         *
+         * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/query-client/infiniteQuery|`infiniteQuery(...)` documentation}
+         *
+         * @example Infinite Query
+         * ```ts
+         * const data = await qraft.accounts.getAccountProfile.infiniteQuery({
+         *     getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) => getNextPageParams(lastPage)
+         * })
+         *
+         * console.log(data.pages);
+         * ```
+         */
+        infiniteQuery<TPageParam extends GetAccountProfileParameters = GetAccountProfileParameters, TData = OperationInfiniteData<GetAccountProfileData, TPageParam>>(options: ServiceOperationImperativeInfiniteQueryOptions<GetAccountProfileSchema, GetAccountProfileData, GetAccountProfileParameters, NoInfer<DeepReadonly<TPageParam>>, GetAccountProfileError, TData>): Promise<TData>;
+        /**
+         * Performs an asynchronous data fetching operation, caches the result, and returns the fetched data.
+         * Useful for imperative fetching outside of React components or when fresh data is needed on demand.
+         *
+         * @deprecated Use `query(...)` instead.
+         * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/query-client/fetchQuery|`fetchQuery(...)` documentation}
+         * @example Fetch query without parameters
+         * ```ts
+         * const data = await qraft.accounts.getAccountProfile.fetchQuery()
+         * ```
+         */
         fetchQuery(options: ServiceOperationFetchQueryOptions<GetAccountProfileSchema, GetAccountProfileData, GetAccountProfileParameters, GetAccountProfileError> | void): Promise<GetAccountProfileData>;
-        /**/
+        /**
+         * Preloads and caches data before it is needed.
+         * Resolves when the request completes without returning the cached data.
+         *
+         * @deprecated Use `query(...)` instead (e.g., `query(...).catch(() => {})` if you want to ignore errors).
+         * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/query-client/prefetchQuery|`prefetchQuery(...)` documentation}
+         * @example Prefetch query without parameters
+         * ```ts
+         * await qraft.accounts.getAccountProfile.prefetchQuery()
+         * ```
+         */
         prefetchQuery(options: ServiceOperationFetchQueryOptions<GetAccountProfileSchema, GetAccountProfileData, GetAccountProfileParameters, GetAccountProfileError> | void): Promise<void>;
-        /**/
+        /**
+         * Returns existing cached data if available, or fetches and caches it otherwise.
+         *
+         * @deprecated Use `query({ ...options, staleTime: 'static' })` instead.
+         * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/query-client/ensureQueryData|`ensureQueryData(...)` documentation}
+         * @example Ensure query data without parameters
+         * ```ts
+         * const data = await qraft.accounts.getAccountProfile.ensureQueryData()
+         * ```
+         */
         ensureQueryData(options: ServiceOperationEnsureQueryDataOptions<GetAccountProfileSchema, GetAccountProfileData, GetAccountProfileParameters, GetAccountProfileError> | void): Promise<GetAccountProfileData>;
-        /**/
+        /**
+         * Performs an asynchronous paginated data fetching operation, caches the pages, and returns the result.
+         *
+         * @deprecated Use `infiniteQuery(...)` instead.
+         * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/query-client/fetchInfiniteQuery|`fetchInfiniteQuery(...)` documentation}
+         *
+         * @example Fetch Infinite Query
+         * ```ts
+         * const data = await qraft.accounts.getAccountProfile.fetchInfiniteQuery({
+         *     getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) => getNextPageParams(lastPage)
+         * })
+         *
+         * console.log(data.pages);
+         * ```
+         */
         fetchInfiniteQuery<TPageParam extends GetAccountProfileParameters>(options: ServiceOperationFetchInfiniteQueryOptions<GetAccountProfileSchema, GetAccountProfileData, GetAccountProfileParameters, DeepReadonly<TPageParam>, GetAccountProfileError> | ServiceOperationFetchInfiniteQueryVoidOption): Promise<OperationInfiniteData<GetAccountProfileData, GetAccountProfileParameters>>;
-        /**/
+        /**
+         * Preloads and caches paginated data before it is needed.
+         * Resolves when the request completes without returning the cached pages.
+         *
+         * @deprecated Use `infiniteQuery(...)` instead (e.g., `infiniteQuery(...).catch(() => {})` if you want to ignore errors).
+         * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/query-client/prefetchInfiniteQuery|`prefetchInfiniteQuery(...)` documentation}
+         *
+         * @example Prefetch Infinite Query
+         * ```ts
+         * await qraft.accounts.getAccountProfile.prefetchInfiniteQuery({
+         *     getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) => getNextPageParams(lastPage)
+         * })
+         * ```
+         */
         prefetchInfiniteQuery<TPageParam extends GetAccountProfileParameters>(options: ServiceOperationFetchInfiniteQueryOptions<GetAccountProfileSchema, GetAccountProfileData, GetAccountProfileParameters, DeepReadonly<TPageParam>, GetAccountProfileError> | ServiceOperationFetchInfiniteQueryVoidOption): Promise<void>;
-        /**/
+        /**
+         * Returns existing cached paginated data if available, or fetches and caches it otherwise.
+         *
+         * @deprecated Use `infiniteQuery({ ...options, staleTime: 'static' })` instead.
+         * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/query-client/ensureInfiniteQueryData|`ensureInfiniteQueryData(...)` documentation}
+         *
+         * @example Ensure Infinite Query Data
+         * ```ts
+         * const data = await qraft.accounts.getAccountProfile.ensureInfiniteQueryData({
+         *     getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) => getNextPageParams(lastPage)
+         * })
+         *
+         * console.log(data.pages);
+         * ```
+         */
         ensureInfiniteQueryData<TPageParam extends GetAccountProfileParameters>(options: ServiceOperationEnsureInfiniteQueryDataOptions<GetAccountProfileSchema, GetAccountProfileData, GetAccountProfileParameters, DeepReadonly<TPageParam>, GetAccountProfileError> | ServiceOperationFetchInfiniteQueryVoidOption): Promise<OperationInfiniteData<GetAccountProfileData, GetAccountProfileParameters>>;
         /**/
         getQueryData(parameters: ServiceOperationQueryKey<GetAccountProfileSchema, GetAccountProfileParameters> | (DeepReadonly<GetAccountProfileParameters> | void)): GetAccountProfileData | undefined;

@@ -1,0 +1,86 @@
+---
+sidebar_label: query()
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# query(...)
+
+The method executes an imperative _Query_ using `QueryClient`, without React Hooks.
+In `@tanstack/react-query >= 5.108.1`, `query` is the unified replacement for [`fetchQuery`](./fetchQuery.mdx), [`prefetchQuery`](./prefetchQuery.mdx) (via `.catch(() => {})`), and [`ensureQueryData`](./ensureQueryData.mdx) (via `staleTime: 'static'`).
+See the TanStack [_queryClient.query 🌴_](https://tanstack.com/query/latest/docs/reference/QueryClient#queryclientquery) documentation.
+
+:::info Requirements
+
+- Requires `@tanstack/react-query >= 5.108.1`.
+- Code generation emits `query` when the detected or configured `--tanstack-query-version` is `5.108.1` or higher. If you upgrade `@tanstack/react-query` from `< 5.108.1` to `>= 5.108.1`, regenerate your API client or pass `--tanstack-query-version 5.108.1`.
+
+:::
+
+```ts
+const data = await api.<service>.<operation>.query({
+  parameters,
+  staleTime,
+  select,
+});
+```
+
+## Arguments
+
+- `options?: { parameters, queryKey, requestFn, baseUrl, queryFn, select, staleTime, ... }`
+  - **Required if OpenAPI defines required parameters**, otherwise the `options` argument itself can be omitted.
+  - Pass either `parameters` (`{ path, query, header, body }`) or a typed `queryKey` (mutually exclusive).
+  - For operations generated with `--queryable-write-operations`, `parameters` may also include `body`.
+    In that mode, `body` is part of the query key and cache identity for query-client methods.
+  - Pass `staleTime: 'static'` to return cached data when present without refetching (replacing `ensureQueryData`).
+  - Pass `select` to transform the resolved value without modifying what is stored in the query cache.
+  - Pass either `requestFn` / `baseUrl` or a custom `queryFn` (mutually exclusive).
+
+## Returns
+
+`Promise<TData>`: resolves with the query data (or the return type of `select` if provided), strictly-typed ✨
+
+## Examples
+
+<Tabs>
+  <TabItem value="parameters" label="Fetch with parameters">
+    ```tsx
+    const pet = await api.pet.getPetById.query({
+      parameters: { path: { petId: 123 } },
+    });
+
+    console.log(pet.name);
+    ```
+  </TabItem>
+  <TabItem value="static" label="Ensure cached data (staleTime: 'static')">
+    ```tsx
+    // Returns cached data if available without refetching
+    const petName = await api.pet.getPetById.query({
+      parameters: { path: { petId: 123 } },
+      staleTime: 'static',
+      select: (pet) => pet.name,
+    });
+    ```
+  </TabItem>
+  <TabItem value="prefetch" label="Prefetch (fire and forget)">
+    ```tsx
+    // Swallows errors just like prefetchQuery
+    api.pet.getPetById
+      .query({ parameters: { path: { petId: 123 } } })
+      .catch(() => {});
+    ```
+  </TabItem>
+  <TabItem value="query-key" label="Custom queryKey & queryFn">
+    ```tsx
+    const queryKey = api.pet.getPetById.getQueryKey({
+      path: { petId: 123 },
+    });
+
+    const pet = await api.pet.getPetById.query({
+      queryKey,
+      queryFn: ({ signal }) => fetchPetById(123, { signal }),
+    });
+    ```
+  </TabItem>
+</Tabs>

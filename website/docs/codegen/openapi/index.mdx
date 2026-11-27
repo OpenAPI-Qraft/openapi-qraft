@@ -147,11 +147,12 @@ It is possible to use multiple plugins at the same time. For example, `--plugin 
 :::
 
 ### `--plugin tanstack-query-react` options
+
 - **`--openapi-types-import-path <path>`:** Set the path to the schema types definition file to ensure consistent type
   usage (assumed, you already have `schema.d.ts` as a result of the [`openapi-typescript`](https://github.com/drwpow/openapi-typescript) utility). You also probably
   don't need the ~~`--plugin openapi-typescript`~~ option in this case.
   - The path is the exact import specifier used in the _generated services_. It should be _relative_ to the service
-  output directory. _Optional_, if the `--plugin openapi-typescript` is used. _Required_ otherwise.
+    output directory. _Optional_, if the `--plugin openapi-typescript` is used. _Required_ otherwise.
     - Examples:
       - `--openapi-types-import-path ../openapi.d.ts`
       - `--openapi-types-import-path '@/api/openapi.d.ts'`
@@ -162,10 +163,10 @@ It is possible to use multiple plugins at the same time. For example, `--plugin 
   Can be specified multiple times to define different overrides. _(optional)_
   - Examples:
     - `--override-import-type services @openapi-qraft/tanstack-query-react-types:OperationError:../../type-overrides/operation-error.js` - replaces
-    the import of `OperationError` type from `@openapi-qraft/tanstack-query-react-types` with an import from `../../type-overrides/operation-error.js`
-    in all service files.
+      the import of `OperationError` type from `@openapi-qraft/tanstack-query-react-types` with an import from `../../type-overrides/operation-error.js`
+      in all service files.
     - `--override-import-type create-api-client @openapi-qraft/react:CreateAPIQueryClientOptions:../type-overrides/create-query-client-options.js` - replaces
-    the import in the `create-api-client.ts` file.
+      the import in the `create-api-client.ts` file.
   - This option is particularly useful when you need to provide custom implementations of library types
     that better suit your project's needs.
 - **`--operation-parameters-type-wrapper <parameters wrappers...>`:** Configure custom _ParametersWrapper_ types for specific operation patterns. This allows you to use custom type
@@ -214,8 +215,8 @@ It is possible to use multiple plugins at the same time. For example, `--plugin 
     - `--create-api-client-fn createAPIClient services:all callbacks:all` - creates the `createAPIClient()` function that
       includes all services and all callbacks by default (_default_ behavior)
     - `--create-api-client-fn createMinimalAPIClient services:none callbacks:none` - creates the `createMinimalAPIClient()`
-    function that generates a **super lightweight 🪶** API client with _zero overhead_ - no default _services_ or _callbacks_ included. Perfect for
-    building a **minimal bundle size** client where you explicitly control which services and callbacks to include.
+      function that generates a **super lightweight 🪶** API client with _zero overhead_ - no default _services_ or _callbacks_ included. Perfect for
+      building a **minimal bundle size** client where you explicitly control which services and callbacks to include.
     - `--create-api-client-fn createCustomClient filename:create-custom-api services:none callbacks:setQueryData,getQueryData` - creates
       the `createCustomClient()` function in the `create-custom-api.ts` file with no default services and only `setQueryData()` and `getQueryData()` callbacks
     - `--create-api-client-fn createAPIClient context:APIClientContext callbacks:useQuery,useMutation` - creates
@@ -227,10 +228,18 @@ It is possible to use multiple plugins at the same time. For example, `--plugin 
   instead of command-line parameters. See the [Redocly configuration documentation](../cli/redocly-config.mdx#generating-multiple-api-client-functions)
   for more details on how to configure multiple _create API client functions_ in a YAML file.
   ::::
+
 - **`--root-security`**: Use root-level OpenAPI `security` as the default for operations that do not define their own `security`. Operation-level `security` overrides it according to OpenAPI semantics. _(optional, disabled by default)_
   - Use this option when your OpenAPI document defines `security` on the top level and you want generated operation schemas to include those security requirements automatically.
   - Without this option, Qraft only includes operation-level `security` in generated schemas.
   - This is especially useful together with [`QraftSecureRequestFn`](../../authorization/qraft-secure-request-fn.mdx), because secure handlers rely on generated operation `schema.security`.
+- **`--tanstack-query-version <version>`**: Target `@tanstack/react-query` version (for example, `5.80.0` or `5.108.1`). _(optional)_
+  - Enables [`query`](../../query-client/query.mdx) and [`infiniteQuery`](../../query-client/infiniteQuery.mdx) code generation when targeting `@tanstack/react-query >= 5.108.1`.
+  - If omitted, OpenAPI Qraft detects the installed `@tanstack/react-query` version from `node_modules` or the nearest `package.json`, defaulting conservatively to `< 5.108.1` when undetectable.
+  - When upgrading `@tanstack/react-query` from `< 5.108.1` to `>= 5.108.1`, regenerate the client so generated service types include `query` and `infiniteQuery`.
+- **`--tanstack-query-deprecations [bool]`**: Emit `@deprecated` TSDoc tags in generated `*Service.ts` files for methods deprecated in the target `@tanstack/react-query` version (`fetchQuery`, `prefetchQuery`, `ensureQueryData`, `fetchInfiniteQuery`, `prefetchInfiniteQuery`, `ensureInfiniteQueryData` in `>= 5.108.1`). _(optional)_
+  - Defaults to `true` when the target version introduces deprecations (`>= 5.108.1`), and `false` otherwise.
+  - Passing `--tanstack-query-deprecations` (`true`) when the target version has no deprecations (`< 5.108.1`) throws a CLI error.
 
 ## `--plugin openapi-typescript` options
 

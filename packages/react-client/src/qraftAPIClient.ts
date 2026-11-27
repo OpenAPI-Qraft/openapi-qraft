@@ -376,6 +376,8 @@ export type QueryOperationHookCallbacks = Extract<
 type QueryOperationCallbacks =
   | Extract<
       keyof ServiceMethods,
+      | 'query'
+      | 'infiniteQuery'
       | 'fetchInfiniteQuery'
       | 'fetchQuery'
       | 'prefetchInfiniteQuery'

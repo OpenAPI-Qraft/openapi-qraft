@@ -31,6 +31,8 @@ export { ensureQueryData } from './ensureQueryData.js';
 export { fetchInfiniteQuery } from './fetchInfiniteQuery.js';
 export { prefetchInfiniteQuery } from './prefetchInfiniteQuery.js';
 export { ensureInfiniteQueryData } from './ensureInfiniteQueryData.js';
+export { query } from './query.js';
+export { infiniteQuery } from './infiniteQuery.js';
 export { getQueryState } from './getQueryState.js';
 export { getInfiniteQueryState } from './getInfiniteQueryState.js';
 export { operationInvokeFn } from './operationInvokeFn.js';

@@ -2,7 +2,9 @@ import type { ReactNode } from 'react';
 import {
   fetchQuery,
   getQueryData,
+  infiniteQuery,
   invalidateQueries,
+  query,
   setQueryData,
   useInfiniteQuery,
 } from '@openapi-qraft/react/callbacks/index';
@@ -353,6 +355,87 @@ describe('Create API Client with Context', () => {
             });
 
             api.files.getFileList.fetchQuery().then(setData);
+          }, [options]);
+
+          return data;
+        },
+        {
+          wrapper: (props) => (
+            <ContextProviders queryClient={queryClient} {...props} />
+          ),
+        }
+      );
+
+      await waitFor(() => {
+        expect(result.current).toEqual(filesFindAllResponsePayloadFixtures);
+      });
+    });
+  });
+
+  describe('custom query and infiniteQuery with context', () => {
+    it('supports query with single service', async () => {
+      const queryClient = new QueryClient();
+      const api = createInternalReactAPIClient(
+        getFileList,
+        {
+          queryClient,
+          requestFn,
+          baseUrl,
+        },
+        { query }
+      );
+
+      const data = await api.query();
+
+      expect(data).toEqual(filesFindAllResponsePayloadFixtures);
+    });
+
+    it('supports query and infiniteQuery with all services', async () => {
+      const queryClient = new QueryClient();
+      const api = createInternalReactAPIClient(
+        services,
+        {
+          queryClient,
+          requestFn,
+          baseUrl,
+        },
+        { query, infiniteQuery }
+      );
+
+      const queryData = await api.files.getFileList.query({
+        parameters: { query: { id__in: ['1'] } },
+        select: (data) => data.data.length,
+      });
+      expect(queryData).toBe(filesFindAllResponsePayloadFixtures.data.length);
+
+      const infiniteData = await api.files.getFileList.infiniteQuery({
+        initialPageParam: { query: { id__in: ['1'] } },
+        getNextPageParam: () => undefined,
+      });
+      expect(infiniteData).toEqual({
+        pageParams: [{ query: { id__in: ['1'] } }],
+        pages: [filesFindAllResponsePayloadFixtures],
+      });
+    });
+
+    it('supports query with options from useContext inside useEffect', async () => {
+      const queryClient = new QueryClient();
+
+      const { result } = renderHook(
+        () => {
+          const options = useContext(InternalReactAPIClientContext);
+          const [data, setData] = useState<
+            typeof filesFindAllResponsePayloadFixtures | null
+          >(null);
+
+          useEffect(() => {
+            if (!options) return;
+
+            const api = createInternalReactAPIClient(services, options, {
+              query,
+            });
+
+            api.files.getFileList.query().then(setData);
           }, [options]);
 
           return data;

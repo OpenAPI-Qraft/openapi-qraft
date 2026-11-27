@@ -4,6 +4,12 @@ sidebar_label: ensureInfiniteQueryData()
 
 # ensureInfiniteQueryData(...)
 
+:::warning Deprecated in `@tanstack/react-query >= 5.108.1`
+
+Use [`infiniteQuery(...)`](./infiniteQuery.mdx) with `staleTime: 'static'` instead. `ensureInfiniteQueryData` remains supported when targeting `@tanstack/react-query >= 5.80.0` (`< 5.108.1`), or when deprecations are disabled via `--tanstack-query-deprecations false`.
+
+:::
+
 The `ensureInfiniteQueryData` method is designed to fetch or retrieve cached data for an infinite query.
 If the specified query data is not already cached, it will automatically call `fetchInfiniteQuery`
 to fetch the data and return the result.

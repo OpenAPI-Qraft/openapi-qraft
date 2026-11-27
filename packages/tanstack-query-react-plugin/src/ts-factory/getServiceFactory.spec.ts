@@ -9,6 +9,7 @@ import {
 } from '@openapi-qraft/plugin/lib/processOperationNameModifierOption';
 import ts from 'typescript';
 import { describe, expect, it } from 'vitest';
+import { resolveTanStackQueryCapabilities } from '../lib/resolveTanStackQueryVersion.js';
 import { astToString } from './astToString.js';
 import { getServiceFactory } from './getServiceFactory.js';
 
@@ -231,6 +232,252 @@ describe('service operation variable names', { timeout: 30_000 }, () => {
     expect(getCompilationDiagnostics(files)).toEqual([]);
   });
 });
+
+describe(
+  'imperativeQuery and deprecatedMethods codegen',
+  { timeout: 30_000 },
+  () => {
+    it('generates and compiles query and infiniteQuery when imperativeQuery is enabled', () => {
+      const optionalService = createService(['listItems']);
+      const optionalSource = generateService(optionalService, {
+        imperativeQuery: true,
+      });
+
+      expect(optionalSource).toContain(
+        'from "@openapi-qraft/tanstack-query-react-types/imperative-query"'
+      );
+      expect(optionalSource).toContain('query<TData = ListItemsData>(');
+      expect(optionalSource).toContain('infiniteQuery<TPageParam extends');
+
+      expectCompiles(
+        optionalService,
+        optionalSource,
+        `
+      import type { ItemsService } from './ItemsService';
+      declare const items: ItemsService;
+
+      const direct: Promise<string> = items.listItems.query();
+      const emptyOpts: Promise<string> = items.listItems.query({});
+      const selected: Promise<number> = items.listItems.query({
+        staleTime: 'static',
+        select: (data) => data.length,
+      });
+      const infinite = items.listItems.infiniteQuery({
+        getNextPageParam: () => undefined,
+      });
+      const infiniteSelected: Promise<number> = items.listItems.infiniteQuery({
+        getNextPageParam: () => undefined,
+        select: (data) => data.pages.length,
+      });
+      void [direct, emptyOpts, selected, infinite, infiniteSelected];
+    `
+      );
+    });
+
+    it('compiles infiniteQuery with initialPageParam and select for optional query parameters', () => {
+      const schema: OpenAPISchemaType = {
+        openapi: '3.1.0',
+        info: { title: 'Optional params', version: '1.0.0' },
+        components: { parameters: undefined },
+        paths: {
+          '/items': {
+            get: {
+              operationId: 'listPagedItems',
+              parameters: [
+                {
+                  name: 'cursor',
+                  in: 'query',
+                  required: false,
+                  schema: { type: 'string' },
+                },
+              ],
+              responses: {
+                200: {
+                  description: 'Successful response',
+                  content: {
+                    'application/json': { schema: { type: 'string' } },
+                  },
+                },
+              },
+            },
+          },
+        },
+      };
+      const service = getServices(schema)[0];
+      const source = generateService(service, { imperativeQuery: true });
+
+      const files = new Map([
+        [path.resolve('ItemsService.ts'), source],
+        [
+          path.resolve('usage.ts'),
+          `
+        import type { ItemsService } from './ItemsService';
+        declare const items: ItemsService;
+
+        const withPageParam = items.listPagedItems.infiniteQuery({
+          initialPageParam: { query: { cursor: 'abc' } },
+          getNextPageParam: (_lastPage, _allPages, lastPageParam) => lastPageParam,
+        });
+        const withEmptyPageParam = items.listPagedItems.infiniteQuery({
+          initialPageParam: {},
+          getNextPageParam: () => undefined,
+          staleTime: 'static',
+          select: (data) => data.pages.length,
+        });
+        const checkSelected: Promise<number> = withEmptyPageParam;
+        void [withPageParam, checkSelected];
+      `,
+        ],
+        [
+          path.resolve('openapi.ts'),
+          `
+        export interface paths {
+          '/items': {
+            get: {
+              parameters: { query?: { cursor?: string } };
+              responses: { 200: { content: { 'application/json': string } } };
+            };
+          };
+        }
+      `,
+        ],
+      ]);
+
+      expect(getCompilationDiagnostics(files)).toEqual([]);
+    });
+
+    it('requires options for query when parameters are required', () => {
+      const schema: OpenAPISchemaType = {
+        openapi: '3.1.0',
+        info: { title: 'Required params', version: '1.0.0' },
+        components: { parameters: undefined },
+        paths: {
+          '/items/{itemId}': {
+            get: {
+              operationId: 'getItem',
+              parameters: [
+                {
+                  name: 'itemId',
+                  in: 'path',
+                  required: true,
+                  schema: { type: 'string' },
+                },
+              ],
+              responses: {
+                200: {
+                  description: 'Successful response',
+                  content: {
+                    'application/json': { schema: { type: 'string' } },
+                  },
+                },
+              },
+            },
+          },
+        },
+      };
+      const service = getServices(schema)[0];
+      const source = generateService(service, { imperativeQuery: true });
+
+      const files = new Map([
+        [path.resolve('ItemsService.ts'), source],
+        [
+          path.resolve('usage.ts'),
+          `
+        import type { ItemsService } from './ItemsService';
+        declare const items: ItemsService;
+        const ok: Promise<string> = items.getItem.query({
+          parameters: { path: { itemId: '1' } },
+        });
+        // @ts-expect-error - options with required parameters cannot be omitted
+        const invalid = items.getItem.query();
+        void [ok, invalid];
+      `,
+        ],
+        [
+          path.resolve('openapi.ts'),
+          `
+        export interface paths {
+          '/items/{itemId}': {
+            get: {
+              parameters: { path: { itemId: string } };
+              responses: { 200: { content: { 'application/json': string } } };
+            };
+          };
+        }
+      `,
+        ],
+      ]);
+
+      expect(getCompilationDiagnostics(files)).toEqual([]);
+    });
+
+    it('omits imperative query methods and subpath imports when imperativeQuery is disabled', () => {
+      const service = createService(['listItems']);
+      const source = generateService(service, { imperativeQuery: false });
+
+      expect(source).not.toContain('imperative-query');
+      expect(source).not.toContain('query<');
+      expect(source).not.toContain('infiniteQuery<');
+      expectCompiles(service, source);
+    });
+
+    it('emits merged @deprecated TSDoc without duplicate @deprecated tags', () => {
+      const schema: OpenAPISchemaType = {
+        openapi: '3.1.0',
+        info: { title: 'Deprecated ops', version: '1.0.0' },
+        components: { parameters: undefined },
+        paths: {
+          '/items/old': {
+            get: {
+              operationId: 'getOldItems',
+              deprecated: true,
+              summary: 'Legacy endpoint',
+              responses: {
+                200: {
+                  description: 'Successful response',
+                  content: {
+                    'application/json': { schema: { type: 'string' } },
+                  },
+                },
+              },
+            },
+          },
+        },
+      };
+      const service = getServices(schema)[0];
+      const capabilities = resolveTanStackQueryCapabilities({
+        kind: 'semver',
+        major: 5,
+        minor: 108,
+        patch: 1,
+      });
+      const source = generateService(service, {
+        imperativeQuery: capabilities.imperativeQuery,
+        deprecatedMethods: capabilities.deprecatedMethods,
+      });
+
+      expect(source).toContain(
+        '@deprecated This operation is deprecated. Use `query(...)` instead.'
+      );
+      expect(source).toContain(
+        "@deprecated This operation is deprecated. Use `query({ ...options, staleTime: 'static' })` instead."
+      );
+      expect(source).toContain(
+        '@deprecated This operation is deprecated. Use `infiniteQuery(...)` instead.'
+      );
+
+      const fetchQuerySignatureIndex = source.indexOf('fetchQuery(options:');
+      const fetchQueryBlock = source.slice(
+        source.lastIndexOf('/**', fetchQuerySignatureIndex),
+        fetchQuerySignatureIndex
+      );
+      expect(fetchQueryBlock).toContain(
+        '@deprecated This operation is deprecated. Use `query(...)` instead.'
+      );
+      expect(fetchQueryBlock.match(/@deprecated/g)).toHaveLength(1);
+    });
+  }
+);
 
 function createService(operationIds: string[]): OpenAPIService {
   const schema: OpenAPISchemaType = {

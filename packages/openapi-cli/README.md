@@ -57,6 +57,9 @@ Options:
                                                       generate several different API client functions from a single OpenAPI document. (default: null)
   --override-import-type <pathname overrides...>      Override import paths for specific types in generated files. This allows using custom type implementations instead of the default ones. Expected
                                                       format: filepath originalModule:importTypeName:customImportPath
+  --tanstack-query-version <version>                  Target @tanstack/react-query version (e.g., "5.80.0", "5.108.1"). Auto-detected from installed dependencies or package.json if omitted.
+  --tanstack-query-deprecations [bool]                Emit @deprecated JSDoc tags for methods deprecated in the target @tanstack/react-query version. Defaults to true when deprecations apply to the
+                                                      target version, false otherwise.
   --openapi-types-file-name <path>                    OpenAPI Schema types file name, e.g.: "schema.d.ts" (default: "schema.ts")
   --enum                                              Export true TS enums instead of unions
   --enum-values                                       Export enum values as arrays.
@@ -103,7 +106,6 @@ npx openapi-qraft --plugin tanstack-query-react --plugin openapi-typescript http
     - `--filter-services '/user/**,/post/**'` - include only API endpoints that start with `/user/` or `/post/`
     - `--filter-services '**,!/internal/**'` - include _all_ API endpoints _except_ those that start with `/internal/`
 - **`--operation-predefined-parameters <patterns...> `:** Predefined parameters for services. The specified services parameters will be optional. _(optional)_
-
   - **Pattern syntax:**
     - `<path glob>:<operation parameter>,...`
     - `<method> <path glob>:<operation parameter>,...`
@@ -131,7 +133,6 @@ npx openapi-qraft --plugin tanstack-query-react --plugin openapi-typescript http
     - `--operation-predefined-parameters 'post,put /**:header.x-entity-id'` - set the `Header` record `x-entity-id` as an optional parameter for the `POST` and `PUT` methods.
 
 - **`--operation-name-modifier <patterns...>`:** Modifies operation names using a pattern.
-
   - **Pattern syntax:**
     - `<path glob>:<regular expression> ==> <new operation name>`
     - `<method> <path glob>:<regular expression> ==> <new operation name>`
@@ -150,7 +151,6 @@ npx openapi-qraft --plugin tanstack-query-react --plugin openapi-typescript http
 - **`--explicit-component-exports`:** Enabling this option will export API components as separate type aliases, alongside `components` interface.
 
 - **`--redocly [config]`:** Use the Redocly configuration to generate multiple API clients. If the `[config]` parameter is not specified, the default Redocly configuration will be used: `[redocly.yaml | redocly.yml | .redocly.yaml | .redocly.yml]`. _(optional)_
-
   - Examples:
     - `--redocly` - use the default Redocly configuration file
     - `--redocly ./my-redocly-config.yaml` - use a custom Redocly configuration file
@@ -214,6 +214,9 @@ The following plugins are currently supported:
 - **`--root-security`**: Use root-level OpenAPI `security` as the default for operations that do not define their own `security`. Operation-level `security` overrides it according to OpenAPI semantics. _(optional, disabled by default)_
   - Use this option when your OpenAPI document defines `security` on the top level and you want generated operation schemas to include those security requirements automatically.
   - Without this option, only operation-level `security` is emitted into generated schemas.
+- **`--tanstack-query-version <version>`**: Target `@tanstack/react-query` version (e.g., `"5.80.0"`, `"5.108.1"`). Auto-detected from installed `node_modules` or the nearest `package.json` if omitted (defaulting conservatively to `< 5.108.1` when undetectable). _(optional)_
+  - Targets `>= 5.108.1` enable `query` and `infiniteQuery` imperative method generation. Regenerate the client when upgrading `@tanstack/react-query` across `5.108.1`.
+- **`--tanstack-query-deprecations [bool]`**: Emit `@deprecated` JSDoc tags on deprecated generated methods (`fetchQuery`, `prefetchQuery`, `ensureQueryData`, `fetchInfiniteQuery`, `prefetchInfiniteQuery`, `ensureInfiniteQueryData` in `>= 5.108.1`). Defaults to `true` when deprecations apply to the target version, and `false` otherwise. _(optional)_
 
 ### `--plugin openapi-typescript` options
 

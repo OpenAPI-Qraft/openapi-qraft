@@ -6,6 +6,7 @@
 import type { paths } from "../../openapi.js";
 import type { DeepReadonly, InvalidateQueryFilters, IsFetchingQueryFilters, IsMutatingMutationFilters, MutationFiltersByMutationKey, MutationFiltersByParameters, MutationVariables, OperationError, OperationInfiniteData, PartialParameters, QueryFiltersByParameters, QueryFiltersByQueryKey, QueryFnOptions, QueryFnOptionsByParameters, QueryFnOptionsByQueryKey, RequestFnResponse, ServiceOperationEnsureInfiniteQueryDataOptions, ServiceOperationEnsureQueryDataOptions, ServiceOperationFetchInfiniteQueryOptions, ServiceOperationFetchInfiniteQueryVoidOption, ServiceOperationFetchQueryOptions, ServiceOperationInfiniteQueryKey, ServiceOperationMutationFnOptions, ServiceOperationMutationKey, ServiceOperationQueryKey, ServiceOperationUseMutationOptions, UseQueryOptionsForUseQueries, UseQueryOptionsForUseSuspenseQuery, QraftServiceOperationsToken } from "@openapi-qraft/tanstack-query-react-types";
 import type { CancelOptions, DefinedInitialDataInfiniteOptions, DefinedInitialDataOptions, DefinedUseInfiniteQueryResult, DefinedUseQueryResult, InfiniteQueryPageParamsOptions, InvalidateOptions, Mutation, MutationCache, MutationState, QueryState, RefetchOptions, ResetOptions, SetDataOptions, UndefinedInitialDataInfiniteOptions, UndefinedInitialDataOptions, Updater, UseInfiniteQueryResult, UseMutationResult, UseQueryResult, UseSuspenseInfiniteQueryOptions, UseSuspenseInfiniteQueryResult, UseSuspenseQueryOptions, UseSuspenseQueryResult } from "@tanstack/react-query";
+import type { ServiceOperationImperativeInfiniteQueryOptions, ServiceOperationImperativeQueryOptions } from "@openapi-qraft/tanstack-query-react-types/imperative-query";
 export interface FilesService {
     /** @summary Get a files by ID */
     getFiles: {
@@ -312,17 +313,210 @@ export interface FilesService {
             queries: T;
             combine?: (results: Array<UseSuspenseQueryResult<GetFilesData, GetFilesError>>) => TCombinedResult;
         }): TCombinedResult;
-        /** @summary Get a files by ID */
+        /**
+         * Performs an asynchronous data fetching operation and caches the result.
+         * Returns cached data when fresh, or fetches and resolves with the latest data otherwise.
+         *
+         * @summary Get a files by ID
+         * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/query-client/query|`query(...)` documentation}
+         * @example Query with parameters
+         * ```ts
+         * const data = await qraft.files.getFiles.query({
+         *     parameters: {
+         *         header: {
+         *             "x-monite-version": "2023-06-04"
+         *         },
+         *         query: {
+         *             id__in: idIn
+         *         }
+         *     }
+         * })
+         * ```
+         */
+        query<TData = GetFilesData>(options: ServiceOperationImperativeQueryOptions<GetFilesSchema, GetFilesData, GetFilesParameters, GetFilesError, TData>): Promise<TData>;
+        /**
+         * Performs an asynchronous paginated data fetching operation and caches the pages.
+         * Returns cached pages when fresh, or fetches and resolves with the latest paginated result.
+         *
+         * @summary Get a files by ID
+         * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/query-client/infiniteQuery|`infiniteQuery(...)` documentation}
+         *
+         * @example Infinite Query
+         * ```ts
+         * const data = await qraft.files.getFiles.infiniteQuery({
+         *     parameters: {
+         *         header: {
+         *             "x-monite-version": "2023-06-04"
+         *         },
+         *         query: {
+         *             id__in: idIn
+         *         }
+         *     },
+         *     initialPageParam: {
+         *         query: {
+         *             id__in: initialIdIn
+         *         }
+         *     },
+         *     getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) => getNextPageParams(lastPage)
+         * })
+         *
+         * console.log(data.pages);
+         * ```
+         */
+        infiniteQuery<TPageParam extends GetFilesParameters = GetFilesParameters, TData = OperationInfiniteData<GetFilesData, TPageParam>>(options: ServiceOperationImperativeInfiniteQueryOptions<GetFilesSchema, GetFilesData, GetFilesParameters, NoInfer<DeepReadonly<TPageParam>>, GetFilesError, TData>): Promise<TData>;
+        /**
+         * Performs an asynchronous data fetching operation, caches the result, and returns the fetched data.
+         * Useful for imperative fetching outside of React components or when fresh data is needed on demand.
+         *
+         * @deprecated Use `query(...)` instead.
+         * @summary Get a files by ID
+         * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/query-client/fetchQuery|`fetchQuery(...)` documentation}
+         * @example Fetch query with parameters
+         * ```ts
+         * const data = await qraft.files.getFiles.fetchQuery({
+         *     parameters: {
+         *         header: {
+         *             "x-monite-version": "2023-06-04"
+         *         },
+         *         query: {
+         *             id__in: idIn
+         *         }
+         *     }
+         * })
+         * ```
+         */
         fetchQuery(options: ServiceOperationFetchQueryOptions<GetFilesSchema, GetFilesData, GetFilesParameters, GetFilesError>): Promise<GetFilesData>;
-        /** @summary Get a files by ID */
+        /**
+         * Preloads and caches data before it is needed.
+         * Resolves when the request completes without returning the cached data.
+         *
+         * @deprecated Use `query(...)` instead (e.g., `query(...).catch(() => {})` if you want to ignore errors).
+         * @summary Get a files by ID
+         * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/query-client/prefetchQuery|`prefetchQuery(...)` documentation}
+         * @example Prefetch query with parameters
+         * ```ts
+         * await qraft.files.getFiles.prefetchQuery({
+         *     parameters: {
+         *         header: {
+         *             "x-monite-version": "2023-06-04"
+         *         },
+         *         query: {
+         *             id__in: idIn
+         *         }
+         *     }
+         * })
+         * ```
+         */
         prefetchQuery(options: ServiceOperationFetchQueryOptions<GetFilesSchema, GetFilesData, GetFilesParameters, GetFilesError>): Promise<void>;
-        /** @summary Get a files by ID */
+        /**
+         * Returns existing cached data if available, or fetches and caches it otherwise.
+         *
+         * @deprecated Use `query({ ...options, staleTime: 'static' })` instead.
+         * @summary Get a files by ID
+         * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/query-client/ensureQueryData|`ensureQueryData(...)` documentation}
+         * @example Ensure query data with parameters
+         * ```ts
+         * const data = await qraft.files.getFiles.ensureQueryData({
+         *     parameters: {
+         *         header: {
+         *             "x-monite-version": "2023-06-04"
+         *         },
+         *         query: {
+         *             id__in: idIn
+         *         }
+         *     }
+         * })
+         * ```
+         */
         ensureQueryData(options: ServiceOperationEnsureQueryDataOptions<GetFilesSchema, GetFilesData, GetFilesParameters, GetFilesError>): Promise<GetFilesData>;
-        /** @summary Get a files by ID */
+        /**
+         * Performs an asynchronous paginated data fetching operation, caches the pages, and returns the result.
+         *
+         * @deprecated Use `infiniteQuery(...)` instead.
+         * @summary Get a files by ID
+         * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/query-client/fetchInfiniteQuery|`fetchInfiniteQuery(...)` documentation}
+         *
+         * @example Fetch Infinite Query
+         * ```ts
+         * const data = await qraft.files.getFiles.fetchInfiniteQuery({
+         *     parameters: {
+         *         header: {
+         *             "x-monite-version": "2023-06-04"
+         *         },
+         *         query: {
+         *             id__in: idIn
+         *         }
+         *     },
+         *     initialPageParam: {
+         *         query: {
+         *             id__in: initialIdIn
+         *         }
+         *     },
+         *     getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) => getNextPageParams(lastPage)
+         * })
+         *
+         * console.log(data.pages);
+         * ```
+         */
         fetchInfiniteQuery<TPageParam extends GetFilesParameters>(options: ServiceOperationFetchInfiniteQueryOptions<GetFilesSchema, GetFilesData, GetFilesParameters, DeepReadonly<TPageParam>, GetFilesError>): Promise<OperationInfiniteData<GetFilesData, GetFilesParameters>>;
-        /** @summary Get a files by ID */
+        /**
+         * Preloads and caches paginated data before it is needed.
+         * Resolves when the request completes without returning the cached pages.
+         *
+         * @deprecated Use `infiniteQuery(...)` instead (e.g., `infiniteQuery(...).catch(() => {})` if you want to ignore errors).
+         * @summary Get a files by ID
+         * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/query-client/prefetchInfiniteQuery|`prefetchInfiniteQuery(...)` documentation}
+         *
+         * @example Prefetch Infinite Query
+         * ```ts
+         * await qraft.files.getFiles.prefetchInfiniteQuery({
+         *     parameters: {
+         *         header: {
+         *             "x-monite-version": "2023-06-04"
+         *         },
+         *         query: {
+         *             id__in: idIn
+         *         }
+         *     },
+         *     initialPageParam: {
+         *         query: {
+         *             id__in: initialIdIn
+         *         }
+         *     },
+         *     getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) => getNextPageParams(lastPage)
+         * })
+         * ```
+         */
         prefetchInfiniteQuery<TPageParam extends GetFilesParameters>(options: ServiceOperationFetchInfiniteQueryOptions<GetFilesSchema, GetFilesData, GetFilesParameters, DeepReadonly<TPageParam>, GetFilesError>): Promise<void>;
-        /** @summary Get a files by ID */
+        /**
+         * Returns existing cached paginated data if available, or fetches and caches it otherwise.
+         *
+         * @deprecated Use `infiniteQuery({ ...options, staleTime: 'static' })` instead.
+         * @summary Get a files by ID
+         * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/query-client/ensureInfiniteQueryData|`ensureInfiniteQueryData(...)` documentation}
+         *
+         * @example Ensure Infinite Query Data
+         * ```ts
+         * const data = await qraft.files.getFiles.ensureInfiniteQueryData({
+         *     parameters: {
+         *         header: {
+         *             "x-monite-version": "2023-06-04"
+         *         },
+         *         query: {
+         *             id__in: idIn
+         *         }
+         *     },
+         *     initialPageParam: {
+         *         query: {
+         *             id__in: initialIdIn
+         *         }
+         *     },
+         *     getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) => getNextPageParams(lastPage)
+         * })
+         *
+         * console.log(data.pages);
+         * ```
+         */
         ensureInfiniteQueryData<TPageParam extends GetFilesParameters>(options: ServiceOperationEnsureInfiniteQueryDataOptions<GetFilesSchema, GetFilesData, GetFilesParameters, DeepReadonly<TPageParam>, GetFilesError>): Promise<OperationInfiniteData<GetFilesData, GetFilesParameters>>;
         /** @summary Get a files by ID */
         getQueryData(parameters: ServiceOperationQueryKey<GetFilesSchema, GetFilesParameters> | (DeepReadonly<GetFilesParameters>)): GetFilesData | undefined;
@@ -1131,33 +1325,214 @@ export interface FilesService {
             combine?: (results: Array<UseSuspenseQueryResult<GetFileListData, GetFileListError>>) => TCombinedResult;
         }): TCombinedResult;
         /**
+         * Performs an asynchronous data fetching operation and caches the result.
+         * Returns cached data when fresh, or fetches and resolves with the latest data otherwise.
+         *
          * @deprecated
          * @summary Get a file list
+         * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/query-client/query|`query(...)` documentation}
+         * @example Query without parameters
+         * ```ts
+         * const data = await qraft.files.getFileList.query()
+         * ```
+         * @example Query with parameters
+         * ```ts
+         * const data = await qraft.files.getFileList.query({
+         *     parameters: {
+         *         header: {
+         *             "x-monite-version": "2023-06-04"
+         *         },
+         *         query: {
+         *             id__in: idIn
+         *         }
+         *     }
+         * })
+         * ```
+         */
+        query<TData = GetFileListData>(options: ServiceOperationImperativeQueryOptions<GetFileListSchema, GetFileListData, GetFileListParameters, GetFileListError, TData> | void): Promise<TData>;
+        /**
+         * Performs an asynchronous paginated data fetching operation and caches the pages.
+         * Returns cached pages when fresh, or fetches and resolves with the latest paginated result.
+         *
+         * @deprecated
+         * @summary Get a file list
+         * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/query-client/infiniteQuery|`infiniteQuery(...)` documentation}
+         *
+         * @example Infinite Query
+         * ```ts
+         * const data = await qraft.files.getFileList.infiniteQuery({
+         *     parameters: {
+         *         header: {
+         *             "x-monite-version": "2023-06-04"
+         *         }
+         *     },
+         *     initialPageParam: {
+         *         query: {
+         *             id__in: initialIdIn
+         *         }
+         *     },
+         *     getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) => getNextPageParams(lastPage)
+         * })
+         *
+         * console.log(data.pages);
+         * ```
+         */
+        infiniteQuery<TPageParam extends GetFileListParameters = GetFileListParameters, TData = OperationInfiniteData<GetFileListData, TPageParam>>(options: ServiceOperationImperativeInfiniteQueryOptions<GetFileListSchema, GetFileListData, GetFileListParameters, NoInfer<DeepReadonly<TPageParam>>, GetFileListError, TData>): Promise<TData>;
+        /**
+         * Performs an asynchronous data fetching operation, caches the result, and returns the fetched data.
+         * Useful for imperative fetching outside of React components or when fresh data is needed on demand.
+         *
+         * @deprecated This operation is deprecated. Use `query(...)` instead.
+         * @summary Get a file list
+         * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/query-client/fetchQuery|`fetchQuery(...)` documentation}
+         * @example Fetch query without parameters
+         * ```ts
+         * const data = await qraft.files.getFileList.fetchQuery()
+         * ```
+         * @example Fetch query with parameters
+         * ```ts
+         * const data = await qraft.files.getFileList.fetchQuery({
+         *     parameters: {
+         *         header: {
+         *             "x-monite-version": "2023-06-04"
+         *         },
+         *         query: {
+         *             id__in: idIn
+         *         }
+         *     }
+         * })
+         * ```
          */
         fetchQuery(options: ServiceOperationFetchQueryOptions<GetFileListSchema, GetFileListData, GetFileListParameters, GetFileListError> | void): Promise<GetFileListData>;
         /**
-         * @deprecated
+         * Preloads and caches data before it is needed.
+         * Resolves when the request completes without returning the cached data.
+         *
+         * @deprecated This operation is deprecated. Use `query(...)` instead (e.g., `query(...).catch(() => {})` if you want to ignore errors).
          * @summary Get a file list
+         * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/query-client/prefetchQuery|`prefetchQuery(...)` documentation}
+         * @example Prefetch query without parameters
+         * ```ts
+         * await qraft.files.getFileList.prefetchQuery()
+         * ```
+         * @example Prefetch query with parameters
+         * ```ts
+         * await qraft.files.getFileList.prefetchQuery({
+         *     parameters: {
+         *         header: {
+         *             "x-monite-version": "2023-06-04"
+         *         },
+         *         query: {
+         *             id__in: idIn
+         *         }
+         *     }
+         * })
+         * ```
          */
         prefetchQuery(options: ServiceOperationFetchQueryOptions<GetFileListSchema, GetFileListData, GetFileListParameters, GetFileListError> | void): Promise<void>;
         /**
-         * @deprecated
+         * Returns existing cached data if available, or fetches and caches it otherwise.
+         *
+         * @deprecated This operation is deprecated. Use `query({ ...options, staleTime: 'static' })` instead.
          * @summary Get a file list
+         * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/query-client/ensureQueryData|`ensureQueryData(...)` documentation}
+         * @example Ensure query data without parameters
+         * ```ts
+         * const data = await qraft.files.getFileList.ensureQueryData()
+         * ```
+         * @example Ensure query data with parameters
+         * ```ts
+         * const data = await qraft.files.getFileList.ensureQueryData({
+         *     parameters: {
+         *         header: {
+         *             "x-monite-version": "2023-06-04"
+         *         },
+         *         query: {
+         *             id__in: idIn
+         *         }
+         *     }
+         * })
+         * ```
          */
         ensureQueryData(options: ServiceOperationEnsureQueryDataOptions<GetFileListSchema, GetFileListData, GetFileListParameters, GetFileListError> | void): Promise<GetFileListData>;
         /**
-         * @deprecated
+         * Performs an asynchronous paginated data fetching operation, caches the pages, and returns the result.
+         *
+         * @deprecated This operation is deprecated. Use `infiniteQuery(...)` instead.
          * @summary Get a file list
+         * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/query-client/fetchInfiniteQuery|`fetchInfiniteQuery(...)` documentation}
+         *
+         * @example Fetch Infinite Query
+         * ```ts
+         * const data = await qraft.files.getFileList.fetchInfiniteQuery({
+         *     parameters: {
+         *         header: {
+         *             "x-monite-version": "2023-06-04"
+         *         }
+         *     },
+         *     initialPageParam: {
+         *         query: {
+         *             id__in: initialIdIn
+         *         }
+         *     },
+         *     getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) => getNextPageParams(lastPage)
+         * })
+         *
+         * console.log(data.pages);
+         * ```
          */
         fetchInfiniteQuery<TPageParam extends GetFileListParameters>(options: ServiceOperationFetchInfiniteQueryOptions<GetFileListSchema, GetFileListData, GetFileListParameters, DeepReadonly<TPageParam>, GetFileListError> | ServiceOperationFetchInfiniteQueryVoidOption): Promise<OperationInfiniteData<GetFileListData, GetFileListParameters>>;
         /**
-         * @deprecated
+         * Preloads and caches paginated data before it is needed.
+         * Resolves when the request completes without returning the cached pages.
+         *
+         * @deprecated This operation is deprecated. Use `infiniteQuery(...)` instead (e.g., `infiniteQuery(...).catch(() => {})` if you want to ignore errors).
          * @summary Get a file list
+         * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/query-client/prefetchInfiniteQuery|`prefetchInfiniteQuery(...)` documentation}
+         *
+         * @example Prefetch Infinite Query
+         * ```ts
+         * await qraft.files.getFileList.prefetchInfiniteQuery({
+         *     parameters: {
+         *         header: {
+         *             "x-monite-version": "2023-06-04"
+         *         }
+         *     },
+         *     initialPageParam: {
+         *         query: {
+         *             id__in: initialIdIn
+         *         }
+         *     },
+         *     getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) => getNextPageParams(lastPage)
+         * })
+         * ```
          */
         prefetchInfiniteQuery<TPageParam extends GetFileListParameters>(options: ServiceOperationFetchInfiniteQueryOptions<GetFileListSchema, GetFileListData, GetFileListParameters, DeepReadonly<TPageParam>, GetFileListError> | ServiceOperationFetchInfiniteQueryVoidOption): Promise<void>;
         /**
-         * @deprecated
+         * Returns existing cached paginated data if available, or fetches and caches it otherwise.
+         *
+         * @deprecated This operation is deprecated. Use `infiniteQuery({ ...options, staleTime: 'static' })` instead.
          * @summary Get a file list
+         * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/query-client/ensureInfiniteQueryData|`ensureInfiniteQueryData(...)` documentation}
+         *
+         * @example Ensure Infinite Query Data
+         * ```ts
+         * const data = await qraft.files.getFileList.ensureInfiniteQueryData({
+         *     parameters: {
+         *         header: {
+         *             "x-monite-version": "2023-06-04"
+         *         }
+         *     },
+         *     initialPageParam: {
+         *         query: {
+         *             id__in: initialIdIn
+         *         }
+         *     },
+         *     getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) => getNextPageParams(lastPage)
+         * })
+         *
+         * console.log(data.pages);
+         * ```
          */
         ensureInfiniteQueryData<TPageParam extends GetFileListParameters>(options: ServiceOperationEnsureInfiniteQueryDataOptions<GetFileListSchema, GetFileListData, GetFileListParameters, DeepReadonly<TPageParam>, GetFileListError> | ServiceOperationFetchInfiniteQueryVoidOption): Promise<OperationInfiniteData<GetFileListData, GetFileListParameters>>;
         /**

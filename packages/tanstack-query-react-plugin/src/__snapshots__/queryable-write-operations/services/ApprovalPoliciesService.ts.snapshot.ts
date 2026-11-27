@@ -6,6 +6,7 @@
 import type { paths } from "../../openapi.d.ts";
 import type { DeepReadonly, InvalidateQueryFilters, IsFetchingQueryFilters, IsMutatingMutationFilters, MutationFiltersByMutationKey, MutationFiltersByParameters, MutationVariables, OperationError, OperationInfiniteData, PartialParameters, QueryFiltersByParameters, QueryFiltersByQueryKey, QueryFnOptionsByParameters, QueryFnOptionsByQueryKey, RequestFnResponse, ServiceOperationEnsureInfiniteQueryDataOptions, ServiceOperationEnsureQueryDataOptions, ServiceOperationFetchInfiniteQueryOptions, ServiceOperationFetchQueryOptions, ServiceOperationInfiniteQueryKey, ServiceOperationMutationFnOptions, ServiceOperationMutationKey, ServiceOperationQueryKey, ServiceOperationUseMutationOptions, UseQueryOptionsForUseQueries, UseQueryOptionsForUseSuspenseQuery, QraftServiceOperationsToken } from "@openapi-qraft/tanstack-query-react-types";
 import type { CancelOptions, DefinedInitialDataInfiniteOptions, DefinedInitialDataOptions, DefinedUseInfiniteQueryResult, DefinedUseQueryResult, InfiniteQueryPageParamsOptions, InvalidateOptions, Mutation, MutationCache, MutationState, QueryState, RefetchOptions, ResetOptions, SetDataOptions, UndefinedInitialDataInfiniteOptions, UndefinedInitialDataOptions, Updater, UseInfiniteQueryResult, UseMutationResult, UseQueryResult, UseSuspenseInfiniteQueryOptions, UseSuspenseInfiniteQueryResult, UseSuspenseQueryOptions, UseSuspenseQueryResult } from "@tanstack/react-query";
+import type { ServiceOperationImperativeInfiniteQueryOptions, ServiceOperationImperativeQueryOptions } from "@openapi-qraft/tanstack-query-react-types/imperative-query";
 export interface ApprovalPoliciesService {
     /**
      * @summary Get an approval policy by ID
@@ -385,33 +386,236 @@ export interface ApprovalPoliciesService {
             combine?: (results: Array<UseSuspenseQueryResult<GetApprovalPoliciesIdData, GetApprovalPoliciesIdError>>) => TCombinedResult;
         }): TCombinedResult;
         /**
+         * Performs an asynchronous data fetching operation and caches the result.
+         * Returns cached data when fresh, or fetches and resolves with the latest data otherwise.
+         *
          * @summary Get an approval policy by ID
          * @description Retrieve a specific approval policy.
+         * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/query-client/query|`query(...)` documentation}
+         * @example Query with parameters
+         * ```ts
+         * const data = await qraft.approvalPolicies.getApprovalPoliciesId.query({
+         *     parameters: {
+         *         header: {
+         *             "x-monite-version": "2023-06-04",
+         *             "x-monite-entity-id": xMoniteEntityId
+         *         },
+         *         path: {
+         *             approval_policy_id: approvalPolicyId
+         *         },
+         *         query: {
+         *             items_order: itemsOrder
+         *         }
+         *     }
+         * })
+         * ```
+         */
+        query<TData = GetApprovalPoliciesIdData>(options: ServiceOperationImperativeQueryOptions<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdData, GetApprovalPoliciesIdParameters, GetApprovalPoliciesIdError, TData>): Promise<TData>;
+        /**
+         * Performs an asynchronous paginated data fetching operation and caches the pages.
+         * Returns cached pages when fresh, or fetches and resolves with the latest paginated result.
+         *
+         * @summary Get an approval policy by ID
+         * @description Retrieve a specific approval policy.
+         * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/query-client/infiniteQuery|`infiniteQuery(...)` documentation}
+         *
+         * @example Infinite Query
+         * ```ts
+         * const data = await qraft.approvalPolicies.getApprovalPoliciesId.infiniteQuery({
+         *     parameters: {
+         *         header: {
+         *             "x-monite-version": "2023-06-04",
+         *             "x-monite-entity-id": xMoniteEntityId
+         *         },
+         *         path: {
+         *             approval_policy_id: approvalPolicyId
+         *         }
+         *     },
+         *     initialPageParam: {
+         *         query: {
+         *             items_order: initialItemsOrder
+         *         }
+         *     },
+         *     getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) => getNextPageParams(lastPage)
+         * })
+         *
+         * console.log(data.pages);
+         * ```
+         */
+        infiniteQuery<TPageParam extends GetApprovalPoliciesIdParameters = GetApprovalPoliciesIdParameters, TData = OperationInfiniteData<GetApprovalPoliciesIdData, TPageParam>>(options: ServiceOperationImperativeInfiniteQueryOptions<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdData, GetApprovalPoliciesIdParameters, NoInfer<DeepReadonly<TPageParam>>, GetApprovalPoliciesIdError, TData>): Promise<TData>;
+        /**
+         * Performs an asynchronous data fetching operation, caches the result, and returns the fetched data.
+         * Useful for imperative fetching outside of React components or when fresh data is needed on demand.
+         *
+         * @deprecated Use `query(...)` instead.
+         * @summary Get an approval policy by ID
+         * @description Retrieve a specific approval policy.
+         * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/query-client/fetchQuery|`fetchQuery(...)` documentation}
+         * @example Fetch query with parameters
+         * ```ts
+         * const data = await qraft.approvalPolicies.getApprovalPoliciesId.fetchQuery({
+         *     parameters: {
+         *         header: {
+         *             "x-monite-version": "2023-06-04",
+         *             "x-monite-entity-id": xMoniteEntityId
+         *         },
+         *         path: {
+         *             approval_policy_id: approvalPolicyId
+         *         },
+         *         query: {
+         *             items_order: itemsOrder
+         *         }
+         *     }
+         * })
+         * ```
          */
         fetchQuery(options: ServiceOperationFetchQueryOptions<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdData, GetApprovalPoliciesIdParameters, GetApprovalPoliciesIdError>): Promise<GetApprovalPoliciesIdData>;
         /**
+         * Preloads and caches data before it is needed.
+         * Resolves when the request completes without returning the cached data.
+         *
+         * @deprecated Use `query(...)` instead (e.g., `query(...).catch(() => {})` if you want to ignore errors).
          * @summary Get an approval policy by ID
          * @description Retrieve a specific approval policy.
+         * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/query-client/prefetchQuery|`prefetchQuery(...)` documentation}
+         * @example Prefetch query with parameters
+         * ```ts
+         * await qraft.approvalPolicies.getApprovalPoliciesId.prefetchQuery({
+         *     parameters: {
+         *         header: {
+         *             "x-monite-version": "2023-06-04",
+         *             "x-monite-entity-id": xMoniteEntityId
+         *         },
+         *         path: {
+         *             approval_policy_id: approvalPolicyId
+         *         },
+         *         query: {
+         *             items_order: itemsOrder
+         *         }
+         *     }
+         * })
+         * ```
          */
         prefetchQuery(options: ServiceOperationFetchQueryOptions<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdData, GetApprovalPoliciesIdParameters, GetApprovalPoliciesIdError>): Promise<void>;
         /**
+         * Returns existing cached data if available, or fetches and caches it otherwise.
+         *
+         * @deprecated Use `query({ ...options, staleTime: 'static' })` instead.
          * @summary Get an approval policy by ID
          * @description Retrieve a specific approval policy.
+         * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/query-client/ensureQueryData|`ensureQueryData(...)` documentation}
+         * @example Ensure query data with parameters
+         * ```ts
+         * const data = await qraft.approvalPolicies.getApprovalPoliciesId.ensureQueryData({
+         *     parameters: {
+         *         header: {
+         *             "x-monite-version": "2023-06-04",
+         *             "x-monite-entity-id": xMoniteEntityId
+         *         },
+         *         path: {
+         *             approval_policy_id: approvalPolicyId
+         *         },
+         *         query: {
+         *             items_order: itemsOrder
+         *         }
+         *     }
+         * })
+         * ```
          */
         ensureQueryData(options: ServiceOperationEnsureQueryDataOptions<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdData, GetApprovalPoliciesIdParameters, GetApprovalPoliciesIdError>): Promise<GetApprovalPoliciesIdData>;
         /**
+         * Performs an asynchronous paginated data fetching operation, caches the pages, and returns the result.
+         *
+         * @deprecated Use `infiniteQuery(...)` instead.
          * @summary Get an approval policy by ID
          * @description Retrieve a specific approval policy.
+         * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/query-client/fetchInfiniteQuery|`fetchInfiniteQuery(...)` documentation}
+         *
+         * @example Fetch Infinite Query
+         * ```ts
+         * const data = await qraft.approvalPolicies.getApprovalPoliciesId.fetchInfiniteQuery({
+         *     parameters: {
+         *         header: {
+         *             "x-monite-version": "2023-06-04",
+         *             "x-monite-entity-id": xMoniteEntityId
+         *         },
+         *         path: {
+         *             approval_policy_id: approvalPolicyId
+         *         }
+         *     },
+         *     initialPageParam: {
+         *         query: {
+         *             items_order: initialItemsOrder
+         *         }
+         *     },
+         *     getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) => getNextPageParams(lastPage)
+         * })
+         *
+         * console.log(data.pages);
+         * ```
          */
         fetchInfiniteQuery<TPageParam extends GetApprovalPoliciesIdParameters>(options: ServiceOperationFetchInfiniteQueryOptions<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdData, GetApprovalPoliciesIdParameters, DeepReadonly<TPageParam>, GetApprovalPoliciesIdError>): Promise<OperationInfiniteData<GetApprovalPoliciesIdData, GetApprovalPoliciesIdParameters>>;
         /**
+         * Preloads and caches paginated data before it is needed.
+         * Resolves when the request completes without returning the cached pages.
+         *
+         * @deprecated Use `infiniteQuery(...)` instead (e.g., `infiniteQuery(...).catch(() => {})` if you want to ignore errors).
          * @summary Get an approval policy by ID
          * @description Retrieve a specific approval policy.
+         * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/query-client/prefetchInfiniteQuery|`prefetchInfiniteQuery(...)` documentation}
+         *
+         * @example Prefetch Infinite Query
+         * ```ts
+         * await qraft.approvalPolicies.getApprovalPoliciesId.prefetchInfiniteQuery({
+         *     parameters: {
+         *         header: {
+         *             "x-monite-version": "2023-06-04",
+         *             "x-monite-entity-id": xMoniteEntityId
+         *         },
+         *         path: {
+         *             approval_policy_id: approvalPolicyId
+         *         }
+         *     },
+         *     initialPageParam: {
+         *         query: {
+         *             items_order: initialItemsOrder
+         *         }
+         *     },
+         *     getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) => getNextPageParams(lastPage)
+         * })
+         * ```
          */
         prefetchInfiniteQuery<TPageParam extends GetApprovalPoliciesIdParameters>(options: ServiceOperationFetchInfiniteQueryOptions<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdData, GetApprovalPoliciesIdParameters, DeepReadonly<TPageParam>, GetApprovalPoliciesIdError>): Promise<void>;
         /**
+         * Returns existing cached paginated data if available, or fetches and caches it otherwise.
+         *
+         * @deprecated Use `infiniteQuery({ ...options, staleTime: 'static' })` instead.
          * @summary Get an approval policy by ID
          * @description Retrieve a specific approval policy.
+         * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/query-client/ensureInfiniteQueryData|`ensureInfiniteQueryData(...)` documentation}
+         *
+         * @example Ensure Infinite Query Data
+         * ```ts
+         * const data = await qraft.approvalPolicies.getApprovalPoliciesId.ensureInfiniteQueryData({
+         *     parameters: {
+         *         header: {
+         *             "x-monite-version": "2023-06-04",
+         *             "x-monite-entity-id": xMoniteEntityId
+         *         },
+         *         path: {
+         *             approval_policy_id: approvalPolicyId
+         *         }
+         *     },
+         *     initialPageParam: {
+         *         query: {
+         *             items_order: initialItemsOrder
+         *         }
+         *     },
+         *     getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) => getNextPageParams(lastPage)
+         * })
+         *
+         * console.log(data.pages);
+         * ```
          */
         ensureInfiniteQueryData<TPageParam extends GetApprovalPoliciesIdParameters>(options: ServiceOperationEnsureInfiniteQueryDataOptions<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdData, GetApprovalPoliciesIdParameters, DeepReadonly<TPageParam>, GetApprovalPoliciesIdError>): Promise<OperationInfiniteData<GetApprovalPoliciesIdData, GetApprovalPoliciesIdParameters>>;
         /**
@@ -872,33 +1076,236 @@ export interface ApprovalPoliciesService {
             combine?: (results: Array<UseSuspenseQueryResult<DeleteApprovalPoliciesIdData, DeleteApprovalPoliciesIdError>>) => TCombinedResult;
         }): TCombinedResult;
         /**
+         * Performs an asynchronous data fetching operation and caches the result.
+         * Returns cached data when fresh, or fetches and resolves with the latest data otherwise.
+         *
          * @summary Delete an approval policy
          * @description Delete an existing approval policy.
+         * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/query-client/query|`query(...)` documentation}
+         * @example Query with parameters
+         * ```ts
+         * const data = await qraft.approvalPolicies.deleteApprovalPoliciesId.query({
+         *     parameters: {
+         *         header: {
+         *             "x-monite-version": "2023-06-04",
+         *             "x-monite-entity-id": xMoniteEntityId
+         *         },
+         *         path: {
+         *             approval_policy_id: approvalPolicyId
+         *         },
+         *         query: {
+         *             limit: limit
+         *         }
+         *     }
+         * })
+         * ```
+         */
+        query<TData = DeleteApprovalPoliciesIdData>(options: ServiceOperationImperativeQueryOptions<DeleteApprovalPoliciesIdSchema, DeleteApprovalPoliciesIdData, DeleteApprovalPoliciesIdParameters, DeleteApprovalPoliciesIdError, TData>): Promise<TData>;
+        /**
+         * Performs an asynchronous paginated data fetching operation and caches the pages.
+         * Returns cached pages when fresh, or fetches and resolves with the latest paginated result.
+         *
+         * @summary Delete an approval policy
+         * @description Delete an existing approval policy.
+         * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/query-client/infiniteQuery|`infiniteQuery(...)` documentation}
+         *
+         * @example Infinite Query
+         * ```ts
+         * const data = await qraft.approvalPolicies.deleteApprovalPoliciesId.infiniteQuery({
+         *     parameters: {
+         *         header: {
+         *             "x-monite-version": "2023-06-04",
+         *             "x-monite-entity-id": xMoniteEntityId
+         *         },
+         *         path: {
+         *             approval_policy_id: approvalPolicyId
+         *         }
+         *     },
+         *     initialPageParam: {
+         *         query: {
+         *             limit: initialLimit
+         *         }
+         *     },
+         *     getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) => getNextPageParams(lastPage)
+         * })
+         *
+         * console.log(data.pages);
+         * ```
+         */
+        infiniteQuery<TPageParam extends DeleteApprovalPoliciesIdParameters = DeleteApprovalPoliciesIdParameters, TData = OperationInfiniteData<DeleteApprovalPoliciesIdData, TPageParam>>(options: ServiceOperationImperativeInfiniteQueryOptions<DeleteApprovalPoliciesIdSchema, DeleteApprovalPoliciesIdData, DeleteApprovalPoliciesIdParameters, NoInfer<DeepReadonly<TPageParam>>, DeleteApprovalPoliciesIdError, TData>): Promise<TData>;
+        /**
+         * Performs an asynchronous data fetching operation, caches the result, and returns the fetched data.
+         * Useful for imperative fetching outside of React components or when fresh data is needed on demand.
+         *
+         * @deprecated Use `query(...)` instead.
+         * @summary Delete an approval policy
+         * @description Delete an existing approval policy.
+         * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/query-client/fetchQuery|`fetchQuery(...)` documentation}
+         * @example Fetch query with parameters
+         * ```ts
+         * const data = await qraft.approvalPolicies.deleteApprovalPoliciesId.fetchQuery({
+         *     parameters: {
+         *         header: {
+         *             "x-monite-version": "2023-06-04",
+         *             "x-monite-entity-id": xMoniteEntityId
+         *         },
+         *         path: {
+         *             approval_policy_id: approvalPolicyId
+         *         },
+         *         query: {
+         *             limit: limit
+         *         }
+         *     }
+         * })
+         * ```
          */
         fetchQuery(options: ServiceOperationFetchQueryOptions<DeleteApprovalPoliciesIdSchema, DeleteApprovalPoliciesIdData, DeleteApprovalPoliciesIdParameters, DeleteApprovalPoliciesIdError>): Promise<DeleteApprovalPoliciesIdData>;
         /**
+         * Preloads and caches data before it is needed.
+         * Resolves when the request completes without returning the cached data.
+         *
+         * @deprecated Use `query(...)` instead (e.g., `query(...).catch(() => {})` if you want to ignore errors).
          * @summary Delete an approval policy
          * @description Delete an existing approval policy.
+         * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/query-client/prefetchQuery|`prefetchQuery(...)` documentation}
+         * @example Prefetch query with parameters
+         * ```ts
+         * await qraft.approvalPolicies.deleteApprovalPoliciesId.prefetchQuery({
+         *     parameters: {
+         *         header: {
+         *             "x-monite-version": "2023-06-04",
+         *             "x-monite-entity-id": xMoniteEntityId
+         *         },
+         *         path: {
+         *             approval_policy_id: approvalPolicyId
+         *         },
+         *         query: {
+         *             limit: limit
+         *         }
+         *     }
+         * })
+         * ```
          */
         prefetchQuery(options: ServiceOperationFetchQueryOptions<DeleteApprovalPoliciesIdSchema, DeleteApprovalPoliciesIdData, DeleteApprovalPoliciesIdParameters, DeleteApprovalPoliciesIdError>): Promise<void>;
         /**
+         * Returns existing cached data if available, or fetches and caches it otherwise.
+         *
+         * @deprecated Use `query({ ...options, staleTime: 'static' })` instead.
          * @summary Delete an approval policy
          * @description Delete an existing approval policy.
+         * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/query-client/ensureQueryData|`ensureQueryData(...)` documentation}
+         * @example Ensure query data with parameters
+         * ```ts
+         * const data = await qraft.approvalPolicies.deleteApprovalPoliciesId.ensureQueryData({
+         *     parameters: {
+         *         header: {
+         *             "x-monite-version": "2023-06-04",
+         *             "x-monite-entity-id": xMoniteEntityId
+         *         },
+         *         path: {
+         *             approval_policy_id: approvalPolicyId
+         *         },
+         *         query: {
+         *             limit: limit
+         *         }
+         *     }
+         * })
+         * ```
          */
         ensureQueryData(options: ServiceOperationEnsureQueryDataOptions<DeleteApprovalPoliciesIdSchema, DeleteApprovalPoliciesIdData, DeleteApprovalPoliciesIdParameters, DeleteApprovalPoliciesIdError>): Promise<DeleteApprovalPoliciesIdData>;
         /**
+         * Performs an asynchronous paginated data fetching operation, caches the pages, and returns the result.
+         *
+         * @deprecated Use `infiniteQuery(...)` instead.
          * @summary Delete an approval policy
          * @description Delete an existing approval policy.
+         * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/query-client/fetchInfiniteQuery|`fetchInfiniteQuery(...)` documentation}
+         *
+         * @example Fetch Infinite Query
+         * ```ts
+         * const data = await qraft.approvalPolicies.deleteApprovalPoliciesId.fetchInfiniteQuery({
+         *     parameters: {
+         *         header: {
+         *             "x-monite-version": "2023-06-04",
+         *             "x-monite-entity-id": xMoniteEntityId
+         *         },
+         *         path: {
+         *             approval_policy_id: approvalPolicyId
+         *         }
+         *     },
+         *     initialPageParam: {
+         *         query: {
+         *             limit: initialLimit
+         *         }
+         *     },
+         *     getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) => getNextPageParams(lastPage)
+         * })
+         *
+         * console.log(data.pages);
+         * ```
          */
         fetchInfiniteQuery<TPageParam extends DeleteApprovalPoliciesIdParameters>(options: ServiceOperationFetchInfiniteQueryOptions<DeleteApprovalPoliciesIdSchema, DeleteApprovalPoliciesIdData, DeleteApprovalPoliciesIdParameters, DeepReadonly<TPageParam>, DeleteApprovalPoliciesIdError>): Promise<OperationInfiniteData<DeleteApprovalPoliciesIdData, DeleteApprovalPoliciesIdParameters>>;
         /**
+         * Preloads and caches paginated data before it is needed.
+         * Resolves when the request completes without returning the cached pages.
+         *
+         * @deprecated Use `infiniteQuery(...)` instead (e.g., `infiniteQuery(...).catch(() => {})` if you want to ignore errors).
          * @summary Delete an approval policy
          * @description Delete an existing approval policy.
+         * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/query-client/prefetchInfiniteQuery|`prefetchInfiniteQuery(...)` documentation}
+         *
+         * @example Prefetch Infinite Query
+         * ```ts
+         * await qraft.approvalPolicies.deleteApprovalPoliciesId.prefetchInfiniteQuery({
+         *     parameters: {
+         *         header: {
+         *             "x-monite-version": "2023-06-04",
+         *             "x-monite-entity-id": xMoniteEntityId
+         *         },
+         *         path: {
+         *             approval_policy_id: approvalPolicyId
+         *         }
+         *     },
+         *     initialPageParam: {
+         *         query: {
+         *             limit: initialLimit
+         *         }
+         *     },
+         *     getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) => getNextPageParams(lastPage)
+         * })
+         * ```
          */
         prefetchInfiniteQuery<TPageParam extends DeleteApprovalPoliciesIdParameters>(options: ServiceOperationFetchInfiniteQueryOptions<DeleteApprovalPoliciesIdSchema, DeleteApprovalPoliciesIdData, DeleteApprovalPoliciesIdParameters, DeepReadonly<TPageParam>, DeleteApprovalPoliciesIdError>): Promise<void>;
         /**
+         * Returns existing cached paginated data if available, or fetches and caches it otherwise.
+         *
+         * @deprecated Use `infiniteQuery({ ...options, staleTime: 'static' })` instead.
          * @summary Delete an approval policy
          * @description Delete an existing approval policy.
+         * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/query-client/ensureInfiniteQueryData|`ensureInfiniteQueryData(...)` documentation}
+         *
+         * @example Ensure Infinite Query Data
+         * ```ts
+         * const data = await qraft.approvalPolicies.deleteApprovalPoliciesId.ensureInfiniteQueryData({
+         *     parameters: {
+         *         header: {
+         *             "x-monite-version": "2023-06-04",
+         *             "x-monite-entity-id": xMoniteEntityId
+         *         },
+         *         path: {
+         *             approval_policy_id: approvalPolicyId
+         *         }
+         *     },
+         *     initialPageParam: {
+         *         query: {
+         *             limit: initialLimit
+         *         }
+         *     },
+         *     getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) => getNextPageParams(lastPage)
+         * })
+         *
+         * console.log(data.pages);
+         * ```
          */
         ensureInfiniteQueryData<TPageParam extends DeleteApprovalPoliciesIdParameters>(options: ServiceOperationEnsureInfiniteQueryDataOptions<DeleteApprovalPoliciesIdSchema, DeleteApprovalPoliciesIdData, DeleteApprovalPoliciesIdParameters, DeepReadonly<TPageParam>, DeleteApprovalPoliciesIdError>): Promise<OperationInfiniteData<DeleteApprovalPoliciesIdData, DeleteApprovalPoliciesIdParameters>>;
         /**
@@ -1580,33 +1987,244 @@ export interface ApprovalPoliciesService {
             combine?: (results: Array<UseSuspenseQueryResult<PatchApprovalPoliciesIdData, PatchApprovalPoliciesIdError>>) => TCombinedResult;
         }): TCombinedResult;
         /**
+         * Performs an asynchronous data fetching operation and caches the result.
+         * Returns cached data when fresh, or fetches and resolves with the latest data otherwise.
+         *
          * @summary Update an approval policy
          * @description Update an existing approval policy.
+         * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/query-client/query|`query(...)` documentation}
+         * @example Query with parameters
+         * ```ts
+         * const data = await qraft.approvalPolicies.patchApprovalPoliciesId.query({
+         *     parameters: {
+         *         body: queryBody,
+         *         header: {
+         *             "x-monite-version": "2023-06-04",
+         *             "x-monite-entity-id": xMoniteEntityId
+         *         },
+         *         path: {
+         *             approval_policy_id: approvalPolicyId
+         *         },
+         *         query: {
+         *             limit: limit
+         *         }
+         *     }
+         * })
+         * ```
+         */
+        query<TData = PatchApprovalPoliciesIdData>(options: ServiceOperationImperativeQueryOptions<PatchApprovalPoliciesIdSchema, PatchApprovalPoliciesIdData, PatchApprovalPoliciesIdQueryParameters, PatchApprovalPoliciesIdError, TData>): Promise<TData>;
+        /**
+         * Performs an asynchronous paginated data fetching operation and caches the pages.
+         * Returns cached pages when fresh, or fetches and resolves with the latest paginated result.
+         *
+         * @summary Update an approval policy
+         * @description Update an existing approval policy.
+         * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/query-client/infiniteQuery|`infiniteQuery(...)` documentation}
+         *
+         * @example Infinite Query
+         * ```ts
+         * const data = await qraft.approvalPolicies.patchApprovalPoliciesId.infiniteQuery({
+         *     parameters: {
+         *         body: queryBody,
+         *         header: {
+         *             "x-monite-version": "2023-06-04",
+         *             "x-monite-entity-id": xMoniteEntityId
+         *         },
+         *         path: {
+         *             approval_policy_id: approvalPolicyId
+         *         }
+         *     },
+         *     initialPageParam: {
+         *         query: {
+         *             limit: initialLimit
+         *         }
+         *     },
+         *     getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) => getNextPageParams(lastPage)
+         * })
+         *
+         * console.log(data.pages);
+         * ```
+         */
+        infiniteQuery<TPageParam extends PatchApprovalPoliciesIdQueryParameters = PatchApprovalPoliciesIdQueryParameters, TData = OperationInfiniteData<PatchApprovalPoliciesIdData, TPageParam>>(options: ServiceOperationImperativeInfiniteQueryOptions<PatchApprovalPoliciesIdSchema, PatchApprovalPoliciesIdData, PatchApprovalPoliciesIdQueryParameters, NoInfer<DeepReadonly<TPageParam>>, PatchApprovalPoliciesIdError, TData>): Promise<TData>;
+        /**
+         * Performs an asynchronous data fetching operation, caches the result, and returns the fetched data.
+         * Useful for imperative fetching outside of React components or when fresh data is needed on demand.
+         *
+         * @deprecated Use `query(...)` instead.
+         * @summary Update an approval policy
+         * @description Update an existing approval policy.
+         * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/query-client/fetchQuery|`fetchQuery(...)` documentation}
+         * @example Fetch query with parameters
+         * ```ts
+         * const data = await qraft.approvalPolicies.patchApprovalPoliciesId.fetchQuery({
+         *     parameters: {
+         *         body: queryBody,
+         *         header: {
+         *             "x-monite-version": "2023-06-04",
+         *             "x-monite-entity-id": xMoniteEntityId
+         *         },
+         *         path: {
+         *             approval_policy_id: approvalPolicyId
+         *         },
+         *         query: {
+         *             limit: limit
+         *         }
+         *     }
+         * })
+         * ```
          */
         fetchQuery(options: ServiceOperationFetchQueryOptions<PatchApprovalPoliciesIdSchema, PatchApprovalPoliciesIdData, PatchApprovalPoliciesIdQueryParameters, PatchApprovalPoliciesIdError>): Promise<PatchApprovalPoliciesIdData>;
         /**
+         * Preloads and caches data before it is needed.
+         * Resolves when the request completes without returning the cached data.
+         *
+         * @deprecated Use `query(...)` instead (e.g., `query(...).catch(() => {})` if you want to ignore errors).
          * @summary Update an approval policy
          * @description Update an existing approval policy.
+         * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/query-client/prefetchQuery|`prefetchQuery(...)` documentation}
+         * @example Prefetch query with parameters
+         * ```ts
+         * await qraft.approvalPolicies.patchApprovalPoliciesId.prefetchQuery({
+         *     parameters: {
+         *         body: queryBody,
+         *         header: {
+         *             "x-monite-version": "2023-06-04",
+         *             "x-monite-entity-id": xMoniteEntityId
+         *         },
+         *         path: {
+         *             approval_policy_id: approvalPolicyId
+         *         },
+         *         query: {
+         *             limit: limit
+         *         }
+         *     }
+         * })
+         * ```
          */
         prefetchQuery(options: ServiceOperationFetchQueryOptions<PatchApprovalPoliciesIdSchema, PatchApprovalPoliciesIdData, PatchApprovalPoliciesIdQueryParameters, PatchApprovalPoliciesIdError>): Promise<void>;
         /**
+         * Returns existing cached data if available, or fetches and caches it otherwise.
+         *
+         * @deprecated Use `query({ ...options, staleTime: 'static' })` instead.
          * @summary Update an approval policy
          * @description Update an existing approval policy.
+         * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/query-client/ensureQueryData|`ensureQueryData(...)` documentation}
+         * @example Ensure query data with parameters
+         * ```ts
+         * const data = await qraft.approvalPolicies.patchApprovalPoliciesId.ensureQueryData({
+         *     parameters: {
+         *         body: queryBody,
+         *         header: {
+         *             "x-monite-version": "2023-06-04",
+         *             "x-monite-entity-id": xMoniteEntityId
+         *         },
+         *         path: {
+         *             approval_policy_id: approvalPolicyId
+         *         },
+         *         query: {
+         *             limit: limit
+         *         }
+         *     }
+         * })
+         * ```
          */
         ensureQueryData(options: ServiceOperationEnsureQueryDataOptions<PatchApprovalPoliciesIdSchema, PatchApprovalPoliciesIdData, PatchApprovalPoliciesIdQueryParameters, PatchApprovalPoliciesIdError>): Promise<PatchApprovalPoliciesIdData>;
         /**
+         * Performs an asynchronous paginated data fetching operation, caches the pages, and returns the result.
+         *
+         * @deprecated Use `infiniteQuery(...)` instead.
          * @summary Update an approval policy
          * @description Update an existing approval policy.
+         * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/query-client/fetchInfiniteQuery|`fetchInfiniteQuery(...)` documentation}
+         *
+         * @example Fetch Infinite Query
+         * ```ts
+         * const data = await qraft.approvalPolicies.patchApprovalPoliciesId.fetchInfiniteQuery({
+         *     parameters: {
+         *         body: queryBody,
+         *         header: {
+         *             "x-monite-version": "2023-06-04",
+         *             "x-monite-entity-id": xMoniteEntityId
+         *         },
+         *         path: {
+         *             approval_policy_id: approvalPolicyId
+         *         }
+         *     },
+         *     initialPageParam: {
+         *         query: {
+         *             limit: initialLimit
+         *         }
+         *     },
+         *     getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) => getNextPageParams(lastPage)
+         * })
+         *
+         * console.log(data.pages);
+         * ```
          */
         fetchInfiniteQuery<TPageParam extends PatchApprovalPoliciesIdQueryParameters>(options: ServiceOperationFetchInfiniteQueryOptions<PatchApprovalPoliciesIdSchema, PatchApprovalPoliciesIdData, PatchApprovalPoliciesIdQueryParameters, DeepReadonly<TPageParam>, PatchApprovalPoliciesIdError>): Promise<OperationInfiniteData<PatchApprovalPoliciesIdData, PatchApprovalPoliciesIdQueryParameters>>;
         /**
+         * Preloads and caches paginated data before it is needed.
+         * Resolves when the request completes without returning the cached pages.
+         *
+         * @deprecated Use `infiniteQuery(...)` instead (e.g., `infiniteQuery(...).catch(() => {})` if you want to ignore errors).
          * @summary Update an approval policy
          * @description Update an existing approval policy.
+         * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/query-client/prefetchInfiniteQuery|`prefetchInfiniteQuery(...)` documentation}
+         *
+         * @example Prefetch Infinite Query
+         * ```ts
+         * await qraft.approvalPolicies.patchApprovalPoliciesId.prefetchInfiniteQuery({
+         *     parameters: {
+         *         body: queryBody,
+         *         header: {
+         *             "x-monite-version": "2023-06-04",
+         *             "x-monite-entity-id": xMoniteEntityId
+         *         },
+         *         path: {
+         *             approval_policy_id: approvalPolicyId
+         *         }
+         *     },
+         *     initialPageParam: {
+         *         query: {
+         *             limit: initialLimit
+         *         }
+         *     },
+         *     getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) => getNextPageParams(lastPage)
+         * })
+         * ```
          */
         prefetchInfiniteQuery<TPageParam extends PatchApprovalPoliciesIdQueryParameters>(options: ServiceOperationFetchInfiniteQueryOptions<PatchApprovalPoliciesIdSchema, PatchApprovalPoliciesIdData, PatchApprovalPoliciesIdQueryParameters, DeepReadonly<TPageParam>, PatchApprovalPoliciesIdError>): Promise<void>;
         /**
+         * Returns existing cached paginated data if available, or fetches and caches it otherwise.
+         *
+         * @deprecated Use `infiniteQuery({ ...options, staleTime: 'static' })` instead.
          * @summary Update an approval policy
          * @description Update an existing approval policy.
+         * @see {@link https://openapi-qraft.github.io/openapi-qraft/docs/query-client/ensureInfiniteQueryData|`ensureInfiniteQueryData(...)` documentation}
+         *
+         * @example Ensure Infinite Query Data
+         * ```ts
+         * const data = await qraft.approvalPolicies.patchApprovalPoliciesId.ensureInfiniteQueryData({
+         *     parameters: {
+         *         body: queryBody,
+         *         header: {
+         *             "x-monite-version": "2023-06-04",
+         *             "x-monite-entity-id": xMoniteEntityId
+         *         },
+         *         path: {
+         *             approval_policy_id: approvalPolicyId
+         *         }
+         *     },
+         *     initialPageParam: {
+         *         query: {
+         *             limit: initialLimit
+         *         }
+         *     },
+         *     getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) => getNextPageParams(lastPage)
+         * })
+         *
+         * console.log(data.pages);
+         * ```
          */
         ensureInfiniteQueryData<TPageParam extends PatchApprovalPoliciesIdQueryParameters>(options: ServiceOperationEnsureInfiniteQueryDataOptions<PatchApprovalPoliciesIdSchema, PatchApprovalPoliciesIdData, PatchApprovalPoliciesIdQueryParameters, DeepReadonly<TPageParam>, PatchApprovalPoliciesIdError>): Promise<OperationInfiniteData<PatchApprovalPoliciesIdData, PatchApprovalPoliciesIdQueryParameters>>;
         /**

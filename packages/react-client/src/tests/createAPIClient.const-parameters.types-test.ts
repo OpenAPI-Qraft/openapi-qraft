@@ -192,7 +192,9 @@ const createFullClient = () =>
       return pageParam;
     },
   });
+  // @ts-expect-error - getNextPageParam is required in TanStack Query 5.108.1+
   void qraft.files.findAll.fetchInfiniteQuery({});
+  // @ts-expect-error - getNextPageParam is required in TanStack Query 5.108.1+
   void qraft.files.findAll.fetchInfiniteQuery();
 }
 
@@ -308,5 +310,119 @@ const createFullClient = () =>
     // getNextPageParam: () => parameters, // OK, incorrect usage
     pages: 1,
     parameters,
+  });
+}
+
+// 8. Imperative query and infiniteQuery with const parameters (5.108.1+)
+{
+  const qraft = createFullClient();
+
+  const constParameters = {
+    query: { id__in: ['1', '2'] },
+    header: { 'x-monite-version': '1.0.0' },
+  } as const;
+
+  void (qraft.files.getFiles.query({
+    parameters: constParameters,
+    staleTime: 'static',
+    select: (data) => data.query?.id__in?.length ?? 0,
+  }) satisfies Promise<number>);
+
+  void qraft.files.findAll.query();
+  void qraft.files.findAll.query({
+    staleTime: 'static',
+    select: (data) => data.data.length,
+  });
+
+  // @ts-expect-error - required parameters cannot be omitted for getFiles.query
+  void qraft.files.getFiles.query();
+
+  void (qraft.files.getFiles.infiniteQuery({
+    parameters: constParameters,
+    initialPageParam: {
+      query: { id__in: ['1'] },
+    } as const,
+    pages: 2,
+    staleTime: 'static',
+    getNextPageParam: (_lastPage, _allPages, lastPageParam) => {
+      lastPageParam.query?.id__in satisfies readonly string[] | undefined;
+      return undefined;
+    },
+    select: (data) => data.pages.length,
+  }) satisfies Promise<number>);
+
+  void qraft.files.getFiles.infiniteQuery({
+    parameters: constParameters,
+    initialPageParam: constParameters,
+    getNextPageParam: () => undefined,
+    queryFn: ({ pageParam }) => {
+      pageParam.query?.id__in satisfies readonly string[] | undefined;
+      return Promise.resolve({});
+    },
+  });
+
+  // NoInfer prevents initialPageParam literal/partial keys from narrowing TPageParam
+  void qraft.files.findAll.infiniteQuery({
+    initialPageParam: {
+      query: { id__in: ['1'] },
+    } as const,
+    getNextPageParam: (_lastPage, _allPages, lastPageParam) => {
+      lastPageParam.query?.id__in satisfies readonly string[] | undefined;
+      return {
+        query: {
+          id__in: ['2'],
+        },
+      };
+    },
+    queryFn: ({ pageParam }) => {
+      pageParam.query?.id__in satisfies readonly string[] | undefined;
+      return Promise.resolve({ data: [] });
+    },
+  });
+
+  void qraft.files.findAll.infiniteQuery({
+    initialPageParam: {},
+    getNextPageParam: () => ({
+      query: { id__in: ['2'] },
+    }),
+  });
+
+  void qraft.files.getFiles.infiniteQuery({
+    parameters: constParameters,
+    initialPageParam: {
+      query: { id__in: ['1'] },
+    } as const,
+    getNextPageParam: (_lastPage, _allPages, lastPageParam) => {
+      lastPageParam.query?.id__in satisfies readonly string[] | undefined;
+      lastPageParam.query?.page satisfies string | undefined;
+      return {
+        query: {
+          id__in: ['2'],
+          page: '2',
+        },
+      };
+    },
+    queryFn: ({ pageParam }) => {
+      pageParam.query?.page satisfies string | undefined;
+      return Promise.resolve({});
+    },
+  });
+
+  void qraft.files.getFiles.infiniteQuery({
+    parameters: constParameters,
+    initialPageParam: {},
+    getNextPageParam: () => ({
+      query: { page: '2' },
+    }),
+  });
+
+  // @ts-expect-error - getNextPageParam is required in infiniteQuery
+  void qraft.files.findAll.infiniteQuery();
+  // @ts-expect-error - getNextPageParam is required in infiniteQuery
+  void qraft.files.findAll.infiniteQuery({});
+  // @ts-expect-error - getNextPageParam is required in infiniteQuery
+  void qraft.files.getFiles.infiniteQuery({
+    parameters: constParameters,
+    initialPageParam: constParameters,
   });
 }

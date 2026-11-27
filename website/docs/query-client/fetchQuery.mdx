@@ -7,6 +7,12 @@ import TabItem from '@theme/TabItem';
 
 # fetchQuery(...)
 
+:::warning Deprecated in `@tanstack/react-query >= 5.108.1`
+
+Use [`query(...)`](./query.mdx) instead. `fetchQuery` remains supported when targeting `@tanstack/react-query >= 5.80.0` (`< 5.108.1`), or when deprecations are disabled via `--tanstack-query-deprecations false`.
+
+:::
+
 The method allows you to execute a _Queries_ without React Hooks with the full power of _QueryClient_.
 To understand how `fetchQuery` handles data and cache management,
 refer to the TanStack [_queryClient.fetchQuery 🌴_](https://tanstack.com/query/latest/docs/reference/QueryClient#queryclientfetchquery) documentation.

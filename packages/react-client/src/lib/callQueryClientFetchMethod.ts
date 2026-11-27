@@ -1,4 +1,4 @@
-import type { QueryClient, QueryFunctionContext } from '@tanstack/react-query';
+import type { QueryFunctionContext } from '@tanstack/react-query';
 import type { CreateAPIQueryClientOptions } from '../qraftAPIClient.js';
 import type { OperationSchema, RequestFn } from './requestFn.js';
 import { composeInfiniteQueryKey } from './composeInfiniteQueryKey.js';
@@ -19,8 +19,8 @@ export function callQueryClientMethodWithQueryKey<
   queryFilterMethod: QFMethod,
   schema: OperationSchema,
   infinite: boolean,
-  args: QueryClientMethodArgs<QFMethod>
-): ReturnType<(typeof QueryClient.prototype)[QFMethod]> {
+  args: QueryClientMethodArgs
+): Promise<unknown> {
   const {
     requestFn: requestFnOption,
     baseUrl: baseUrlOption,
@@ -85,24 +85,27 @@ export function callQueryClientMethodWithQueryKey<
   });
 }
 
-type QueryClientMethodArgs<QMethod extends keyof QueryClientPrototype> = [
-  options: Parameters<QueryClientPrototype[QMethod]>[0] & {
-    parameters?: unknown;
-    baseUrl?: string;
-    requestFn?: RequestFn<unknown, unknown>;
-  },
-  queryClient: QueryClient,
+// Keep option/method types decoupled from QueryClient.prototype so emitted .d.ts
+// stays compatible with @tanstack/react-query < 5.108.1 (e.g., 5.80.0).
+type QueryClientFetchMethodOptions = Record<string, any> & {
+  queryKey?: unknown;
+  queryFn?: (...args: any[]) => unknown;
+  parameters?: unknown;
+  baseUrl?: string;
+  requestFn?: RequestFn<unknown, unknown>;
+};
+
+type QueryClientMethodArgs = [
+  options?: QueryClientFetchMethodOptions | void,
+  ...rest: unknown[],
 ];
 
 type QueryKeyMethods =
-  | QueryKeyMethod<'fetchQuery'>
-  | QueryKeyMethod<'prefetchQuery'>
-  | QueryKeyMethod<'ensureQueryData'>
-  | QueryKeyMethod<'fetchInfiniteQuery'>
-  | QueryKeyMethod<'prefetchInfiniteQuery'>
-  | QueryKeyMethod<'ensureInfiniteQueryData'>;
-
-type QueryClientPrototype = typeof QueryClient.prototype;
-
-type QueryKeyMethod<QFMethod extends keyof typeof QueryClient.prototype> =
-  QFMethod;
+  | 'query'
+  | 'infiniteQuery'
+  | 'fetchQuery'
+  | 'prefetchQuery'
+  | 'ensureQueryData'
+  | 'fetchInfiniteQuery'
+  | 'prefetchInfiniteQuery'
+  | 'ensureInfiniteQueryData';

@@ -109,8 +109,9 @@ the necessary `requestFn`, `baseUrl` and `queryClient` for React Hooks.
       baseUrl: 'https://api.sandbox.monite.com/v1',
     });
 
-    // ⬇︎ Fetch the `getPetById` query with the `queryClient`
-    const pet = await api.pet.getPetById.fetchQuery(
+    // ⬇︎ Query the `getPetById` operation with the `queryClient`
+    // (Use `.fetchQuery(...)` on `@tanstack/react-query < 5.108.1`)
+    const pet = await api.pet.getPetById.query(
       { parameters: { path: { petId: 1 } } }
     );
 

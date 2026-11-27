@@ -1,6 +1,10 @@
 import { ServiceOperation } from '@openapi-qraft/plugin/lib/open-api/OpenAPIService';
+import { createOperationCommonTSDoc } from '../../lib/createOperationCommonTSDoc.js';
+import { DeprecatedTanStackQueryMethod } from '../../lib/resolveTanStackQueryVersion.js';
 import { ServiceFactoryOptions } from '../getServiceFactory.js';
 import { createGetMutationCacheOperationTSDocExample } from './createGetMutationCacheOperationTSDocExample.js';
+import { createInfiniteQueryOperationTSDocExample } from './createInfiniteQueryOperationTSDocExample.js';
+import { createQueryOperationTSDocExample } from './createQueryOperationTSDocExample.js';
 import { createUseInfiniteQueryOperationTSDocExample } from './createUseInfiniteQueryOperationTSDocExample.js';
 import { createUseIsFetchingOperationTSDocExample } from './createUseIsFetchingOperationTSDocExample.js';
 import { createUseIsMutatingOperationTSDocExample } from './createUseIsMutatingOperationTSDocExample.js';
@@ -12,6 +16,21 @@ import { createUseSuspenseInfiniteQueryOperationTSDocExample } from './createUse
 import { createUseSuspenseQueriesOperationTSDocExample } from './createUseSuspenseQueriesOperationTSDocExample.js';
 import { createUseSuspenseQueryOperationTSDocExample } from './createUseSuspenseQueryOperationTSDocExample.js';
 
+const DEPRECATED_METHOD_MESSAGES: Record<
+  DeprecatedTanStackQueryMethod,
+  string
+> = {
+  fetchQuery: 'Use `query(...)` instead.',
+  prefetchQuery:
+    'Use `query(...)` instead (e.g., `query(...).catch(() => {})` if you want to ignore errors).',
+  ensureQueryData: "Use `query({ ...options, staleTime: 'static' })` instead.",
+  fetchInfiniteQuery: 'Use `infiniteQuery(...)` instead.',
+  prefetchInfiniteQuery:
+    'Use `infiniteQuery(...)` instead (e.g., `infiniteQuery(...).catch(() => {})` if you want to ignore errors).',
+  ensureInfiniteQueryData:
+    "Use `infiniteQuery({ ...options, staleTime: 'static' })` instead.",
+};
+
 export const createOperationMethodTSDocExample = (
   operation: ServiceOperation,
   {
@@ -21,9 +40,42 @@ export const createOperationMethodTSDocExample = (
     serviceVariableName: string;
     operationMethodName: string;
   },
-  options: Pick<ServiceFactoryOptions, 'queryableWriteOperations'>
+  options: Pick<
+    ServiceFactoryOptions,
+    'queryableWriteOperations' | 'deprecatedMethods'
+  >
 ) => {
+  const deprecationReason = options.deprecatedMethods?.has(
+    operationMethodName as DeprecatedTanStackQueryMethod
+  )
+    ? DEPRECATED_METHOD_MESSAGES[
+        operationMethodName as DeprecatedTanStackQueryMethod
+      ]
+    : undefined;
+
   switch (operationMethodName) {
+    case 'query':
+    case 'fetchQuery':
+    case 'prefetchQuery':
+    case 'ensureQueryData':
+      return createQueryOperationTSDocExample(operation, serviceVariableName, {
+        ...options,
+        operationMethodName,
+        deprecationReason,
+      });
+    case 'infiniteQuery':
+    case 'fetchInfiniteQuery':
+    case 'prefetchInfiniteQuery':
+    case 'ensureInfiniteQueryData':
+      return createInfiniteQueryOperationTSDocExample(
+        operation,
+        serviceVariableName,
+        {
+          ...options,
+          operationMethodName,
+          deprecationReason,
+        }
+      );
     case 'useQuery':
       return createUseQueryOperationTSDocExample(
         operation,
@@ -87,6 +139,8 @@ export const createOperationMethodTSDocExample = (
         options
       );
     default:
-      return undefined;
+      return deprecationReason
+        ? createOperationCommonTSDoc(operation, deprecationReason)
+        : undefined;
   }
 };

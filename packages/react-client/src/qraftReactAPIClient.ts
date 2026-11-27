@@ -286,6 +286,8 @@ export type APIQueryClientMethodsServices<
 
 type QueryOperationMethodCallbacks = Extract<
   keyof ServiceMethods,
+  | 'query'
+  | 'infiniteQuery'
   | 'fetchInfiniteQuery'
   | 'fetchQuery'
   | 'prefetchInfiniteQuery'
