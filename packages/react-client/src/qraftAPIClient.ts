@@ -504,7 +504,7 @@ export type APIBasicClientServices<
 export type APIUtilityClientServices<
   Services extends UnionServiceOperationsDeclaration<Services>,
   Callbacks extends Pick<PartialServiceMethods, UtilityOperationCallbacks>,
-> = ServicesFilteredByUtilityCallbacks<
+> = ServicesFilteredByCallbacks<
   Services,
   Extract<keyof Callbacks, UtilityOperationCallbacks>
 >;
@@ -513,86 +513,35 @@ export type ServicesFilteredByCallbacks<
   Services extends UnionServiceOperationsDeclaration<Services>,
   CallbackList extends OperationCallbackList,
 > = Services extends OperationDeclaration
-  ? Pick<
-      Services[QraftServiceOperationsToken],
-      Extract<
-        keyof Services[QraftServiceOperationsToken],
-        CallbackList | 'schema' | 'types'
-      >
-    > &
-      OperationInvokeFn<Services[QraftServiceOperationsToken], CallbackList>
+  ? FilterOperation<Services[QraftServiceOperationsToken], CallbackList>
   : Services extends OperationsDeclaration<Services>
     ? {
-        [operation in keyof Services]: Pick<
+        [operation in keyof Services]: FilterOperation<
           Services[operation][QraftServiceOperationsToken],
-          Extract<
-            keyof Services[operation][QraftServiceOperationsToken],
-            CallbackList | 'schema' | 'types'
-          >
-        > &
-          OperationInvokeFn<
-            Services[operation][QraftServiceOperationsToken],
-            CallbackList
-          >;
-      }
-    : Services extends ServicesDeclaration<Services>
-      ? {
-          [serviceName in keyof Services]: {
-            [operation in keyof Services[serviceName]]: Pick<
-              Services[serviceName][operation][QraftServiceOperationsToken],
-              Extract<
-                keyof Services[serviceName][operation][QraftServiceOperationsToken],
-                CallbackList | 'schema' | 'types'
-              >
-            > &
-              OperationInvokeFn<
-                Services[serviceName][operation][QraftServiceOperationsToken],
-                CallbackList
-              >;
-          };
-        }
-      : never;
-
-type OperationInvokeFn<
-  InvokeFn extends (...args: any[]) => any,
-  CallbackList extends OperationCallbackList,
-> = InvokeOperationCallback extends CallbackList
-  ? InvokeFn extends (...args: infer Args) => infer Result
-    ? { (...args: Args): Result }
-    : Record<string, never>
-  : Record<string, never>;
-
-type ServicesFilteredByUtilityCallbacks<
-  Services extends UnionServiceOperationsDeclaration<Services>,
-  CallbackList extends UtilityOperationCallbacks,
-> = Services extends OperationDeclaration
-  ? Pick<
-      Services[QraftServiceOperationsToken],
-      Extract<
-        keyof Services[QraftServiceOperationsToken],
-        CallbackList | 'schema' | 'types'
-      >
-    >
-  : Services extends OperationsDeclaration<Services>
-    ? {
-        [operation in keyof Services]: Pick<
-          Services[operation][QraftServiceOperationsToken],
-          Extract<
-            keyof Services[operation][QraftServiceOperationsToken],
-            CallbackList | 'schema' | 'types'
-          >
+          CallbackList
         >;
       }
     : Services extends ServicesDeclaration<Services>
       ? {
           [serviceName in keyof Services]: {
-            [operation in keyof Services[serviceName]]: Pick<
+            [operation in keyof Services[serviceName]]: FilterOperation<
               Services[serviceName][operation][QraftServiceOperationsToken],
-              Extract<
-                keyof Services[serviceName][operation][QraftServiceOperationsToken],
-                CallbackList | 'schema' | 'types'
-              >
+              CallbackList
             >;
           };
         }
       : never;
+
+type FilterOperation<
+  Op,
+  CallbackList extends OperationCallbackList,
+> = InvokeOperationCallback extends CallbackList
+  ? Pick<Op, Extract<keyof Op, CallbackList | 'schema' | 'types'>> &
+      OperationInvokeFn<Op>
+  : Pick<Op, Extract<keyof Op, CallbackList | 'schema' | 'types'>>;
+
+type OperationInvokeFn<InvokeFn> = InvokeFn extends (
+  ...args: infer Args
+) => infer Result
+  ? { (...args: Args): Result }
+  : unknown;

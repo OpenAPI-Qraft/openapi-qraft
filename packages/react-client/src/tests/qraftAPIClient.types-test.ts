@@ -843,3 +843,82 @@ client.files.getFiles.ensureInfiniteQueryData({
   baseUrl: 'https://example.com',
   queryFn: () => Promise.resolve({}),
 });
+
+//// ServicesFilteredByCallbacks - no Record<string, never> leakage & operation shapes ////
+// Bare property access (without invoking) on omitted callbacks or unknown keys must error
+// @ts-expect-error - queryClient-only client must not expose useQuery property
+queryClientOnlyApi.files.getFiles.useQuery;
+// @ts-expect-error - queryClient-only client must not expose fetchQuery property
+queryClientOnlyApi.files.getFiles.fetchQuery;
+// @ts-expect-error - queryClient-only client must not expose arbitrary properties via Record<string, never>
+queryClientOnlyApi.files.getFiles.nonExistentMethod;
+// @ts-expect-error - utility client must not expose useQuery property
+noQueryClientNoRequestApi.files.getFiles.useQuery;
+// @ts-expect-error - utility client must not expose arbitrary properties via Record<string, never>
+noQueryClientNoRequestApi.files.getFiles.nonExistentMethod;
+// @ts-expect-error - context client must not expose getQueryData property
+contextReactApi.files.getFiles.getQueryData;
+// @ts-expect-error - context client must not expose arbitrary properties via Record<string, never>
+contextReactApi.files.getFiles.nonExistentMethod;
+// @ts-expect-error - direct React queryClient-only client must not expose useQuery property
+directReactQueryClientOnlyApi.files.getFiles.useQuery;
+// @ts-expect-error - direct React queryClient-only client must not expose arbitrary properties via Record<string, never>
+directReactQueryClientOnlyApi.files.getFiles.nonExistentMethod;
+
+// Empty callbacks object exposes schema and types only
+const emptyCallbacksClient = qraftAPIClient(
+  services,
+  {},
+  { queryClient: new QueryClient() }
+);
+emptyCallbacksClient.files.getFiles.schema.method satisfies 'get';
+typeof emptyCallbacksClient.files.getFiles.types.data;
+// @ts-expect-error - empty callbacks client must not expose getQueryKey
+emptyCallbacksClient.files.getFiles.getQueryKey;
+// @ts-expect-error - empty callbacks client must not be callable
+emptyCallbacksClient.files.getFiles({ parameters });
+
+// OperationsDeclaration (single service) without operationInvokeFn
+const filesServiceQueryClientOnly = qraftAPIClient(
+  filesService,
+  {
+    getQueryKey: callbacks.getQueryKey,
+    getQueryData: callbacks.getQueryData,
+  },
+  { queryClient: new QueryClient() }
+);
+filesServiceQueryClientOnly.getFiles.getQueryKey(parameters);
+filesServiceQueryClientOnly.getFiles.getQueryData(parameters);
+filesServiceQueryClientOnly.getFiles.schema.method satisfies 'get';
+// @ts-expect-error - service-level queryClient-only client must not be callable
+filesServiceQueryClientOnly.getFiles({ parameters });
+// @ts-expect-error - service-level queryClient-only client must not expose useQuery
+filesServiceQueryClientOnly.getFiles.useQuery;
+// @ts-expect-error - service-level queryClient-only client must not expose arbitrary properties
+filesServiceQueryClientOnly.getFiles.nonExistentMethod;
+
+// Single OperationDeclaration without operationInvokeFn
+const deleteFilesQueryClientOnly = qraftAPIClient(
+  deleteFiles,
+  { getMutationKey: callbacks.getMutationKey },
+  { queryClient: new QueryClient() }
+);
+deleteFilesQueryClientOnly.getMutationKey();
+deleteFilesQueryClientOnly.schema.method satisfies 'delete';
+// @ts-expect-error - single-operation queryClient-only client must not be callable
+deleteFilesQueryClientOnly({ parameters: {} });
+// @ts-expect-error - single-operation queryClient-only client must not expose useMutation
+deleteFilesQueryClientOnly.useMutation;
+// @ts-expect-error - single-operation queryClient-only client must not expose arbitrary properties
+deleteFilesQueryClientOnly.nonExistentMethod;
+
+// Single OperationDeclaration with operationInvokeFn only
+const deleteFilesInvokeOnly = qraftAPIClient(
+  deleteFiles,
+  { operationInvokeFn: callbacks.operationInvokeFn },
+  { requestFn, baseUrl: 'https://api.sandbox.monite.com/v1' }
+);
+deleteFilesInvokeOnly({ parameters: { query: { all: true } } });
+deleteFilesInvokeOnly.schema.method satisfies 'delete';
+// @ts-expect-error - single-operation invoke-only client must not expose getMutationKey
+deleteFilesInvokeOnly.getMutationKey;
