@@ -509,22 +509,20 @@ export type APIUtilityClientServices<
   Extract<keyof Callbacks, UtilityOperationCallbacks>
 >;
 
-// Wrap mapped-type sources and callback key sets in NoInfer so contextual return-type
-// inference skips cross-branch Pick/keyof matching (avoiding LiteralKeyof object synthesis)
-// while keeping the mapped types homomorphic (preserving per-operation TSDoc and modifiers).
+// Wrap mapped-type key sources and Pick key sets in NoInfer to block type inference
+// across Pick/keyof branches (preventing LiteralKeyof object synthesis) while keeping
+// per-operation TSDoc and modifiers intact (homomorphically on Services and via the
+// indexed-access modifiers type on Services[serviceName]).
 export type ServicesFilteredByCallbacks<
   Services extends UnionServiceOperationsDeclaration<Services>,
   CallbackList extends OperationCallbackList,
 > = Services extends OperationDeclaration
-  ? FilterOperation<
-      Services[QraftServiceOperationsToken],
-      NoInfer<CallbackList>
-    >
+  ? FilterOperation<Services[QraftServiceOperationsToken], CallbackList>
   : Services extends OperationsDeclaration<Services>
     ? {
         [operation in keyof NoInfer<Services>]: FilterOperation<
           Services[operation][QraftServiceOperationsToken],
-          NoInfer<CallbackList>
+          CallbackList
         >;
       }
     : Services extends ServicesDeclaration<Services>
@@ -534,7 +532,7 @@ export type ServicesFilteredByCallbacks<
               Services[serviceName]
             >]: FilterOperation<
               Services[serviceName][operation][QraftServiceOperationsToken],
-              NoInfer<CallbackList>
+              CallbackList
             >;
           };
         }
