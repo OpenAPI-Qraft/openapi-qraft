@@ -16,7 +16,7 @@ describe('configParser', () => {
     ]);
   });
 
-  it('should parse simple boolean, null and undefined values as toggles', () => {
+  it('should parse simple boolean, null and undefined values', () => {
     expect(
       parseConfigToArgs({
         'some-boolean-flag': true,
@@ -24,7 +24,7 @@ describe('configParser', () => {
         'some-null-boolean-flag': null,
         'some-undefined-boolean-flag': undefined,
       })
-    ).toEqual(['--some-boolean-flag']);
+    ).toEqual(['--some-boolean-flag', '--some-disabled-boolean-flag=false']);
   });
 
   it('should parse arrays', () => {
