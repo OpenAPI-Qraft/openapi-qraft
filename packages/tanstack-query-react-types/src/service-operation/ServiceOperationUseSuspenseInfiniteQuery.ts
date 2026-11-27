@@ -3,14 +3,10 @@ import type {
   DeepReadonly,
   OperationError,
   OperationInfiniteData,
-  PartialParameters,
   ServiceOperationInfiniteQueryKey,
+  ServiceOperationUseSuspenseInfiniteQueryOptions,
 } from '@openapi-qraft/tanstack-query-react-types';
-import type {
-  InfiniteQueryPageParamsOptions,
-  UseSuspenseInfiniteQueryOptions,
-  UseSuspenseInfiniteQueryResult,
-} from '@tanstack/react-query';
+import type { UseSuspenseInfiniteQueryResult } from '@tanstack/react-query';
 
 export interface ServiceOperationUseSuspenseInfiniteQuery<
   TSchema extends { url: string; method: string },
@@ -28,22 +24,13 @@ export interface ServiceOperationUseSuspenseInfiniteQuery<
       | (AreAllOptional<TQueryParams> extends true
           ? DeepReadonly<TQueryParams> | void
           : DeepReadonly<TQueryParams>),
-    options: Omit<
-      UseSuspenseInfiniteQueryOptions<
-        TQueryFnData,
-        TError,
-        TData,
-        ServiceOperationInfiniteQueryKey<TSchema, TQueryParams>,
-        PartialParameters<DeepReadonly<TPageParam>>
-      >,
-      | 'queryKey'
-      | 'getPreviousPageParam'
-      | 'getNextPageParam'
-      | 'initialPageParam'
-    > &
-      InfiniteQueryPageParamsOptions<
-        TQueryFnData,
-        PartialParameters<DeepReadonly<TPageParam>>
-      >
+    options: ServiceOperationUseSuspenseInfiniteQueryOptions<
+      TSchema,
+      TQueryFnData,
+      TQueryParams,
+      TPageParam,
+      TError,
+      TData
+    >
   ): UseSuspenseInfiniteQueryResult<TData, OperationError<TError>>;
 }

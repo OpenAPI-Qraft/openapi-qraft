@@ -3,11 +3,11 @@ import type {
   DeepReadonly,
   OperationError,
   ServiceOperationQueryKey,
+  ServiceOperationUseQueryDefinedOptions,
+  ServiceOperationUseQueryUndefinedOptions,
 } from '@openapi-qraft/tanstack-query-react-types';
 import type {
-  DefinedInitialDataOptions,
   DefinedUseQueryResult,
-  UndefinedInitialDataOptions,
   UseQueryResult,
 } from '@tanstack/react-query';
 
@@ -29,14 +29,12 @@ export interface ServiceOperationUseQuery<
       | (AreAllOptional<TQueryParams> extends true
           ? DeepReadonly<TQueryParams> | void
           : DeepReadonly<TQueryParams>),
-    options: Omit<
-      DefinedInitialDataOptions<
-        TOperationQueryFnData,
-        TError,
-        TData,
-        ServiceOperationQueryKey<TSchema, TQueryParams>
-      >,
-      'queryKey'
+    options: ServiceOperationUseQueryDefinedOptions<
+      TSchema,
+      TOperationQueryFnData,
+      TQueryParams,
+      TError,
+      TData
     >
   ): DefinedUseQueryResult<TData, OperationError<TError>>;
 
@@ -46,14 +44,12 @@ export interface ServiceOperationUseQuery<
       | (AreAllOptional<TQueryParams> extends true
           ? DeepReadonly<TQueryParams> | void
           : DeepReadonly<TQueryParams>),
-    options?: Omit<
-      UndefinedInitialDataOptions<
-        TOperationQueryFnData,
-        TError,
-        TData,
-        ServiceOperationQueryKey<TSchema, TQueryParams>
-      >,
-      'queryKey'
+    options?: ServiceOperationUseQueryUndefinedOptions<
+      TSchema,
+      TOperationQueryFnData,
+      TQueryParams,
+      TError,
+      TData
     >
   ): UseQueryResult<TData, OperationError<TError>>;
 }

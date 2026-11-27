@@ -3,8 +3,9 @@ import type {
   MutationFiltersByParameters,
   MutationVariables,
   OperationError,
+  ServiceOperationMutationCacheBase,
 } from '@openapi-qraft/tanstack-query-react-types';
-import type { Mutation, MutationCache } from '@tanstack/react-query';
+import type { Mutation } from '@tanstack/react-query';
 
 export interface ServiceOperationGetMutationCache<
   TSchema extends { url: string; method: string },
@@ -13,7 +14,7 @@ export interface ServiceOperationGetMutationCache<
   TMutationParams,
   TError,
 > {
-  getMutationCache(): Omit<MutationCache, 'find' | 'findAll'> & {
+  getMutationCache(): ServiceOperationMutationCacheBase & {
     find<TContext = unknown>(
       filters:
         | MutationFiltersByParameters<

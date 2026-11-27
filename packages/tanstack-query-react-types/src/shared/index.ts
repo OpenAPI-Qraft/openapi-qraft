@@ -16,3 +16,8 @@ export type * from './UseQueryOptionsForUseSuspenseQuery.js';
 export type * from './WithOptional.js';
 export type * from './QraftServiceOperationsToken.js';
 export type * from './OperationError.js';
+export type * from './ServiceOperationMutationCacheBase.js';
+export type * from './ServiceOperationUseInfiniteQueryOptions.js';
+export type * from './ServiceOperationUseQueryOptions.js';
+export type * from './ServiceOperationUseSuspenseInfiniteQueryOptions.js';
+export type * from './ServiceOperationUseSuspenseQueryOptions.js';

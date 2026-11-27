@@ -3,14 +3,12 @@ import type {
   DeepReadonly,
   OperationError,
   OperationInfiniteData,
-  PartialParameters,
   ServiceOperationInfiniteQueryKey,
+  ServiceOperationUseInfiniteQueryDefinedOptions,
+  ServiceOperationUseInfiniteQueryUndefinedOptions,
 } from '@openapi-qraft/tanstack-query-react-types';
 import type {
-  DefinedInitialDataInfiniteOptions,
   DefinedUseInfiniteQueryResult,
-  InfiniteQueryPageParamsOptions,
-  UndefinedInitialDataInfiniteOptions,
   UseInfiniteQueryResult,
 } from '@tanstack/react-query';
 
@@ -36,23 +34,14 @@ export interface ServiceOperationUseInfiniteQuery<
       | (AreAllOptional<TQueryParams> extends true
           ? DeepReadonly<TQueryParams> | void
           : DeepReadonly<TQueryParams>),
-    options: Omit<
-      DefinedInitialDataInfiniteOptions<
-        TQueryFnData,
-        TError,
-        TData,
-        ServiceOperationInfiniteQueryKey<TSchema, TQueryParams>,
-        PartialParameters<DeepReadonly<TPageParam>>
-      >,
-      | 'queryKey'
-      | 'getPreviousPageParam'
-      | 'getNextPageParam'
-      | 'initialPageParam'
-    > &
-      InfiniteQueryPageParamsOptions<
-        TQueryFnData,
-        PartialParameters<DeepReadonly<TPageParam>>
-      >
+    options: ServiceOperationUseInfiniteQueryDefinedOptions<
+      TSchema,
+      TQueryFnData,
+      TQueryParams,
+      TPageParam,
+      TError,
+      TData
+    >
   ): DefinedUseInfiniteQueryResult<TData, OperationError<TError>>;
 
   useInfiniteQuery<
@@ -65,22 +54,13 @@ export interface ServiceOperationUseInfiniteQuery<
       | (AreAllOptional<TQueryParams> extends true
           ? DeepReadonly<TQueryParams> | void
           : DeepReadonly<TQueryParams>),
-    options: Omit<
-      UndefinedInitialDataInfiniteOptions<
-        TQueryFnData,
-        TError,
-        TData,
-        ServiceOperationInfiniteQueryKey<TSchema, TQueryParams>,
-        PartialParameters<DeepReadonly<TPageParam>>
-      >,
-      | 'queryKey'
-      | 'getPreviousPageParam'
-      | 'getNextPageParam'
-      | 'initialPageParam'
-    > &
-      InfiniteQueryPageParamsOptions<
-        TQueryFnData,
-        PartialParameters<DeepReadonly<TPageParam>>
-      >
+    options: ServiceOperationUseInfiniteQueryUndefinedOptions<
+      TSchema,
+      TQueryFnData,
+      TQueryParams,
+      TPageParam,
+      TError,
+      TData
+    >
   ): UseInfiniteQueryResult<TData, OperationError<TError>>;
 }

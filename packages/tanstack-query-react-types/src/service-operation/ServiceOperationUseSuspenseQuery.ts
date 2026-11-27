@@ -3,11 +3,9 @@ import type {
   DeepReadonly,
   OperationError,
   ServiceOperationQueryKey,
+  ServiceOperationUseSuspenseQueryOptions,
 } from '@openapi-qraft/tanstack-query-react-types';
-import type {
-  UseSuspenseQueryOptions,
-  UseSuspenseQueryResult,
-} from '@tanstack/react-query';
+import type { UseSuspenseQueryResult } from '@tanstack/react-query';
 
 export interface ServiceOperationUseSuspenseQuery<
   TSchema extends { url: string; method: string },
@@ -21,14 +19,12 @@ export interface ServiceOperationUseSuspenseQuery<
       | (AreAllOptional<TQueryParams> extends true
           ? DeepReadonly<TQueryParams> | void
           : DeepReadonly<TQueryParams>),
-    options?: Omit<
-      UseSuspenseQueryOptions<
-        TOperationQueryFnData,
-        TError,
-        TData,
-        ServiceOperationQueryKey<TSchema, TQueryParams>
-      >,
-      'queryKey'
+    options?: ServiceOperationUseSuspenseQueryOptions<
+      TSchema,
+      TOperationQueryFnData,
+      TQueryParams,
+      TError,
+      TData
     >
   ): UseSuspenseQueryResult<TData, OperationError<TError>>;
 }

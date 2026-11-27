@@ -8,7 +8,7 @@ import {
   processOperationNameModifierOption,
 } from '@openapi-qraft/plugin/lib/processOperationNameModifierOption';
 import ts from 'typescript';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, test } from 'vitest';
 import { resolveTanStackQueryCapabilities } from '../lib/resolveTanStackQueryVersion.js';
 import { astToString } from './astToString.js';
 import { getServiceFactory } from './getServiceFactory.js';
@@ -479,6 +479,478 @@ describe(
   }
 );
 
+describe('shared service operation option aliases', { timeout: 30_000 }, () => {
+  const queryOptionAliases = [
+    'ServiceOperationUseQueryDefinedOptions',
+    'ServiceOperationUseQueryUndefinedOptions',
+    'ServiceOperationUseSuspenseQueryOptions',
+    'ServiceOperationUseInfiniteQueryDefinedOptions',
+    'ServiceOperationUseInfiniteQueryUndefinedOptions',
+    'ServiceOperationUseSuspenseInfiniteQueryOptions',
+  ] as const;
+
+  const removedTanStackTypes = [
+    'DefinedInitialDataOptions',
+    'UndefinedInitialDataOptions',
+    'UseSuspenseQueryOptions',
+    'DefinedInitialDataInfiniteOptions',
+    'UndefinedInitialDataInfiniteOptions',
+    'UseSuspenseInfiniteQueryOptions',
+    'InfiniteQueryPageParamsOptions',
+    'MutationCache',
+  ] as const;
+
+  function getImportedSpecifiersByModule(
+    source: string
+  ): Record<string, string[]> {
+    const sourceFile = ts.createSourceFile(
+      'service.ts',
+      source,
+      ts.ScriptTarget.Latest,
+      true
+    );
+    const imports: Record<string, string[]> = {};
+
+    for (const statement of sourceFile.statements) {
+      if (
+        ts.isImportDeclaration(statement) &&
+        ts.isStringLiteral(statement.moduleSpecifier) &&
+        statement.importClause?.namedBindings &&
+        ts.isNamedImports(statement.importClause.namedBindings)
+      ) {
+        imports[statement.moduleSpecifier.text] =
+          statement.importClause.namedBindings.elements.map(
+            (element) => element.name.text
+          );
+      }
+    }
+
+    return imports;
+  }
+
+  const queryAndMutationOpenAPITypes = `
+    export interface paths {
+      '/items': {
+        get: {
+          parameters: { query?: { cursor?: string } };
+          responses: {
+            200: { content: { 'application/json': string } };
+            400: { content: { 'application/json': { message: string } } };
+          };
+        };
+      };
+      '/items/{itemId}': {
+        delete: {
+          parameters: { path: { itemId: string } };
+          responses: {
+            200: { content: { 'application/json': { deleted: boolean } } };
+            404: { content: { 'application/json': { error: string } } };
+          };
+        };
+      };
+    }
+  `;
+
+  function createQueryAndMutationService(): OpenAPIService {
+    const schema: OpenAPISchemaType = {
+      openapi: '3.1.0',
+      info: { title: 'Query and mutation ops', version: '1.0.0' },
+      components: { parameters: undefined },
+      paths: {
+        '/items': {
+          get: {
+            operationId: 'listItems',
+            parameters: [
+              {
+                name: 'cursor',
+                in: 'query',
+                required: false,
+                schema: { type: 'string' },
+              },
+            ],
+            responses: {
+              200: {
+                description: 'Successful response',
+                content: { 'application/json': { schema: { type: 'string' } } },
+              },
+              400: {
+                description: 'Bad request',
+                content: {
+                  'application/json': {
+                    schema: {
+                      type: 'object',
+                      properties: { message: { type: 'string' } },
+                      required: ['message'],
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+        '/items/{itemId}': {
+          delete: {
+            operationId: 'deleteItem',
+            parameters: [
+              {
+                name: 'itemId',
+                in: 'path',
+                required: true,
+                schema: { type: 'string' },
+              },
+            ],
+            responses: {
+              200: {
+                description: 'Deleted',
+                content: {
+                  'application/json': {
+                    schema: {
+                      type: 'object',
+                      properties: { deleted: { type: 'boolean' } },
+                      required: ['deleted'],
+                    },
+                  },
+                },
+              },
+              404: {
+                description: 'Not found',
+                content: {
+                  'application/json': {
+                    schema: {
+                      type: 'object',
+                      properties: { error: { type: 'string' } },
+                      required: ['error'],
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    };
+
+    return getServices(schema)[0];
+  }
+
+  it('emits shared option aliases and omits unused inline Omit types and TanStack Query imports', () => {
+    const queryOnlySource = generateService(createService(['listItems']));
+    const queryOnlyImports = getImportedSpecifiersByModule(queryOnlySource);
+    expect(queryOnlySource).not.toContain('Omit<');
+    for (const typeName of removedTanStackTypes) {
+      expect(queryOnlyImports['@tanstack/react-query']).not.toContain(typeName);
+    }
+    expect(
+      queryOnlyImports['@openapi-qraft/tanstack-query-react-types']
+    ).not.toContain('PartialParameters');
+    expect(
+      queryOnlyImports['@openapi-qraft/tanstack-query-react-types']
+    ).toEqual(expect.arrayContaining([...queryOptionAliases]));
+    expect(
+      queryOnlyImports['@openapi-qraft/tanstack-query-react-types']
+    ).not.toContain('ServiceOperationMutationCacheBase');
+
+    const mixedSource = generateService(createQueryAndMutationService());
+    const mixedImports = getImportedSpecifiersByModule(mixedSource);
+    expect(mixedSource).not.toContain('Omit<');
+    for (const typeName of removedTanStackTypes) {
+      expect(mixedImports['@tanstack/react-query']).not.toContain(typeName);
+    }
+    expect(
+      mixedImports['@openapi-qraft/tanstack-query-react-types']
+    ).not.toContain('PartialParameters');
+    expect(mixedImports['@openapi-qraft/tanstack-query-react-types']).toEqual(
+      expect.arrayContaining([
+        ...queryOptionAliases,
+        'ServiceOperationMutationCacheBase',
+      ])
+    );
+  });
+
+  it('preserves overload resolution, select, TPageParam, OperationError, and MutationCache inference', () => {
+    const service = createQueryAndMutationService();
+    const source = generateService(service);
+
+    const files = new Map([
+      [path.resolve('ItemsService.ts'), source],
+      [path.resolve('openapi.ts'), queryAndMutationOpenAPITypes],
+      [
+        path.resolve('usage.ts'),
+        `
+          import type { ItemsService } from './ItemsService';
+          import { skipToken } from '@tanstack/react-query';
+
+          declare const items: ItemsService;
+
+          const definedQuery = items.listItems.useQuery(
+            { query: { cursor: '1' } } as const,
+            { initialData: 'seed' }
+          );
+          const _definedData: string = definedQuery.data;
+          definedQuery.error satisfies { message: string } | Error | null;
+
+          const undefinedQuery = items.listItems.useQuery(
+            { query: { cursor: '1' } } as const
+          );
+          undefinedQuery.data satisfies string | undefined;
+          // @ts-expect-error - undefined overload includes undefined in data
+          const _undefinedData: string = undefinedQuery.data;
+
+          const selectedQuery = items.listItems.useQuery(undefined, {
+            select: (data) => data.length,
+            queryFn: skipToken,
+          });
+          selectedQuery.data satisfies number | undefined;
+          items.listItems.useQuery(undefined, {
+            // @ts-expect-error - queryKey is omitted from options
+            queryKey: items.listItems.getQueryKey(),
+          });
+
+          const suspenseQuery = items.listItems.useSuspenseQuery(
+            { query: { cursor: '1' } } as const,
+            { select: (data) => data.length }
+          );
+          suspenseQuery.data satisfies number;
+          suspenseQuery.error satisfies { message: string } | Error | null;
+          items.listItems.useSuspenseQuery(undefined, {
+            // @ts-expect-error - queryKey is omitted from options
+            queryKey: items.listItems.getQueryKey(),
+          });
+          items.listItems.useSuspenseQuery(undefined, {
+            // @ts-expect-error - skipToken is not allowed in useSuspenseQuery
+            queryFn: skipToken,
+          });
+
+          const definedInfinite = items.listItems.useInfiniteQuery(
+            { query: { cursor: '1' } } as const,
+            {
+              initialPageParam: { query: { cursor: '0' } } as const,
+              getNextPageParam: (_lastPage, _allPages, lastPageParam) => {
+                lastPageParam.query?.cursor satisfies string | undefined;
+                return undefined;
+              },
+              initialData: { pages: ['first'], pageParams: [{}] },
+            }
+          );
+          const _definedInfinitePages: Array<string> =
+            definedInfinite.data.pages;
+
+          const undefinedInfinite = items.listItems.useInfiniteQuery(
+            { query: { cursor: '1' } } as const,
+            {
+              initialPageParam: { query: { cursor: '0' } } as const,
+              getNextPageParam: () => undefined,
+              getPreviousPageParam: (
+                _firstPage,
+                _allPages,
+                firstPageParam
+              ) => {
+                firstPageParam.query?.cursor satisfies string | undefined;
+                return undefined;
+              },
+              select: (data) => data.pages.length,
+              queryFn: skipToken,
+            }
+          );
+          undefinedInfinite.data satisfies number | undefined;
+          // @ts-expect-error - undefined infinite overload includes undefined in data
+          const _undefinedInfiniteData: number = undefinedInfinite.data;
+
+          const suspenseInfinite = items.listItems.useSuspenseInfiniteQuery(
+            { query: { cursor: '1' } } as const,
+            {
+              initialPageParam: { query: { cursor: '0' } } as const,
+              getNextPageParam: (_lastPage, _allPages, lastPageParam) => {
+                lastPageParam.query?.cursor satisfies string | undefined;
+                return undefined;
+              },
+              select: (data) => data.pages.length,
+            }
+          );
+          suspenseInfinite.data satisfies number;
+
+          const explicitSuspenseInfinite =
+            items.listItems.useSuspenseInfiniteQuery<
+              typeof items.listItems.types.parameters,
+              { custom: number }
+            >(undefined, {
+              initialPageParam: {},
+              getNextPageParam: (lastPage) => {
+                lastPage satisfies { custom: number };
+                return undefined;
+              },
+            });
+          explicitSuspenseInfinite.data.pages satisfies Array<{
+            custom: number;
+          }>;
+
+          const mutationCache = items.deleteItem.getMutationCache();
+          const foundMutation = mutationCache.find({
+            parameters: { path: { itemId: '1' } },
+          });
+          foundMutation?.state.data satisfies
+            | { deleted: boolean }
+            | undefined;
+          mutationCache.findAll({ exact: true }).length satisfies number;
+          mutationCache.getAll().length satisfies number;
+          mutationCache.clear();
+
+          void [
+            _definedData,
+            _undefinedData,
+            _definedInfinitePages,
+            _undefinedInfiniteData,
+          ];
+        `,
+      ],
+    ]);
+
+    expect(getCompilationDiagnostics(files)).toEqual([]);
+  });
+
+  test.each([
+    {
+      name: 'Node10 with imperativeQuery: false',
+      imperativeQuery: false,
+      openapiTypesImportPath: './openapi',
+      serviceImportPath: './ItemsService',
+      options: {
+        ...compilerOptions,
+        module: ts.ModuleKind.CommonJS,
+        moduleResolution: ts.ModuleResolutionKind.Node10,
+      },
+    },
+    {
+      name: 'Node10 with imperativeQuery: true',
+      imperativeQuery: true,
+      openapiTypesImportPath: './openapi',
+      serviceImportPath: './ItemsService',
+      options: {
+        ...compilerOptions,
+        module: ts.ModuleKind.CommonJS,
+        moduleResolution: ts.ModuleResolutionKind.Node10,
+      },
+    },
+    {
+      name: 'NodeNext with imperativeQuery: false',
+      imperativeQuery: false,
+      openapiTypesImportPath: './openapi.js',
+      serviceImportPath: './ItemsService.js',
+      options: {
+        ...compilerOptions,
+        module: ts.ModuleKind.NodeNext,
+        moduleResolution: ts.ModuleResolutionKind.NodeNext,
+        verbatimModuleSyntax: true,
+      },
+    },
+    {
+      name: 'NodeNext with imperativeQuery: true',
+      imperativeQuery: true,
+      openapiTypesImportPath: './openapi.js',
+      serviceImportPath: './ItemsService.js',
+      options: {
+        ...compilerOptions,
+        module: ts.ModuleKind.NodeNext,
+        moduleResolution: ts.ModuleResolutionKind.NodeNext,
+        verbatimModuleSyntax: true,
+      },
+    },
+  ])(
+    'compiles under $name',
+    ({
+      imperativeQuery,
+      openapiTypesImportPath,
+      serviceImportPath,
+      options,
+    }) => {
+      const service = createQueryAndMutationService();
+      const source = generateService(service, {
+        imperativeQuery,
+        openapiTypesImportPath,
+      });
+
+      const imperativeUsage = imperativeQuery
+        ? `
+          import type { ServiceOperationImperativeQueryOptions } from '@openapi-qraft/tanstack-query-react-types/imperative-query';
+          type _ImperativeAlias = ServiceOperationImperativeQueryOptions<
+            { url: '/items'; method: 'get' },
+            string,
+            { query?: { cursor?: string } }
+          >;
+          const _imperativeResult: Promise<string> = items.listItems.query();
+          void _imperativeResult;
+        `
+        : '';
+
+      const files = new Map([
+        [path.resolve('ItemsService.ts'), source],
+        [path.resolve('openapi.ts'), queryAndMutationOpenAPITypes],
+        [
+          path.resolve('usage.ts'),
+          `
+            import type {
+              ServiceOperationMutationCacheBase,
+              ServiceOperationUseInfiniteQueryDefinedOptions,
+              ServiceOperationUseInfiniteQueryUndefinedOptions,
+              ServiceOperationUseQueryDefinedOptions,
+              ServiceOperationUseQueryUndefinedOptions,
+              ServiceOperationUseSuspenseInfiniteQueryOptions,
+              ServiceOperationUseSuspenseQueryOptions,
+            } from '@openapi-qraft/tanstack-query-react-types';
+            import type { ItemsService } from '${serviceImportPath}';
+
+            declare const items: ItemsService;
+
+            type _SharedAliases = [
+              ServiceOperationMutationCacheBase,
+              ServiceOperationUseQueryDefinedOptions<
+                { url: '/items'; method: 'get' },
+                string,
+                { query?: { cursor?: string } }
+              >,
+              ServiceOperationUseQueryUndefinedOptions<
+                { url: '/items'; method: 'get' },
+                string,
+                { query?: { cursor?: string } }
+              >,
+              ServiceOperationUseSuspenseQueryOptions<
+                { url: '/items'; method: 'get' },
+                string,
+                { query?: { cursor?: string } }
+              >,
+              ServiceOperationUseInfiniteQueryDefinedOptions<
+                { url: '/items'; method: 'get' },
+                string,
+                { query?: { cursor?: string } },
+                { query?: { cursor?: string } }
+              >,
+              ServiceOperationUseInfiniteQueryUndefinedOptions<
+                { url: '/items'; method: 'get' },
+                string,
+                { query?: { cursor?: string } },
+                { query?: { cursor?: string } }
+              >,
+              ServiceOperationUseSuspenseInfiniteQueryOptions<
+                { url: '/items'; method: 'get' },
+                string,
+                { query?: { cursor?: string } },
+                { query?: { cursor?: string } }
+              >,
+            ];
+
+            const queryResult = items.listItems.useQuery();
+            const mutationCache = items.deleteItem.getMutationCache();
+            void [queryResult, mutationCache];
+            ${imperativeUsage}
+          `,
+        ],
+      ]);
+
+      expect(getCompilationDiagnostics(files, options)).toEqual([]);
+    }
+  );
+});
+
 function createService(operationIds: string[]): OpenAPIService {
   const schema: OpenAPISchemaType = {
     openapi: '3.1.0',
@@ -562,10 +1034,12 @@ function expectCompiles(
 }
 
 function getCompilationDiagnostics(
-  files: ReadonlyMap<string, string>
+  files: ReadonlyMap<string, string>,
+  customCompilerOptions: ts.CompilerOptions = compilerOptions
 ): string[] {
-  const host = ts.createCompilerHost(compilerOptions);
+  const host = ts.createCompilerHost(customCompilerOptions);
   const { fileExists, readFile, getSourceFile } = host;
+  const canUseDefaultCache = customCompilerOptions === compilerOptions;
 
   host.fileExists = (fileName) => files.has(fileName) || fileExists(fileName);
   host.readFile = (fileName) => files.get(fileName) ?? readFile(fileName);
@@ -581,8 +1055,10 @@ function getCompilationDiagnostics(
       return ts.createSourceFile(fileName, content, languageVersion, true);
     }
 
-    const cached = sourceFileCache.get(fileName);
-    if (cached && !shouldCreateNewSourceFile) return cached;
+    if (canUseDefaultCache) {
+      const cached = sourceFileCache.get(fileName);
+      if (cached && !shouldCreateNewSourceFile) return cached;
+    }
 
     const sourceFile = getSourceFile(
       fileName,
@@ -590,11 +1066,17 @@ function getCompilationDiagnostics(
       onError,
       shouldCreateNewSourceFile
     );
-    if (sourceFile) sourceFileCache.set(fileName, sourceFile);
+    if (canUseDefaultCache && sourceFile) {
+      sourceFileCache.set(fileName, sourceFile);
+    }
     return sourceFile;
   };
 
-  const program = ts.createProgram([...files.keys()], compilerOptions, host);
+  const program = ts.createProgram(
+    [...files.keys()],
+    customCompilerOptions,
+    host
+  );
   return ts
     .getPreEmitDiagnostics(program)
     .map((diagnostic) =>
