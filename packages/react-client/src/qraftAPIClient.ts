@@ -509,24 +509,32 @@ export type APIUtilityClientServices<
   Extract<keyof Callbacks, UtilityOperationCallbacks>
 >;
 
+// Wrap mapped-type sources and callback key sets in NoInfer so contextual return-type
+// inference skips cross-branch Pick/keyof matching (avoiding LiteralKeyof object synthesis)
+// while keeping the mapped types homomorphic (preserving per-operation TSDoc and modifiers).
 export type ServicesFilteredByCallbacks<
   Services extends UnionServiceOperationsDeclaration<Services>,
   CallbackList extends OperationCallbackList,
 > = Services extends OperationDeclaration
-  ? FilterOperation<Services[QraftServiceOperationsToken], CallbackList>
+  ? FilterOperation<
+      Services[QraftServiceOperationsToken],
+      NoInfer<CallbackList>
+    >
   : Services extends OperationsDeclaration<Services>
     ? {
-        [operation in keyof Services]: FilterOperation<
+        [operation in keyof NoInfer<Services>]: FilterOperation<
           Services[operation][QraftServiceOperationsToken],
-          CallbackList
+          NoInfer<CallbackList>
         >;
       }
     : Services extends ServicesDeclaration<Services>
       ? {
-          [serviceName in keyof Services]: {
-            [operation in keyof Services[serviceName]]: FilterOperation<
+          [serviceName in keyof NoInfer<Services>]: {
+            [operation in keyof NoInfer<
+              Services[serviceName]
+            >]: FilterOperation<
               Services[serviceName][operation][QraftServiceOperationsToken],
-              CallbackList
+              NoInfer<CallbackList>
             >;
           };
         }
@@ -536,9 +544,9 @@ type FilterOperation<
   Op,
   CallbackList extends OperationCallbackList,
 > = InvokeOperationCallback extends CallbackList
-  ? Pick<Op, Extract<keyof Op, CallbackList | 'schema' | 'types'>> &
+  ? Pick<Op, NoInfer<Extract<keyof Op, CallbackList | 'schema' | 'types'>>> &
       OperationInvokeFn<Op>
-  : Pick<Op, Extract<keyof Op, CallbackList | 'schema' | 'types'>>;
+  : Pick<Op, NoInfer<Extract<keyof Op, CallbackList | 'schema' | 'types'>>>;
 
 type OperationInvokeFn<InvokeFn> = InvokeFn extends (
   ...args: infer Args
