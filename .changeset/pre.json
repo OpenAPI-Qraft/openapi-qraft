@@ -31,6 +31,7 @@
     "dull-parts-yell",
     "forbid-fetch-status-and-status-on-fetching-mutating",
     "forward-mutation-context-meta",
+    "imperative-query-methods",
     "khaki-llamas-find",
     "poor-pugs-fix",
     "public-lies-sell",
