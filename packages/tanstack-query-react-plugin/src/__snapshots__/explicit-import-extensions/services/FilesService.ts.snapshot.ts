@@ -1681,6 +1681,7 @@ export const getFileList = {
     schema: GetFileListSchema;
     [QraftServiceOperationsToken]: FilesService["getFileList"];
 };
+/** @deprecated Import individual operations directly from this module instead. Pass `--service-object-exports false` to omit this export. */
 export const filesService = {
     getFiles,
     postFiles,

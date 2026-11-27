@@ -1188,6 +1188,7 @@ export const patchApprovalPoliciesId = {
     schema: PatchApprovalPoliciesIdSchema;
     [QraftServiceOperationsToken]: ApprovalPoliciesService["patchApprovalPoliciesId"];
 };
+/** @deprecated Import individual operations directly from this module instead. Pass `--service-object-exports false` to omit this export. */
 export const approvalPoliciesService = {
     getApprovalPoliciesId,
     deleteApprovalPoliciesId,

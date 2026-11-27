@@ -12,6 +12,7 @@ import { describe, expect, it, test } from 'vitest';
 import { resolveTanStackQueryCapabilities } from '../lib/resolveTanStackQueryVersion.js';
 import { astToString } from './astToString.js';
 import { getServiceFactory } from './getServiceFactory.js';
+import { getServiceIndexFactory } from './getServiceIndexFactory.js';
 
 const compilerOptions: ts.CompilerOptions = {
   strict: true,
@@ -206,6 +207,74 @@ describe('service operation variable names', { timeout: 30_000 }, () => {
         `,
       }
     );
+  });
+
+  it('uses a computed property key for __proto__ operations in the service object', () => {
+    const baseService = createService(['protoOp', 'listItems']);
+    const service: OpenAPIService = {
+      ...baseService,
+      operations: baseService.operations.map((operation, index) =>
+        index === 0 ? { ...operation, name: '__proto__' } : operation
+      ),
+    };
+    const source = generateService(service);
+
+    expect(source).toContain('export const __proto__ =');
+    expect(source).toContain('["__proto__"]: __proto__,');
+    expect(source).not.toContain('__proto__: __proto__');
+    expect(source).not.toMatch(
+      /export const itemsService = \{[^}]*(?:\{|,)\s*__proto__\s*(?:,|\})/s
+    );
+
+    expectCompiles(
+      service,
+      source,
+      `
+        import { __proto__ as protoOperation, itemsService } from './ItemsService';
+        const op: typeof protoOperation = itemsService['__proto__'];
+        void op;
+      `
+    );
+
+    const filesWithoutServiceObject = new Map([
+      [
+        path.resolve('ItemsService.ts'),
+        generateService(service, { exportServiceObject: false }),
+      ],
+      [
+        path.resolve('usage.ts'),
+        `
+          import { __proto__ as protoOperation, type ItemsService } from './ItemsService';
+          const op: ItemsService['__proto__'] = null as unknown as ItemsService['__proto__'];
+          void [protoOperation, op];
+        `,
+      ],
+      [
+        path.resolve('openapi.ts'),
+        `
+          export interface paths {
+            ${service.operations
+              .map(
+                (operation) => `
+              ${JSON.stringify(operation.path)}: {
+                ${operation.method}: {
+                  responses: { 200: { content: { 'application/json': string } } };
+                };
+              };
+            `
+              )
+              .join('\n')}
+          }
+        `,
+      ],
+    ]);
+
+    expect(
+      getCompilationDiagnostics(filesWithoutServiceObject, {
+        declaration: true,
+        emitDeclarationOnly: true,
+      })
+    ).toEqual([]);
   });
 
   it('keeps virtual files and type errors isolated between compilations', () => {
@@ -1103,6 +1172,82 @@ describe('shared service operation option aliases', { timeout: 30_000 }, () => {
   );
 });
 
+describe('service object exports', { timeout: 30_000 }, () => {
+  it('marks the aggregating service object export as @deprecated by default', () => {
+    const service = createService(['listItems']);
+    const source = generateService(service);
+
+    expect(source).toContain(
+      [
+        '/** @deprecated Import individual operations directly from this module instead. Pass `--service-object-exports false` to omit this export. */',
+        'export const itemsService = {',
+      ].join('\n')
+    );
+    expectCompiles(service, source);
+  });
+
+  it('omits the aggregating service object export when exportServiceObject is false while preserving types and variable names', () => {
+    const service = createService(['listItems', 'delete', 'itemsService']);
+    const source = generateService(service, { exportServiceObject: false });
+    const servicesIndexSource = astToString(
+      getServiceIndexFactory([service], { explicitImportExtensions: undefined })
+    );
+
+    expect(source).not.toContain('export const itemsService =');
+    expect(source).toContain('export interface ItemsService {');
+    expect(source).toContain('export const listItems =');
+    expect(source).toContain('export const deleteOperation =');
+    expect(source).toContain('export const itemsServiceOperation =');
+    expect(servicesIndexSource).toContain(
+      'itemsServiceOperation as items_itemsService'
+    );
+
+    const files = new Map([
+      [path.resolve('ItemsService.ts'), source],
+      [path.resolve('servicesIndex.ts'), servicesIndexSource],
+      [
+        path.resolve('usage.ts'),
+        `
+        import type { ItemsService } from './ItemsService';
+        import { deleteOperation, itemsServiceOperation, listItems } from './ItemsService';
+        import { services, type Services } from './servicesIndex';
+
+        const typedService: ItemsService = null as unknown as Services['items'];
+        const listCheck: typeof listItems = services.items.listItems;
+        const deleteCheck: typeof deleteOperation = services.items.delete;
+        const serviceOpCheck: typeof itemsServiceOperation = services.items.itemsService;
+        void [typedService, listCheck, deleteCheck, serviceOpCheck];
+      `,
+      ],
+      [
+        path.resolve('openapi.ts'),
+        `
+        export interface paths {
+          ${service.operations
+            .map(
+              (operation) => `
+            ${JSON.stringify(operation.path)}: {
+              ${operation.method}: {
+                responses: { 200: { content: { 'application/json': string } } };
+              };
+            };
+          `
+            )
+            .join('\n')}
+        }
+      `,
+      ],
+    ]);
+
+    expect(
+      getCompilationDiagnostics(files, {
+        declaration: true,
+        emitDeclarationOnly: true,
+      })
+    ).toEqual([]);
+  });
+});
+
 function createService(operationIds: string[]): OpenAPIService {
   const schema: OpenAPISchemaType = {
     openapi: '3.1.0',
@@ -1187,14 +1332,22 @@ function expectCompiles(
 
 function getCompilationDiagnostics(
   files: ReadonlyMap<string, string>,
-  customCompilerOptions: ts.CompilerOptions = compilerOptions
+  extraOptions?: ts.CompilerOptions
 ): string[] {
-  const host = ts.createCompilerHost(customCompilerOptions);
+  const effectiveOptions: ts.CompilerOptions = extraOptions
+    ? {
+        ...compilerOptions,
+        ...extraOptions,
+        ...(extraOptions.declaration ? { noEmit: false } : {}),
+      }
+    : compilerOptions;
+  const host = ts.createCompilerHost(effectiveOptions);
   const { fileExists, readFile, getSourceFile } = host;
-  const canUseDefaultCache = customCompilerOptions === compilerOptions;
+  const canUseDefaultCache = effectiveOptions === compilerOptions;
 
   host.fileExists = (fileName) => files.has(fileName) || fileExists(fileName);
   host.readFile = (fileName) => files.get(fileName) ?? readFile(fileName);
+  host.writeFile = () => {};
   host.getSourceFile = (
     fileName,
     languageVersion,
@@ -1224,14 +1377,13 @@ function getCompilationDiagnostics(
     return sourceFile;
   };
 
-  const program = ts.createProgram(
-    [...files.keys()],
-    customCompilerOptions,
-    host
+  const program = ts.createProgram([...files.keys()], effectiveOptions, host);
+  const preEmitDiagnostics = ts.getPreEmitDiagnostics(program);
+  const emitDiagnostics = effectiveOptions.declaration
+    ? program.emit().diagnostics
+    : [];
+
+  return [...preEmitDiagnostics, ...emitDiagnostics].map((diagnostic) =>
+    ts.flattenDiagnosticMessageText(diagnostic.messageText, '\n')
   );
-  return ts
-    .getPreEmitDiagnostics(program)
-    .map((diagnostic) =>
-      ts.flattenDiagnosticMessageText(diagnostic.messageText, '\n')
-    );
 }

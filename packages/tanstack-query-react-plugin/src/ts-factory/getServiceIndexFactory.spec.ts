@@ -415,6 +415,24 @@ describe('getServiceIndexFactory', { timeout: 30_000 }, () => {
 
     expectGeneratedProjectCompiles(services, { imperativeQuery: true });
   });
+
+  it('emits declaration files without TS4023 when exportServiceObject is false', () => {
+    const services = [
+      createService('files', 'FilesService', 'filesService', [
+        'getFiles',
+        'delete',
+      ]),
+      createService('users', 'UsersService', 'usersService', [
+        'getFiles',
+        'default',
+      ]),
+    ];
+
+    expectGeneratedProjectCompiles(services, {
+      exportServiceObject: false,
+      imperativeQuery: true,
+    });
+  });
 });
 
 function createService(

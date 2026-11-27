@@ -240,6 +240,10 @@ It is possible to use multiple plugins at the same time. For example, `--plugin 
 - **`--tanstack-query-deprecations [bool]`**: Emit `@deprecated` TSDoc tags in generated `*Service.ts` files for methods deprecated in the target `@tanstack/react-query` version (`fetchQuery`, `prefetchQuery`, `ensureQueryData`, `fetchInfiniteQuery`, `prefetchInfiniteQuery`, `ensureInfiniteQueryData` in `>= 5.108.1`). _(optional)_
   - Defaults to `true` when the target version introduces deprecations (`>= 5.108.1`), and `false` otherwise.
   - Passing `--tanstack-query-deprecations` (`true`) when the target version has no deprecations (`< 5.108.1`) throws a CLI error.
+- **`--service-object-exports [bool]`**: Control whether the deprecated aggregating `export const <name>Service = { ... } as const;` object is emitted in each generated `*Service.ts` file. _(optional, default: `true`)_
+  - Defaults to `true` for backward compatibility, emitting the aggregating object with a `@deprecated` JSDoc tag.
+  - Set `--service-object-exports false` to omit the aggregating object while preserving individual operation exports and `export interface <Name>Service`, reducing generated code/exports without relying on bundler tree-shaking heuristics.
+  - In a Redocly configuration file (`x-openapi-qraft`), set `service-object-exports: false` to omit it or `service-object-exports: true` to enable it.
 
 ## `--plugin openapi-typescript` options
 

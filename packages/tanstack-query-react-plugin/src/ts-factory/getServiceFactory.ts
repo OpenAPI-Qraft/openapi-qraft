@@ -33,6 +33,7 @@ export type ServiceFactoryOptions = {
   operationParametersTypeWrapper: OperationParametersTypeOption | undefined;
   imperativeQuery?: boolean;
   deprecatedMethods?: ReadonlySet<DeprecatedTanStackQueryMethod>;
+  exportServiceObject?: boolean;
 };
 
 type Service = { name: string; typeName: string; variableName: string };
@@ -60,16 +61,15 @@ export const getServiceFactory = (
     )
   );
 
-  const serviceVariable = getServiceVariableFactory(
-    service,
-    operations,
-    operationVariableNames
-  );
+  const serviceVariable =
+    options.exportServiceObject === false
+      ? null
+      : getServiceVariableFactory(service, operations, operationVariableNames);
 
   const mainNodes = [
     getServiceInterfaceFactory(service, operations, options),
     ...operationVariables,
-    serviceVariable,
+    ...(serviceVariable ? [serviceVariable] : []),
     ...operationsTypesResult.nodes,
   ];
 
@@ -606,7 +606,7 @@ const getServiceVariableFactory = (
   operations: ServiceOperation[],
   operationVariableNames: Map<string, string>
 ) => {
-  return factory.createVariableStatement(
+  const variableNode = factory.createVariableStatement(
     [factory.createToken(ts.SyntaxKind.ExportKeyword)],
     factory.createVariableDeclarationList(
       [
@@ -642,6 +642,17 @@ const getServiceVariableFactory = (
       ts.NodeFlags.Const
     )
   );
+
+  ts.addSyntheticLeadingComment(
+    variableNode,
+    ts.SyntaxKind.MultiLineCommentTrivia,
+    createMultilineComment([
+      '@deprecated Import individual operations directly from this module instead. Pass `--service-object-exports false` to omit this export.',
+    ]),
+    true
+  );
+
+  return variableNode;
 };
 
 const getOperationsTypes = (
