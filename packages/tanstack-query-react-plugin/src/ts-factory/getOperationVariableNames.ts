@@ -1,4 +1,4 @@
-const reservedBindingNames = new Set([
+export const reservedBindingNames: ReadonlySet<string> = new Set([
   'arguments',
   'await',
   'break',

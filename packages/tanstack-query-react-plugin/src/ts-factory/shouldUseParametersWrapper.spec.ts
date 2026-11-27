@@ -1,6 +1,6 @@
 import type { ServiceOperation } from '@openapi-qraft/plugin/lib/open-api/OpenAPIService';
 import { describe, expect, test } from 'vitest';
-import { shouldUseParametersWrapper } from './getServiceFactory.js';
+import { shouldUseParametersWrapper } from './resolveServiceOperationVariableNames.js';
 
 describe('shouldUseParametersWrapper(...)', () => {
   const createMockOperation = (
