@@ -45,8 +45,8 @@ apis:
         services:
           '@openapi-qraft/tanstack-query-react-types':
             OperationError: '../../type-overrides/operation-error.js'
+            ServiceOperationUseSuspenseQueryOptions: '../../type-overrides/suspense-query.js'
           '@tanstack/react-query':
-            UseSuspenseQueryOptions: '../../type-overrides/suspense-query.js'
             UseSuspenseQueryResult: '../../type-overrides/suspense-query.js'
             UseInfiniteQueryResult: '../../type-overrides/use-infinite-query-result.js'
         create-api-client:

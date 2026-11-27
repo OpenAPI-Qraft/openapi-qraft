@@ -270,7 +270,7 @@ describe('TanStack Query React Client Generation', () => {
         '--override-import-type',
         'services',
         '@openapi-qraft/tanstack-query-react-types:OperationError:../../type-overrides/operation-error.js',
-        '@tanstack/react-query:UseSuspenseQueryOptions:../../type-overrides/suspense-query.js',
+        '@openapi-qraft/tanstack-query-react-types:ServiceOperationUseSuspenseQueryOptions:../../type-overrides/suspense-query.js',
         '@tanstack/react-query:UseSuspenseQueryResult:../../type-overrides/suspense-query.js',
         '@tanstack/react-query:UseInfiniteQueryResult:../../type-overrides/use-infinite-query-result.js',
         '--override-import-type',
