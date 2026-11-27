@@ -683,3 +683,163 @@ client.files.getFiles.infiniteQuery({
 });
 // @ts-expect-error - deleteFiles is not a queryable operation
 client.files.deleteFiles.infiniteQuery;
+
+//// ServiceOperationFetchQueryOptions & ServiceOperationFetchInfiniteQueryOptions ////
+client.files.getFiles.fetchQuery({ parameters }) satisfies Promise<
+  typeof client.files.getFiles.types.data
+>;
+client.files.getFiles.fetchQuery({
+  queryKey: client.files.getFiles.getQueryKey(parameters),
+}) satisfies Promise<typeof client.files.getFiles.types.data>;
+client.files.getFiles.fetchQuery({
+  queryKey: client.files.getFiles.getQueryKey(parameters),
+  queryFn: ({ queryKey }) => {
+    queryKey[1].query?.id__in satisfies readonly string[] | undefined;
+    return Promise.resolve({});
+  },
+}) satisfies Promise<typeof client.files.getFiles.types.data>;
+// @ts-expect-error - parameters and queryKey are mutually exclusive on fetchQuery
+client.files.getFiles.fetchQuery({
+  parameters,
+  queryKey: client.files.getFiles.getQueryKey(parameters),
+});
+// @ts-expect-error - requestFn and queryFn are mutually exclusive on fetchQuery
+client.files.getFiles.fetchQuery({
+  parameters,
+  requestFn,
+  queryFn: () => Promise.resolve({}),
+});
+// @ts-expect-error - baseUrl and queryFn are mutually exclusive on fetchQuery
+client.files.getFiles.fetchQuery({
+  parameters,
+  baseUrl: 'https://example.com',
+  queryFn: () => Promise.resolve({}),
+});
+client.files.getFiles.fetchQuery({
+  parameters,
+  // @ts-expect-error - revalidateIfStale is only available on ensureQueryData
+  revalidateIfStale: true,
+});
+
+client.files.getFiles.prefetchQuery({ parameters }) satisfies Promise<void>;
+client.files.getFiles.prefetchQuery({
+  queryKey: client.files.getFiles.getQueryKey(parameters),
+}) satisfies Promise<void>;
+
+client.files.getFiles.ensureQueryData({
+  parameters,
+  revalidateIfStale: true,
+}) satisfies Promise<typeof client.files.getFiles.types.data>;
+client.files.getFiles.ensureQueryData({
+  queryKey: client.files.getFiles.getQueryKey(parameters),
+  revalidateIfStale: false,
+}) satisfies Promise<typeof client.files.getFiles.types.data>;
+client.files.findAll.ensureQueryData() satisfies Promise<
+  typeof client.files.findAll.types.data
+>;
+client.files.findAll.ensureQueryData({
+  revalidateIfStale: true,
+}) satisfies Promise<typeof client.files.findAll.types.data>;
+// @ts-expect-error - parameters and queryKey are mutually exclusive on ensureQueryData
+client.files.getFiles.ensureQueryData({
+  parameters,
+  queryKey: client.files.getFiles.getQueryKey(parameters),
+});
+// @ts-expect-error - requestFn and queryFn are mutually exclusive on ensureQueryData
+client.files.getFiles.ensureQueryData({
+  parameters,
+  requestFn,
+  queryFn: () => Promise.resolve({}),
+});
+// @ts-expect-error - baseUrl and queryFn are mutually exclusive on ensureQueryData
+client.files.getFiles.ensureQueryData({
+  parameters,
+  baseUrl: 'https://example.com',
+  queryFn: () => Promise.resolve({}),
+});
+
+client.files.getFiles.fetchInfiniteQuery({
+  queryKey: client.files.getFiles.getInfiniteQueryKey(parameters),
+  initialPageParam: parameters,
+  getNextPageParam: () => undefined,
+  queryFn: ({ pageParam }) => {
+    pageParam.query?.id__in satisfies readonly string[] | undefined;
+    return Promise.resolve({});
+  },
+});
+// @ts-expect-error - parameters and queryKey are mutually exclusive on fetchInfiniteQuery
+client.files.getFiles.fetchInfiniteQuery({
+  parameters,
+  queryKey: client.files.getFiles.getInfiniteQueryKey(parameters),
+  initialPageParam: parameters,
+  getNextPageParam: () => undefined,
+});
+// @ts-expect-error - requestFn and queryFn are mutually exclusive on fetchInfiniteQuery
+client.files.getFiles.fetchInfiniteQuery({
+  parameters,
+  initialPageParam: parameters,
+  getNextPageParam: () => undefined,
+  requestFn,
+  queryFn: () => Promise.resolve({}),
+});
+// @ts-expect-error - baseUrl and queryFn are mutually exclusive on fetchInfiniteQuery
+client.files.getFiles.fetchInfiniteQuery({
+  parameters,
+  initialPageParam: parameters,
+  getNextPageParam: () => undefined,
+  baseUrl: 'https://example.com',
+  queryFn: () => Promise.resolve({}),
+});
+client.files.getFiles.fetchInfiniteQuery({
+  parameters,
+  initialPageParam: parameters,
+  getNextPageParam: () => undefined,
+  // @ts-expect-error - revalidateIfStale is only available on ensureInfiniteQueryData
+  revalidateIfStale: true,
+});
+
+client.files.getFiles.prefetchInfiniteQuery({
+  queryKey: client.files.getFiles.getInfiniteQueryKey(parameters),
+  initialPageParam: parameters,
+  getNextPageParam: () => undefined,
+}) satisfies Promise<void>;
+
+client.files.getFiles.ensureInfiniteQueryData({
+  parameters,
+  initialPageParam: parameters,
+  getNextPageParam: () => undefined,
+  revalidateIfStale: true,
+});
+client.files.getFiles.ensureInfiniteQueryData({
+  queryKey: client.files.getFiles.getInfiniteQueryKey(parameters),
+  initialPageParam: parameters,
+  getNextPageParam: () => undefined,
+  revalidateIfStale: false,
+  queryFn: ({ pageParam }) => {
+    pageParam.query?.id__in satisfies readonly string[] | undefined;
+    return Promise.resolve({});
+  },
+});
+// @ts-expect-error - parameters and queryKey are mutually exclusive on ensureInfiniteQueryData
+client.files.getFiles.ensureInfiniteQueryData({
+  parameters,
+  queryKey: client.files.getFiles.getInfiniteQueryKey(parameters),
+  initialPageParam: parameters,
+  getNextPageParam: () => undefined,
+});
+// @ts-expect-error - requestFn and queryFn are mutually exclusive on ensureInfiniteQueryData
+client.files.getFiles.ensureInfiniteQueryData({
+  parameters,
+  initialPageParam: parameters,
+  getNextPageParam: () => undefined,
+  requestFn,
+  queryFn: () => Promise.resolve({}),
+});
+// @ts-expect-error - baseUrl and queryFn are mutually exclusive on ensureInfiniteQueryData
+client.files.getFiles.ensureInfiniteQueryData({
+  parameters,
+  initialPageParam: parameters,
+  getNextPageParam: () => undefined,
+  baseUrl: 'https://example.com',
+  queryFn: () => Promise.resolve({}),
+});
