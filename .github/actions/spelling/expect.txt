@@ -29,6 +29,7 @@ gimuy
 gitlab
 groupnames
 hipchat
+homomorphically
 htpasswd
 ianvs
 iat
@@ -67,7 +68,6 @@ orval
 peaceiris
 petstore
 pids
-QMethod
 qraft
 qraftclient
 qraftio
