@@ -1,11 +1,7 @@
-import type { RequestFn } from '@openapi-qraft/tanstack-query-react-types';
-import type {
-  DefaultError,
-  FetchQueryOptions,
-  QueryFunction,
-} from '@tanstack/react-query';
+import type { FetchQueryOptions, QueryFunction } from '@tanstack/react-query';
 import type { AreAllOptional } from './AreAllOptional.js';
 import type { DeepReadonly } from './DeepReadonly.js';
+import type { RequestFn } from './RequestFn.js';
 import type { ServiceOperationQueryKey } from './ServiceOperationKey.js';
 
 export type ServiceOperationFetchQueryOptions<
@@ -13,32 +9,29 @@ export type ServiceOperationFetchQueryOptions<
   TQueryFnData,
   TParams,
   TError,
-> =
-  | (FetchQueryOptionsByQueryKey<TSchema, TQueryFnData, TParams, TError> &
-      FetchQueryOptionsQueryFn<TSchema, TQueryFnData, TParams, TError>)
-  | (FetchQueryOptionsByParameters<TSchema, TQueryFnData, TParams, TError> &
-      FetchQueryOptionsQueryFn<TSchema, TQueryFnData, TParams, TError>);
+> = FetchQueryOptionsBase<TSchema, TQueryFnData, TParams, TError> &
+  FetchQueryOptionsTarget<TSchema, TParams> &
+  FetchQueryOptionsQueryFn<TSchema, TQueryFnData, TParams, TError>;
 
 export type ServiceOperationEnsureQueryDataOptions<
   TSchema extends { url: string; method: string },
   TQueryFnData,
   TParams,
   TError,
-> =
-  | (FetchQueryOptionsByQueryKey<TSchema, TQueryFnData, TParams, TError> &
-      FetchQueryOptionsQueryFn<TSchema, TQueryFnData, TParams, TError> & {
-        revalidateIfStale?: boolean;
-      })
-  | (FetchQueryOptionsByParameters<TSchema, TQueryFnData, TParams, TError> &
-      FetchQueryOptionsQueryFn<TSchema, TQueryFnData, TParams, TError> & {
-        revalidateIfStale?: boolean;
-      });
+> = ServiceOperationFetchQueryOptions<
+  TSchema,
+  TQueryFnData,
+  TParams,
+  TError
+> & {
+  revalidateIfStale?: boolean;
+};
 
 type FetchQueryOptionsBase<
   TSchema extends { url: string; method: string },
   TQueryFnData,
-  TParams = {},
-  TError = DefaultError,
+  TParams,
+  TError,
 > = Omit<
   FetchQueryOptions<
     TQueryFnData,
@@ -49,15 +42,17 @@ type FetchQueryOptionsBase<
   'queryKey' | 'queryFn'
 >;
 
-type FetchQueryOptionsByQueryKey<
+type FetchQueryOptionsTarget<
   TSchema extends { url: string; method: string },
-  TQueryFnData,
   TParams,
-  TError = DefaultError,
-> = FetchQueryOptionsBase<TSchema, TQueryFnData, TParams, TError> &
-  (AreAllOptional<TParams> extends true
-    ? Partial<FetchQueryOptionsQueryKey<TSchema, TParams>>
-    : FetchQueryOptionsQueryKey<TSchema, TParams>);
+> =
+  AreAllOptional<TParams> extends true
+    ?
+        | Partial<FetchQueryOptionsQueryKey<TSchema, TParams>>
+        | Partial<FetchQueryOptionsParameters<TParams>>
+    :
+        | FetchQueryOptionsQueryKey<TSchema, TParams>
+        | FetchQueryOptionsParameters<TParams>;
 
 type FetchQueryOptionsQueryKey<
   TSchema extends { url: string; method: string },
@@ -69,16 +64,6 @@ type FetchQueryOptionsQueryKey<
   queryKey: ServiceOperationQueryKey<TSchema, TParams>;
   parameters?: never;
 };
-
-type FetchQueryOptionsByParameters<
-  TSchema extends { url: string; method: string },
-  TQueryFnData,
-  TParams,
-  TError = DefaultError,
-> = FetchQueryOptionsBase<TSchema, TQueryFnData, TParams, TError> &
-  (AreAllOptional<TParams> extends true
-    ? Partial<FetchQueryOptionsParameters<TParams>>
-    : FetchQueryOptionsParameters<TParams>);
 
 type FetchQueryOptionsParameters<TParams> = {
   /**
@@ -99,6 +84,8 @@ type FetchQueryOptionsQueryFn<
         TQueryFnData,
         ServiceOperationQueryKey<TSchema, TParams>
       >;
+      requestFn?: never;
+      baseUrl?: never;
     }
   | {
       /**

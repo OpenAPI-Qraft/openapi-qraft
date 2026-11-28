@@ -1,6 +1,5 @@
 import type {
   AreAllOptional,
-  DeepReadonly,
   OperationInfiniteData,
   ServiceOperationEnsureInfiniteQueryDataOptions,
   ServiceOperationFetchInfiniteQueryOptions,
@@ -20,7 +19,7 @@ export interface ServiceOperationFetchInfiniteQuery<
               TSchema,
               TOperationQueryFnData,
               TQueryParams,
-              DeepReadonly<TPageParam>,
+              TPageParam,
               TError
             >
           | ServiceOperationFetchInfiniteQueryVoidOption
@@ -28,7 +27,7 @@ export interface ServiceOperationFetchInfiniteQuery<
           TSchema,
           TOperationQueryFnData,
           TQueryParams,
-          DeepReadonly<TPageParam>,
+          TPageParam,
           TError
         >
   ): Promise<OperationInfiniteData<TOperationQueryFnData, TQueryParams>>;
@@ -40,7 +39,7 @@ export interface ServiceOperationFetchInfiniteQuery<
               TSchema,
               TOperationQueryFnData,
               TQueryParams,
-              DeepReadonly<TPageParam>,
+              TPageParam,
               TError
             >
           | ServiceOperationFetchInfiniteQueryVoidOption
@@ -48,7 +47,7 @@ export interface ServiceOperationFetchInfiniteQuery<
           TSchema,
           TOperationQueryFnData,
           TQueryParams,
-          DeepReadonly<TPageParam>,
+          TPageParam,
           TError
         >
   ): Promise<void>;
@@ -60,7 +59,7 @@ export interface ServiceOperationFetchInfiniteQuery<
               TSchema,
               TOperationQueryFnData,
               TQueryParams,
-              DeepReadonly<TPageParam>,
+              TPageParam,
               TError
             >
           | ServiceOperationFetchInfiniteQueryVoidOption
@@ -68,7 +67,7 @@ export interface ServiceOperationFetchInfiniteQuery<
           TSchema,
           TOperationQueryFnData,
           TQueryParams,
-          DeepReadonly<TPageParam>,
+          TPageParam,
           TError
         >
   ): Promise<OperationInfiniteData<TOperationQueryFnData, TQueryParams>>;

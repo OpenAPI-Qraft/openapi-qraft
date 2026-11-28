@@ -4,8 +4,8 @@
  */
 
 import type { paths } from "../../openapi.d.ts";
-import type { DeepReadonly, InvalidateQueryFilters, IsFetchingQueryFilters, OperationError, OperationInfiniteData, PartialParameters, QueryFiltersByParameters, QueryFiltersByQueryKey, QueryFnOptions, QueryFnOptionsByParameters, QueryFnOptionsByQueryKey, RequestFnResponse, ServiceOperationEnsureInfiniteQueryDataOptions, ServiceOperationEnsureQueryDataOptions, ServiceOperationFetchInfiniteQueryOptions, ServiceOperationFetchInfiniteQueryVoidOption, ServiceOperationFetchQueryOptions, ServiceOperationInfiniteQueryKey, ServiceOperationQueryKey, UseQueryOptionsForUseQueries, UseQueryOptionsForUseSuspenseQuery, QraftServiceOperationsToken } from "@openapi-qraft/tanstack-query-react-types";
-import type { CancelOptions, DefinedInitialDataInfiniteOptions, DefinedInitialDataOptions, DefinedUseInfiniteQueryResult, DefinedUseQueryResult, InfiniteQueryPageParamsOptions, InvalidateOptions, QueryState, RefetchOptions, ResetOptions, SetDataOptions, UndefinedInitialDataInfiniteOptions, UndefinedInitialDataOptions, Updater, UseInfiniteQueryResult, UseQueryResult, UseSuspenseInfiniteQueryOptions, UseSuspenseInfiniteQueryResult, UseSuspenseQueryOptions, UseSuspenseQueryResult } from "@tanstack/react-query";
+import type { DeepReadonly, InvalidateQueryFilters, IsFetchingQueryFilters, OperationError, OperationInfiniteData, QueryFiltersByParameters, QueryFiltersByQueryKey, QueryFnOptions, QueryFnOptionsByParameters, QueryFnOptionsByQueryKey, RequestFnResponse, ServiceOperationEnsureInfiniteQueryDataOptions, ServiceOperationEnsureQueryDataOptions, ServiceOperationFetchInfiniteQueryOptions, ServiceOperationFetchInfiniteQueryVoidOption, ServiceOperationFetchQueryOptions, ServiceOperationInfiniteQueryKey, ServiceOperationQueryKey, ServiceOperationUseInfiniteQueryDefinedOptions, ServiceOperationUseInfiniteQueryUndefinedOptions, ServiceOperationUseQueryDefinedOptions, ServiceOperationUseQueryUndefinedOptions, ServiceOperationUseSuspenseInfiniteQueryOptions, ServiceOperationUseSuspenseQueryOptions, UseQueryOptionsForUseQueries, UseQueryOptionsForUseSuspenseQuery, QraftServiceOperationsToken } from "@openapi-qraft/tanstack-query-react-types";
+import type { CancelOptions, DefinedUseInfiniteQueryResult, DefinedUseQueryResult, InvalidateOptions, QueryState, RefetchOptions, ResetOptions, SetDataOptions, Updater, UseInfiniteQueryResult, UseQueryResult, UseSuspenseInfiniteQueryResult, UseSuspenseQueryResult } from "@tanstack/react-query";
 import type { ServiceOperationImperativeInfiniteQueryOptions, ServiceOperationImperativeQueryOptions } from "@openapi-qraft/tanstack-query-react-types/imperative-query";
 export interface AccountsService {
     getAccounts: {
@@ -26,7 +26,7 @@ export interface AccountsService {
          * const { data, isLoading } = qraft.accounts.getAccounts.useQuery()
          * ```
          */
-        useQuery<TData = GetAccountsData>(parameters: ServiceOperationQueryKey<GetAccountsSchema, GetAccountsParameters> | (DeepReadonly<GetAccountsParameters> | void), options: Omit<DefinedInitialDataOptions<GetAccountsData, GetAccountsError, TData, ServiceOperationQueryKey<GetAccountsSchema, GetAccountsParameters>>, "queryKey">): DefinedUseQueryResult<TData, OperationError<GetAccountsError>>;
+        useQuery<TData = GetAccountsData>(parameters: ServiceOperationQueryKey<GetAccountsSchema, GetAccountsParameters> | (DeepReadonly<GetAccountsParameters> | void), options: ServiceOperationUseQueryDefinedOptions<GetAccountsSchema, GetAccountsData, GetAccountsParameters, GetAccountsError, TData>): DefinedUseQueryResult<TData, OperationError<GetAccountsError>>;
         /**
          * Performs asynchronous data fetching, manages loading states and error handling.
          *
@@ -36,7 +36,7 @@ export interface AccountsService {
          * const { data, isLoading } = qraft.accounts.getAccounts.useQuery()
          * ```
          */
-        useQuery<TData = GetAccountsData>(parameters: ServiceOperationQueryKey<GetAccountsSchema, GetAccountsParameters> | (DeepReadonly<GetAccountsParameters> | void), options?: Omit<UndefinedInitialDataOptions<GetAccountsData, GetAccountsError, TData, ServiceOperationQueryKey<GetAccountsSchema, GetAccountsParameters>>, "queryKey">): UseQueryResult<TData, OperationError<GetAccountsError>>;
+        useQuery<TData = GetAccountsData>(parameters: ServiceOperationQueryKey<GetAccountsSchema, GetAccountsParameters> | (DeepReadonly<GetAccountsParameters> | void), options?: ServiceOperationUseQueryUndefinedOptions<GetAccountsSchema, GetAccountsData, GetAccountsParameters, GetAccountsError, TData>): UseQueryResult<TData, OperationError<GetAccountsError>>;
         /**/
         getInfiniteQueryKey(parameters: DeepReadonly<GetAccountsParameters> | void): ServiceOperationInfiniteQueryKey<GetAccountsSchema, GetAccountsParameters>;
         /**
@@ -56,7 +56,7 @@ export interface AccountsService {
          * fetchNextPage(); // Fetch the next page
          * ```
          */
-        useInfiniteQuery<TPageParam extends GetAccountsParameters, TQueryFnData = GetAccountsData, TData = OperationInfiniteData<TQueryFnData, GetAccountsParameters>>(parameters: ServiceOperationInfiniteQueryKey<GetAccountsSchema, GetAccountsParameters> | (DeepReadonly<GetAccountsParameters> | void), options: Omit<DefinedInitialDataInfiniteOptions<TQueryFnData, GetAccountsError, TData, ServiceOperationInfiniteQueryKey<GetAccountsSchema, GetAccountsParameters>, PartialParameters<DeepReadonly<TPageParam>>>, "queryKey" | "getPreviousPageParam" | "getNextPageParam" | "initialPageParam"> & InfiniteQueryPageParamsOptions<TQueryFnData, PartialParameters<DeepReadonly<TPageParam>>>): DefinedUseInfiniteQueryResult<TData, OperationError<GetAccountsError>>;
+        useInfiniteQuery<TPageParam extends GetAccountsParameters, TQueryFnData = GetAccountsData, TData = OperationInfiniteData<TQueryFnData, GetAccountsParameters>>(parameters: ServiceOperationInfiniteQueryKey<GetAccountsSchema, GetAccountsParameters> | (DeepReadonly<GetAccountsParameters> | void), options: ServiceOperationUseInfiniteQueryDefinedOptions<GetAccountsSchema, TQueryFnData, GetAccountsParameters, TPageParam, GetAccountsError, TData>): DefinedUseInfiniteQueryResult<TData, OperationError<GetAccountsError>>;
         /**
          * Performs asynchronous data fetching with support for infinite scrolling scenarios.
          * Manages paginated data and provides utilities for fetching additional pages.
@@ -74,7 +74,7 @@ export interface AccountsService {
          * fetchNextPage(); // Fetch the next page
          * ```
          */
-        useInfiniteQuery<TPageParam extends GetAccountsParameters, TQueryFnData = GetAccountsData, TData = OperationInfiniteData<TQueryFnData, GetAccountsParameters>>(parameters: ServiceOperationInfiniteQueryKey<GetAccountsSchema, GetAccountsParameters> | (DeepReadonly<GetAccountsParameters> | void), options: Omit<UndefinedInitialDataInfiniteOptions<TQueryFnData, GetAccountsError, TData, ServiceOperationInfiniteQueryKey<GetAccountsSchema, GetAccountsParameters>, PartialParameters<DeepReadonly<TPageParam>>>, "queryKey" | "getPreviousPageParam" | "getNextPageParam" | "initialPageParam"> & InfiniteQueryPageParamsOptions<TQueryFnData, PartialParameters<DeepReadonly<TPageParam>>>): UseInfiniteQueryResult<TData, OperationError<GetAccountsError>>;
+        useInfiniteQuery<TPageParam extends GetAccountsParameters, TQueryFnData = GetAccountsData, TData = OperationInfiniteData<TQueryFnData, GetAccountsParameters>>(parameters: ServiceOperationInfiniteQueryKey<GetAccountsSchema, GetAccountsParameters> | (DeepReadonly<GetAccountsParameters> | void), options: ServiceOperationUseInfiniteQueryUndefinedOptions<GetAccountsSchema, TQueryFnData, GetAccountsParameters, TPageParam, GetAccountsError, TData>): UseInfiniteQueryResult<TData, OperationError<GetAccountsError>>;
         /**
          * Monitors the number of queries currently fetching, matching the provided filters.
          * Useful for creating loading indicators or performing actions based on active requests.
@@ -128,7 +128,7 @@ export interface AccountsService {
          * const data = qraft.accounts.getAccounts.useSuspenseQuery()
          * ```
          */
-        useSuspenseQuery<TData = GetAccountsData>(parameters: ServiceOperationQueryKey<GetAccountsSchema, GetAccountsParameters> | (DeepReadonly<GetAccountsParameters> | void), options?: Omit<UseSuspenseQueryOptions<GetAccountsData, GetAccountsError, TData, ServiceOperationQueryKey<GetAccountsSchema, GetAccountsParameters>>, "queryKey">): UseSuspenseQueryResult<TData, OperationError<GetAccountsError>>;
+        useSuspenseQuery<TData = GetAccountsData>(parameters: ServiceOperationQueryKey<GetAccountsSchema, GetAccountsParameters> | (DeepReadonly<GetAccountsParameters> | void), options?: ServiceOperationUseSuspenseQueryOptions<GetAccountsSchema, GetAccountsData, GetAccountsParameters, GetAccountsError, TData>): UseSuspenseQueryResult<TData, OperationError<GetAccountsError>>;
         /**
          * Performs asynchronous data fetching with support for infinite scrolling scenarios.
          * Manages paginated data and provides utilities for fetching additional pages.
@@ -147,7 +147,7 @@ export interface AccountsService {
          * fetchNextPage(); // Fetch the next page
          * ```
          */
-        useSuspenseInfiniteQuery<TPageParam extends GetAccountsParameters, TQueryFnData = GetAccountsData, TData = OperationInfiniteData<TQueryFnData, GetAccountsParameters>>(parameters: ServiceOperationInfiniteQueryKey<GetAccountsSchema, GetAccountsParameters> | (DeepReadonly<GetAccountsParameters> | void), options: Omit<UseSuspenseInfiniteQueryOptions<TQueryFnData, GetAccountsError, TData, ServiceOperationInfiniteQueryKey<GetAccountsSchema, GetAccountsParameters>, PartialParameters<DeepReadonly<TPageParam>>>, "queryKey" | "getPreviousPageParam" | "getNextPageParam" | "initialPageParam"> & InfiniteQueryPageParamsOptions<TQueryFnData, PartialParameters<DeepReadonly<TPageParam>>>): UseSuspenseInfiniteQueryResult<TData, OperationError<GetAccountsError>>;
+        useSuspenseInfiniteQuery<TPageParam extends GetAccountsParameters, TQueryFnData = GetAccountsData, TData = OperationInfiniteData<TQueryFnData, GetAccountsParameters>>(parameters: ServiceOperationInfiniteQueryKey<GetAccountsSchema, GetAccountsParameters> | (DeepReadonly<GetAccountsParameters> | void), options: ServiceOperationUseSuspenseInfiniteQueryOptions<GetAccountsSchema, TQueryFnData, GetAccountsParameters, TPageParam, GetAccountsError, TData>): UseSuspenseInfiniteQueryResult<TData, OperationError<GetAccountsError>>;
         /**
          * Allows you to execute multiple asynchronous data fetching operations concurrently with Suspense support.
          * Similar to useQueries but integrates with React Suspense for loading states.
@@ -205,7 +205,7 @@ export interface AccountsService {
          * console.log(data.pages);
          * ```
          */
-        infiniteQuery<TPageParam extends GetAccountsParameters = GetAccountsParameters, TData = OperationInfiniteData<GetAccountsData, TPageParam>>(options: ServiceOperationImperativeInfiniteQueryOptions<GetAccountsSchema, GetAccountsData, GetAccountsParameters, NoInfer<DeepReadonly<TPageParam>>, GetAccountsError, TData>): Promise<TData>;
+        infiniteQuery<TPageParam extends GetAccountsParameters = GetAccountsParameters, TData = OperationInfiniteData<GetAccountsData, GetAccountsParameters>>(options: ServiceOperationImperativeInfiniteQueryOptions<GetAccountsSchema, GetAccountsData, GetAccountsParameters, NoInfer<TPageParam>, GetAccountsError, TData>): Promise<TData>;
         /**
          * Performs an asynchronous data fetching operation, caches the result, and returns the fetched data.
          * Useful for imperative fetching outside of React components or when fresh data is needed on demand.
@@ -256,7 +256,7 @@ export interface AccountsService {
          * console.log(data.pages);
          * ```
          */
-        fetchInfiniteQuery<TPageParam extends GetAccountsParameters>(options: ServiceOperationFetchInfiniteQueryOptions<GetAccountsSchema, GetAccountsData, GetAccountsParameters, DeepReadonly<TPageParam>, GetAccountsError> | ServiceOperationFetchInfiniteQueryVoidOption): Promise<OperationInfiniteData<GetAccountsData, GetAccountsParameters>>;
+        fetchInfiniteQuery<TPageParam extends GetAccountsParameters>(options: ServiceOperationFetchInfiniteQueryOptions<GetAccountsSchema, GetAccountsData, GetAccountsParameters, TPageParam, GetAccountsError> | ServiceOperationFetchInfiniteQueryVoidOption): Promise<OperationInfiniteData<GetAccountsData, GetAccountsParameters>>;
         /**
          * Preloads and caches paginated data before it is needed.
          * Resolves when the request completes without returning the cached pages.
@@ -271,7 +271,7 @@ export interface AccountsService {
          * })
          * ```
          */
-        prefetchInfiniteQuery<TPageParam extends GetAccountsParameters>(options: ServiceOperationFetchInfiniteQueryOptions<GetAccountsSchema, GetAccountsData, GetAccountsParameters, DeepReadonly<TPageParam>, GetAccountsError> | ServiceOperationFetchInfiniteQueryVoidOption): Promise<void>;
+        prefetchInfiniteQuery<TPageParam extends GetAccountsParameters>(options: ServiceOperationFetchInfiniteQueryOptions<GetAccountsSchema, GetAccountsData, GetAccountsParameters, TPageParam, GetAccountsError> | ServiceOperationFetchInfiniteQueryVoidOption): Promise<void>;
         /**
          * Returns existing cached paginated data if available, or fetches and caches it otherwise.
          *
@@ -287,7 +287,7 @@ export interface AccountsService {
          * console.log(data.pages);
          * ```
          */
-        ensureInfiniteQueryData<TPageParam extends GetAccountsParameters>(options: ServiceOperationEnsureInfiniteQueryDataOptions<GetAccountsSchema, GetAccountsData, GetAccountsParameters, DeepReadonly<TPageParam>, GetAccountsError> | ServiceOperationFetchInfiniteQueryVoidOption): Promise<OperationInfiniteData<GetAccountsData, GetAccountsParameters>>;
+        ensureInfiniteQueryData<TPageParam extends GetAccountsParameters>(options: ServiceOperationEnsureInfiniteQueryDataOptions<GetAccountsSchema, GetAccountsData, GetAccountsParameters, TPageParam, GetAccountsError> | ServiceOperationFetchInfiniteQueryVoidOption): Promise<OperationInfiniteData<GetAccountsData, GetAccountsParameters>>;
         /**/
         getQueryData(parameters: ServiceOperationQueryKey<GetAccountsSchema, GetAccountsParameters> | (DeepReadonly<GetAccountsParameters> | void)): GetAccountsData | undefined;
         /**/
@@ -353,7 +353,7 @@ export interface AccountsService {
          * const { data, isLoading } = qraft.accounts.getAccountProfile.useQuery()
          * ```
          */
-        useQuery<TData = GetAccountProfileData>(parameters: ServiceOperationQueryKey<GetAccountProfileSchema, GetAccountProfileParameters> | (DeepReadonly<GetAccountProfileParameters> | void), options: Omit<DefinedInitialDataOptions<GetAccountProfileData, GetAccountProfileError, TData, ServiceOperationQueryKey<GetAccountProfileSchema, GetAccountProfileParameters>>, "queryKey">): DefinedUseQueryResult<TData, OperationError<GetAccountProfileError>>;
+        useQuery<TData = GetAccountProfileData>(parameters: ServiceOperationQueryKey<GetAccountProfileSchema, GetAccountProfileParameters> | (DeepReadonly<GetAccountProfileParameters> | void), options: ServiceOperationUseQueryDefinedOptions<GetAccountProfileSchema, GetAccountProfileData, GetAccountProfileParameters, GetAccountProfileError, TData>): DefinedUseQueryResult<TData, OperationError<GetAccountProfileError>>;
         /**
          * Performs asynchronous data fetching, manages loading states and error handling.
          *
@@ -363,7 +363,7 @@ export interface AccountsService {
          * const { data, isLoading } = qraft.accounts.getAccountProfile.useQuery()
          * ```
          */
-        useQuery<TData = GetAccountProfileData>(parameters: ServiceOperationQueryKey<GetAccountProfileSchema, GetAccountProfileParameters> | (DeepReadonly<GetAccountProfileParameters> | void), options?: Omit<UndefinedInitialDataOptions<GetAccountProfileData, GetAccountProfileError, TData, ServiceOperationQueryKey<GetAccountProfileSchema, GetAccountProfileParameters>>, "queryKey">): UseQueryResult<TData, OperationError<GetAccountProfileError>>;
+        useQuery<TData = GetAccountProfileData>(parameters: ServiceOperationQueryKey<GetAccountProfileSchema, GetAccountProfileParameters> | (DeepReadonly<GetAccountProfileParameters> | void), options?: ServiceOperationUseQueryUndefinedOptions<GetAccountProfileSchema, GetAccountProfileData, GetAccountProfileParameters, GetAccountProfileError, TData>): UseQueryResult<TData, OperationError<GetAccountProfileError>>;
         /**/
         getInfiniteQueryKey(parameters: DeepReadonly<GetAccountProfileParameters> | void): ServiceOperationInfiniteQueryKey<GetAccountProfileSchema, GetAccountProfileParameters>;
         /**
@@ -383,7 +383,7 @@ export interface AccountsService {
          * fetchNextPage(); // Fetch the next page
          * ```
          */
-        useInfiniteQuery<TPageParam extends GetAccountProfileParameters, TQueryFnData = GetAccountProfileData, TData = OperationInfiniteData<TQueryFnData, GetAccountProfileParameters>>(parameters: ServiceOperationInfiniteQueryKey<GetAccountProfileSchema, GetAccountProfileParameters> | (DeepReadonly<GetAccountProfileParameters> | void), options: Omit<DefinedInitialDataInfiniteOptions<TQueryFnData, GetAccountProfileError, TData, ServiceOperationInfiniteQueryKey<GetAccountProfileSchema, GetAccountProfileParameters>, PartialParameters<DeepReadonly<TPageParam>>>, "queryKey" | "getPreviousPageParam" | "getNextPageParam" | "initialPageParam"> & InfiniteQueryPageParamsOptions<TQueryFnData, PartialParameters<DeepReadonly<TPageParam>>>): DefinedUseInfiniteQueryResult<TData, OperationError<GetAccountProfileError>>;
+        useInfiniteQuery<TPageParam extends GetAccountProfileParameters, TQueryFnData = GetAccountProfileData, TData = OperationInfiniteData<TQueryFnData, GetAccountProfileParameters>>(parameters: ServiceOperationInfiniteQueryKey<GetAccountProfileSchema, GetAccountProfileParameters> | (DeepReadonly<GetAccountProfileParameters> | void), options: ServiceOperationUseInfiniteQueryDefinedOptions<GetAccountProfileSchema, TQueryFnData, GetAccountProfileParameters, TPageParam, GetAccountProfileError, TData>): DefinedUseInfiniteQueryResult<TData, OperationError<GetAccountProfileError>>;
         /**
          * Performs asynchronous data fetching with support for infinite scrolling scenarios.
          * Manages paginated data and provides utilities for fetching additional pages.
@@ -401,7 +401,7 @@ export interface AccountsService {
          * fetchNextPage(); // Fetch the next page
          * ```
          */
-        useInfiniteQuery<TPageParam extends GetAccountProfileParameters, TQueryFnData = GetAccountProfileData, TData = OperationInfiniteData<TQueryFnData, GetAccountProfileParameters>>(parameters: ServiceOperationInfiniteQueryKey<GetAccountProfileSchema, GetAccountProfileParameters> | (DeepReadonly<GetAccountProfileParameters> | void), options: Omit<UndefinedInitialDataInfiniteOptions<TQueryFnData, GetAccountProfileError, TData, ServiceOperationInfiniteQueryKey<GetAccountProfileSchema, GetAccountProfileParameters>, PartialParameters<DeepReadonly<TPageParam>>>, "queryKey" | "getPreviousPageParam" | "getNextPageParam" | "initialPageParam"> & InfiniteQueryPageParamsOptions<TQueryFnData, PartialParameters<DeepReadonly<TPageParam>>>): UseInfiniteQueryResult<TData, OperationError<GetAccountProfileError>>;
+        useInfiniteQuery<TPageParam extends GetAccountProfileParameters, TQueryFnData = GetAccountProfileData, TData = OperationInfiniteData<TQueryFnData, GetAccountProfileParameters>>(parameters: ServiceOperationInfiniteQueryKey<GetAccountProfileSchema, GetAccountProfileParameters> | (DeepReadonly<GetAccountProfileParameters> | void), options: ServiceOperationUseInfiniteQueryUndefinedOptions<GetAccountProfileSchema, TQueryFnData, GetAccountProfileParameters, TPageParam, GetAccountProfileError, TData>): UseInfiniteQueryResult<TData, OperationError<GetAccountProfileError>>;
         /**
          * Monitors the number of queries currently fetching, matching the provided filters.
          * Useful for creating loading indicators or performing actions based on active requests.
@@ -455,7 +455,7 @@ export interface AccountsService {
          * const data = qraft.accounts.getAccountProfile.useSuspenseQuery()
          * ```
          */
-        useSuspenseQuery<TData = GetAccountProfileData>(parameters: ServiceOperationQueryKey<GetAccountProfileSchema, GetAccountProfileParameters> | (DeepReadonly<GetAccountProfileParameters> | void), options?: Omit<UseSuspenseQueryOptions<GetAccountProfileData, GetAccountProfileError, TData, ServiceOperationQueryKey<GetAccountProfileSchema, GetAccountProfileParameters>>, "queryKey">): UseSuspenseQueryResult<TData, OperationError<GetAccountProfileError>>;
+        useSuspenseQuery<TData = GetAccountProfileData>(parameters: ServiceOperationQueryKey<GetAccountProfileSchema, GetAccountProfileParameters> | (DeepReadonly<GetAccountProfileParameters> | void), options?: ServiceOperationUseSuspenseQueryOptions<GetAccountProfileSchema, GetAccountProfileData, GetAccountProfileParameters, GetAccountProfileError, TData>): UseSuspenseQueryResult<TData, OperationError<GetAccountProfileError>>;
         /**
          * Performs asynchronous data fetching with support for infinite scrolling scenarios.
          * Manages paginated data and provides utilities for fetching additional pages.
@@ -474,7 +474,7 @@ export interface AccountsService {
          * fetchNextPage(); // Fetch the next page
          * ```
          */
-        useSuspenseInfiniteQuery<TPageParam extends GetAccountProfileParameters, TQueryFnData = GetAccountProfileData, TData = OperationInfiniteData<TQueryFnData, GetAccountProfileParameters>>(parameters: ServiceOperationInfiniteQueryKey<GetAccountProfileSchema, GetAccountProfileParameters> | (DeepReadonly<GetAccountProfileParameters> | void), options: Omit<UseSuspenseInfiniteQueryOptions<TQueryFnData, GetAccountProfileError, TData, ServiceOperationInfiniteQueryKey<GetAccountProfileSchema, GetAccountProfileParameters>, PartialParameters<DeepReadonly<TPageParam>>>, "queryKey" | "getPreviousPageParam" | "getNextPageParam" | "initialPageParam"> & InfiniteQueryPageParamsOptions<TQueryFnData, PartialParameters<DeepReadonly<TPageParam>>>): UseSuspenseInfiniteQueryResult<TData, OperationError<GetAccountProfileError>>;
+        useSuspenseInfiniteQuery<TPageParam extends GetAccountProfileParameters, TQueryFnData = GetAccountProfileData, TData = OperationInfiniteData<TQueryFnData, GetAccountProfileParameters>>(parameters: ServiceOperationInfiniteQueryKey<GetAccountProfileSchema, GetAccountProfileParameters> | (DeepReadonly<GetAccountProfileParameters> | void), options: ServiceOperationUseSuspenseInfiniteQueryOptions<GetAccountProfileSchema, TQueryFnData, GetAccountProfileParameters, TPageParam, GetAccountProfileError, TData>): UseSuspenseInfiniteQueryResult<TData, OperationError<GetAccountProfileError>>;
         /**
          * Allows you to execute multiple asynchronous data fetching operations concurrently with Suspense support.
          * Similar to useQueries but integrates with React Suspense for loading states.
@@ -532,7 +532,7 @@ export interface AccountsService {
          * console.log(data.pages);
          * ```
          */
-        infiniteQuery<TPageParam extends GetAccountProfileParameters = GetAccountProfileParameters, TData = OperationInfiniteData<GetAccountProfileData, TPageParam>>(options: ServiceOperationImperativeInfiniteQueryOptions<GetAccountProfileSchema, GetAccountProfileData, GetAccountProfileParameters, NoInfer<DeepReadonly<TPageParam>>, GetAccountProfileError, TData>): Promise<TData>;
+        infiniteQuery<TPageParam extends GetAccountProfileParameters = GetAccountProfileParameters, TData = OperationInfiniteData<GetAccountProfileData, GetAccountProfileParameters>>(options: ServiceOperationImperativeInfiniteQueryOptions<GetAccountProfileSchema, GetAccountProfileData, GetAccountProfileParameters, NoInfer<TPageParam>, GetAccountProfileError, TData>): Promise<TData>;
         /**
          * Performs an asynchronous data fetching operation, caches the result, and returns the fetched data.
          * Useful for imperative fetching outside of React components or when fresh data is needed on demand.
@@ -583,7 +583,7 @@ export interface AccountsService {
          * console.log(data.pages);
          * ```
          */
-        fetchInfiniteQuery<TPageParam extends GetAccountProfileParameters>(options: ServiceOperationFetchInfiniteQueryOptions<GetAccountProfileSchema, GetAccountProfileData, GetAccountProfileParameters, DeepReadonly<TPageParam>, GetAccountProfileError> | ServiceOperationFetchInfiniteQueryVoidOption): Promise<OperationInfiniteData<GetAccountProfileData, GetAccountProfileParameters>>;
+        fetchInfiniteQuery<TPageParam extends GetAccountProfileParameters>(options: ServiceOperationFetchInfiniteQueryOptions<GetAccountProfileSchema, GetAccountProfileData, GetAccountProfileParameters, TPageParam, GetAccountProfileError> | ServiceOperationFetchInfiniteQueryVoidOption): Promise<OperationInfiniteData<GetAccountProfileData, GetAccountProfileParameters>>;
         /**
          * Preloads and caches paginated data before it is needed.
          * Resolves when the request completes without returning the cached pages.
@@ -598,7 +598,7 @@ export interface AccountsService {
          * })
          * ```
          */
-        prefetchInfiniteQuery<TPageParam extends GetAccountProfileParameters>(options: ServiceOperationFetchInfiniteQueryOptions<GetAccountProfileSchema, GetAccountProfileData, GetAccountProfileParameters, DeepReadonly<TPageParam>, GetAccountProfileError> | ServiceOperationFetchInfiniteQueryVoidOption): Promise<void>;
+        prefetchInfiniteQuery<TPageParam extends GetAccountProfileParameters>(options: ServiceOperationFetchInfiniteQueryOptions<GetAccountProfileSchema, GetAccountProfileData, GetAccountProfileParameters, TPageParam, GetAccountProfileError> | ServiceOperationFetchInfiniteQueryVoidOption): Promise<void>;
         /**
          * Returns existing cached paginated data if available, or fetches and caches it otherwise.
          *
@@ -614,7 +614,7 @@ export interface AccountsService {
          * console.log(data.pages);
          * ```
          */
-        ensureInfiniteQueryData<TPageParam extends GetAccountProfileParameters>(options: ServiceOperationEnsureInfiniteQueryDataOptions<GetAccountProfileSchema, GetAccountProfileData, GetAccountProfileParameters, DeepReadonly<TPageParam>, GetAccountProfileError> | ServiceOperationFetchInfiniteQueryVoidOption): Promise<OperationInfiniteData<GetAccountProfileData, GetAccountProfileParameters>>;
+        ensureInfiniteQueryData<TPageParam extends GetAccountProfileParameters>(options: ServiceOperationEnsureInfiniteQueryDataOptions<GetAccountProfileSchema, GetAccountProfileData, GetAccountProfileParameters, TPageParam, GetAccountProfileError> | ServiceOperationFetchInfiniteQueryVoidOption): Promise<OperationInfiniteData<GetAccountProfileData, GetAccountProfileParameters>>;
         /**/
         getQueryData(parameters: ServiceOperationQueryKey<GetAccountProfileSchema, GetAccountProfileParameters> | (DeepReadonly<GetAccountProfileParameters> | void)): GetAccountProfileData | undefined;
         /**/

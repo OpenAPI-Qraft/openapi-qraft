@@ -1,7 +1,4 @@
-import type {
-  DeepReadonly,
-  OperationInfiniteData,
-} from '@openapi-qraft/tanstack-query-react-types';
+import type { OperationInfiniteData } from '@openapi-qraft/tanstack-query-react-types';
 import type { ServiceOperationImperativeInfiniteQueryOptions } from '@openapi-qraft/tanstack-query-react-types/imperative-query';
 
 export interface ServiceOperationImperativeInfiniteQuery<
@@ -12,13 +9,13 @@ export interface ServiceOperationImperativeInfiniteQuery<
 > {
   infiniteQuery<
     TPageParam extends TQueryParams = TQueryParams,
-    TData = OperationInfiniteData<TOperationQueryFnData, TPageParam>,
+    TData = OperationInfiniteData<TOperationQueryFnData, TQueryParams>,
   >(
     options: ServiceOperationImperativeInfiniteQueryOptions<
       TSchema,
       TOperationQueryFnData,
       TQueryParams,
-      NoInfer<DeepReadonly<TPageParam>>,
+      NoInfer<TPageParam>,
       TError,
       TData
     >
