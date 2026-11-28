@@ -4,7 +4,7 @@
  */
 
 import type { paths } from "../../openapi.d.ts";
-import type { DeepReadonly, InvalidateQueryFilters, IsFetchingQueryFilters, IsMutatingMutationFilters, MutationFiltersByMutationKey, MutationFiltersByParameters, MutationVariables, OperationError, OperationInfiniteData, QueryFiltersByParameters, QueryFiltersByQueryKey, QueryFnOptionsByParameters, QueryFnOptionsByQueryKey, RequestFnResponse, ServiceOperationEnsureInfiniteQueryDataOptions, ServiceOperationEnsureQueryDataOptions, ServiceOperationFetchInfiniteQueryOptions, ServiceOperationFetchQueryOptions, ServiceOperationInfiniteQueryKey, ServiceOperationMutationCacheBase, ServiceOperationMutationFnOptions, ServiceOperationMutationKey, ServiceOperationQueryKey, ServiceOperationUseInfiniteQueryDefinedOptions, ServiceOperationUseInfiniteQueryUndefinedOptions, ServiceOperationUseMutationOptions, ServiceOperationUseQueryDefinedOptions, ServiceOperationUseQueryUndefinedOptions, ServiceOperationUseSuspenseInfiniteQueryOptions, ServiceOperationUseSuspenseQueryOptions, UseQueryOptionsForUseQueries, UseQueryOptionsForUseSuspenseQuery, QraftServiceOperationsToken } from "@openapi-qraft/tanstack-query-react-types";
+import type { DeepReadonly, InvalidateQueryFilters, IsFetchingQueryFilters, IsMutatingMutationFilters, MutationFiltersByMutationKey, MutationFiltersByParameters, MutationVariables, OperationError, OperationInfiniteData, QueryFiltersByParameters, QueryFiltersByQueryKey, QueryFnOptionsByParameters, QueryFnOptionsByQueryKey, RequestFnResponse, ServiceOperationEnsureInfiniteQueryDataOptions, ServiceOperationEnsureQueryDataOptions, ServiceOperationFetchInfiniteQueryOptions, ServiceOperationFetchQueryOptions, ServiceOperationInfiniteQueryKey, ServiceOperationMutationCacheBase, ServiceOperationMutationFnOptions, ServiceOperationMutationKey, ServiceOperationQueryKey, ServiceOperationUseInfiniteQueryDefinedOptions, ServiceOperationUseInfiniteQueryUndefinedOptions, ServiceOperationUseMutationOptions, ServiceOperationUseQueryDefinedOptions, ServiceOperationUseQueryUndefinedOptions, ServiceOperationUseSuspenseInfiniteQueryOptions, ServiceOperationUseSuspenseQueryOptions, UseQueryOptionsForUseQueries, UseQueryOptionsForUseSuspenseQuery, QraftServiceOperationsToken, QraftServiceOperationInvokeToken } from "@openapi-qraft/tanstack-query-react-types";
 import type { CancelOptions, DefinedUseInfiniteQueryResult, DefinedUseQueryResult, InvalidateOptions, Mutation, MutationState, QueryState, RefetchOptions, ResetOptions, SetDataOptions, Updater, UseInfiniteQueryResult, UseMutationResult, UseQueryResult, UseSuspenseInfiniteQueryResult, UseSuspenseQueryResult } from "@tanstack/react-query";
 import type { ServiceOperationImperativeInfiniteQueryOptions, ServiceOperationImperativeQueryOptions } from "@openapi-qraft/tanstack-query-react-types/imperative-query";
 export interface ApprovalPoliciesService {
@@ -12,16 +12,7 @@ export interface ApprovalPoliciesService {
      * @summary Get an approval policy by ID
      * @description Retrieve a specific approval policy.
      */
-    getApprovalPoliciesId: {
-        /**
-         * @summary Get an approval policy by ID
-         * @description Retrieve a specific approval policy.
-         */
-        <TMeta extends Record<string, any>, TSignal extends AbortSignal = AbortSignal>(options: QueryFnOptionsByQueryKey<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdParameters, TMeta, TSignal> | (QueryFnOptionsByParameters<GetApprovalPoliciesIdParameters, TMeta, TSignal>), client?: (schema: GetApprovalPoliciesIdSchema, options: {
-            parameters: GetApprovalPoliciesIdParameters;
-            signal?: TSignal;
-            meta?: TMeta;
-        }) => Promise<RequestFnResponse<GetApprovalPoliciesIdData, GetApprovalPoliciesIdError>>): Promise<RequestFnResponse<GetApprovalPoliciesIdData, GetApprovalPoliciesIdError>>;
+    getApprovalPoliciesId: GetApprovalPoliciesIdInvoke & {
         /**
          * @summary Get an approval policy by ID
          * @description Retrieve a specific approval policy.
@@ -711,7 +702,7 @@ export interface ApprovalPoliciesService {
      * @summary Delete an approval policy
      * @description Delete an existing approval policy.
      */
-    deleteApprovalPoliciesId: {
+    deleteApprovalPoliciesId: DeleteApprovalPoliciesIdInvoke & {
         /**
          * @summary Delete an approval policy
          * @description Delete an existing approval policy.
@@ -1394,11 +1385,6 @@ export interface ApprovalPoliciesService {
          * @summary Delete an approval policy
          * @description Delete an existing approval policy.
          */
-        <TMeta extends Record<string, any>, TSignal extends AbortSignal = AbortSignal>(options: ServiceOperationMutationFnOptions<DeleteApprovalPoliciesIdBody, DeleteApprovalPoliciesIdParameters, TMeta, TSignal>, client?: (schema: DeleteApprovalPoliciesIdSchema, options: ServiceOperationMutationFnOptions<DeleteApprovalPoliciesIdBody, DeleteApprovalPoliciesIdParameters, TMeta, TSignal>) => Promise<RequestFnResponse<DeleteApprovalPoliciesIdData, DeleteApprovalPoliciesIdError>>): Promise<RequestFnResponse<DeleteApprovalPoliciesIdData, DeleteApprovalPoliciesIdError>>;
-        /**
-         * @summary Delete an approval policy
-         * @description Delete an existing approval policy.
-         */
         getMutationKey(parameters: DeepReadonly<DeleteApprovalPoliciesIdParameters> | void): ServiceOperationMutationKey<DeleteApprovalPoliciesIdSchema, DeleteApprovalPoliciesIdParameters>;
         /**
          * Enables performing asynchronous data mutation operations such as POST, PUT, PATCH, or DELETE requests.
@@ -1607,7 +1593,7 @@ export interface ApprovalPoliciesService {
      * @summary Update an approval policy
      * @description Update an existing approval policy.
      */
-    patchApprovalPoliciesId: {
+    patchApprovalPoliciesId: PatchApprovalPoliciesIdInvoke & {
         /**
          * @summary Update an approval policy
          * @description Update an existing approval policy.
@@ -2313,11 +2299,6 @@ export interface ApprovalPoliciesService {
          * @summary Update an approval policy
          * @description Update an existing approval policy.
          */
-        <TMeta extends Record<string, any>, TSignal extends AbortSignal = AbortSignal>(options: ServiceOperationMutationFnOptions<PatchApprovalPoliciesIdBody, PatchApprovalPoliciesIdMutationParameters, TMeta, TSignal>, client?: (schema: PatchApprovalPoliciesIdSchema, options: ServiceOperationMutationFnOptions<PatchApprovalPoliciesIdBody, PatchApprovalPoliciesIdMutationParameters, TMeta, TSignal>) => Promise<RequestFnResponse<PatchApprovalPoliciesIdData, PatchApprovalPoliciesIdError>>): Promise<RequestFnResponse<PatchApprovalPoliciesIdData, PatchApprovalPoliciesIdError>>;
-        /**
-         * @summary Update an approval policy
-         * @description Update an existing approval policy.
-         */
         getMutationKey(parameters: DeepReadonly<PatchApprovalPoliciesIdMutationParameters> | void): ServiceOperationMutationKey<PatchApprovalPoliciesIdSchema, PatchApprovalPoliciesIdMutationParameters>;
         /**
          * Enables performing asynchronous data mutation operations such as POST, PUT, PATCH, or DELETE requests.
@@ -2536,6 +2517,7 @@ export const getApprovalPoliciesId = {
 } as {
     schema: GetApprovalPoliciesIdSchema;
     [QraftServiceOperationsToken]: ApprovalPoliciesService["getApprovalPoliciesId"];
+    [QraftServiceOperationInvokeToken]: GetApprovalPoliciesIdInvoke;
 };
 /**
  * @summary Delete an approval policy
@@ -2550,6 +2532,7 @@ export const deleteApprovalPoliciesId = {
 } as {
     schema: DeleteApprovalPoliciesIdSchema;
     [QraftServiceOperationsToken]: ApprovalPoliciesService["deleteApprovalPoliciesId"];
+    [QraftServiceOperationInvokeToken]: DeleteApprovalPoliciesIdInvoke;
 };
 /**
  * @summary Update an approval policy
@@ -2565,6 +2548,7 @@ export const patchApprovalPoliciesId = {
 } as {
     schema: PatchApprovalPoliciesIdSchema;
     [QraftServiceOperationsToken]: ApprovalPoliciesService["patchApprovalPoliciesId"];
+    [QraftServiceOperationInvokeToken]: PatchApprovalPoliciesIdInvoke;
 };
 /** @deprecated Import individual operations directly from this module instead. Pass `--service-object-exports false` to omit this export. */
 export const approvalPoliciesService = {
@@ -2582,6 +2566,17 @@ type GetApprovalPoliciesIdSchema = {
 type GetApprovalPoliciesIdParameters = paths["/approval_policies/{approval_policy_id}"]["get"]["parameters"];
 type GetApprovalPoliciesIdData = paths["/approval_policies/{approval_policy_id}"]["get"]["responses"]["200"]["content"]["application/json"];
 type GetApprovalPoliciesIdError = paths["/approval_policies/{approval_policy_id}"]["get"]["responses"]["401"]["content"]["application/json"] | paths["/approval_policies/{approval_policy_id}"]["get"]["responses"]["422"]["content"]["application/json"] | paths["/approval_policies/{approval_policy_id}"]["get"]["responses"]["default"]["content"]["application/json"];
+type GetApprovalPoliciesIdInvoke = {
+    /**
+     * @summary Get an approval policy by ID
+     * @description Retrieve a specific approval policy.
+     */
+    <TMeta extends Record<string, any>, TSignal extends AbortSignal = AbortSignal>(options: QueryFnOptionsByQueryKey<GetApprovalPoliciesIdSchema, GetApprovalPoliciesIdParameters, TMeta, TSignal> | (QueryFnOptionsByParameters<GetApprovalPoliciesIdParameters, TMeta, TSignal>), client?: (schema: GetApprovalPoliciesIdSchema, options: {
+        parameters: GetApprovalPoliciesIdParameters;
+        signal?: TSignal;
+        meta?: TMeta;
+    }) => Promise<RequestFnResponse<GetApprovalPoliciesIdData, GetApprovalPoliciesIdError>>): Promise<RequestFnResponse<GetApprovalPoliciesIdData, GetApprovalPoliciesIdError>>;
+};
 type DeleteApprovalPoliciesIdSchema = {
     method: "delete";
     url: "/approval_policies/{approval_policy_id}";
@@ -2593,6 +2588,13 @@ type DeleteApprovalPoliciesIdParameters = paths["/approval_policies/{approval_po
 type DeleteApprovalPoliciesIdData = paths["/approval_policies/{approval_policy_id}"]["delete"]["responses"]["200"]["content"]["application/json"];
 type DeleteApprovalPoliciesIdError = paths["/approval_policies/{approval_policy_id}"]["delete"]["responses"]["401"]["content"]["application/json"] | paths["/approval_policies/{approval_policy_id}"]["delete"]["responses"]["422"]["content"]["application/json"] | paths["/approval_policies/{approval_policy_id}"]["delete"]["responses"]["default"]["content"]["application/json"];
 type DeleteApprovalPoliciesIdBody = undefined;
+type DeleteApprovalPoliciesIdInvoke = {
+    /**
+     * @summary Delete an approval policy
+     * @description Delete an existing approval policy.
+     */
+    <TMeta extends Record<string, any>, TSignal extends AbortSignal = AbortSignal>(options: ServiceOperationMutationFnOptions<DeleteApprovalPoliciesIdBody, DeleteApprovalPoliciesIdParameters, TMeta, TSignal>, client?: (schema: DeleteApprovalPoliciesIdSchema, options: ServiceOperationMutationFnOptions<DeleteApprovalPoliciesIdBody, DeleteApprovalPoliciesIdParameters, TMeta, TSignal>) => Promise<RequestFnResponse<DeleteApprovalPoliciesIdData, DeleteApprovalPoliciesIdError>>): Promise<RequestFnResponse<DeleteApprovalPoliciesIdData, DeleteApprovalPoliciesIdError>>;
+};
 type PatchApprovalPoliciesIdSchema = {
     method: "patch";
     url: "/approval_policies/{approval_policy_id}";
@@ -2610,3 +2612,10 @@ type PatchApprovalPoliciesIdMutationParameters = paths["/approval_policies/{appr
 type PatchApprovalPoliciesIdData = paths["/approval_policies/{approval_policy_id}"]["patch"]["responses"]["200"]["content"]["application/json"];
 type PatchApprovalPoliciesIdError = paths["/approval_policies/{approval_policy_id}"]["patch"]["responses"]["401"]["content"]["application/json"] | paths["/approval_policies/{approval_policy_id}"]["patch"]["responses"]["422"]["content"]["application/json"] | paths["/approval_policies/{approval_policy_id}"]["patch"]["responses"]["default"]["content"]["application/json"];
 type PatchApprovalPoliciesIdBody = paths["/approval_policies/{approval_policy_id}"]["patch"]["requestBody"]["content"]["application/json"];
+type PatchApprovalPoliciesIdInvoke = {
+    /**
+     * @summary Update an approval policy
+     * @description Update an existing approval policy.
+     */
+    <TMeta extends Record<string, any>, TSignal extends AbortSignal = AbortSignal>(options: ServiceOperationMutationFnOptions<PatchApprovalPoliciesIdBody, PatchApprovalPoliciesIdMutationParameters, TMeta, TSignal>, client?: (schema: PatchApprovalPoliciesIdSchema, options: ServiceOperationMutationFnOptions<PatchApprovalPoliciesIdBody, PatchApprovalPoliciesIdMutationParameters, TMeta, TSignal>) => Promise<RequestFnResponse<PatchApprovalPoliciesIdData, PatchApprovalPoliciesIdError>>): Promise<RequestFnResponse<PatchApprovalPoliciesIdData, PatchApprovalPoliciesIdError>>;
+};

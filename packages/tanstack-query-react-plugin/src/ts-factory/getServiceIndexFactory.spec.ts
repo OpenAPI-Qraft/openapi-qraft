@@ -114,6 +114,8 @@ describe('getServiceIndexFactory', { timeout: 30_000 }, () => {
         'filesService',
         'paths',
         'wrapper',
+        'QraftServiceOperationsToken',
+        'QraftServiceOperationInvokeToken',
       ]),
     ];
 
@@ -138,10 +140,22 @@ describe('getServiceIndexFactory', { timeout: 30_000 }, () => {
     expect(source).toContain('filesServiceOperation as files_filesService');
     expect(source).toContain('pathsOperation as files_paths');
     expect(source).toContain('wrapperOperation as files_wrapper');
+    expect(source).toContain(
+      'QraftServiceOperationsTokenOperation as files_QraftServiceOperationsToken'
+    );
+    expect(source).toContain(
+      'QraftServiceOperationInvokeTokenOperation as files_QraftServiceOperationInvokeToken'
+    );
     expect(source).toContain('delete: files_delete');
     expect(source).toContain('default: files_default');
     expect(source).toContain('class: files_class');
     expect(source).toContain('filesService: files_filesService');
+    expect(source).toContain(
+      'QraftServiceOperationsToken: files_QraftServiceOperationsToken'
+    );
+    expect(source).toContain(
+      'QraftServiceOperationInvokeToken: files_QraftServiceOperationInvokeToken'
+    );
 
     expectGeneratedProjectCompiles(services, serviceOptions, {
       'services/wrapper.ts': `

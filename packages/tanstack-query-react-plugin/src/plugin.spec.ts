@@ -876,7 +876,7 @@ describe('TanStack Query React Client Generation', () => {
       expect(serviceCode).toContain('@deprecated Use `query(...)` instead.');
 
       const getFileListSection = serviceCode.slice(
-        serviceCode.indexOf('getFileList: {'),
+        serviceCode.indexOf('getFileList: GetFileListInvoke & {'),
         serviceCode.indexOf('schema: GetFileListSchema;')
       );
       const fetchQueryIndex = getFileListSection.indexOf('fetchQuery(options:');

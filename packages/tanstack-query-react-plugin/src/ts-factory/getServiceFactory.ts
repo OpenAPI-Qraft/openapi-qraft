@@ -12,6 +12,7 @@ import {
   isValidIdentifierName,
 } from './createPropertyName.js';
 import { filterUnusedTypes } from './filterUnusedTypes.js';
+import { reservedBindingNames } from './getOperationVariableNames.js';
 import { getOverriddenImportDeclarationsFactory } from './getOverriddenImportDeclarationsFactory.js';
 import {
   getModuleTypeImports,
@@ -38,6 +39,11 @@ export type ServiceFactoryOptions = {
 
 type Service = { name: string; typeName: string; variableName: string };
 
+type OperationSignatures = {
+  callSignatures: ts.CallSignatureDeclaration[];
+  methodSignatures: ts.MethodSignature[];
+};
+
 export const getServiceFactory = (
   service: Service,
   operations: ServiceOperation[],
@@ -47,19 +53,50 @@ export const getServiceFactory = (
     | undefined
 ) => {
   const allModuleTypeImports = getModuleTypeImports(operations, options);
-  const operationsTypesResult = getOperationsTypes(operations, options);
+  const parameterWrapperImports = getOperationParametersWrapperImports(
+    operations,
+    options.operationParametersTypeWrapper
+  );
   const operationVariableNames = resolveServiceOperationVariableNames(
     service,
     operations,
     options
   );
-  const operationVariables = operations.map((operation) =>
-    getServiceOperationVariableFactory(
+  const operationInvokeTypeNames = resolveOperationInvokeTypeNames(
+    service,
+    operations,
+    options,
+    operationVariableNames,
+    allModuleTypeImports,
+    parameterWrapperImports
+  );
+  const operationSignatures = new Map(
+    operations.map((operation) => [
+      operation.name,
+      getTransformedOperationSignatures(operation, service, options),
+    ])
+  );
+  const operationsTypesResult = getOperationsTypes(
+    operations,
+    options,
+    operationInvokeTypeNames,
+    operationSignatures,
+    parameterWrapperImports
+  );
+  const operationVariables = operations.map((operation) => {
+    const signatures = operationSignatures.get(operation.name)!;
+    const invokeTypeName =
+      signatures.callSignatures.length > 0
+        ? operationInvokeTypeNames.get(operation.name)
+        : undefined;
+
+    return getServiceOperationVariableFactory(
       service.typeName,
       operation,
-      operationVariableNames.get(operation.name)!
-    )
-  );
+      operationVariableNames.get(operation.name)!,
+      invokeTypeName
+    );
+  });
 
   const serviceVariable =
     options.exportServiceObject === false
@@ -67,7 +104,13 @@ export const getServiceFactory = (
       : getServiceVariableFactory(service, operations, operationVariableNames);
 
   const mainNodes = [
-    getServiceInterfaceFactory(service, operations, options),
+    getServiceInterfaceFactory(
+      service,
+      operations,
+      options,
+      operationInvokeTypeNames,
+      operationSignatures
+    ),
     ...operationVariables,
     ...(serviceVariable ? [serviceVariable] : []),
     ...operationsTypesResult.nodes,
@@ -89,9 +132,24 @@ export const getServiceFactory = (
     }
   }
 
-  moduleTypeImports['@openapi-qraft/tanstack-query-react-types']?.push(
-    'QraftServiceOperationsToken'
-  );
+  if (operations.length > 0) {
+    const reactTypesModule = '@openapi-qraft/tanstack-query-react-types';
+    const reactTypesImports = (moduleTypeImports[reactTypesModule] ??= []);
+    const hasInvokeCallSignatures = operations.some(
+      (operation) =>
+        (operationSignatures.get(operation.name)?.callSignatures.length ?? 0) >
+        0
+    );
+
+    for (const tokenName of [
+      'QraftServiceOperationsToken',
+      ...(hasInvokeCallSignatures ? ['QraftServiceOperationInvokeToken'] : []),
+    ]) {
+      if (!reactTypesImports.includes(tokenName)) {
+        reactTypesImports.push(tokenName);
+      }
+    }
+  }
 
   const importNodes = [
     getOpenAPISchemaImportsFactory(options.openapiTypesImportPath),
@@ -172,33 +230,88 @@ const getServiceOperationImportsFactory = (
   return [...standardImports, ...customImports];
 };
 
-const getServiceInterfaceFactory = (
+/**
+ * Resolves collision-free local type alias names for operation invoke signatures.
+ */
+const resolveOperationInvokeTypeNames = (
   service: Service,
   operations: ServiceOperation[],
-  options: Pick<
-    ServiceFactoryOptions,
-    'queryableWriteOperations' | 'imperativeQuery' | 'deprecatedMethods'
-  >
-) => {
-  return factory.createInterfaceDeclaration(
-    [factory.createToken(ts.SyntaxKind.ExportKeyword)],
-    factory.createIdentifier(service.typeName),
-    undefined,
-    undefined,
-    operations.map((operation) =>
-      getServiceInterfaceOperationFactory(operation, service, options)
-    )
-  );
+  options: Pick<ServiceFactoryOptions, 'queryableWriteOperations'>,
+  operationVariableNames: Map<string, string>,
+  allModuleTypeImports: Record<string, string[]>,
+  parameterWrapperImports: Record<string, string[]>
+): Map<string, string> => {
+  const usedNames = new Set<string>([
+    service.typeName,
+    service.variableName,
+    'paths',
+    'QraftServiceOperationsToken',
+    'QraftServiceOperationInvokeToken',
+    ...reservedBindingNames,
+    ...Object.values(allModuleTypeImports).flat(),
+    ...Object.values(parameterWrapperImports).flat(),
+    ...operationVariableNames.values(),
+  ]);
+
+  for (const operation of operations) {
+    usedNames.add(getOperationSchemaTypeName(operation));
+    if (isSeparateParametersOperation(operation, options)) {
+      usedNames.add(
+        getOperationParametersTypeName(operation, options, 'query')
+      );
+      usedNames.add(
+        getOperationParametersTypeName(operation, options, 'mutation')
+      );
+    } else {
+      usedNames.add(
+        getOperationParametersTypeName(
+          operation,
+          options,
+          isReadOnlyOperation(operation) ? 'query' : 'mutation'
+        )
+      );
+    }
+    usedNames.add(getOperationDataTypeName(operation));
+    usedNames.add(getOperationErrorTypeName(operation));
+    if (!isReadOnlyOperation(operation) || operation.requestBody) {
+      usedNames.add(getOperationBodyTypeName(operation));
+    }
+  }
+
+  const invokeTypeNames = new Map<string, string>();
+
+  for (const operation of operations) {
+    const rawBaseName = camelCase(`${operation.name}-Invoke`, {
+      pascalCase: true,
+    });
+    const sanitized = rawBaseName.replace(/[^a-zA-Z0-9_$]+/g, '');
+    const baseName = isValidIdentifierName(sanitized)
+      ? sanitized
+      : sanitized
+        ? `_${sanitized}`
+        : '_OperationInvoke';
+
+    let candidate = baseName;
+    let suffix = 2;
+    while (usedNames.has(candidate)) {
+      candidate = `${baseName}${suffix++}`;
+    }
+
+    usedNames.add(candidate);
+    invokeTypeNames.set(operation.name, candidate);
+  }
+
+  return invokeTypeNames;
 };
 
-const getServiceInterfaceOperationFactory = (
+const getTransformedOperationSignatures = (
   operation: ServiceOperation,
   service: Service,
   options: Pick<
     ServiceFactoryOptions,
     'queryableWriteOperations' | 'imperativeQuery' | 'deprecatedMethods'
   >
-) => {
+): OperationSignatures => {
   const operationMethodNodes = getMethodSignatureNodes(
     isReadOnlyOperation(operation)
       ? createServicesQueryOperationNodes({
@@ -243,93 +356,138 @@ const getServiceInterfaceOperationFactory = (
       );
     } else if (ts.isCallSignatureDeclaration(node)) {
       // Query and Mutation functions (invoke methods)
-      ts.addSyntheticLeadingComment(
-        node,
-        ts.SyntaxKind.MultiLineCommentTrivia,
-        createMultilineComment([...createOperationCommonTSDoc(operation)]),
-        true
-      );
+      addOperationTSDoc(node, operation);
     }
   });
+
+  const transformedNodes = replaceGenericTypesWithOperationTypes(
+    reduceAreAllOptionalConditionalTVariablesType(
+      reduceAreAllOptionalConditionalTParamsType(
+        operationMethodNodes,
+        operation,
+        options
+      ),
+      operation
+    ),
+    operation,
+    options
+  );
+
+  return {
+    callSignatures: transformedNodes.filter(ts.isCallSignatureDeclaration),
+    methodSignatures: transformedNodes.filter(ts.isMethodSignature),
+  };
+};
+
+const getServiceInterfaceFactory = (
+  service: Service,
+  operations: ServiceOperation[],
+  options: Pick<ServiceFactoryOptions, 'queryableWriteOperations'>,
+  operationInvokeTypeNames: Map<string, string>,
+  operationSignatures: Map<string, OperationSignatures>
+) => {
+  return factory.createInterfaceDeclaration(
+    [factory.createToken(ts.SyntaxKind.ExportKeyword)],
+    factory.createIdentifier(service.typeName),
+    undefined,
+    undefined,
+    operations.map((operation) =>
+      getServiceInterfaceOperationFactory(
+        operation,
+        options,
+        operationInvokeTypeNames.get(operation.name)!,
+        operationSignatures.get(operation.name)!
+      )
+    )
+  );
+};
+
+const getServiceInterfaceOperationFactory = (
+  operation: ServiceOperation,
+  options: Pick<ServiceFactoryOptions, 'queryableWriteOperations'>,
+  invokeTypeName: string,
+  { callSignatures, methodSignatures }: OperationSignatures
+) => {
+  const membersTypeLiteral = factory.createTypeLiteralNode([
+    ...methodSignatures,
+    factory.createPropertySignature(
+      undefined,
+      factory.createIdentifier('schema'),
+      undefined,
+      factory.createTypeReferenceNode(
+        getOperationSchemaTypeName(operation),
+        undefined
+      )
+    ),
+    factory.createPropertySignature(
+      undefined,
+      factory.createIdentifier('types'),
+      undefined,
+      factory.createTypeLiteralNode(
+        [
+          factory.createPropertySignature(
+            undefined,
+            factory.createIdentifier('parameters'),
+            undefined,
+            factory.createTypeReferenceNode(
+              getOperationParametersTypeName(
+                operation,
+                options,
+                isReadOnlyOperation(operation) ? 'query' : 'mutation'
+              ),
+              undefined
+            )
+          ),
+          factory.createPropertySignature(
+            undefined,
+            factory.createIdentifier('data'),
+            undefined,
+            factory.createTypeReferenceNode(
+              getOperationDataTypeName(operation),
+              undefined
+            )
+          ),
+          factory.createPropertySignature(
+            undefined,
+            factory.createIdentifier('error'),
+            undefined,
+            factory.createTypeReferenceNode(
+              getOperationErrorTypeName(operation),
+              undefined
+            )
+          ),
+          !isReadOnlyOperation(operation) || operation.requestBody
+            ? factory.createPropertySignature(
+                undefined,
+                factory.createIdentifier('body'),
+                undefined,
+                factory.createTypeReferenceNode(
+                  getOperationBodyTypeName(operation),
+                  undefined
+                )
+              )
+            : undefined,
+        ].filter((node) => !!node)
+      )
+    ),
+  ]);
+
+  const operationTypeNode =
+    callSignatures.length > 0
+      ? factory.createIntersectionTypeNode([
+          factory.createTypeReferenceNode(
+            factory.createIdentifier(invokeTypeName),
+            undefined
+          ),
+          membersTypeLiteral,
+        ])
+      : membersTypeLiteral;
 
   const node = factory.createPropertySignature(
     undefined,
     createPropertyName(operation.name),
     undefined,
-    factory.createTypeLiteralNode([
-      ...replaceGenericTypesWithOperationTypes(
-        reduceAreAllOptionalConditionalTVariablesType(
-          reduceAreAllOptionalConditionalTParamsType(
-            operationMethodNodes,
-            operation,
-            options
-          ),
-          operation
-        ),
-        operation,
-        options
-      ),
-      factory.createPropertySignature(
-        undefined,
-        factory.createIdentifier('schema'),
-        undefined,
-        factory.createTypeReferenceNode(
-          getOperationSchemaTypeName(operation),
-          undefined
-        )
-      ),
-      factory.createPropertySignature(
-        undefined,
-        factory.createIdentifier('types'),
-        undefined,
-        factory.createTypeLiteralNode(
-          [
-            factory.createPropertySignature(
-              undefined,
-              factory.createIdentifier('parameters'),
-              undefined,
-              factory.createTypeReferenceNode(
-                getOperationParametersTypeName(
-                  operation,
-                  options,
-                  isReadOnlyOperation(operation) ? 'query' : 'mutation'
-                ),
-                undefined
-              )
-            ),
-            factory.createPropertySignature(
-              undefined,
-              factory.createIdentifier('data'),
-              undefined,
-              factory.createTypeReferenceNode(
-                getOperationDataTypeName(operation),
-                undefined
-              )
-            ),
-            factory.createPropertySignature(
-              undefined,
-              factory.createIdentifier('error'),
-              undefined,
-              factory.createTypeReferenceNode(
-                getOperationErrorTypeName(operation),
-                undefined
-              )
-            ),
-            !isReadOnlyOperation(operation) || operation.requestBody
-              ? factory.createPropertySignature(
-                  undefined,
-                  factory.createIdentifier('body'),
-                  undefined,
-                  factory.createTypeReferenceNode(
-                    getOperationBodyTypeName(operation),
-                    undefined
-                  )
-                )
-              : undefined,
-          ].filter((node) => !!node)
-        )
-      ),
-    ])
+    operationTypeNode
   );
 
   addOperationTSDoc(node, operation);
@@ -660,13 +818,11 @@ const getOperationsTypes = (
   options: Pick<
     ServiceFactoryOptions,
     'queryableWriteOperations' | 'operationParametersTypeWrapper'
-  >
+  >,
+  operationInvokeTypeNames: Map<string, string>,
+  operationSignatures: Map<string, OperationSignatures>,
+  importsMap: Record<string, string[]>
 ): { nodes: ts.Node[]; imports: Record<string, string[]> } => {
-  const importsMap = getOperationParametersWrapperImports(
-    operations,
-    options.operationParametersTypeWrapper
-  );
-
   const nodes = operations.flatMap((operation) => {
     const wrapperConfig = shouldUseParametersWrapper(
       operation,
@@ -758,6 +914,23 @@ const getOperationsTypes = (
       );
     }
 
+    const callSignatures =
+      operationSignatures.get(operation.name)?.callSignatures ?? [];
+    if (callSignatures.length > 0) {
+      // Emit a single non-exported invoke signature alias shared by the service interface
+      // and QraftServiceOperationInvokeToken so TS4058 is avoided while TSDoc stays intact.
+      nodes.push(
+        factory.createTypeAliasDeclaration(
+          undefined,
+          factory.createIdentifier(
+            operationInvokeTypeNames.get(operation.name)!
+          ),
+          undefined,
+          factory.createTypeLiteralNode(callSignatures)
+        )
+      );
+    }
+
     return nodes;
   });
 
@@ -803,7 +976,8 @@ const getOperationBodyTypeName = (operation: ServiceOperation) =>
 const getServiceOperationVariableFactory = (
   serviceName: string,
   operation: ServiceOperation,
-  variableName: string
+  variableName: string,
+  invokeTypeName: string | undefined
 ) => {
   const variableNode = factory.createVariableStatement(
     [factory.createToken(ts.SyntaxKind.ExportKeyword)],
@@ -886,6 +1060,23 @@ const getServiceOperationVariableFactory = (
                   )
                 )
               ),
+              ...(invokeTypeName
+                ? [
+                    factory.createPropertySignature(
+                      undefined,
+                      factory.createComputedPropertyName(
+                        factory.createIdentifier(
+                          'QraftServiceOperationInvokeToken'
+                        )
+                      ),
+                      undefined,
+                      factory.createTypeReferenceNode(
+                        factory.createIdentifier(invokeTypeName),
+                        undefined
+                      )
+                    ),
+                  ]
+                : []),
             ])
           )
         ),

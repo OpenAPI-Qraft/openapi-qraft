@@ -4,18 +4,12 @@
  */
 
 import type { paths } from "../../openapi.js";
-import type { DeepReadonly, InvalidateQueryFilters, IsFetchingQueryFilters, IsMutatingMutationFilters, MutationFiltersByMutationKey, MutationFiltersByParameters, MutationVariables, OperationError, OperationInfiniteData, QueryFiltersByParameters, QueryFiltersByQueryKey, QueryFnOptions, QueryFnOptionsByParameters, QueryFnOptionsByQueryKey, RequestFnResponse, ServiceOperationEnsureInfiniteQueryDataOptions, ServiceOperationEnsureQueryDataOptions, ServiceOperationFetchInfiniteQueryOptions, ServiceOperationFetchInfiniteQueryVoidOption, ServiceOperationFetchQueryOptions, ServiceOperationInfiniteQueryKey, ServiceOperationMutationCacheBase, ServiceOperationMutationFnOptions, ServiceOperationMutationKey, ServiceOperationQueryKey, ServiceOperationUseInfiniteQueryDefinedOptions, ServiceOperationUseInfiniteQueryUndefinedOptions, ServiceOperationUseMutationOptions, ServiceOperationUseQueryDefinedOptions, ServiceOperationUseQueryUndefinedOptions, ServiceOperationUseSuspenseInfiniteQueryOptions, ServiceOperationUseSuspenseQueryOptions, UseQueryOptionsForUseQueries, UseQueryOptionsForUseSuspenseQuery, QraftServiceOperationsToken } from "@openapi-qraft/tanstack-query-react-types";
+import type { DeepReadonly, InvalidateQueryFilters, IsFetchingQueryFilters, IsMutatingMutationFilters, MutationFiltersByMutationKey, MutationFiltersByParameters, MutationVariables, OperationError, OperationInfiniteData, QueryFiltersByParameters, QueryFiltersByQueryKey, QueryFnOptions, QueryFnOptionsByParameters, QueryFnOptionsByQueryKey, RequestFnResponse, ServiceOperationEnsureInfiniteQueryDataOptions, ServiceOperationEnsureQueryDataOptions, ServiceOperationFetchInfiniteQueryOptions, ServiceOperationFetchInfiniteQueryVoidOption, ServiceOperationFetchQueryOptions, ServiceOperationInfiniteQueryKey, ServiceOperationMutationCacheBase, ServiceOperationMutationFnOptions, ServiceOperationMutationKey, ServiceOperationQueryKey, ServiceOperationUseInfiniteQueryDefinedOptions, ServiceOperationUseInfiniteQueryUndefinedOptions, ServiceOperationUseMutationOptions, ServiceOperationUseQueryDefinedOptions, ServiceOperationUseQueryUndefinedOptions, ServiceOperationUseSuspenseInfiniteQueryOptions, ServiceOperationUseSuspenseQueryOptions, UseQueryOptionsForUseQueries, UseQueryOptionsForUseSuspenseQuery, QraftServiceOperationsToken, QraftServiceOperationInvokeToken } from "@openapi-qraft/tanstack-query-react-types";
 import type { CancelOptions, DefinedUseInfiniteQueryResult, DefinedUseQueryResult, InvalidateOptions, Mutation, MutationState, QueryState, RefetchOptions, ResetOptions, SetDataOptions, Updater, UseInfiniteQueryResult, UseMutationResult, UseQueryResult, UseSuspenseInfiniteQueryResult, UseSuspenseQueryResult } from "@tanstack/react-query";
 import type { ServiceOperationImperativeInfiniteQueryOptions, ServiceOperationImperativeQueryOptions } from "@openapi-qraft/tanstack-query-react-types/imperative-query";
 export interface FilesService {
     /** @summary Get a files by ID */
-    getFiles: {
-        /** @summary Get a files by ID */
-        <TMeta extends Record<string, any>, TSignal extends AbortSignal = AbortSignal>(options: QueryFnOptionsByQueryKey<GetFilesSchema, GetFilesParameters, TMeta, TSignal> | (QueryFnOptionsByParameters<GetFilesParameters, TMeta, TSignal>), client?: (schema: GetFilesSchema, options: {
-            parameters: GetFilesParameters;
-            signal?: TSignal;
-            meta?: TMeta;
-        }) => Promise<RequestFnResponse<GetFilesData, GetFilesError>>): Promise<RequestFnResponse<GetFilesData, GetFilesError>>;
+    getFiles: GetFilesInvoke & {
         /** @summary Get a files by ID */
         getQueryKey(parameters: DeepReadonly<GetFilesParameters>): ServiceOperationQueryKey<GetFilesSchema, GetFilesParameters>;
         /**
@@ -566,9 +560,7 @@ export interface FilesService {
         };
     };
     /** @summary Upload a files by ID */
-    postFiles: {
-        /** @summary Upload a files by ID */
-        <TMeta extends Record<string, any>, TSignal extends AbortSignal = AbortSignal>(options: ServiceOperationMutationFnOptions<PostFilesBody, PostFilesParameters, TMeta, TSignal>, client?: (schema: PostFilesSchema, options: ServiceOperationMutationFnOptions<PostFilesBody, PostFilesParameters, TMeta, TSignal>) => Promise<RequestFnResponse<PostFilesData, PostFilesError>>): Promise<RequestFnResponse<PostFilesData, PostFilesError>>;
+    postFiles: PostFilesInvoke & {
         /** @summary Upload a files by ID */
         getMutationKey(parameters: DeepReadonly<PostFilesParameters> | void): ServiceOperationMutationKey<PostFilesSchema, PostFilesParameters>;
         /**
@@ -692,9 +684,7 @@ export interface FilesService {
         };
     };
     /** @summary Delete all files */
-    deleteFiles: {
-        /** @summary Delete all files */
-        <TMeta extends Record<string, any>, TSignal extends AbortSignal = AbortSignal>(options: ServiceOperationMutationFnOptions<DeleteFilesBody, DeleteFilesParameters, TMeta, TSignal>, client?: (schema: DeleteFilesSchema, options: ServiceOperationMutationFnOptions<DeleteFilesBody, DeleteFilesParameters, TMeta, TSignal>) => Promise<RequestFnResponse<DeleteFilesData, DeleteFilesError>>): Promise<RequestFnResponse<DeleteFilesData, DeleteFilesError>>;
+    deleteFiles: DeleteFilesInvoke & {
         /** @summary Delete all files */
         getMutationKey(parameters: DeepReadonly<DeleteFilesParameters> | void): ServiceOperationMutationKey<DeleteFilesSchema, DeleteFilesParameters>;
         /**
@@ -844,9 +834,7 @@ export interface FilesService {
         };
     };
     /** @summary Trash files */
-    trashFiles: {
-        /** @summary Trash files */
-        <TMeta extends Record<string, any>, TSignal extends AbortSignal = AbortSignal>(options: ServiceOperationMutationFnOptions<TrashFilesBody, TrashFilesParameters, TMeta, TSignal>, client?: (schema: TrashFilesSchema, options: ServiceOperationMutationFnOptions<TrashFilesBody, TrashFilesParameters, TMeta, TSignal>) => Promise<RequestFnResponse<TrashFilesData, TrashFilesError>>): Promise<RequestFnResponse<TrashFilesData, TrashFilesError>>;
+    trashFiles: TrashFilesInvoke & {
         /** @summary Trash files */
         getMutationKey(parameters: DeepReadonly<TrashFilesParameters> | void): ServiceOperationMutationKey<TrashFilesSchema, TrashFilesParameters>;
         /**
@@ -999,16 +987,7 @@ export interface FilesService {
      * @deprecated
      * @summary Get a file list
      */
-    getFileList: {
-        /**
-         * @deprecated
-         * @summary Get a file list
-         */
-        <TMeta extends Record<string, any>, TSignal extends AbortSignal = AbortSignal>(options: QueryFnOptionsByQueryKey<GetFileListSchema, GetFileListParameters, TMeta, TSignal> | (QueryFnOptionsByParameters<GetFileListParameters, TMeta, TSignal> | QueryFnOptions<TMeta, TSignal> | void), client?: (schema: GetFileListSchema, options: {
-            parameters: GetFileListParameters;
-            signal?: TSignal;
-            meta?: TMeta;
-        }) => Promise<RequestFnResponse<GetFileListData, GetFileListError>>): Promise<RequestFnResponse<GetFileListData, GetFileListError>>;
+    getFileList: GetFileListInvoke & {
         /**
          * @deprecated
          * @summary Get a file list
@@ -1635,6 +1614,7 @@ export const getFiles = {
 } as {
     schema: GetFilesSchema;
     [QraftServiceOperationsToken]: FilesService["getFiles"];
+    [QraftServiceOperationInvokeToken]: GetFilesInvoke;
 };
 /** @summary Upload a files by ID */
 export const postFiles = {
@@ -1646,6 +1626,7 @@ export const postFiles = {
 } as {
     schema: PostFilesSchema;
     [QraftServiceOperationsToken]: FilesService["postFiles"];
+    [QraftServiceOperationInvokeToken]: PostFilesInvoke;
 };
 /** @summary Delete all files */
 export const deleteFiles = {
@@ -1656,6 +1637,7 @@ export const deleteFiles = {
 } as {
     schema: DeleteFilesSchema;
     [QraftServiceOperationsToken]: FilesService["deleteFiles"];
+    [QraftServiceOperationInvokeToken]: DeleteFilesInvoke;
 };
 /** @summary Trash files */
 export const trashFiles = {
@@ -1666,6 +1648,7 @@ export const trashFiles = {
 } as {
     schema: TrashFilesSchema;
     [QraftServiceOperationsToken]: FilesService["trashFiles"];
+    [QraftServiceOperationInvokeToken]: TrashFilesInvoke;
 };
 /**
  * @deprecated
@@ -1680,6 +1663,7 @@ export const getFileList = {
 } as {
     schema: GetFileListSchema;
     [QraftServiceOperationsToken]: FilesService["getFileList"];
+    [QraftServiceOperationInvokeToken]: GetFileListInvoke;
 };
 /** @deprecated Import individual operations directly from this module instead. Pass `--service-object-exports false` to omit this export. */
 export const filesService = {
@@ -1699,6 +1683,14 @@ type GetFilesSchema = {
 type GetFilesParameters = paths["/files"]["get"]["parameters"];
 type GetFilesData = paths["/files"]["get"]["responses"]["200"]["content"]["application/json"];
 type GetFilesError = paths["/files"]["get"]["responses"]["405"]["content"]["application/json"] | paths["/files"]["get"]["responses"]["422"]["content"]["application/json"] | paths["/files"]["get"]["responses"]["default"]["content"]["application/json"];
+type GetFilesInvoke = {
+    /** @summary Get a files by ID */
+    <TMeta extends Record<string, any>, TSignal extends AbortSignal = AbortSignal>(options: QueryFnOptionsByQueryKey<GetFilesSchema, GetFilesParameters, TMeta, TSignal> | (QueryFnOptionsByParameters<GetFilesParameters, TMeta, TSignal>), client?: (schema: GetFilesSchema, options: {
+        parameters: GetFilesParameters;
+        signal?: TSignal;
+        meta?: TMeta;
+    }) => Promise<RequestFnResponse<GetFilesData, GetFilesError>>): Promise<RequestFnResponse<GetFilesData, GetFilesError>>;
+};
 type PostFilesSchema = {
     method: "post";
     url: "/files";
@@ -1714,6 +1706,10 @@ type PostFilesParameters = {
 type PostFilesData = paths["/files"]["post"]["responses"]["200"]["content"]["application/json"];
 type PostFilesError = paths["/files"]["post"]["responses"]["default"]["content"]["application/json"];
 type PostFilesBody = NonNullable<paths["/files"]["post"]["requestBody"]>["content"]["multipart/form-data"] | FormData;
+type PostFilesInvoke = {
+    /** @summary Upload a files by ID */
+    <TMeta extends Record<string, any>, TSignal extends AbortSignal = AbortSignal>(options: ServiceOperationMutationFnOptions<PostFilesBody, PostFilesParameters, TMeta, TSignal>, client?: (schema: PostFilesSchema, options: ServiceOperationMutationFnOptions<PostFilesBody, PostFilesParameters, TMeta, TSignal>) => Promise<RequestFnResponse<PostFilesData, PostFilesError>>): Promise<RequestFnResponse<PostFilesData, PostFilesError>>;
+};
 type DeleteFilesSchema = {
     method: "delete";
     url: "/files";
@@ -1722,6 +1718,10 @@ type DeleteFilesParameters = paths["/files"]["delete"]["parameters"];
 type DeleteFilesData = paths["/files"]["delete"]["responses"]["200"]["content"]["application/json"] | null;
 type DeleteFilesError = paths["/files"]["delete"]["responses"]["default"]["content"]["application/json"];
 type DeleteFilesBody = undefined;
+type DeleteFilesInvoke = {
+    /** @summary Delete all files */
+    <TMeta extends Record<string, any>, TSignal extends AbortSignal = AbortSignal>(options: ServiceOperationMutationFnOptions<DeleteFilesBody, DeleteFilesParameters, TMeta, TSignal>, client?: (schema: DeleteFilesSchema, options: ServiceOperationMutationFnOptions<DeleteFilesBody, DeleteFilesParameters, TMeta, TSignal>) => Promise<RequestFnResponse<DeleteFilesData, DeleteFilesError>>): Promise<RequestFnResponse<DeleteFilesData, DeleteFilesError>>;
+};
 type TrashFilesSchema = {
     method: "delete";
     url: "/files/trash";
@@ -1730,6 +1730,10 @@ type TrashFilesParameters = paths["/files/trash"]["delete"]["parameters"];
 type TrashFilesData = paths["/files/trash"]["delete"]["responses"]["200"]["content"]["application/json"] | paths["/files/trash"]["delete"]["responses"]["200"]["content"]["application/octet-stream"] | null;
 type TrashFilesError = paths["/files/trash"]["delete"]["responses"]["default"]["content"]["application/json"];
 type TrashFilesBody = undefined;
+type TrashFilesInvoke = {
+    /** @summary Trash files */
+    <TMeta extends Record<string, any>, TSignal extends AbortSignal = AbortSignal>(options: ServiceOperationMutationFnOptions<TrashFilesBody, TrashFilesParameters, TMeta, TSignal>, client?: (schema: TrashFilesSchema, options: ServiceOperationMutationFnOptions<TrashFilesBody, TrashFilesParameters, TMeta, TSignal>) => Promise<RequestFnResponse<TrashFilesData, TrashFilesError>>): Promise<RequestFnResponse<TrashFilesData, TrashFilesError>>;
+};
 type GetFileListSchema = {
     method: "get";
     url: "/files/list";
@@ -1740,3 +1744,14 @@ type GetFileListSchema = {
 type GetFileListParameters = paths["/files/list"]["get"]["parameters"];
 type GetFileListData = paths["/files/list"]["get"]["responses"]["200"]["content"]["application/json"];
 type GetFileListError = paths["/files/list"]["get"]["responses"]["default"]["content"]["application/json"];
+type GetFileListInvoke = {
+    /**
+     * @deprecated
+     * @summary Get a file list
+     */
+    <TMeta extends Record<string, any>, TSignal extends AbortSignal = AbortSignal>(options: QueryFnOptionsByQueryKey<GetFileListSchema, GetFileListParameters, TMeta, TSignal> | (QueryFnOptionsByParameters<GetFileListParameters, TMeta, TSignal> | QueryFnOptions<TMeta, TSignal> | void), client?: (schema: GetFileListSchema, options: {
+        parameters: GetFileListParameters;
+        signal?: TSignal;
+        meta?: TMeta;
+    }) => Promise<RequestFnResponse<GetFileListData, GetFileListError>>): Promise<RequestFnResponse<GetFileListData, GetFileListError>>;
+};

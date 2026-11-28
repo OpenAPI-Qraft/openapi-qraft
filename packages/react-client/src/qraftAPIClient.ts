@@ -1,4 +1,7 @@
-import type { QraftServiceOperationsToken } from '@openapi-qraft/tanstack-query-react-types';
+import type {
+  QraftServiceOperationInvokeToken,
+  QraftServiceOperationsToken,
+} from '@openapi-qraft/tanstack-query-react-types';
 import type { QueryClient } from '@tanstack/react-query';
 import type * as callbacks from './callbacks/index.js';
 import type * as operationInvokeModule from './callbacks/operationInvokeFn.js';
@@ -348,6 +351,7 @@ type OperationDeclaration = {
     schema: OperationSchema;
     (...args: any[]): any;
   };
+  [QraftServiceOperationInvokeToken]?: (...args: any[]) => any;
 };
 
 type OperationsDeclaration<Operations> = {
@@ -517,11 +521,11 @@ export type ServicesFilteredByCallbacks<
   Services extends UnionServiceOperationsDeclaration<Services>,
   CallbackList extends OperationCallbackList,
 > = Services extends OperationDeclaration
-  ? FilterOperation<Services[QraftServiceOperationsToken], CallbackList>
+  ? FilterOperation<Services, CallbackList>
   : Services extends OperationsDeclaration<Services>
     ? {
         [operation in keyof NoInfer<Services>]: FilterOperation<
-          Services[operation][QraftServiceOperationsToken],
+          Services[operation],
           CallbackList
         >;
       }
@@ -530,21 +534,45 @@ export type ServicesFilteredByCallbacks<
           [serviceName in keyof NoInfer<Services>]: {
             [operation in keyof NoInfer<
               Services[serviceName]
-            >]: FilterOperation<
-              Services[serviceName][operation][QraftServiceOperationsToken],
-              CallbackList
-            >;
+            >]: FilterOperation<Services[serviceName][operation], CallbackList>;
           };
         }
       : never;
 
 type FilterOperation<
-  Op,
+  Operation extends OperationDeclaration,
   CallbackList extends OperationCallbackList,
 > = InvokeOperationCallback extends CallbackList
-  ? Pick<Op, NoInfer<Extract<keyof Op, CallbackList | 'schema' | 'types'>>> &
-      OperationInvokeFn<Op>
-  : Pick<Op, NoInfer<Extract<keyof Op, CallbackList | 'schema' | 'types'>>>;
+  ? Pick<
+      Operation[QraftServiceOperationsToken],
+      NoInfer<
+        Extract<
+          keyof Operation[QraftServiceOperationsToken],
+          CallbackList | 'schema' | 'types'
+        >
+      >
+    > &
+      OperationInvoke<Operation>
+  : Pick<
+      Operation[QraftServiceOperationsToken],
+      NoInfer<
+        Extract<
+          keyof Operation[QraftServiceOperationsToken],
+          CallbackList | 'schema' | 'types'
+        >
+      >
+    >;
+
+type OperationInvoke<Operation extends OperationDeclaration> =
+  Operation extends {
+    readonly [QraftServiceOperationInvokeToken]: (...args: any[]) => any;
+  }
+    ? [Operation[QraftServiceOperationInvokeToken]] extends [never]
+      ? OperationInvokeFn<Operation[QraftServiceOperationsToken]>
+      : unknown extends Operation[QraftServiceOperationInvokeToken]
+        ? OperationInvokeFn<Operation[QraftServiceOperationsToken]>
+        : Operation[QraftServiceOperationInvokeToken]
+    : OperationInvokeFn<Operation[QraftServiceOperationsToken]>;
 
 type OperationInvokeFn<InvokeFn> = InvokeFn extends (
   ...args: infer Args
