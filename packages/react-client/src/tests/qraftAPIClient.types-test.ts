@@ -1,5 +1,14 @@
 import type { CreateAPIQueryClientOptions } from '@openapi-qraft/react';
-import type { RequestFnInfo } from '@openapi-qraft/tanstack-query-react-types';
+import type {
+  QraftServiceOperationInvokeToken,
+  QraftServiceOperationsToken,
+  RequestFnInfo,
+  RequestFnResponse,
+  ServiceOperationMutation,
+  ServiceOperationMutationFn,
+  ServiceOperationQuery,
+  ServiceOperationQueryFn,
+} from '@openapi-qraft/tanstack-query-react-types';
 import type { MutationFunctionContext } from '@tanstack/react-query';
 import {
   qraftAPIClient,
@@ -922,3 +931,414 @@ deleteFilesInvokeOnly({ parameters: { query: { all: true } } });
 deleteFilesInvokeOnly.schema.method satisfies 'delete';
 // @ts-expect-error - single-operation invoke-only client must not expose getMutationKey
 deleteFilesInvokeOnly.getMutationKey;
+
+//// QraftServiceOperationInvokeToken - invoke generics, compatibility, and strict filtering ////
+type TokenTestQuerySchema = { readonly url: '/items'; readonly method: 'get' };
+type TokenTestQueryParams = { readonly query: { readonly id: string } };
+type TokenTestQueryData = { readonly items: readonly string[] };
+type TokenTestError = { readonly message: string };
+
+type TokenTestMutationSchema = {
+  readonly url: '/items';
+  readonly method: 'post';
+};
+type TokenTestMutationBody = { readonly name: string };
+type TokenTestMutationParams = {
+  readonly header?: { readonly 'x-req'?: string };
+};
+type TokenTestMutationData = { readonly id: string };
+
+interface OverloadedInvokeFn {
+  (options: { id: string }): Promise<string>;
+  (options: { all: true }): Promise<string[]>;
+}
+
+interface CustomAbortSignal extends AbortSignal {
+  readonly customSignalTag: 'custom';
+}
+
+declare const customSignal: CustomAbortSignal;
+
+declare const tokenQueryOp: {
+  schema: TokenTestQuerySchema;
+  [QraftServiceOperationsToken]: ServiceOperationQuery<
+    TokenTestQuerySchema,
+    TokenTestQueryData,
+    TokenTestQueryParams,
+    TokenTestError
+  >;
+  [QraftServiceOperationInvokeToken]: ServiceOperationQueryFn<
+    TokenTestQuerySchema,
+    TokenTestQueryData,
+    TokenTestQueryParams,
+    TokenTestError
+  >;
+};
+
+declare const tokenMutationOp: {
+  schema: TokenTestMutationSchema;
+  [QraftServiceOperationsToken]: ServiceOperationMutation<
+    TokenTestMutationSchema,
+    TokenTestMutationBody,
+    TokenTestMutationData,
+    TokenTestMutationParams,
+    TokenTestError
+  >;
+  [QraftServiceOperationInvokeToken]: ServiceOperationMutationFn<
+    TokenTestMutationSchema,
+    TokenTestMutationBody,
+    TokenTestMutationData,
+    TokenTestMutationParams,
+    TokenTestError
+  >;
+};
+
+declare const overloadedTokenOp: {
+  schema: TokenTestQuerySchema;
+  [QraftServiceOperationsToken]: ServiceOperationQuery<
+    TokenTestQuerySchema,
+    TokenTestQueryData,
+    TokenTestQueryParams,
+    TokenTestError
+  >;
+  readonly [QraftServiceOperationInvokeToken]: OverloadedInvokeFn;
+};
+
+declare const legacyQueryOp: {
+  schema: TokenTestQuerySchema;
+  [QraftServiceOperationsToken]: ServiceOperationQuery<
+    TokenTestQuerySchema,
+    TokenTestQueryData,
+    TokenTestQueryParams,
+    TokenTestError
+  >;
+};
+
+declare const optionalTokenOp: {
+  schema: TokenTestQuerySchema;
+  [QraftServiceOperationsToken]: ServiceOperationQuery<
+    TokenTestQuerySchema,
+    TokenTestQueryData,
+    TokenTestQueryParams,
+    TokenTestError
+  >;
+  [QraftServiceOperationInvokeToken]?: ServiceOperationQueryFn<
+    TokenTestQuerySchema,
+    TokenTestQueryData,
+    TokenTestQueryParams,
+    TokenTestError
+  >;
+};
+
+declare const anyTokenOp: {
+  schema: TokenTestQuerySchema;
+  [QraftServiceOperationsToken]: ServiceOperationQuery<
+    TokenTestQuerySchema,
+    TokenTestQueryData,
+    TokenTestQueryParams,
+    TokenTestError
+  >;
+  [QraftServiceOperationInvokeToken]: any;
+};
+
+declare const neverTokenOp: {
+  schema: TokenTestQuerySchema;
+  [QraftServiceOperationsToken]: ServiceOperationQuery<
+    TokenTestQuerySchema,
+    TokenTestQueryData,
+    TokenTestQueryParams,
+    TokenTestError
+  >;
+  [QraftServiceOperationInvokeToken]: never;
+};
+
+const tokenService = {
+  tokenQueryOp,
+  tokenMutationOp,
+  overloadedTokenOp,
+  legacyQueryOp,
+  optionalTokenOp,
+  anyTokenOp,
+  neverTokenOp,
+} as const;
+
+const tokenServices = {
+  items: tokenService,
+} as const;
+
+const tokenServicesClient = qraftAPIClient(tokenServices, callbacks, {
+  queryClient: new QueryClient(),
+  requestFn,
+  baseUrl: 'https://api.sandbox.monite.com/v1',
+});
+const tokenServiceClient = qraftAPIClient(tokenService, callbacks, {
+  requestFn,
+  baseUrl: 'https://api.sandbox.monite.com/v1',
+});
+const tokenSingleOpClient = qraftAPIClient(tokenQueryOp, callbacks, {
+  requestFn,
+  baseUrl: 'https://api.sandbox.monite.com/v1',
+});
+const tokenReactClient = qraftReactAPIClient(tokenServices, callbacks, {
+  requestFn,
+  baseUrl: 'https://api.sandbox.monite.com/v1',
+});
+
+// Generic type parameter preservation (<TMeta, TSignal>) across all shapes
+tokenServicesClient.items.tokenQueryOp<
+  { readonly traceId: string },
+  CustomAbortSignal
+>(
+  {
+    parameters: { query: { id: '1' } },
+    meta: { traceId: 'abc' },
+    signal: customSignal,
+  },
+  (_schema, requestOptions) => {
+    requestOptions.meta satisfies { readonly traceId: string } | undefined;
+    requestOptions.signal satisfies CustomAbortSignal | undefined;
+    return Promise.resolve({
+      data: { items: ['a'] },
+      error: undefined,
+      response: new Response(),
+    } satisfies RequestFnResponse<TokenTestQueryData, TokenTestError>);
+  }
+);
+
+tokenServiceClient.tokenQueryOp(
+  {
+    parameters: { query: { id: '2' } },
+    meta: { requestTag: 'svc' },
+    signal: customSignal,
+  },
+  (_schema, requestOptions) => {
+    requestOptions.meta satisfies { requestTag: string } | undefined;
+    requestOptions.signal satisfies CustomAbortSignal | undefined;
+    return Promise.resolve({
+      data: { items: [] },
+      error: undefined,
+      response: new Response(),
+    });
+  }
+);
+
+tokenSingleOpClient<{ readonly single: true }, CustomAbortSignal>(
+  {
+    parameters: { query: { id: '3' } },
+    meta: { single: true },
+    signal: customSignal,
+  },
+  (_schema, requestOptions) => {
+    requestOptions.meta satisfies { readonly single: true } | undefined;
+    requestOptions.signal satisfies CustomAbortSignal | undefined;
+    return Promise.resolve({
+      data: { items: [] },
+      error: undefined,
+      response: new Response(),
+    });
+  }
+);
+
+tokenServicesClient.items.tokenMutationOp<
+  { readonly auditId: number },
+  CustomAbortSignal
+>(
+  {
+    body: { name: 'doc' },
+    meta: { auditId: 42 },
+    signal: customSignal,
+  },
+  (_schema, requestOptions) => {
+    requestOptions.meta satisfies { readonly auditId: number } | undefined;
+    requestOptions.signal satisfies CustomAbortSignal | undefined;
+    return Promise.resolve({
+      data: { id: 'doc-1' },
+      error: undefined,
+      response: new Response(),
+    });
+  }
+);
+
+tokenReactClient.items.tokenQueryOp<
+  { readonly reactTrace: string },
+  CustomAbortSignal
+>(
+  {
+    parameters: { query: { id: '4' } },
+    meta: { reactTrace: 'r-1' },
+    signal: customSignal,
+  },
+  (_schema, requestOptions) => {
+    requestOptions.meta satisfies { readonly reactTrace: string } | undefined;
+    requestOptions.signal satisfies CustomAbortSignal | undefined;
+    return Promise.resolve({
+      data: { items: [] },
+      error: undefined,
+      response: new Response(),
+    });
+  }
+);
+
+// Overloaded call signature preservation across all three shapes
+tokenServicesClient.items.overloadedTokenOp({
+  id: '1',
+}) satisfies Promise<string>;
+tokenServicesClient.items.overloadedTokenOp({
+  all: true,
+}) satisfies Promise<string[]>;
+tokenServiceClient.overloadedTokenOp({ id: '1' }) satisfies Promise<string>;
+tokenServiceClient.overloadedTokenOp({ all: true }) satisfies Promise<string[]>;
+const overloadedSingleClient = qraftAPIClient(overloadedTokenOp, callbacks, {
+  requestFn,
+  baseUrl: 'https://api.sandbox.monite.com/v1',
+});
+overloadedSingleClient({ id: '1' }) satisfies Promise<string>;
+overloadedSingleClient({ all: true }) satisfies Promise<string[]>;
+
+// Backward compatibility when QraftServiceOperationInvokeToken is omitted, optional, any, or never
+tokenServicesClient.items.legacyQueryOp({
+  parameters: { query: { id: '1' } },
+});
+tokenServiceClient.legacyQueryOp({
+  parameters: { query: { id: '1' } },
+});
+const legacySingleOpClient = qraftAPIClient(legacyQueryOp, callbacks, {
+  requestFn,
+  baseUrl: 'https://api.sandbox.monite.com/v1',
+});
+legacySingleOpClient({
+  parameters: { query: { id: '1' } },
+});
+// @ts-expect-error - legacy fallback strips generic type parameters via infer
+legacySingleOpClient<{ readonly traceId: string }>({
+  parameters: { query: { id: '1' } },
+});
+
+const partialInvokeServicesClient = qraftAPIClient(
+  tokenServices,
+  {
+    operationInvokeFn: callbacks.operationInvokeFn,
+    getQueryKey: callbacks.getQueryKey,
+  },
+  {
+    requestFn,
+    baseUrl: 'https://api.sandbox.monite.com/v1',
+  }
+);
+
+partialInvokeServicesClient.items.optionalTokenOp({
+  parameters: { query: { id: '1' } },
+});
+partialInvokeServicesClient.items.anyTokenOp({
+  parameters: { query: { id: '1' } },
+});
+partialInvokeServicesClient.items.neverTokenOp({
+  parameters: { query: { id: '1' } },
+});
+partialInvokeServicesClient.items.tokenQueryOp.getQueryKey({
+  query: { id: '1' },
+});
+// @ts-expect-error - omitted callback must not be exposed on tokenQueryOp
+partialInvokeServicesClient.items.tokenQueryOp.useQuery;
+// @ts-expect-error - omitted callback must not be exposed on anyTokenOp
+partialInvokeServicesClient.items.anyTokenOp.useQuery;
+// @ts-expect-error - unknown key must not be exposed on anyTokenOp
+partialInvokeServicesClient.items.anyTokenOp.nonExistentMethod;
+// @ts-expect-error - omitted callback must not be exposed on neverTokenOp
+partialInvokeServicesClient.items.neverTokenOp.useQuery;
+// @ts-expect-error - unknown key must not be exposed on neverTokenOp
+partialInvokeServicesClient.items.neverTokenOp.nonExistentMethod;
+// @ts-expect-error - omitted callback must not be exposed on optionalTokenOp
+partialInvokeServicesClient.items.optionalTokenOp.useQuery;
+
+// Strict callback filtering without operationInvokeFn across all three shapes
+const tokenNoInvokeServicesClient = qraftAPIClient(
+  tokenServices,
+  {
+    getQueryKey: callbacks.getQueryKey,
+    useQuery: callbacks.useQuery,
+  },
+  {
+    requestFn,
+    baseUrl: 'https://api.sandbox.monite.com/v1',
+  }
+);
+const tokenQueryClientOnlyServicesClient = qraftAPIClient(
+  tokenServices,
+  callbacks,
+  { queryClient: new QueryClient() }
+);
+const tokenUtilityServicesClient = qraftAPIClient(tokenServices, callbacks);
+const tokenNoInvokeServiceClient = qraftAPIClient(
+  tokenService,
+  { getQueryKey: callbacks.getQueryKey },
+  { queryClient: new QueryClient() }
+);
+const tokenNoInvokeSingleOpClient = qraftAPIClient(
+  tokenQueryOp,
+  { getQueryKey: callbacks.getQueryKey },
+  { queryClient: new QueryClient() }
+);
+
+// @ts-expect-error - ServicesDeclaration without operationInvokeFn must not be callable
+tokenNoInvokeServicesClient.items.tokenQueryOp({
+  parameters: { query: { id: '1' } },
+});
+// @ts-expect-error - queryClient-only ServicesDeclaration must not be callable
+tokenQueryClientOnlyServicesClient.items.tokenQueryOp({
+  parameters: { query: { id: '1' } },
+});
+// @ts-expect-error - utility ServicesDeclaration must not be callable
+tokenUtilityServicesClient.items.tokenQueryOp({
+  parameters: { query: { id: '1' } },
+});
+// @ts-expect-error - OperationsDeclaration without operationInvokeFn must not be callable
+tokenNoInvokeServiceClient.tokenQueryOp({
+  parameters: { query: { id: '1' } },
+});
+// @ts-expect-error - single OperationDeclaration without operationInvokeFn must not be callable
+tokenNoInvokeSingleOpClient({
+  parameters: { query: { id: '1' } },
+});
+// @ts-expect-error - omitted callback must error on single OperationDeclaration
+tokenNoInvokeSingleOpClient.useQuery;
+// @ts-expect-error - unknown key must error on single OperationDeclaration
+tokenNoInvokeSingleOpClient.nonExistentMethod;
+
+declare const invokeTokenKey: QraftServiceOperationInvokeToken;
+declare const operationsTokenKey: QraftServiceOperationsToken;
+
+// QraftServiceOperationInvokeToken and QraftServiceOperationsToken must not leak
+// @ts-expect-error - QraftServiceOperationInvokeToken must not leak onto invoke-enabled operation
+tokenServicesClient.items.tokenQueryOp[invokeTokenKey];
+// @ts-expect-error - QraftServiceOperationsToken must not leak onto invoke-enabled operation
+tokenServicesClient.items.tokenQueryOp[operationsTokenKey];
+// @ts-expect-error - QraftServiceOperationInvokeToken must not leak onto non-invoke operation
+tokenNoInvokeServicesClient.items.tokenQueryOp[invokeTokenKey];
+// @ts-expect-error - QraftServiceOperationInvokeToken must not leak onto OperationsDeclaration operation
+tokenServiceClient.tokenQueryOp[invokeTokenKey];
+// @ts-expect-error - QraftServiceOperationInvokeToken must not leak onto single OperationDeclaration
+tokenSingleOpClient[invokeTokenKey];
+
+type AssertNoTokenKeys<T> = Extract<
+  keyof T,
+  QraftServiceOperationInvokeToken | QraftServiceOperationsToken
+>;
+true satisfies [
+  AssertNoTokenKeys<typeof tokenServicesClient.items.tokenQueryOp>,
+] extends [never]
+  ? true
+  : false;
+true satisfies [
+  AssertNoTokenKeys<typeof tokenNoInvokeServicesClient.items.tokenQueryOp>,
+] extends [never]
+  ? true
+  : false;
+true satisfies [
+  AssertNoTokenKeys<typeof tokenServiceClient.tokenQueryOp>,
+] extends [never]
+  ? true
+  : false;
+true satisfies [AssertNoTokenKeys<typeof tokenSingleOpClient>] extends [never]
+  ? true
+  : false;
