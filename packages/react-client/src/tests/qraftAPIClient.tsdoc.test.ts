@@ -155,25 +155,33 @@ serviceClient.legacy({ id: '1' });
 legacySingleOpClient({ id: '1' });
 `;
 
-function createTestLanguageService() {
+function createTestLanguageService(filePath: string, source: string) {
   const compilerOptions: ts.CompilerOptions = {
     target: ts.ScriptTarget.ESNext,
     module: ts.ModuleKind.ESNext,
     moduleResolution: ts.ModuleResolutionKind.Bundler,
+    baseUrl: packageRoot,
+    paths: {
+      '@openapi-qraft/react': ['./src/index.ts'],
+      '@openapi-qraft/react/callbacks/index': ['./src/callbacks/index.ts'],
+      '@openapi-qraft/react/Unstable_QraftSecureRequestFn': [
+        './src/Unstable_QraftSecureRequestFn.ts',
+      ],
+    },
     strict: true,
     noEmit: true,
     skipLibCheck: true,
     jsx: ts.JsxEmit.React,
     verbatimModuleSyntax: true,
-    lib: ['lib.es2022.d.ts', 'lib.dom.d.ts'],
+    lib: ['lib.es2022.d.ts', 'lib.dom.d.ts', 'lib.dom.iterable.d.ts'],
   };
 
   const host: ts.LanguageServiceHost = {
-    getScriptFileNames: () => [virtualFilePath],
+    getScriptFileNames: () => [filePath],
     getScriptVersion: () => '1',
     getScriptSnapshot: (fileName) => {
-      if (fileName === virtualFilePath) {
-        return ts.ScriptSnapshot.fromString(virtualSource);
+      if (fileName === filePath) {
+        return ts.ScriptSnapshot.fromString(source);
       }
       const content = ts.sys.readFile(fileName);
       return content !== undefined
@@ -184,9 +192,9 @@ function createTestLanguageService() {
     getCompilationSettings: () => compilerOptions,
     getDefaultLibFileName: (options) => ts.getDefaultLibFilePath(options),
     fileExists: (fileName) =>
-      fileName === virtualFilePath || ts.sys.fileExists(fileName),
+      fileName === filePath || ts.sys.fileExists(fileName),
     readFile: (fileName) =>
-      fileName === virtualFilePath ? virtualSource : ts.sys.readFile(fileName),
+      fileName === filePath ? source : ts.sys.readFile(fileName),
     readDirectory: ts.sys.readDirectory,
     directoryExists: ts.sys.directoryExists,
     getDirectories: ts.sys.getDirectories,
@@ -196,8 +204,12 @@ function createTestLanguageService() {
   return ts.createLanguageService(host, ts.createDocumentRegistry());
 }
 
-function getOffset(needle: string, offsetInsideNeedle: number): number {
-  const index = virtualSource.indexOf(needle);
+function getOffset(
+  source: string,
+  needle: string,
+  offsetInsideNeedle: number
+): number {
+  const index = source.indexOf(needle);
   if (index === -1) {
     throw new Error(`Could not find needle in virtual source: ${needle}`);
   }
@@ -214,7 +226,10 @@ function normalizeTags(
 }
 
 describe('qraftAPIClient invoke TSDoc preservation via TypeScript Language Service', () => {
-  const languageService = createTestLanguageService();
+  const languageService = createTestLanguageService(
+    virtualFilePath,
+    virtualSource
+  );
 
   afterAll(() => {
     languageService.dispose();
@@ -267,7 +282,7 @@ describe('qraftAPIClient invoke TSDoc preservation via TypeScript Language Servi
     ({ calleeNeedle, calleeOffset, callNeedle, callOffset }) => {
       const quickInfo = languageService.getQuickInfoAtPosition(
         virtualFilePath,
-        getOffset(calleeNeedle, calleeOffset)
+        getOffset(virtualSource, calleeNeedle, calleeOffset)
       );
 
       expect(quickInfo).toBeDefined();
@@ -281,7 +296,7 @@ describe('qraftAPIClient invoke TSDoc preservation via TypeScript Language Servi
 
       const signatureHelp = languageService.getSignatureHelpItems(
         virtualFilePath,
-        getOffset(callNeedle, callOffset),
+        getOffset(virtualSource, callNeedle, callOffset),
         undefined
       );
 
@@ -332,7 +347,11 @@ describe('qraftAPIClient invoke TSDoc preservation via TypeScript Language Servi
   it('preserves overloaded invoke signatures and per-overload TSDoc', () => {
     const firstQuickInfo = languageService.getQuickInfoAtPosition(
       virtualFilePath,
-      getOffset("servicesClient.files.overloaded({ id: '1' });", 23)
+      getOffset(
+        virtualSource,
+        "servicesClient.files.overloaded({ id: '1' });",
+        23
+      )
     );
     expect(ts.displayPartsToString(firstQuickInfo?.documentation)).toContain(
       'Fetch a single file by ID.'
@@ -344,6 +363,7 @@ describe('qraftAPIClient invoke TSDoc preservation via TypeScript Language Servi
     const firstSigHelp = languageService.getSignatureHelpItems(
       virtualFilePath,
       getOffset(
+        virtualSource,
         "servicesClient.files.overloaded({ id: '1' });",
         'servicesClient.files.overloaded('.length + 1
       ),
@@ -360,7 +380,11 @@ describe('qraftAPIClient invoke TSDoc preservation via TypeScript Language Servi
 
     const secondQuickInfo = languageService.getQuickInfoAtPosition(
       virtualFilePath,
-      getOffset('servicesClient.files.overloaded({ all: true });', 23)
+      getOffset(
+        virtualSource,
+        'servicesClient.files.overloaded({ all: true });',
+        23
+      )
     );
     expect(ts.displayPartsToString(secondQuickInfo?.documentation)).toContain(
       'Fetch all files in one request.'
@@ -373,6 +397,7 @@ describe('qraftAPIClient invoke TSDoc preservation via TypeScript Language Servi
     const secondSigHelp = languageService.getSignatureHelpItems(
       virtualFilePath,
       getOffset(
+        virtualSource,
         'servicesClient.files.overloaded({ all: true });',
         'servicesClient.files.overloaded('.length + 1
       ),
@@ -403,7 +428,7 @@ describe('qraftAPIClient invoke TSDoc preservation via TypeScript Language Servi
     ({ callNeedle, callOffset }) => {
       const signatureHelp = languageService.getSignatureHelpItems(
         virtualFilePath,
-        getOffset(callNeedle, callOffset),
+        getOffset(virtualSource, callNeedle, callOffset),
         undefined
       );
 
@@ -411,4 +436,566 @@ describe('qraftAPIClient invoke TSDoc preservation via TypeScript Language Servi
       expect(signatureHelp?.items).toHaveLength(1);
     }
   );
+});
+
+const fixturesVirtualFilePath = path.join(
+  packageRoot,
+  'src/tests/__virtual_generated_fixtures_tsdoc__.ts'
+);
+
+const fixturesVirtualSource = `
+import { QueryClient } from '@tanstack/react-query';
+import * as callbacks from '../callbacks/index.js';
+import {
+  qraftAPIClient,
+  qraftReactAPIClient,
+  requestFn,
+} from '../index.js';
+import { createAPIClient, services } from './fixtures/api/index.js';
+import { findAll, getFiles } from './fixtures/api/services/FilesService.js';
+
+interface CustomAbortSignal extends AbortSignal {
+  readonly customBrand: 'custom-signal';
+}
+
+declare const customSignal: CustomAbortSignal;
+
+const baseUrl = 'https://api.example.com';
+
+const filesParameters = {
+  header: { 'x-monite-version': '2023-06-04' },
+  query: { id__in: ['file-1'] },
+} as const;
+
+const approvalPolicyParameters = {
+  header: { 'x-monite-version': '2023-06-04' },
+  path: { approval_policy_id: 'policy-1' },
+} as const;
+
+const documentsParameters = {
+  path: { entity_id: 'entity-1' },
+} as const;
+
+const documentsBody = {
+  verification_document_front: 'front.pdf',
+} as const;
+
+const client = qraftAPIClient(services, callbacks, {
+  queryClient: new QueryClient(),
+  requestFn,
+  baseUrl,
+});
+
+const generatedClient = createAPIClient({
+  queryClient: new QueryClient(),
+  requestFn,
+  baseUrl,
+});
+
+const apiBasicClient = qraftAPIClient(services, callbacks, {
+  requestFn,
+  baseUrl,
+});
+
+const generatedBasicClient = createAPIClient({
+  requestFn,
+  baseUrl,
+});
+
+const partialCallbacksClient = qraftAPIClient(
+  services,
+  {
+    operationInvokeFn: callbacks.operationInvokeFn,
+    getQueryKey: callbacks.getQueryKey,
+  },
+  {
+    requestFn,
+    baseUrl,
+  }
+);
+
+const serviceClient = qraftAPIClient(
+  { getFiles, findAll },
+  callbacks,
+  {
+    requestFn,
+    baseUrl,
+  }
+);
+
+const singleOpClient = qraftAPIClient(getFiles, callbacks, {
+  requestFn,
+  baseUrl,
+});
+
+const deprecatedSingleOpClient = qraftAPIClient(findAll, callbacks, {
+  requestFn,
+  baseUrl,
+});
+
+const reactClient = qraftReactAPIClient(services, callbacks, {
+  requestFn,
+  baseUrl,
+});
+
+// Direct invocations across all client shapes
+client.files.getFiles({ parameters: filesParameters });
+generatedClient.files.getFiles({ parameters: filesParameters });
+apiBasicClient.files.getFiles({ parameters: filesParameters });
+generatedBasicClient.files.getFiles({ parameters: filesParameters });
+partialCallbacksClient.files.getFiles({ parameters: filesParameters });
+serviceClient.getFiles({ parameters: filesParameters });
+singleOpClient({ parameters: filesParameters });
+reactClient.files.getFiles({ parameters: filesParameters });
+
+// Explicit <TMeta, TSignal> generic preservation on generated fixtures
+apiBasicClient.files.getFiles<{ readonly traceId: string }, CustomAbortSignal>(
+  {
+    parameters: filesParameters,
+    meta: { traceId: 'trace-1' },
+    signal: customSignal,
+  },
+  (_schema, reqOptions) => {
+    reqOptions.meta satisfies { readonly traceId: string } | undefined;
+    reqOptions.signal satisfies CustomAbortSignal | undefined;
+    return Promise.reject(new Error('type-only'));
+  }
+);
+
+client.files.findAll<{ readonly listTrace: string }, CustomAbortSignal>(
+  {
+    parameters: {},
+    meta: { listTrace: 'list-1' },
+    signal: customSignal,
+  },
+  (_schema, reqOptions) => {
+    reqOptions.meta satisfies { readonly listTrace: string } | undefined;
+    reqOptions.signal satisfies CustomAbortSignal | undefined;
+    return Promise.reject(new Error('type-only'));
+  }
+);
+
+apiBasicClient.entities.postEntitiesIdDocuments<
+  { readonly auditId: number },
+  CustomAbortSignal
+>(
+  {
+    parameters: documentsParameters,
+    body: documentsBody,
+    meta: { auditId: 42 },
+    signal: customSignal,
+  },
+  (_schema, reqOptions) => {
+    reqOptions.meta satisfies { readonly auditId: number } | undefined;
+    reqOptions.signal satisfies CustomAbortSignal | undefined;
+    return Promise.reject(new Error('type-only'));
+  }
+);
+
+singleOpClient<{ readonly single: true }, CustomAbortSignal>(
+  {
+    parameters: filesParameters,
+    meta: { single: true },
+    signal: customSignal,
+  },
+  (_schema, reqOptions) => {
+    reqOptions.meta satisfies { readonly single: true } | undefined;
+    reqOptions.signal satisfies CustomAbortSignal | undefined;
+    return Promise.reject(new Error('type-only'));
+  }
+);
+
+// @summary + @description on generated query and mutation operations
+client.approvalPolicies.getApprovalPoliciesId({
+  parameters: approvalPolicyParameters,
+});
+apiBasicClient.approvalPolicies.getApprovalPoliciesId({
+  parameters: approvalPolicyParameters,
+});
+apiBasicClient.entities.postEntitiesIdDocuments({
+  parameters: documentsParameters,
+  body: documentsBody,
+});
+
+// @deprecated findAll across all client shapes
+client.files.findAll({ parameters: {} });
+apiBasicClient.files.findAll({ parameters: {} });
+generatedBasicClient.files.findAll({ parameters: {} });
+serviceClient.findAll({ parameters: {} });
+deprecatedSingleOpClient({ parameters: {} });
+reactClient.files.findAll({ parameters: {} });
+`;
+
+describe('qraftAPIClient invoke TSDoc and generic preservation with generated API fixtures', () => {
+  const languageService = createTestLanguageService(
+    fixturesVirtualFilePath,
+    fixturesVirtualSource
+  );
+
+  afterAll(() => {
+    languageService.dispose();
+  });
+
+  it('typechecks all generated fixture calls including explicit <TMeta, TSignal> generics without diagnostics', () => {
+    const diagnostics = [
+      ...languageService.getSyntacticDiagnostics(fixturesVirtualFilePath),
+      ...languageService.getSemanticDiagnostics(fixturesVirtualFilePath),
+    ];
+
+    expect(
+      diagnostics.map((d) =>
+        ts.flattenDiagnosticMessageText(d.messageText, '\n')
+      )
+    ).toEqual([]);
+  });
+
+  it('preserves <TMeta, TSignal> type parameters in SignatureHelp and QuickInfo', () => {
+    const signatureHelp = languageService.getSignatureHelpItems(
+      fixturesVirtualFilePath,
+      getOffset(
+        fixturesVirtualSource,
+        'apiBasicClient.files.getFiles<{ readonly traceId: string }, CustomAbortSignal>(',
+        'apiBasicClient.files.getFiles<'.length
+      ),
+      undefined
+    );
+
+    expect(signatureHelp).toBeDefined();
+    expect(signatureHelp?.items).toHaveLength(1);
+    expect(
+      ts.displayPartsToString(signatureHelp?.items[0].prefixDisplayParts)
+    ).toBe('getFiles<');
+    expect(
+      signatureHelp?.items[0].parameters.map((parameter) =>
+        ts.displayPartsToString(parameter.displayParts)
+      )
+    ).toEqual([
+      'TMeta extends Record<string, any>',
+      'TSignal extends AbortSignal = AbortSignal',
+    ]);
+    expect(normalizeTags(signatureHelp?.items[0].tags)).toEqual([
+      { name: 'summary', text: 'Get a files by ID' },
+    ]);
+
+    const genericQuickInfo = languageService.getQuickInfoAtPosition(
+      fixturesVirtualFilePath,
+      getOffset(
+        fixturesVirtualSource,
+        'apiBasicClient.files.getFiles<{ readonly traceId: string }, CustomAbortSignal>(',
+        'apiBasicClient.files.'.length + 2
+      )
+    );
+    expect(ts.displayPartsToString(genericQuickInfo?.displayParts)).toContain(
+      'CustomAbortSignal'
+    );
+    expect(ts.displayPartsToString(genericQuickInfo?.displayParts)).toContain(
+      'readonly traceId: string'
+    );
+  });
+
+  it.each([
+    {
+      label: 'qraftAPIClient with queryClient (client.files.getFiles)',
+      calleeNeedle: 'client.files.getFiles({ parameters: filesParameters });',
+      calleeOffset: 'client.files.'.length + 2,
+      callNeedle: 'client.files.getFiles({ parameters: filesParameters });',
+      callOffset: 'client.files.getFiles('.length + 1,
+    },
+    {
+      label:
+        'createAPIClient with queryClient (generatedClient.files.getFiles)',
+      calleeNeedle:
+        'generatedClient.files.getFiles({ parameters: filesParameters });',
+      calleeOffset: 'generatedClient.files.'.length + 2,
+      callNeedle:
+        'generatedClient.files.getFiles({ parameters: filesParameters });',
+      callOffset: 'generatedClient.files.getFiles('.length + 1,
+    },
+    {
+      label: 'qraftAPIClient basic client (apiBasicClient.files.getFiles)',
+      calleeNeedle:
+        'apiBasicClient.files.getFiles({ parameters: filesParameters });',
+      calleeOffset: 'apiBasicClient.files.'.length + 2,
+      callNeedle:
+        'apiBasicClient.files.getFiles({ parameters: filesParameters });',
+      callOffset: 'apiBasicClient.files.getFiles('.length + 1,
+    },
+    {
+      label:
+        'createAPIClient basic client (generatedBasicClient.files.getFiles)',
+      calleeNeedle:
+        'generatedBasicClient.files.getFiles({ parameters: filesParameters });',
+      calleeOffset: 'generatedBasicClient.files.'.length + 2,
+      callNeedle:
+        'generatedBasicClient.files.getFiles({ parameters: filesParameters });',
+      callOffset: 'generatedBasicClient.files.getFiles('.length + 1,
+    },
+    {
+      label: 'partial callbacks client (partialCallbacksClient.files.getFiles)',
+      calleeNeedle:
+        'partialCallbacksClient.files.getFiles({ parameters: filesParameters });',
+      calleeOffset: 'partialCallbacksClient.files.'.length + 2,
+      callNeedle:
+        'partialCallbacksClient.files.getFiles({ parameters: filesParameters });',
+      callOffset: 'partialCallbacksClient.files.getFiles('.length + 1,
+    },
+    {
+      label: 'OperationsDeclaration client (serviceClient.getFiles)',
+      calleeNeedle: 'serviceClient.getFiles({ parameters: filesParameters });',
+      calleeOffset: 'serviceClient.'.length + 2,
+      callNeedle: 'serviceClient.getFiles({ parameters: filesParameters });',
+      callOffset: 'serviceClient.getFiles('.length + 1,
+    },
+    {
+      label: 'single OperationDeclaration client (singleOpClient)',
+      calleeNeedle: 'singleOpClient({ parameters: filesParameters });',
+      calleeOffset: 2,
+      callNeedle: 'singleOpClient({ parameters: filesParameters });',
+      callOffset: 'singleOpClient('.length + 1,
+    },
+    {
+      label: 'qraftReactAPIClient (reactClient.files.getFiles)',
+      calleeNeedle:
+        'reactClient.files.getFiles({ parameters: filesParameters });',
+      calleeOffset: 'reactClient.files.'.length + 2,
+      callNeedle:
+        'reactClient.files.getFiles({ parameters: filesParameters });',
+      callOffset: 'reactClient.files.getFiles('.length + 1,
+    },
+  ])(
+    'preserves generated getFiles @summary TSDoc in QuickInfo and SignatureHelp for $label',
+    ({ calleeNeedle, calleeOffset, callNeedle, callOffset }) => {
+      const quickInfo = languageService.getQuickInfoAtPosition(
+        fixturesVirtualFilePath,
+        getOffset(fixturesVirtualSource, calleeNeedle, calleeOffset)
+      );
+
+      expect(quickInfo).toBeDefined();
+      expect(normalizeTags(quickInfo?.tags)).toEqual([
+        { name: 'summary', text: 'Get a files by ID' },
+      ]);
+
+      const signatureHelp = languageService.getSignatureHelpItems(
+        fixturesVirtualFilePath,
+        getOffset(fixturesVirtualSource, callNeedle, callOffset),
+        undefined
+      );
+
+      expect(signatureHelp).toBeDefined();
+      expect(signatureHelp?.items).toHaveLength(1);
+      expect(normalizeTags(signatureHelp?.items[0].tags)).toEqual([
+        { name: 'summary', text: 'Get a files by ID' },
+      ]);
+    }
+  );
+
+  it.each([
+    {
+      label:
+        'qraftAPIClient query with @summary and @description (client.approvalPolicies.getApprovalPoliciesId)',
+      calleeNeedle:
+        'client.approvalPolicies.getApprovalPoliciesId({\n  parameters: approvalPolicyParameters,',
+      calleeOffset: 'client.approvalPolicies.'.length + 2,
+      callNeedle:
+        'client.approvalPolicies.getApprovalPoliciesId({\n  parameters: approvalPolicyParameters,',
+      callOffset: 'client.approvalPolicies.getApprovalPoliciesId('.length + 1,
+      expectedTags: [
+        { name: 'summary', text: 'Get an approval policy by ID' },
+        {
+          name: 'description',
+          text: 'Retrieve a specific approval policy.',
+        },
+      ],
+    },
+    {
+      label:
+        'basic client query with @summary and @description (apiBasicClient.approvalPolicies.getApprovalPoliciesId)',
+      calleeNeedle:
+        'apiBasicClient.approvalPolicies.getApprovalPoliciesId({\n  parameters: approvalPolicyParameters,',
+      calleeOffset: 'apiBasicClient.approvalPolicies.'.length + 2,
+      callNeedle:
+        'apiBasicClient.approvalPolicies.getApprovalPoliciesId({\n  parameters: approvalPolicyParameters,',
+      callOffset:
+        'apiBasicClient.approvalPolicies.getApprovalPoliciesId('.length + 1,
+      expectedTags: [
+        { name: 'summary', text: 'Get an approval policy by ID' },
+        {
+          name: 'description',
+          text: 'Retrieve a specific approval policy.',
+        },
+      ],
+    },
+    {
+      label:
+        'basic client mutation with @summary and @description (apiBasicClient.entities.postEntitiesIdDocuments)',
+      calleeNeedle:
+        'apiBasicClient.entities.postEntitiesIdDocuments({\n  parameters: documentsParameters,',
+      calleeOffset: 'apiBasicClient.entities.'.length + 2,
+      callNeedle:
+        'apiBasicClient.entities.postEntitiesIdDocuments({\n  parameters: documentsParameters,',
+      callOffset: 'apiBasicClient.entities.postEntitiesIdDocuments('.length + 1,
+      expectedTags: [
+        { name: 'summary', text: 'Update entity onboarding documents' },
+        {
+          name: 'description',
+          text: 'Update the onboarding documents of an entity.',
+        },
+      ],
+    },
+  ])(
+    'preserves @summary and @description TSDoc for $label',
+    ({ calleeNeedle, calleeOffset, callNeedle, callOffset, expectedTags }) => {
+      const quickInfo = languageService.getQuickInfoAtPosition(
+        fixturesVirtualFilePath,
+        getOffset(fixturesVirtualSource, calleeNeedle, calleeOffset)
+      );
+
+      expect(quickInfo).toBeDefined();
+      expect(normalizeTags(quickInfo?.tags)).toEqual(expectedTags);
+
+      const signatureHelp = languageService.getSignatureHelpItems(
+        fixturesVirtualFilePath,
+        getOffset(fixturesVirtualSource, callNeedle, callOffset),
+        undefined
+      );
+
+      expect(signatureHelp).toBeDefined();
+      expect(signatureHelp?.items).toHaveLength(1);
+      expect(normalizeTags(signatureHelp?.items[0].tags)).toEqual(expectedTags);
+    }
+  );
+
+  it.each([
+    {
+      label: 'qraftAPIClient with queryClient (client.files.findAll)',
+      calleeNeedle: 'client.files.findAll({ parameters: {} });',
+      calleeOffset: 'client.files.'.length + 2,
+      callNeedle: 'client.files.findAll({ parameters: {} });',
+      callOffset: 'client.files.findAll('.length + 1,
+    },
+    {
+      label: 'qraftAPIClient basic client (apiBasicClient.files.findAll)',
+      calleeNeedle: 'apiBasicClient.files.findAll({ parameters: {} });',
+      calleeOffset: 'apiBasicClient.files.'.length + 2,
+      callNeedle: 'apiBasicClient.files.findAll({ parameters: {} });',
+      callOffset: 'apiBasicClient.files.findAll('.length + 1,
+    },
+    {
+      label:
+        'createAPIClient basic client (generatedBasicClient.files.findAll)',
+      calleeNeedle: 'generatedBasicClient.files.findAll({ parameters: {} });',
+      calleeOffset: 'generatedBasicClient.files.'.length + 2,
+      callNeedle: 'generatedBasicClient.files.findAll({ parameters: {} });',
+      callOffset: 'generatedBasicClient.files.findAll('.length + 1,
+    },
+    {
+      label: 'OperationsDeclaration client (serviceClient.findAll)',
+      calleeNeedle: 'serviceClient.findAll({ parameters: {} });',
+      calleeOffset: 'serviceClient.'.length + 2,
+      callNeedle: 'serviceClient.findAll({ parameters: {} });',
+      callOffset: 'serviceClient.findAll('.length + 1,
+    },
+    {
+      label: 'single OperationDeclaration client (deprecatedSingleOpClient)',
+      calleeNeedle: 'deprecatedSingleOpClient({ parameters: {} });',
+      calleeOffset: 2,
+      callNeedle: 'deprecatedSingleOpClient({ parameters: {} });',
+      callOffset: 'deprecatedSingleOpClient('.length + 1,
+    },
+    {
+      label: 'qraftReactAPIClient (reactClient.files.findAll)',
+      calleeNeedle: 'reactClient.files.findAll({ parameters: {} });',
+      calleeOffset: 'reactClient.files.'.length + 2,
+      callNeedle: 'reactClient.files.findAll({ parameters: {} });',
+      callOffset: 'reactClient.files.findAll('.length + 1,
+    },
+  ])(
+    'preserves @deprecated and @summary TSDoc for generated findAll on $label',
+    ({ calleeNeedle, calleeOffset, callNeedle, callOffset }) => {
+      const quickInfo = languageService.getQuickInfoAtPosition(
+        fixturesVirtualFilePath,
+        getOffset(fixturesVirtualSource, calleeNeedle, calleeOffset)
+      );
+
+      expect(quickInfo).toBeDefined();
+      expect(normalizeTags(quickInfo?.tags)).toEqual([
+        { name: 'deprecated', text: '' },
+        { name: 'summary', text: 'Get a file list' },
+      ]);
+
+      const signatureHelp = languageService.getSignatureHelpItems(
+        fixturesVirtualFilePath,
+        getOffset(fixturesVirtualSource, callNeedle, callOffset),
+        undefined
+      );
+
+      expect(signatureHelp).toBeDefined();
+      expect(signatureHelp?.items).toHaveLength(1);
+      expect(normalizeTags(signatureHelp?.items[0].tags)).toEqual([
+        { name: 'deprecated', text: '' },
+        { name: 'summary', text: 'Get a file list' },
+      ]);
+    }
+  );
+
+  it('reports @deprecated suggestion diagnostics for generated findAll invocations without false positives', () => {
+    const deprecatedSuggestions = languageService
+      .getSuggestionDiagnostics(fixturesVirtualFilePath)
+      .filter((diagnostic) => diagnostic.code === 6387)
+      .map((diagnostic) => ({
+        snippet: fixturesVirtualSource.slice(
+          diagnostic.start,
+          diagnostic.start + diagnostic.length
+        ),
+        message: ts.flattenDiagnosticMessageText(diagnostic.messageText, '\n'),
+      }));
+
+    expect(deprecatedSuggestions.map((item) => item.snippet)).toEqual(
+      expect.arrayContaining(['findAll', 'deprecatedSingleOpClient'])
+    );
+    expect(
+      deprecatedSuggestions.some((item) =>
+        item.message.includes('client.files.findAll')
+      )
+    ).toBe(true);
+    expect(
+      deprecatedSuggestions.some((item) =>
+        item.message.includes('apiBasicClient.files.findAll')
+      )
+    ).toBe(true);
+    expect(
+      deprecatedSuggestions.some((item) =>
+        item.message.includes('generatedBasicClient.files.findAll')
+      )
+    ).toBe(true);
+    expect(
+      deprecatedSuggestions.some((item) =>
+        item.message.includes('serviceClient.findAll')
+      )
+    ).toBe(true);
+    expect(
+      deprecatedSuggestions.some((item) =>
+        item.message.includes('deprecatedSingleOpClient')
+      )
+    ).toBe(true);
+    expect(
+      deprecatedSuggestions.some((item) =>
+        item.message.includes('reactClient.files.findAll')
+      )
+    ).toBe(true);
+
+    expect(
+      deprecatedSuggestions.some((item) => item.message.includes('getFiles'))
+    ).toBe(false);
+    expect(
+      deprecatedSuggestions.some((item) =>
+        item.message.includes('getApprovalPoliciesId')
+      )
+    ).toBe(false);
+    expect(
+      deprecatedSuggestions.some((item) =>
+        item.message.includes('postEntitiesIdDocuments')
+      )
+    ).toBe(false);
+  });
 });
