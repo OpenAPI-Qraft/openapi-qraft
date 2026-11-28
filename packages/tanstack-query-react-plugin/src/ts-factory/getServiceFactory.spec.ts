@@ -2,13 +2,14 @@ import type { OpenAPISchemaType } from '@openapi-qraft/plugin/lib/open-api/OpenA
 import type { OpenAPIService } from '@openapi-qraft/plugin/lib/open-api/OpenAPIService';
 import type { ServiceFactoryOptions } from './getServiceFactory.js';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { getServices } from '@openapi-qraft/plugin/lib/open-api/getServices';
 import {
   parseOperationNameModifier,
   processOperationNameModifierOption,
 } from '@openapi-qraft/plugin/lib/processOperationNameModifierOption';
 import ts from 'typescript';
-import { describe, expect, it, test } from 'vitest';
+import { afterAll, describe, expect, it, test } from 'vitest';
 import { resolveTanStackQueryCapabilities } from '../lib/resolveTanStackQueryVersion.js';
 import { astToString } from './astToString.js';
 import { getServiceFactory } from './getServiceFactory.js';
@@ -158,6 +159,158 @@ describe('service operation variable names', { timeout: 30_000 }, () => {
       const serviceOperation: typeof itemsServiceOperation = itemsService.itemsService;
       const schemaOperation: typeof pathsOperation = itemsService.paths;
     `
+    );
+  });
+
+  it('avoids collisions with QraftServiceOperationsToken and QraftServiceOperationInvokeToken', () => {
+    const service = createServiceWithExactOperationNames([
+      'QraftServiceOperationsToken',
+      'QraftServiceOperationInvokeToken',
+    ]);
+    const source = generateService(service);
+    const servicesIndexSource = astToString(
+      getServiceIndexFactory([service], { explicitImportExtensions: undefined })
+    );
+
+    expect(source).toContain(
+      'export const QraftServiceOperationsTokenOperation ='
+    );
+    expect(source).toContain(
+      'export const QraftServiceOperationInvokeTokenOperation ='
+    );
+    expect(source).toContain(
+      'QraftServiceOperationsToken: QraftServiceOperationsTokenOperation'
+    );
+    expect(source).toContain(
+      'QraftServiceOperationInvokeToken: QraftServiceOperationInvokeTokenOperation'
+    );
+    expect(servicesIndexSource).toContain(
+      'QraftServiceOperationInvokeTokenOperation as items_QraftServiceOperationInvokeToken'
+    );
+
+    expectCompiles(
+      service,
+      source,
+      `
+      import {
+        QraftServiceOperationsTokenOperation,
+        QraftServiceOperationInvokeTokenOperation,
+        itemsService,
+        type ItemsService,
+      } from './ItemsService';
+      import { services } from './servicesIndex';
+
+      const opsTokenOp: typeof QraftServiceOperationsTokenOperation =
+        itemsService.QraftServiceOperationsToken;
+      const invokeTokenOp: typeof QraftServiceOperationInvokeTokenOperation =
+        itemsService.QraftServiceOperationInvokeToken;
+      const indexedInvokeOp: typeof QraftServiceOperationInvokeTokenOperation =
+        services.items.QraftServiceOperationInvokeToken;
+      const ifaceCheck: ItemsService['QraftServiceOperationInvokeToken'] =
+        null as unknown as ItemsService['QraftServiceOperationInvokeToken'];
+      void [opsTokenOp, invokeTokenOp, indexedInvokeOp, ifaceCheck];
+    `,
+      {
+        'servicesIndex.ts': servicesIndexSource,
+      },
+      {
+        declaration: true,
+        emitDeclarationOnly: true,
+      }
+    );
+  });
+
+  it('avoids collisions between generated <Op>Invoke type aliases and existing operation, service, or wrapper names', () => {
+    const service = createServiceWithExactOperationNames([
+      'listItems',
+      'ListItemsInvoke',
+      'ListItemsInvoke2',
+    ]);
+    const source = generateService(service);
+
+    expect(source).toContain('listItems: ListItemsInvoke3 & {');
+    expect(source).toContain(
+      '[QraftServiceOperationInvokeToken]: ListItemsInvoke3'
+    );
+    expect(source).toContain('type ListItemsInvoke3 = {');
+    expect(source).toContain('ListItemsInvoke: ListItemsInvokeInvoke & {');
+    expect(source).toContain('ListItemsInvoke2: ListItemsInvoke2Invoke & {');
+    expectCompiles(
+      service,
+      source,
+      `
+      import {
+        listItems,
+        ListItemsInvoke,
+        ListItemsInvoke2,
+        type ItemsService,
+      } from './ItemsService';
+
+      const a: ItemsService['listItems'] = null as unknown as ItemsService['listItems'];
+      const b: ItemsService['ListItemsInvoke'] = null as unknown as ItemsService['ListItemsInvoke'];
+      const c: ItemsService['ListItemsInvoke2'] = null as unknown as ItemsService['ListItemsInvoke2'];
+      void [listItems, ListItemsInvoke, ListItemsInvoke2, a, b, c];
+    `,
+      {},
+      {
+        declaration: true,
+        emitDeclarationOnly: true,
+      }
+    );
+
+    const collidedServiceType: OpenAPIService = {
+      ...createService(['listItems']),
+      typeName: 'ListItemsInvoke',
+    };
+    const serviceCollisionSource = generateService(collidedServiceType);
+    expect(serviceCollisionSource).toContain('listItems: ListItemsInvoke2 & {');
+    expect(serviceCollisionSource).toContain(
+      '[QraftServiceOperationInvokeToken]: ListItemsInvoke2'
+    );
+    expect(serviceCollisionSource).toContain('type ListItemsInvoke2 = {');
+    expectCompiles(
+      collidedServiceType,
+      serviceCollisionSource,
+      `
+      import { listItems, type ListItemsInvoke } from './ItemsService';
+      const op: ListItemsInvoke['listItems'] = null as unknown as ListItemsInvoke['listItems'];
+      void [listItems, op];
+    `,
+      {},
+      {
+        declaration: true,
+        emitDeclarationOnly: true,
+      }
+    );
+
+    const wrapperService = createService(['listItems']);
+    const wrapperCollisionSource = generateService(wrapperService, {
+      operationParametersTypeWrapper: {
+        '/items/listItems': { type: 'ListItemsInvoke', import: './wrapper' },
+      },
+    });
+    expect(wrapperCollisionSource).toContain('listItems: ListItemsInvoke2 & {');
+    expect(wrapperCollisionSource).toContain(
+      '[QraftServiceOperationInvokeToken]: ListItemsInvoke2'
+    );
+    expect(wrapperCollisionSource).toContain('type ListItemsInvoke2 = {');
+    expectCompiles(
+      wrapperService,
+      wrapperCollisionSource,
+      `
+      import { listItems, type ItemsService } from './ItemsService';
+      const op: ItemsService['listItems'] = null as unknown as ItemsService['listItems'];
+      void [listItems, op];
+    `,
+      {
+        'wrapper.ts': `
+          export type ListItemsInvoke<TSchema, TOperation, TData, TError> = undefined;
+        `,
+      },
+      {
+        declaration: true,
+        emitDeclarationOnly: true,
+      }
     );
   });
 
@@ -1248,6 +1401,490 @@ describe('service object exports', { timeout: 30_000 }, () => {
   });
 });
 
+describe(
+  'QraftServiceOperationInvokeToken TSDoc and generic inference',
+  { timeout: 30_000 },
+  () => {
+    const packageRoot = path.resolve(
+      path.dirname(fileURLToPath(import.meta.url)),
+      '../..'
+    );
+    const virtualDir = path.join(packageRoot, '__virtual_invoke_tsdoc__');
+
+    const schema: OpenAPISchemaType = {
+      openapi: '3.1.0',
+      info: { title: 'Invoke TSDoc API', version: '1.0.0' },
+      components: { parameters: undefined },
+      paths: {
+        '/items': {
+          get: {
+            operationId: 'listItems',
+            deprecated: true,
+            summary: 'List items',
+            description: 'Fetch paginated items from the catalog.',
+            parameters: [
+              {
+                name: 'cursor',
+                in: 'query',
+                required: false,
+                schema: { type: 'string' },
+              },
+            ],
+            responses: {
+              200: {
+                description: 'Item list',
+                content: {
+                  'application/json': { schema: { type: 'string' } },
+                },
+              },
+            },
+          },
+          post: {
+            operationId: 'createItem',
+            summary: 'Create item',
+            description: 'Create a new catalog item.',
+            requestBody: {
+              required: true,
+              content: {
+                'application/json': {
+                  schema: {
+                    type: 'object',
+                    properties: { name: { type: 'string' } },
+                    required: ['name'],
+                  },
+                },
+              },
+            },
+            responses: {
+              201: {
+                description: 'Created',
+                content: {
+                  'application/json': {
+                    schema: {
+                      type: 'object',
+                      properties: { id: { type: 'string' } },
+                      required: ['id'],
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    };
+
+    const openapiSource = `
+      export interface paths {
+        '/items': {
+          get: {
+            parameters: { query?: { cursor?: string } };
+            responses: { 200: { content: { 'application/json': string } } };
+          };
+          post: {
+            requestBody: { content: { 'application/json': { name: string } } };
+            responses: { 201: { content: { 'application/json': { id: string } } } };
+          };
+        };
+      }
+    `;
+
+    const baseService = getServices(schema)[0];
+
+    function buildVirtualFiles(options: {
+      queryableWriteOperations: boolean;
+      exportServiceObject?: boolean;
+    }): Map<string, string> {
+      const serviceOptions: ServiceFactoryOptions = {
+        openapiTypesImportPath: '../openapi.js',
+        queryableWriteOperations: options.queryableWriteOperations,
+        operationParametersTypeWrapper: undefined,
+        exportServiceObject: options.exportServiceObject,
+      };
+      const serviceSource = astToString(
+        getServiceFactory(
+          baseService,
+          baseService.operations,
+          serviceOptions,
+          undefined
+        )
+      );
+      const servicesIndexSource = astToString(
+        getServiceIndexFactory([baseService], {
+          explicitImportExtensions: '.js',
+          serviceOptions,
+        })
+      );
+
+      const usageSource = `
+        import type {
+          QraftServiceOperationInvokeToken,
+          QraftServiceOperationsToken,
+        } from '@openapi-qraft/tanstack-query-react-types';
+        import { qraftAPIClient } from '@openapi-qraft/react';
+        import { operationInvokeFn } from '@openapi-qraft/react/callbacks/operationInvokeFn';
+        import { useMutation } from '@openapi-qraft/react/callbacks/useMutation';
+        import { useQuery } from '@openapi-qraft/react/callbacks/useQuery';
+        import { services } from './services/index.js';
+        import { listItems, type ItemsService } from './services/ItemsService.js';
+
+        const client = qraftAPIClient(
+          services,
+          { operationInvokeFn, useQuery, useMutation },
+          { requestFn: null as any, baseUrl: 'https://api.example.com' }
+        );
+        const singleOpClient = qraftAPIClient(
+          listItems,
+          { operationInvokeFn },
+          { requestFn: null as any, baseUrl: 'https://api.example.com' }
+        );
+        const noInvokeClient = qraftAPIClient(
+          services,
+          { useQuery },
+          { requestFn: null as any, baseUrl: 'https://api.example.com' }
+        );
+
+        declare const directService: ItemsService;
+
+        // Direct service interface invoke calls with explicit <TMeta, TSignal> generics
+        const directQuery = directService.listItems<{ traceId: string }, AbortSignal>({
+          parameters: { query: { cursor: '1' } },
+          meta: { traceId: 'direct-q' },
+        });
+        const directMutation = directService.createItem<{ traceId: string }, AbortSignal>({
+          body: { name: 'widget' },
+          meta: { traceId: 'direct-m' },
+        });
+
+        // Filtered qraftAPIClient invoke calls with explicit <TMeta, TSignal> generics
+        const clientQuery = client.items.listItems<{ traceId: string }, AbortSignal>({
+          parameters: { query: { cursor: '1' } },
+          meta: { traceId: 'client-q' },
+        });
+        const clientQueryZeroArgs = client.items.listItems();
+        const clientMutation = client.items.createItem<{ traceId: string }, AbortSignal>({
+          body: { name: 'widget' },
+          meta: { traceId: 'client-m' },
+        });
+
+        // Single-operation client invoke call
+        const singleQuery = singleOpClient<{ traceId: string }, AbortSignal>({
+          parameters: { query: { cursor: '2' } },
+          meta: { traceId: 'single-q' },
+        });
+
+        // Ensure QraftServiceOperationInvokeToken and QraftServiceOperationsToken never leak into user-facing types
+        type InvokeClientKeys = keyof typeof client.items.listItems;
+        type NoInvokeClientKeys = keyof typeof noInvokeClient.items.listItems;
+        type DirectInterfaceKeys = keyof ItemsService['listItems'];
+        type AssertNoInvokeLeak1 = QraftServiceOperationInvokeToken extends InvokeClientKeys ? never : true;
+        type AssertNoInvokeLeak2 = QraftServiceOperationInvokeToken extends NoInvokeClientKeys ? never : true;
+        type AssertNoInvokeLeak3 = QraftServiceOperationInvokeToken extends DirectInterfaceKeys ? never : true;
+        type AssertNoOpsLeak1 = QraftServiceOperationsToken extends InvokeClientKeys ? never : true;
+        type AssertNoOpsLeak2 = QraftServiceOperationsToken extends DirectInterfaceKeys ? never : true;
+        const tokenLeakChecks: [
+          AssertNoInvokeLeak1,
+          AssertNoInvokeLeak2,
+          AssertNoInvokeLeak3,
+          AssertNoOpsLeak1,
+          AssertNoOpsLeak2,
+        ] = [true, true, true, true, true];
+
+        // @ts-expect-error - operationInvokeFn was omitted so the operation is not callable
+        noInvokeClient.items.listItems();
+
+        void [
+          directQuery,
+          directMutation,
+          clientQuery,
+          clientQueryZeroArgs,
+          clientMutation,
+          singleQuery,
+          tokenLeakChecks,
+        ];
+      `;
+
+      return new Map<string, string>([
+        [path.join(virtualDir, 'openapi.ts'), openapiSource],
+        [
+          path.join(virtualDir, 'services', `${baseService.fileBaseName}.ts`),
+          serviceSource,
+        ],
+        [path.join(virtualDir, 'services', 'index.ts'), servicesIndexSource],
+        [path.join(virtualDir, 'usage.ts'), usageSource],
+      ]);
+    }
+
+    function createLanguageService(files: ReadonlyMap<string, string>) {
+      const lsCompilerOptions: ts.CompilerOptions = {
+        ...compilerOptions,
+        noEmit: false,
+        declaration: true,
+        emitDeclarationOnly: true,
+        verbatimModuleSyntax: true,
+        lib: ['lib.es2022.d.ts', 'lib.dom.d.ts'],
+        baseUrl: packageRoot,
+        paths: {
+          '@openapi-qraft/react': ['../react-client/src/index.ts'],
+          '@openapi-qraft/react/callbacks/*': [
+            '../react-client/src/callbacks/*.ts',
+          ],
+        },
+      };
+
+      const virtualDirectories = new Set<string>();
+      for (const fileName of files.keys()) {
+        let dir = path.dirname(fileName);
+        while (!virtualDirectories.has(dir)) {
+          virtualDirectories.add(dir);
+          const parent = path.dirname(dir);
+          if (parent === dir) break;
+          dir = parent;
+        }
+      }
+
+      const host: ts.LanguageServiceHost = {
+        getScriptFileNames: () => [...files.keys()],
+        getScriptVersion: () => '1',
+        getScriptSnapshot: (fileName) => {
+          const content = files.get(fileName) ?? ts.sys.readFile(fileName);
+          return content !== undefined
+            ? ts.ScriptSnapshot.fromString(content)
+            : undefined;
+        },
+        getCurrentDirectory: () => packageRoot,
+        getCompilationSettings: () => lsCompilerOptions,
+        getDefaultLibFileName: (opts) => ts.getDefaultLibFilePath(opts),
+        fileExists: (fileName) =>
+          files.has(fileName) || ts.sys.fileExists(fileName),
+        readFile: (fileName) =>
+          files.get(fileName) ?? ts.sys.readFile(fileName),
+        directoryExists: (dirName) =>
+          virtualDirectories.has(path.resolve(dirName)) ||
+          ts.sys.directoryExists(dirName),
+        getDirectories: ts.sys.getDirectories,
+        realpath: ts.sys.realpath,
+      };
+
+      return {
+        languageService: ts.createLanguageService(
+          host,
+          ts.createDocumentRegistry()
+        ),
+        lsCompilerOptions,
+      };
+    }
+
+    function normalizeTags(tags: readonly ts.JSDocTagInfo[] | undefined) {
+      return (tags ?? []).map((tag) => ({
+        name: tag.name,
+        text: ts.displayPartsToString(tag.text),
+      }));
+    }
+
+    function getOffset(source: string, needle: string, offsetInside: number) {
+      const index = source.indexOf(needle);
+      if (index === -1) {
+        throw new Error(`Needle not found: ${needle}`);
+      }
+      return index + offsetInside;
+    }
+
+    describe.each([
+      { queryableWriteOperations: false, exportServiceObject: true },
+      { queryableWriteOperations: true, exportServiceObject: false },
+    ])(
+      'queryableWriteOperations=$queryableWriteOperations exportServiceObject=$exportServiceObject',
+      ({ queryableWriteOperations, exportServiceObject }) => {
+        const files = buildVirtualFiles({
+          queryableWriteOperations,
+          exportServiceObject,
+        });
+        const usagePath = path.join(virtualDir, 'usage.ts');
+        const usageSource = files.get(usagePath)!;
+        const { languageService } = createLanguageService(files);
+
+        afterAll(() => {
+          languageService.dispose();
+        });
+
+        it('compiles without syntactic, semantic, or declaration emit diagnostics', () => {
+          const serviceCode = files.get(
+            path.join(virtualDir, 'services', `${baseService.fileBaseName}.ts`)
+          )!;
+          expect(serviceCode).toContain(
+            '[QraftServiceOperationInvokeToken]: ListItemsInvoke'
+          );
+          expect(serviceCode).toContain(
+            '[QraftServiceOperationInvokeToken]: CreateItemInvoke'
+          );
+          if (!exportServiceObject) {
+            expect(serviceCode).not.toContain('export const itemsService');
+          }
+
+          const diagnostics = [
+            ...languageService.getSyntacticDiagnostics(usagePath),
+            ...languageService.getSemanticDiagnostics(usagePath),
+          ];
+
+          expect(
+            diagnostics.map((d) =>
+              ts.flattenDiagnosticMessageText(d.messageText, '\n')
+            )
+          ).toEqual([]);
+
+          const emitOutput = languageService.getEmitOutput(usagePath, true);
+          expect(emitOutput.emitSkipped).toBe(false);
+          expect(emitOutput.outputFiles.length).toBeGreaterThan(0);
+
+          const emitResult = languageService
+            .getProgram()!
+            .emit(undefined, () => {});
+          expect(
+            emitResult.diagnostics.map((d) =>
+              ts.flattenDiagnosticMessageText(d.messageText, '\n')
+            )
+          ).toEqual([]);
+        });
+
+        it.each([
+          {
+            label: 'direct ItemsService.listItems',
+            needle: 'directService.listItems<{ traceId: string }',
+            calleeOffset: 'directService.'.length + 2,
+            argOffset:
+              'directService.listItems<{ traceId: string }, AbortSignal>('
+                .length + 1,
+          },
+          {
+            label: 'filtered client.items.listItems',
+            needle: 'client.items.listItems<{ traceId: string }',
+            calleeOffset: 'client.items.'.length + 2,
+            argOffset:
+              'client.items.listItems<{ traceId: string }, AbortSignal>('
+                .length + 1,
+          },
+          {
+            label: 'single-op client(listItems)',
+            needle: 'singleOpClient<{ traceId: string }',
+            calleeOffset: 2,
+            argOffset:
+              'singleOpClient<{ traceId: string }, AbortSignal>('.length + 1,
+          },
+        ])(
+          'preserves TSDoc tags on QuickInfo and SignatureHelp for $label',
+          ({ needle, calleeOffset, argOffset }) => {
+            const quickInfo = languageService.getQuickInfoAtPosition(
+              usagePath,
+              getOffset(usageSource, needle, calleeOffset)
+            );
+            expect(normalizeTags(quickInfo?.tags)).toEqual([
+              { name: 'deprecated', text: '' },
+              { name: 'summary', text: 'List items' },
+              {
+                name: 'description',
+                text: 'Fetch paginated items from the catalog.',
+              },
+            ]);
+
+            const signatureHelp = languageService.getSignatureHelpItems(
+              usagePath,
+              getOffset(usageSource, needle, argOffset),
+              undefined
+            );
+            expect(signatureHelp?.items).toHaveLength(1);
+            expect(normalizeTags(signatureHelp?.items[0].tags)).toEqual([
+              { name: 'deprecated', text: '' },
+              { name: 'summary', text: 'List items' },
+              {
+                name: 'description',
+                text: 'Fetch paginated items from the catalog.',
+              },
+            ]);
+          }
+        );
+
+        it.each([
+          {
+            label: 'direct ItemsService.createItem',
+            needle: 'directService.createItem<{ traceId: string }',
+            calleeOffset: 'directService.'.length + 2,
+            argOffset:
+              'directService.createItem<{ traceId: string }, AbortSignal>('
+                .length + 1,
+          },
+          {
+            label: 'filtered client.items.createItem',
+            needle: 'client.items.createItem<{ traceId: string }',
+            calleeOffset: 'client.items.'.length + 2,
+            argOffset:
+              'client.items.createItem<{ traceId: string }, AbortSignal>('
+                .length + 1,
+          },
+        ])(
+          'preserves mutation TSDoc tags on QuickInfo and SignatureHelp for $label',
+          ({ needle, calleeOffset, argOffset }) => {
+            const quickInfo = languageService.getQuickInfoAtPosition(
+              usagePath,
+              getOffset(usageSource, needle, calleeOffset)
+            );
+            expect(normalizeTags(quickInfo?.tags)).toEqual([
+              { name: 'summary', text: 'Create item' },
+              { name: 'description', text: 'Create a new catalog item.' },
+            ]);
+
+            const signatureHelp = languageService.getSignatureHelpItems(
+              usagePath,
+              getOffset(usageSource, needle, argOffset),
+              undefined
+            );
+            expect(signatureHelp?.items).toHaveLength(1);
+            expect(normalizeTags(signatureHelp?.items[0].tags)).toEqual([
+              { name: 'summary', text: 'Create item' },
+              { name: 'description', text: 'Create a new catalog item.' },
+            ]);
+          }
+        );
+
+        it('reports @deprecated suggestion diagnostics for direct, filtered, and single-op invoke calls', () => {
+          const deprecatedSuggestions = languageService
+            .getSuggestionDiagnostics(usagePath)
+            .filter((diagnostic) => diagnostic.code === 6387)
+            .map((diagnostic) => ({
+              snippet: usageSource.slice(
+                diagnostic.start,
+                diagnostic.start + diagnostic.length
+              ),
+              message: ts.flattenDiagnosticMessageText(
+                diagnostic.messageText,
+                '\n'
+              ),
+            }));
+
+          expect(deprecatedSuggestions.map((d) => d.snippet)).toEqual(
+            expect.arrayContaining(['listItems', 'singleOpClient'])
+          );
+          expect(
+            deprecatedSuggestions.some((d) =>
+              d.message.includes('directService.listItems')
+            )
+          ).toBe(true);
+          expect(
+            deprecatedSuggestions.some((d) =>
+              d.message.includes('client.items.listItems')
+            )
+          ).toBe(true);
+          expect(
+            deprecatedSuggestions.some((d) =>
+              d.message.includes('singleOpClient')
+            )
+          ).toBe(true);
+        });
+      }
+    );
+  }
+);
+
 function createService(operationIds: string[]): OpenAPIService {
   const schema: OpenAPISchemaType = {
     openapi: '3.1.0',
@@ -1275,6 +1912,20 @@ function createService(operationIds: string[]): OpenAPIService {
   return getServices(schema)[0];
 }
 
+function createServiceWithExactOperationNames(
+  operationNames: string[]
+): OpenAPIService {
+  const service = createService(operationNames);
+
+  return {
+    ...service,
+    operations: service.operations.map((operation, index) => ({
+      ...operation,
+      name: operationNames[index],
+    })),
+  };
+}
+
 function generateService(
   service: OpenAPIService,
   options: Partial<ServiceFactoryOptions> = {}
@@ -1298,7 +1949,8 @@ function expectCompiles(
   service: OpenAPIService,
   source: string,
   usage = '',
-  additionalFiles: Record<string, string> = {}
+  additionalFiles: Record<string, string> = {},
+  extraOptions?: ts.CompilerOptions
 ): void {
   const files = new Map([
     [path.resolve('ItemsService.ts'), source],
@@ -1327,7 +1979,7 @@ function expectCompiles(
     files.set(path.resolve(fileName), content);
   }
 
-  expect(getCompilationDiagnostics(files)).toEqual([]);
+  expect(getCompilationDiagnostics(files, extraOptions)).toEqual([]);
 }
 
 function getCompilationDiagnostics(

@@ -52,6 +52,7 @@ export const resolveServiceOperationVariableNames = (
       service.typeName,
       'paths',
       'QraftServiceOperationsToken',
+      'QraftServiceOperationInvokeToken',
       ...Object.values(moduleTypeImports).flat(),
       ...Object.values(parameterWrapperImports).flat(),
     ]

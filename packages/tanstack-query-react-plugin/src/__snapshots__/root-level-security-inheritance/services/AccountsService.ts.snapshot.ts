@@ -4,17 +4,11 @@
  */
 
 import type { paths } from "../../openapi.d.ts";
-import type { DeepReadonly, InvalidateQueryFilters, IsFetchingQueryFilters, OperationError, OperationInfiniteData, QueryFiltersByParameters, QueryFiltersByQueryKey, QueryFnOptions, QueryFnOptionsByParameters, QueryFnOptionsByQueryKey, RequestFnResponse, ServiceOperationEnsureInfiniteQueryDataOptions, ServiceOperationEnsureQueryDataOptions, ServiceOperationFetchInfiniteQueryOptions, ServiceOperationFetchInfiniteQueryVoidOption, ServiceOperationFetchQueryOptions, ServiceOperationInfiniteQueryKey, ServiceOperationQueryKey, ServiceOperationUseInfiniteQueryDefinedOptions, ServiceOperationUseInfiniteQueryUndefinedOptions, ServiceOperationUseQueryDefinedOptions, ServiceOperationUseQueryUndefinedOptions, ServiceOperationUseSuspenseInfiniteQueryOptions, ServiceOperationUseSuspenseQueryOptions, UseQueryOptionsForUseQueries, UseQueryOptionsForUseSuspenseQuery, QraftServiceOperationsToken } from "@openapi-qraft/tanstack-query-react-types";
+import type { DeepReadonly, InvalidateQueryFilters, IsFetchingQueryFilters, OperationError, OperationInfiniteData, QueryFiltersByParameters, QueryFiltersByQueryKey, QueryFnOptions, QueryFnOptionsByParameters, QueryFnOptionsByQueryKey, RequestFnResponse, ServiceOperationEnsureInfiniteQueryDataOptions, ServiceOperationEnsureQueryDataOptions, ServiceOperationFetchInfiniteQueryOptions, ServiceOperationFetchInfiniteQueryVoidOption, ServiceOperationFetchQueryOptions, ServiceOperationInfiniteQueryKey, ServiceOperationQueryKey, ServiceOperationUseInfiniteQueryDefinedOptions, ServiceOperationUseInfiniteQueryUndefinedOptions, ServiceOperationUseQueryDefinedOptions, ServiceOperationUseQueryUndefinedOptions, ServiceOperationUseSuspenseInfiniteQueryOptions, ServiceOperationUseSuspenseQueryOptions, UseQueryOptionsForUseQueries, UseQueryOptionsForUseSuspenseQuery, QraftServiceOperationsToken, QraftServiceOperationInvokeToken } from "@openapi-qraft/tanstack-query-react-types";
 import type { CancelOptions, DefinedUseInfiniteQueryResult, DefinedUseQueryResult, InvalidateOptions, QueryState, RefetchOptions, ResetOptions, SetDataOptions, Updater, UseInfiniteQueryResult, UseQueryResult, UseSuspenseInfiniteQueryResult, UseSuspenseQueryResult } from "@tanstack/react-query";
 import type { ServiceOperationImperativeInfiniteQueryOptions, ServiceOperationImperativeQueryOptions } from "@openapi-qraft/tanstack-query-react-types/imperative-query";
 export interface AccountsService {
-    getAccounts: {
-        /**/
-        <TMeta extends Record<string, any>, TSignal extends AbortSignal = AbortSignal>(options: QueryFnOptionsByQueryKey<GetAccountsSchema, GetAccountsParameters, TMeta, TSignal> | (QueryFnOptionsByParameters<GetAccountsParameters, TMeta, TSignal> | QueryFnOptions<TMeta, TSignal> | void), client?: (schema: GetAccountsSchema, options: {
-            parameters: GetAccountsParameters;
-            signal?: TSignal;
-            meta?: TMeta;
-        }) => Promise<RequestFnResponse<GetAccountsData, GetAccountsError>>): Promise<RequestFnResponse<GetAccountsData, GetAccountsError>>;
+    getAccounts: GetAccountsInvoke & {
         /**/
         getQueryKey(parameters: DeepReadonly<GetAccountsParameters> | void): ServiceOperationQueryKey<GetAccountsSchema, GetAccountsParameters>;
         /**
@@ -335,13 +329,7 @@ export interface AccountsService {
             error: GetAccountsError;
         };
     };
-    getAccountProfile: {
-        /**/
-        <TMeta extends Record<string, any>, TSignal extends AbortSignal = AbortSignal>(options: QueryFnOptionsByQueryKey<GetAccountProfileSchema, GetAccountProfileParameters, TMeta, TSignal> | (QueryFnOptionsByParameters<GetAccountProfileParameters, TMeta, TSignal> | QueryFnOptions<TMeta, TSignal> | void), client?: (schema: GetAccountProfileSchema, options: {
-            parameters: GetAccountProfileParameters;
-            signal?: TSignal;
-            meta?: TMeta;
-        }) => Promise<RequestFnResponse<GetAccountProfileData, GetAccountProfileError>>): Promise<RequestFnResponse<GetAccountProfileData, GetAccountProfileError>>;
+    getAccountProfile: GetAccountProfileInvoke & {
         /**/
         getQueryKey(parameters: DeepReadonly<GetAccountProfileParameters> | void): ServiceOperationQueryKey<GetAccountProfileSchema, GetAccountProfileParameters>;
         /**
@@ -672,6 +660,7 @@ export const getAccounts = {
 } as {
     schema: GetAccountsSchema;
     [QraftServiceOperationsToken]: AccountsService["getAccounts"];
+    [QraftServiceOperationInvokeToken]: GetAccountsInvoke;
 };
 export const getAccountProfile = {
     schema: {
@@ -682,6 +671,7 @@ export const getAccountProfile = {
 } as {
     schema: GetAccountProfileSchema;
     [QraftServiceOperationsToken]: AccountsService["getAccountProfile"];
+    [QraftServiceOperationInvokeToken]: GetAccountProfileInvoke;
 };
 /** @deprecated Import individual operations directly from this module instead. Pass `--service-object-exports false` to omit this export. */
 export const accountsService = {
@@ -699,6 +689,13 @@ type GetAccountsSchema = {
 type GetAccountsParameters = undefined;
 type GetAccountsData = null;
 type GetAccountsError = unknown;
+type GetAccountsInvoke = {
+    <TMeta extends Record<string, any>, TSignal extends AbortSignal = AbortSignal>(options: QueryFnOptionsByQueryKey<GetAccountsSchema, GetAccountsParameters, TMeta, TSignal> | (QueryFnOptionsByParameters<GetAccountsParameters, TMeta, TSignal> | QueryFnOptions<TMeta, TSignal> | void), client?: (schema: GetAccountsSchema, options: {
+        parameters: GetAccountsParameters;
+        signal?: TSignal;
+        meta?: TMeta;
+    }) => Promise<RequestFnResponse<GetAccountsData, GetAccountsError>>): Promise<RequestFnResponse<GetAccountsData, GetAccountsError>>;
+};
 type GetAccountProfileSchema = {
     method: "get";
     url: "/accounts/profile";
@@ -709,3 +706,10 @@ type GetAccountProfileSchema = {
 type GetAccountProfileParameters = undefined;
 type GetAccountProfileData = null;
 type GetAccountProfileError = unknown;
+type GetAccountProfileInvoke = {
+    <TMeta extends Record<string, any>, TSignal extends AbortSignal = AbortSignal>(options: QueryFnOptionsByQueryKey<GetAccountProfileSchema, GetAccountProfileParameters, TMeta, TSignal> | (QueryFnOptionsByParameters<GetAccountProfileParameters, TMeta, TSignal> | QueryFnOptions<TMeta, TSignal> | void), client?: (schema: GetAccountProfileSchema, options: {
+        parameters: GetAccountProfileParameters;
+        signal?: TSignal;
+        meta?: TMeta;
+    }) => Promise<RequestFnResponse<GetAccountProfileData, GetAccountProfileError>>): Promise<RequestFnResponse<GetAccountProfileData, GetAccountProfileError>>;
+};
