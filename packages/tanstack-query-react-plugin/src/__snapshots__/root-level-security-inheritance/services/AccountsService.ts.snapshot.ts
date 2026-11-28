@@ -683,6 +683,7 @@ export const getAccountProfile = {
     schema: GetAccountProfileSchema;
     [QraftServiceOperationsToken]: AccountsService["getAccountProfile"];
 };
+/** @deprecated Import individual operations directly from this module instead. Pass `--service-object-exports false` to omit this export. */
 export const accountsService = {
     getAccounts,
     getAccountProfile

@@ -3,23 +3,44 @@
  * Do not make direct changes to the file.
  */
 
-import type { EntitiesService } from "./EntitiesService.js";
-import { entitiesService } from "./EntitiesService.js";
-import type { ApprovalPoliciesService } from "./ApprovalPoliciesService.js";
-import { approvalPoliciesService } from "./ApprovalPoliciesService.js";
-import type { FilesService } from "./FilesService.js";
-import { filesService } from "./FilesService.js";
+import { type EntitiesService, postEntitiesIdDocuments as entities_postEntitiesIdDocuments } from "./EntitiesService.js";
+import { type ApprovalPoliciesService, getApprovalPoliciesId as approvalPolicies_getApprovalPoliciesId, deleteApprovalPoliciesId as approvalPolicies_deleteApprovalPoliciesId, patchApprovalPoliciesId as approvalPolicies_patchApprovalPoliciesId } from "./ApprovalPoliciesService.js";
+import { type FilesService, getFiles as files_getFiles, postFiles as files_postFiles, deleteFiles as files_deleteFiles, trashFiles as files_trashFiles, getFileList as files_getFileList } from "./FilesService.js";
 export type Services = {
     entities: EntitiesService;
     approvalPolicies: ApprovalPoliciesService;
     files: FilesService;
 };
 export const services: {
-    entities: typeof entitiesService;
-    approvalPolicies: typeof approvalPoliciesService;
-    files: typeof filesService;
+    entities: {
+        readonly postEntitiesIdDocuments: typeof entities_postEntitiesIdDocuments;
+    };
+    approvalPolicies: {
+        readonly getApprovalPoliciesId: typeof approvalPolicies_getApprovalPoliciesId;
+        readonly deleteApprovalPoliciesId: typeof approvalPolicies_deleteApprovalPoliciesId;
+        readonly patchApprovalPoliciesId: typeof approvalPolicies_patchApprovalPoliciesId;
+    };
+    files: {
+        readonly getFiles: typeof files_getFiles;
+        readonly postFiles: typeof files_postFiles;
+        readonly deleteFiles: typeof files_deleteFiles;
+        readonly trashFiles: typeof files_trashFiles;
+        readonly getFileList: typeof files_getFileList;
+    };
 } = {
-    entities: entitiesService,
-    approvalPolicies: approvalPoliciesService,
-    files: filesService
+    entities: {
+        postEntitiesIdDocuments: entities_postEntitiesIdDocuments
+    },
+    approvalPolicies: {
+        getApprovalPoliciesId: approvalPolicies_getApprovalPoliciesId,
+        deleteApprovalPoliciesId: approvalPolicies_deleteApprovalPoliciesId,
+        patchApprovalPoliciesId: approvalPolicies_patchApprovalPoliciesId
+    },
+    files: {
+        getFiles: files_getFiles,
+        postFiles: files_postFiles,
+        deleteFiles: files_deleteFiles,
+        trashFiles: files_trashFiles,
+        getFileList: files_getFileList
+    }
 };

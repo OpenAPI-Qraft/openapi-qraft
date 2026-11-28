@@ -62,6 +62,8 @@ export function parseConfigToArgs(config: Record<string, unknown>): string[] {
     } else if (typeof value === 'boolean') {
       if (value) {
         args.push(`--${key}`);
+      } else {
+        args.push(`--${key}=false`);
       }
     } else if (value == null) {
       continue;

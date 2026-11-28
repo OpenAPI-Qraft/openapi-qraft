@@ -1,16 +1,24 @@
 import type { OverrideImportType } from './OverrideImportType.js';
-import { createServicePathMatch } from '@openapi-qraft/plugin/lib/createServicePathMatch';
+import type { OperationParametersTypeOption } from './resolveServiceOperationVariableNames.js';
 import { isReadOnlyOperation } from '@openapi-qraft/plugin/lib/isReadOnlyOperation';
 import { ServiceOperation } from '@openapi-qraft/plugin/lib/open-api/OpenAPIService';
-import { parseOperationGlobs } from '@openapi-qraft/plugin/lib/parseOperationGlobs';
-import { splitCommaSeparatedGlobs } from '@openapi-qraft/plugin/lib/splitCommaSeparatedGlobs';
 import camelCase from 'camelcase';
 import ts from 'typescript';
 import { createOperationCommonTSDoc } from '../lib/createOperationCommonTSDoc.js';
 import { DeprecatedTanStackQueryMethod } from '../lib/resolveTanStackQueryVersion.js';
+import {
+  createObjectLiteralPropertyName,
+  createPropertyName,
+  isValidIdentifierName,
+} from './createPropertyName.js';
 import { filterUnusedTypes } from './filterUnusedTypes.js';
-import { getOperationVariableNames } from './getOperationVariableNames.js';
 import { getOverriddenImportDeclarationsFactory } from './getOverriddenImportDeclarationsFactory.js';
+import {
+  getModuleTypeImports,
+  getOperationParametersWrapperImports,
+  resolveServiceOperationVariableNames,
+  shouldUseParametersWrapper,
+} from './resolveServiceOperationVariableNames.js';
 import {
   createServicesMutationOperationNodes,
   createServicesQueryOperationNodes,
@@ -19,19 +27,13 @@ import { createOperationMethodTSDocExample } from './tsdoc/createOperationMethod
 
 const factory = ts.factory;
 
-export type ParametersWrapperConfig = {
-  type: string;
-  import: string;
-};
-
-type OperationParametersTypeOption = Record<string, ParametersWrapperConfig>;
-
 export type ServiceFactoryOptions = {
   openapiTypesImportPath: string;
   queryableWriteOperations: boolean;
   operationParametersTypeWrapper: OperationParametersTypeOption | undefined;
   imperativeQuery?: boolean;
   deprecatedMethods?: ReadonlySet<DeprecatedTanStackQueryMethod>;
+  exportServiceObject?: boolean;
 };
 
 type Service = { name: string; typeName: string; variableName: string };
@@ -46,16 +48,10 @@ export const getServiceFactory = (
 ) => {
   const allModuleTypeImports = getModuleTypeImports(operations, options);
   const operationsTypesResult = getOperationsTypes(operations, options);
-  const operationVariableNames = getOperationVariableNames(
-    operations.map((operation) => operation.name),
-    [
-      service.variableName,
-      service.typeName,
-      'paths',
-      'QraftServiceOperationsToken',
-      ...Object.values(allModuleTypeImports).flat(),
-      ...Object.values(operationsTypesResult.imports).flat(),
-    ]
+  const operationVariableNames = resolveServiceOperationVariableNames(
+    service,
+    operations,
+    options
   );
   const operationVariables = operations.map((operation) =>
     getServiceOperationVariableFactory(
@@ -65,16 +61,15 @@ export const getServiceFactory = (
     )
   );
 
-  const serviceVariable = getServiceVariableFactory(
-    service,
-    operations,
-    operationVariableNames
-  );
+  const serviceVariable =
+    options.exportServiceObject === false
+      ? null
+      : getServiceVariableFactory(service, operations, operationVariableNames);
 
   const mainNodes = [
     getServiceInterfaceFactory(service, operations, options),
     ...operationVariables,
-    serviceVariable,
+    ...(serviceVariable ? [serviceVariable] : []),
     ...operationsTypesResult.nodes,
   ];
 
@@ -259,7 +254,7 @@ const getServiceInterfaceOperationFactory = (
 
   const node = factory.createPropertySignature(
     undefined,
-    factory.createIdentifier(operation.name),
+    createPropertyName(operation.name),
     undefined,
     factory.createTypeLiteralNode([
       ...replaceGenericTypesWithOperationTypes(
@@ -611,7 +606,7 @@ const getServiceVariableFactory = (
   operations: ServiceOperation[],
   operationVariableNames: Map<string, string>
 ) => {
-  return factory.createVariableStatement(
+  const variableNode = factory.createVariableStatement(
     [factory.createToken(ts.SyntaxKind.ExportKeyword)],
     factory.createVariableDeclarationList(
       [
@@ -626,10 +621,12 @@ const getServiceVariableFactory = (
                   operation.name
                 )!;
 
-                return variableName === operation.name
+                return variableName === operation.name &&
+                  operation.name !== '__proto__' &&
+                  isValidIdentifierName(operation.name)
                   ? factory.createShorthandPropertyAssignment(operation.name)
                   : factory.createPropertyAssignment(
-                      operation.name,
+                      createObjectLiteralPropertyName(operation.name),
                       factory.createIdentifier(variableName)
                     );
               }),
@@ -645,39 +642,17 @@ const getServiceVariableFactory = (
       ts.NodeFlags.Const
     )
   );
-};
 
-/**
- * @private
- * Checks if an operation matches the operationParametersTypeWrapper patterns.
- * @param operation - The operation to check
- * @param operationParametersTypeWrapper - An object with pattern -> config mapping
- * @returns ParametersWrapperConfig if the operation should use ParametersWrapper, null otherwise
- */
-export const shouldUseParametersWrapper = (
-  operation: ServiceOperation,
-  operationParametersTypeWrapper: OperationParametersTypeOption | undefined
-): ParametersWrapperConfig | null => {
-  if (!operationParametersTypeWrapper) return null;
+  ts.addSyntheticLeadingComment(
+    variableNode,
+    ts.SyntaxKind.MultiLineCommentTrivia,
+    createMultilineComment([
+      '@deprecated Import individual operations directly from this module instead. Pass `--service-object-exports false` to omit this export.',
+    ]),
+    true
+  );
 
-  for (const [pattern, config] of Object.entries(
-    operationParametersTypeWrapper
-  )) {
-    const { pathGlobs, methods } = parseOperationGlobs(pattern);
-
-    // Check if method matches
-    if (methods && !methods.includes(operation.method)) continue;
-
-    // Check if path matches
-    const pathGlobsArray = splitCommaSeparatedGlobs(pathGlobs);
-    const isPathMatch = createServicePathMatch(pathGlobsArray);
-    if (!isPathMatch(operation.path)) continue;
-
-    // Operation matches this pattern
-    return config;
-  }
-
-  return null;
+  return variableNode;
 };
 
 const getOperationsTypes = (
@@ -687,23 +662,16 @@ const getOperationsTypes = (
     'queryableWriteOperations' | 'operationParametersTypeWrapper'
   >
 ): { nodes: ts.Node[]; imports: Record<string, string[]> } => {
-  const importsMap: Record<string, string[]> = {};
+  const importsMap = getOperationParametersWrapperImports(
+    operations,
+    options.operationParametersTypeWrapper
+  );
 
   const nodes = operations.flatMap((operation) => {
     const wrapperConfig = shouldUseParametersWrapper(
       operation,
       options.operationParametersTypeWrapper
     );
-
-    // Collect imports if wrapper config is provided and has import path
-    if (wrapperConfig?.import) {
-      if (!importsMap[wrapperConfig.import]) {
-        importsMap[wrapperConfig.import] = [];
-      }
-      if (!importsMap[wrapperConfig.import].includes(wrapperConfig.type)) {
-        importsMap[wrapperConfig.import].push(wrapperConfig.type);
-      }
-    }
 
     const createParametersType = () => {
       if (wrapperConfig) {
@@ -980,66 +948,6 @@ const getMethodSignatureNodes = (
 };
 
 /**
- * Returns a list of all the modules that are imported by the operations.
- * @param operations The list of service operations to analyze
- * @param options Options for controlling module imports generation.Options for controlling module imports generation.
- * @returns Record<moduleName, importSpecifierNames[]>
- */
-const getModuleTypeImports = (
-  operations: ServiceOperation[],
-  options: Pick<
-    ServiceFactoryOptions,
-    'queryableWriteOperations' | 'imperativeQuery'
-  >
-) => {
-  const nodes = [];
-
-  const hasReadOnlyOperations = operations.some(isReadOnlyOperation);
-
-  if (hasReadOnlyOperations || options.queryableWriteOperations) {
-    nodes.push(
-      ...createServicesQueryOperationNodes({
-        omitOperationQueryFnNodes: !hasReadOnlyOperations,
-        imperativeQuery: options.imperativeQuery,
-      })
-    );
-  }
-
-  if (operations.some((operation) => !isReadOnlyOperation(operation))) {
-    nodes.push(...createServicesMutationOperationNodes());
-  }
-
-  return nodes
-    .map((node) =>
-      ts.isImportDeclaration(node) &&
-      ts.isStringLiteral(node.moduleSpecifier) &&
-      node.importClause?.isTypeOnly &&
-      node.importClause.namedBindings &&
-      ts.isNamedImports(node.importClause.namedBindings)
-        ? {
-            module: node.moduleSpecifier.text,
-            imports: node.importClause.namedBindings.elements
-              .filter(ts.isImportSpecifier)
-              .map((specifier) => specifier.name.text),
-          }
-        : undefined
-    )
-    .reduce<Record<string, string[]>>((acc, item) => {
-      if (!item) return acc;
-      if (!acc[item.module])
-        acc[item.module] = item.imports.filter(arrayFilterUniqueCallback);
-      else
-        acc[item.module] = [...acc[item.module], ...item.imports].filter(
-          arrayFilterUniqueCallback
-        );
-
-      acc[item.module].sort();
-
-      return acc;
-    }, {});
-};
-
-/**
  * Replaces generic types with operation types with named types.
  *
  * For example, replaces `TQueryParams` and `TQueryFnData` will be
@@ -1180,8 +1088,4 @@ function reduceAreAllOptionalConditionalTVariablesType<T extends ts.Node>(
   const result = ts.transform(node, [transformer]);
 
   return result.transformed as T[];
-}
-
-function arrayFilterUniqueCallback<T>(value: T, index: number, self: T[]) {
-  return self.indexOf(value) === index;
 }

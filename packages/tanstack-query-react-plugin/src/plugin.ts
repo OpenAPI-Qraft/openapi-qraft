@@ -85,6 +85,12 @@ export const plugin: QraftCommandPlugin = {
         'Emit @deprecated JSDoc tags for methods deprecated in the target @tanstack/react-query version. Defaults to true when deprecations apply to the target version, false otherwise.',
         parseBooleanOption
       )
+      .option(
+        '--service-object-exports [bool]',
+        'Export the deprecated aggregating service object (e.g., `filesService`) from each generated service file. Set to `false` to omit it and reduce generated code/exports without relying on bundler tree-shaking.',
+        parseBooleanOption,
+        true
+      )
       .action(async ({ spinner, output, args, services, schema }, resolve) => {
         const resolvedTanStackQueryVersion = resolveTanStackQueryVersion({
           explicitVersion: args.tanstackQueryVersion,
@@ -163,6 +169,7 @@ export const plugin: QraftCommandPlugin = {
             )
               ? args.operationParametersTypeWrapper[0]
               : undefined,
+            exportServiceObject: args.serviceObjectExports,
           },
           overrideImportType: Array.isArray(args.overrideImportType)
             ? args.overrideImportType[0]

@@ -1,4 +1,5 @@
-import { describe, expect, it } from 'vitest';
+import { Option } from 'commander';
+import { describe, expect, it, vi } from 'vitest';
 import { QraftCommand, splitOptionFlags } from './QraftCommand.js';
 
 describe('QraftCommand', () => {
@@ -99,6 +100,105 @@ describe('QraftCommand', () => {
         shortFlag: '-m',
         longFlag: '--mixed',
       });
+    });
+  });
+
+  describe('normalizeBooleanFalseArgs', () => {
+    const createCommand = () =>
+      new QraftCommand()
+        .option(
+          '--service-object-exports [bool]',
+          'Export service objects',
+          (arg) => arg?.toLowerCase() !== 'false',
+          true
+        )
+        .addOption(
+          new Option(
+            '--explicit-import-extensions [extension]',
+            'Explicit import extensions'
+          )
+            .preset('.js')
+            .choices(['.js', '.ts'])
+        )
+        .option('--no-blob-from-binary', 'Disable Blob conversion');
+
+    it('keeps optional [bool] =false while stripping plain boolean toggles and choice options via parse({ from: "user" })', () => {
+      const command = createCommand();
+
+      command.parse(
+        [
+          '--service-object-exports=false',
+          '--clean=false',
+          '--explicit-import-extensions=false',
+          '--no-blob-from-binary=false',
+        ],
+        { from: 'user' }
+      );
+
+      expect(command.opts()).toEqual({
+        fileHeader: '',
+        serviceObjectExports: false,
+        blobFromBinary: true,
+      });
+    });
+
+    it('normalizes =false args via parseAsync with default node argv layout', async () => {
+      const command = createCommand();
+      const spinnerSpy = vi
+        .spyOn(QraftCommand.spinner, 'info')
+        .mockImplementation(() => QraftCommand.spinner);
+
+      try {
+        await command.parseAsync([
+          'node',
+          'qraft',
+          '--service-object-exports=false',
+          '--clean=false',
+          '--explicit-import-extensions=false',
+        ]);
+      } finally {
+        spinnerSpy.mockRestore();
+      }
+
+      expect(command.opts()).toEqual({
+        fileHeader: '',
+        serviceObjectExports: false,
+        blobFromBinary: true,
+      });
+    });
+
+    it('preserves =false values passed to required options or after -- terminator', () => {
+      const command = createCommand().allowExcessArguments();
+
+      command.parse(['--file-header', '--clean=false', '--', '--clean=false'], {
+        from: 'user',
+      });
+
+      expect(command.opts()).toEqual({
+        fileHeader: '--clean=false',
+        serviceObjectExports: true,
+        blobFromBinary: true,
+      });
+      expect(command.args).toEqual(['--clean=false']);
+
+      const equalsCommand = createCommand();
+      equalsCommand.parse(['--file-header=false'], { from: 'user' });
+      expect(equalsCommand.opts()).toEqual({
+        fileHeader: 'false',
+        serviceObjectExports: true,
+        blobFromBinary: true,
+      });
+    });
+
+    it('does not strip unknown --flag=false options', () => {
+      const command = createCommand().exitOverride();
+      command.configureOutput({
+        writeErr: () => {},
+      });
+
+      expect(() =>
+        command.parse(['--unknown-flag=false'], { from: 'user' })
+      ).toThrow(/unknown option '--unknown-flag=false'/i);
     });
   });
 });

@@ -233,12 +233,81 @@ export class QraftCommand<
 
   parseAsync(argv?: readonly string[], options?: ParseOptions): Promise<this> {
     if (options?.from !== 'user') this.logVersion();
-    return super.parseAsync(argv, options);
+    return super.parseAsync(
+      this.normalizeBooleanFalseArgs(argv, options),
+      options
+    );
   }
 
   parse(argv?: readonly string[], options?: ParseOptions): this {
     if (options?.from !== 'user') this.logVersion();
-    return super.parse(argv, options);
+    return super.parse(this.normalizeBooleanFalseArgs(argv, options), options);
+  }
+
+  protected normalizeBooleanFalseArgs(
+    argv?: readonly string[],
+    options?: ParseOptions
+  ): readonly string[] | undefined {
+    if (!argv) return argv;
+
+    const startIndex =
+      options?.from === 'user' ? 0 : options?.from === 'electron' ? 1 : 2;
+    const normalized: string[] = [];
+    let afterTerminator = false;
+    let expectingRequiredArg = false;
+
+    for (let i = 0; i < argv.length; i++) {
+      const arg = argv[i];
+
+      if (i < startIndex || afterTerminator) {
+        normalized.push(arg);
+        continue;
+      }
+
+      if (expectingRequiredArg) {
+        normalized.push(arg);
+        expectingRequiredArg = false;
+        continue;
+      }
+
+      if (arg === '--') {
+        afterTerminator = true;
+        normalized.push(arg);
+        continue;
+      }
+
+      if (arg.startsWith('--') && arg.endsWith('=false')) {
+        const longFlag = arg.slice(0, -'=false'.length);
+        const matchedOption = this.options.find(
+          (option) => option.long === longFlag
+        );
+
+        // Strip `=false` emitted from Redocly YAML for plain boolean toggles and non-boolean choice options.
+        if (
+          matchedOption &&
+          !matchedOption.required &&
+          (!matchedOption.optional ||
+            (matchedOption.argChoices !== undefined &&
+              !matchedOption.argChoices.includes('false')))
+        ) {
+          continue;
+        }
+      }
+
+      if (arg.startsWith('-') && !arg.includes('=')) {
+        const matchedOption = this.options.find(
+          (option) => option.long === arg || option.short === arg
+        );
+
+        if (matchedOption?.required && !matchedOption.variadic) {
+          expectingRequiredArg = true;
+        }
+      }
+
+      normalized.push(arg);
+    }
+
+    return normalized;
   }
 
   protected logVersion() {

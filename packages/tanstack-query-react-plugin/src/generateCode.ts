@@ -53,7 +53,7 @@ export const generateCode = async ({
       output,
       overrideImportType
     )),
-    ...(await generateServiceIndex(spinner, services, output)),
+    ...(await generateServiceIndex(spinner, services, serviceOptions, output)),
     ...(await generateContext(spinner, output)),
     ...(await generateOperationClient(spinner, output, overrideImportType)),
     ...(output.operationPredefinedParameters
@@ -134,6 +134,7 @@ const generateServices = async (
 const generateServiceIndex = async (
   spinner: Ora,
   services: OpenAPIService[],
+  serviceOptions: ServiceFactoryOptions,
   output: OutputOptions
 ) => {
   spinner.start('Generating services index');
@@ -146,7 +147,12 @@ const generateServiceIndex = async (
   ];
 
   try {
-    const code = astToString(getServiceIndexFactory(services, output));
+    const code = astToString(
+      getServiceIndexFactory(services, {
+        explicitImportExtensions: output.explicitImportExtensions,
+        serviceOptions,
+      })
+    );
 
     serviceIndexFiles.push({
       file: new URL('index.ts', composeServicesDirPath(output)),

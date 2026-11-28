@@ -1017,4 +1017,160 @@ describe('TanStack Query React Client Generation', () => {
       });
     });
   });
+
+  describe('--service-object-exports', () => {
+    test('marks aggregating service export as @deprecated by default and uses per-operation imports in services/index.ts', async () => {
+      const { QraftCommand } =
+        await import('@openapi-qraft/plugin/lib/QraftCommand');
+      const { plugin } = await import('./plugin.js');
+      const command = new QraftCommand(undefined, {
+        defaultFileHeader: createFileHeader('@openapi-qraft/cli'),
+      });
+      plugin.setupCommand(command);
+
+      await command.parseAsync([
+        'dummy-node',
+        'dummy-qraft-bin',
+        openAPIDocumentFixturePath,
+        '--clean',
+        '-o',
+        '/mock-fs/default-service-exports',
+        '--openapi-types-import-path',
+        '../../openapi.js',
+        '--explicit-import-extensions',
+        '--filter-services',
+        '/files/**',
+      ]);
+
+      const filesService = fs.readFileSync(
+        '/mock-fs/default-service-exports/services/FilesService.ts',
+        'utf-8'
+      );
+      const servicesIndex = fs.readFileSync(
+        '/mock-fs/default-service-exports/services/index.ts',
+        'utf-8'
+      );
+
+      expect(filesService).toContain(
+        [
+          '/** @deprecated Import individual operations directly from this module instead. Pass `--service-object-exports false` to omit this export. */',
+          'export const filesService = {',
+        ].join('\n')
+      );
+      expect(servicesIndex).not.toContain('filesService');
+      expect(servicesIndex).toContain(
+        'import { type FilesService, getFiles as files_getFiles, postFiles as files_postFiles, deleteFiles as files_deleteFiles, trashFiles as files_trashFiles, getFileList as files_getFileList } from "./FilesService.js";'
+      );
+    });
+
+    test('emits aggregating service object export when --service-object-exports is set to true or passed without a value', async () => {
+      const { QraftCommand } =
+        await import('@openapi-qraft/plugin/lib/QraftCommand');
+      const { plugin } = await import('./plugin.js');
+
+      for (const [outputSuffix, extraArgs] of [
+        ['true', ['--service-object-exports', 'true']],
+        ['bare', ['--service-object-exports']],
+      ] as const) {
+        const command = new QraftCommand(undefined, {
+          defaultFileHeader: createFileHeader('@openapi-qraft/cli'),
+        });
+        plugin.setupCommand(command);
+
+        const outputDir = `/mock-fs/service-object-exports-${outputSuffix}`;
+        await command.parseAsync([
+          'dummy-node',
+          'dummy-qraft-bin',
+          openAPIDocumentFixturePath,
+          '--clean',
+          '-o',
+          outputDir,
+          '--openapi-types-import-path',
+          '../../openapi.js',
+          '--explicit-import-extensions',
+          ...extraArgs,
+          '--filter-services',
+          '/files/**',
+        ]);
+
+        const filesService = fs.readFileSync(
+          `${outputDir}/services/FilesService.ts`,
+          'utf-8'
+        );
+
+        expect(filesService).toContain(
+          [
+            '/** @deprecated Import individual operations directly from this module instead. Pass `--service-object-exports false` to omit this export. */',
+            'export const filesService = {',
+          ].join('\n')
+        );
+      }
+    });
+
+    test('omits aggregating service object export when --service-object-exports is false while preserving types and client files', async () => {
+      const { QraftCommand } =
+        await import('@openapi-qraft/plugin/lib/QraftCommand');
+      const { plugin } = await import('./plugin.js');
+      const command = new QraftCommand(undefined, {
+        defaultFileHeader: createFileHeader('@openapi-qraft/cli'),
+      });
+      plugin.setupCommand(command);
+
+      await command.parseAsync([
+        'dummy-node',
+        'dummy-qraft-bin',
+        openAPIDocumentFixturePath,
+        '--clean',
+        '-o',
+        '/mock-fs/service-object-exports-false',
+        '--openapi-types-import-path',
+        '../../openapi.js',
+        '--explicit-import-extensions',
+        '--service-object-exports',
+        'false',
+        '--filter-services',
+        '/files/**',
+      ]);
+
+      const filesService = fs.readFileSync(
+        '/mock-fs/service-object-exports-false/services/FilesService.ts',
+        'utf-8'
+      );
+      const servicesIndex = fs.readFileSync(
+        '/mock-fs/service-object-exports-false/services/index.ts',
+        'utf-8'
+      );
+      const rootIndex = fs.readFileSync(
+        '/mock-fs/service-object-exports-false/index.ts',
+        'utf-8'
+      );
+      const createApiClient = fs.readFileSync(
+        '/mock-fs/service-object-exports-false/create-api-client.ts',
+        'utf-8'
+      );
+
+      expect(filesService).not.toContain('export const filesService');
+      expect(filesService).toContain('export interface FilesService {');
+      expect(filesService).toContain('export const getFiles =');
+      expect(filesService).toContain('export const postFiles =');
+      expect(filesService).toContain('export const deleteFiles =');
+      expect(filesService).toContain('export const trashFiles =');
+      expect(filesService).toContain('export const getFileList =');
+
+      expect(servicesIndex).not.toContain('filesService');
+      expect(servicesIndex).toContain(
+        'export type Services = {\n    files: FilesService;\n};'
+      );
+      expect(servicesIndex).toContain('getFiles as files_getFiles');
+      expect(rootIndex).toContain(
+        'export { services } from "./services/index.js";'
+      );
+      expect(rootIndex).toContain(
+        'export type { Services } from "./services/index.js";'
+      );
+      expect(createApiClient).toContain(
+        'import { services } from "./services/index.js";'
+      );
+    });
+  });
 });

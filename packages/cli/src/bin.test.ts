@@ -1,8 +1,10 @@
 import { execFile } from 'node:child_process';
+import fs from 'node:fs';
+import os from 'node:os';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { promisify } from 'node:util';
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it } from 'vitest';
 
 const execFileAsync = promisify(execFile);
 
@@ -124,6 +126,7 @@ describe('CLI binary help output', { timeout: 30_000 }, () => {
           --operation-parameters-type-wrapper <parameters wrappers...>  Configure ParametersWrapper types for specific operation patterns. Expected format: pattern type:TypeName import:ImportPath. Can be specified multiple times for different patterns.
           --tanstack-query-version <version>                            Target @tanstack/react-query version (e.g., "5.80.0", "5.108.1"). Auto-detected from installed dependencies or package.json if omitted.
           --tanstack-query-deprecations [bool]                          Emit @deprecated JSDoc tags for methods deprecated in the target @tanstack/react-query version. Defaults to true when deprecations apply to the target version, false otherwise.
+          --service-object-exports [bool]                               Export the deprecated aggregating service object (e.g., \`filesService\`) from each generated service file. Set to \`false\` to omit it and reduce generated code/exports without relying on bundler tree-shaking. (default: true)
           -h, --help                                                    display help for command"
       `);
     });
@@ -224,6 +227,7 @@ describe('CLI binary help output', { timeout: 30_000 }, () => {
           --operation-parameters-type-wrapper <parameters wrappers...>  Configure ParametersWrapper types for specific operation patterns. Expected format: pattern type:TypeName import:ImportPath. Can be specified multiple times for different patterns.
           --tanstack-query-version <version>                            Target @tanstack/react-query version (e.g., "5.80.0", "5.108.1"). Auto-detected from installed dependencies or package.json if omitted.
           --tanstack-query-deprecations [bool]                          Emit @deprecated JSDoc tags for methods deprecated in the target @tanstack/react-query version. Defaults to true when deprecations apply to the target version, false otherwise.
+          --service-object-exports [bool]                               Export the deprecated aggregating service object (e.g., \`filesService\`) from each generated service file. Set to \`false\` to omit it and reduce generated code/exports without relying on bundler tree-shaking. (default: true)
           --openapi-types-file-name <path>                              OpenAPI Schema types file name, e.g.: "schema.d.ts" (default: "schema.ts")
           --enum                                                        Export true TS enums instead of unions
           --enum-values                                                 Export enum values as arrays.
@@ -346,6 +350,225 @@ describe('CLI binary help output', { timeout: 30_000 }, () => {
     });
   });
 });
+
+describe(
+  'openapi --service-object-exports execution',
+  { timeout: 30_000 },
+  () => {
+    const tempDirs: string[] = [];
+
+    afterEach(() => {
+      for (const dir of tempDirs.splice(0)) {
+        fs.rmSync(dir, { recursive: true, force: true });
+      }
+    });
+
+    it('omits service object exports when --service-object-exports false is passed', async () => {
+      const tempDir = fs.mkdtempSync(
+        join(os.tmpdir(), 'qraft-cli-service-object-exports-false-')
+      );
+      tempDirs.push(tempDir);
+
+      const schemaPath = join(tempDir, 'schema.json');
+      const outputDir = join(tempDir, 'api');
+
+      fs.writeFileSync(
+        schemaPath,
+        JSON.stringify({
+          openapi: '3.1.0',
+          info: { title: 'Test API', version: '1.0.0' },
+          paths: {
+            '/files': {
+              get: {
+                operationId: 'getFiles',
+                responses: { 200: { description: 'OK' } },
+              },
+              delete: {
+                operationId: 'delete',
+                responses: { 204: { description: 'Deleted' } },
+              },
+            },
+          },
+        })
+      );
+
+      await executeBin([
+        'openapi',
+        '--plugin',
+        'tanstack-query-react',
+        schemaPath,
+        '-o',
+        outputDir,
+        '--openapi-types-import-path',
+        '../openapi.js',
+        '--explicit-import-extensions',
+        '--service-object-exports',
+        'false',
+      ]);
+
+      const filesService = fs.readFileSync(
+        join(outputDir, 'services/FilesService.ts'),
+        'utf-8'
+      );
+      const servicesIndex = fs.readFileSync(
+        join(outputDir, 'services/index.ts'),
+        'utf-8'
+      );
+      const rootIndex = fs.readFileSync(join(outputDir, 'index.ts'), 'utf-8');
+      const createApiClient = fs.readFileSync(
+        join(outputDir, 'create-api-client.ts'),
+        'utf-8'
+      );
+
+      expect(filesService).not.toContain('export const filesService');
+      expect(filesService).toContain('export interface FilesService {');
+      expect(filesService).toContain('export const getFiles =');
+      expect(filesService).toContain('export const deleteOperation =');
+
+      expect(servicesIndex).toContain(
+        'import { type FilesService, getFiles as files_getFiles, deleteOperation as files_delete } from "./FilesService.js";'
+      );
+      expect(servicesIndex).toContain('delete: files_delete');
+      expect(servicesIndex).not.toContain('filesService');
+      expect(rootIndex).toContain(
+        'export { services } from "./services/index.js";'
+      );
+      expect(rootIndex).toContain(
+        'export type { Services } from "./services/index.js";'
+      );
+      expect(createApiClient).toContain(
+        'import { services } from "./services/index.js";'
+      );
+    });
+
+    it('omits service object exports when configured via Redocly service-object-exports: false', async () => {
+      const tempDir = fs.mkdtempSync(
+        join(os.tmpdir(), 'qraft-cli-redocly-service-object-exports-false-')
+      );
+      tempDirs.push(tempDir);
+
+      const schemaPath = join(tempDir, 'schema.json');
+      const outputDir = join(tempDir, 'api');
+      const redoclyConfigPath = join(tempDir, 'redocly.yaml');
+
+      fs.writeFileSync(
+        schemaPath,
+        JSON.stringify({
+          openapi: '3.1.0',
+          info: { title: 'Test API', version: '1.0.0' },
+          paths: {
+            '/files': {
+              get: {
+                operationId: 'getFiles',
+                responses: { 200: { description: 'OK' } },
+              },
+            },
+          },
+        })
+      );
+
+      fs.writeFileSync(
+        redoclyConfigPath,
+        [
+          'apis:',
+          '  main:',
+          `    root: ${JSON.stringify(schemaPath)}`,
+          '    x-openapi-qraft:',
+          `      output-dir: ${JSON.stringify(outputDir)}`,
+          '      plugin:',
+          '        - tanstack-query-react',
+          '      openapi-types-import-path: "../openapi.js"',
+          '      explicit-import-extensions: true',
+          '      clean: false',
+          '      service-object-exports: false',
+        ].join('\n')
+      );
+
+      await executeBin(['openapi', '--redocly', redoclyConfigPath]);
+
+      const filesService = fs.readFileSync(
+        join(outputDir, 'services/FilesService.ts'),
+        'utf-8'
+      );
+      const servicesIndex = fs.readFileSync(
+        join(outputDir, 'services/index.ts'),
+        'utf-8'
+      );
+
+      expect(filesService).not.toContain('export const filesService');
+      expect(filesService).toContain('export interface FilesService {');
+      expect(filesService).toContain('export const getFiles =');
+      expect(servicesIndex).toContain(
+        'import { type FilesService, getFiles as files_getFiles } from "./FilesService.js";'
+      );
+    });
+
+    it('emits deprecated service object exports when configured via Redocly service-object-exports: true', async () => {
+      const tempDir = fs.mkdtempSync(
+        join(os.tmpdir(), 'qraft-cli-redocly-service-object-exports-true-')
+      );
+      tempDirs.push(tempDir);
+
+      const schemaPath = join(tempDir, 'schema.json');
+      const outputDir = join(tempDir, 'api');
+      const redoclyConfigPath = join(tempDir, 'redocly.yaml');
+
+      fs.writeFileSync(
+        schemaPath,
+        JSON.stringify({
+          openapi: '3.1.0',
+          info: { title: 'Test API', version: '1.0.0' },
+          paths: {
+            '/files': {
+              get: {
+                operationId: 'getFiles',
+                responses: { 200: { description: 'OK' } },
+              },
+            },
+          },
+        })
+      );
+
+      fs.writeFileSync(
+        redoclyConfigPath,
+        [
+          'apis:',
+          '  main:',
+          `    root: ${JSON.stringify(schemaPath)}`,
+          '    x-openapi-qraft:',
+          `      output-dir: ${JSON.stringify(outputDir)}`,
+          '      plugin:',
+          '        - tanstack-query-react',
+          '      openapi-types-import-path: "../openapi.js"',
+          '      explicit-import-extensions: true',
+          '      service-object-exports: true',
+        ].join('\n')
+      );
+
+      await executeBin(['openapi', '--redocly', redoclyConfigPath]);
+
+      const filesService = fs.readFileSync(
+        join(outputDir, 'services/FilesService.ts'),
+        'utf-8'
+      );
+      const servicesIndex = fs.readFileSync(
+        join(outputDir, 'services/index.ts'),
+        'utf-8'
+      );
+
+      expect(filesService).toContain(
+        [
+          '/** @deprecated Import individual operations directly from this module instead. Pass `--service-object-exports false` to omit this export. */',
+          'export const filesService = {',
+        ].join('\n')
+      );
+      expect(servicesIndex).not.toContain('filesService');
+      expect(servicesIndex).toContain(
+        'import { type FilesService, getFiles as files_getFiles } from "./FilesService.js";'
+      );
+    });
+  }
+);
 
 function stripAnsiCodes(str: string): string {
   return str.replace(
